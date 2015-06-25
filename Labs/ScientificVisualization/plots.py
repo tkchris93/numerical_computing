@@ -48,8 +48,8 @@ def heatmap_color():
     plt.gca().set_aspect('equal', adjustable='box')
     plt.savefig("heatmap_color.png", bbox_inches='tight')
     plt.close()
-
-def heatmap_gray():
+    
+def heatmap_hot():
     plt.figure(num=1, figsize=(10, 4) )
     n = 81
     x = np.linspace(-1,4,n)
@@ -58,11 +58,12 @@ def heatmap_gray():
     Z = np.sin(X)*np.sin(Y)
     
     plt.gca().set_aspect('equal', adjustable='box')
-    plt.pcolormesh(X, Y, Z, cmap="gray")
+    plt.pcolormesh(X, Y, Z, cmap="afmhot")
     plt.colorbar(ticks=[-1,0,.8])
-    plt.savefig("heatmap_gray.png", bbox_inches='tight')
+    plt.savefig("heatmap_hot.png", bbox_inches='tight')
     plt.close()
-    
+
+
 def healthcare_linscale():
 
     m = 2.07
@@ -78,7 +79,7 @@ def healthcare_linscale():
 
     #plt.figure(num=1, figsize=(10, 4) )
 
-    plt.hist(sp.exp(sp_samples), 100)
+    plt.hist(sp_samples, 100)
 	
     plt.savefig("healthcare_linscale.pdf")
     plt.close()
@@ -91,7 +92,7 @@ def healthcare_logscale():
     samples = []
 
     for i in xrange(num_samples):
-        samples.append(sp.random.lognormal(m, s)) 
+        samples.append(sp.random.normal(m, s)) 
 
     sp_samples = sp.array(samples)
 
@@ -113,7 +114,7 @@ def simplify_plot():
     sp_samples = sp.array(samples)
     
     # Get rid of lines
-    plt.hist(sp_samples, 100, histtype='stepfilled')
+    plt.hist(sp.log(sp_samples), 100, edgecolor='none')
     
     # get current axis instance
     axis = plt.gca()
@@ -126,11 +127,11 @@ def simplify_plot():
     axis.xaxis.set_ticks_position('bottom')
     
     # Use fewer axis ticks
-    plt.xlim(0,70)
-    plt.xticks(np.arange(0, 71, 35))
+    plt.xlim(-1,5)
+    plt.xticks(np.arange(0, 5, 2))
     
-    plt.ylim(0, 800)
-    plt.yticks(np.arange(0, 801, 200))
+    plt.ylim(0, 350)
+    plt.yticks(np.arange(0, 351, 100))
     
     plt.savefig("simplify.pdf")
     plt.close()
@@ -178,7 +179,7 @@ def log_plots():
 if __name__ == "__main__":
     dog_plots()
     heatmap_color()
-    heatmap_gray()
+    heatmap_hot()
     healthcare_linscale()
     healthcare_logscale()
     simplify_plot()

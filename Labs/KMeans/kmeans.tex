@@ -3,7 +3,7 @@
 
 \subsection*{Clustering}
 In Lab \ref{lab:pca}, we analyzed the iris dataset using PCA; we have reproduced the first two principal components of the iris data in Figure \ref{fig:iris_data}.
-Upon inspection of the first two principal components, a human can easily see that there are two very distinct groups of irises.
+Upon inspection, a human can easily see that there are two very distinct groups of irises.
 Can we create an algorithm to identify these groups without human supervision?
 This task is called \emph{clustering}, an instance of \emph{unsupervised learning}.
 
@@ -39,7 +39,7 @@ where $\mu_i$ is the mean of the elements in $S_i$, i.e.
 
 \subsection*{The \emph{K-Means} Method}
 Finding the global minimizing partition $S^*$ is generally intractable since the set of partitions can be very large indeed,
-but the \emph{k-means} algorithm is a heuristic approach that can often provide good results.
+but the \emph{k-means} algorithm is a heuristic approach that can often provide reasonably accurate results.
 
 
 We begin by specifying an initial cluster mean $\mu_i^{(1)}$ for each $i = 1, \cdots, N$ (this can be done by random initialization, or according to some heuristic).
@@ -117,8 +117,8 @@ Your clustering should be similar to the first clustering in Figure \ref{fig:iri
 Suppose we are interested in learning about which regions are prone to experience frequent earthquake activity.
 We could make a map of all earthquakes over a given period of time and examine it ourselves, but we recognize this as an unsupervised learning problem and are eager to apply our new k-means clustering tool.
 
-Our data is contained in 6 text files, each with a months worth of earthquake data throughout the world, from January 2010 through June 2010.
-These files contain a lot of information which we aren't interested in at the time; all we would like to extract from them is the location of each earthquake, which appears in characters $21$ through $33$ of each line.
+Our data is contained in 6 text files, each with earthquake data throughout the world covering a time period of one month, giving us data from January 2010 through June 2010.
+These files contain a lot of information which isn't of interest to us at the present time; all we would like to extract from them is the location of each earthquake, which appears in characters $21$ through $33$ of each line.
 Characters $21$ through $26$ contain the latitude of each epicenter, character $26$ denoting North or South, and characters $27$ through $33$ contain the longitude of each epicenter, character $33$ denoting East or West.
 We need to divide each value by $1,000$ to represent these as degrees and decimals.
 \begin{figure}
@@ -130,7 +130,7 @@ We need to divide each value by $1,000$ to represent these as degrees and decima
 \begin{problem}
 Load the earthquake data into a $n\times 2$ array, where each row gives the longitude and latitude of an earthquake in degrees.
 Multiply South latitudes and West longitudes by $-1$.
-Create a scatter plot of the resulting data. You should be able to see the outlines of some of the continents and tectonic plates (since these are often areas of greater seismic activity). See also Figure \ref{fig:earthquakes}.
+Create a scatter plot of the resulting data. You should be able to see the outlines of some of the continents and tectonic plates (since these are often areas of significant seismic activity). Your plot should match Figure \ref{fig:earthquakes}.
 \end{problem}
 
 We want to cluster this data into active earthquake regions.
@@ -170,11 +170,18 @@ Thus, we need to add optional functionality to our \li{kmeans} function.
 \end{figure}
 
 \begin{problem}
-Add a keyword argument \li{normalize=False} to you \li{kmeans} function, and add code to normalize the means at each iteration, should this argument be set to \li{True}.
+Add a keyword argument \li{normalize=False} to your \li{kmeans} function, and add code to normalize the means at each iteration, should this argument be set to \li{True}.
 Use your function to cluster the earthquake data into 15 clusters. Run this 10 times, keeping the best clustering.
 Transform the cluster means back to latitude and longitude coordinates (when calculating $\theta$ using the inverse tangent, use \li{numpy.arctan2} or \li{math.arctan2},
 so that that correct quadrant is chosen).
-Create a scatter plot showing each cluster mean, along with the earthquake epicenters color-coated according to their cluster. You plot should resemble that in Figure \ref{fig:earthquakeclusters}.
+Create a scatter plot showing each cluster mean, along with the earthquake epicenters color-coded according to their cluster. Your plot should resemble that of Figure \ref{fig:earthquakeclusters}.
 \end{problem}
 
+Though plotting our results in two dimensions gives us a good picture, we can see that this is not entirely accurate.  There are points that appear to be closer to a different cluster center than the one to which they belong.  This comes from viewing the results in only two dimensions.  When viewing in three dimensions, we can see more clearly the accuracy of our results.  
+\begin{problem}
+Add a keyword argument \li{3d=False} to your \li{kmeans} function, and add code to show the three-dimensional plot instead of the two-dimensional scatter plot should this argument be set to \li{True}.  Maintain the same color-coding scheme as before.  Use the function \li{mpl_toolkits.mplot3d.Axes3D} to make your plot.
+\end{problem}
 
+\begin{comment}
+A section on spectral clustering should be included here.
+\end{comment}
