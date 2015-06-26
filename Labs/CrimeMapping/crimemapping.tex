@@ -45,9 +45,9 @@ For multivariate data, the KDE is
 \begin{equation*}
 \widehat{f}_{\mathbf{H}}(x) = \frac{1}{n} \sum_{i=1}^{n} K_{\mathbf{H}}(x - x_{i}) = \frac{1}{n\lvert \mathbf{H} \rvert^{\frac{1}{2}}} \sum_{i=1}^{n} K(\mathbf{H}^{-\frac{1}{2}}(x - x_{i}))
 \end{equation*}
-where $\mathbf{H}$ is a bandwidth matrix, and $K$ is some multivariate symmetric density centered at the origin. Choosing $\mathbf{H}$ is even more difficult in the multivariate case, but a decent results can be obtained by choosing the diagonal matrix $\mathbf{H}$ where 
+where $\mathbf{H}$ is a bandwidth matrix, and $K$ is some multivariate symmetric density centered at the origin. Choosing $\mathbf{H}$ is even more difficult in the multivariate case, but decent results can be obtained by choosing the diagonal matrix $\mathbf{H}$ where 
 \begin{equation*}
-H_{ii} = (\frac{4}{d+2})^{\frac{2}{d+4}} n^{\frac{-2}{d+4}} \widehat{\sigma}_{i}^{2}
+H_{ii} = (\frac{4}{d+2})^{\frac{2}{d+4}} \cdot n^{\frac{-2}{d+4}} \cdot \widehat{\sigma}_{i}^{2}
 \end{equation*}
 where $d$ is the dimension of the data, and $\widehat{\sigma}_{i}$ is the standard deviation of the $i^{th}$ dimension. We will use \li{scipy}'s implementation of the KDE.
 
