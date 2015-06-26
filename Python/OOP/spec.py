@@ -1,5 +1,5 @@
 # name this file 'solutions.py'
-""" Volume II Lab 2: Object Oriented Programming
+"""Volume II Lab 2: Object Oriented Programming
     <Name>
     <Class>
     <Date>

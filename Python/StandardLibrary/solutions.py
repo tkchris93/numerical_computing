@@ -150,7 +150,7 @@ def test(student_module, student_file):
     s = student_module
     path = student_file
     score = 0
-    feedback = ""
+    feedback = s.__doc__
     
     try:
         # Problem 1: 3 points

@@ -261,15 +261,34 @@ Note that since \li{insert} inserts a node before a specified node, it is not po
 
 \section*{Doubly-Linked Lists}
 
+\begin{figure}
+\centering
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto, node distance=1.5cm, thick,main node/.style={rectangle,draw}, minimum size=.5cm]
+\tikzset{rect node/.style={rectangle, draw, minimum height = .5cm, minimum width=.9cm}}
+  \node[main node] (1) {B};
+  \node[main node] (2) [right of=1] {F};
+  \node[main node] (3) [right of=2] {G};
+  \node[main node] (4) [right of=3] {C};
+  \node[draw = none, black!20!blue, node distance = 1.5cm] [above right of=4] (T) {Tail};
+  \node[draw = none, black!20!blue, node distance = 1.5cm] [above left of=1] (H) {Head};
+  \node[rect node](1.5)[]{};
+  \node[rect node](2.5)[right of=1.5]{};
+  \node[rect node](3.5)[right of=2.5]{};
+  \node[rect node](4.5)[right of=3.5]{};
+
+\foreach \s/\t  in {1/2, 2/3, 2/1, 3/2, 3/4, 4/3}{
+	\path[draw](\s) edge[shorten <=.1cm, shorten >=.1cm](\t);}	
+  \draw[black!20!blue] (H) edge (1.north);
+  \draw[black!20!blue] (T) edge (4.north);
+\end{tikzpicture}
+\caption{Doubly-linked List}
+\label{fig:doubly_linked}
+\end{figure}
+
 A doubly-linked list is a linked list where each node keeps track the node that precedes it as well as the node that follows.
 The end of the list is also typically kept track of with a \li{tail} attribute.
 See Figure \ref{fig:doubly_linked} for an illustration.
 
-\begin{figure}
-\centering
-\caption{Illustrate a doubly-linked list.}
-\label{fig:doubly_linked}
-\end{figure}
 
 \begin{lstlisting}
 # location: Node.py
