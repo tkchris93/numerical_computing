@@ -1,5 +1,7 @@
 # rsa_tools.py
-""" Volume II Lab 3: Public Key Encryption (RSA). Auxiliary file."""
+"""Volume II Lab 3: Public Key Encryption (RSA). Auxiliary file.
+    Helper code for the myRSA class. Do not modify this file.
+"""
 
 from itertools import izip_longest
 

@@ -1,5 +1,5 @@
 # name this file 'solutions.py'
-""" Volume II Lab 3: Public Key Encryption (RSA)
+"""Volume II Lab 3: Public Key Encryption (RSA)
     <Name>
     <Date>
     <Class>

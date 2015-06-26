@@ -179,11 +179,11 @@ Then, deterministic algorithms are used to verify the primality of a candidate.
 Write a function called \li{is_prime} that implements Fermat's test for primality.
 Run the test at most five times, using integers randomly chosen from $[2, n-1]$ as possible witnesses.
 If a witness number is found, return the number of tries it took to find it.
-If no witness number is found after five tries, return 0.
+If no witness number is found after five tries, return $0$.
 
-For most composite values of $n$, if you call \li{is_prime(n)} one hundred times, you should expect to get 0 at most five times.
+For most composite values of $n$, if you call \li{is_prime(n)} one hundred times, you should expect to get $0$ at most five times.
 However, some composite numbers do not follow this rule. 
-For example, how many times do you have to call \li{is_prime()} on 340561 to get an answer of 0?
+For example, how many times do you have to call \li{is_prime()} on $340561$ to get an answer of $0$?
 \label{prob:prime_confidence}
 \end{problem}
 
@@ -257,7 +257,7 @@ A commonly used padding algorithm is implemented in PyCrypto in the \li{Crypto.C
 
 % Problem 3: Implement a PyCrypto-powered RSA system.
 \begin{problem}
-Write a new RSA class called \li{PyCrypto} that uses methods from PyCrypto's \li{Crypto.RSA} package to accomplish the same objectives as the \li{myRSA} class.
+Write a new RSA class called \li{PyCrypto} that acts like the \li{myRSA} class, but implement it with methods from PyCrypto's \li{RSA} package.
 
 Store both of your RSA keys in a single attribute called \li{_keypair}, and store a sharable string representation of the public key in the \li{public_key} attribute.
 Initialize \li{_keypair} and \li{public_key} in the constructor.

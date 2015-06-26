@@ -195,7 +195,7 @@ class PyCrypto(object):
 
 # ----------------------------- END OF SOLUTIONS ----------------------------- #
 
-# prime number generator for sample key generation
+# prime number generator for sample key generation. Not part of the lab.
 def prime(n):
     """Calculates the nth prime number."""
     primes = [2,3,5,7] # start with some primes
@@ -212,11 +212,9 @@ def prime(n):
     print primes[len(primes) - 1]
     return primes
 
-# TEST THIS SCRIPT WITH TANNER AND BEN'S SOLUTIONS TO MAKE SURE IT WORKS !!!
-#   NOT SURE IF THE KEYS WILL ALWAYS BE GENERATED THE SAME (DIFFERENT EEA)...
 def test(student_module):
     """Test script. You must import the student's file as a module.
-    30 points for problem 1
+    20 points for problem 1
     10 points for problem 2
     10 points for problem 3
     
@@ -230,77 +228,55 @@ def test(student_module):
     
     s = student_module
     score = 0
-    feedback = ""
+    feedback = s.__doc__
     
     try:
-        # Problem 1: 30 points
-        feedback += "\nTesting problem 1 (30 points)..."
-        points = 20
+        # Problem 1: 20 points
+        feedback += "\nTesting problem 1 (20 points)..."
+        points = 2
         r1 =   myRSA()
         r2 = s.myRSA()
-        # Round 1: test e, d, n (5 pts)
-        r1.generate_keys(610639,287117,104729)
-        r2.generate_keys(610639,287117,104729)
-        if r1.public_key[0] != r2.public_key[0]:
+        # Test public key (2 pts)
+        r1.generate_keys(287117,104729,610639)
+        r2.generate_keys(287117,104729,610639)
+        if r1.public_key != r2.public_key:
             points -= 1; feedback += "\n\tincorrect public key"
-        if r1._private_key[0] != r2._private_key[0]:
-            points -= 2; feedback += "\n\tincorrect private key"
-        if r2.public_key[1] != r2._private_key[1]:
-            points -= 2; feedback += "\n\tincorrect encryption exponent"
-        # Round 2: test e, d, n (5 pts)
-        r1.generate_keys(562739,588949,7927)
-        r2.generate_keys(562739,588949,7927)
-        if r1.public_key[0] != r2.public_key[0]:
+        r1.generate_keys(562739,7927,588949)
+        r2.generate_keys(562739,7927,588949)
+        if r1.public_key != r2.public_key:
             points -= 1; feedback += "\n\tincorrect public key"
-        if r1._private_key[0] != r2._private_key[0]:
-            points -= 2; feedback += "\n\tincorrect private key"
-        if r2.public_key[1] != r2._private_key[1]:
-            points -= 2; feedback += "\n\tincorrect encryption exponent"
-        # test encrypt() (5 pts)
-        r2.generate_keys(20731,4021,4987)
-        r1.public_key,r1._private_key = r2.public_key,r2._private_key
-        if r1.encrypt("Test1") != r2.encrypt("Test1"):
-            points -= 1; feedback += "\n\tincorrect encryption"
-        if r1.encrypt("_____") != r2.encrypt("_____"):
-            points -= 2; feedback += "\n\tincorrect encryption"
-        if r1.encrypt("__A__") != r2.encrypt("__A__"):
-            points -= 2; feedback += "\n\tincorrect encryption"
-        # test decrypt() (5 pts)
-        r1.generate_keys(22697,20743,30931)
-        r2.public_key,r2._private_key = r1.public_key,r1._private_key
-        if r2.decrypt(r1.encrypt("test1")) != "test1":
-            points -= 1; feedback += "\n\tincorrect decryption"
-        if r2.decrypt(r1.encrypt("2test2")) != "2test2":
-            points -= 2; feedback += "\n\tincorrect decryption"
-        if r2.decrypt(r1.encrypt("tEst3")) != "tEst3":
-            points -= 2; feedback += "\n\tincorrect decryption"
-        # test encrypt() and decrypt() together (10 pts)
-        def crypt(o,message):
+        # test decrypt(encryption)
+        def crypt(o,p,message):
             """Test encrypt() and decrypt(). Return 1 on success, 0 else."""
-            mes = o.decrypt(o.encrypt(message))
-            if message == mes: return 1
+            if message == o.decrypt(p.encrypt(message,o.public_key)): return 1
             else: return 0
+        # test encrypt() and decrypt() together, default key (8 pts)
         r2.generate_keys(610639,287117,104729)
         p = 0
-        p += crypt(r2,"small")
-        p += crypt(r2,"really really really really really long test")
-        p += crypt(r2,"!@#$%^&*^$%##%^%&*&^&$%^#%#$@#%$& weird test")
-        p += crypt(r2,"Jared is the bomb.")
-        p += crypt(r2,"F$I$N$A$L$_ ### _$T$E$S$T")
-        if p < 5:
-            feedback += "\n\tmyRSA Decrypt(encryption) failed"
+        p += crypt(r2,r2,"small")
+        p += crypt(r2,r2,"really really really really really long test")
+        r2.generate_keys(287117,104729,610639)
+        p += crypt(r2,r2,"!@#$%^&*^$%##%^%&*&^&$%^#%#$@#%$& weird test") * 2
+        p += crypt(r2,r2,"Jared Webb is the bomb.") * 2
+        r2.generate_keys(562739,7927,588949)
+        p += crypt(r2,r2,"F!I*N@A(L)_ ### _&T+E=S^T") * 2
+        if p < 8:
+            feedback += "\n\tmyRSA.decrypt(Encrypt(Message)) failed with "
+            feedback += "default key"
         points += p
-        # Key exchange
-        r1.generate_keys(17393,12899,3853)
-        r2.public_key,r2._private_key = r1.public_key,r1._private_key
+        # test encrypt() and decrypt() together, non-default public key (10 pts)
+        r1.generate_keys(12899,3853,17393)
         p = 0
-        p += crypt(r2,"small")
-        p += crypt(r2,"really really really really really long test")
-        p += crypt(r2,"!@#$%^&*^$%##%^%&*&^&$%^#%#$@#%$& weird test")
-        p += crypt(r2,"Jared is the bomb.")
-        p += crypt(r2,"F$I$N$A$L$_ ### _$T$E$S$T")
-        if p < 5:
-            feedback += "\n\tmyRSA Decrypt(Encrypt(Message)) failed"
+        p += crypt(r1,r2,"small")
+        p += crypt(r1,r2,"really really really really really long test") * 2
+        r1.generate_keys(610639,287117,104729)
+        p += crypt(r1,r2,"!@#$%^&*^$%##%^%&*&^&$%^#%#$@#%$& weird test") * 2
+        p += crypt(r1,r2,"Jared Webb is the bomb.") * 2
+        r1.generate_keys(287117,104729,610639)
+        p += crypt(r1,r2,"F!I*N@A(L)_ ### _&T+E=S^T") * 3
+        if p < 10:
+            feedback += "\n\tmyRSA.decrypt(Encrypt(Message)) failed with "
+            feedback += "non-default key"
         points += p
         
         score += points
@@ -349,36 +325,33 @@ def test(student_module):
         p = 0
         r2 = s.PyCrypto()
         # Test encrypt and decrypt together
-        p += crypt(r2,"small")
-        p += crypt(r2,"really really really really really long test")
+        p += crypt(r2,r2,"small")
+        p += crypt(r2,r2,"really really really really really long test")
         r2 = s.PyCrypto()
-        p += crypt(r2,"!@#$%^&*^$%##%^%&*&^&$%^#%#$@#%$& weird test")
-        p += crypt(r2,"Jared is the bomb.")
+        p += crypt(r2,r2,"!@#$%^&*^$%##%^%&*&^&$%^#%#$@#%$& weird test")
+        p += crypt(r2,r2,"Jared Webb is the bomb.")
         r2 = s.PyCrypto()
-        p += crypt(r2,"F$I$N$A$L$_ ### _$T$E$S$T")
+        p += crypt(r2,r2,"F!I*N@A(L)_ ### _&T+E=S^T")
         if p < 5:
-            feedback += "\n\tPyCrypto Decrypt(Encrypt(Message))) failed"
+            feedback += "\n\tPyCrypto.decrypt(Encryption)) failed with "
+            feedback += "default key"
         points = p
         p = 0
         # Test send()
-        def sender(p,q,message):
-            """Test send(). Return 1 on success, 0 else."""
-            mes = q.decrypt(p.encrypt(message,q.public_key))
-            if message == mes: return 1
-            else: return 0
         r1 =   PyCrypto()
         r2 = s.PyCrypto()
-        p += sender(r2,r1,"small")
-        p += sender(r2,r1,"really really really really really long test")
+        p += crypt(r2,r1,"small")
+        p += crypt(r2,r1,"really really really really really long test")
         r1 =   PyCrypto()
         r2 = s.PyCrypto()
-        p += sender(r2,r1,"!@#$%^&*^$%##%^%&*&^&$%^#%#$@#%$& weird test")
-        p += sender(r1,r2,"Jared is the bomb.")
+        p += crypt(r2,r1,"!@#$%^&*^$%##%^%&*&^&$%^#%#$@#%$& weird test")
+        p += crypt(r1,r2,"Jared is the bomb.")
         r1 =   PyCrypto()
         r2 = s.PyCrypto()
-        p += sender(r1,r2,"F$I$N$A$L$_ ### _$T$E$S$T")
+        p += crypt(r1,r2,"F!I*N@A(L)_ ### _&T+E=S^T")
         if p < 5:
-            feedback += "\n\tPyCrypto Decrypt(send(Message,Public Key)) failed"
+            feedback += "\n\tPyCrypto.decrypt(Encryption)) failed with "
+            feedback += "non-default key"
         points += p
         
         score += points
@@ -387,6 +360,6 @@ def test(student_module):
     except:
         feedback += "\n\nCompilation Error!!"
     
-    # Report final score    
-    feedback += "\n\nTotal score: "+str(score)+"/50 = "+str(score/.5)+"%"
-    return score/.5,feedback
+    # Report final score
+    feedback += "\n\nTotal score: "+str(score)+"/40 = "+str(score/.4)+"%"
+    return score/.4,feedback
