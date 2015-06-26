@@ -13,11 +13,12 @@ As long as it is difficult to find the private key from the public key, this is 
 %Also, they eliminate the need for secure key sharing algorithms like the Diffie-Hellman key exchange (see Lab \ref{lab:DiffieHellman}).
 
 As an analogy, consider a locked box with two kinds of keys.
-One kind of key, called the public key, is available to anyone and can lock the box but not unlock it.The other kind of key, called the private key, is only available to one person and can unlock the box.
+One kind of key, called the public key, is available to anyone and can lock the box but not unlock it.
+The other kind of key, called the private key, is only available to one person and can unlock the box.
 To send a message to someone with the private key, the sender will put the message in the box and lock it.
 Since the only person that can unlock the box is the recipient, the message is safe until it arrives. This is how public key cryptography works.
 
-One of the oldest and most popular public key cryptosystems is RSA cryptography.\\
+One of the oldest and most popular public key cryptosystems is RSA cryptography.
 
 %All material in this lab through the section ``Security of RSA'' is required. 
 %After that, all sections and subsections are independent of each other and may be covered as desired.
@@ -87,21 +88,24 @@ True
 \end{lstlisting}
 
 \subsection*{Logistical considerations}
-The cryptosystem described is not particularly easy to use, since the message to an integer and back again by hand.
-The module \li{rsa_tools} contains some functions to fix this proble.
+The cryptosystem described is not particularly easy to use, since the message must be converted to an integer and back again by hand.
+The module \li{rsa_tools} contains some functions to fix this problem.
 The function \li{string_to_int()} turns any string into an integer (using a mapping more complicated than $A=01, B=02$), and the function \li{int_to_string()} changes it back again.
 
 \begin{lstlisting}
->>> string_to_int('SECRET')
+>>> import rsa_tools as r
+>>> r.string_to_int('SECRET')
 91556947314004
+>>> r.int_to_string(91556947314004)
+'SECRET'
 \end{lstlisting}
 
 At this point we have a problem, because the message 91556947314004 is larger than $n=608610825827$.
-We can only use RSA to encrypt messages that are smaller than $n.$
-In fact, the function \li{string_size()} provided in the appendix tells us the maximum number of characters we can encrypt with this choice of $n$.
+We can only use RSA to encrypt messages that are smaller than $n$.
+In fact, the function \li{string_size()} provided in the \li{rsa_tools} tells us the maximum number of characters we can encrypt with this choice of $n$.
 
 \begin{lstlisting}
->>> string_size(608610825827)
+>>> r.string_size(608610825827)
 4
 \end{lstlisting}
 
@@ -109,18 +113,24 @@ The function \li{partition()}, also in the \li{rsa_tools} will break our message
 We specify the ``fill value'' \li{x} that will be used to make all pieces the same length.
 
 \begin{lstlisting}
->>> partition('SECRET', 4, 'x')
+>>> r.partition('SECRET', 4, 'x')
 ['SECR', 'ETxx']
 \end{lstlisting}
 Now we can proceed to encrypt and decrypt the strings \li{'SECR'} and \li{'ETxx'} as before.
 
+% Problem 1: Implement the 'myRSA' class.
 \begin{problem}
-Write a class called RSA that can generate keys, encrypt, and decrypt messages.
-The \li{generate_keys} function accepts a pair of primes and sets \li{public_key} and \li{private_key} attributes.
-The \li{encrypt} function accepts a string and returns the message (as a number) encrypted with the public key as the default.
-If a different public key is provided then the message should be encrypted with the provided key.
-The \li{decrypt} function decrypts a message using the private key.
-The module \li{rsa_tools.py} provides methods for converting letters to numbers and vice-versa.
+Write a class called \li{myRSA} that can generate keys, encrypt messages, and decrypt messages.
+
+Write a method called \li{generate_keys} that accepts a pair of primes and an encryption exponent and sets the \li{public_key} and \li{_private_key} attributes.
+(Starting \li{_private_key} with an underscore hides the attribute from the user.)
+
+Also include an \li{encrypt} method that accepts a string and encrypts it, using \li{public_key} as the default encryption key.
+If a different public key is provided, then the message should be encrypted with the provided key.
+
+Finally, write a \li{decrypt} method that decrypts a message with \li{_private_key}.
+
+Use methods from the provided \li{rsa_tools.py} module to convert strings to ints and vice-versa.
 \label{prob:rsa1}
 \end{problem}
 
@@ -138,12 +148,11 @@ However, computing $d$ means computing $\phi(n)$.
 Computing $\phi(n)$ from $n$ directly requires factoring $n$.
 When $n$ has hundreds of digits, finding its factors with known algorithms can take years.
 
-Thus, the security of RSA depends on selecting large primes to that $n$ has many digits.
+Thus, the security of RSA depends on selecting large primes so that $n$ has many digits.
 
 \section*{Making RSA Secure}
 
-The security of RSA depends on the use of large prime numbers for $p$ and $q$.
-For RSA to be a practical cryptosystem, we need a fast way to find such numbers.
+Since the security of RSA depends on the use of large prime numbers for $p$ and $q$, we need a fast way to find such numbers for RSA to be a practical cryptosystem.
 It is very slow to check that a large number is prime by finding its factors.
 In fact, it is the difficulty of factoring that makes RSA secure.
 
@@ -163,37 +172,29 @@ Thus, if we run the above test on $p$ just a few times and don't find a witness 
 This test is called Fermat's test for primality.
 
 In practice, a probabilistic algorithm like Fermat's test is used to identify numbers that have a high chance of being prime. 
-Then, deterministic algorithms are used to verify primality of a candidate.
+Then, deterministic algorithms are used to verify the primality of a candidate.
 
+% Problem 2: Implement Fermat's test for primality.
 \begin{problem}
-Write the following function, implementing Fermat's test for primality.
-\begin{lstlisting}
-def is_prime(n):
-    '''Use Fermat's test for primality to see if `n' is probably prime.
-    
-    INPUTS:
-    n - An integer.
-    
-    Run Fermat's test on at most 5 numbers randomly chosen from [2, n-1]. 
-    If a witness number is found, return the number of tries it took to 
-    find the witness number. If no witness number is found after 5 tries, 
-    return 0.
-    '''
-\end{lstlisting}
-For most composite values of \li{n}, if you call \li{is_prime(n)} one hundred times, you should expect to get 0 at most five times.
+Write a function called \li{is_prime} that implements Fermat's test for primality.
+Run the test at most five times, using integers randomly chosen from $[2, n-1]$ as possible witnesses.
+If a witness number is found, return the number of tries it took to find it.
+If no witness number is found after five tries, return $0$.
 
+For most composite values of $n$, if you call \li{is_prime(n)} one hundred times, you should expect to get $0$ at most five times.
 However, some composite numbers do not follow this rule. 
-How many times do you have to call \li{is_prime()} on 340561 to get an answer of 0?
+For example, how many times do you have to call \li{is_prime()} on $340561$ to get an answer of $0$?
 \label{prob:prime_confidence}
 \end{problem}
 
 \section*{PyCrypto: RSA in Python (Optional)}
 % A professional implementation of RSA is found in the PyCrypto module.
 
-% TODO: edit this section. The PyCrypto documentation is extremely poor and I can't figure out how to use it.
-RSA encryption in Python can be accomplished with a library called PyCrypto.
+PyCrypto is a professional implementation of RSA in python.
+The package is called \li{Crypto}, and can be downloaded \href{https://pypi.python.org/pypi/pycrypto}{here}.
 This library contains many random number generators and encryption classes.
 Many programs use PyCrypto for their security needs.
+
 \begin{warn}
 Make certain that you are using the latest version of PyCrypto.
 Security software is updated often to fix security vulnerablilities and bugs.
@@ -201,24 +202,25 @@ The current version of PyCrypto at the time of writing is version 2.6.1.
 \end{warn}
 
 The RSA module in PyCrypto is located in the PublicKey module.
-Let's try a small example using PyCrypto.
 The library allows us to explicity construct a key, or generate a key automatically.
 \begin{lstlisting}
 >>> from Crypto.PublicKey import RSA
->>> from Crypto import Random
->>> keypair = RSA.generate(2048) #generate a 2048-bit RSA key
->>> publickey = keypair.publickey()
+
+# generate a 2048-bit RSA key
+>>> keypair = RSA.generate(2048)
+
 # Save the public key as a string for distribution.
+>>> publickey = keypair.publickey()
 >>> share_this = publickey.exportkey()
 \end{lstlisting}
 
-The \li{share_this} variable may be distributed at a public key.
+The \li{share_this} variable may be distributed as a public key.
 Another user may then import it and use it to encrypt a message.
 
 \begin{lstlisting}
 >>> encrypter = RSA.importKey(share_this)
->>> enc_message = encrypter.encrypt('abcde', 2048)
->>> enc_message
+>>> encoded_message = encrypter.encrypt('abcde', 2048)
+>>> encoded_message
 ('\xb1\t\xc6L\xd1u\x80.C@\x07$#\x8e\xca\x8a\x05*\xdf\x1f.N\xa9\x80
 \x08\xcb*8~7\x1d\x87&&Ke\xd5\xed_H\xb9\xd0x\xac!\xf3\xa9\xdc\xbfy5
 s\x92\x8d\x15\xf7vY\x99G\xb6\x03j[\xa3\xc6\x92a\n\x91\x08N\xbc\xe4
@@ -232,11 +234,13 @@ xdf\xd7\x86\x87\xff\x11#-\xb5!Q)\xf7\xf1a\x94\xb3e?\xd0\x96W4\xb4\
 xca\xcf\x18\xd1I\xcd\x1dl\xd7\xe0Y\xdf}F\x93\x92\xe1(d\xcc\xdc\xa7
  x\xc5`',)
 
->>> keypair.decrypt(enc_message)
+>>> keypair.decrypt(encoded_message)
 'abcde'
 \end{lstlisting}
 
 The RSA encryption and decryption methods on these keys are textbook approaches.
+
+\begin{comment}
 However, to increase security, we will want to pad the messages so every message encrypted with a particular key will become exactly as large (in bits) as the key itself.
 A commonly used padding algorithm is implemented in PyCrypto in the \li{Crypto.Cipher.PKCS1_OAEP} module.
 \begin{lstlisting}
@@ -249,15 +253,31 @@ A commonly used padding algorithm is implemented in PyCrypto in the \li{Crypto.C
 >>> paddedkey.decrypt(encrypted)
 'hello world'
 \end{lstlisting}
+\end{comment}
 
+% Problem 3: Implement a PyCrypto-powered RSA system.
 \begin{problem}
-Modify the \li{RSA} class from the previous problems so that the user can choose whether or not to use \li{PyCrypto}.
-To this end, add a key word argument to each method in the \li{RSA} called \li{pycrypto} that defaults to \li{False}.
-If the user switches \li{pycrypto} to \li{True}, then use the \li{PyCrypto} methods to encrypt the message.
-Otherwise, the class should perform as before.
+Write a new RSA class called \li{PyCrypto} that acts like the \li{myRSA} class, but implement it with methods from PyCrypto's \li{RSA} package.
+
+Store both of your RSA keys in a single attribute called \li{_keypair}, and store a sharable string representation of the public key in the \li{public_key} attribute.
+Initialize \li{_keypair} and \li{public_key} in the constructor.
+
+The \li{encrypt} method accepts a string and encrypts it, using \li{_keypair} as the default encryption key.
+If the string representation of a different public key is provided, then the message should be encrypted with the provided key.
+
+The \li{decrypt} method decrypts a message using \li{_keypair}.
+
+With a partner, test your classes by exchanging public keys and sending secret messages.
 \end{problem}
 
+\begin{warn}
+PyCrypto is a very powerful tool and should not be used casually.
+Something about being imprisoned and/or exiled if you leak NSA secrets.
+\end{warn}
 
+
+% Group project problem from the old lab.
+% Assumes we did a problem on digital signatures.
 \begin{comment}
 \begin{problem}[Group Project]
 Split into several groups of at least three individuals.
