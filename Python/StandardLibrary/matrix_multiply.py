@@ -1,5 +1,5 @@
 # matrix_multiply.py
-""" Volume II Lab 1: The Standard Library (Auxiliary File)
+"""Volume II Lab 1: The Standard Library (Auxiliary File)
     Use this module to complete problem 4. Do not modify this file in any way.
 """
 

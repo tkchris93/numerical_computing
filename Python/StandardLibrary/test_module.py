@@ -1,5 +1,5 @@
 # test_module.py
-""" Volume II Lab 1: The Standard Library (Auxiliary File)
+"""Volume II Lab 1: The Standard Library (Auxiliary File)
     Example code. You do not need to modify this file in any way.
 """
 

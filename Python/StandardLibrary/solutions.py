@@ -1,7 +1,6 @@
-# solutions.py
-""" Volume II Lab 1: The Standard Library
-    Main solutions file. See also 'calculator.py' and 'test_module.py'.
-    Use the test() method as a test script.
+# lab1_solutions.py
+"""Volume II Lab 1: The Standard Library
+    Main solutions file. See also 'calculator.py' and 'matrix_multiply.py'.
     Written by Shane McQuarrie, Spring 2015.
 """
 
@@ -10,10 +9,10 @@ import sys
 import time
 import matrix_multiply # as m
 
-# Problem 1
+# Problem 1: Implement this function.
 def prob1(l):
-    """Accept a list 'l' of numbers as input and return a list with the
-    minimum, maximum, and average of the original list.
+    """Accept a list 'l' of numbers as input and return a list with the minimum,
+    maximum, and average of the original list.
     """
     ans = []
     ans.append(min(l))
@@ -21,7 +20,8 @@ def prob1(l):
     ans.append(float(sum(l))/len(l))
     return ans
 
-# Problem 2
+
+# Problem 2: Implement this function.
 def prob2():
     """Determine which Python objects are mutable and which are immutable. Test
     numbers, strings, lists, tuples, and dictionaries.
@@ -68,7 +68,8 @@ def prob2():
     if dic1 == dic2: print("Mutable")
     else: print("Immutable")
 
-# Problem 3
+
+# Problem 3: Create a 'calculator' module and use it to implement this function.
 def prob3(a,b):
     """Calculate and return the length of the hypotenuse of a right triangle.
     Do not use any methods other than those that are imported from the
@@ -120,16 +121,17 @@ def prob4():
 
 # Everything under this 'if' statement is executed when this file is run from
 #   the terminal. In this case, if we enter 'python solutions.py word' into the
-#   terminal, then sys.argv is ['solutions.py, 'word'], and prob4() is executed.
+#   terminal, then sys.argv is ['solutions.py', 'word'], and prob4() is executed.
 if __name__ == "__main__":
     prob4()
 
-# =========================== END OF SOLUTIONS =========================== #
+# ----------------------------- END OF SOLUTIONS ----------------------------- #
 
 # Test script
-def test(student_module, student_file):
+def test(student_module, student_file, late=False):
     """Test script. You must import the students file as a module AND have the
     students' filename (because of the sys stuff in problem 4)
+    
     3 points for problem 1
     5 points for problem 2
     5 points for problem 3
@@ -138,9 +140,10 @@ def test(student_module, student_file):
     Parameters:
         student_module: the imported module for the student's file.
         student_file: the student's filename, including the path.
+        late (bool, opt): if True, half credit is awarded.
     
     Returns:
-        score (int): the student's score, out of 100
+        score (int): the student's score, out of 20
         feedback (str): a printout of test results for the student.
     """
     
@@ -151,51 +154,51 @@ def test(student_module, student_file):
     path = student_file
     score = 0
     feedback = s.__doc__
+    print(feedback)
     
     try:
         # Problem 1: 3 points
-        feedback += "Testing problem 1 (3 points)..."
-        points = 3
+        feedback += "\nTesting problem 1 (3 points)..."
+        points = 0
         l = [192102312,-234892,9423,1220002,82,3432,23892,100000,-123812]
-        [min1,max1,ave1] = s.prob1(l)
-        [min2,max2,ave2] = prob1(l)
-        if max1 != max2:
-            points -= 1; feedback += "\n\tincorrect maximum"
-        if min1 != min2:
-            points -= 1; feedback += "\n\tincorrect minimum"
-        if ave1 != ave2:
-            points -= 1; feedback += "\n\tincorrect average"
-
-        feedback += "\n  Score += " + str(points)
-        score += points
-    
+        [min1,max1,ave1] =   prob1(l)
+        [min2,max2,ave2] = s.prob1(l)
+        if max1 == max2: points += 1
+        else: feedback += "\n\tincorrect maximum"
+        if min1 == min2: points += 1
+        else: feedback += "\n\tincorrect minimum"
+        if ave1 == ave2: points += 1
+        else: feedback += "\n\tincorrect average"
+        
+        score += points; feedback += "\n  Score += " + str(points)
+        
         # Problem 2: 5 points
         feedback += "\nTesting problem 2 (5 points)..."
-        print"\nExpected output:"
-        prob2()
-        print"\nStudent output:"
-        s.prob2()
-        points = int(input("\nScore out of 5: "))
+        print"\nCorrect output:";   prob2()
+        print"\nStudent output:"; s.prob2()
+        points = 6
+        while points > 5:
+            points = int(input("\nScore out of 5: "))
         if points < 5: feedback += "\n\tincorrect response(s)"
         
-        feedback += "\n  Score += " + str(points)
-        score += points
+        score += points; feedback += "\n  Score += " + str(points)
         
         # Problem 3: 5 points
         feedback += "\nTesting problem 3 (5 points)..."
-        points = 5
-        if s.prob3(5,12) != prob3(5,12):
-            points -= 2; feedback += "\n\tincorrect hypotenuse length"
-        if s.prob3(6,7) != prob3(6,7):
-            points -= 3; feedback += "\n\tincorrect hypotenuse length"
-            
-        feedback += "\n  Score += " + str(points)
-        score += points
+        points = 0
+        if s.prob3(5,12) == prob3(5,12): points += 1
+        else: feedback += "\n\tincorrect hypotenuse length"
+        if s.prob3(6,7) == prob3(6,7): points += 2
+        else: feedback += "\n\tincorrect hypotenuse length"
+        c = s.calculator
+        if prob3(2,7) == c.sqrt(c.add(c.mult(2,2),c.mult(7,7))): points += 2
+        else: feedback += "\n\t'calculator' module operations failed"
+        
+        score += points; feedback += "\n  Score += " + str(points)
         
         # Problem 4: 7 points
         feedback += "\nTesting problem 4 (7 points)..."
-        points = 7
-        print("\nExpected output:")
+        print("\nCorrect output:")
         os.system('python lab1_solutions.py')
         os.system('python lab1_solutions.py "Wrong Name"')
         os.system('python lab1_solutions.py "matrices.npz"')
@@ -203,14 +206,23 @@ def test(student_module, student_file):
         os.system('python ' + path)
         os.system('python ' + path + ' "Wrong Name"')
         os.system('python ' + path + ' "matrices.npz"')
-        points = int(input("\nScore out of 7: "))
+        points = 8
+        while points > 7:
+            points = int(input("\nScore out of 7: "))
         if points < 7: feedback += "\n\tincorrect outputs"
-
-        feedback += "\n  Score += " + str(points)
-        score += points
+        
+        score += points; feedback += "\n  Score += " + str(points)
         
     except:
         feedback += "\n\nCompilation Error!!"
     
+    if late:    # Late submission penalty
+        feedback += "\n\nHalf credit for late submission."
+        feedback += "\nRaw score: " + str(score) + "/20"
+        score *= .5
+    
     feedback += "\n\nTotal score: "+str(score)+"/20 = "+str(score/.2)+"%"
-    return score/.2, feedback
+    
+    if   score/.2 >= 100.0: feedback += "\n\nExcellent!"
+    elif score/.2 >=  90.0: feedback += "\n\nGreat job!"
+    return score, feedback

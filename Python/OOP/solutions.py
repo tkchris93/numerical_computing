@@ -1,5 +1,5 @@
 # solutions.py
-""" Volume II Lab 2: Object Oriented Programming
+"""Volume II Lab 2: Object Oriented Programming
     Main solutions file. See also 'Backpack_solutions.py' and 'Knapsack.py'.
     Use the test() method as a test script.
     Written by Shane McQuarrie, Spring 2015.
@@ -10,8 +10,8 @@
 # from Backpack import Backpack
 
 
-# Problem 1: Modify constructor to include name, max_size. Modify put() to
-#   contents size from exceeding max_size. Write dump(). (Problem 3 below)
+# Problem 1: Modify this class. Add 'name' and max_size' attributes, modify
+#   the put() method, and add a dump() method. Remember to update docstrings.
 class Backpack(object):
     """Backpack object. Has a color, name, maximum size, and a list of contents.
     
@@ -66,7 +66,7 @@ class Backpack(object):
     def __lt__(self,other):
         return len(self.contents) < len(other.contents)
     
-    # Problem 3: Write the __str__ and __eq__ methods for the Backpack class
+    # Problem 3: Write the __str__ and __eq__ methods for the Backpack class.
     def __str__(self):
         """String Representation.
         Examples:
@@ -109,57 +109,6 @@ class Backpack(object):
             if l1[i] != l2[i]: return False
         return True                     # If nothing is unequal, return True.
 
-
-# Problem 2: The Jetpack class (Based off of the Knapsack class, included below)
-class Jetpack(Backpack):
-    """Jetpack object. Inherits from the Backpack class. In addition to storing
-    items like a backpack, a jetpack has fuel that is used to fly.
-    
-    Attributes:
-        color (str): the color of the jetpack.
-        name (str): the name of the jetpack.
-        max_size (int): the maximum number of items that can fit in the
-            jetpack.
-        contents (list): the contents of the jetpack.
-        fuel (int): the amount of fuel in the jetpack's tank.
-    """
-
-    def __init__(self,color='silver',name='jetpack',max_size=2,fuel=10):
-        """Constructor for a jetpack object. A jetpack only holds 2 items by
-        default instead of 5, and has an additional attribute for fuel.
-        
-        Inputs:
-            color (str, opt): the color of the knapsack. Defaults to 'brown'.
-            name (str, opt): the name of the knapsack. Defaults to 'knapsack'.
-            max_size (int, opt): the maximum number of items that can be stored
-                in the jetpack. Defaults to 2.
-            fuel (int, opt): the starting amount of fuel. Defaults to 10.
-        
-        Returns:
-            A jetpck object with no contents and 10 units of fuel.
-        """
-        
-        Backpack.__init__(self, color, name, max_size)
-        self.fuel = fuel
-        # Or self.fuel = 10, without fuel as an argument for __init__().
-    
-    def fly(self,amount):
-        """Fly by using 'amount' units of fuel."""
-        if self.fuel - amount < 0:                  # Check current fuel
-            print "Not enough fuel!"
-        else:
-            self.fuel -= amount
-    
-    def dump(self):
-        """Empty the contents of the jetpack and dump out all the fuel."""
-        Backpack.dump(self)
-        # Or self.contents = []
-        self.fuel = 0                               # Reset fuel to 0
-    
-    def __repr__(self):
-        out = Backpack.__repr__(self)
-        out += "\nFuel:\t\t" + str(self.fuel)
-        return out
 
 # An example class for Inheritance. Students do not need to modify this class;
 #   it is given to them in 'Knapsack.py' but is not used in their solutions.
@@ -207,9 +156,58 @@ class Knapsack(Backpack):
         """Tie the knapsack."""
         self.closed = True
 
+
+# Problem 2: Write a 'Jetpack' class that inherits from the 'Backpack' class.
+class Jetpack(Backpack):
+    """Jetpack object. Inherits from the Backpack class. In addition to storing
+    items like a backpack, a jetpack has fuel that is used to fly.
+    
+    Attributes:
+        color (str): the color of the jetpack.
+        name (str): the name of the jetpack.
+        max_size (int): the maximum number of items that can fit in the
+            jetpack.
+        contents (list): the contents of the jetpack.
+        fuel (int): the amount of fuel in the jetpack's tank.
+    """
+
+    def __init__(self,color='silver',name='jetpack',max_size=2,fuel=10):
+        """Constructor for a jetpack object. A jetpack only holds 2 items by
+        default instead of 5, and has an additional attribute for fuel.
+        
+        Inputs:
+            color (str, opt): the color of the knapsack. Defaults to 'brown'.
+            name (str, opt): the name of the knapsack. Defaults to 'knapsack'.
+            max_size (int, opt): the maximum number of items that can be stored
+                in the jetpack. Defaults to 2.
+            fuel (int, opt): the starting amount of fuel. Defaults to 10.
+        
+        Returns:
+            A jetpck object with no contents and 10 units of fuel.
+        """
+        
+        Backpack.__init__(self, color, name, max_size)
+        self.fuel = fuel
+        # Or self.fuel = 10, without fuel as an argument for __init__().
+    
+    def fly(self,amount):
+        """Fly by using 'amount' units of fuel."""
+        if self.fuel - amount < 0:                  # Check current fuel
+            print "Not enough fuel!"
+        else:
+            self.fuel -= amount
+    
+    def dump(self):
+        """Empty the contents of the jetpack and dump out all the fuel."""
+        Backpack.dump(self)
+        # Or self.contents = []
+        self.fuel = 0                               # Reset fuel to 0
+
+
 # Problem 3: See the 'Backpack' class above.
 
-# Problem 4: The Complex Number class
+
+# Problem 4: Write a ComplexNumber class.
 class ComplexNumber(object):
     """Complex number object. Has a real and imaginary part.
     
@@ -266,289 +264,261 @@ class ComplexNumber(object):
 # ----------------------------- END OF SOLUTIONS ----------------------------- #
 
 # Test Script
-def test(student_module):
+def test(student_module, late=False):
     """Test script. You must import the students file as a module.
+    
     10 points for problem 1
     15 points for problem 2
-    20 points for problem 3
-    20 points for problem 4
+    15 points for problem 3
+    15 points for problem 4
     
     Inputs:
         student_module: the imported module for the student's file.
+        late (bool, opt): if True, half credit is awarded.
     
     Returns:
-        score (int): the student's score, out of 100.
+        score (int): the student's score, out of 55.
         feedback (str): a printout of the test results for the student.
     """
-
+    
+    def strTest(p,m):
+        """Manually grade a problem worth 'p' points with error message 'm'."""
+        part = p + 1
+        while part > p:
+            part = int(input("\nScore out of " + str(p) + ": "))
+        if part < p: return part,m
+        else: return part,""
+    
     s = student_module
     score = 0
-    feedback = ""
+    feedback = s.__doc__
+    print(feedback)
+    
     try:
         # Problem 1: 10 points
-        feedback += "Testing problem 1 (10 points)..."
-        points = 7
+        feedback += "\nTesting problem 1 (10 points)..."
+        points = 0
         # Test default name and max_size attributes
-        b1 = Backpack()
+        b1 =   Backpack()
         b2 = s.Backpack()
-        if b1.name != b2.name:
-            points -= 1; feedback += "\n\tincorrect name"
-        if b1.max_size != b2.max_size:
-            points -= 1; feedback += "\n\tincorrect max_size"
+        if b1.name == b2.name: points += 1
+        else: feedback += "\n\tBackpack.name failed on default value"
+        if b1.max_size == b2.max_size: points += 1
+        else: feedback += "\n\tBackpack.max_size failed on default value"
         # Test non-default color, name, and max_size attributes
         b1 =   Backpack(color='asvnawie',name='efnaiwen', max_size=3)
         b2 = s.Backpack(color='asvnawie',name='efnaiwen', max_size=3)
-        if b1.color != b2.color:
-            points -= 1; feedback += "\n\tincorrect color"
-        if b1.name != b2.name:
-            points -= 1; feedback += "\n\tincorrect name"
-        if b1.max_size != b2.max_size:
-            points -= 1; feedback += "\n\tincorrect max_size"
+        if b1.name == b2.name: points += 1
+        else: feedback += "\n\tBackpack.name failed on nondefault value"
+        if b1.max_size == b2.max_size: points += 1
+        else: feedback += "\n\tBackpack.max_size failed on nondefault value"
+        if b1.color == b2.color: points += 1
+        else: feedback += "\n\tBackpack.color failed on nondefault value"
         # Test put() (no going over the limit)
         b1.put('f'); b1.put('u'); b1.put('n')
         b2.put('f'); b2.put('u'); b2.put('n')
-        print("\nExpected output:\t"),
-        b1.put('something else that should not fit')
-        print("Student output: \t"),
-        b2.put('something else that should not fit')
-        part = int(input("\nScore out of 1: "))
-        if not part: feedback += "\n\tput() failed to print 'Backpack Full!'"
-        points += part
-        if b1.contents != b2.contents:
-            points -= 1; feedback += "\n\tincorrect contents -- put() failed"
+        print("Correct output:\t"),; b1.put('this should not fit')
+        print("Student output:\t"),; b2.put('this should not fit')
+        p,f = strTest(1,"\n\tBackpack.put() failed to print 'Backpack Full!'")
+        points += p; feedback += f
+        if b1.contents == b2.contents: points += 1
+        else: feedback += "\n\tBackpack.put() failed (went over max_size)"
         # Test dump()
-        b1.dump()
-        b2.dump()
-        if b1.contents != b2.contents:
-            points -= 1; feedback += "\n\tincorrect contents -- dump() failed"
+        b1.dump(); b2.dump()
+        if b1.contents == b2.contents: points += 1
+        else: feedback += "\n\tBackpack.dump() failed to empty contents"
         # Test docstrings
-        print("\nStudent docstrings:\n")
-        print(b2.__doc__)
-        print(b2.__init__.__doc__)
-        part = int(input("\nScore out of 2: "))
-        if part < 2: feedback += "\n\tbad 'Backpack' docstring(s)"
-        points += part
-    
-        feedback += "\n  Score += " + str(points)
-        score += points
-    
+        print("\nStudent Backpack class docstrings:\n")
+        print(b2.__doc__); print(b2.__init__.__doc__)
+        p,f = strTest(2,"\n\tbad Backpack docstring(s)")
+        points += p; feedback += f
+        
+        score += points; feedback += "\n  Score += " + str(points)
+        
         # Problem 2: 15 points
         feedback += "\nTesting problem 2 (15 points)..."
-        points = 11
+        points = 0
         # Test default name, and max_size attributes
-        b1 = Jetpack()
+        b1 =   Jetpack()
         b2 = s.Jetpack()
-        if b1.name != b2.name:
-            points -= 1
-            feedback += "\n\tincorrect name (inheritance problem?)"
-        if b1.max_size != b2.max_size:
-            points -= 1
-            feedback += "\n\tincorrect max_size (inheritance problem?)"
+        if b1.name == b2.name: points += 1
+        else: feedback += "\n\tJetpack.name failed on default value"
+        if b1.max_size == b2.max_size: points += 1
+        else: feedback += "\n\tJetpack.max_size failed on default value"
         # Test non-default color, name, and max_size attributes
         b1 =   Jetpack(color='asvnawie',name='efnaiwen', max_size=3)
         b2 = s.Jetpack(color='asvnawie',name='efnaiwen', max_size=3)
-        if b1.color != b2.color:
-            points -= 1
-            feedback += "\n\tincorrect color (inheritance problem?)"
-        if b1.name != b2.name:
-            points -= 1
-            feedback += "\n\tincorrect name (inheritance problem?)"
-        if b1.max_size != b2.max_size:
-            points -= 1
-            feedback += "\n\tincorrect max_size (inheritance problem?)"
-         # Test fuel attribute
-        if b1.fuel != b2.fuel:
-            points -= 1
-            feedback += "\n\tincorrect fuel -- wrong default amount"
+        if b1.name == b2.name: points += 1
+        else: feedback += "\n\tJetpack.name failed on nondefault value"
+        if b1.max_size == b2.max_size: points += 1
+        else: feedback += "\n\tJetpack.max_size failed on nondefault value"
+        if b1.color == b2.color: points += 1
+        else: feedback += "\n\tJetpack.color failed on nondefault value"
+        # Test fuel attribute
+        if b1.fuel == b2.fuel: points += 1
+        else: feedback += "\n\tJetpack.fuel failed on starting value"
         # Test put() (no going over the limit)
         b1.put('f'); b1.put('u'); b1.put('n')
         b2.put('f'); b2.put('u'); b2.put('n')
-        print("\nExpected output:\t"),
-        b1.put('something else that should not fit')
-        print("Student output: \t"),
-        b2.put('something else that should not fit')
-        part = int(input("\nScore out of 1: "))
-        if not part:
-            feedback += "\n\tput() failed to print 'Backpack Full!'. "
-            feedback += "(inheritance problem?)"
-        points += part
-        if b1.contents != b2.contents: points -= 1
+        print("\nCorrect output:\t"),; b1.put('this should not fit')
+        print(  "Student output:\t"),; b2.put('this should not fit')
+        p,f = strTest(1,"\n\tJetpack.put() failed to print 'Backpack Full!'")
+        points += p; feedback += f
+        if b1.contents == b2.contents: points += 1
+        else: feedback += "\n\tJetpack.put() failed (went over max_size)"
         # Test dump()
-        b1.dump()
-        b2.dump()
-        if b1.contents != b2.contents:
-            points -= 1; feedback += "\n\tincorrect contents -- dump() failed"
-        if b1.fuel != b2.fuel:
-            points -= 1; feedback += "\n\tincorrect fuel -- dump() failed"
+        b1.dump(); b2.dump()
+        if b1.contents == b2.contents: points += 1
+        else: feedback += "\n\tJetpack.dump() failed to empty contents"
+        if b1.fuel == b2.fuel: points += 1
+        else: feedback += "\n\tJetpack.dump() failed to empty fuel"
         # Test fly()
         b1.fuel = 10
         b2.fuel = 10
-        print("\nExpected output:\t"),
-        b1.fly(20)
-        print("Student output: \t"),
-        b2.fly(20)
-        part = int(input("\nScore out of 1: "))
-        if not part: feedback += "\n\tfly() failed to print 'Not enough fuel!'"
-        points += part
-        if b1.fuel != b2.fuel:
-            points -= 1; feedback += "\n\tincorrect fuel -- fly() failed"
-        b1.fly(5)
-        b2.fly(5)
-        if b1.fuel != b2.fuel:
-            points -= 1; feedback += "\n\tincorrect fuel -- fly() failed"
+        print("\nCorrect output:\t"),; b1.fly(20)
+        print(  "Student output:\t"),; b2.fly(20)
+        p,f = strTest(1,"\n\tJetpack.put() failed to print 'Not enough fuel!'")
+        points += p; feedback += f
+        if b1.fuel == b2.fuel: points += 1
+        else: feedback += "\n\tJetpack.fly() failed to decrease fuel correctly"
+        b1.fly(5); b2.fly(5)
+        if b1.fuel == b2.fuel: points += 1
+        else: feedback += "\n\tJetpack.fly() failed to decrease fuel correctly"
         # Test docstrings
-        print("\nStudent docstrings:\n")
-        print(b2.__doc__)
-        print(b2.__init__.__doc__)
-        part = int(input("\nScore out of 2: "))
-        if part < 2: feedback += "\n\tbad 'Jetpack' docstring(s)"
-        points += part
+        print("\nStudent Jetpack class docstrings:\n")
+        print(b2.__doc__); print(b2.__init__.__doc__)
+        p,f = strTest(2,"\n\tbad Jetpack docstring(s)")
+        points += p; feedback += f
         
-        feedback += "\n  Score += " + str(points)
-        score += points
+        score += points; feedback += "\n  Score += " + str(points)
         
-        # Problem 3: 20 points
-        points = 10
-        feedback += "\nTesting problem 3 (20 points)..."
-        # Test __repr__ on an empty, default backpack
+        # Problem 3: 15 points
+        points = 0
+        feedback += "\nTesting problem 3 (15 points)..."
+        # Test __str__ on an empty, default backpack
         b1 =   Backpack()
         b2 = s.Backpack()
-        print("\nExpected output:")
-        print(b1)
-        print("\nStudent output:")
-        print(b2)
-        part = int(input("\nScore out of 5: "))
-        if part < 5: feedback += "\n\tincorrect __repr__ for 'Backpack' object"
-        points += part
-        # Test __repr__ on a partially full backpack
+        print("\nCorrect output:"); print(b1)
+        print("\nStudent output:"); print(b2)
+        p,f = strTest(3,"\n\tBackpack.__str__ failed")
+        points += p; feedback += f
+        # Test __str__ on a partially full backpack
         b1 =   Backpack('Blue and White','ACME',7)
         b2 = s.Backpack('Blue and White','ACME',7)
         b1.put('thing1'); b1.put('thing2'); b1.put('thing3')
         b2.put('thing1'); b2.put('thing2'); b2.put('thing3')
-        print("\nExpected output:")
-        print(b1)
-        print("\nStudent output:")
-        print(b2)
-        part = int(input("\nScore out of 5: "))
-        if part < 5: feedback += "\n\tincorrect __repr__ for 'Backpack' object"
-        points += part
+        print("\nCorrect output:"); print(b1)
+        print("\nStudent output:"); print(b2)
+        p,f = strTest(5,"\n\tBackpack.__str__ failed")
+        points += p; feedback += f
         # Test __eq__ in False case
         b1 =   Backpack('Color','Name',5)
         b2 = s.Backpack('Color','Name',5)
         b1.name = 'FalseName'
-        if b1 == b2:
-            points -= 1; feedback += "incorrect __eq__ for different names"
+        if b1 == b2: feedback += "Backpack.__eq__ failed on different names"
+        else: points += 1
         b1.name = 'Name'; b1.color = 'Red'
-        if b1 == b2:
-            points -= 1; feedback += "incorrect __eq__ for different colors"
+        if b1 == b2: feedback += "Backpack.__eq__ failed on different colors"
+        else: points += 1
         b1.color = 'Color'
         b1.put('an item')
         b2.put("a different item")
         if b1 == b2:
-            points -= 1;
-            feedback += "incorrect __eq__ for different contents"
-            feedback += "(same size contents list)"
+            feedback += "Backpack.__eq__ failed on different contents"
+            feedback += " (same sized contents lists)"
+        else: points += 1;
         b1.put("yet another item")
         if b1 == b2:
-            points -= 2
-            feedback += "incorrect __eq__ for different contents"
-            feedback += "(different sized contents list)"
+            feedback += "Backpack.__eq__ failed on different contents"
+            feedback += " (different sized contents list)"
+        else: points += 1
         # Test __eq__ in True case
         b1 =   Backpack('green','Math',3)
         b2 = s.Backpack('green','Math',3)
+        if not (b1 == b2): feedback += "Backpack.__eq__ failed on equal"
+        else: points += 1
+        b1.put('an item'); b2.put('an item')
+        if not (b1 == b2): feedback += "Backpack.__eq__ failed on equal"
+        else: points += 1
+        b1.put('A'); b1.put('B')
+        b2.put('B'); b2.put('A')
         if not (b1 == b2):
-            points -= 1; feedback += "incorrect __eq__ for same names"
-        b1.put('an item')
-        b2.put('an item')
-        if not (b1 == b2):
-            points -= 2; feedback += "incorrect __eq__ for same contents"
-        b1.put('A')
-        b2.put('B')
-        b1.put('B')
-        b2.put('A')
-        if not (b1 == b2):
-            points -= 2
-            feedback += "incorrect __eq__ for same contents"
-            feedback += "(same contents in different order)"
-
-        feedback += "\n  Score += " + str(points)
-        score += points
-    
+            feedback += "Backpack.__eq__ failed on equal"
+            feedback += " (same contents in different order)"
+        else: points += 1
+        
+        score += points; feedback += "\n  Score += " + str(points)
+        
         # Problem 4: 20 points
-        feedback += "\nTesting problem 4 (20 points)..."
-        points = 18
+        feedback += "\nTesting problem 4 (15 points)..."
+        points = 0
         x1 =   ComplexNumber(3392,-493)
         y1 = s.ComplexNumber(3392,-493)
         # Test real / imag attributes
-        if x1.real != y1.real:
-            points -= 1; feedback += "\n\tincorrect real"
-        if x1.imag != y1.imag:
-            points -= 1; feedback += "\n\tincorrect imag"
+        if x1.real == y1.real: points += 1
+        else: feedback += "\n\tComplexNumber.real failed"
+        if x1.imag == y1.imag: points += 1
+        else: feedback += "\n\tComplexNumber.imag failed"
         # Test conjugate()
         x2 = x1.conjugate()
         y2 = y1.conjugate()
-        if x2.real != y2.real:
-            points -= 1
-            feedback += "\n\tincorrect real -- conjugate() failed"
-        if x2.imag != y2.imag:
-            points -= 1
-            feedback += "\n\tincorrect imag -- conjugate() failed"
+        if x2.real == y2.real: points += 1
+        else: feedback += "\n\tComplexNumber.conjugate() failed for real part"
+        if x2.imag == y2.imag: points += 1
+        else: feedback += "\n\tComplexNumber.conjugate() failed for imag part"
         # Test norm()
-        if x1.norm() != y1.norm():
-            points -= 2
-            feedback += "\n\tnorm() failed"
+        if x1.norm() == y1.norm(): points += 1
+        else: feedback += "\n\tComplexNumber.norm() failed"
         # Test __add__
         x2 = ComplexNumber(-21,210)
         y2 = ComplexNumber(-21,210)
         x3 = x1 + x2
         y3 = y1 + y2
-        if x3.real != y3.real:
-            points -= 1
-            feedback += "\n\tincorrect real -- __add__ failed"
-        if x3.imag != y3.imag:
-            points -= 1
-            feedback += "\n\tincorrect imag -- __add__ failed"
+        if x3.real == y3.real: points += 1
+        else: feedback += "\n\tComplexNumber.__add__ failed for real part"
+        if x3.imag == y3.imag: points += 1
+        else: feedback += "\n\tComplexNumber.__add__ failed for imag part"
         # Test __sub__
         x3 = x1 - x2
         y3 = y1 - y2
-        if x3.real != y3.real:
-            points -= 1
-            feedback += "\n\tincorrect real -- __sub__ failed"
-        if x3.imag != y3.imag:
-            points -= 1
-            feedback += "\n\tincorrect imag -- __sub__failed"
+        if x3.real == y3.real: points += 1
+        else: feedback += "\n\tComplexNumber.__sub__ failed for real part"
+        if x3.imag == y3.imag: points += 1
+        else: feedback += "\n\tComplexNumber.__sub__ failed for imag part"
         # Test __mul__
         x3 = x1 * x2
         y3 = y1 * y2
-        if x3.real != y3.real:
-            points -= 2
-            feedback += "\n\tincorrect real -- __mul__ failed"
-        if x3.imag != y3.imag:
-            points -= 2
-            feedback += "\n\tincorect imag -- __mul__ failed"
+        if x3.real == y3.real: points += 1
+        else: feedback += "\n\tComplexNumber.__mul__ failed for real part"
+        if x3.imag == y3.imag: points += 1
+        else: feedback += "\n\tComplexNumber.__mul__ failed for imag part"
         # Test __div__
         x3 = x1 / x2
         y3 = y1 / y2
-        if x3.real != y3.real:
-            points -= 2
-            feedback += "\n\tincorrect real -- __div__ failed"
-        if x3.imag != y3.imag:
-            points -= 2
-            feedback += "\n\tincorrect imag -- __div__ failed"
+        if x3.real == y3.real: points += 1
+        else: feedback += "\n\tComplexNumber.__div__ failed for real part"
+        if x3.imag == y3.imag: points += 1
+        else: feedback += "\n\tComplexNumber.__div__ failed for imag part"
         # Test docstrings
         print("\nStudent docstrings:\n")
-        print(y1.__doc__)
-        print(y1.__init__.__doc__)
-        part = int(input("\nScore out of 2: "))
-        if part < 2: feedback += "\n\tbad 'ComplexNumber' docstring(s)"
-        points += part
+        print(y1.__doc__); print(y1.__init__.__doc__)
+        p,f = strTest(2,"\n\tbad ComplexNumber docstring(s)")
+        points += p; feedback += f
         
-        feedback += "\n  Score += " + str(points)
-        score += points
+        score += points; feedback += "\n  Score += " + str(points)
         
     except:
         feedback += "\n\nCompilation Error!"
     
-    # Report final score    
-    feedback += "\n\nTotal score: "+str(score)+"/65 = "+str(score/.65)+"%"
-    return score/.65, feedback
+    if late:    # Late submission penalty
+        feedback += "\n\nHalf credit for late submission."
+        feedback += "\nRaw score: " + str(score) + "/60"
+        score *= .5
+    
+    # Report final score
+    feedback += "\n\nTotal score: "+str(score)+"/55 = "+str(score/.55)+"%"
+    
+    if   score/.55 >= 99.0: feedback += "\n\nExcellent!"
+    elif score/.55 >=  90.0: feedback += "\n\nGreat job!"
+    
+    return score, feedback
