@@ -1,7 +1,6 @@
-# lab3_solutions.py
-""" Volume II Lab 3: Public Key Encryption (RSA)
+# solutions.py
+"""Volume II Lab 3: Public Key Encryption (RSA)
     Main solutions file. Also see 'rsa_tools'.
-    Use the test() method as a test script.
     Written by Shane McQuarrie, Spring 2015.
 """
 
@@ -212,44 +211,55 @@ def prime(n):
     print primes[len(primes) - 1]
     return primes
 
-def test(student_module):
-    """Test script. You must import the student's file as a module.
+def test(student_module, late=False):
+    """Test script. You must import the student's solutions file as a module.
+    
     20 points for problem 1
     10 points for problem 2
     10 points for problem 3
     
     Inputs:
-        student_module: the imported module for the student's file.
+        student_module: the imported module for the student's solutions file.
+        late (bool): if True, half credit is awarded.
     
     Returns:
-        score (int): the student's score, out of 100.
+        score (int): the student's score, out of 40.
         feedback (str): a printout of test results for the student.
     """
+    
+    def crypt(o,p,message):
+        """Test encrypt() and decrypt(). Return 1 on success, 0 else."""
+        if message == o.decrypt(p.encrypt(message,o.public_key)): return 1
+        else: return 0
+    
+    def primality(n):
+        """Call the student's is_prime() function 10 times on 'n'."""
+        total = 0
+        for i in xrange(10):
+            total += s.is_prime(n)
+            if total > 0: break
+        return total
     
     s = student_module
     score = 0
     feedback = s.__doc__
+    print(feedback)
     
     try:
         # Problem 1: 20 points
-        feedback += "\nTesting problem 1 (20 points)..."
-        points = 2
+        feedback += "\nTesting problem 1 (20 points):"
+        points = 0
         r1 =   myRSA()
         r2 = s.myRSA()
         # Test public key (2 pts)
         r1.generate_keys(287117,104729,610639)
         r2.generate_keys(287117,104729,610639)
-        if r1.public_key != r2.public_key:
-            points -= 1; feedback += "\n\tincorrect public key"
+        if r1.public_key == r2.public_key: points += 1
+        else: feedback += "\n\tmyRSA.public_key failed"
         r1.generate_keys(562739,7927,588949)
         r2.generate_keys(562739,7927,588949)
-        if r1.public_key != r2.public_key:
-            points -= 1; feedback += "\n\tincorrect public key"
-        # test decrypt(encryption)
-        def crypt(o,p,message):
-            """Test encrypt() and decrypt(). Return 1 on success, 0 else."""
-            if message == o.decrypt(p.encrypt(message,o.public_key)): return 1
-            else: return 0
+        if r1.public_key == r2.public_key: points += 1
+        else: feedback += "\n\tmyRSA.public_key failed"
         # test encrypt() and decrypt() together, default key (8 pts)
         r2.generate_keys(610639,287117,104729)
         p = 0
@@ -260,9 +270,7 @@ def test(student_module):
         p += crypt(r2,r2,"Jared Webb is the bomb.") * 2
         r2.generate_keys(562739,7927,588949)
         p += crypt(r2,r2,"F!I*N@A(L)_ ### _&T+E=S^T") * 2
-        if p < 8:
-            feedback += "\n\tmyRSA.decrypt(Encrypt(Message)) failed with "
-            feedback += "default key"
+        if p < 8: feedback += "\n\tmyRSA.decrypt(myRSA.encrypt(Message)) failed"
         points += p
         # test encrypt() and decrypt() together, non-default public key (10 pts)
         r1.generate_keys(12899,3853,17393)
@@ -275,91 +283,81 @@ def test(student_module):
         r1.generate_keys(287117,104729,610639)
         p += crypt(r1,r2,"F!I*N@A(L)_ ### _&T+E=S^T") * 3
         if p < 10:
-            feedback += "\n\tmyRSA.decrypt(Encrypt(Message)) failed with "
-            feedback += "non-default key"
+            feedback += "\n\tmyRSA.decrypt(myRSA.encrypt(Message,newkey)) failed "
         points += p
         
-        score += points
-        feedback += "\n  Score += " + str(points)
+        score += points; feedback += "\n  Score += " + str(points)
         
         # Problem 2: 10 points
-        feedback += "\nTesting problem 2 (10 points)..."
-        points = 10
-        prime = "\n\tprime marked as nonprime -- is_prime() failed"
-        nonprime = "\n\tnonprime marked as prime -- is_prime() failed"
-        def primality(n):
-            """Call the student's is_prime() function 10 times on 'n'."""
-            total = 0
-            for i in xrange(10):
-                total += s.is_prime(n)
-                if total > 0: break
-            return total
+        feedback += "\nTesting problem 2 (10 points):"
+        points = 0
+        # Feedback messages
+        prime = "\n\tis_prime() failed (prime marked as nonprime)"
+        nonprime = "\n\tis_prime() failed (nonprime marked as prime)"
         # Correct response with primes
-        if primality(547):
-            points -= 1; feedback += prime
-        if primality(4421):
-            points -= 1; feedback += prime
-        if primality(9739):
-            points -= 1; feedback += prime
-        if primality(16411):
-            points -= 1; feedback += prime
-        if primality(43063):
-            points -= 1; feedback += prime
+        if primality(547) == 0: points += 1
+        else: feedback += prime
+        if primality(4421) == 0: points += 1
+        else: feedback += prime
+        if primality(9739) == 0: points += 1
+        else: feedback += prime
+        if primality(16411) == 0: points += 1
+        else: feedback += prime
+        if primality(43063) == 0: points += 1
+        else: feedback += prime
         # Correct response with composites
-        if not primality(10):
-            points -= 1; feedback += nonprime
-        if not primality(1000):
-            points -= 1; feedback += nonprime
-        if not primality(542):
-            points -= 1; feedback += nonprime
-        if not primality(1643):
-            points -= 1; feedback += nonprime
-        if not primality(340561):
-            points -= 1; feedback += nonprime
+        if primality(10) > 0: points += 1
+        else: feedback += nonprime
+        if primality(1000) > 0: points += 1
+        else: feedback += nonprime
+        if primality(542) > 0: points += 1
+        else: feedback += nonprime
+        if primality(1643) > 0: points += 1
+        else: feedback += nonprime
+        if primality(340561) > 0: points += 1
+        else: feedback += nonprime        
         
-        score += points
-        feedback += "\n  Score += " + str(points)
+        score += points; feedback += "\n  Score += " + str(points)
         
         # Problem 3: 10 points
-        feedback += "\nTesting problem 3 (10 points)..."
+        feedback += "\nTesting problem 3 (10 points):"
         p = 0
+        # Test encrypt() and decrypt together(), default key
         r2 = s.PyCrypto()
-        # Test encrypt and decrypt together
         p += crypt(r2,r2,"small")
         p += crypt(r2,r2,"really really really really really long test")
         r2 = s.PyCrypto()
         p += crypt(r2,r2,"!@#$%^&*^$%##%^%&*&^&$%^#%#$@#%$& weird test")
         p += crypt(r2,r2,"Jared Webb is the bomb.")
-        r2 = s.PyCrypto()
         p += crypt(r2,r2,"F!I*N@A(L)_ ### _&T+E=S^T")
-        if p < 5:
-            feedback += "\n\tPyCrypto.decrypt(Encryption)) failed with "
-            feedback += "default key"
+        if p < 5: feedback += "\n\tPyCrypto.decrypt(PyCrypto.encrypt(Mesage)) failed"
         points = p
         p = 0
-        # Test send()
+        # Test encrypt() and decrypt() together, nondefault public key
         r1 =   PyCrypto()
         r2 = s.PyCrypto()
         p += crypt(r2,r1,"small")
         p += crypt(r2,r1,"really really really really really long test")
-        r1 =   PyCrypto()
-        r2 = s.PyCrypto()
         p += crypt(r2,r1,"!@#$%^&*^$%##%^%&*&^&$%^#%#$@#%$& weird test")
         p += crypt(r1,r2,"Jared is the bomb.")
-        r1 =   PyCrypto()
-        r2 = s.PyCrypto()
         p += crypt(r1,r2,"F!I*N@A(L)_ ### _&T+E=S^T")
         if p < 5:
-            feedback += "\n\tPyCrypto.decrypt(Encryption)) failed with "
-            feedback += "non-default key"
+            feedback += "\n\tPyCrypto.decrypt(PyCrypto.encrypt(Message,newkey)) failed"
         points += p
         
-        score += points
-        feedback += "\n  Score += " + str(points)
+        score += points; feedback += "\n  Score += " + str(points)
     
     except:
         feedback += "\n\nCompilation Error!!"
     
+    if late:    # Late submission penalty
+        feedback += "\n\nHalf credit for late submission."
+        feedback += "\nRaw score: " + str(score) + "/40"
+        score *= .5
+    
     # Report final score
     feedback += "\n\nTotal score: "+str(score)+"/40 = "+str(score/.4)+"%"
-    return score/.4,feedback
+    if score/.4 >= 100.0: feedback += "\n\nExcellent!"
+    elif score/.4 >= 90.0: feedback += "\n\nGreat job!"
+    
+    return score,feedback
