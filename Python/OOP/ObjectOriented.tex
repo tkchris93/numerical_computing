@@ -246,7 +246,7 @@ b.__doc__     b.__init__    b.__module__
 \end{lstlisting}
 
 In all of our preceding examples, the comments enclosed by sets of three double quotes are stored as the object's \emph{docstring}, stored as \li{__doc__}.
-It is important to write good docstrings so that others can utilize your code effectively.
+It is important to write good docstrings so that others can utilize your code correctly.
 
 Now, suppose we wanted an operation for adding two backpacks together.
 In the following class, adding two backpacks combines their contents.
@@ -308,7 +308,7 @@ class Backpack(object):
         self.color = color
         self.contents = []
     
-    def put(self, item)
+    def put(self, item):
         self.contents.append(item)
     
     def take(self, item):
@@ -351,12 +351,13 @@ True
 
 A complete list of available magic methods can be found \href{https://docs.python.org/2/reference/datamodel.html#special-method-names}{here}.
 
+% Problem 3: __str__ magic method
 \begin{problem}
-
 The \li{__str__} magic method is used to give the string representation of an object.
 When the object is used with the \li{print} command, the \li{__str__} method is called.
 Add the \li{__str__} method to Backpack.py so that \li{print backpack} yields
 \begin{lstlisting}
+ Name:		<name>
  Color:		<color>
  Size:		<number of items in contents>
  Max Size:	<max_size>
@@ -376,6 +377,7 @@ Add the \li{__eq__} magic method to Backpack.py so that two backpack objects are
 Note that the contents do not need to be in the same order for the contents to be the same.
 \end{problem}
 
+% Problem 4: ComplexNumber class
 \begin{problem}
 Create a \li{ComplexNumber} class that supports the basic operations of complex numbers. Implement a \li{conjugate} method that return a \li{ComplexNumber} object that is the complex conjugate, and a \li{norm} method that returns the magnitude of the complex number.
 Also implement the following magic methods:

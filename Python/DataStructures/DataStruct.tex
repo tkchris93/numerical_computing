@@ -129,35 +129,35 @@ See Figure \ref{fig:add} for an illustration.
 \begin{lstlisting}
 # spec.py
 
-from Node import LinkedListNode as Node
+from Node import LinkedListNode
 
 class LinkedList(object):
-    """Singly-linked list data structure class. The first node in the list is
-    referenced to by 'head'.
+	"""Singly-linked list data structure class.
+	The first node in the list is referenced to by 'head'.
 	"""
 	
 	def __init__(self):
-		"""Creates a new linked list. Create the head attribute and set it 
-		to 'None' since the list is empty.
+		"""Create a new empty linked list. Create the head
+		attribute and set it to None since the list is empty.
 		"""
 		self.head = None
 
 	def add(self, data):
-		"""Create a new Node containing 'data' and add it to the end of
-		the list.
+		"""Create a new Node containing 'data' and add it to
+		the end of the list.
 		"""
 
-		new_node = Node(data)
+		new_node = LinkedListNode(data)
 		if self.head is None:
 			# If the list is empty, point the head attribute to the new node.
 			self.head = new_node
 		else:
-			# If the list is not empty, traverse the list and place the
-			# new_node at the end.
+			# If the list is not empty, traverse the list
+			# and place the new_node at the end.
 			current_node = self.head
 			while current_node.next is not None:
-				# This moves the current node to the next node if it is
-				# not empty. Thus when we break out of the loop, current_node
+				# This moves the current node to the next node if it is not
+				# empty. Then when we break out of the loop, current_node
 				# points to the last node in the list.
 				current_node = current_node.next
 
@@ -217,8 +217,8 @@ def remove(self, data):
 	"""Remove the Node containing 'data'."""
 
 	# First, check if the head is the node to be removed. If so, set the
-	# head to be the node after head. This removes the only reference to
-	# head, so it is then deleted.
+	# new head to be the first node after the old head. This removes
+	# the only reference to the old head, so it is then deleted.
 	if self.head.data == data:
 		self.head = self.head.next
 	else:
@@ -228,7 +228,7 @@ def remove(self, data):
 		while current_node.next.data != data:
 			current_node = current_node.next
 	
-		# Point the current node to the node after the target node.
+		# Point current_node to the node after the target node.
 		new_next_node = current_node.next.next
 		current_node.next = new_next_node
 \end{lstlisting}
@@ -241,7 +241,7 @@ In Python if there is no reference to an object, and thus no way for the program
 
 \begin{problem}
 Though the above code works to remove specified nodes, it is not quite complete.
-Modify the \li{remove} method so that if the user tries to remove a node containing \li{value} that is not in the list, the method prints ``\li{value} not in list.''
+Modify the \li{remove} method so that if this list is empty, or if the user tries to remove a node containing \li{value} that is not in the list, the method prints ``\li{value} is not in the list.''
 \end{problem}
 
 \begin{figure}
@@ -254,9 +254,10 @@ Modify the \li{remove} method so that if the user tries to remove a node contain
 Inserting a node at a specified location is similar to removing a node.
 Add an \li{insert} method to the \li{LinkedList} class that inserts a new node before the first node that contains the data specified by the user.
 This function accepts two arguments: the data for the new node, and the data of the node before which the new node will be inserted.
+If the list is empty, or if the user calls \li{insert(data,place)} and there is no node containing \li{place} in the list, print ``\li{place} is not in the list.''
 
 See Figure \ref{fig:insert} for an illustration of the \li{insert} method.
-Note that since \li{insert} inserts a node before a specified node, it is not possible to \li{insert} at the end of the list.
+Note that since \li{insert} inserts a node before a specified node, it is not possible to \li{insert} at the end of the list or to an empty list.
 \end{problem}
 
 \section*{Doubly-Linked Lists}
@@ -291,15 +292,17 @@ See Figure \ref{fig:doubly_linked} for an illustration.
 
 
 \begin{lstlisting}
-# location: Node.py
+# Node.py
 
-class DoublyLinkedListNode(Node):
-	"""A node for a doubly-linked list."""
-	def __init__(self, data):
-		"""Set prev and next attributes."""
-		Node.__init__(self, data)
-		self.prev = None
+class DoublyLinkedListNode(LinkedListNode):
+	"""A Node class for doubly-linked lists. Inherits from the 'Node' class.
+	Contains references to the next and previous nodes in the list.
+	"""
+	def __init__(self,data):
+		"""Set the next and prev attributes."""
+		Node.__init__(self,data)
 		self.next = None
+		self.prev = None
 \end{lstlisting}
 
 \begin{figure}
@@ -318,34 +321,36 @@ class DoublyLinkedListNode(Node):
 All of the methods for linked lists can be implemented for doubly-linked lists.
 See Figures \ref{fig:d_insertion} and \ref{fig:d_removal} for illustrations of the insert and remove methods.
 
+% Problem 5: doubly-linked list
 \begin{problem}
-Implement a \li{DoublyLinkedList} class that inherits from the \li{LinkedList} class, but uses \li{DoublyLinkedListNode} instances to build the list.
+Implement a \li{DoublyLinkedList} class that inherits from \li{LinkedList} and uses \li{DoublyLinkedListNode} instances to build the list.
 Add an attribute called \li{tail} that keeps track of the node at the end of the list.
 Overwrite the \li{add}, \li{remove}, and \li{insert} methods.
 Use the \li{tail} attribute to make the \li{add} method more efficient.
 \end{problem}
 
-% TODO: change the class hierarchy (?) What do we do with StrNode?
+% Problem 6: sorted linked list
 \begin{problem}
 Implement a sorted linked list.
 This data structure adds new nodes strategically so that the data is always kept in order.
 Inherit this class from \li{DoublyLinkedList}, and override the \li{add} and \li{insert} methods.
 %Inherit the node class for this data structure from \li{StrNode}, and modify it so that it is compatible with doubly-linked lists.
 When a new node is added, traverse the list until the data in the next node is greater than or equal to the data for the new node.
-Then insert the new node so that the ordering is maintained.
-Also override the \li{insert} method so that it receives only one argument and calls \li{add}. This effectively disables \li{insert} and prevents the user from accidentally inserting a node in a location that would disrupt the ordering.
+Then insert the new node, thereby preserving the ordering.
+Also override the \li{insert} method so that it receives only one argument and calls \li{add}.
+This effectively disables \li{insert} for the \li{SortedLinkedList} and prevents the user from accidentally inserting a node in a location that would disrupt the ordering.
 
 To test this data structure, import the provided \li{WordList} module.
 This includes a method called \li{create_word_list} that returns a list of randomly ordered words, extracted from a text file.
-The file \li{English.txt} contains a list of over $58,000$ English words.
-Write a function called \li{sort} that sorts the list of words generated by \li{create_word_list("English.txt")} by adding them to a \li{SortedLinkedList} object.
+The file \li{English.txt} contains a list of over $58 000$ English words.
+Write a function called \li{sort_words} that sorts the list of words generated by \li{create_word_list("English.txt")} by adding them to a \li{SortedLinkedList} object.
 Then return the object.
 (Warning: sorting the entire data set can take about 15 minutes. Test your data structure on smaller data sets first.)
 \end{problem}
 
 Python has many quick sorting methods.
 Even on the seemingly large data set of over 58,000 words used in the preceding problem, the \li{sort} method for Python lists is almost instantaneous.
-In the next lab we will focus \emph{Trees}, special kinds of linked lists that allow for much quicker sorting and data retrieval.
+In the next lab we will turn our attention to \emph{Trees}, special kinds of linked lists that allow for much quicker sorting and data retrieval.
 
 
 

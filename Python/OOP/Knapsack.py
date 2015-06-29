@@ -1,5 +1,5 @@
 # Knapsack.py
-""" Volume II Lab 2: Object Oriented Programming (Auxiliary file)
+"""Volume II Lab 2: Object Oriented Programming (Auxiliary file)
     Example code. You are not required to modify this file in any way.
 """
 from Backpack import Backpack
@@ -56,3 +56,5 @@ class Knapsack(Backpack):
     def tie(self):
         """Tie the knapsack."""
         self.closed = True
+
+# ============================== END OF FILE ============================== #

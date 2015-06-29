@@ -1,9 +1,10 @@
 # name this file 'solutions.py'
-""" Volume II Lab 1: The Standard Library
+"""Volume II Lab 1: The Standard Library
     <Name>
     <Class>
     <Date>
 """
+
 
 
 # Problem 1: Implement this function.
@@ -23,14 +24,16 @@ def prob2():
     pass
 
 
-# Problem 3: Create a 'calculator' module and implement this function.
+# Problem 3: Create a 'calculator' module and use it to implement this function.
 def prob3(a,b):
     """Calculate and return the length of the hypotenuse of a right triangle.
     Do not use any methods other than those that are imported from the
     'calculator' module.
+    
     Parameters:
-        a : the length one of the sides of the triangle.
-        b : the length the other nonhypotenuse side of the triangle.
+        a (float): the length one of the sides of the triangle.
+        b (float): the length the other nonhypotenuse side of the triangle.
+    
     Returns:
         The length of the triangle's hypotenuse.
     """
@@ -52,7 +55,7 @@ def prob4():
 
 # Everything under this 'if' statement is executed when this file is run from
 #   the terminal. In this case, if we enter 'python solutions.py word' into the
-#   terminal, then sys.argv is ['solutions.py, 'word'], and prob4() is executed.
+#   terminal, then sys.argv is ['solutions.py', 'word'], and prob4() is executed.
 if __name__ == "__main__":
     prob4()
 
