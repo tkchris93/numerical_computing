@@ -507,8 +507,7 @@ def test(student_module, late=False):
         
         score += points; feedback += "\n  Score += " + str(points)
         
-    except:
-        feedback += "\n\nCompilation Error!"
+    except Exception as e: feedback += "\n\nError: " + e.message
     
     if late:    # Late submission penalty
         feedback += "\n\nHalf credit for late submission."

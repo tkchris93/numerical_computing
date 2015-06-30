@@ -612,6 +612,7 @@ def test(student_module, node_module, late=False):
         l1.__init__(); l2.__init__()
         entries = [1,3,5,7,9,2,4,6,8,0]
         for i in entries:
+            x = l1.tail
             l1.add(i); l2.add(i)
         p,f = testPart(4,l1,l2,"\n\tSortedLinkedList.insert() failed")
         points += p; feedback += f
@@ -619,13 +620,13 @@ def test(student_module, node_module, late=False):
         shrink_file("English.txt", "Short.txt")
         word_list = create_word_list("Short.txt")
         word_list.sort()
-        p,f = testPart(10,word_list,s.sort_words("Short.txt"),
-            "\n\tsort_words() function failed.")
+        p,f = testPart(10,word_list,
+            s.sort_words("Short.txt"),"\n\tsort_words() function failed.")
         points += p; feedback += f
         
         score += points; feedback += "\n  Score += " + str(points)
     
-    except: feedback += "\n\nCompilation Error!!"
+    except Exception as e: feedback += "\n\nError: " + e.message
     
     if late:    # Late submission penalty
         feedback += "\n\nHalf credit for late submission."
