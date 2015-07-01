@@ -25,7 +25,7 @@ def export_word_list(words, outfile='Test.txt'):
     Take note of how file input / output works in Python. The concept will
     resurface many times in later labs.
     """
-    file = open(outfile, 'w'        # open the file with write-only access
+    file = open(outfile, 'w')       # open the file with write-only access
     for w in words:                 # write each word to the file, appending
         file.write(w + '\n')        #   an endline character after each word
     f.close()                       # close the file.
