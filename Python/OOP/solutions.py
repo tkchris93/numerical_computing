@@ -389,6 +389,8 @@ def test(student_module, late=False):
         print(b2.__doc__); print(b2.__init__.__doc__)
         p,f = strTest(2,"\n\tbad Jetpack docstring(s)")
         points += p; feedback += f
+        if not issubclass(s.Jetpack, s.Backpack):
+            points = 0; feedback += "\n\tJetpack must inherit from Backpack!"
         
         score += points; feedback += "\n  Score += " + str(points)
         
