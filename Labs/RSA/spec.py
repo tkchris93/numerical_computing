@@ -11,9 +11,9 @@ class myRSA(object):
     'rsa_tools' and your implementation of the Extended Euclidean Algorithm.
     
     Attributes:
-        public_key (tup): the RSA key that is available to everyone. Of the
+        public_key (tup): the RSA key that is available to everyone, of the
             form (e, n). Used only in encryption.
-        _private_key (tup, hidden): the secret RSA key. Of the form (d, n).
+        _private_key (tup, hidden): the secret RSA key, of the form (d, n).
             Used only in decryption.
     
     Examples:
@@ -28,7 +28,7 @@ class myRSA(object):
         >>> s = myRSA()
         >>> s.generate_keys(287117,104729,610639)
         >>> s.decrypt(r.encrypt("SECRET MESSAGE",s.public_key))
-        'SECRET MESSAGE
+        'SECRET MESSAGE'
     """
     def __init__(self):
         """Initialize public and private key variables."""
@@ -48,7 +48,7 @@ class myRSA(object):
         """
         pass
     
-    def encrypt(self, message):
+    def encrypt(self, message, key=None):
         """Encrypt 'message' with a public key and return its encryption as a
         list of integers. If no key is provided, use the 'public_key' attribute
         to encrypt the message.
@@ -60,10 +60,11 @@ class myRSA(object):
         """
         pass
     
-    def decrypt(self, message):
-        """Decrypt 'message' with the private key and return its decryption as
-        a single string. You may assume that the format of 'message' is the
-        same as the output of the encrypt() function.
+    def decrypt(self, ciphertext):
+        """Decrypt 'ciphertext' with the private key and return its decryption
+        as a single string. You may assume that the format of 'ciphertext' is
+        the same as the output of the encrypt() function. Remember to strip off
+        the fill value used in rsa_tools.partition().
         """
         pass
 
@@ -80,8 +81,8 @@ def is_prime(n):
         n (int): the candidate for primality.
     
     Returns:
-        The number of tries it took to find a witness number, up to 5 (or 0 if
-        no witnesses were found).
+        The number of tries it took to find a witness number, up to 5
+        (or 0 if no witnesses were found).
     
     """
     pass
@@ -131,8 +132,8 @@ class PyCrypto(object):
         """
         pass
     
-    def decrypt(self, message):
-        """Decrypt 'message' and return its decryption."""
+    def decrypt(self, ciphertext):
+        """Decrypt 'ciphertext' with '_keypair' and return the decryption."""
         pass
 
 # ============================== END OF FILE ============================== #

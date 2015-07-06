@@ -135,9 +135,11 @@ class DoublyLinkedList(LinkedList):
 class SortedLinkedList(DoublyLinkedList):
     """Sorted doubly-linked list data structure class."""
 
+    # Overload add() and insert().
     def add(self, data):
         """Create a new Node containing 'data' and insert it at the
         appropriate location to preserve list sorting.
+        
         Example:
             >>> print(my_list)
             [3, 5]
@@ -156,8 +158,15 @@ class SortedLinkedList(DoublyLinkedList):
 # Conclude problem 6 by implementing this function.
 def sort_words(filename = "English.txt"):
     """Use the 'create_word_list' method from the 'WordList' module to generate
-    a scrambled list of words from the specified file. Then use an instance of
-    the SortedLinkedList class to sort the list.
+    a scrambled list of words from the specified file. Use an instance of
+    the SortedLinkedList class to sort the list. Then return the list.
+    
+    Inputs:
+        filename (str, opt): the file to be parsed and sorted. Defaults to
+            'English.txt.
+    
+    Returns:
+        The SortedLinkedList object containing the sorted list.
     """
     pass
 

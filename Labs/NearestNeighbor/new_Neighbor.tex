@@ -1,7 +1,7 @@
 \lab{Nearest Neighbor Search}{Nearest Neighbor Search}
 \label{lab:NNS}
 
-\objective{Teach about branch and bound and the curse of dimensionality using the nearest neighbor search problem.}
+\objective{Introduce the nearest neighbor search problem, K-D trees, and the curse of dimensionality.}%Teach about branch and bound and the curse of dimensionality using the nearest neighbor search problem.}
 
 \section*{The Nearest Neighbor Search Problem}
 
@@ -10,56 +10,225 @@ The premise is this: suppose that you move into a new city with several post off
 Since you are a busy individual, to minimize travel time you would like to know which post office is closest to your home.
 More generally, the problem is to find the point in a set of points (the post offices) that is nearest to some other point (your home).
 
+% Problem 1: Euclidean Distance
+\begin{problem}
+To solve the nearest neighbor problem, we must define a metric.
+That is, we need a way of determining the distance between two points.
+For this lab, we will use standard euclidean distance.
+
+% should we say 1 x n (like usual) or 1 x k (to reflect the k-d tree idea)
+Write a function that accepts two vectors (as $1$ x $k$ numpy arrays) and returns the distance between them.
+If the two vectors do not have the same dimensions, raise a ValueError.
+Make sure the function can handle data in $\mathbb{R}^n$ for any $n\in\mathbb{N}$
+\end{problem}
+
+
 The naive approach to solving the post office problem is to travel from your house to one of the post offices, then from your house to a different post office, and so on until all post offices have been visited. Then choose the post office that it took the least amount of time to get to from your house. This exhaustive method is clearly inefficient, and only feasible if the data set is very small.
 
+% Problem 2: Exhaustive search method
 \begin{problem}
 Write a function that solves the nearest neighbor search problem by exhaustively checking all of the distances between a point of interest and each point in a data set.
 
-The function should take in the set of data points (as a list of tuples) and a single target point.
-Return distance to the closest data point and the index of that point.
-Your function should be able to take in data in an arbitrary dimension.
+% what should the format of the data be?
+The function should take in the set of data points (as a $m$ x $k$ numpy array) and a single target point (as a $1$ x $k$ numpy array).
+Return the point in the set that is closest to the point of interest (the nearest neighbor) and the distance between those two points. As in the previous problem, your function should be able to take in data in $\mathbb{R}^n$ for any $n\in\mathbb{N}$.
 \end{problem}
 
-The complexity of this algorithm is $O(kn)$.
-Where  is the $k$ number of dimensions and $n$ is the number of data points.
+% Bad choice of variables k and n
+The complexity of this algorithm is $O(kn)$, where $k$ is the number of dimensions and $n$ is the number of data points.
 
 \section*{K-D Trees}
 
-A faster way to solve this problem is to build a k-d tree and search the k-d tree for the nearest neighbor. 
+\begin{figure}
+\caption{This 2-dimensional tree partitions $\mathbb{R}^2$ at each level. (TODO: Make a figure like the one on Wikipedia or reference Wikipedia)}
+\label{fig:k-binary-search}
+\end{figure}
 
-A k-d tree is a binary tree where the nodes to the left of parent node have a lower value in the i-th dimension and the nodes to the right of the parent node have a greater value in the i-th dimension.
-Which dimension you split the nodes alternates at different levels.
-In the $3$ dimensional case the root node is divided in the $x$ dimension, children in the $y$ dimension, grandchildren in the $z$ dimension, and the great-grandchildren in the $x$ dimension and so on.
-Each node stores its location, left child and right child.
-This requires sorting at each level so the complexity is $O(n log^2(n))$, but we only need to build the k-d tree once and after that we can query it as many times as we want.
+Fortunately, there is a particular data structure that lends itself well to solving this problem quickly.
+A \emph{k-d tree}, or \emph{k-dimensional tree}, is a specialized binary search tree.
+Using a k-d tree to solve a nearest neighbor search problem speeds things up by travelling toward the target incrementally instead of exhaustively searching every option.
+Just as a regular binary search tree partitions the number line at every step of descent, a k-d tree partitions $\mathbb{R}^k$ at every step of descent.
 
-Included is a function that takes in a set of data and builds k-d tree.
-The leaf nodes' children are  python's ``None" object.
+At each level of the tree, for some $i$ the nodes to the left of the parent nodes have a lower value in the $i^{th}$ dimension and the nodes to the right of the parent node have a greater value in the $i^{th}$ dimension.
+The choice of dimension $i$ cycles through the possible choices as we descend deeper through the tree.
+In the $3$-dimensional case the root node is divided in the $x$ dimension, the children in the $y$ dimension, the grandchildren in the $z$ dimension, the great-grandchildren in the $x$ dimension, and so on.
+See figure \ref{fig:k-binary-search} for an example in $\mathbb{R}^2$.
 
-The search of the tree is done recursively.
-Our search function will accept a parent node on which to search, a search point to which we want to find the nearest neighbor, the current best point, the current best distance, and a dimension $i$.
-The search function should return the best point and best distance currently held in the algorithm.
-We start the algorithm on the root node of the tree using it's point and distance to the search point as the best point and best distance, and start with $0$ as the first dimension.
+Constructing an optimal k-d tree requires sorting the data before each insertion, so the complexity is $O(n\log^2{n})$. However, once the tree is built we can use it as needed with much lower Big-O rates.
+
+In this lab we will construct our own k-d tree class by inheriting from the previous lab's \li{BST} class. First, we need to create specialized nodes.
+
+% KDT Node class -- should probably become example code instead of a problem
+\begin{problem}
+Copy or import your \li{BSTNode} class from the previous lab.
+Write a \li{KDTNode} class that inherits from \li{BSTNode}.
+% Optional vvv
+Modify the constructor so that a \li{KDTNode} can only hold a list or numpy list.
+% Optional ^^^
+Add an attribute called \li{axis}.
+This attribute will track how deep the node is in the tree so we know which entry of \li{data} to use as the bisector.
+
+Write the \li{__lt__} and \li{__gt__} magic methods so that the $<$ and $>$ operators compare the $i^{th}$ entry of the data, where $i$ is the \li{axis} attribute of the node on the \emph{right side} of the operator.
+For example,
+
+\begin{lstlisting}
+>>> x = KDTNode([1,2])
+>>> y = KDTNode([3,1])
+>>> y.axis = 0			# Compare the '0th' entry of the data 
+>>> x < y				# True, since 1 < 3
+True
+>>> x > y
+False
+
+>>> y.axis = 1			# Compare the '1st' entry of the data
+>>> x < y				# False, since 2 > 1
+False
+>>> x > y
+True
+\end{lstlisting}
+
+Finally, write the \li{__sub__} magic method so that \li{x} - \li{y} yields the euclidean distance between the data in node \li{x} and the data in node \li{y}.
+
+(Hint: use the function from problem 1)
+\end{problem}
 
 
-For each recursive step, we first check if the euclidean distance between the parent node's point to the search point is less than the current best.
-If so, we update it the best distance and best point to match the parent node.
+Now we must construct the actual k-d tree class.
+The structure requires an attribute that houses the dimension of the tree (the \emph{k} of the k-d tree).
+
+\begin{lstlisting}
+def class KDT(BST)
+	"""A k-dimensional tree object."""
+
+	def __init__(self, k)
+	"""Set the dimension attribute 'k'."""
+		BST.__init__(self)
+		self.k = k
+\end{lstlisting}
 
 
-We then compare the values in the $i$-th dimension of the search point and the parent's point.
-If the search point's value is less than that of the parent node's point we recursively call the search function again on the left child of the parent node on the dimension $i+1$, flipping the dimension to $0$ if necessary, and set best point and best distance to it's output.
-Then we have to check if the hypersphere around the point with radius being the current best distance crosses the dividing hyperplane created by the parent.
-In code we accomplish this by adding the best distance to the point's value in the $i$-th dimension.
-If this sum is greater than the parent's point value in the i-th dimension, we then search additionally the right child of the parent (using the dimension $i+1$) and update the best point and best distance to the output.
+The only major difference between a k-d tree and a binary search tree is how the data is compared at each depth level.
+As long as we set the \li{axis} attribute correctly in each node as it is inserted into the tree, we should be able to do this fairly easily because of our work in the previous problem.
+Though we don't need to use a \li{find} function in solving the nearest neighbor problem, we provide the k-d tree version of \li{find} as an instructive example.
+
+\begin{lstlisting}
+class KDT(BST):
+	# ...
+
+	def find(self, data):
+		"""Return the node containing 'data'. Raise a ValueError if there is
+		no such node in the tree or if the tree is empty."""
+		
+		def _step(current, target):
+			"""Recursively approach the target node."""
+			
+			if current is None:				# Base case: target not found.
+				return current
+			if current.data == target.data:	# Base case: target found!
+				return current
+			if target < current:			# Recursively search to the left
+				return _step(current.left, target)
+			else:							# Recursively search to the right
+				return _step(current.right, target)
+			
+		if self.root is None:				# Check for empty tree
+			raise ValueError(str(data) + " is not in the tree.")
+		
+		# Create a new node so that the KDTNode comparison operators can be used
+		n = KDTNode(data)
+		found = _step(self.root, n)
+		if found is None:					# Report that the data was not found
+			raise ValueError(str(data) + " is not in the tree.")
+		return found						# Return the node containing 'data'
+\end{lstlisting}
+
+At every comparison in the \li{_step} function, the data of \li{target} and \li{current} are compared based on the \li{axis} attribute of \li{current}, since \li{current} is the right-hand operand.
+% A little repetitive here
+This way if each existing node in the tree has the correct \li{axis}, the correct comparisons will be made as we descend.
+
+% This next bit should probably be part of the next problem.
+\begin{comment}
+To solve the nearest neighbor search problem, we only need to create the k-d tree once. Then we can use it multiple times with different target points. To prevent the user from messing with the tree, disable the \li{remove} method:
+\begin{lstlisting}
+class KDT(BST):
+	# ...
+	
+	def remove(self, *args):
+		raise ValueError("remove() has been disabled for this class.")
+\end{lstlisting}
+\end{comment}
+
+\begin{problem}
+Finish the \li{KDT} class by overriding \li{insert} and disabling \li{remove}.
+
+To insert a new node, first check to make sure the data is the proper format. Then find the correct insertion location using an approach similar to the \li{find} method. Remember to double-link the nodes. Set the \li{axis} of the new node appropriately. Do not allow for duplicates in the tree.
+
+To solve the nearest neighbor search problem, we need only create the k-d tree once. Then we can use it multiple times with different target points. To prevent the user from altering the tree, disable the \li{remove} method. Raise a \li{ValueError} if the method is called, and allow it to receive any number of arguments.
+
+\end{problem}
 
 
-If the point's value was less than the parent's in th i-th dimension, we apply the last two steps mirrored to the right and left children.
-We first search the right child with the $i+1$-th dimension and set the best point and best distance to the output.
-We then check if the search point's value in the $i$-th dimension minus the best distance is less than the parent node's value in the $i$-th dimension. 
-If it is, we will also search the left child one the $i+1$-th dimension and set the best point and best distance to the output.
+Now that we have a k-d tree, we can use it to solve the nearest neighbor problem.
+First we must load the tree with data so that it can be searched.
 
-Below the algorithm summarized in pseudo code 
+% This can be done by writing the following short function, or by adding stuff to the constructor of the KDT class.
+% I like the constructor idea, but I have only written it so far as a function.
+% This could also possibly be absorbed into the next problem.
+\begin{problem}
+Write a function that creates a \li{KDT} instance and loads it with a set of data.
+The data will be a $m$ x $k$ numpy array.
+For an optimal k-d tree, the data needs to be inserted in a very particular order.
+However, inserting at random still usually produces a good tree.
+For this problem, insert the data in the order that it is given (iterate through the rows).
+\end{problem}
 
+To solve the nearest neighbor problem, we need to do a careful recursive search through the tree.
+At each step, we need to keep track of a current search node, the target point, the current best point (our current candidate for the nearest neighbor), and the current minimum distance (the distance from the nearest neighbor to the target).
+We start the algorithm on the root node.
+For each recursive step, we first check if the euclidean distance between the current search node and the target point is less than the current minimum distance.
+If so, we update the nearest neighbor and calculate the new minimum distance.
+We then descend through the tree and search recursively, similar to the \li{find} function.
+
+We aren't done, however; after descending we need to check that there truly is no other nearest neighbor.
+Technically, we are checking to see if the hypersphere of radius `minimum distance' around the supposed nearest neighbor does not intersect with any other hyperplanes created by the tree.
+In the code we accomplish this by adding the minimum distance to the $i^{th}$ entry of the target point's data, where $i$ is the \li{axis} of the supposed nearest neighbor.
+If this sum is greater than the $i^{th}$ entry of the current search node's data, then we need to descend in the \emph{opposite} direction that we came.
+
+We summarize the algorithm below.
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+%d = euclidean\_metric
+\Procedure{KDTSearch}{current, target, neighbor, distance}
+\State index = current.axis
+\State d = euclidean\_distance
+	\If {d(current,target) $<$ distance}
+		\State neighbor = current
+		\State distance = d(current,target)
+	\EndIf
+	
+	\If {target.data[index] $<$ current.data[index]}
+		\State neighbor, distance = KDTSearch(current.left, target,
+			\State									neighbor, distance)
+		\If {target.data[index] + distance $>=$ current.data[index]}
+			\State neighbor, distance = KDTSearch(current.right, target,
+				\State									neighbor, distance)
+		\EndIf
+	\Else
+		\State neighbor, distance = KDTSearch(current.right, target,
+			\State									neighbor, distance)
+		\If {target.data[index] + distance $<=$ current.data[index]}
+			\State neighbor, distance = KDTSearch(current.left, target,
+				\State									neighbor, distance)
+		\EndIf
+	\EndIf
+\EndProcedure
+\end{algorithmic}
+\caption{k-d tree nearest neighbor search}
+\label{alg:kdneighborz}
+\end{algorithm}
+
+\begin{comment}
 \begin{algorithm}
 \begin{algorithmic}[1]
 \Procedure{KDSearch}{search\_point,parent\_node,b\_point,b\_distance,i}
@@ -88,35 +257,104 @@ Below the algorithm summarized in pseudo code
 \caption{Nearest Neighbor}
 \label{alg:nearestneighbor}
 \end{algorithm}
+\end{comment}
 
 
 \begin{problem}
-Write a function that solves the nearest neighbor search problem by searching through a k-d tree.
-The function should take in k-d tree and a single point.
-The output should be the distance to the closest data point and the coordinates of that point. 
+Use Algorithm \ref{alg:kdneighborz} to write a function that solves the nearest neighbor search problem by searching through a k-d tree.
+The function should take in a k-d tree (already loaded with data) and a single point of interest.
+Output the nearest neighbor in the tree and the distance from the nearest neighbor to the point of interest. 
 \end{problem}
 
-\begin{problem}
-Time both the functions you have created with the number of data points being $10,000-100,000$ every multiple of $10,000$ with $4$ dimensions.
-Time only the searching of the k-d tree not the building of it.
-Plot both times on the same plot.
-How do the two algorithms compare?
+\section*{Scipy.spatial.KDTree}
 
+Scipy has a built-in k-d tree structure.
+It functions the same way that the \li{KDT} class does, except its operations have been heavily optimized.
+To create the tree, we simply give it data in the initializer.
+To solve the nearest neighbor search problem, we `query' the tree and give it a target point.
+\li{query} returns a tuple of the minimum distance and the index of the nearest neighbor in the data.
+
+\begin{lstlisting}
+>>> from scipy.spatial import KDTree
+>>> from numpy.random import random
+
+# Initialize the tree with data
+>>> data = random((100,20))
+>>> scipy_kdt =  KDTree(data)
+
+# Query the tree and print the minimum distance
+>>> min_distance, node_index = scipy_kdt.query(random(20))
+>>> print(min_distance)
+1.1769198641683098
+
+# Print the nearest neighbor by indexing into the tree's data
+>>> print scipy_kdt.data[node_index]
+array([ 0.30411204,  0.72439179,  0.81654881,  0.37483482,  0.37419281,
+        0.19786408,  0.28339901,  0.26042625,  0.95736655,  0.9898518 ,
+        0.3523297 ,  0.91607715,  0.91631037,  0.87982453,  0.66185015,
+        0.8003657 ,  0.73600775,  0.7150884 ,  0.1836229 ,  0.89556912])
+\end{lstlisting}
+
+\section*{The Curse of Dimensionality}
+
+In almost all multidimensional optimization problems, as the number of dimensions increases, the amount of time it takes to solve the problem increases exponentially.
+This is the so-called `Curse of Dimensionality'.
+In Algorithm \ref{alg:kdneighborz}, as the number of dimensions increases the number of times that we travel down both branches increases. Eventually using a k-d tree actually becomes less efficient than the exhaustive search method.
+
+\begin{problem}
+Write a function that creates three distinct figures.
+In each figure, plot the time that it takes to solve the nearest neighbor search problem by exhaustive search, then by a k-d tree search using \li{KDT}, then again using \li{scipy.spatial.KDTree}.
+
+In the first figure, use $n$ x 4 data sets with $n$ varying from 10,000 to 100,000 by multiples of 10,000.
+Generate the data with \li{numpy.random.random()}.
+Time only the searching of the k-d trees, not the building of them.
+
+In the second figure, repeat the process with $n$ x 20 data sets, $n$ varying again from 10,000 to 100,000 by multiples of 10,000.
+
+In the third figure, repeat the process with 20,000 x $k$ data sets, where $k$ varies from 2 to 50.
+Here we are increasing the dimension, not the number of data points, and we expect to suffer from the curse of dimensionality.
 
 \begin{figure}[H]
 \includegraphics[width=\textwidth]{fourDTime.pdf}
-\caption{Your graph should look like this.
-The green line is the naive version and blue line is using a kd-tree.
-As you can see the kd-tree is much faster.}
+\caption{The first plot may look something like this.
+The green line is the naive algorithm and blue line is the kd-tree search.
+The kd-tree is the clear winner so far.}
 \label{fig:fourDTime}
 \end{figure}
+
+\begin{figure}[H]
+\includegraphics[width=\textwidth]{twentyDTime.pdf}
+\caption{The second graph may look something like this.
+The green line is the naive version and blue line is using a kd-tree.
+Now the k-d tree search is slower than the naive algorithm.}
+\label{fig:twentyDTime}
+\end{figure}
+
+\begin{figure}[H]
+\includegraphics[width=\textwidth]{curseD.pdf}
+\caption{The third graph may look something like this.
+Around 15 dimensions the time spikes for the k-d tree search algorithm.
+At that point using a kd-tree is even less effective than the naive algorithm.}
+\end{figure}
+
 \end{problem}
 
-The complexity of this algorithm is $O(klog(n))$ in optimal time.
+Certain algorithms suffer less due to the curse of dimensionality, but are not as good in lower dimensions.
+Others, like the one we have studied in this lab, are good in lower dimensions but suffer heavily in higher dimensions.
+Knowing how to pick your algorithm is an important skill in multidimensional data analysis.
+
+
+
+
+
+
+\begin{comment} % END OF LAB. The rest of this needs to be moved elsewhere.
+
+The complexity of this algorithm is $O(k\log(n))$ in optimal time.
 Its worst case is $O(k*n^{1-\frac{1}{k}})$ where $k$ is the number of dimensions and $n$ is the number of points in the tree.
 The reasons for this are discussed in the next section.
 
-\section*{Curse of Dimensionality}
+\section{Curse of Dimensionality}
 
 As you increase the number of dimensions the number of times that you have to go down both branches increases.
 You get to the point where you eliminate very few points by using a k-d tree.
@@ -126,14 +364,7 @@ Time both algorithms for the number of data points being $10,000-100,000$ every 
 Plot both times on the same plot. Now how do the two algorithms compare?
 \end{problem}
 
-\begin{figure}[H]
-\includegraphics[width=\textwidth]{twentyDTime.pdf}
-\caption{
-Your graph should look like this.
-The green line is the naive version and blue line is using a kd-tree.
-As you can see the kd-tree is slightly slower than the naive version.}
-\label{fig:twentyDTime}
-\end{figure}
+
 
 \begin{problem}
 Time the SciPy built in function for searching a k-d tree (do not time the building of the kd-tree) for the number of dimensions points being $2-50$ with $20,000$ data points.
@@ -144,15 +375,8 @@ Create the tree by \li{tree = KDTree(data)} and search it by \li{tree.query(poin
 
 \li{scipy.spatial} includes a \li{cKDTree} object which is implemented in C.
 Is it any better?
-
-\begin{figure}[H]
-\includegraphics[width=\textwidth]{curseD.pdf}
-\caption{
-Your graph should look similar to this.
-Around 15 dimensions the time jumps.
-At that point using a kd-tree is not more effective than checking all the combinations.}
-\end{figure}
 \end{problem}
+
 
 \section*{Classification}
 A common problem is correctly classifying data.  
@@ -303,3 +527,5 @@ A similar classification process is used by the United States Postal Service to 
 \caption{An example of the number 6 taken from the data set}
 \end{figure}
 \end{problem}
+
+\end{comment}

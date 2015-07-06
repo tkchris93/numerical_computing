@@ -31,7 +31,7 @@ Then she sets $\phi(n) = (p-1)(q-1)$.\footnote{
 The function $\phi: \mathbb{Z} \rightarrow \mathbb{N}$ is called the \emph{Euler phi function}. In general $\phi(n)$ is the number of positive integers less than $n$ that are relatively prime to $n$.}
 Alice chooses her encryption exponent to be some integer $e$ that is relatively prime to $\phi(n)$.
 Then she uses the Extended Euclidean Algorithm to find $d'$ such that $ed' + \phi(n)x' = 1$, and adds or subtracts multiples of $\phi(n)$ until $d = d'+k\phi(n)$ is between 0 and $\phi(n)$.
-Alice publishes her public key $(e, n)$ for the world to see and keeps her private key $(d,n)$ a secret.
+Alice publishes her public key $(e, n)$ for the world to see and keeps her private key $(d,n)$ a secret ($e$ for encryption, $d$ for decryption).
 
 Now imagine Bob wants to send Alice a message, which he represents as an integer $m<n$ (say, using the A=01, B=02 scheme).
 Bob computes 
@@ -89,7 +89,7 @@ True
 
 \subsection*{Logistical considerations}
 The cryptosystem described is not particularly easy to use, since the message must be converted to an integer and back again by hand.
-The module \li{rsa_tools} contains some functions to fix this problem.
+The provided \li{rsa_tools} module contains some functions to fix this problem.
 The function \li{string_to_int()} turns any string into an integer (using a mapping more complicated than $A=01, B=02$), and the function \li{int_to_string()} changes it back again.
 
 \begin{lstlisting}
@@ -102,7 +102,7 @@ The function \li{string_to_int()} turns any string into an integer (using a mapp
 
 At this point we have a problem, because the message 91556947314004 is larger than $n=608610825827$.
 We can only use RSA to encrypt messages that are smaller than $n$.
-In fact, the function \li{string_size()} provided in the \li{rsa_tools} tells us the maximum number of characters we can encrypt with this choice of $n$.
+In fact, the function \li{string_size()} provided in \li{rsa_tools} tells us the maximum number of characters we can encrypt with this choice of $n$.
 
 \begin{lstlisting}
 >>> r.string_size(608610825827)
@@ -128,7 +128,7 @@ Write a method called \li{generate_keys} that accepts a pair of primes and an en
 Also include an \li{encrypt} method that accepts a string and encrypts it, using \li{public_key} as the default encryption key.
 If a different public key is provided, then the message should be encrypted with the provided key.
 
-Finally, write a \li{decrypt} method that decrypts a message with \li{_private_key}.
+Finally, write a \li{decrypt} method that decrypts an encrypted message with \li{_private_key}.
 
 Use methods from the provided \li{rsa_tools.py} module to convert strings to ints and vice-versa.
 \label{prob:rsa1}
@@ -180,6 +180,7 @@ Write a function called \li{is_prime} that implements Fermat's test for primalit
 Run the test at most five times, using integers randomly chosen from $[2, n-1]$ as possible witnesses.
 If a witness number is found, return the number of tries it took to find it.
 If no witness number is found after five tries, return $0$.
+(Hint: use the built-in \li{pow} function so the exponentiation operation does not overflow.)
 
 For most composite values of $n$, if you call \li{is_prime(n)} one hundred times, you should expect to get $0$ at most five times.
 However, some composite numbers do not follow this rule. 
@@ -191,7 +192,9 @@ For example, how many times do you have to call \li{is_prime()} on $340561$ to g
 % A professional implementation of RSA is found in the PyCrypto module.
 
 PyCrypto is a professional implementation of RSA in python.
-The package is called \li{Crypto}, and can be downloaded \href{https://pypi.python.org/pypi/pycrypto}{here}.
+The package is called \li{Crypto}, and is included with most Python distributions.
+It can be downloaded separately \href{https://pypi.python.org/pypi/pycrypto}{here}.
+Documentation for PyCrypto can be found \href{https://www.dlitz.net/software/pycrypto/api/current/}{here}.
 This library contains many random number generators and encryption classes.
 Many programs use PyCrypto for their security needs.
 
@@ -210,8 +213,8 @@ The library allows us to explicity construct a key, or generate a key automatica
 >>> keypair = RSA.generate(2048)
 
 # Save the public key as a string for distribution.
->>> publickey = keypair.publickey()
->>> share_this = publickey.exportkey()
+>>> public_key = keypair.publickey()
+>>> share_this = public_key.exportKey()
 \end{lstlisting}
 
 The \li{share_this} variable may be distributed as a public key.
@@ -219,8 +222,8 @@ Another user may then import it and use it to encrypt a message.
 
 \begin{lstlisting}
 >>> encrypter = RSA.importKey(share_this)
->>> encoded_message = encrypter.encrypt('abcde', 2048)
->>> encoded_message
+>>> ciphertext = encrypter.encrypt('abcde', 2048)
+>>> ciphertext
 ('\xb1\t\xc6L\xd1u\x80.C@\x07$#\x8e\xca\x8a\x05*\xdf\x1f.N\xa9\x80
 \x08\xcb*8~7\x1d\x87&&Ke\xd5\xed_H\xb9\xd0x\xac!\xf3\xa9\xdc\xbfy5
 s\x92\x8d\x15\xf7vY\x99G\xb6\x03j[\xa3\xc6\x92a\n\x91\x08N\xbc\xe4
@@ -234,7 +237,7 @@ xdf\xd7\x86\x87\xff\x11#-\xb5!Q)\xf7\xf1a\x94\xb3e?\xd0\x96W4\xb4\
 xca\xcf\x18\xd1I\xcd\x1dl\xd7\xe0Y\xdf}F\x93\x92\xe1(d\xcc\xdc\xa7
  x\xc5`',)
 
->>> keypair.decrypt(encoded_message)
+>>> keypair.decrypt(ciphertext)
 'abcde'
 \end{lstlisting}
 
@@ -265,16 +268,19 @@ Initialize \li{_keypair} and \li{public_key} in the constructor.
 The \li{encrypt} method accepts a string and encrypts it, using \li{_keypair} as the default encryption key.
 If the string representation of a different public key is provided, then the message should be encrypted with the provided key.
 
-The \li{decrypt} method decrypts a message using \li{_keypair}.
+The \li{decrypt} method decrypts an encrypted message using \li{_keypair}.
 
 With a partner, test your classes by exchanging public keys and sending secret messages.
 \end{problem}
 
 \begin{warn}
-PyCrypto is a very powerful tool and should not be used casually.
-Something about being imprisoned and/or exiled if you leak NSA secrets.
+The following warning comes from the PyCrypto \href{https://www.dlitz.net/software/pycrypto/}{website}:
+
+``The export of cryptography software is (still) governed by arms control regulations in Canada, the United States, and elsewhere.
+The export or re-export of this software may be regulated by law in your country.''
 \end{warn}
 
+% 	================ END OF LAB ================	%
 
 % Group project problem from the old lab.
 % Assumes we did a problem on digital signatures.

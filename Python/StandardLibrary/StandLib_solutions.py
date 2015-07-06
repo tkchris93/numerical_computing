@@ -1,13 +1,78 @@
-# lab1_solutions.py
+# StandLib_solutions.py
 """Volume II Lab 1: The Standard Library
-    Main solutions file. See also 'calculator.py' and 'matrix_multiply.py'.
-    Written by Shane McQuarrie, Spring 2015.
+    Solutions file. Written by Shane McQuarrie, Summer 2015.
 """
 
-import calculator # as c
+# import calculator # as c
 import sys
 import time
-import matrix_multiply # as m
+# import matrix_multiply # as m
+
+# ============================ AUXILIARY FILES ============================ #
+
+# calculator.py
+"""Volume II Lab 1: The Standard Library (Auxiliary file)
+    Write this module for part of problem 3.
+"""
+import math
+
+def add(x,y):
+    return x+y
+
+def mult(x,y):
+    return x*y
+
+def sqrt(x):
+    return math.sqrt(x)
+
+# Or "sqrt = math.sqrt"
+
+# matrix_multiply.py
+"""Volume II Lab 1: The Standard Library (Auxiliary File)
+    Use this module to complete problem 4. Do not modify this file in any way.
+"""
+
+import numpy as np
+
+def load_matrices(filename):
+    """Returns two matrices if the correct filename is given."""
+    
+    files = np.load(filename)
+    return files['arr_0'], files['arr_1']
+
+
+def method1(A,B):
+    """Multiply the matrices 'A' and 'B' together using nested for loops."""
+    
+    product_matrix = np.zeros((A.shape[0], B.shape[1]))
+    for i in range(product_matrix.shape[0]):
+        for j in range(product_matrix.shape[1]):
+            for k in range(product_matrix.shape[0]):
+                product_matrix[i,j] += A[i,k]*B[k,j] 
+    
+    return product_matrix
+
+
+def method2(A,B):
+    """Multiply the matrices 'A' and 'B' together with some vectorization.
+    We also use xrange() instead of range() to make things a little faster.
+    """
+    
+    product_matrix = np.zeros((A.shape[0], B.shape[1]))
+    for i in xrange(product_matrix.shape[0]):
+        for j in xrange(product_matrix.shape[1]):
+            product_matrix[i,j] = np.dot(A[i,:], B[:,j])
+    
+    return product_matrix
+
+def method3(A,B):
+    """Use numpy's matrix multiplication method for maximum speed."""
+    
+    return np.dot(A,B)
+
+
+# ============================ SOLUTIONS FILES ============================ #
+
 
 # Problem 1: Implement this function.
 def prob1(l):
@@ -80,13 +145,15 @@ def prob3(a,b):
     Returns:
         The length of the triangle's hypotenuse.
     """
-    a2 = calculator.mult(a,a)
-    b2 = calculator.mult(b,b)
-    a2plusb2 = calculator.add(a2, b2)
-    return calculator.sqrt(a2plusb2)
+    # Students should use calculator.method() instead of method()
+    a2 = mult(a,a)
+    b2 = mult(b,b)
+    a2plusb2 = add(a2, b2)
+    return sqrt(a2plusb2)
     # Or, simply
     c = calculator              # or "import calculator as c" at the top
     return c.sqrt(c.add(c.mult(a,a),c.mult(b,b)))
+
 
 # Problem 4: Utilize the 'matrix_multiply' module and 'matrices.npz' to
 #   implement this function.
@@ -98,25 +165,26 @@ def prob4():
     each method takes to multiply the two matrices together. Print your results
     to the terminal.
     """
+    # Students should use matrix_multiply.method() instead of method()
+    # m = matrix_multiply     # or "import matrix_multiply as m" at the top
     if len(sys.argv) == 1: print("No input")
     elif sys.argv[1] != "matrices.npz": print("Incorrect Input")
     else:   # If the correct filename is given,
-        m = matrix_multiply     # or "import matrix_multiply as m" at the top
-        A,B = m.load_matrices(sys.argv[1])  # load the matrices
+        A,B = load_matrices(sys.argv[1])  # load the matrices
         
         # time method1()
         start = time.time()
-        m.method1(A,B)
+        method1(A,B)
         print(time.time() - start)
         
         # time method2()
         start = time.time()
-        m.method2(A,B)
+        method2(A,B)
         print(time.time() - start)
         
         # time method3()
         start = time.time()
-        m.method3(A,B)
+        method3(A,B)
         print(time.time() - start)
 
 # Everything under this 'if' statement is executed when this file is run from
@@ -125,7 +193,7 @@ def prob4():
 if __name__ == "__main__":
     prob4()
 
-# ----------------------------- END OF SOLUTIONS ----------------------------- #
+# =========================== END OF SOLUTIONS =========================== #
 
 # Test script
 def test(student_module, student_file, late=False):
@@ -156,9 +224,8 @@ def test(student_module, student_file, late=False):
     feedback = s.__doc__
     print(feedback)
     
-    try:
-        # Problem 1: 3 points
-        feedback += "\nTesting problem 1 (3 points)..."
+    try:    # Problem 1: 3 points
+        feedback += "\n\nTesting problem 1 (3 points):"
         points = 0
         l = [192102312,-234892,9423,1220002,82,3432,23892,100000,-123812]
         [min1,max1,ave1] =   prob1(l)
@@ -170,21 +237,23 @@ def test(student_module, student_file, late=False):
         if ave1 == ave2: points += 1
         else: feedback += "\n\tincorrect average"
         
-        score += points; feedback += "\n  Score += " + str(points)
-        
-        # Problem 2: 5 points
-        feedback += "\nTesting problem 2 (5 points)..."
+        score += points; feedback += "\nScore += " + str(points)
+    except Exception as e: feedback += "\nError: " + e.message
+
+    try:    # Problem 2: 5 points
+        feedback += "\n\nTesting problem 2 (5 points):"
         print"\nCorrect output:";   prob2()
         print"\nStudent output:"; s.prob2()
-        points = 6
-        while points > 5:
+        points = -1
+        while points > 5 or points < 0:
             points = int(input("\nScore out of 5: "))
         if points < 5: feedback += "\n\tincorrect response(s)"
         
-        score += points; feedback += "\n  Score += " + str(points)
+        score += points; feedback += "\nScore += " + str(points)
+    except Exception as e: feedback += "\nError: " + e.message
         
-        # Problem 3: 5 points
-        feedback += "\nTesting problem 3 (5 points)..."
+    try:    # Problem 3: 5 points
+        feedback += "\n\nTesting problem 3 (5 points):"
         points = 0
         if s.prob3(5,12) == prob3(5,12): points += 1
         else: feedback += "\n\tincorrect hypotenuse length"
@@ -194,34 +263,34 @@ def test(student_module, student_file, late=False):
         if prob3(2,7) == c.sqrt(c.add(c.mult(2,2),c.mult(7,7))): points += 2
         else: feedback += "\n\t'calculator' module operations failed"
         
-        score += points; feedback += "\n  Score += " + str(points)
+        score += points; feedback += "\nScore += " + str(points)
+    except Exception as e: feedback += "\nError: " + e.message
         
-        # Problem 4: 7 points
-        feedback += "\nTesting problem 4 (7 points)..."
+    try:    # Problem 4: 7 points
+        feedback += "\n\nTesting problem 4 (7 points):"
         print("\nCorrect output:")
-        os.system('python lab1_solutions.py')
-        os.system('python lab1_solutions.py "Wrong Name"')
-        os.system('python lab1_solutions.py "matrices.npz"')
+        os.system("python " + __file__)
+        os.system("python " + __file__ + " Wrong Name")
+        os.system("python " + __file__ + " matrices.npz")
         print("\nStudent output:")
         os.system('python ' + path)
         os.system('python ' + path + ' "Wrong Name"')
         os.system('python ' + path + ' "matrices.npz"')
-        points = 8
-        while points > 7:
+        points = -1
+        while points > 7 or points < 0:
             points = int(input("\nScore out of 7: "))
         if points < 7: feedback += "\n\tincorrect outputs"
         
-        score += points; feedback += "\n  Score += " + str(points)
-        
-    except Exception as e: feedback += "\n\nError: " + e.message
+        score += points; feedback += "\nScore += " + str(points)
+    except Exception as e: feedback += "\nError: " + e.message
     
     if late:    # Late submission penalty
         feedback += "\n\nHalf credit for late submission."
         feedback += "\nRaw score: " + str(score) + "/20"
         score *= .5
     
+    # Report final score
     feedback += "\n\nTotal score: "+str(score)+"/20 = "+str(score/.2)+"%"
-    
     if   score/.2 >= 100.0: feedback += "\n\nExcellent!"
     elif score/.2 >=  90.0: feedback += "\n\nGreat job!"
     return score, feedback

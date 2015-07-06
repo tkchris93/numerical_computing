@@ -290,10 +290,9 @@ class SortedLinkedList(DoublyLinkedList):
                 current = current.next
             DoublyLinkedList.insert(self,data,current.data)     # Insert
     
-    def insert(self, data):
-        """Overload insert() so the user is forced to use add()."""
-        self.add(data)
-    # Or simply: insert = add
+    def insert(self, *args):
+        """Disable insert() for this class."""
+        print("insert() has been disabled for the SortedLinkedList class.")
 
 # Conclude problem 6 by implementing this function.
 def sort_words(filename = "English.txt"):
@@ -585,6 +584,9 @@ def test(student_module, node_module, late=False):
         p,f = strTest(1,
             "\n\tDoublyLinkedList.insert(x,place) failed to report on bad place")
         points += p; feedback += f
+        if not issubclass(s.DoublyLinkedList, s.LinkedList):
+            points = 0
+            feedback += "\n\tDoublyLinkedList must inherit from LinkedList!"
         
         score += points; feedback += "\n  Score += " + str(points)
         
@@ -595,34 +597,50 @@ def test(student_module, node_module, late=False):
         l2 = s.SortedLinkedList()
         # 10 points for correct SortedLinkedList
         # test 1
-        entries = [1,2,3,4,5,'a','b','c','d','e']
+        entries = [1,2,3,4,5,6,7,8,9]
         for i in entries:
             l1.add(i); l2.add(i)
         p,f = testPart(3,l1,l2,"\n\tSortedLinkedList.add() failed")
         points += p; feedback += f
         # test 2
-        l1.__init__()
-        l2.__init__()
-        entries = [9,8,7,6,5,4,2,3,1,'a','i','u','o','e']
+        l1.__init__(); l2.__init__()
+        entries = [9,8,7,6,5,4,2,3,1]
         for i in entries:
             l1.add(i); l2.add(i)
         p,f = testPart(3,l1,l2,"\n\tSortedLinkedList.add() failed")
         points += p; feedback += f
         # test 3
         l1.__init__(); l2.__init__()
-        entries = [1,3,5,7,9,2,4,6,8,0]
+        entries = [1,3,5,7,9,2,4,6,8]
         for i in entries:
-            x = l1.tail
             l1.add(i); l2.add(i)
-        p,f = testPart(4,l1,l2,"\n\tSortedLinkedList.insert() failed")
+        p,f = testPart(3,l1,l2,"\n\tSortedLinkedList.add() failed")
         points += p; feedback += f
+        # Test that insert() was disabled
+        try:
+            print("\nCorrect Output:\t"); l1.insert('a','b','c')
+            print("\nStudent Output:\t"); l2.insert('a','b','c')
+            p,f = strTest(1,
+                "\n\tSortedLinkedList.insert() failed to report as disabled")
+            points += p; feedback += f
+        except TypeError:
+            feedback += "\n\tSortedLinkedList.insert() not disabled"
+        
         # 10 points for correct sort_words() output.
         shrink_file("English.txt", "Short.txt")
         word_list = create_word_list("Short.txt")
         word_list.sort()
-        p,f = testPart(10,word_list,
-            s.sort_words("Short.txt"),"\n\tsort_words() function failed.")
+        out = s.sort_words("Short.txt")
+        p,f = testPart(10,word_list,out,"\n\tsort_words() function failed.")
         points += p; feedback += f
+        if out.__doc__ != l2.__doc__:
+            points = 0
+            feedback += "\n\tA SortedLinkedList object must be "
+            feedback += "returned in sort_words()!"
+        if not issubclass(s.SortedLinkedList, s.DoublyLinkedList):
+            points = 0
+            feedback += "\n\tSortedLinkedList must inherit "
+            feedback += "from DoublyLinkedList!"
         
         score += points; feedback += "\n  Score += " + str(points)
     
