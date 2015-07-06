@@ -1,7 +1,6 @@
-# lab4_solutions.py
+# DS1_solutions.py
 """Volume II Lab 4: Data Structures 1
-    Main solutions file. See also 'Node.py'.
-    Written by Shane McQuarrie, Summer 2015.
+    Solutions file. Written by Shane McQuarrie, Summer 2015.
 """
 
 # The student should import their various Node classes from 'Node.py'.
@@ -11,6 +10,8 @@ from WordList import create_word_list
 
 # ============================== Node classes ============================== #
 # The following classes should be located in the students' 'Node.py' file.
+
+
 # Problem 1: Add the magic methods __str__, __lt__, __le__, __eq__,
 #   __gt__, and __ge__ to this class.
 class Node(object):
@@ -20,10 +21,9 @@ class Node(object):
         self.data = data
     def __str__(self): return str(self.data)
     def __lt__(self, other): return self.data <  other.data
-    def __le__(self, other): return self.data <= other.data
     def __eq__(self, other): return self.data == other.data 
     def __gt__(self, other): return self.data >  other.data
-    def __ge__(self, other): return self.data >= other.data
+
 
 class LinkedListNode(Node):
     """A Node class for linked lists. Inherits from the 'Node' class.
@@ -48,6 +48,8 @@ class DoublyLinkedListNode(LinkedListNode):
 
 # ============================== List classes ============================== #
 # The following classes should be located in the students' 'solutions.py' file.
+
+
 # Problems 2, 3, 4: Complete the implementation of the LinkedList class.
 class LinkedList(object):
     """Singly-linked list data structure class.
@@ -181,6 +183,7 @@ class LinkedList(object):
             n.next = curr.next              # point n to 'place' node
             curr.next = n                   # point curr to n
 
+
 # Problem 5: Implement this class.
 class DoublyLinkedList(LinkedList):
     """Doubly-linked list data structure class. Inherits from the 'LinkedList'
@@ -307,7 +310,7 @@ def sort_words(filename = "English.txt"):
     return s                                # Return the Sorted Linked List.
 
 # =========================== END OF SOLUTIONS =========================== #
-# Test script
+
 def test(student_module, node_module, late=False):
     """Test script. You must import the student's 'solutions.py' and 'Node.py'
     files as modules.
@@ -333,26 +336,32 @@ def test(student_module, node_module, late=False):
     feedback = s.__doc__
     print(feedback)
 
-    def testPart(p,x,y,m):
+    def testPart(x,y,m): ###TODO
         """Test to see if x and y have the same string representation. If
-        correct, award 'p' points and return no message. If incorrect, return
+        correct, award a points and return no message. If incorrect, return
         0 and return 'm' as feedback.
         """
-        if str(x) == str(y): return p, ""
-        else: return 0, m
+        if str(x) == str(y): return 1, ""
+        else:
+            m += "\n\t\tCorrect response: " + str(x)
+            m += "\n\t\tStudent response: " + str(y)
+            return 0, m
     
-    def testTail(p,x,y,m):
+    def testTail(x,y,m):
         """Test to see if x and y have the same tail attribute. If correct,
-        award 'p' points and return no message. If incorrect, return 0 and
+        award a point and return no message. If incorrect, return 0 and
         return 'm' as feedback. Problematic if list has 0 or 1 entries.
         """
-        if x.tail.prev.next == y.tail.prev.next: return p, ""
-        else: return 0, m
+        if x.tail.prev.next == y.tail.prev.next: return 1, ""
+        else:
+            m += "\n\t\tCorrect tail: " + str(x)
+            m += "\n\t\tStudent tail: " + str(y)
+            return 0, m
     
     def strTest(p,m):
         """Manually grade a problem worth 'p' points with error message 'm'."""
-        part = p + 1
-        while part > p:
+        part = -1
+        while part > p or part < 0:
             part = int(input("\nScore out of " + str(p) + ": "))
         if part < p: return part,m
         else: return part,""
@@ -370,61 +379,62 @@ def test(student_module, node_module, late=False):
             f.write(i + '\n')
         f.close()
     
-    try:
-        # Problem 1: 5 points
-        feedback += "\nTesting problem 1 (5 points):"
+    try:    # Problem 1: 5 points
+        feedback += "\n\nTesting problem 1 (5 points):"
         points = 0
         SNode = node_module.Node
         # Comparison magic methods
         n1 = SNode(5)
         n2 = SNode(5)
-        if n1 <= n2: points += 1
+        if not (n1 < n2): points += 1
         if n1 == n2: points += 1
         n1 = SNode(4)
         n2 = SNode(6)
-        if not (n1 > n2): points += 1
+        if n1 < n2: points += 1
         if points < 3:
             feedback += "\n\t" + str(3-points)
             feedback += " Node class comparison magic method(s) failed"
         # __str__
         n1 = Node(6)
-        if str(n1) == str(n2): points += 2
-        else: feedback += "\n\tNode.__str__ failed"
+        p,f = testPart(n1,n2,"\n\tNode.__str__ failed")
+        points += (p * 2); feedback += f
         
-        score += points; feedback += "\n  Score += " + str(points)
-        
-        # Problem 2: 10 points
-        feedback += "\nTesting problem 2 (10 points):"
+        score += points; feedback += "\nScore += " + str(points)
+    except Exception as e: feedback += "\nError: " + e.message
+    
+    try:    # Problem 2: 10 points
+        feedback += "\n\nTesting problem 2 (10 points):"
         points = 0
         # Empty list
         l1 = s.LinkedList()
         l2 = list()
-        p,f = testPart(1,l1,l2,"\n\tLinkedList.__str__ failed on empty list")
+        p,f = testPart(l1,l2,"\n\tLinkedList.__str__ failed on empty list")
         points += p; feedback += f
         # Single item
-        l1.add(3)
-        l2.append(3)
-        p,f = testPart(3,l1,l2,"\n\tLinkedList.__str__ failed on single item")
-        points += p; feedback += f
+        l1.add('this')
+        l2.append('this')
+        p,f = testPart(l1,l2,"\n\tLinkedList.__str__ failed with single item")
+        points += (p * 3); feedback += f
         # Two items
-        l1.add('applesausage')
-        l2.append('applesausage')
-        p,f = testPart(3,l1,l2,"\n\tLinkedList.__str__ failed on two items")
-        points += p; feedback += f
+        l1.add('little')
+        l2.append('little')
+        p,f = testPart(l1,l2,"\n\tLinkedList.__str__ failed with two items")
+        points += (p * 3); feedback += f
         # Many items
-        entries = ['a','b',3,10.0,-1+3j,'...testing...']
+        entries = ['piggy','made','a','Linked List',3,10.0,-1+3j,set(),[1,2,3]]
         for i in entries:
             l1.add(i)
             l2.append(i)
-        p,f = testPart(3,l1,l2,"\n\tLinkedList.__str__ failed on many items")
-        points += p; feedback += f
+        p,f = testPart(l1,l2,"\n\tLinkedList.__str__ failed with many items")
+        points += (p * 3); feedback += f
         if points == 0:
             feedback += "\n\tCheck LinkedList.add() and LinkedList.__str__"
         
-        score += points; feedback += "\n  Score += " + str(points)
+        score += points; feedback += "\nScore += " + str(points)
+    except Exception as e: feedback += "\nError: " + e.message
         
-        # Problem 3: 10 points
-        feedback += "\nTesting problem 3 (10 points):"
+    try:    # Problem 3: 10 points
+        feedback += "\n\nTesting problem 3 (10 points):"
         points = 0
         l1 =   LinkedList()
         l2 = s.LinkedList()
@@ -437,27 +447,24 @@ def test(student_module, node_module, late=False):
         # Test add() (no credit, but vital for other points)
         for i in [1,3,2,5,4,7,6,9,8]:
             l1.add(i); l2.add(i)
-        p,f=testPart(0,l1,l2,
-            "\n\tIf __str__ fails, these tests will all fail")
-        points += p; feedback += f
+        p,f=testPart(l1,l2,
+            "\n\tIf LinkedList.__str__ fails, these tests will all fail!")
+        feedback += f
         # remove() head
         l1.remove(1); l1.remove(3)
         l2.remove(1); l2.remove(3)
-        p,f = testPart(2,l1,l2,
-            "\n\tLinkedList.remove() failed on head removal")
-        points += p; feedback += f
+        p,f = testPart(l1,l2, "\n\tLinkedList.remove() failed on head removal")
+        points += (p * 2); feedback += f
         # remove() end
         l1.remove(8); l1.remove(9)
         l2.remove(8); l2.remove(9)
-        p,f = testPart(2,l1,l2,
-            "\n\tLinkedList.remove() failed on tail removal")
-        points += p; feedback += f
+        p,f = testPart(l1,l2, "\n\tLinkedList.remove() failed on tail removal")
+        points += (p * 2); feedback += f
         # remove() from middle
         l1.remove(5); l1.remove(4)
         l2.remove(5); l2.remove(4)
-        p,f=testPart(2,l1,l2,
-            "\n\tLinkedList.remove() failed on middle removal")
-        points += p; feedback += f
+        p,f=testPart(l1,l2, "\n\tLinkedList.remove() failed on middle removal")
+        points += (p * 2); feedback += f
         # remove() nonexistent 
         print("\nCorrect output:\t"),;  l1.remove(100)
         print("Student output:\t"),;    l2.remove(100)
@@ -465,10 +472,11 @@ def test(student_module, node_module, late=False):
             "\n\tLinkedList.remove(x) failed to report for x not in list")
         points += p; feedback += f
         
-        score += points; feedback += "\n  Score += " + str(points)
+        score += points; feedback += "\nScore += " + str(points)
+    except Exception as e: feedback += "\nError: " + e.message
         
-        # Problem 4: 15 Points
-        feedback += "\nTesting problem 4 (15 points):"
+    try:    # Problem 4: 15 Points
+        feedback += "\n\nTesting problem 4 (15 points):"
         points = 0
         l1 =   LinkedList()
         l2 = s.LinkedList()
@@ -481,15 +489,14 @@ def test(student_module, node_module, late=False):
         # insert() before head
         l1.add(5); l1.insert(3,5); l1.insert(1,3)
         l2.add(5); l2.insert(3,5); l2.insert(1,3)
-        p,f=testPart(5,l1,l2,
-            "\n\tLinkedList.insert() failed on head insertion")
-        points += p; feedback += f
+        p,f=testPart(l1,l2,"\n\tLinkedList.insert() failed on head insertion")
+        points += (p * 5); feedback += f
         # insert() in the middle
         l1.insert(2,3); l1.insert(4,5)
         l2.insert(2,3); l2.insert(4,5)
-        p,f=testPart(5,l1,l2,
+        p,f=testPart(l1,l2,
             "\n\tLinkedList.insert() failed on middle insertion")
-        points += p; feedback += f
+        points += (p * 5); feedback += f
         print("\nCorrect output:")
         l1.insert(1,10); l1.insert(1,11); l1.insert(1,12)
         print("\nStudent output:")
@@ -498,10 +505,11 @@ def test(student_module, node_module, late=False):
             "\n\tLinkedList.insert(x,place) failed to report on bad place")
         points += p; feedback += f
         
-        score += points; feedback += "\n  Score += " + str(points)
+        score += points; feedback += "\nScore += " + str(points)
+    except Exception as e: feedback += "\nError: " + e.message
         
-        # Problem 5: 20 points
-        feedback += "\nTesting problem 5 (20 points):"
+    try:    # Problem 5: 20 points
+        feedback += "\n\nTesting problem 5 (20 points):"
         points = 0
         l1 =   DoublyLinkedList()
         l2 = s.DoublyLinkedList()
@@ -514,36 +522,35 @@ def test(student_module, node_module, late=False):
         # Test add() (no credit, but vital for other points)
         for i in [1,3,2,5,4,7,6,9,8]:
             l1.add(i); l2.add(i)
-        p,f=testPart(1,l1,l2,"\n\tDoublyLinkedList.add() failed")
-        points += p; feedback += f
-        p,f = testTail(1,l1,l2,
-            "\n\tDoublyLinkedList.tail failed on add()")
+        p,f = testPart(l1,l2,"\n\tDoublyLinkedList.add() failed")
+        feedback += f
+        p,f = testTail(l1,l2,"\n\tDoublyLinkedList.tail failed on add()")
         points += p; feedback += f
         # remove() head
         l1.remove(1); l1.remove(3)
         l2.remove(1); l2.remove(3)
-        p,f = testPart(1,l1,l2,
+        p,f = testPart(l1,l2,
             "\n\tDoublyLinkedList.remove() failed on head removal")
         points += p; feedback += f
-        p,f = testTail(1,l1,l2,
+        p,f = testTail(l1,l2,
             "\n\tDoublyLinkedList.tail failed on head removal")
         points += p; feedback += f
         # remove() end
         l1.remove(8); l1.remove(9)
         l2.remove(8); l2.remove(9)
-        p,f = testPart(1,l1,l2,
+        p,f = testPart(l1,l2,
             "\n\tDoublyLinkedList.remove() failed on tail removal")
         points += p; feedback += f
-        p,f = testTail(1,l1,l2,
+        p,f = testTail(l1,l2,
             "\n\tDoublyLinkedList.tail failed on tail removal")
         points += p; feedback += f
         # remove() from middle
         l1.remove(5); l1.remove(4)
         l2.remove(5); l2.remove(4)
-        p,f=testPart(1,l1,l2,
+        p,f=testPart(l1,l2,
             "\n\tDoublyLinkedList.remove() failed on middle removal")
-        points += p; feedback += f
-        p,f = testTail(1,l1,l2,
+        points += (p * 2); feedback += f
+        p,f = testTail(l1,l2,
             "\n\tDoublyLinkedList.tail failed on middle removal")
         points += p; feedback += f
         # remove() nonexistent 
@@ -562,19 +569,19 @@ def test(student_module, node_module, late=False):
         # insert() before head
         l1.add(5); l1.insert(3,5); l1.insert(1,3)
         l2.add(5); l2.insert(3,5); l2.insert(1,3)
-        p,f=testPart(3,l1,l2,
+        p,f=testPart(l1,l2,
             "\n\tDoublyLinkedList.insert() failed on head insertion")
-        points += p; feedback += f
-        p,f = testTail(1,l1,l2,
+        points += (p * 3); feedback += f
+        p,f = testTail(l1,l2,
             "\n\tDoublyLinkedList.tail failed on head insertion")
         points += p; feedback += f
         # insert() in the middle
         l1.insert(2,3); l1.insert(4,5)
         l2.insert(2,3); l2.insert(4,5)
-        p,f=testPart(3,l1,l2,
+        p,f=testPart(l1,l2,
             "\n\tDoublyLinkedList.insert() failed on middle insertion")
-        points += p; feedback += f
-        p,f = testTail(1,l1,l2,
+        points += (p * 3); feedback += f
+        p,f = testTail(l1,l2,
             "\n\tDoublyLinkedList.tail failed on middle insertion")
         points += p; feedback += f
         print("\nCorrect output:")
@@ -588,10 +595,11 @@ def test(student_module, node_module, late=False):
             points = 0
             feedback += "\n\tDoublyLinkedList must inherit from LinkedList!"
         
-        score += points; feedback += "\n  Score += " + str(points)
+        score += points; feedback += "\nScore += " + str(points)
+    except Exception as e: feedback += "\nError: " + e.message
         
-        # Problem 6: 20 points
-        feedback += "\nTesting problem 6 (20 points):"
+    try:    # Problem 6: 20 points
+        feedback += "\n\nTesting problem 6 (20 points):"
         points = 0
         l1 =   SortedLinkedList()
         l2 = s.SortedLinkedList()
@@ -600,22 +608,22 @@ def test(student_module, node_module, late=False):
         entries = [1,2,3,4,5,6,7,8,9]
         for i in entries:
             l1.add(i); l2.add(i)
-        p,f = testPart(3,l1,l2,"\n\tSortedLinkedList.add() failed")
-        points += p; feedback += f
+        p,f = testPart(l1,l2,"\n\tSortedLinkedList.add() failed")
+        points += (p * 3); feedback += f
         # test 2
         l1.__init__(); l2.__init__()
         entries = [9,8,7,6,5,4,2,3,1]
         for i in entries:
             l1.add(i); l2.add(i)
-        p,f = testPart(3,l1,l2,"\n\tSortedLinkedList.add() failed")
-        points += p; feedback += f
+        p,f = testPart(l1,l2,"\n\tSortedLinkedList.add() failed")
+        points += (p * 3); feedback += f
         # test 3
         l1.__init__(); l2.__init__()
         entries = [1,3,5,7,9,2,4,6,8]
         for i in entries:
             l1.add(i); l2.add(i)
-        p,f = testPart(3,l1,l2,"\n\tSortedLinkedList.add() failed")
-        points += p; feedback += f
+        p,f = testPart(l1,l2,"\n\tSortedLinkedList.add() failed")
+        points += (p * 3); feedback += f
         # Test that insert() was disabled
         try:
             print("\nCorrect Output:\t"); l1.insert('a','b','c')
@@ -631,8 +639,9 @@ def test(student_module, node_module, late=False):
         word_list = create_word_list("Short.txt")
         word_list.sort()
         out = s.sort_words("Short.txt")
-        p,f = testPart(10,word_list,out,"\n\tsort_words() function failed.")
-        points += p; feedback += f
+        p,f = testPart(word_list, out, "\n\tsort_words() function failed.")
+        points += (p * 10); feedback += f
+        # detect cheating
         if out.__doc__ != l2.__doc__:
             points = 0
             feedback += "\n\tA SortedLinkedList object must be "
@@ -642,9 +651,8 @@ def test(student_module, node_module, late=False):
             feedback += "\n\tSortedLinkedList must inherit "
             feedback += "from DoublyLinkedList!"
         
-        score += points; feedback += "\n  Score += " + str(points)
-    
-    except Exception as e: feedback += "\n\nError: " + e.message
+        score += points; feedback += "\nScore += " + str(points)
+    except Exception as e: feedback += "\nError: " + e.message
     
     if late:    # Late submission penalty
         feedback += "\n\nHalf credit for late submission."
