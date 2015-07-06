@@ -12,7 +12,7 @@ import time
 
 # calculator.py
 """Volume II Lab 1: The Standard Library (Auxiliary file)
-    Write this module for part of problem 3.
+    This module is written as part of problem 3. Do not provide to students.
 """
 import math
 
@@ -26,6 +26,7 @@ def sqrt(x):
     return math.sqrt(x)
 
 # Or "sqrt = math.sqrt"
+
 
 # matrix_multiply.py
 """Volume II Lab 1: The Standard Library (Auxiliary File)
