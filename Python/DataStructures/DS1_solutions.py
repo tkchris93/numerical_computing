@@ -336,7 +336,7 @@ def test(student_module, node_module, late=False):
     feedback = s.__doc__
     print(feedback)
 
-    def testPart(x,y,m): ###TODO
+    def testPart(x,y,m):
         """Test to see if x and y have the same string representation. If
         correct, award a points and return no message. If incorrect, return
         0 and return 'm' as feedback.
