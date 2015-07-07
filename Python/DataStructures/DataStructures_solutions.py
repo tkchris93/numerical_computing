@@ -1,4 +1,4 @@
-# DS1_solutions.py
+# DataStructures_solutions.py
 """Volume II Lab 4: Data Structures 1
     Solutions file. Written by Shane McQuarrie, Summer 2015.
 """
@@ -12,8 +12,7 @@ from WordList import create_word_list
 # The following classes should be located in the students' 'Node.py' file.
 
 
-# Problem 1: Add the magic methods __str__, __lt__, __le__, __eq__,
-#   __gt__, and __ge__ to this class.
+# Problem 1: Add the magic methods __str__, __lt__, __eq__, and __gt__.
 class Node(object):
     """A Node class for storing data."""
     def __init__(self, data):
@@ -333,8 +332,8 @@ def test(student_module, node_module, late=False):
     """
     s = student_module
     score = 0
+    total = 80
     feedback = s.__doc__
-    print(feedback)
 
     def testPart(x,y,m):
         """Test to see if x and y have the same string representation. If
@@ -656,16 +655,18 @@ def test(student_module, node_module, late=False):
     
     if late:    # Late submission penalty
         feedback += "\n\nHalf credit for late submission."
-        feedback += "\nRaw score: " + str(score) + "/80"
+        feedback += "\nRaw score: " + str(score) + "/" + str(total)
         score *= .5
     
-    # Report final score
-    feedback += "\n\nTotal score: "+str(score)+"/80 = "+str(score/.8)+"%"
-    if score/.8 < 72.0 and not late:
+    # Report final score.
+    feedback += "\n\nTotal score: " + str(score) + "/" + str(total)
+    percentage = (100.0 * score) / total
+    feedback += " = " + str(percentage) + "%"
+    if percentage < 72.0 and not late:
         feedback += "\n\nOn any given problem, if one test fails then"
         feedback += " subsequent tests are likely to fail.\nFix the tests in"
         feedback += " the order that they are mentioned in this feedback file."
-    if score/.8 >= 98.0: feedback += "\n\nExcellent!"
-    elif score/.8 >= 90.0: feedback += "\n\nGreat job!"
+    if   percentage >=  98.0: feedback += "\n\nExcellent!"
+    elif percentage >=  90.0: feedback += "\n\nGreat job!"
     
-    return score,feedback
+    return score, feedback

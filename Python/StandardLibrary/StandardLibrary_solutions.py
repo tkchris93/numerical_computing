@@ -1,4 +1,4 @@
-# StandLib_solutions.py
+# StandardLibrary_solutions.py
 """Volume II Lab 1: The Standard Library
     Solutions file. Written by Shane McQuarrie, Summer 2015.
 """
@@ -197,9 +197,8 @@ if __name__ == "__main__":
 # =========================== END OF SOLUTIONS =========================== #
 
 # Test script
-def test(student_module, student_file, late=False):
-    """Test script. You must import the students file as a module AND have the
-    students' filename (because of the sys stuff in problem 4)
+def test(student_module, late=False):
+    """Test script. You must import the students file as a module.
     
     3 points for problem 1
     5 points for problem 2
@@ -208,22 +207,22 @@ def test(student_module, student_file, late=False):
     
     Parameters:
         student_module: the imported module for the student's file.
-        student_file: the student's filename, including the path.
         late (bool, opt): if True, half credit is awarded.
     
     Returns:
         score (int): the student's score, out of 20
         feedback (str): a printout of test results for the student.
     """
-    
-    import os
-    if os.system('ls ' + student_file):
-        return
+
     s = student_module
-    path = student_file
+    sFile = s.__file__    
+    import os
+    if os.system('ls ' + sFile):
+        return
+
     score = 0
+    total = 20
     feedback = s.__doc__
-    print(feedback)
     
     try:    # Problem 1: 3 points
         feedback += "\n\nTesting problem 1 (3 points):"
@@ -248,7 +247,8 @@ def test(student_module, student_file, late=False):
         points = -1
         while points > 5 or points < 0:
             points = int(input("\nScore out of 5: "))
-        if points < 5: feedback += "\n\tincorrect response(s)"
+        if points < 5:
+            feedback += "\n\t" + str(5 - points) + " incorrect response(s)"
         
         score += points; feedback += "\nScore += " + str(points)
     except Exception as e: feedback += "\nError: " + e.message
@@ -274,9 +274,9 @@ def test(student_module, student_file, late=False):
         os.system("python " + __file__ + " Wrong Name")
         os.system("python " + __file__ + " matrices.npz")
         print("\nStudent output:")
-        os.system('python ' + path)
-        os.system('python ' + path + ' "Wrong Name"')
-        os.system('python ' + path + ' "matrices.npz"')
+        os.system('python ' + sFile)
+        os.system('python ' + sFile + ' "Wrong Name"')
+        os.system('python ' + sFile + ' "matrices.npz"')
         points = -1
         while points > 7 or points < 0:
             points = int(input("\nScore out of 7: "))
@@ -287,11 +287,13 @@ def test(student_module, student_file, late=False):
     
     if late:    # Late submission penalty
         feedback += "\n\nHalf credit for late submission."
-        feedback += "\nRaw score: " + str(score) + "/20"
+        feedback += "\nRaw score: " + str(score) + "/" + str(total)
         score *= .5
     
     # Report final score
-    feedback += "\n\nTotal score: "+str(score)+"/20 = "+str(score/.2)+"%"
-    if   score/.2 >= 100.0: feedback += "\n\nExcellent!"
-    elif score/.2 >=  90.0: feedback += "\n\nGreat job!"
+    feedback += "\n\nTotal score: " + str(score) + "/" + str(total)
+    percentage = (100.0 * score) / total
+    feedback += " = " + str(percentage) + "%"
+    if   percentage >= 100.0: feedback += "\n\nExcellent!"
+    elif percentage >=  90.0: feedback += "\n\nGreat job!"
     return score, feedback

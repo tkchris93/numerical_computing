@@ -297,8 +297,8 @@ def test(student_module, late=False):
     
     s = student_module
     score = 0
+    total = 55
     feedback = s.__doc__
-    print(feedback)
     
     try:    # Problem 1: 10 points
         feedback += "\n\nTesting problem 1 (10 points):"
@@ -548,12 +548,13 @@ def test(student_module, late=False):
     
     if late:    # Late submission penalty
         feedback += "\n\nHalf credit for late submission."
-        feedback += "\nRaw score: " + str(score) + "/60"
+        feedback += "\nRaw score: " + str(score) + "/" + str(total)
         score *= .5
     
-    # Report final score
-    feedback += "\n\nTotal score: "+str(score)+"/55 = "+str(score/.55)+"%"
-    if   score/.55 >= 99.0: feedback += "\n\nExcellent!"
-    elif score/.55 >=  90.0: feedback += "\n\nGreat job!"
-    
+    # Report final score.
+    feedback += "\n\nTotal score: " + str(score) + "/" + str(total)
+    percentage = (100.0 * score) / total
+    feedback += " = " + str(percentage) + "%"
+    if   percentage >=  98.0: feedback += "\n\nExcellent!"
+    elif percentage >=  90.0: feedback += "\n\nGreat job!"
     return score, feedback
