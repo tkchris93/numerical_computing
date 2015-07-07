@@ -73,8 +73,9 @@ The argument \li{color} is an input for the constructor, and holds the value tha
 Classes may be imported in the same way as modules.
 If the above module is saved as \li{Backpack.py}, it is possible to import the \li{Backpack} class from it.
 Once imported, the \li{Backpack} class can be called to construct backpack objects.
+
 \begin{lstlisting}
-# From the fiile Backpack.py import the Backpack class. Then create a backpack.
+# From the file Backpack.py import the Backpack class. Then create a backpack.
 >>> from Backpack import Backpack
 >>> my_backpack = Backpack('green')
 
@@ -163,6 +164,7 @@ class Knapsack(Backpack):
         self.closed = True
 \end{lstlisting}
 
+A subclass may have new attributes and methods that are unavailable to the superclass.
 If methods in the new class need to be changed, they are overwritten as is the case of the constructor in the \li{Knapsack} class.
 New methods are included normally.
 For example, the \li{put} and \li{take} methods in \li{knapsack} are modified to check if the knapsack is shut. 
@@ -171,7 +173,7 @@ For example, the \li{put} and \li{take} methods in \li{knapsack} are modified to
 \begin{lstlisting}
     def put(self, item):
         """If the knapsack is untied, use the Backpack put() method."""
-        if self.closed:				# same as 'if self.closed == True:'
+        if self.closed:					# same as 'if self.closed == True:'
             print "Knapsack is closed!"
         else:
             Backpack.put(self, item)

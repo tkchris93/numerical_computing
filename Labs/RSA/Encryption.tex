@@ -121,16 +121,13 @@ Now we can proceed to encrypt and decrypt the strings \li{'SECR'} and \li{'ETxx'
 % Problem 1: Implement the 'myRSA' class.
 \begin{problem}
 Write a class called \li{myRSA} that can generate keys, encrypt messages, and decrypt messages.
+Use methods from the provided \li{rsa_tools.py} module to convert strings to ints and vice-versa.
 
 Write a method called \li{generate_keys} that accepts a pair of primes and an encryption exponent and sets the \li{public_key} and \li{_private_key} attributes.
 (Starting \li{_private_key} with an underscore hides the attribute from the user.)
-
 Also include an \li{encrypt} method that accepts a string and encrypts it, using \li{public_key} as the default encryption key.
 If a different public key is provided, then the message should be encrypted with the provided key.
-
 Finally, write a \li{decrypt} method that decrypts an encrypted message with \li{_private_key}.
-
-Use methods from the provided \li{rsa_tools.py} module to convert strings to ints and vice-versa.
 \label{prob:rsa1}
 \end{problem}
 
@@ -188,7 +185,7 @@ For example, how many times do you have to call \li{is_prime()} on $340561$ to g
 \label{prob:prime_confidence}
 \end{problem}
 
-\section*{PyCrypto: RSA in Python (Optional)}
+\section*{PyCrypto: RSA in Python}
 % A professional implementation of RSA is found in the PyCrypto module.
 
 PyCrypto is a professional implementation of RSA in python.
@@ -264,10 +261,8 @@ Write a new RSA class called \li{PyCrypto} that acts like the \li{myRSA} class, 
 
 Store both of your RSA keys in a single attribute called \li{_keypair}, and store a sharable string representation of the public key in the \li{public_key} attribute.
 Initialize \li{_keypair} and \li{public_key} in the constructor.
-
 The \li{encrypt} method accepts a string and encrypts it, using \li{_keypair} as the default encryption key.
 If the string representation of a different public key is provided, then the message should be encrypted with the provided key.
-
 The \li{decrypt} method decrypts an encrypted message using \li{_keypair}.
 
 With a partner, test your classes by exchanging public keys and sending secret messages.

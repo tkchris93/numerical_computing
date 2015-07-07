@@ -4,8 +4,7 @@
 """
 
 
-# Problem 1: Add the magic methods __str__, __lt__, __le__, __eq__,
-#   __gt__, and __ge__ to this class.
+# Problem 1: Add the magic methods __str__, __lt__, __eq__, and __gt__.
 class Node(object):
     """A Node class for storing data."""
     def __init__(self, data):
