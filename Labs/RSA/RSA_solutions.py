@@ -123,7 +123,7 @@ class myRSA(object):
         self._private_key = None
         # Or self.generate_keys() here, if you provide default values.
     
-    def generate_keys(self,p=1000003,q=608609,e=1234567891):
+    def generate_keys(self, p, q, e):
         """Create a pair of RSA keys.
         
         Inputs:
@@ -186,7 +186,46 @@ class myRSA(object):
         return text
 
 
-# Problem 2: Fermat's test for primality.
+# Problem 2: Partially test the myRSA class with this function.
+#   Use Exceptions to indicate inappropriate arguments or test failure.
+def test_myRSA(message, p, q, e):
+    """Create a 'myRSA' object. Generate a pair of keys using 'p', 'q', and
+    'e'. Encrypt the message, then decrypt the encryption. If the decryption
+    is not exactly the same as the original message, raise a ValueError with
+    error message "decrypt(encrypt(message)) failed."
+    
+    If 'message' is not a string, raise a TypeError with error message
+    "message must be a string."
+    
+    If any of p, q, or e are not integers, raise a TypeError with error
+    message "p, q, and e must be integers."
+    
+    Inputs:
+        message (str): a message to be encrypted and decrypted.
+        p (int): A large prime for key generation.
+        q (int): A second large prime for key generation.
+        e (int): The encryption exponent.
+        
+    Returns:
+        True if no exception is raised.
+    """
+    if type(message) != str:
+        raise TypeError("message must be a string")         # Input validation 1
+    if type(p) != int or type(q) != int or type(e) != int:
+        raise TypeError("p, q, and e must be integers.")    # Input validation 2
+    r = myRSA()                                             # Instantiate object
+    r.generate_keys(p,q,e)                                  # Generate keys
+    if message != r.decrypt(r.encrypt(message)):            # myRSA validation
+        raise ValueError("decrypt(encrypt(message)) failed.")
+    return True
+    # Or, a slightly longer way,
+    ciphertext = r.encrypt(message)
+    new_message = r.decrypt(ciphertext)
+    if message != new_message:
+        raise ValueError("decrypt(encrypt(message)) failed.")
+
+
+# Problem 3: Fermat's test for primality.
 def is_prime(n):
     """Use Fermat's test for primality to see if 'n' is probably prime.
     Run the test at most five times, using integers randomly chosen from
@@ -209,7 +248,7 @@ def is_prime(n):
     return 0                    # return 0 if no witness is found.
 
 
-# Problem 3: Implement an RSA class using PyCrypto.
+# Problem 4: Implement the following RSA system using PyCrypto.
 class PyCrypto(object):
     """RSA String Encryption System. Do not use any external modules except for
     those found in the 'Crypto' package.
@@ -289,13 +328,14 @@ def test(student_module, late=False):
     20 points for problem 1
     10 points for problem 2
     10 points for problem 3
+    10 points for problem 4
     
     Inputs:
         student_module: the imported module for the student's solutions file.
         late (bool): if True, half credit is awarded.
     
     Returns:
-        score (int): the student's score, out of 40.
+        score (int): the student's score, out of 50.
         feedback (str): a printout of test results for the student.
     """
     
@@ -319,9 +359,18 @@ def test(student_module, late=False):
             if total > 0: break
         return total
     
+    def strTest(p, m):
+        """Manually grade a problem worth 'p' points and failure message 'm'."""
+        part = -1
+        while part > p or part < 0:
+            part = int(input("\nScore out of " + str(p) + ": "))
+        if part == p: return p, ""
+        else: return part, m
+        
+    
     s = student_module
     score = 0
-    total = 40
+    total = 50
     feedback = s.__doc__
     
     try:    # Problem 1: 20 points
@@ -367,19 +416,56 @@ def test(student_module, late=False):
         p,f = crypt(r1,r2,"F!I*N@A(L)_ ### _&T+E=S^T")
         points += (p * 3); feedback += f
         # Manually check that encrypt() actually returns an encryption
-        print("Student Encryption:\n")
+        print("Student Encryption:")
         print(r2.encrypt("test message"))
-        p = 2
-        while p > 1: p = int(input("\nScore out of 1: "))
-        if p < 1:
-            points = 0
-            feedback += "\n\tmyRSA.encrypt() must encrypt the message!" 
+        p,f = strTest(1,"\n\tmyRSA.encrypt() must encrypt the message!")
+        points *= p; feedback += f
         
         score += points; feedback += "\n  Score += " + str(points)
     except Exception as e: feedback += "\n\nError: " + e.message
     
     try:    # Problem 2: 10 points
         feedback += "\nTesting problem 2 (10 points):"
+        points = 0
+        print("\nCorrect response:\tmessage must be a string.")
+        print("Student response:\t"),
+        try: s.test_myRSA(1,2,3,4)
+        except TypeError as e:
+            points += 1; print(e.message)
+            p,f = strTest(1,"\n\tTypeError did not report for 'message'.")
+            points += p; feedback += f
+        print("Correct response:\tp, q, and e must be integers.")
+        print("Student response:\t"),
+        try: s.test_myRSA("secret",p="tunnels",q=1,e=2)
+        except TypeError as e:
+            points += 1; print(e.message)
+            p,f = strTest(1,"\n\tTypeError did not report for 'p'.")
+            points += p; feedback += f
+        print("Correct response:\tp, q, and e must be integers.")
+        print("Student response:\t"),
+        try: s.test_myRSA("secret",p=1,q="tunnels",e=2)
+        except TypeError as e:
+            points += 1; print(e.message)
+            p,f = strTest(1,"\n\tTypeError did not report for 'q'.")
+            points += p; feedback += f
+        print("Correct response:\tp, q, and e must be integers.")
+        print("Student response:\t"),
+        try: s.test_myRSA("secret",p=1,q=2,e="tunnels")
+        except TypeError as e:
+            points += 1; print(e.message)
+            p,f = strTest(1,"\n\tTypeError did not report for 'e'.")
+            points += p; feedback += f
+        try:
+            s.test_myRSA(message="secret",p=287117,q=104729,e=610639)
+            points += 2
+        except ValueError as e:
+            feedback += "\n\t" + e.message + "(message = 'secret')"
+        
+        score += points; feedback += "\n  Score += " + str(points)
+    except Exception as e: feedback += "\n\nError: " + e.message
+    
+    try:    # Problem 3: 10 points
+        feedback += "\nTesting problem 3 (10 points):"
         points = 0
         # Feedback messages
         prime = "\n\tis_prime() failed (prime marked as nonprime: "
@@ -410,8 +496,8 @@ def test(student_module, late=False):
         score += points; feedback += "\n  Score += " + str(points)
     except Exception as e: feedback += "\n\nError: " + e.message
     
-    try:    # Problem 3: 10 points
-        feedback += "\nTesting problem 3 (10 points):"
+    try:    # Problem 4: 10 points
+        feedback += "\nTesting problem 4 (10 points):"
         points = 0
         # Test encrypt() and decrypt together(), default key
         r2 = s.PyCrypto()
@@ -440,13 +526,10 @@ def test(student_module, late=False):
         p,f = crypt(r1,r2,"F!I*N@A(L)_ ### _&T+E=S^T")
         points += p; feedback += f
         # Manually check that encrypt() actually returns an encryption
-        print("Student Encryption:\n")
+        print("\nStudent Encryption:")
         print(r2.encrypt("test message"))
-        p = 2
-        while p > 1: p = int(input("\nScore out of 1: "))
-        if p < 1:
-            points = 0
-            feedback += "\n\tPyCrypto.encrypt() must encrypt the message!"
+        p,f = strTest(1,"\n\tPyCrypto.encrypt() must encrypt the message!")
+        points *= p; feedback += f
         
         score += points; feedback += "\n  Score += " + str(points)
     except Exception as e: feedback += "\n\nError: " + e.message
