@@ -70,11 +70,12 @@ class LinkedList(object):
         """
         return ""
 
-        # Problem 3: Finish implementing LinkedList.remove() so that if the node
-        #   is not found, the user is informed.
+    # Problem 3: Finish implementing LinkedList.remove() so that if the node
+    #   is not found, an exception is raised.
     def remove(self, data):
         """Remove the node containing 'data'. If the list is empty, or if the
-        target node is not in the list, print "<data> is not in the list."
+        target node is not in the list, raise a ValueError with error message
+        "<data> is not in the list."
         
         Example:
             >>> print(my_list)
@@ -108,7 +109,8 @@ class LinkedList(object):
     def insert(self, data, place):
         """Create a new Node containing 'data'. Insert it into the list before
         the first Node in the list containing 'place'. If the list is empty, or
-        if 'place' is not in the list, print "<place> is not in the list."
+        if there is no node containing 'place' in the list, raise a ValueError
+        with error message "<place> is not in the list."
         
         Example:
             >>> print(my_list)
@@ -119,7 +121,7 @@ class LinkedList(object):
             >>> my_list.insert(2,4)
             4 is not in the list.
         """
-        pass
+        raise NotImplementedError
 
 
 # Problem 5: Implement this class for creating doubly-linked lists.
@@ -149,11 +151,11 @@ class SortedLinkedList(DoublyLinkedList):
             >>> print(my_list)
             [2, 3, 4, 5, 6]
         """
-        pass
+        raise NotImplementedError
     
     def insert(self, data):
-        """Overload insert() so the user is forced to use add()."""
-        pass
+        """Disable insert() so the user is forced to use add()."""
+        raise NotImplementedError
 
 # Conclude problem 6 by implementing this function.
 def sort_words(filename = "English.txt"):
