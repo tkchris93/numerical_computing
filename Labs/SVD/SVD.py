@@ -4,6 +4,59 @@ import matplotlib.pyplot as plt
 import scipy.linalg as la
 from scipy.linalg import svd, norm
 
+
+def truncated_svd(A,r=None,tol=10**-6):
+    '''
+    Computes the truncated SVD of A. If r is None or equals the number of nonzero singular values, it is the compact SVD.
+    Parameters:
+        A: the matrix
+        r: the number of singular values to use 
+        tol: the tolerance for zero
+    Returns:
+        U - the matrix U in the SVD
+        s - the diagonals of Sigma in the SVD
+        Vh - the matrix V^H in the SVD
+    '''
+    #Initialize things
+    m,n = A.shape
+
+    #Find eigenvalues and eigenvectors of A^H A
+    eigs, vr = la.eig(A.conj().T.dot(A)) 
+    #Find singular values
+    sigs = np.sqrt(eigs) 
+    #Find how many singular values are nonzero
+    mask = sigs > tol 
+    num_eigs = np.sum(mask)
+    if (r==None):
+        #Return compact SVD
+        r=num_eigs
+    elif (num_eigs < r):
+        print 'less nonzero eigenvalues than given size'
+        return
+    #Initialize things
+    U = np.empty((m,r))
+    s = np.zeros(r)
+    V = np.empty((n,r))
+    
+    
+    #Sort the singular values and only keep the greatest r
+    sorted_index = np.argsort(sigs)[::-1]
+    sigs = sigs[sorted_index]
+    s[:r] = sigs[:r]
+    #Keep eigenvectors matching the order of the singular values
+    vr = vr[:,sorted_index]
+    
+    #Calculate V
+    #Only keep the first r columns corresponding to the first r singular values
+    V = vr[:,:r]
+
+    #Calculate U
+    #The first r columns are 1/sigma*A V_i where V_i is the ith column of V.
+    #Only use columns that correspond to the first r singular values
+    U = 1./sigs[:r]*A.dot(V[:,:r])
+    
+    return U, s, V.conj().T
+
 def svd_approx(A, k):
     '''
     Calculate the best rank k approximation to A with respect to the induced
@@ -23,10 +76,50 @@ def svd_approx(A, k):
     #reconstruct the best rank k approximation
     return U[:,:k].dot(S).dot(Vt[:k,:])
     
+def plot_svd():
+	A = np.array([[3,1],[1,3]])
+	U, S, V = truncated_svd(A)
+	S = np.diag(S)
+	
+	t = np.linspace(0,2*np.pi,100)
+	pts = np.array([np.cos(t),np.sin(t)])
+	v= V.dot(pts)
+	sv = S.dot(v)
+	a = U.dot(sv)
+	
+	unit_vecs = np.array([[1,0],[0,1]])
+	vu = V.dot(unit_vecs)
+	svu = S.dot(vu)
+	au = U.dot(svu)
+	
+	plt.subplot(221)
+	plt.plot(pts[0],pts[1],'b')
+	plt.plot([0,unit_vecs[0,0]],[0,unit_vecs[1,0]],'g')
+	plt.plot([0,unit_vecs[0,1]],[0,unit_vecs[1,1]],'g')
+	plt.axis('equal')
+
+	plt.subplot(222)
+	plt.plot(v[0],v[1],'b')
+	plt.plot([0,vu[0,0]],[0,vu[1,0]],'g')
+	plt.plot([0,vu[0,1]],[0,vu[1,1]],'g')
+	plt.axis('equal')
+
+	plt.subplot(223)
+	plt.plot(sv[0],sv[1],'b')
+	plt.plot([0,svu[0,0]],[0,svu[1,0]],'g')
+	plt.plot([0,svu[0,1]],[0,svu[1,1]],'g')
+	plt.axis('equal')
+	
+	plt.subplot(224)
+	plt.plot(a[0],a[1],'b')
+	plt.plot([0,au[0,0]],[0,au[1,0]],'g')
+	plt.plot([0,au[0,1]],[0,au[1,1]],'g')
+	plt.axis('equal')
+	plt.show()
     
 def lowest_rank_approx(A,e):
     '''
-    Calculate the lowest rank approximation to A that has error stricly less than e.
+    Calculate the lowest rank approximation to A that has error strictly less than e.
     Inputs:
         A -- array of shape (m,n)
         e -- positive floating point number
