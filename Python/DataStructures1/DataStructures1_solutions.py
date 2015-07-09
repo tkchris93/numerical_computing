@@ -48,6 +48,7 @@ class DoublyLinkedListNode(LinkedListNode):
 # ============================== List classes ============================== #
 # The following classes should be located in the students' 'solutions.py' file.
 
+# Problem 1: in Node.py, add magic methods to the Node class.
 
 # Problems 2, 3, 4: Complete the implementation of the LinkedList class.
 class LinkedList(object):
@@ -99,13 +100,15 @@ class LinkedList(object):
             >>> str(my_list) == str([1,2,3])
             True
         """
-        current = self.head             # List construction method
+        # List construction method
+        current = self.head
         items = list()
         while current:
             items.append(current.data)
             current = current.next
         return str(items)
-        """current = self.head          # String construction method
+        # String construction method
+        current = self.head          
         out = "["
         while current:
             out += str(current.data)
@@ -113,13 +116,13 @@ class LinkedList(object):
             if current: out += ", "
         out += "]"
         return out
-        """
 
-        # Problem 3: Finish implementing remove() so that if the node is not
-        #   found, the user is informed.
+    # Problem 3: Finish implementing remove() so that if the node is not
+    #   found, an exception is raised.
     def remove(self, data):
         """Remove the node containing 'data'. If the list is empty, or if the
-        target node is not in the list, print "<data> is not in the list."
+        target node is not in the list, raise a ValueError with error message
+        "<data> is not in the list."
         
         Example:
             >>> print(my_list)
@@ -132,18 +135,16 @@ class LinkedList(object):
             >>> print(my_list)
             [1, 3]
         """
-        if self.head is None:           # If the list is empty,
-            print str(data) + " is not in the list."    # inform the user
-            return                                      # and return.
+        if self.head is None:           # If the list is empty, raise an error.
+            raise ValueError(str(data) + " is not in the list.")
         if self.head.data == data:      # Remove the head:
             self.head = self.head.next      # Reset the head
         else:                           # Remove nonhead:
             curr = self.head
             while curr.next.data != data:   # Find the node before 'data' node
                 curr = curr.next
-                if curr.next is None:           # (If the node is not found,
-                    print str(data) + " is not in the list."
-                    return                      # inform the user and return)
+                if curr.next is None:           # (If not found, raise an error)
+                    raise ValueError(str(data) + " is not in the list.")
             new_next_node = curr.next.next  # point it to the node after 'data'
             curr.next = new_next_node
 
@@ -151,7 +152,8 @@ class LinkedList(object):
     def insert(self, data, place):
         """Create a new Node containing 'data'. Insert it into the list before
         the first Node in the list containing 'place'. If the list is empty, or
-        if 'place' is not in the list, print "<place> is not in the list."
+        if there is no node containing 'place' in the list, raise a ValueError
+        with error message "<place> is not in the list."
         
         Example:
             >>> print(my_list)
@@ -164,9 +166,8 @@ class LinkedList(object):
         """
         
         n = LinkedListNode(data)        # Create a new node with the data.
-        if self.head is None:           # If the list is empty, return.
-            print str(place) + " is not in the list."
-            return
+        if self.head is None:           # If the list is empty, raise an error.
+            raise ValueError(str(place) + " is not in the list.")
         # Compare nodes by comparing their data, or by using the Node __eq__.
         # if self.head == n:
         if self.head.data == place:     # Insert at the head:
@@ -176,14 +177,13 @@ class LinkedList(object):
             curr = self.head                # Find the node before 'place' node
             while curr.next.data != place:
                 curr = curr.next
-                if curr.next is None:           # (If the location is not found,
-                    print str(place) + " is not in the list."
-                    return                      # inform the user and return)
+                if curr.next is None:           # (if not found, raise an error)
+                    raise ValueError(str(place) + " is not in the list.")
             n.next = curr.next              # point n to 'place' node
             curr.next = n                   # point curr to n
 
 
-# Problem 5: Implement this class.
+# Problem 5: Implement this class for creating doubly-linked lists.
 class DoublyLinkedList(LinkedList):
     """Doubly-linked list data structure class. Inherits from the 'LinkedList'
     class. Has a 'head' for the front of the list and a 'tail' for the end.
@@ -212,9 +212,8 @@ class DoublyLinkedList(LinkedList):
         """Remove the node containing 'data'. If the list is empty, or if the
         target node is not in the list, print "<data> is not in the list."
         """
-        if not self.head:               # If the list is empty,
-            print str(data) + " is not in the list."    # inform the user
-            return                                      # and return.
+        if not self.head:               # If the list is empty, raise an error.
+            raise ValueError(str(data) + " is not in the list.")
         if self.head.data == data:      # Remove the head:
             if not self.head.next:          # If there's only one node:
                 self.head = None                # reset the head
@@ -227,9 +226,8 @@ class DoublyLinkedList(LinkedList):
             curr = self.head
             while curr.data != data:        # Find the target node
                 curr = curr.next
-                if not curr:                    # (If the node was not found,
-                    print str(data) + " is not in the list."
-                    return                      # inform the user and return)
+                if not curr:                    # (if not found, raise an error)
+                    raise ValueError(str(data) + " is not in the list.")
             if curr == self.tail:           # If it's the tail:
                 curr.prev.next = None           # tail.prev -/-> tail
                 self.tail = curr.prev           # reset the tail
@@ -244,9 +242,8 @@ class DoublyLinkedList(LinkedList):
         """
         
         n = DoublyLinkedListNode(data)  # Create a new node with the data.
-        if self.head is None:           # If the list is empty,
-            print str(place) + " is not in the list."   # inform the user
-            return                                      # and return.
+        if self.head is None:           # If the list is empty, raise an error.
+            raise ValueError(str(place) + " is not in the list.")
         # Compare nodes by comparing their data, or by using the Node __eq__.
         # if self.head == n:
         if self.head.data == place:    # Insert at the head:
@@ -257,16 +254,16 @@ class DoublyLinkedList(LinkedList):
             curr = self.head                # Find the node before 'place' node
             while curr.next.data != place:
                 curr = curr.next
-                if not curr.next:               # (If the location is not found,
-                    print str(place) + " is not in the list."
-                    return                      # inform the user and return)
+                if not curr.next:               # (if not found, raise an error)
+                    raise ValueError(str(place) + " is not in the list.")
             n.next = curr.next              # n --> place
             n.prev = curr                   # curr <-- n
             curr.next.prev = n              # n <-- place
             curr.next = n                   # curr --> n
 
 
-# Problem 6: Implement this class and use it to sort a large data set.
+# Problem 6: Implement this class for creating sorted linked lists.
+#   Use an instance of your object to sort a large data set in sort_words().
 class SortedLinkedList(DoublyLinkedList):
     """Sorted doubly-linked list data structure class."""
 
@@ -293,8 +290,8 @@ class SortedLinkedList(DoublyLinkedList):
             DoublyLinkedList.insert(self,data,current.data)     # Insert
     
     def insert(self, *args):
-        """Disable insert() for this class."""
-        print("insert() has been disabled for the SortedLinkedList class.")
+        """Disable insert() so the user is forced to use add()."""
+        raise ValueError("insert() has been disabled for this class.")
 
 # Conclude problem 6 by implementing this function.
 def sort_words(filename = "English.txt"):
@@ -310,7 +307,7 @@ def sort_words(filename = "English.txt"):
 
 # =========================== END OF SOLUTIONS =========================== #
 
-def test(student_module, node_module, late=False):
+def test(student_module, late=False):
     """Test script. You must import the student's 'solutions.py' and 'Node.py'
     files as modules.
     
@@ -323,7 +320,6 @@ def test(student_module, node_module, late=False):
     
     Inputs:
         student_module: the imported module for the student's file.
-        node_module: the imported module for the student's 'Node.py' file.
         late (bool): if True, half credit is awarded.
     
     Returns:
@@ -331,6 +327,7 @@ def test(student_module, node_module, late=False):
         feedback (str): a printout of test results for the student.
     """
     s = student_module
+    SNode = student_module.LinkedListNode
     score = 0
     total = 80
     feedback = s.__doc__
@@ -362,26 +359,28 @@ def test(student_module, node_module, late=False):
         part = -1
         while part > p or part < 0:
             part = int(input("\nScore out of " + str(p) + ": "))
-        if part < p: return part,m
-        else: return part,""
+        if part == p: return p,""
+        else: return part,m
     
     from numpy.random import permutation # numpy is not required for this lab
     def shrink_file(infile, outfile):
         """Shrink the dataset in problem 6 so it can be tested quickly."""
-        f = open(infile, 'r')
-        f = f.read()
-        f = f.split('\n')
-        f = f[:-1]
-        x = list(permutation(f))[::20]
-        f = open(outfile, 'w')
-        for i in x:
-            f.write(i + '\n')
-        f.close()
+        try:
+            f = open(infile, 'r')
+            f = f.read()
+            f = f.split('\n')
+            f = f[:-1]
+            x = list(permutation(f))[::20]
+            f = open(outfile, 'w')
+            for i in x:
+                f.write(i + '\n')
+            f.close()
+        except IOError:
+            raise IOError(str(infile) + " not found!")
     
     try:    # Problem 1: 5 points
         feedback += "\n\nTesting problem 1 (5 points):"
         points = 0
-        SNode = node_module.Node
         # Comparison magic methods
         n1 = SNode(5)
         n2 = SNode(5)
@@ -405,25 +404,25 @@ def test(student_module, node_module, late=False):
         feedback += "\n\nTesting problem 2 (10 points):"
         points = 0
         # Empty list
-        l1 = s.LinkedList()
-        l2 = list()
+        l1 = list()
+        l2 = s.LinkedList()
         p,f = testPart(l1,l2,"\n\tLinkedList.__str__ failed on empty list")
         points += p; feedback += f
         # Single item
-        l1.add('this')
-        l2.append('this')
+        l1.append('this')
+        l2.add('this')
         p,f = testPart(l1,l2,"\n\tLinkedList.__str__ failed with single item")
         points += (p * 3); feedback += f
         # Two items
-        l1.add('little')
-        l2.append('little')
+        l1.append('little')
+        l2.add('little')
         p,f = testPart(l1,l2,"\n\tLinkedList.__str__ failed with two items")
         points += (p * 3); feedback += f
         # Many items
-        entries = ['piggy','made','a','Linked List',3,10.0,-1+3j,set(),[1,2,3]]
+        entries = ['Linked List',3,10.0,-1+3j,set(),[1,2,3]]
         for i in entries:
-            l1.add(i)
-            l2.append(i)
+            l1.append(i)
+            l2.add(i)
         p,f = testPart(l1,l2,"\n\tLinkedList.__str__ failed with many items")
         points += (p * 3); feedback += f
         if points == 0:
@@ -438,11 +437,17 @@ def test(student_module, node_module, late=False):
         l1 =   LinkedList()
         l2 = s.LinkedList()
         # remove() from empty list
-        print("\nCorrect output:\t"),;  l1.remove(100)
-        print("Student output:\t"),;    l2.remove(100)
-        p,f = strTest(2,
-            "\n\tLinkedList.remove() failed to report on empty list")
-        points += p; feedback += f
+        print("\nCorrect output:\t100 is not in the list.")
+        print("Student output:\t"),
+        try:
+            l2.remove(100)
+            feedback += "\n\tNo exception raised by LinkedList.remove()"
+            feedback += " on empty list"
+        except ValueError as e:
+            points += 1; print(e.message)
+            p,f = strTest(1,
+                "\n\tLinkedList.remove() failed to report on empty list")
+            points += p; feedback += f;
         # Test add() (no credit, but vital for other points)
         for i in [1,3,2,5,4,7,6,9,8]:
             l1.add(i); l2.add(i)
@@ -464,12 +469,18 @@ def test(student_module, node_module, late=False):
         l2.remove(5); l2.remove(4)
         p,f=testPart(l1,l2, "\n\tLinkedList.remove() failed on middle removal")
         points += (p * 2); feedback += f
-        # remove() nonexistent 
-        print("\nCorrect output:\t"),;  l1.remove(100)
-        print("Student output:\t"),;    l2.remove(100)
-        p,f = strTest(2,
-            "\n\tLinkedList.remove(x) failed to report for x not in list")
-        points += p; feedback += f
+        # remove() nonexistent
+        print("\nCorrect output:\t100 is not in the list.")
+        print("Student output:\t"),
+        try:
+            l2.remove(100)
+            feedback += "\n\tNo exception raised by LinkedList.remove(x)"
+            feedback += " for 'x' not in list"
+        except ValueError as e:
+            points += 1; print(e.message)
+            p,f = strTest(1,
+                "\n\tLinkedList.remove(x) failed to report for 'x' not in list")
+            points += p; feedback += f;
         
         score += points; feedback += "\nScore += " + str(points)
     except Exception as e: feedback += "\nError: " + e.message
@@ -480,11 +491,17 @@ def test(student_module, node_module, late=False):
         l1 =   LinkedList()
         l2 = s.LinkedList()
         # insert() empty list
-        print("\nCorrect output:\t"),;  l1.insert(1,100)
-        print("Student output:\t"),;    l2.insert(1,100)
-        p,f = strTest(2,
-            "\n\tLinkedList.insert() failed to report on empty list")
-        points += p; feedback += f
+        print("\nCorrect output:\t100 is not in the list.")
+        print("Student output:\t"),
+        try:
+            l2.insert(1,100)
+            feedback += "\n\tNo exception raised by LinkedList.insert()"
+            feedback += " on empty list"
+        except ValueError as e:
+            points += 1; print(e.message)
+            p,f = strTest(1,
+                "\n\tLinkedList.insert() failed to report on empty list")
+            points += p; feedback += f;
         # insert() before head
         l1.add(5); l1.insert(3,5); l1.insert(1,3)
         l2.add(5); l2.insert(3,5); l2.insert(1,3)
@@ -496,13 +513,18 @@ def test(student_module, node_module, late=False):
         p,f=testPart(l1,l2,
             "\n\tLinkedList.insert() failed on middle insertion")
         points += (p * 5); feedback += f
-        print("\nCorrect output:")
-        l1.insert(1,10); l1.insert(1,11); l1.insert(1,12)
-        print("\nStudent output:")
-        l2.insert(1,10); l2.insert(1,11); l2.insert(1,12)
-        p,f = strTest(3,
-            "\n\tLinkedList.insert(x,place) failed to report on bad place")
-        points += p; feedback += f
+        # insert(place, x) on nonexistant place
+        print("\nCorrect output:\t100 is not in the list.")
+        print("Student output:\t"),
+        try:
+            l2.insert(1,100)
+            feedback += "\n\tNo exception raised by LinkedList.insert(x, place)"
+            feedback += " for 'place' not in list"
+        except ValueError as e:
+            points += 2; print(e.message)
+            p,f = strTest(1, "\n\tLinkedList.remove(x, place)" + 
+                                " failed to report for 'place' not in list")
+            points += p; feedback += f;
         
         score += points; feedback += "\nScore += " + str(points)
     except Exception as e: feedback += "\nError: " + e.message
@@ -513,11 +535,17 @@ def test(student_module, node_module, late=False):
         l1 =   DoublyLinkedList()
         l2 = s.DoublyLinkedList()
         # remove() from empty list
-        print("\nCorrect output:\t"),;  l1.remove(100)
-        print("Student output:\t"),;    l2.remove(100)
-        p,f = strTest(1,
-            "\n\tDoublyLinkedList.remove() failed to report on empty list")
-        points += p; feedback += f
+        print("\nCorrect output:\t100 is not in the list.")
+        print("Student output:\t"),
+        try:
+            l2.remove(100)
+            feedback += "\n\tNo exception raised by DoublyLinkedList.remove()"
+            feedback += " on empty list"
+        except ValueError as e:
+            print(e.message)
+            p,f = strTest(1,
+                "\n\tDoublyLinkedList.remove() failed to report on empty list")
+            points += p; feedback += f;
         # Test add() (no credit, but vital for other points)
         for i in [1,3,2,5,4,7,6,9,8]:
             l1.add(i); l2.add(i)
@@ -530,7 +558,7 @@ def test(student_module, node_module, late=False):
         l2.remove(1); l2.remove(3)
         p,f = testPart(l1,l2,
             "\n\tDoublyLinkedList.remove() failed on head removal")
-        points += p; feedback += f
+        points += (p * 2); feedback += f
         p,f = testTail(l1,l2,
             "\n\tDoublyLinkedList.tail failed on head removal")
         points += p; feedback += f
@@ -539,7 +567,7 @@ def test(student_module, node_module, late=False):
         l2.remove(8); l2.remove(9)
         p,f = testPart(l1,l2,
             "\n\tDoublyLinkedList.remove() failed on tail removal")
-        points += p; feedback += f
+        points += (p * 2); feedback += f
         p,f = testTail(l1,l2,
             "\n\tDoublyLinkedList.tail failed on tail removal")
         points += p; feedback += f
@@ -552,25 +580,37 @@ def test(student_module, node_module, late=False):
         p,f = testTail(l1,l2,
             "\n\tDoublyLinkedList.tail failed on middle removal")
         points += p; feedback += f
-        # remove() nonexistent 
-        print("\nCorrect output:\t"),;  l1.remove(100)
-        print("Student output:\t"),;    l2.remove(100)
-        p,f = strTest(1,
-            "\n\tDoublyLinkedList.remove(x) failed to report for x not in list")
-        points += p; feedback += f
+        # remove() nonexistent
+        print("\nCorrect output:\t100 is not in the list.")
+        print("Student output:\t"),
+        try:
+            l2.remove(100)
+            feedback += "\n\tNo exception raised by DoublyLinkedList.remove(x)"
+            feedback += " for 'x' not in list"
+        except ValueError as e:
+            print(e.message)
+            p,f = strTest(1, "\n\tDoublyLinkedList.remove(x)" + 
+                                " failed to report for 'x' not in list")
+            points += p; feedback += f;
         # insert() empty list
         l1.__init__(); l2.__init__()
-        print("\nCorrect output:\t"),;  l1.insert(1,100)
-        print("Student output:\t"),;    l2.insert(1,100)
-        p,f = strTest(1,
-            "\n\tDoublyLinkedList.insert() failed to report on empty list")
-        points += p; feedback += f
+        print("\nCorrect output:\t100 is not in the list.")
+        print("Student output:\t"),
+        try:
+            l2.insert(1,100)
+            feedback += "\n\tNo exception raised by DoublyLinkedList.insert()"
+            feedback += " on empty list"
+        except ValueError as e:
+            print(e.message)
+            p,f = strTest(1, "\n\tDoublyLinkedList.insert()" + 
+                                " failed to report on empty list")
+            points += p; feedback += f;
         # insert() before head
         l1.add(5); l1.insert(3,5); l1.insert(1,3)
         l2.add(5); l2.insert(3,5); l2.insert(1,3)
         p,f=testPart(l1,l2,
             "\n\tDoublyLinkedList.insert() failed on head insertion")
-        points += (p * 3); feedback += f
+        points += (p * 2); feedback += f
         p,f = testTail(l1,l2,
             "\n\tDoublyLinkedList.tail failed on head insertion")
         points += p; feedback += f
@@ -579,17 +619,23 @@ def test(student_module, node_module, late=False):
         l2.insert(2,3); l2.insert(4,5)
         p,f=testPart(l1,l2,
             "\n\tDoublyLinkedList.insert() failed on middle insertion")
-        points += (p * 3); feedback += f
+        points += (p * 2); feedback += f
         p,f = testTail(l1,l2,
             "\n\tDoublyLinkedList.tail failed on middle insertion")
         points += p; feedback += f
-        print("\nCorrect output:")
-        l1.insert(1,10); l1.insert(1,11); l1.insert(1,12)
-        print("\nStudent output:")
-        l2.insert(1,10); l2.insert(1,11); l2.insert(1,12)
-        p,f = strTest(1,
-            "\n\tDoublyLinkedList.insert(x,place) failed to report on bad place")
-        points += p; feedback += f
+        # insert(place, x) on nonexistant place
+        print("\nCorrect output:\t100 is not in the list.")
+        print("Student output:\t"),
+        try:
+            l2.insert(1,100)
+            feedback += "\n\tNo exception raised by"
+            feedback += " DoublyLinkedList.insert(x,place)"
+            feedback += " for 'place' not in list"
+        except ValueError as e:
+            print(e.message)
+            p,f = strTest(1, "\n\tDoublyLinkedList.remove(x,place)" + 
+                                " failed to report for 'place' not in list")
+            points += p; feedback += f;
         if not issubclass(s.DoublyLinkedList, s.LinkedList):
             points = 0
             feedback += "\n\tDoublyLinkedList must inherit from LinkedList!"
@@ -602,7 +648,7 @@ def test(student_module, node_module, late=False):
         points = 0
         l1 =   SortedLinkedList()
         l2 = s.SortedLinkedList()
-        # 10 points for correct SortedLinkedList
+        # Test sorting (9 points)
         # test 1
         entries = [1,2,3,4,5,6,7,8,9]
         for i in entries:
@@ -623,16 +669,21 @@ def test(student_module, node_module, late=False):
             l1.add(i); l2.add(i)
         p,f = testPart(l1,l2,"\n\tSortedLinkedList.add() failed")
         points += (p * 3); feedback += f
-        # Test that insert() was disabled
+        # Test that insert() was disabled (1 point)
+        print("\nCorrect output:\tinsert() has been disabled for this class.")
+        print("Student output:\t"),
         try:
-            print("\nCorrect Output:\t"); l1.insert('a','b','c')
-            print("\nStudent Output:\t"); l2.insert('a','b','c')
-            p,f = strTest(1,
-                "\n\tSortedLinkedList.insert() failed to report as disabled")
-            points += p; feedback += f
+            l2.insert(1,2,3,4,5)
+            feedback += "\n\tNo ValueError exception raised by"
+            feedback += " SortedLinkedList.insert()"
+        except ValueError as e:
+            print(e.message)
+            p,f = strTest(1, "\n\tSortedLinkedList.insert()" + 
+                                " failed to report as disabled")
+            points += p; feedback += f;
         except TypeError:
-            feedback += "\n\tSortedLinkedList.insert() not disabled"
-        
+            feedback += "\n\tSortedLinkedList.insert() not disabled correctly"
+            feedback += "\n\t\t(insert() should accept any number of arguments)"
         # 10 points for correct sort_words() output.
         shrink_file("English.txt", "Short.txt")
         word_list = create_word_list("Short.txt")

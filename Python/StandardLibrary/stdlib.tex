@@ -5,12 +5,12 @@
 \section*{Introduction}
 
 Python is designed to make it easy to implement complex tasks with little code.
-To that end, any python distribution includes several built-in functions for accomplishing common tasks.
+To that end, any Python distribution includes several built-in functions for accomplishing common tasks.
 In addition, Python is designed to import and reuse Python code written by others.
 A Python file that can be imported is called a module.
 %In other words, the Python programming language is designed to be extendable.
 For example, it is possible to import a Python module that produces graphs and figures.
-%Also included with any python distribution is a collection of modules for accomplishing a variety of tasks.
+%Also included with any Python distribution is a collection of modules for accomplishing a variety of tasks.
 Any Python distribution includes a collection of modules for accomplishing a variety of tasks.
 These modules are called the Python standard library.
 
@@ -66,9 +66,9 @@ Remember to use floating point division to calculate the average.
 \subsection*{Names and Namespaces}
 Any object created in Python resides in memory.
 These objects may be data, data structures, methods, or any other sort of Python object.
-A Python name is a reference to a python object.
+A Python name is a reference to a Python object.
 
-A namespace is a dictionary that maps names to python objects.
+A namespace is a dictionary that maps names to Python objects.
 For example, in the following code block we create several names.
 
 \begin{lstlisting}
@@ -78,7 +78,7 @@ For example, in the following code block we create several names.
 # The number 4 is the object, number_of_students is the name.
 >>> number_of_sudents = 4
 
-# This is more complicated.  The set of python statements form an object.  
+# This is more complicated.  The set of Python statements form an object.  
 # The name is add_numbers.
 >>> def add_numbers(a,b):
 >>>   return a+b
@@ -174,8 +174,8 @@ Performing a similar operation on a tuple yields a different result.
 (1,2,3)
 \end{lstlisting}
 
-Using this technique, determine which python object types are mutable and which are immutable.
-Recall that the python object types are numbers, strings, lists, tuples, and dictionaries.
+Using this technique, determine which Python object types are mutable and which are immutable.
+Recall that the Python object types are numbers, strings, lists, tuples, and dictionaries.
 Use the following operations to modify each type.
 \begin{center}
 \begin{tabular}{|c|c|}
@@ -200,8 +200,8 @@ In general, a module is a file that contains Python statements.
 The Python \li{import} operation loads the statements from a Python file.
 When writing scripts and modules, all \li{import} statements occur at the top of the file.
 
-The \li{import} statement first tries to find the python file specified.
-Once found, every statement in the python file is executed.
+The \li{import} statement first tries to find the Python file specified.
+Once found, every statement in the Python file is executed.
 Once imported, a module's names are available to the user.
 
 For example, download the file "test\_module.py" and save it to a directory.
@@ -330,7 +330,7 @@ Return the square root of x.
 
 \subsection*{The \li{sys} module}
 
-The \li{sys} module includes methods for interacting with the python interpreter.
+The \li{sys} module includes methods for interacting with the Python interpreter.
 The module has a name \li{argv} that is a list of arguments passed to the interpreter when it runs Python scripts.
 Consider the following script.
 
@@ -348,7 +348,7 @@ $ python test_script.py I am the walrus
 ['test_script', 'I', 'am', 'the', 'walrus']
 \end{lstlisting}
 
-This method can be used to point a python script to a file to be analyzed.
+This method can be used to point a Python script to a file to be analyzed.
 It can also be used to control a scripts behavior.
 For example, a script's might have two methods and let the user decide which to use.
 \begin{lstlisting}
@@ -401,7 +401,7 @@ def time_for_loop():
 \end{lstlisting}
 
 The standard library also has a module called \li{timeit}.
-This library is built to time python code.
+This library is built to time Python code.
 In practice, \li{timeit} is the correct module for timing code.
 In IPython, it can be used like a built-in function any time with the \li{\%timeit} command.
 

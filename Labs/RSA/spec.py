@@ -69,7 +69,33 @@ class myRSA(object):
         pass
 
 
-# Problem 2: Fermat's test for primality.
+# Problem 2: Partially test the myRSA class with this function.
+#   Use Exceptions to indicate inappropriate arguments or test failure.
+def test_myRSA(message, p, q, e):
+    """Create a 'myRSA' object. Generate a pair of keys using 'p', 'q', and
+    'e'. Encrypt the message, then decrypt the encryption. If the decryption
+    is not exactly the same as the original message, raise a ValueError with
+    error message "decrypt(encrypt(message)) failed."
+    
+    If 'message' is not a string, raise a TypeError with error message
+    "message must be a string."
+    
+    If any of p, q, or e are not integers, raise a TypeError with error
+    message "p, q, and e must be integers."
+    
+    Inputs:
+        message (str): a message to be encrypted and decrypted.
+        p (int): A large prime for key generation.
+        q (int): A second large prime for key generation.
+        e (int): The encryption exponent.
+        
+    Returns:
+        True if no exception is raised.
+    """
+    pass
+
+
+# Problem 3: Fermat's test for primality.
 def is_prime(n):
     """Use Fermat's test for primality to see if 'n' is probably prime.
     Run the test at most five times, using integers randomly chosen from
@@ -88,7 +114,7 @@ def is_prime(n):
     pass
 
 
-# Problem 3: Implement the following RSA system using PyCrypto.
+# Problem 4: Implement the following RSA system using PyCrypto.
 class PyCrypto(object):
     """RSA String Encryption System. Do not use any external modules except for
     those found in the 'Crypto' package.
@@ -118,7 +144,10 @@ class PyCrypto(object):
     """
     def __init__(self):
         """Initialize the _keypair and public_key attributes."""
-        pass
+        # A NotImplementedError indicates that the method will be overwritten
+        #   by children classes, or that the method is under construction.
+        #   Here it is only being used as a temporary placeholder, like 'pass'.
+        raise NotImplementedError
     
     def encrypt(self, message, key=None):
         """Encrypt 'message' with a public key and return its encryption. If
@@ -130,10 +159,10 @@ class PyCrypto(object):
                 used in the encryption. Defaults to 'None', in which case
                 '_keypair' is used to encrypt the message.
         """
-        pass
+        raise NotImplementedError
     
     def decrypt(self, ciphertext):
         """Decrypt 'ciphertext' with '_keypair' and return the decryption."""
-        pass
+        raise NotImplementedError
 
 # ============================== END OF FILE ============================== #
