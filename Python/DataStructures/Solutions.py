@@ -11,19 +11,26 @@ class DoublyLinkedList(object):
 
 	def __init__(self):
 		self.head = None
+		self.tail = None
 
 	def add_node(self, data):
 	
 		new_node = DLNode(data)
 		if self.head is None:
 			self.head = new_node
+			self.tail = new_node
 		else:
+			new_node.prev = self.tail
+			self.tail.next = new_node
+			self.tail = new_node
+			'''
 			current_node = self.head
 			while current_node.next is not None:
 				current_node = current_node.next
 
 			current_node.next = new_node
 			new_node.prev = current_node
+			'''
 
 	def remove_node(self, data):
 		
@@ -55,6 +62,14 @@ class DoublyLinkedList(object):
 			new_node.prev = current_node
 			current_node.next = new_node
 			new_node.next.prev = new_node
+
+	def find(self, data):
+		current = self.head
+		
+		while current.data != data:
+			current = current.next
+		
+		return current
 
 
 	def __str__(self):
