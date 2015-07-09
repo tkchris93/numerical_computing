@@ -32,3 +32,4 @@ class DoublyLinkedListNode(LinkedListNode):
         Node.__init__(self,data)
         self.next = None
         self.prev = None
+
