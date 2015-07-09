@@ -50,13 +50,13 @@ class Node(object):
 # Import the Node class from Node.py
 >>> from Node import Node
 
-# Create some nodes.  Note that any data type may be stored.
+# Create some nodes. Note that any data type may be stored.
 >>> int_node = Node(1)
 >>> str_node = Node('abc')
->>> lis_node = Node([1,'abc'])
+>>> list_node = Node([1,'abc'])
 
 # Access a node's data.
->>> lis_node.data
+>>> list_node.data
 [1, 'abc']
 \end{lstlisting}
 
@@ -234,14 +234,16 @@ def remove(self, data):
 \end{lstlisting}
 
 \begin{warn}
-In some other programming languages, leaving a reference to an object without explicitly deleting it can cause serious memory leaks.
-In these languages, even though the object is not accessible to the user, it still occupies space in memory, often leading to an overflow.
-In Python if there is no reference to an object, and thus no way for the programmer to access it, the object is automatically deleted and the space in memory is freed up.
+
+Python keeps track of the variables in use and automatically deletes a variable if there is no access to it.
+In many other languages, leaving a reference to an object without explicitly deleting it could cause a serious memory leak.
+See \href{https://docs.python.org/2/library/gc.html}{here} for more information on python's auto-cleanup system.
 \end{warn}
 
+% Problem 3: Complete LinkedList.remove()
 \begin{problem}
 Though the above code works to remove specified nodes, it is not quite complete.
-Modify the \li{remove} method so that if this list is empty, or if the user tries to remove a node containing \li{value} that is not in the list, the method prints ``\li{value} is not in the list.''
+Modify the \li{remove} method to account for possible errors: if the list is empty, or if the target node is not in the list, raise a \li{ValueError} with error message ``\li{data} is not in the list.''
 \end{problem}
 
 \begin{figure}
@@ -250,14 +252,15 @@ Modify the \li{remove} method so that if this list is empty, or if the user trie
 \label{fig:insert}
 \end{figure}
 
+% Problem 4: LinkedList.insert()
 \begin{problem}
 Inserting a node at a specified location is similar to removing a node.
-Add an \li{insert} method to the \li{LinkedList} class that inserts a new node before the first node that contains the data specified by the user.
-This function accepts two arguments: the data for the new node, and the data of the node before which the new node will be inserted.
-If the list is empty, or if the user calls \li{insert(data,place)} and there is no node containing \li{place} in the list, print ``\li{place} is not in the list.''
+Add an \li{insert} method to the \li{LinkedList} class that inserts a new node before the first node in the list that contains the data specified by the user.
+This function accepts two arguments: the data for the new node (\li{data}), and the data of the node before which the new node will be inserted (\li{place}).
+If the list is empty, or there is no node containing \li{place} in the list, raise a \li{ValueError} with error message ``\li{place} is not in the list.''
 
 See Figure \ref{fig:insert} for an illustration of the \li{insert} method.
-Note that since \li{insert} inserts a node before a specified node, it is not possible to \li{insert} at the end of the list or to an empty list.
+Note that since \li{insert} inserts a node before a specified node that is already in the list, it is not possible to \li{insert} at the end of the list or to an empty list.
 \end{problem}
 
 \section*{Doubly-Linked Lists}
@@ -327,6 +330,7 @@ Implement a \li{DoublyLinkedList} class that inherits from \li{LinkedList} and u
 Add an attribute called \li{tail} that keeps track of the node at the end of the list.
 Overwrite the \li{add}, \li{remove}, and \li{insert} methods.
 Use the \li{tail} attribute to make the \li{add} method more efficient.
+Raise the same exceptions in the \li{insert} and \li{remove} methods as before.
 \end{problem}
 
 % Problem 6: sorted linked list
@@ -340,24 +344,23 @@ Also override the \li{insert} method with the following:
 
 \begin{lstlisting}
 def insert(self, *args):
-	print("insert() has been disabled for the SortedLinkedList class.")
+	raise ValueError("insert() has been disabled for this class.")
 \end{lstlisting}
 
-This effectively disables \li{insert} for the \li{SortedLinkedList} and prevents the user from accidentally inserting a node in a location that would disrupt the ordering.
-The \li{*args} argument allows \li{insert} to receive any number of arguments without raising an exception.
+This effectively disables \li{insert} for the \li{SortedLinkedList} class and prevents the user from accidentally inserting a node in a location that would disrupt the ordering.
+The \li{*args} argument allows \li{insert} to receive any number of arguments without raising a \li{TypeError} exception.
 
 To test this data structure, import the provided \li{WordList} module.
-This includes a method called \li{create_word_list} that extracts each line from a text file and returns the text as a list of strings in random order.
-The file \li{English.txt} contains over 58,000 English words.
-Write a function called \li{sort_words} that sorts the list of words generated by \li{create_word_list("English.txt")} by adding them to a \li{SortedLinkedList} object.
+This includes a method called \li{create_word_list} that reads each line of text from a file and returns it as a randomly-ordered list of strings.
+Write a function called \li{sort_words} that sorts the list generated by \li{create_word_list("English.txt")} by adding them to a \li{SortedLinkedList} object.
 Then return the object.
 
-(Warning: sorting the entire data set can take about 15 minutes. Test your data structure on smaller data sets first.)
+(Warning: \li{English.txt} contains over 58,000 English words.
+Sorting the entire data set should take about 15 minutes.
+Test your data structure on small data sets first.)
 \end{problem}
 
 Python has many quick sorting methods.
 Even on the seemingly large data set of over 58,000 words used in the preceding problem, the \li{sort} method for Python lists is almost instantaneous.
-In the next lab we will turn our attention to \emph{Trees}, special kinds of linked lists that allow for much quicker sorting and data retrieval.
-
-
+In the next lab we will turn our attention to \emph{trees}, special kinds of linked lists that allow for much quicker sorting and data retrieval.
 
