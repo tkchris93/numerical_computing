@@ -1,9 +1,10 @@
 .. image:: https://travis-ci.org/byuimpact/numerical_computing.png?branch=develop
    :target: https://travis-ci.org/byuimpact/numerical_computing
 
-This project contains the labs for BYU's Applied and Computational Mathematics program.
+This project contains the labs for the Foundations of Applied Mathematics curriculum and
+are being developed as part of BYU's Applied and Computational Mathematics degree program.
 The labs go in tandem with the four textbooks that are currently being written and will
-start rolling out in 2015.
+start rolling out in 2016.
 
 This work is licenced under the Creative Commons Attribution 3.0 United States License.  
 To view a copy of this license please visit:
@@ -15,5 +16,5 @@ Department of Mathematics
 Brigham Young University
 Email: acme@math.byu.edu
 
-This project is funded in part by the National Science Foundation, grant no. TUES-1323785.
+This project is funded in part by the National Science Foundation, grant no. TUES Phase II DUE-1323785.
 
