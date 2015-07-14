@@ -1,6 +1,9 @@
 # Trees.py
-"""Volume II Lab 5: Data Structures II (Trees)
-Auxiliary File. Contains Node and Tree classes.
+"""Volume II Lab 5: Data Structures II (Trees). Auxiliary File.
+Contains Node and Tree classes. Modify this file for problems 2 and 3.
+<Name>
+<Date>
+<Class>
 """
 
 
@@ -70,7 +73,7 @@ class BST(object):
             >>> b.insert(7)     |   [8]                 |             \
             >>> b.insert(8)     |                       |             (8)
         """
-        raise NotImplementedError
+        raise NotImplementedError("Problem 2 incomplete")
     
     # Problem 3: Implement BST.remove().
     def remove(self, data):
@@ -87,7 +90,7 @@ class BST(object):
             If the tree is empty, or if there is no node containing 'data',
             raise a ValueError.
         """
-        raise NotImplementedError
+        raise NotImplementedError("Problem 3 incomplete")
     
     def __str__(self):
         """String representation: a hierarchical view of the BST.
@@ -249,4 +252,4 @@ def _height(current):
         return -1           # Otherwise, descend down both branches.
     return 1 + max(_height(current.right), _height(current.left))
 
-# ============================== END OF FILE ============================== #
+# =============================== END OF FILE =============================== #

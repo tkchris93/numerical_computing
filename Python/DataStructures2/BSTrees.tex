@@ -492,17 +492,16 @@ Use the \li{create_word_list} function in the provided \li{WordList} module to g
 Time (separately) how long it takes to load a \li{LinkedList}, a \li{BST}, and an \li{AVL} with the data set.
 Use \li{add} to load the \li{LinkedList} and \li{insert} to load the trees.
 Then choose 5 random words from the data set, and time how long it takes to find each word in each object.
-Use the \li{iterative_search} function from problem 1 to search the \li{LinkedList} and \li{find} so search the trees.
+Use the \li{iterative_search} function from problem 1 to search the \li{LinkedList} and \li{find} to search the trees.
 Calculate the average search time for each object.
 
 In the first subplot, plot the number of words in each data set against the time it took to build each object.
 In the second subplot, plot the number of words in each data set against the average time it took to search each object.
 Your plot should look similar to Figure \ref{fig:times}.
 
-% TODO: merge this figure in.
-
 \begin{comment}
 
+% TODO: merge in this picture (as a pdf? png? jpeg?)
 \begin{figure}[H]
 \includegraphics[width=\textwidth]{times.pdf}
 \caption{Note that the \li{BST} has the fastest build times, but the \li{AVL} has the fastest search times. How would the graph change if the data were sorted to begin with?}

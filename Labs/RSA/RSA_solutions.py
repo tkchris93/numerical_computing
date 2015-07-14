@@ -1,27 +1,36 @@
 # RSA_solutions.py
 """Volume II Lab 3: Public Key Encryption (RSA)
-    Main solutions file. See also 'rsa_tools'.
-    Written by Shane McQuarrie, Spring 2015.
+Solutions file. Written by Shane A. McQuarrie.
 """
 
-# import rsa_tools as rtl
-from numpy.random import randint
-from Crypto.PublicKey import RSA
+# Students will implement the Extended Euclidean Algorithm as part of a
+# homework exercise, and they should use it to complete problem 1.
+# This is one possible implementation.
+def eea(a, b):
+    """The Extended Euclidean Algorithm.
+    
+    Inputs:
+        a (int)
+        b (int)
+    
+    Returns:
+        gcd (int), c (int), d (int) such that gcd = ac + bd.
+    """
+    if a == 0:
+        return (b, 0, 1)
+    else:
+        g, y, x = eea(b % a, a)
+        return (g, x - (b // a) * y, y)
 
 
-# ============================== RSA TOOLS ============================== #
-
-
-# rsa_tools.py
-"""Volume II Lab 3: Public Key Encryption (RSA). Auxiliary file.
-    Helper code for the myRSA class. Do not modify this file.
-"""
+# ============================== rsa_tools.py =============================== #
+# Helper code for the myRSA class. Provide to the students.
 
 from itertools import izip_longest
 
 def partition(iterable, n, fillvalue=None):
-    """Partition data into blocks of length 'n', padding with 'fillvalue' if
-    needed. Return a list of the partitions.
+    """Partition data into blocks of length 'n', padding with 'fillvalue'
+    if needed. Return a list of the partitions.
     Example:
     >>> partition('ABCDEFG, 3, 'x')
     """
@@ -32,8 +41,8 @@ def partition(iterable, n, fillvalue=None):
 def string_size(n):
     """Return the maximum number of characters that can be encoded with the
     public key (e, n). In other words, find the largest integer L such that
-    if 'string' has at most L characters, then string_to_int('string') will be
-    less than 'n'.
+    if 'string' has at most L characters, then string_to_int('string') will
+    be less than 'n'.
     """
     L=0
     max_int = 0
@@ -70,26 +79,11 @@ def int_to_string(msg):
     return str(msg)
 
 
-# ============================== SOLUTIONS ============================== #
+# ============================== solutions.py =============================== #
 
-
-# Students should use their implementation of the Extended Euclidean Algorithm
-#   to solve Problem 1. We use this implementation in the solution for 'myRSA'.
-def eea(a, b):
-    """The Extended Euclidean Algorithm.
-    
-    Inputs:
-        a (int)
-        b (int)
-    
-    Returns:
-        gcd (int), c (int), d (int) such that gcd = ac + bd.
-    """
-    if a == 0:
-        return (b, 0, 1)
-    else:
-        g, y, x = eea(b % a, a)
-        return (g, x - (b // a) * y, y)
+# import rsa_tools as rtl
+from numpy.random import randint
+from Crypto.PublicKey import RSA
 
 
 # Problem 1: Implement the following RSA system.
@@ -209,15 +203,23 @@ def test_myRSA(message, p, q, e):
     Returns:
         True if no exception is raised.
     """
+    # Input validation 1
     if type(message) != str:
-        raise TypeError("message must be a string")         # Input validation 1
+        raise TypeError("message must be a string.")
+    
+    # Input validation 2
     if type(p) != int or type(q) != int or type(e) != int:
-        raise TypeError("p, q, and e must be integers.")    # Input validation 2
-    r = myRSA()                                             # Instantiate object
-    r.generate_keys(p,q,e)                                  # Generate keys
-    if message != r.decrypt(r.encrypt(message)):            # myRSA validation
+        raise TypeError("p, q, and e must be integers.")
+    
+    # Test myRSA
+    r = myRSA()
+    r.generate_keys(p,q,e)
+    if message != r.decrypt(r.encrypt(message)):
         raise ValueError("decrypt(encrypt(message)) failed.")
+    
+    # return True if no exception has been raised.
     return True
+    
     # Or, a slightly longer way,
     ciphertext = r.encrypt(message)
     new_message = r.decrypt(ciphertext)
@@ -322,6 +324,7 @@ def prime(n):
     return primes
 
 
+# Test script
 def test(student_module, late=False):
     """Test script. You must import the student's solutions file as a module.
     
@@ -374,7 +377,7 @@ def test(student_module, late=False):
     feedback = s.__doc__
     
     try:    # Problem 1: 20 points
-        feedback += "\nTesting problem 1 (20 points):"
+        feedback += "\n\nTesting problem 1 (20 points):"
         points = 0
         r1 =   myRSA()
         r2 = s.myRSA()
@@ -422,10 +425,10 @@ def test(student_module, late=False):
         points *= p; feedback += f
         
         score += points; feedback += "\n  Score += " + str(points)
-    except Exception as e: feedback += "\n\nError: " + e.message
+    except Exception as e: feedback += "\nError: " + e.message
     
     try:    # Problem 2: 10 points
-        feedback += "\nTesting problem 2 (10 points):"
+        feedback += "\n\nTesting problem 2 (10 points):"
         points = 0
         print("\nCorrect response:\tmessage must be a string.")
         print("Student response:\t"),
@@ -462,10 +465,10 @@ def test(student_module, late=False):
             feedback += "\n\t" + e.message + "(message = 'secret')"
         
         score += points; feedback += "\n  Score += " + str(points)
-    except Exception as e: feedback += "\n\nError: " + e.message
+    except Exception as e: feedback += "\nError: " + e.message
     
     try:    # Problem 3: 10 points
-        feedback += "\nTesting problem 3 (10 points):"
+        feedback += "\n\nTesting problem 3 (10 points):"
         points = 0
         # Feedback messages
         prime = "\n\tis_prime() failed (prime marked as nonprime: "
@@ -494,10 +497,10 @@ def test(student_module, late=False):
         else: feedback += nonprime + "340561)"
         
         score += points; feedback += "\n  Score += " + str(points)
-    except Exception as e: feedback += "\n\nError: " + e.message
+    except Exception as e: feedback += "\nError: " + e.message
     
     try:    # Problem 4: 10 points
-        feedback += "\nTesting problem 4 (10 points):"
+        feedback += "\n\nTesting problem 4 (10 points):"
         points = 0
         # Test encrypt() and decrypt together(), default key
         r2 = s.PyCrypto()
@@ -532,7 +535,7 @@ def test(student_module, late=False):
         points *= p; feedback += f
         
         score += points; feedback += "\n  Score += " + str(points)
-    except Exception as e: feedback += "\n\nError: " + e.message
+    except Exception as e: feedback += "\nError: " + e.message
     
     if late:    # Late submission penalty
         feedback += "\n\nHalf credit for late submission."
@@ -548,3 +551,5 @@ def test(student_module, late=False):
     return score, feedback
     
     return score,feedback
+
+# =============================== END OF FILE =============================== #

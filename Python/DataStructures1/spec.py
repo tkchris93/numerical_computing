@@ -1,8 +1,8 @@
 # name this file 'solutions.py'
 """Volume II Lab 4: Data Structures 1
-    <Name>
-    <Class>
-    <Date>
+<Name>
+<Class>
+<Date>
 """
 
 from Node import LinkedListNode
@@ -36,7 +36,6 @@ class LinkedList(object):
             >>> my_list.head.next.data
             2
         """
-        
         new_node = LinkedListNode(data)
         if self.head is None:
             # If the list is empty, point the head attribute to the new node.
@@ -68,7 +67,7 @@ class LinkedList(object):
             >>> str(my_list) == str([1,2,3])
             True
         """
-        return ""
+        raise NotImplementedError("Problem 2 incomplete.")
 
     # Problem 3: Finish implementing LinkedList.remove() so that if the node
     #   is not found, an exception is raised.
@@ -88,7 +87,6 @@ class LinkedList(object):
             >>> print(my_list)
             [1, 3]
         """
-        
         # First, check if the head is the node to be removed. If so, set the
         # new head to be the first node after the old head. This removes
         # the only reference to the old head, so it is then deleted.
@@ -121,7 +119,7 @@ class LinkedList(object):
             >>> my_list.insert(2,4)
             4 is not in the list.
         """
-        raise NotImplementedError
+        raise NotImplementedError("Problem 4 incomplete.")
 
 
 # Problem 5: Implement this class for creating doubly-linked lists.
@@ -129,7 +127,8 @@ class DoublyLinkedList(LinkedList):
     """Doubly-linked list data structure class. Inherits from the 'LinkedList'
     class. Has a 'head' for the front of the list and a 'tail' for the end.
     """
-    pass
+    def __init__(self):
+        raise NotImplementedError("Problem 5 incomplete")
 
 
 # Problem 6: Implement this class for creating sorted linked lists.
@@ -151,11 +150,7 @@ class SortedLinkedList(DoublyLinkedList):
             >>> print(my_list)
             [2, 3, 4, 5, 6]
         """
-        raise NotImplementedError
-    
-    def insert(self, data):
-        """Disable insert() so the user is forced to use add()."""
-        raise NotImplementedError
+        raise NotImplementedError("Problem 6 incomplete")
 
 # Conclude problem 6 by implementing this function.
 def sort_words(filename = "English.txt"):
@@ -170,6 +165,6 @@ def sort_words(filename = "English.txt"):
     Returns:
         The SortedLinkedList object containing the sorted list.
     """
-    pass
+    raise NotImplementedError("Problem 6 incomplete.")
 
 # =========================== END OF File =========================== #
