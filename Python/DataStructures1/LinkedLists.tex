@@ -1,0 +1,357 @@
+\lab{Data Structures I: Lists}{Data Structures I}
+\label{lab:Python_DataStructures}
+
+\objective{Discuss the purpose of data structures and implement several kinds of linked lists.}
+
+\section*{Introduction}
+
+Analyzing and manipulating data are essential skills in scientific computing.
+Storing, retrieving, and manipulating data take time.
+As a dataset grows, so does the amount of time it takes to access and manipulate it.
+The structure of how the data are stored determines how efficiently the data may be processed.
+
+Data structures are specialized objects for organizing data.
+There are many kinds, each with specific strengths and weaknesses.
+For example, some data structures take a long time to build, but once built their data are quickly accessible.
+Others are built quickly, but are not as efficiently accessible.
+Different applications require different structures for optimal performance.
+
+\section*{Nodes}
+
+Booleans, strings, floats, and integers are some of the built-in data types in Python.
+Most data in applications take one of these forms.
+However, as the size of a dataset increases, these types prove inefficient.
+Many data structures use \emph{nodes} to overcome these inefficiencies.
+
+If we thought of data as several types of objects that need to be stored in a warehouse, a node would be a standard size box that can hold all the different types of objects.
+Suppose a warehouse needs to store lamps of various sizes.
+Rather than trying to stack lamps of different shapes on top of each other efficiently, it is preferable to put them in the boxes of standard size.
+Then adding new boxes and retrieving stored ones becomes much easier.
+
+A \li{Node} class is usually simple.
+In Python, the data in the Node is stored as an attribute.
+Other attributes may be added (or inherited) specific to a particular data structure.
+The data structure links the nodes together in a way that is efficient for its particular application.
+
+\begin{lstlisting}
+# Node.py
+
+class Node(object):
+	"""A Node class for storing data."""
+	def __init__(self, data):
+		"""Construct a new node that stores some data."""
+		self.data = data
+\end{lstlisting}
+
+\begin{lstlisting}
+# Import the Node class from Node.py
+>>> from Node import Node
+
+# Create some nodes. Note that any data type may be stored.
+>>> int_node = Node(1)
+>>> str_node = Node('abc')
+>>> list_node = Node([1,'abc'])
+
+# Access a node's data.
+>>> list_node.data
+[1, 'abc']
+\end{lstlisting}
+
+% Problem 1: Node magic methods
+\begin{problem}
+Add extra functionality to the \li{Node} class by implementing the \li{__str__} magic method so that it returns a string representation of its data.
+Also implement the \li{__lt__}, \li{__eq__}, and \li{__gt__} comparison magic methods so that the data stored inside of two Nodes is compared.
+For example, a Node \li{x} is less than a Node \li{y} if and only if the data contained in \li{x} is less than the data contained in \li{y}.
+\end{problem}
+
+\section*{Linked Lists}
+
+A linked list is a data type that chains nodes together.
+Each node instance in a linked list stores a reference to the next link in the chain.
+A linked list class also stores a reference to the first node in the chain, called the \li{head}.
+See Figure \ref{fig:singly_linked}.
+
+\begin{figure}
+\centering
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto, node distance=1.5cm,thick,main node/.style={rectangle,draw}, minimum size=.5cm]
+\tikzset{rect node/.style={rectangle, draw, minimum height = .5cm, minimum width=.2cm}}
+  \node[main node] (1) {B};
+  \node[main node] (2) [right of=1] {F};
+  \node[main node] (3) [right of=2] {G};
+  \node[main node] (4) [right of=3] {C};
+  \node[draw = none, black!20!blue, node distance=1.5cm] [above left of=1](H) {Head};
+\foreach \r in {1, 2, 3, 4}{
+  \node[rect node][right of=\r, node distance = .36cm]{};}
+\node[draw = none, node distance = 1.5cm] [right of=4]{};  % Centralize this particular figure
+\foreach \s/\t  in {1/2, 2/3, 3/4}{
+    \path[draw](\s) edge[shorten <=.1cm](\t);}
+  \draw[black!20!blue] (H) edge (1.north);
+\end{tikzpicture}
+\caption{Singly-linked List}
+\label{fig:singly_linked}
+\end{figure}
+
+\begin{lstlisting}
+# Node.py
+
+class LinkedListNode(Node):
+	"""A Node class for linked lists. Inherits from the 'Node' class.
+	Contains a reference to the next node in the list.
+    """
+	
+	
+    def __init__(self, data):
+        """Construct a Node and initialize an attribute for the next
+        node in the list.
+        """
+        Node.__init__(self, data)
+        self.next = None
+\end{lstlisting}
+
+A basic implementation of a linked list will have a constructor and a method for adding new nodes to the end of the list.
+To get to the end of the list, start at the \li{head} of the list.
+Then traverse the list by going from node to node until the end is reached.
+Then, set the \li{next} attribute of the last node to be the new node.
+This is done in the following class.
+See Figure \ref{fig:add} for an illustration.
+
+\begin{lstlisting}
+# spec.py
+
+from Node import LinkedListNode
+
+class LinkedList(object):
+	"""Singly-linked list data structure class.
+	The first node in the list is referenced to by 'head'.
+	"""
+	
+	def __init__(self):
+		"""Create a new empty linked list. Create the head
+		attribute and set it to None since the list is empty.
+		"""
+		self.head = None
+
+	def add(self, data):
+		"""Create a new Node containing 'data' and add it to
+		the end of the list.
+		"""
+
+		new_node = LinkedListNode(data)
+		if self.head is None:
+			# If the list is empty, point the head attribute to the new node.
+			self.head = new_node
+		else:
+			# If the list is not empty, traverse the list
+			# and place the new_node at the end.
+			current_node = self.head
+			while current_node.next is not None:
+				# This moves the current node to the next node if it is not
+				# empty. Then when we break out of the loop, current_node
+				# points to the last node in the list.
+				current_node = current_node.next
+
+			current_node.next = new_node
+\end{lstlisting}
+
+\begin{figure}
+\centering
+\caption{Include a picture of the \li{add} method and describe it.}
+\label{fig:add}
+\end{figure}
+
+% Problem 2: __str__ for the LinkedList class.
+\begin{problem}
+Write the \li{__str__} method for the \li{LinkedList} class so that when a \li{LinkedList} instance is printed, its output matches that of a Python list.
+\end{problem}
+
+In addition to adding new nodes to the end of a list, it is also useful to remove nodes and insert new nodes at specified locations.
+To delete a node, all references to the node must be removed.
+Then Python will automatically delete the object, since there is no way for the user to access it.
+Na{\"i}vely, this might be done by finding the previous node to the one being removed, and setting its \li{next} attribute to none.
+
+\begin{lstlisting}
+# A naive node removal - Does not work.
+
+def remove(self, data):
+	"""Remove the Node containing 'data'."""
+
+	# Find the node whose next node contains data
+	current_node = self.head
+	while current_node.next.data != data:
+		current_node = current_node.next
+
+	# Remove the next reference to the target node.
+	current_node.next = None
+\end{lstlisting}
+
+Since the only reference to the node that is deleted is the previous node's next attribute, this will delete the node.
+However, since the only reference to the next node came from the deleted node, it also will deleted.
+This will continue to the end of the list.
+Thus, deleting one node in this manner deletes the remainder of the list.
+This can be remedied by pointing the previous node's next attribute to the node after the deleted node.
+Then there will be no reference to the removed node and it will be deleted. 
+See Figure \ref{fig:remove} for an illustration.
+
+\begin{figure}
+\centering
+\caption{Include two pictures of the \li{remove} method: the na{\"i}ve method that doesn't work, and the true method that does. Describe them.}
+\label{fig:remove}
+\end{figure}
+
+
+\begin{lstlisting}
+# A node removal that works
+
+def remove(self, data):
+	"""Remove the Node containing 'data'."""
+
+	# First, check if the head is the node to be removed. If so, set the
+	# new head to be the first node after the old head. This removes
+	# the only reference to the old head, so it is then deleted.
+	if self.head.data == data:
+		self.head = self.head.next
+	else:
+		current_node = self.head
+		# Move current_node through the list until it points to the node that
+		# precedes the target node.
+		while current_node.next.data != data:
+			current_node = current_node.next
+	
+		# Point current_node to the node after the target node.
+		new_next_node = current_node.next.next
+		current_node.next = new_next_node
+\end{lstlisting}
+
+\begin{warn}
+
+Python keeps track of the variables in use and automatically deletes a variable if there is no access to it.
+In many other languages, leaving a reference to an object without explicitly deleting it could cause a serious memory leak.
+See \href{https://docs.python.org/2/library/gc.html}{here} for more information on python's auto-cleanup system.
+\end{warn}
+
+% Problem 3: Complete LinkedList.remove()
+\begin{problem}
+Though the above code works to remove specified nodes, it is not quite complete.
+Modify the \li{remove} method to account for possible errors: if the list is empty, or if the target node is not in the list, raise a \li{ValueError} with error message ``\li{data} is not in the list.''
+\end{problem}
+
+\begin{figure}
+\centering
+\caption{Include a picture of the \li{insert} method and describe it.}
+\label{fig:insert}
+\end{figure}
+
+% Problem 4: LinkedList.insert()
+\begin{problem}
+Inserting a node at a specified location is similar to removing a node.
+Add an \li{insert} method to the \li{LinkedList} class that inserts a new node before the first node in the list that contains the data specified by the user.
+This function accepts two arguments: the data for the new node (\li{data}), and the data of the node before which the new node will be inserted (\li{place}).
+If the list is empty, or there is no node containing \li{place} in the list, raise a \li{ValueError} with error message ``\li{place} is not in the list.''
+
+See Figure \ref{fig:insert} for an illustration of the \li{insert} method.
+Note that since \li{insert} inserts a node before a specified node that is already in the list, it is not possible to \li{insert} at the end of the list or to an empty list.
+\end{problem}
+
+\section*{Doubly-Linked Lists}
+
+\begin{figure}
+\centering
+\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto, node distance=1.5cm, thick,main node/.style={rectangle,draw}, minimum size=.5cm]
+\tikzset{rect node/.style={rectangle, draw, minimum height = .5cm, minimum width=.9cm}}
+  \node[main node] (1) {B};
+  \node[main node] (2) [right of=1] {F};
+  \node[main node] (3) [right of=2] {G};
+  \node[main node] (4) [right of=3] {C};
+  \node[draw = none, black!20!blue, node distance = 1.5cm] [above right of=4] (T) {Tail};
+  \node[draw = none, black!20!blue, node distance = 1.5cm] [above left of=1] (H) {Head};
+  \node[rect node](1.5)[]{};
+  \node[rect node](2.5)[right of=1.5]{};
+  \node[rect node](3.5)[right of=2.5]{};
+  \node[rect node](4.5)[right of=3.5]{};
+
+\foreach \s/\t  in {1/2, 2/3, 2/1, 3/2, 3/4, 4/3}{
+	\path[draw](\s) edge[shorten <=.1cm, shorten >=.1cm](\t);}	
+  \draw[black!20!blue] (H) edge (1.north);
+  \draw[black!20!blue] (T) edge (4.north);
+\end{tikzpicture}
+\caption{Doubly-linked List}
+\label{fig:doubly_linked}
+\end{figure}
+
+A doubly-linked list is a linked list where each node keeps track the node that precedes it as well as the node that follows.
+The end of the list is also typically kept track of with a \li{tail} attribute.
+See Figure \ref{fig:doubly_linked} for an illustration.
+
+
+\begin{lstlisting}
+# Node.py
+
+class DoublyLinkedListNode(LinkedListNode):
+	"""A Node class for doubly-linked lists. Inherits from the 'Node' class.
+	Contains references to the next and previous nodes in the list.
+	"""
+	def __init__(self,data):
+		"""Set the next and prev attributes."""
+		Node.__init__(self,data)
+		self.next = None
+		self.prev = None
+\end{lstlisting}
+
+\begin{figure}
+\centering
+\caption{Illustrate insertion for doubly-linked lists.}
+\label{fig:d_insertion}
+\end{figure}
+
+\begin{figure}
+\centering
+\caption{Illustrate removal for doubly-linked lists.}
+\label{fig:d_removal}
+\end{figure}
+
+
+All of the methods for linked lists can be implemented for doubly-linked lists.
+See Figures \ref{fig:d_insertion} and \ref{fig:d_removal} for illustrations of the insert and remove methods.
+
+% Problem 5: doubly-linked list
+\begin{problem}
+Implement a \li{DoublyLinkedList} class that inherits from \li{LinkedList} and uses \li{DoublyLinkedListNode} instances to build the list.
+Add an attribute called \li{tail} that keeps track of the node at the end of the list.
+Overwrite the \li{add}, \li{remove}, and \li{insert} methods.
+Use the \li{tail} attribute to make the \li{add} method more efficient.
+Raise the same exceptions in the \li{insert} and \li{remove} methods as before.
+\end{problem}
+
+% Problem 6: sorted linked list
+\begin{problem}
+Implement a sorted linked list.
+This data structure adds new nodes strategically so that the data is always kept in order.
+Inherit this class from \li{DoublyLinkedList}, and override the \li{add} and \li{insert} methods.
+When a new node is added, traverse the list until the data in the next node is greater than or equal to the data for the new node.
+Then insert the new node, thereby preserving the ordering.
+Also override the \li{insert} method with the following:
+
+\begin{lstlisting}
+def insert(self, *args):
+	raise ValueError("insert() has been disabled for this class.")
+\end{lstlisting}
+
+This effectively disables \li{insert} for the \li{SortedLinkedList} class and prevents the user from accidentally inserting a node in a location that would disrupt the ordering.
+The \li{*args} argument allows \li{insert} to receive any number of arguments without raising a \li{TypeError} exception.
+
+To test this data structure, import the provided \li{WordList} module.
+This includes a method called \li{create_word_list} that reads each line of text from a file and returns it as a randomly-ordered list of strings.
+Write a function called \li{sort_words} that sorts the list generated by \li{create_word_list} by adding them to a \li{SortedLinkedList} object.
+Then return the object.
+
+\begin{warn}
+\li{English.txt}, the default source file for \li{create_word_list}, contains over 58,000 English words.
+Sorting the entire data set should take about 15 minutes.
+Test your data structure on small data sets first.
+\end{warn}
+\end{problem}
+
+Python has many quick sorting methods.
+Even on the seemingly large data set of over 58,000 words used in the preceding problem, the \li{sort} method for Python lists is almost instantaneous.
+In the next lab we will turn our attention to \emph{trees}, special kinds of linked lists that allow for much quicker sorting and data retrieval.
+
