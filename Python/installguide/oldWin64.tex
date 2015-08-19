@@ -1,7 +1,7 @@
-\lab{Windows 64 bit Installation}{Windows 64 bit}
+\lab{Windows 64-bit Installation}{Windows 64-bit}
 \label{win64install}
 
-\objective{Install fundamental package requirements for the labs on a Windows 64 bit machine.}
+\objective{Install fundamental package requirements for the labs on a Windows 64-bit machine.}
 
 \begin{warn}
 The information provided in this appendix is for convenience only.
@@ -11,7 +11,7 @@ Some of the changes could cause unexpected behavior in the computer system.
 \end{warn}
 
 There are a wide variety of ways to install most of the Python packages required for these labs.
-There are, however, some problems with Cython and F2py since the distutils package included in Python is currently not very good for building new extension modules on 64 bit Windows machines.
+There are, however, some problems with Cython and F2py since the distutils package included in Python is currently not very good for building new extension modules on 64-bit Windows machines.
 Installing these libraries can be difficult; the following are ways that have worked for us.
 They still may not work on every computer.
 
@@ -34,9 +34,9 @@ You can find this option by opening the file explorer to "Computer", right click
 
 This should be done to the path variable in the box for "System Variables" (the system path instead of the user path).
 
-% This is what allows f2py to work on 64 bit windows.
+% This is what allows f2py to work on 64-bit windows.
 % The version of MinGW that comes as a part of Anaconda is
-% currently a 64 bit version of gcc and gfortran 4.7.
+% currently a 64-bit version of gcc and gfortran 4.7.
 % Using MinGW64 with f2py is not officially supported, but it works.
 \item Open \li{C:\\Anaconda\\Lib\\site-packages\\numpy\\distutils\\fcompiler\\gnu.py} and comment out the two lines that read 
 \begin{lstlisting}
@@ -97,7 +97,7 @@ You can get an installer at \url{http://git-scm.com/downloads}.
 % Useful for students.
 % Absolutely required for contributors.
 \item Download and install MikTex from \url{http://miktex.org/download}.
-You can use either the 32 or 64 bit version in this case.
+You can use either the 32-bit or 64-bit version in this case.
 
 \end{enumerate}
 
