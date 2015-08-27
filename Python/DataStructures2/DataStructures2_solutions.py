@@ -15,7 +15,7 @@ class BSTNode(object):
         attributes will be set when the node is added to a tree.
         """
         self.data = data
-        self.prev = None        # A reference to this node's parent node.
+        self.prev = None        # A reference to this node's parent node
         self.left = None        # self.left.data < self.data
         self.right = None       # self.data < self.right.data
         
@@ -23,7 +23,7 @@ class BSTNode(object):
         """String representation: the data contained in the node."""
         return str(self.data)
 
-# Modify this class for problems 2 and 3.
+# Modify this class for problems 2 and 3
 class BST(object):
     """Binary Search Tree data structure class.
     The first node is referenced to by 'root'.
@@ -36,18 +36,18 @@ class BST(object):
         """Return the node containing 'data'. If there is no such node in the
         tree, raise a ValueError with error message "<data> is not in the tree."
         """
-        # First, check to see if the tree is empty.
+        # First, check to see if the tree is empty
         if self.root is None:
             raise ValueError(str(data) + " is not in the tree.")
         
-        # Define a recursive function to traverse the tree.
+        # Define a recursive function to traverse the tree
         def _step(current, item):
             """Recursively step through the tree until the node containing
             'item' is found. If there is no such node, raise a Value Error.
             """
-            if current is None:                     # Base case 1: dead end.
+            if current is None:                     # Base case 1: dead end
                 raise ValueError(str(data) + " is not in the tree.")
-            if item == current.data:                # Base case 2: the data matches.
+            if item == current.data:                # Base case 2: data matches
                 return current
             if item < current.data:                 # Step to the left
                 return _step(current.left,item)
@@ -57,7 +57,7 @@ class BST(object):
         # Start the recursion on the root of the tree.
         return _step(self.root, data)
     
-    # Problem 2: Implement BST.insert().
+    # Problem 2: Implement BST.insert()
     def insert(self, data):
         """Insert a new node containing 'data' at the appropriate location.
         Do not allow for duplicates in the tree: if there is already a node
@@ -77,19 +77,19 @@ class BST(object):
             """Recursively descend through the tree to find the node that
             should be the parent of the new node. Do not allow for duplicates.
             """
-            if item == current.data:                # Base case 1: duplicate.
+            if item == current.data:                # Base case 1: duplicate
                 raise ValueError(str(item) + " is already in the tree.")
-            if current is None:                     # Base case 2: failure.
+            if current is None:                     # Base case 2: failure
                 raise ValueError("_find_parent() failed for " + str(item))
             if item < current.data:                 # Step to the left
                 if current.left:
                     return _find_parent(current.left,item)
-                else:                                   # Base case: parent found.
+                else:                               # Base case: parent found
                     return current
             else:                                   # Step to the right
                 if current.right:
                     return _find_parent(current.right,item)
-                else:                                   # Base case: parent found.
+                else:                               # Base case: parent found
                     return current
         
         n = BSTNode(data)                           # Make a new node
@@ -103,7 +103,7 @@ class BST(object):
                 parent.right = n
             n.prev = parent                             # Double link
     
-    # Problem 3: Implement BST.remove().
+    # Problem 3: Implement BST.remove()
     def remove(self, data):
         """Remove the node containing 'data'. Consider several cases:
             - The tree is empty
@@ -128,14 +128,14 @@ class BST(object):
         """
         
         def _predecessor(node):
-            """Find the next-smallest node in the tree by traversing left once,
-            then right as far as possible.
+            """Find the next-smallest node in the tree by travelling
+            right once, then left as far as possible.
             """
-            if node.left is None:                   # Function called inappropriately.
+            if node.right is None:          # Function called inappropriately
                 raise ValueError("IOP problem")
-            node = node.left                        # Step left once
-            while node.right:
-                node = node.right                   # Step right until done
+            node = node.right               # Step right once
+            while node.left:
+                node = node.left            # Step right until done
             return node
         
         # Case 1: the tree is empty
@@ -217,9 +217,9 @@ class BST(object):
             str_tree[depth].append(current.data)
             visited.add(current)
             if current.left and current.left not in visited:
-                _visit(current.left, depth+1)   # travel left recursively (DFS)
+                _visit(current.left, depth+1)  # travel left recursively (DFS)
             if current.right and current.right not in visited:
-                _visit(current.right, depth+1)  # travel right recursively (DFS)
+                _visit(current.right, depth+1) # travel right recursively (DFS)
         
         _visit(self.root,0)                     # Load the list of lists.
         out = ""                                # Build the final string.
@@ -231,9 +231,10 @@ class BST(object):
         return out
 
 class AVL(BST):
-    """AVL Binary Search Tree data structure class. Inherits from the BST class.
-    Includes methods for rebalancing upon insertion. If your BST.insert() method
-    works correctly, this class will work correctly. Do not modify.
+    """AVL Binary Search Tree data structure class. Inherits from the BST
+    class. Includes methods for rebalancing upon insertion. If your
+    BST.insert() method works correctly, this class will work correctly.
+    Do not modify.
     """
     def _checkBalance(self, n):
         if abs(_height(n.left) - _height(n.right)) >= 2:
@@ -351,7 +352,6 @@ def _height(current):
     return 1 + max(_height(current.right), _height(current.left))
 
 # ============================== solutions.py ============================== #
-
 
 # from Trees import BST
 # from Trees import AVL
@@ -523,7 +523,7 @@ def plot_times(filename="English.txt"):
 
 import inspect
 
-# Simple sinlgy-linked list objects for testing problem 1
+# Simple singly-linked list objects for testing problem 1
 class LinkedListNode(object):
     """Simple singly-linked list node. Used to test problem 1."""
     def __init__(self, data):
