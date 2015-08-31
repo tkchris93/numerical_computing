@@ -55,6 +55,9 @@
 \newenvironment{problem}{\begin{mdframed}[style=problem]\begin{problemnum}}{\end{problemnum}\end{mdframed}}
 \newtheoremup{problemnum}{Problem}
 
+\newenvironment{problem*}{\begin{mdframed}[style=problem]\begin{problemnum*}}{\end{problemnum*}\end{mdframed}}
+\newtheoremup{problemnum*}[problemnum]{*Problem}
+
 %%%%%%%%%%%%%%%%%%%%%%%
 % Colors
 %%%%%%%%%%%%%%%%%%%%%%%
@@ -264,3 +267,4 @@
 \DeclareMathOperator{\sech}{sech}
 \DeclareMathOperator{\Out}{Out}	%Used in PageRank lab
 \DeclareMathOperator{\In}{In}		%Used in PageRank lab
+\DeclareMathOperator\erf{erf}

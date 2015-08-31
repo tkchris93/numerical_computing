@@ -1,163 +1,336 @@
-import math
-import cmath
-import random
-import timeit
-import csv
-import collections as col
-import itertools
+# solutions.py
+"""Volume II Lab 1: The Standard Library
+Solutions file. Written by Shane McQuarrie, Summer 2015.
+"""
+
+# import calculator # as c
 import sys
+import time
+# import matrix_multiply # as m
+
+# In many labs, students will submit multiple files.
+# Every solutions file contains all of the code that students will write,
+# separated by file.
 
 
-#Problem 1
+# ============================== calculator.py ============================== #
+# Students write this module as part of problem 3. Do not provide to students.
 
-def read_events():
-    # Read in the file 'events.txt'.
-    # Return a list of the events.
-    events = []
-    with open('events.txt','r') as f:
-        for line in f:
-            events.append(line.strip())
-    return events
+import math
 
-events = read_events()
+def add(x,y):
+    return x+y
 
-#Problem 2
+def mult(x,y):
+    return x*y
 
-# Using the sys module, print the filename 'output.txt' to screen.
-# 'output.txt' is an argument passed in at command line.
-# In practice, this part would be better to put at the bottom of your script.
+def sqrt(x):
+    return math.sqrt(x)
+
+# Or "sqrt = math.sqrt"
+
+# =========================== matrix_multiply.py ============================ #
+# This module is provided to students and used to complete problem 4.
+
+import numpy as np
+
+def load_matrices(filename):
+    """Returns two matrices if the correct filename is given."""
+    
+    files = np.load(filename)
+    return files['arr_0'], files['arr_1']
+
+
+def method1(A,B):
+    """Multiply the matrices 'A' and 'B' together using nested for loops."""
+    
+    product_matrix = np.zeros((A.shape[0], B.shape[1]))
+    for i in range(product_matrix.shape[0]):
+        for j in range(product_matrix.shape[1]):
+            for k in range(product_matrix.shape[0]):
+                product_matrix[i,j] += A[i,k]*B[k,j] 
+    
+    return product_matrix
+
+
+def method2(A,B):
+    """Multiply the matrices 'A' and 'B' together with some vectorization.
+    Use xrange() instead of range() to make things a little faster.
+    """
+    
+    product_matrix = np.zeros((A.shape[0], B.shape[1]))
+    for i in xrange(product_matrix.shape[0]):
+        for j in xrange(product_matrix.shape[1]):
+            product_matrix[i,j] = np.dot(A[i,:], B[:,j])
+    
+    return product_matrix
+
+def method3(A,B):
+    """Use numpy's matrix multiplication method for maximum speed."""
+    
+    return np.dot(A,B)
+
+
+# ============================== Solutions.py =============================== #
+# The students are provided a specifications file called 'spec.py' with the
+# following functions. They are to rename the file 'solutions.py'.
+
+# Problem 1: Implement this function.
+def prob1(l):
+    """Accept a list 'l' of numbers as input and return a list with the minimum,
+    maximum, and average of the original list.
+    """
+    ans = []
+    ans.append(min(l))
+    ans.append(max(l))
+    ans.append(float(sum(l))/len(l))
+    return ans
+
+
+# Problem 2: Implement this function.
+def prob2():
+    """Determine which Python objects are mutable and which are immutable. Test
+    numbers, strings, lists, tuples, and dictionaries.
+    """
+
+    # numbers: num+= 1
+    num1 = 0
+    num2 = num1
+    num1 += 1
+    print("Numbers:\t"),
+    if num1 == num2:
+        print("Mutable")
+    else:
+        print("Immutable")
+
+    # strings: str1 += 'a'
+    str1 = "a"
+    str2 = str1
+    str1 += "a"
+    print("Strings:\t"),
+    if str1 == str2:
+        print("Mutable")
+    else:
+        print("Immutable")
+
+    # lists: list1.append(1)
+    list1 = [4,3,2]
+    list2 = list1
+    list1.append(1)
+    print("Lists:\t\t"),
+    if list1 == list2:
+        print("Mutable")
+    else:
+        print("Immutable")
+
+    # tuples: tup1 += (1,)
+    tup1 = (4,3,2)
+    tup2 = tup1
+    tup1 += (1,)
+    print("Tuples:\t\t"),
+    if tup1 == tup2:
+        print("Mutable")
+    else:
+        print("Immutable")
+
+    # dictionaries: dic1[1] = 'a'
+    dic1 = dict()
+    dic1[1] = 'b'
+    dic2 = dic1
+    dic1[1] = 'a'
+    print("Dictionaries:\t"),
+    if dic1 == dic2:
+        print("Mutable")
+    else:
+        print("Immutable")
+
+
+# Problem 3: Create a 'calculator' module and use it to implement this function.
+def prob3(a,b):
+    """Calculate and return the length of the hypotenuse of a right triangle.
+    Do not use any methods other than those that are imported from the
+    'calculator' module.
+    Parameters:
+        a : the length one of the sides of the triangle.
+        b : the length the other nonhypotenuse side of the triangle.
+    Returns:
+        The length of the triangle's hypotenuse.
+    """
+    # Students should use calculator.method() instead of method()
+    a2 = mult(a,a)
+    b2 = mult(b,b)
+    a2plusb2 = add(a2, b2)
+    return sqrt(a2plusb2)
+    # Or, simply
+    c = calculator              # or "import calculator as c" at the top
+    return c.sqrt(c.add(c.mult(a,a),c.mult(b,b)))
+
+
+# Problem 4: Utilize the 'matrix_multiply' module and 'matrices.npz' file to
+#   implement this function.
+def prob4():
+    """If no command line argument is given, print "No Input."
+    If anything other than "matrices.npz is given, print "Incorrect Input."
+    If "matrices.npz" is given as a command line argument, use functions
+    from the provided 'matrix_multiply' module to load two matrices, then
+    time how long each method takes to multiply the two matrices together.
+    Print your results to the terminal.
+    """
+    # Students should use matrix_multiply.method() instead of method()
+    # m = matrix_multiply     # or "import matrix_multiply as m" at the top
+    if len(sys.argv) == 1:
+        print("No input")
+    elif sys.argv[1] != "matrices.npz":
+        print("Incorrect Input")
+    else:   # If the correct filename is given,
+        # load the matrices
+        A,B = load_matrices(sys.argv[1])
+        
+        # time method1()
+        start = time.time()
+        method1(A,B)
+        print(time.time() - start)
+        
+        # time method2()
+        start = time.time()
+        method2(A,B)
+        print(time.time() - start)
+        
+        # time method3()
+        start = time.time()
+        method3(A,B)
+        print(time.time() - start)
+
+
+# Everything under this 'if' statement is executed when this file is run from
+#   the terminal. In this case, if we enter 'python solutions.py word' into
+#   the terminal, then sys.argv is ['solutions.py', 'word'], and prob4() is
+#   executed. Note that the arguments are parsed as strings. Do not modify.
 if __name__ == "__main__":
-    print sys.argv[1]
+    prob4()
 
-#Problem 3
+# ============================ END OF SOLUTIONS ============================= #
 
-def read_tributes():
-    males =[]
-    females = []
-    with open('tributes.csv', 'r') as csv_file:
-        csv_reader = csv.reader(csv_file)
-        for male, female in csv_reader:
-            males.append(male)
-            females.append(female)
-    return males, females
+import os
 
-males, females = read_tributes()
+# Test script
+def test(student_module, late=False):
+    """Test script. You must import the students file as a module.
+    
+    3 points for problem 1
+    5 points for problem 2
+    5 points for problem 3
+    7 points for problem 4
+    
+    Parameters:
+        student_module: the imported module for the student's file.
+        late (bool, opt): if True, half credit is awarded.
+    
+    Returns:
+        score (int): the student's score, out of 20
+        feedback (str): a printout of test results for the student.
+    """
 
-#Problem 4
+    s = student_module
+    sFile = s.__file__    
+    if os.system('ls ' + sFile):
+        return
 
-def sqrt_variants(n):
-    # Print floating point squareroot.
-    # Print complex squareroot.
-    print math.sqrt(n)
-    print cmath.sqrt(n)
+    score = 0
+    total = 20
+    feedback = ""
 
-#Problem 5
-
-def random_list():
-    # Create and return a list of 24 random floating-point numbers
-    # between 1.0 and 10.0 that represent the likelihood of a tribute
-    # surviving an event.
-    rand = []
-    for i in xrange(24):
-        rand.append(random.random()*9+1)
-    return rand
-
-likelihoods = random_list()
-
-#Problem 6
-
-def pair_tributes(males, females):
-    # The parameters 'males' and 'females' are the lists from Problem 3.
-    # Create a named tuple called "Tribute".
-    # Return a list of 24 named tuples, each representing a tribute.
-    Tribute = col.namedtuple('Tribute', 'name, district, gender')
-    tributes = []
-    for d, t in enumerate(itertools.izip(males, females),1):
-        tributes.append(Tribute(t[0], d, "M"))
-        tributes.append(Tribute(t[1], d, "F"))
-    return tributes
-
-tributes = pair_tributes(males, females)
-
-#Problem 7
-
-# Initialize deque D, with 10000 elements.
-# Initialize list L, with 10000 elements.
-
-def time_func(f, args=(), kargs={}, repeat=3, number=100):
-    # Wrap f into pfunc.
-    pfunc = lambda: f(*args, **kargs)
-    # Define an object T that times pfunc once.
-    T = timeit.Timer(pfunc)
-
-    # Time f several times, return the name of f and the minimum runtime.
-    try:
-        # Repeat is also a timeit module function
-        t = T.repeat(repeat=repeat, number=int(number))
-        runtime = min(t)/float(number)
-        return runtime
-    # Print an error statement if something goes wrong.
-    except:
-        T.print_exc()
-
-def rotate_deque(D):
-    # In this function use the deque object's rotate method.
-    D.rotate(10000)
-
-def rotate_list(L):
-        length = len(L)
-        for i in xrange(length):
-            y = L.pop()
-            L.insert(0,y)
-
-L = range(10000)
-D = col.deque(range(10000))
-
-# Print timing for rotate_deque.
-print time_func(rotate_deque, [D])
-# Print timing for rotate_list.
-print time_func(rotate_list, [L])
-
-
-
-#Problem 8
-def HungerSim(events, likelihoods, tributes):
-    # Parameters are:
-    #   events - list of events from Problem 1.
-    #   likelihoods - the list of random numbers from Problem 5.
-    #   tributes - the list of tributes from Problem 6.
-    # Write the results of each day to the 'output.txt' file.
-    k = 0
-    with open('output.txt','w') as f:
-        while len(tributes) > 1:
-            survivors = []
-            k += 1
-            f.write("Day " + str(k) + "\n")
-            for i in xrange(len(tributes)):
-                random.shuffle(events)
-                if (random.random()*9+1) > likelihoods[i]:
-                    survivors.append(tributes[i])
-                    f.write(str(tributes[i][0]) + " experienced " + str(events[i]) + " and survived.\n")
-                else:
-                    f.write(str(tributes[i][0]) + " experienced " + str(events[i]) + " and died.\n")
-            f.write("End of Day " + str(k) + "\n" + " \n")
-            tributes = survivors
-
-
-        if len(tributes) == 0:
-            print "There were no winners."
-            f.write("There were no winners.")
+    def strTest(x,y,m):
+        """Test to see if x and y have the same string representation. If
+        correct, award a points and return no message. If incorrect, return
+        0 and return 'm' as feedback.
+        """
+        if str(x) == str(y): return 1, ""
         else:
-            print "The final tribute was the girl from District " + str(tributes[0][1]) + ": " + str(tributes[0][0])
-            f.write("The final tribute was the girl from District " + str(tributes[0][1]) + ": " + str(tributes[0][0]))
+            m += "\n\t\tCorrect response: " + str(x)
+            m += "\n\t\tStudent response: " + str(y)
+            return 0, m
+    
+    def grade(p,m):
+        """Manually grade a problem worth 'p' points with error message 'm'."""
+        part = -1
+        while part > p or part < 0:
+            part = int(input("\nScore out of " + str(p) + ": "))
+        if part == p: return p,""
+        else: return part,m
+    
+    try:    # Problem 1: 3 points
+        feedback += "\n\nProblem 1 (3 points):"
+        points = 0
+        l = [192102312,-234892,9423,1220002,82,3432,23892,100000,-123812]
+        ans =   prob1(l)
+        std = s.prob1(l)
+        if not std: raise NotImplementedError("Problem 1 incomplete")
+        p,f = strTest(ans[0], std[0], "\n\tincorrect maximum")
+        points += p; feedback += f
+        p,f = strTest(ans[1], std[1], "\n\tincorrect minimum")
+        points += p; feedback += f
+        p,f = strTest(ans[2], std[2], "\n\tincorrect average")
+        points += p; feedback += f
 
+        score += points; feedback += "\nScore += " + str(points)
+    except Exception as e: feedback += "\nError: " + e.message
 
-HungerSim(events, likelihoods, tributes)
+    try:    # Problem 2: 5 points
+        feedback += "\n\nProblem 2 (5 points):"
+        points = 0
+        print"\nCorrect output:";   prob2()
+        print"\nStudent output:"; s.prob2()
+        p,f = grade(5, "\n\tincorrect response(s)"
+            + "\n\t\t(Hint: 3 are immutable and 2 are mutable)")
+        points += p; feedback += f
+        
+        score += points; feedback += "\nScore += " + str(points)
+    except Exception as e: feedback += "\nError: " + e.message
+        
+    try:    # Problem 3: 5 points
+        feedback += "\n\nProblem 3 (5 points):"
+        points = 0
+        p,f = strTest(s.prob3(5,12), prob3(5,12),
+                                "\n\tincorrect hypotenuse length")
+        points += (p * 2); feedback += f
+        p,f = strTest(s.prob3(6,7), prob3(6,7),
+                                "\n\tincorrect hypotenuse length")
+        points += (p * 3); feedback += f
+        
+        score += points; feedback += "\nScore += " + str(points)
+    except Exception as e: feedback += "\nError: " + e.message
+        
+    try:    # Problem 4: 7 points
+        feedback += "\n\nProblem 4 (7 points):"
+        points = 0
+        print("\nCorrect output:")
+        os.system("python " + __file__)
+        os.system("python " + __file__ + " Wrong Name")
+        os.system("python " + __file__ + " matrices.npz")
+        print("\nStudent output:")
+        os.system('python ' + sFile)
+        os.system('python ' + sFile + ' "Wrong Name"')
+        os.system('python ' + sFile + ' "matrices.npz"')
+        p,f = grade(7, "\n\tincorrect outputs")
+        points += p; feedback += f
+        
+        score += points; feedback += "\nScore += " + str(points)
+    except Exception as e: feedback += "\nError: " + e.message
+    
+    # Late submission penalty
+    if late:
+        feedback += "\n\nHalf credit for late submission."
+        feedback += "\nRaw score: " + str(score) + "/" + str(total)
+        score *= .5
+    
+    # Report final score
+    feedback += "\n\nTotal score: " + str(score) + "/" + str(total)
+    percentage = (100.0 * score) / total
+    feedback += " = " + str(percentage) + "%"
+    if   percentage >= 100.0: feedback += "\n\nExcellent!"
+    elif percentage >=  90.0: feedback += "\n\nGreat job!"
+    feedback += "\n\n-------------------------------------------------------\n"
+    return score, feedback
 
-
-
-
-
-
-
-
+# ============================== END OF FILE ================================ #
