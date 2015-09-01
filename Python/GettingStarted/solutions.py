@@ -242,18 +242,20 @@ def test(student_module, late=False):
         feedback += "\n\nTesting problem 4 (5 points):"
         points = 0
         
-        solution_list = []
-        for i in squares(50):
-            solution_list.append(i)
+        if type(squares(10)) == type(s.squares(10)):
+            solution_list = []
+            for i in squares(50):
+                solution_list.append(i)
 
-        student_list = []
-        for i in s.squares(50):
-            student_list.append(i)
+            student_list = []
+            for i in s.squares(50):
+                student_list.append(i)
 
-        p,f = strTest(solution_list, student_list,
+            p,f = strTest(solution_list, student_list,
                                             "\n\tsquares(50) failed")
-        points += (p * 5); feedback += f
-
+            points += (p * 5); feedback += f
+        else:
+            feedback += "\n\nDid not detect a generator type"
 
         score += points; feedback += "\nScore += " + str(points)
     except Exception as e: feedback += "\nError: " + e.message
