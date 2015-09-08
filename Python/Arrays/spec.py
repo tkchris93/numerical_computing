@@ -43,7 +43,7 @@ def laplace(A, tolerance):
     pass  
 
 def laplace_plot():    
-	"""Visualize your solution to Laplace equation"""
+    """Visualize your solution to Laplace equation"""
     n = 100
     tol = .0001
     U = np.ones ((n, n))
@@ -65,13 +65,13 @@ def laplace_plot():
 # Problem 5: Blue shift an RGB image
 
 def blue_shift():
-	"""Create a 100x100x3 array and perform a blue shift. Returns the original
-	array and the blue-shifted array
-	"""
+    """Create a 100x100x3 array and perform a blue shift. Returns the original
+    array and the blue-shifted array
+    """
     pass
 
 def blue_shift_plot():
-	"""Visualize the original and the blue_shift image"""
+    """Visualize the original and the blue_shift image"""
     original, blue = blue_shift()
     original = 255 - original
     blue = 255 - blue
