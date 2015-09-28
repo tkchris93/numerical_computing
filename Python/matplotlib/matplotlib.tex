@@ -2,7 +2,7 @@
 \objective{Introduce some of the basic plotting functions available in matplotlib and Mayavi.}
 \label{lab:Matplotlib_and_Mayavi}
 
-\section*{2-D plotting with \li{matplotlib}}
+\section*{2-D plotting with matplotlib}
 The Python library \li{matplotlib} will be our primary tool for creating 2-D graphs in this text. This lab introduces the basic features of \li{matplotlib}; for more information, visit the documentation at \url{http://matplotlib.org}.
 
 To begin, import \li{pyplot} from \li{matplotlib}.
@@ -260,6 +260,7 @@ The returned arrays give the $x$- and $y$-coordinates of the points in the grid 
 \end{figure}
 
 \begin{lstlisting}
+# Create an XY meshgrid
 x = np.linspace(-6, 6, 401)
 y = np.linspace(-6, 6, 401)
 X, Y = np.meshgrid(x, y)
@@ -413,8 +414,9 @@ plt.show()
 \caption{A scatter plot.}
 \label{fig:scatter}
 \end{subfigure}
-\caption{A histogram produced with \li{plt.hist()}and a scatter plot produced with \li{plt.scatter()}.}
-\label{fig:otherplots}
+
+\caption{A histogram produced with \li{plt.hist()} and a scatter plot produced with \li{plt.scatter()}.}
+label{fig:otherplots}
 \end{figure}
 
 
@@ -547,6 +549,18 @@ To get started, import \li{mlab} from \li{mayavi}.
 \begin{lstlisting}
 from mayavi import mlab
 \end{lstlisting}
+
+\begin{info}
+If you do not have the \li{Mayavi} package installed on your system, you may download it by running the following commands from the command line:
+\begin{lstlisting}
+$ conda install conda     # downloads the most recent installer.
+$ conda install anaconda  # updates all packages.
+$ conda install mayavi    # installs mayavi.
+\end{lstlisting}
+
+For more information regarding installing Python packages, see Appendix \ref{updateinstall}.
+\end{info}
+%$
 
 The module \li{mlab} has many plotting functions.
 We will introduce a few in this lab; for more see \url{http://docs.enthought.com/mayavi/mayavi/auto/mlab_helper_functions.html}.
@@ -683,8 +697,6 @@ For a list of all colormaps in Mayavi, see \url{http://docs.enthought.com/mayavi
 Plot the function $z = \sin(10(x^2+y^2))/10$ on $[-1,1] \times [-1,1]$ using Mayavi.
 \end{problem}
 
-
-
 %TODO: this problem is copied from https://github.com/enthought/mayavi/blob/master/examples/mayavi/mlab/canyon.py.
 % we either need to cite this (and thus give the solution) or find a different problem.
 \begin{comment}
@@ -711,4 +723,3 @@ This should produce Figure \ref{fig:GrandCanyon}
 
 \end{problem}
 \end{comment}
-
