@@ -1,27 +1,17 @@
 \lab{Object-Oriented Programming}{Object Oriented Programming}
 \label{lab:OOP}
-\objective{Teach object-oriented programming in Python.}
-
-\section*{Introduction}
-
-Writing readable code is an important skill for computer programmers.
-Well-written code is easy to understand and modify.
-An important part of readable code is how it is organized.
-Object-oriented programming is one way to accomplish good code organization.
-
+\objective{
 Python is a class-based language.
-A class is a sort of blueprint for an object.
-Calling a class constructs an object.
-Once constructed, the user has access to an object's methods and attributes.
-An object created by a class is called an \emph{instance} of the class.
-It is also said that a class \emph{instantiates} objects.
+A class is a blueprint for an object, defining attributes and methods.
+In this lab we learn how to define Python classes to create customized objects for use in algorithms.}
 
 \section*{Python Classes}
 
-A Python class is code that determines an object's behavior.
-A class is defined using the the \li{class} command to name the class.
-Other statements follow the \li{class} command to determine the behavior of objects instantiated by the class.
-Finally, a class needs a method called a constructor that is called when the class instantiates a new object.
+A Python class is code that defines a custom object and determines its behavior.
+A class is defined with the \li{class} command to name the class.
+Other statements follow, indented below the class name, to determine the behavior of objects instantiated by the class.
+
+A class needs a method called a constructor that is called when the class instantiates a new object.
 The constructor specifies the initial state of the object.
 In Python, a class's constructor is always named \li{__init__}.
 For example, the following is a class that created backpack objects.
@@ -36,7 +26,6 @@ class Backpack(object):
         color (str): the color of the backpack.
         contents (list): the contents of the backpack.
     """
-    
     
     def __init__(self, color = 'black'):
         """Constructor for a backpack object.
@@ -74,6 +63,10 @@ Classes may be imported in the same way as modules.
 If the above module is saved as \li{Backpack.py}, it is possible to import the \li{Backpack} class from it.
 Once imported, the \li{Backpack} class can be called to construct backpack objects.
 
+Calling a class constructs an object.
+Once constructed, the user has access to an object's methods and attributes.
+An object created by a class is called an \emph{instance} of the class.
+It is also said that a class \emph{instantiates} objects.
 \begin{lstlisting}
 # From the file Backpack.py import the Backpack class. Then create a backpack.
 >>> from Backpack import Backpack
@@ -217,7 +210,7 @@ Knapsack closed!
 
 % Problem 2: create an inheritance class.
 \begin{problem}
-Create a jetpack class that inherits from the backpack class.
+Create a \li{Jetpack} class that inherits from the \li{Backpack} class.
 Overwrite the constructor so that the \li{color} attribute defaults to `silver', the \li{name} defaults to `jetpack', and the \li{max_size} defaults to 2.
 Also in the constructor initialize a \li{fuel} attribute that keeps track of how much fuel is left in the jetpack.
 Set the default amount of \li{fuel} to 10.
@@ -230,7 +223,7 @@ Finally, overload the \li{dump} method so that both the contents and the fuel ta
 \section*{Magic Methods}
 
 Python \emph{magic methods} can be used to make objects behave like built-in data types.
-A magic methods begins and ends with two underscores, like \li{__init__}.
+A magic method begins and ends with two underscores, like \li{__init__}.
 Every Python object is automatically endowed with several magic methods, but they are hidden because they begin with an underscore (this is a way of hiding attributes or methods from the user; for example, try hiding the \li{closed} attribute in the \li{Knapsack} class by changing it to \li{_closed}).
 A complete list of magic methods can be found \href{https://docs.python.org/2/reference/datamodel.html#special-method-names}{here}.
 
@@ -364,8 +357,12 @@ Contents:	Empty
 
 % Problem 4: ComplexNumber class
 \begin{problem}
-Create your own \li{ComplexNumber} class that supports the basic operations of complex numbers. Implement a \li{conjugate} method that returns a \li{ComplexNumber} object that is the object's complex conjugate, and a \li{norm} method that returns the magnitude of the complex number.
-Neither method should receive any arguments.
+Create your own \li{ComplexNumber} class that supports the basic operations of complex numbers.
+The constructor should accept two numbers:
+store the first as \li{self.real} and the second as \li{self.imag}.
+
+Implement a \li{conjugate} method that returns a \li{ComplexNumber} object that is the object's complex conjugate, and a \li{norm} method that returns the magnitude of the complex number (as a \li{float}).
+Neither of these methods should receive any arguments.
 
 Also implement the following magic methods appropriately:
 \begin{enumerate}
@@ -374,4 +371,6 @@ Also implement the following magic methods appropriately:
 \item \li{__mul__(self, other)}
 \item \li{__div__(self, other)} (Use the complex conjugate to implement division)
 \end{enumerate}
+Each of these should return a new \li{ComplexNumber} object.
+
 \end{problem}
