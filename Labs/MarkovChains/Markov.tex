@@ -1,272 +1,319 @@
 \lab{Markov Chains}{Markov Chains}
-\objective{Learn about Markov chains.}
-\label{lab:EigSolve}
+\label{lab:Markov}
 
-\section*{Markov chains}
-A Markov chain is a collection of states with specified probabilities for transitioning from one state to another.
-Markov chains are characterized by the fact that future behavior of the system depends only on its current state.
+\objective{A \emph{Markov chain} is a finite collection of states with specified probabilities for transitioning from one state to another. They are characterized by the fact that future behavior of the system depends only on its current state. Markov chains have far ranging applications; in this lab, we create a Markov chain for generating random English sentences.}
 
-This lab is a very brief introduction to Markov chains. To learn more, see [TODO: ref something].
+\section*{Definition and Implementation}
 
-\subsection*{An example}
-Suppose Fredo the frog is jumping between the three lily pads 1, 2, and 3.
-These three pads are the \emph{possible states} of the system, and the lily pad on which Fredo is presently sitting is the \emph{current state}.
-If Fredo is on lily pad 1 and jumps, there is a 25\% chance that it will land back on lily pad 1, a 25\% chance that it will land on lily pad 2, and a 50\% chance that it will land on lily pad 3.
-These probabilities are the \emph{transition probabilities}.
-Figure \ref{fig:markov1} is a \emph{transition diagram} that depicts all transition probabilities.
+Suppose that we wish to model a system that can be described by a finite number of states.
+A Markov chain is a collection of states, together with the probabilities of moving from one state to another.
+An example of a Markov chain is a board game where players move around the board based on die rolls.
+Each space represents a state, and a player is said to be in a state if their piece is currently on the corresponding space.
+In this case, the probability of moving from one space to another only depends on the players current location.
+Where the player was on a previous turn does not affect their current turn.
 
-\begin{figure}
-\begin{tikzpicture}[normalcircle/.style={draw, circle, minimum size=1cm, fill=shadecolor, thick, node distance=1.5cm} ]
+Markov chains have an associated transition matrix that stores all the information about the chain.
+The $(ij)^{th}$ entry of the matrix gives the probability of moving from state $j$ to state $i$.
+Thus the columns of the transition matrix must sum to 1.
 
-\node[normalcircle](circle1)[]{};
-\node[draw=none](one)[]{1};
+Consider a very simple weather model, where the probability of being hot or cold depends on the weather of the previous day.
+If the probability that tomorrow is hot given that today is hot is 0.7, and the probability that tomorrow is cold given that today is cold is 0.4, then by assigning hot to the $0^{th}$ column and cold to the $1^{st}$ column, the Markov chain has the following transition matrix:
+\[ W = \left( \begin{array}{cc}
+0.7 & 0.6 \\
+0.3 & 0.4 \end{array} \right)\] 
 
-\node[draw=none, node distance=2.5cm](dummy)
-	[below of=circle1]{};
-
-\node[normalcircle](circle2)[left of=dummy]{};
-\node[draw=none, node distance= 1.5cm](two)[left 
-	of=dummy]{2};
-\node[normalcircle](circle3)[right of=dummy]{};
-\node[draw=none, node distance= 1.5cm](three)
-	[right of=dummy]{3};
-
-\foreach \s /\t in {circle2/circle1, circle1/circle3, circle3/circle2}
-	{\path[draw,bend left=20, thick, ->, >=stealth'] (\s)edge(\t);}
-\foreach \s /\t in {circle1/circle2, circle3/circle1, circle2/circle3}
-	{\path[draw,bend left=20, thick, ->, >=stealth'] (\s)edge(\t);}
-
-\draw[thick,->, >=stealth'](-1.9,-2.8) arc (325:40:.4 and .5); 
-\draw[thick,->, >=stealth'](1.9,-2.2) arc (500:215:.4 and .5); 
-\draw[thick,->, >=stealth'](-.4,.3) arc (220:-35:.5 and .4); 
-
-\node[draw=none, node distance=1.6cm](dummy2)
-	[below of=circle1]{};
-\node[draw= none, node distance=.3cm](midvalues)
-	[above left of=dummy2]{$\frac{1}{4}$};
-\node[draw= none, node distance=.3cm](midvalues2)
-	[above right of=dummy2]{$\frac{1}{2}$};
-\node[draw= none, node distance=.25cm](midvalues3)
-	[below of=dummy2]{$\frac{1}{3}$};
-\node[draw=none, node distance=1.6cm](outsidevalue)
-	[above left of=midvalues3]{$\frac{1}{2}$};
-\node[draw=none, node distance=1.6cm](outsidevalue2)
-	[above right of=midvalues3]{$\frac{1}{2}$};
-\node[draw=none, node distance=1.35cm](outsidevalue3)
-	[below of=midvalues3]{$\frac{1}{2}$};
-\node[draw=none, node distance=1.25cm](circlevalue)
-	[above of=circle1]{$\frac{1}{4}$};
-\node[draw=none, node distance=2.8cm](circlevalue2)
-	[left of=dummy]{$\frac{1}{6}$};
-\node[draw=none, node distance=2.8cm](circlevalue3)
-	[right of=dummy]{$0$};
-
-\end{tikzpicture}
-\caption{Transition diagram for Fredo the Frog.}
-\label{fig:markov1}
-\end{figure}
-
-We can convert our transition diagram into a \emph{transition matrix} The $(i,j)$-entry of the transition matrix is the probability that Fredo jumps from lily pad $j$ to lily pad $i$.
-Fredo's transition matrix is
-\[
-A = \begin{pmatrix}
-1/4 & 1/2 & 1/2\\
-1/4 & 1/6 & 1/2\\
-1/2 & 1/3 & 0
-\end{pmatrix}.
-\]
-
-At any time, the chances that Fredo is on each lily pad is encoded by a \emph{state distribution vector} $\x = (x_1, x_2, x_3)^T$, where $x_i$ is the probability that Fredo is on lily pad $i$. 
-For $\x$ to be a state distribution vector, we require $x_i\geq 0$ and $\|\x\|_1=1$ (recall that the 1-norm of a column vector is the sum of the magnitudes of its entries). 
-Then $A\x$ will be another state distribution vector, which tells us the probability that Fredo is on each lily pad after one jump.
-
-Thus, we can use Fredo's transition matrix to find where he will be after $k$ jumps. In fact, the $(i,j)$-entry of $A^k$ is the probability that Fredo goes from lily pad $j$ to lily pad $i$ in $k$ jumps. 
-In our case,
-
-\[
-A^2 \approx \begin{pmatrix}
-0.4375 & 0.3750 & 0.3750\\
-0.3542 & 0.3194 & 0.2083\\
-0.2083 & 0.3056 & 0.4167
-\end{pmatrix}.
-\]
-Therefore, if Fredo starts on lily pad 1, there is a 43.75\% chance it will still be on lily pad 1 after two jumps.
-Maybe Fredo jumped from 1 to 1 to 1, denoted $1 \rightarrow 1 \rightarrow 1$, or perhaps it jumped to one of the other lily pads and then back again, that is, either $1 \rightarrow 2 \rightarrow 1$ or $1 \rightarrow 3 \rightarrow 1$.
-
-In addition, there is a 35.42\% chance Fredo will be on lily pad 2 and a 20.83\% chance that it will be on lily pad 3.
-We can type our transition matrix into Python and see where Fredo is likely to be after any number of jumps.
-
-\begin{lstlisting}
-# The 1.'s in the numerator force floating point division.
->>> A = np.array([[1./4,1./2,1./2],[1./4,1./6,1./2],[1./2,1./3,0]])
->>> np.linalg.matrix_power(A,10)
-array([[ 0.40000057,  0.39999962,  0.39999962],
-       [ 0.30002369,  0.29999268,  0.29997574],
-       [ 0.29997574,  0.3000077 ,  0.30002464]])
-\end{lstlisting}
-
-In fact, as we take higher and higher powers of $A$, it appears that 
-\[
-\lim_{k \rightarrow \infty} A^k = \begin{pmatrix}
-0.4 & 0.4 & 0.4\\
-0.3 & 0.3 & 0.3\\
-0.3 & 0.3 & 0.3
-\end{pmatrix}.
-\]
-This means that Fredo's state distribution approaches $(0.4, 0.3, 0.3)^T$ after many jumps, regardless of his initial state distribution.
-
-Moreover, suppose Fredo's initial state distribution is $(0.4, 0.3, 0.3)^T$. 
-We can use Python to compute his state distribution after 1 jump.
-\begin{lstlisting}
->>> A.dot(np.array([0.4,0.3,0.3]))
-array([ 0.4,  0.3,  0.3])
-\end{lstlisting} 
-Fredo's state distribution after a jump stays ``fixed.'' We call the vector $(0.4, 0.3, 0.3)^T$ a \emph{stable fixed point} for Fredo.
-
-
-\subsection*{General Markov chains}
-Let us generalize this example. A Markov chain is a collection of states with the probabilities that we will move from one state to another. 
-These transition probabilities are encoded in a transition matrix, whose $(i-j)$-entry is the probability of moving from state $j$ to state $i$. 
-Each column of such a matrix will necessarily have entries that sum to 1. 
-
-%When we have a Markov chain, we want to know what the state distribution is after our system has been running for some time. We are especially interested if the state distributions converge to something that is independent of the initial state, as was the case for Fredo. That is, we want to know about stable fixed points.
-
-Let $A$ be the transition matrix of a Markov chain. 
-Then a state distribution vector $\x$ is a \emph{stable fixed point} if $A\x=\x$. 
-So $\x$ is a stable fixed point if and only if $\x$ is a positive unit eigenvector of $A$ corresponding to the eigenvalue 1. 
-
-
-Every Markov chain has at least one stable fixed point. 
-If in addition we assume some power $A^k$ of $A$ has all positive (nonzero) entries, then the stable fixed point is unique. 
-In this case, $A^k$ will converge to a matrix whose columns are all equal to the unique stable fixed point.
-
-Note that Fredo's transition matrix does not have positive entries, but its square does. 
-So Fredo has the unique stable fixed point $(0.4, 0.3, 0.3)^T$.
-
-\subsection*{Finding stable fixed points}
-Calculating stable fixed points is an important problem in Markov chain analysis. 
-Suppose a Markov chain has a transition matrix $A$ such that $A^k$ has strictly positive entries for some $k$. 
-Then the \emph{Perron-Frobenius theorem} says that 1 is the unique eigenvalue of $A$ of largest magnitude, and the corresponding eigenvector is unique. 
-This means that we can use the power method to find the unique stable fixed point of $A$.
-
-Let us look at what the power method is doing in the example of Fredo the frog. 
-We will use the 1-norm. 
-
-Suppose we know Fredo starts on lily pad 1. Then we begin with the state distribution vector
-\[
-\x_0 = \begin{bmatrix}
-1\\
-0\\
-0
-\end{bmatrix}
-\]
-because we know for certainty (100\%) that Fredo is in the first state.
-The next iteration of the power method is $\x_1=A\x_0/\|A\x_0\|_1$. But since $\|A\x_0\|_1=1$, this is just
-\[
-\x_1 = A \x_0 = \begin{bmatrix}
-0.25\\
-0.25\\
-0.50
-\end{bmatrix},
-\]
-which is exactly Fredo's state distribution after 1 jump.
-After two jumps, Fredo's state distribution is
-\[
-\x_2 = A \x_1 = A^2 \x_0 = \begin{bmatrix}
-0.4375\\
-0.3542\\
-0.2083
-\end{bmatrix},
-\]
-which is also the second iteration of the power method.
-After a large number of jumps, we have
-\[
-\x_n = A \x_{n-1} = \dots = A^n \x_0 \approx \begin{bmatrix}
-0.4\\
-0.3\\
-0.3
-\end{bmatrix}.
-\]
-Thus, the limiting vector of the power method is exactly the unique stable fixed point of the Markov chain. 
-
-\subsection*{A final example}
-Consider the Markov chain with transition matrix
-\[
-A = \begin{pmatrix}
-0.5 & 0.3 & 0.4\\
-0.2 & 0.2 & 0.3\\
-0.3 & 0.5 & 0.3
-\end{pmatrix}.
-\]
-
-Because all entries of $A$ are positive, the Markov chain has a unique stable fixed point. 
-We could find this fixed point with the power method as outlined above, or we can do it by computing eigenvalues and eigenvectors in Python, as shown below.
-\begin{lstlisting}
->>> from scipy import linalg as la
->>> A = np.array([[.5,.3,.4],[.2,.2,.3],[.3,.5,.3]])
->>> evals, evecs = la.eig(A)
->>> evals
-array([ 1.        ,  0.14142136, -0.14142136])
-\end{lstlisting}
-We are interested in the eigenvalue 1, which is the first one outputted in this case. 
-The corresponding eigenvector is the first column of \li{evecs}; let us call it \li{x}.
-\begin{lstlisting}
->>> x = evecs[:,0]
-\end{lstlisting}
-Now, the one-norm of \li{x} will probably not be 1. To make it 1, we divide by the one-norm of \li{x}.
-\begin{lstlisting}
->>>x = x/np.sum(x)
-\end{lstlisting}
-Finally, let us check that \li{x} is a stable fixed point of $A$. There are two things to check.
-\begin{lstlisting}
-# Check Ax = x
->>> np.allclose(A.dot(x),  x)
-True
-
-# Check ||x||_1 = 1
->>> np.sum(x)==1
-True
-\end{lstlisting}
+We interpret the matrix $W$ as follows.
+If it is hot today, examine the $0^{th}$ column of $W$.
+There is a $70\%$ chance that tomorrow will be hot ($0^{th}$ row), and a $30\%$ chance that tomorrow will be cold ($1^{st}$ row).
+Conversely, if it is cold today, here is a $60\%$ chance that tomorrow will be hot, and a $40\%$ chance that tomorrow will be cold.
 
 \begin{problem}
-Write a function that accepts as input a transition matrix, a vector representing the initial state, and a number of iterations \li{niter}. Your function should
-\begin{enumerate}
-\item Assume that the input matrix has a unique stable fixed point.
-\item Calculate the unique stable fixed point by computing eigenvectors and eigenvalues in Python.
-\item Return the current state of the Markov chain after \li{niter} iterations and the stable fixed point.
-\end{enumerate}
-\label{prob:markov}
+Transition matrices for Markov chains are efficiently stored as NumPy arrays.
+Write a function that accepts a dimension $n$ and returns the transition matrix for a random markov chain with $n$ states.
 \end{problem}
 
+\section*{Simulating State Transitions}
+
+We may simulate moving from state to state by sampling from a uniform distribution.
+In a general Markov chain, if we are in state $j$ then the $j^{th}$ column of the transition matrix gives the probabilities of moving to any other state $i$.
+By definition, these probabilities sum to $1$.
+Thus, the entries of each column partition the interval $[0, 1]$, and we can choose the next state to move to by generating a random number between $0$ and $1$.
+
+Consider again the weather model example from the previous section.
+Suppose that today is hot, and that we want to simulate tomorrow's weather.
+The column that corresponds to ``hot'' in the transition matrix is $(0.7, 0.3)^T$.
+If we generate a random number and it is smaller than $0.3$, then our simulation indicates that tomorrow will be cold.
+Conversely, if the random number is betwen $0.3$ and $1$, then the simulation says that tomorrow will be hot.
+In Python, the programming logic is as follows:
+
+\begin{lstlisting}
+import numpy as np
+
+def forecast():
+	"""Forecast tomorrow's weather given that today is hot."""
+
+	transition_matrix = np.array([[0.7, 0.6], [0.3, 0.4]])
+	random_number = np.random.random()
+	if random_number < transition_matrix[1,0]:
+		print "Cold"
+		return 1
+	else:
+		print "Hot"
+		return 0
+\end{lstlisting}
+
+% Problem 2: Forcasting over several days.
 \begin{problem}
-Suppose a basketball player's success at shooting free throws can be described with the following Markov chain
-\[
-A = \begin{pmatrix}.75&.50\\.25&.50\end{pmatrix}
-\]
-where the first state corresponds to success and the second state to failure. Use the function you wrote in Problem \ref{prob:markov} to answer the following questions.
-\begin{enumerate}
-\item If the player makes his first free throw, what is the probability that he also makes his third one? 
-(That is, what is the probability that this system starts in state 1 and is still in state 1 after 3 steps?)
-\item What is the player's average free throw percentage? 
-(This is equal to the success-component of the stable fixed point.)
-\end{enumerate}
-\label{prob:markov_freethrow}
+Modify the \li{forecast} function so that it accepts a parameter \li{num\_days} and runs a simulation of the weather for the number of days given.
+Return a list containing the day-by-day weather predictions (0 for hot, 1 for cold).
+Assume the first day is hot, but do not include the data from the first day in the list of predictions.
+The resulting list should therefore have \li{num\_days} entries.
+\end{problem}
+
+% Problem 3: 3 states instead of 2.
+\begin{problem}
+Suppose that we want to model weather with three states: hot, mild, and cold.
+Let the transition matrix for this new Markov chain be:
+
+\[ \left( \begin{array}{ccc}
+0.6 & 0.3 & 0.2\\
+0.3 & 0.4 & 0.4\\
+0.1 & 0.3 & 0.4\end{array} \right)\]
+
+With hot, mild, and cold corresponding to 0, 1, and 2, respectively.
+
+Write a new function \li{three_state_forcast} that accepts a parameter \li{num\_days} and runs the same simulation as \li{forecast}, but that uses the new transition matrix. Return a list containing the day-to-day results (0 for hot, 1 for mild, 2 for cold).
+\end{problem}
+
+% Problem 4: Analysis of results
+\begin{problem}
+Write a function \li{analyze_simulation} that interprets the results of the functions in the previous two problems.
+Find the percentage of days that are hot, cold, and mild in each simulation.
+Print your results.
+\end{problem}
+
+% This section will be moved to Lab 1, Standard Library.
+\section*{Input and Output in Python}
+
+Throughout some of the previous labs, we have provided code for reading information from and writing information to exterior files.
+Here we briefly introduce formal file I/O protocol.
+It's not very hard, but read this carefully.
+
+Python has a useful \li{file} object which acts as an interface to all kinds of different file streams.
+The built-in function \li{open} creates a \li{file} object.
+
+\begin{lstlisting}
+>>> myfile = open('filename.txt','r') 	# Open the file with read-only access.
+>>> for line in myfile:                 # Print out each line of the file.
+... 	print line
+...
+>>> myfile.close() 						# Close the file connection.
+\end{lstlisting}
+
+The \li{open} command accepts up to three arguments: the filename, mode, and buffering options.
+The mode determines the kind of access to use when opening the file.
+Possible mode strings are:
+\begin{description}
+\item \li{'r'} Opens a file for read-only access.
+This is the default mode.
+\item \li{'w'} Opens a file for write-only access.
+This mode creates the file if it doesn't already exist, and overwrites \textbf{everything} in the file if it does exist.
+\item \li{'a'} Opens a file for appending.
+This mode is like write-only, but instead of overwriting existing data any new data is appended to the end of the file.
+This mode also creates a new file if it doesn't already exist.
+\end{description}
+
+If your file cannot be opened for any reason, an exception is raised (usually an \li{IOException}).
+Finally, every file object has several attributes and methods.
+The most notable are described in Table \ref{table:fileattribs}.
+
+\begin{table}
+\begin{tabular}{|l|l|}
+\hline
+Attribute & Description \\
+\hline
+\li{closed} & True if file object is closed. \\
+\li{mode} & The access mode used to open the file object. \\
+\li{name} & The name of the file. \\
+\hline
+\hline
+Method & Description \\
+\hline
+\li{close()} & Flush any delayed writes and close the file object. \\
+\li{read()} & Read the next string of the file. \\
+\li{readline()} & Read a line of the file. \\
+\li{readlines()} & Read lines of the file until the end of file (returned as a \li{list}). \\
+\li{write()} & Write a string to the file. \\
+\li{writelines()} & Write a sequence of strings to the file (input a \li{list}). \\
+\hline
+\end{tabular}
+\caption{File object attributes and methods.}
+\label{table:fileattribs}
+\end{table}
+
+\subsection*{The \li{with} Statement}
+
+The keyword \li{with} can be used in conjunction with an \li{open} statement to create an indented block in which the file is open.
+Upon exiting the block, the file is closed safely and automatically.
+This is the preferred method when a file only needs to be accessed briefly.
+
+\begin{lstlisting}
+>>> myfile = open('in.txt', 'r')		# Open the file with read-only access.
+>>> contents = myfile.readlines()		# Read in the content by line.
+>>> myfile.close()						# Explicitly close the file.
+>>> for line in contents: 				# Note that the contents variable is
+...		print(line) 					#  still accessible, even though the 
+... 									#  file variable is closed.
+
+>>> with open('in.txt', 'r') as myfile: 	# Open the file using 'with'.
+...    contents = myfile.readlines() 		# Read in the content by line.
+... 										# The file is closed automatically.
+>>> for line in contents:					# Again, the contents variable
+...		print(line) 						#  is still accessible.
+\end{lstlisting}
+
+Only strings can be written to files.
+To write a non-string type, first cast it as a string using \li{str}.
+Again we present two equivalent methods.
+\begin{lstlisting}
+>>> outfile = open('out.txt', 'w') 		# Open the file with write-only access.
+>>> for i in xrange(10):
+...		outfile.write(str(i**2))		# Write some strings to the file.
+>>> outfile.close()						# Explicitly close the file.
+
+>>> with open('out.txt', 'w') as outfile: 	# Use the file using 'with'.
+... 	for i in xrange(10): 				
+... 		outfile.write(str(i**2)) 		# Write some strings to the file.
+...
+>>> outfile.closed 							# The file is closed automatically.
+True
+\end{lstlisting}
+
+% I/O section ends here.
+\section*{Using Markov Chains to Simulate English}
+
+One of the original applications of Markov chains was to study natural languages (citation needed, but it totally was).
+In the early $20^{th}$ century, Markov used his chains to model how Russian switched from vowels to consonants.
+By midcentury, they had been used to try and model English.
+It turns out that Markov chains are, by themselves, insufficient to model very good English.
+However, they can approach a model of bad English, with sometimes amusing results.
+
+A Markov chain model of English has each word as a state.
+By nature, a Markov chain is only concerned with its current state.
+Thus, a Markov chain is unaware of context or even previous words in a sentence.
+For example, a Markov chain's current state may be the word ``continuous.''
+Then the chain would say that the next word in the sentence is more likey to be ``function'' rather than ``racoon.''
+However, without the context of the rest of the sentence, even two likely words stringed together may result in gibberish.
+
+To build a Markov chain to simulate English, we need to determine the transition probabilities between words.
+One way to do this would be to assign every word in English a number.  Say there are $N$ of them, and create an $N\times N$ matrix of zeros.
+Then, read every written work in English and when word $b$ follows word $a$, we add 1 to the $(b,a)^{th}$ entry of the matrix.
+Once we have done this for every word of every written work, we normalize the columns and have a transition matrix that we may simulate from.
+
+The main problem with this approach is the sheer enormity of the task at hand.
+We will restrict ourselves to a subproblem of modeling the English of a specific group of people.
+%Specifically, we will use the posts from the math stack exchange website.
+%(See \texttt{stack_exchange_posts.txt}).
+Thus, the transition probabilities of our Markov chains will reflect the sort of English that the source authors speak.
+For example, the transition matrix built from the Complete Works of William Shakespeare will differ greatly from, say, a collection of academic journals.
+We will call the source collection of works in the next problems the \emph{training set}.
+
+\begin{problem}
+%First we must convert a file of English words to numbers.
+%These numbers will correspond to rows and columns in our transition matrix.
+%Thus, we may refer to a words column or row in the transition matrix by its number.
+
+Write a function that accept the path to a file containing a training set of words.
+Each line in the file will be an English sentence.
+Examine each line, one at a time.
+Check each word in the line to see if it has been assigned a number yet.
+If it hasn't, then assign the word a number and write the number into a new file.
+If a number has been assigned already, write it to the new file.
+The line break structure should be maintained.
+
+For example, a text and its conversion to numbers follows.
+
+\begin{lstlisting}
+<<Love is patient Love is kind 							1 2 3 1 2 4 
+It does not envy It does not boast 						5 6 7 8 5 6 7 9 
+It is not proud It is not rude 							5 2 7 10 5 2 7 11 
+It is not self-seeking It is not easily angered  		5 2 7 5 2 7 12 13 
+It keeps no record of wrongs							5 14 15 16 17 18 
+Love does not delight in evil							1 6 7 19 20 21 
+but rejoices with the truth 							22 23 24 25 26 
+It always protects always trusts 						5 27 28 27 29 
+always hopes always perseveres 							27 30 27 31 
+Love never fails>> 										1 32 33
+\end{lstlisting}
+
+The word ``Love'', for example is assigned the number 1, and the word ``It'' is assigned the number 5.
+
+Besides writing the new file, return a dictionary mapping the numbers in the new file to the words from the original file (so 1 is the key for ``Love'', 5 is the key for ``It'', and so on)
+% Also return a list that matches the index of the list to the word assigned that number.
+\end{problem}
+
+Now that we have converted our English text into numbers, it is time to build the transition matrix for the Markov chain.
+We will scan the file we created in the previous problem and use it to create the matrix.
+
+\begin{problem}
+Write a function that accepts the path to the file created in the previous problem and the number of unique words in the text (this will be the number of keys in the dictionary from the previous exercise). %list
+Initialize a \emph{sparse} square zero matrix of floats (use \li{lil_matrix} from the \li{scipy.sparse} library) whose dimension is the number of unique words in the text, plus 2 (to include a start and stop state).
+Then, read each line of the file and for each pair of subsequent numbers add one to the corresponding entry of the matrix.
+
+For instance, if we use the example text of the previous problem and we scanned the line 1 6 7 19 20 21, then we would add one to the $(6,1)$, $(7,6)$, $(19,7)$, $(20,19),$ and $(21,20)$ entries of the matrix.
+Also, each line should begin with the start state (assign it the number 0) and stop state (length of word list + 1), so that $(1,0)$ and $(34,21)$ would also be incremented.
+
+Once the entire file has been read, divide each column by its column sum.
+Now each column will sum to one and it's non zero entries correspond to the probability of moving from word $j$ to word $i$.
+%For troubleshooting, use \texttt{stack_exchange_posts_small.txt} to save time.
 \end{problem}
 
 \begin{comment}
-\begin{problem}
-Consider the Markov process given by the transition diagram in Figure \ref{fig:markov2}.
-\begin{figure}[H]
-\includegraphics[width=\textwidth]{markov2}
-\caption{Transition diagram}
-\label{fig:markov2}
-\end{figure}
+\subsection*{Starting and Stopping states}
 
-\begin{enumerate}
-\item Find the transition matrix.
-\item If the Markov process is in state 1 initially, find the probability that it is in state 2 after two transitions.
-\item Find the stable fixed point if it exists.
-\end{enumerate}
-\label{prob:markov_stablept}
-\end{problem}
+In the previous weather model we chose a fixed number of states to simulate.
+However, in English, sentences are of varying length.
+One way to simulate this is to create a start state and an end state.
+To generate a new sentence, we begin in the given start state.
+Subsequent words will have a probability of moving to the end state.
+Once the chain has moved to the end state, we have reached the end of the sentence and place a period.
+This is modeled in Python with a \li{while} loop and putting the start and stop state as the first and last column of the transition matrix, respectively.
+In the following code, we use a multinomial distribution to produce the transitions.
+
+# THIS NEEDS TO BE EXPLAINED IN THE SIMULATING TRANSITIONS SECTION.
+# It's explanation is beyond their ken (as in, they don't know what a multinomial distribution
+# is.  However, it is the best way I can think of to produce the transitions.
+# Maybe put it in a function and give it to them as a black box to be understood later.
 \end{comment}
+
+%\subsection*{Teaching the Markov Chain}
+
+%Now that we know how to travel through a Markov chain, we will build one to simulate English.
+
+\begin{problem}
+%Now that we have a Markov chain and a word list, we may simulate English sentences by travelling through the chain.
+The follwing code uses a multinomial distribution to simulate state changes in a Markov chain.
+
+\begin{lstlisting}
+def start_to_stop(t_matrix, word_index, num_sentences=1):
+	"""Travel along the Markov chain with transition matrix 't_matrix'
+	from the starting state (first column) to the stopping state
+	(last column).
+	"""
+	current_state = 0						# Begin at the start state 0.
+	stop_state = t_matrix.shape[1] 			# End at the stopping state n.
+
+	while current_state != stop_state:
+		state_vec = np.random.multinomial(1, t_matrix[:,current_state])
+		new_state = np.where(state_vec)[0][0]
+\end{lstlisting}
+
+Use the dictionary returned in Problem 5 to construct a sentence based on the 
+Modify this function so it prints a sentence generated by the chain.
+%This function will accept the transition matrix and word list as arguments.
+%Also include a keyword argument that allows you to specify the number of sentences created.
+
+Once this is working, you may try experiments with other data sets.
+%We have also made the works of Shakespeare available in \li{shakespeare.txt}.
+\end{problem}
+
