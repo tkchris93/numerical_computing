@@ -3,7 +3,8 @@
 
 \objective{Introduce Sparse Grids.}
 
-At first inspection, our world appears to be nice and continuous.  However, this only works on a macroscopic level.  As we zoom in on matter, we find that it is made of discrete atoms with much empty space between.  Computers likewise work in discrete space.  You have already seen many examples of this.  Consider plotting the function $y=x^2$, such as in Figure \ref{fig:x_squared}.  To do this we take an array of discrete points of $x$ and $y$ values, which are then joined linearly.  As you either zoom in on the function or decrease the number of plotting points, you can see the discrete nature of even this simple function. 
+\section*{Discretization}
+At first inspection, our world appears to be nice and continuous.  However, this only works on a macroscopic level.  As we zoom in on matter, we find that it is made of discrete atoms with much empty space between.  Computers likewise work in discrete space.  You have already seen many examples of this.  Consider plotting the function $y=x^2$, such as in Figure \ref{fig:x_squared}.  To do this we take an array of discrete points of $x$ and $y$ values, which are then joined linearly.  As you either zoom in on the function or decrease the number of plotting points, you can see the discrete nature of even this simple function.
 
 \begin{figure}
 \begin{subfigure}{.5\textwidth}
@@ -16,9 +17,28 @@ At first inspection, our world appears to be nice and continuous.  However, this
 \label{fig:x_squared}
 \end{figure}
 
-\section*{First Section}
+In order to get better results, we need to use a larger number of points.  This is true not just for graphing purposes, but also for standard computation.  If we double the number of points, we double the computation time necessary.  This effect, while not irrelevant, pales in comparison to the case when working in multiple dimensions.  Imagine a function that we discretize into $20$ points.  A similar function of two variables, where each variable is discretized into $20$ points, would necessitate $400$ unique points.  Expanding to seven variables would necessitate $1,280,000,000$ unique points!
 
-Say things.
+In general, for $n$ discrete points in $d$ dimensions, this gives $n^d$ points.  This can be visualized as a $d$-dimensional grid of size $n \times n \times \cdots \times n$. In practice, we seldom need to know the value for each and every point.  Instead of using the full grid, we can use a sparse grid.  The main idea of a sparse grid is that it can reduce the order of difficulty for a standard $d$-dimensional problem.
+
+\section*{The Hierarchical Basis}
+One of the most basic uses of Sparse Grids is the use of the Hierarchical Basis.  This uses piecewise linear basis functions to find the points to compute.  The \emph{standard hat function} is defined as:
+
+\begin{equation}
+\phi(x) = \left\{
+        \begin{array}{ll}
+            1-\abs{x} & \quad -1 \leq x \leq 1 \\
+            0 & \quad otherwise
+        \end{array}
+    \right.
+\end{equation}
+
+From this equation, we can build a set of basis functions 
+
+\begin{equation}
+\phi_{j,i}(x) = \phi(2^{j-1}x - (2(i-j)+1))
+\end{equation}
+where $j$ is the dimension.  If $j=1$, $i=1/2$, and we are left with simply $\phi(x)$.  For $j>1$, $i=1,2,3,\cdots,2^{j-1}$.
 
 \begin{problem}
 Write problems.
