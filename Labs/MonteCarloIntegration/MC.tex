@@ -8,9 +8,8 @@ For example, the integral of the joint normal distribution
 \]
 is ubiquitous in statistics.
 However, the integrand does not have a symbolic antiderivative.
-This means we must use numerical methods to evaluate this integral.
+This means we must use numerical methods to evaluate this integral. The standard technique for numerically evaluating multivariable integrals is \emph{Monte-Carlo Integration}. In the next lab, we will approximate this integral using a modified version of Monte-Carlo Integration. In this lab, we address the basics of Monte-Carlo Integration.
 
-The standard technique for numerically evaluating multivariable integrals is \emph{Monte-Carlo Integration}.
 Monte-Carlo (MC) integration is radically different from 1-dimensional techniques like Simpson's rule, relying on probability to calculate the integral.
 Although it converges slowly, MC integration is frequently used to evaluate multivariable integrals because the higher-dimensional analogs of methods like Simpson's rule are inefficient. 
 
@@ -51,10 +50,9 @@ Finally, we approximate the area.
 \end{lstlisting}
 This differs from $\pi$ by about 0.117.
 
-
-
-
-
+\begin{problem}
+Estimate the volume of the unit sphere using 10000 sample points from $[-1,1]\times[-1,1]\times[-1,1]$. Your answer should be approximately 4.189.
+\end{problem}
 
 We analyze the error of the MC method by repeating this experiment for many values of \li{numPoints} and plotting the errors.
 The result is the blue line in Figure \ref{fig:mc_error}.
@@ -113,12 +111,16 @@ In the approximation on the right-hand-side, $x_i$ is drawn from a uniform distr
 The average of $N$ such draws will converge to $1/2$. 
 
 \begin{problem}
+Monte-Carlo Integration is particularly useful when trying to approximate integrals that would be difficult to calculate otherwise. Approximate the following integral:
+$$\int_{1}^{5} \left | \text{sin}(10x)\text{cos}(10x) + \sqrt{x}\text{sin}(3x) \right | dx$$
+Your answer should be approximately $4.502$.
+\end{problem}
+
+\begin{problem}
 \label{prob:mc}
-Implement Monte-Carlo integration with the following function.
+Implement Monte-Carlo integration with the following function. Your implementation should be robust enough to integrate any function $f$ in $\mathbb{R}^n$ over any interval in $\mathbb{R}^n$.
 Your implementation should run the Monte-Carlo algorithm several times 
-and return the average of those runs. Implement your function so it can work 
-in $\mathbb{R}^n$. Test your function by estimating the volume of the unit sphere. 
-You answer should be near $4.189$.
+and return the average of those runs. Test your function by recalculating Problem 1 and 2.
 \begin{lstlisting}
 def mc_int(f, mins, maxs, numPoints=500, numIters=100):
     """Use Monte-Carlo integration to approximate the integral of f
@@ -163,23 +165,18 @@ array([ 1.73205081,  2.23606798,  0.8660254 ,  1.41421356])
 \end{enumerate}
 \end{problem}
 
-\begin{comment}
 \begin{problem}
 \label{prob:mc_test}
 The exact value of the integral of
 \[
 f(w,x,y,z) = sin(x) y^5 -y^3 + zw + yz^3
 \]
-on $[-1,1]x[-1,1]x[-1,1]x[-1,1]$ is 0.
-\begin{enumerate}
-\item Run the function \li{mc_int()} you wrote in Problem \ref{prob:mc} on $f$ 10 sample points.
-Do this 100 times and take the average. What is the error?
-\item Repeat part (1) of this problem with 100, 1000, and 10000 sample points. 
+on $[-1,1]\times[-1,1]\times[-1,1]\times[-1,1]$ is 0.
+Run the function \li{mc_int()} you wrote in Problem \ref{prob:mc} on $f$ with 100, 1000, and 10000 sample points.
 Plot the errors of your estimates.
-\end{enumerate}
 \end{problem}
-\end{comment}
 
+\begin{comment}
 One application of Monte Carlo integration is integrating probability density functions that do not have closed form solutions.
 
 \begin{comment}
@@ -200,7 +197,7 @@ N = norm()
 N.cdf(1)
 \end{lstlisting}
 \end{problem}
-\end{comment}
+
 
 \begin{problem}
 The joint normal distribution of $N$ independent random variables with mean 0 and variance 1 is
@@ -253,7 +250,7 @@ with MC integragtion using the following code.
 Since this code returns a finite value, so we could assume that this integral has a finite value.
 In fact, the integral is infinite.
 We could discover this emprically by using larger and larger values of $k$, and noting that MC integration returns larger and larger values.
-
+\end{comment}
 
 \begin{comment}
 \begin{problem}
