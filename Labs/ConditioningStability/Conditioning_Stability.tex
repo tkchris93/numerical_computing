@@ -84,7 +84,7 @@ The function \li{np.poly1d()} creates a polynomial object using the array passed
 \begin{lstlisting}
 >>> perturbed_roots = np.roots(np.poly1d(perturbed_coeffs))
 \end{lstlisting}
-The new roots are plotted with the original roots in Figure \ref{fig:wilkinsonpolynomial}.
+The new roots are plotted with the original roots in Figure \ref{fig:wilkinsonpolynomial}. 
 
 Finally we compute an approximation to the condition number.
 We sort the roots before we compare them to ensure that they are in the same order.
@@ -123,11 +123,10 @@ We will return to this issue in the next section.
 
 \begin{figure}
 \centering
-\includegraphics[height=2.5in]{wilkinsonpolynomial.pdf}
-\caption{The blue dots are the roots of $w(x)$. The red dots are the roots of the polynomial perturbed by 1e-7 in the $x^{19}$-coefficient. }
+\includegraphics[height=2.25in]{wilk2.png}
+\caption{In these images, blue is associated with $w(x)$ and red is associated with $w(x)$ perturbed by 1e-7 in the $x^{19}$-coefficient. On the left is a plot of the two polynomials. On the right is a graphical representation of the roots of the polynomials. The blue dots are the roots of $w(x)$. The red x's are the roots of the perturbed polynomial. }
 \label{fig:wilkinsonpolynomial}
 \end{figure}
-
 
 \begin{problem}\label{prob:wilk}
 Write a Python function that investigates the condition number of the Wilkinson polynomial by doing the following.
@@ -135,7 +134,7 @@ Write a Python function that investigates the condition number of the Wilkinson 
 \item Perform this experiment:
 
 \begin{quote}
-Randomly perturb $w(x)$ by replacing a coefficient $a_i$ with $a_i*r_i$, where $r_i$ is drawn from a normal distribution centered at 1 with variance $e^{-10}$.
+Randomly perturb $w(x)$ by replacing each coefficients $a_i$ with $a_i*r_i$, where $r_i$ is drawn from a normal distribution centered at 1 with standard deviation $1e-10$.
 \end{quote}
 
 Plot the results of 100 such experiments in a single graphic, along with the roots of the unperturbed polynomial $w(x)$. The plot should look something like Figure \ref{fig:wilkinsonpolynomial_many}. This exercise reproduces Figure 12.1 on p. 93 of \emph{Numerical Linear Algebra} by Lloyd N. Trefethen and David Bau III.
@@ -292,7 +291,7 @@ You can avoid the problem either by rewriting your program to not use subtractio
 Here is an example of catastrophic cancellation.
 Suppose we wish to compute $\sqrt{a}-\sqrt{b}$. We can either do this subtraction directly or perform the equivalent division
 \[
-\sqrt{a}-\sqrt{b} = (\sqrt{a}-\sqrt{b})\frac{\sqrt{a}+\sqrt{b}}{\sqrt{a}+\sqrt{b}} = \frac{a-b}{\sqrt{a}+\sqrt{b}}=\frac{1}{\sqrt{a}+\sqrt{b}}.
+\sqrt{a}-\sqrt{b} = (\sqrt{a}-\sqrt{b})\frac{\sqrt{a}+\sqrt{b}}{\sqrt{a}+\sqrt{b}} = \frac{a-b}{\sqrt{a}+\sqrt{b}}.
 \]
 
 Let us perform this computation both ways in NumPy with $a=10^{20}+1$ and $b=10^{20}$.
