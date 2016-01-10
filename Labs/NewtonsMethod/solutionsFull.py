@@ -35,14 +35,14 @@ def Newtons_method(f, x0, Df, iters=15, tol=.002):
 # Problem 1.2: Implement this function.
 def problemOneTwo():
     '''
-    Return a tuple of the number of iterations to get 5 digits of accuracy
+    Return a tuple of the number of iterations to get five digits of accuracy
     for f = cos(x) with x_0 = 1 and x_0 = 2.
     '''
     f = lambda x : np.cos(x)
     df = lambda x: -1*np.sin(x)
     iter1 = Newtons_method(f,1,df,tol=.00001)
     iter2 = Newtons_method(f,2,df,tol=.00001)
-    return iter1,iter2
+    return iter1[2],iter2[2]
 
 # Problem 1.3: Implement this function.
 def problemOneThree():
@@ -62,14 +62,14 @@ def problemOneThree():
 def problemOneFour():
     '''
     Return a tuple of
-    1. The number of iterations to get 2 digit of accuracy for f(x) = x^9
+    1. The number of iterations to get five digits of accuracy for f(x) = x^9
         with x_0 = 1.
     2. A string with the reason to why you think the convergence is slow for 
         this function.
     '''
     f = lambda x : x**9
     df = lambda x : 9*x**8
-    xnew,converged,numiters = Newtons_method(f,1,df,iters=3000,tol=.01)
+    xnew,converged,numiters = Newtons_method(f,1,df,iters=3000,tol=1e-5)
     return numiters,"The derivative is very close to zero so it will converge slowly"
     
 
@@ -86,6 +86,21 @@ def problemOneFive():
 
 # Problem 2 (Optional): Modify the function Newtons_method() to calculate the numerical
 # derivative of f using centered coefficients.
+
+def Newtons_method_mod(f, x0, Df=None, iters=15, tol=.002):
+    
+    if Df == None:
+        h = 1e-5
+        Df = lambda x: .5 * (f(x+h) - f(x-h))/h
+        
+    xold = x0
+    for numiters in range(1,iters+1):
+        xnew = xold-f(xold)*1./Df(xold)
+        if abs(xnew-xold)<tol:
+            return xnew,True,numiters
+        else:
+            xold = xnew
+    return xnew,False,numiters
 
 
 # Problem 3.1: Implement this function.
