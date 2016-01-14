@@ -246,18 +246,18 @@ def reverse_file(infile, outfile):
 
 # END OF SOLUTIONS ========================================================== #
 
-from numpy.random import permutation
+from numpy.random import permutation, randint
 
 def test(student_module):
     """Test script. You must import the student's 'solutions.py' as a module.
     
-     5 points for problem 1
-     5 points for problem 2
-    10 points for problem 3
-    10 points for problem 4
-    10 points for problem 5
-    15 points for problem 6
-    15 points for problem 7
+     5 points for problem 1: Node class restrictions
+     5 points for problem 2: LinkedList.find()
+    10 points for problem 3: LinkedList.__len__(), LinkedList.__str__()
+    10 points for problem 4: LinkedList.remove()
+    10 points for problem 5: LinkedList.insert()
+    15 points for problem 6: SortedList, sort_file()
+    15 points for problem 7: Deque, reverse_file()
     
     Inputs:
         student_module: the imported module for the student's file.
@@ -272,7 +272,6 @@ def test(student_module):
     return tester.score, tester.feedback
 
 
-# TODO: UPDATE THIS TEST DRIVER !!!!!!
 class _testDriver(object):
     """Class for testing a student's work. See test.__doc__ for more info."""
 
@@ -294,23 +293,23 @@ class _testDriver(object):
                 self.feedback += "\n\nProblem %d (%d points):"%(number, value)
                 points = problem(student_module)
                 self.score += points
-                self.feedback += "\nScore += %d"%points
+                self.feedback += "\nScore += {}".format(points)
             except BaseException as e:
-                self.feedback += "\n%s: %s"%(self._errType(e),e)
+                self.feedback += "\n{}: {}".format(self._errType(e),e)
 
         # Grade each problem.
-        test_one(self.problem1, 1, 0)   # Problem 1:  5 points.
-        test_one(self.problem2, 2, 0)   # Problem 2:  5 points.
-        test_one(self.problem3, 3, 0)   # Problem 3: 10 points.
-        test_one(self.problem4, 4, 0)   # Problem 4: 10 points.
-        test_one(self.problem5, 5, 0)   # Problem 5: 10 points.
-        test_one(self.problem6, 6, 0)   # Problem 6: 15 points.
-        test_one(self.problem7, 7, 0)   # Problem 7: 15 points.
+        test_one(self.problem1, 1, 5)   # Problem 1:  5 points.
+        test_one(self.problem2, 2, 5)   # Problem 2:  5 points.
+        test_one(self.problem3, 3, 10)  # Problem 3: 10 points.
+        test_one(self.problem4, 4, 10)  # Problem 4: 10 points.
+        test_one(self.problem5, 5, 10)  # Problem 5: 10 points.
+        test_one(self.problem6, 6, 15)  # Problem 6: 15 points.
+        test_one(self.problem7, 7, 15)  # Problem 7: 15 points.
 
         # Report final score.
         percentage = (100. * self.score) / total
-        self.feedback += "\n\nTotal score: {}/{} = {}%%".format(
-                                    self.score, total, percentage)
+        self.feedback += "\n\nTotal score: {}/{} = {}%".format(
+                                    self.score, total, round(percentage, 2))
         if   percentage >=  98: self.feedback += "\n\nExcellent!"
         elif percentage >=  90: self.feedback += "\n\nGreat job!"
 
@@ -329,16 +328,31 @@ class _testDriver(object):
         else:
             return str(error)
 
-    def _eqTest(self, correct, student, message):
-        """Test to see if 'correct' and 'student' are equal.
-        Report the given 'message' if they are not.
+    @staticmethod
+    def _random_list(min_size=5, max_size=10):
+        """Construct a random list of monotone increasing integers with
+        length at least 'min_size' and no more than 'max_size'.
         """
-        if correct == student:
+        a = randint(2,   20)
+        b = randint(a+1, 60)
+        c = randint(1, a)
+        rand_list = list(range(a, b, c))
+        n = len(rand_list)
+        if n < min_size or max_size < n:
+            return _testDriver._random_list(min_size, max_size)
+        else:
+            return rand_list
+
+    def _isTest(self, correct, student, message):
+        """Test to see if the nodes 'correct' and 'student' are the same
+        object. Report the given 'message' if they are not.
+        """
+        if correct is student:
             return 1
         else:
-            self.feedback += "\n%s"%message
-            self.feedback += "\n\tCorrect response: %s"%correct
-            self.feedback += "\n\tStudent response: %s"%student
+            self.feedback += "\n{}".format(message)
+            self.feedback += "\n\tCorrect response: {}".format(correct.value)
+            self.feedback += "\n\tStudent response: {}".format(student.value)
             return 0
 
     def _strTest(self, correct, student, message):
@@ -374,20 +388,61 @@ class _testDriver(object):
     # Problems ----------------------------------------------------------------
     def problem1(self, s):
         """Test the Node class for input restrictions. 5 points."""
-        points = 0
+
+        def test_Node(item):
+            """Attempt to instantiate a Node containing 'item'."""
+            try:
+                s.Node(item)
+            except TypeError:
+                return 1
+            except BaseException as e:
+                self.feedback += "\nTypeError not raised "
+                self.feedback += "(got {} instead)".format(self._errType(e))
+            else:
+                self.feedback += "Node class failed to raise a TypeError "
+                self.feedback += "with data of type {}".format(type(item))
+            return 0
         
-        return points
+        # Test that anyting other than int, long, float, or str are rejected.
+        points  = test_Node(["This", "is", "a", "list"])
+        points += test_Node({"This", "is", "a", "set"})
+        points += test_Node(3+2j)
+
+        # Test that int, long, float, and str are still accepted.
+        s.Node("string"); s.Node(0)
+        return points + 2
 
     def problem2(self, s):
         """Test LinkedList.find(). 5 points."""
-        points = 0
+        if not hasattr(s.LinkedList, "find"):
+            raise NotImplementedError("Problem 2 Incomplete")
+
+        # Make a list of integers to test and create an identical linked list.
+        _list = s.LinkedList()
+        source = self._random_list(5, 10)
+        for i in source:
+            _list.append(i)
+
+        def search_list(node, index):
+            """Search '_list' for 'node', which contains source[index]."""
+            assert node.value == source[index], "TEST DRIVER ERR 1"
+            return self._isTest(node, _list.find(source[index]),
+                "LinkedList.find() failed to locate {} in {}".format(
+                                                    source[index], source))
+
+        # Search the linked list for individual nodes.
+        points  = search_list(_list.head, 0)
+        points += search_list(_list.head.next, 1)
+        points += search_list(_list.head.next.next, 2)
+        points += search_list(_list.head.next.next.next, 3)
+        points += search_list(_list.tail, len(source)-1)
 
         return points
 
     def problem3(self, s):
         """Test LinkedList.__len__() and LinkedList.__str__(). 10 Points."""
         points = 0
-
+        # TODO: START EDITING HERE ============================================
         return points
         
         # Test an empty list
@@ -425,6 +480,14 @@ class _testDriver(object):
     def problem4(self, s):
         """Test LinkedList.remove(). 10 points."""
         points = 0
+        '''
+        def test_insert(value, solTree, stuTree):
+            oldTree = str(solTree)
+            solTree.insert(value); stuTree.insert(value)
+            p = self.strTest(tree1, tree2, "\n\tBST.insert(" + str(value)
+                            + ") failed.\nPrevious tree:\n" + oldTree)
+            return p, solTree, stuTree
+        '''
 
         return points
 

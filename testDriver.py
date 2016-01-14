@@ -139,8 +139,8 @@ class _testDriver(object):
 
         # Report final score.
         percentage = (100. * self.score) / total
-        self.feedback += "\n\nTotal score: {}/{} = {}%%".format(
-                                                self.score, total, percentage)
+        self.feedback += "\n\nTotal score: {}/{} = {}%".format(
+                                    self.score, total, round(percentage, 2))
         if   percentage >=  98: self.feedback += "\n\nExcellent!"
         elif percentage >=  90: self.feedback += "\n\nGreat job!"
 
