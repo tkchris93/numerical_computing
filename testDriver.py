@@ -150,7 +150,7 @@ class _testDriver(object):
         if len(comments) > 0:
             self.feedback += '\n\n\nComments:\n\t{}'.format(comments)
 
-    # Possible Helper Functions -----------------------------------------------
+    # Helper Functions --------------------------------------------------------
     @staticmethod
     def _errType(error):
         """Get just the name of the exception 'error' in string format."""
@@ -214,22 +214,15 @@ class _testDriver(object):
     # Problems ----------------------------------------------------------------
     def problem1(self, s):
         """Test Problem 1. X points."""
-
         points = 0
         # Test problem 1 here.
         return points
 
     def problem2(self, s):
         """Test Problem 2. X points."""
-
         points = 0
         # Test problem 2 here.
         return points
 
-# Grade from the terminal
-if __name__ == '__main__':
-    import sys, imp
-    filename = sys.argv[1]
-    student = imp.load_source("student", filename)
-    score, feedback = test(student)
-    # now use/store the score and feedback as desired.
+
+# END OF FILE =================================================================
