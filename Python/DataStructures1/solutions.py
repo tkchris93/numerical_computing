@@ -274,135 +274,121 @@ def test(student_module):
 
 # TODO: UPDATE THIS TEST DRIVER !!!!!!
 class _testDriver(object):
+    """Class for testing a student's work. See test.__doc__ for more info."""
 
-    # Constructor / main routine ----------------------------------------------
+    # Constructor -------------------------------------------------------------
     def __init__(self):
+        """Initialize the feedback attribute."""
         self.feedback = ""
 
-    def test_all(self, student_module):
-        """Grade each problem in sequence and compile feedback."""
+    # Main routine -----------------------------------------------------------
+    def test_all(self, student_module, total=70):
+        """Grade the provided module on each problem and compile feedback."""
+        # Reset feedback and score.
         self.feedback = ""
-        score = 0
+        self.score = 0
 
-        try:    # Problem 1: 5 points
-            points = self.problem1(student_module)
-            score += points
-            self.feedback += "\nScore += " + str(points)
-        except BaseException as e:
-            self.feedback += "\nError: " + e.message
-        
-        try:    # Problem 2: 10 points
-            points = self.problem2(student_module)
-            score += points
-            self.feedback += "\nScore += " + str(points)
-        except BaseException as e:
-            self.feedback += "\nError: " + e.message
-        
-        try:    # Problem 3: 10 points
-            points = self.problem3(student_module)
-            score += points
-            self.feedback += "\nScore += " + str(points)
-        except BaseException as e:
-            self.feedback += "\nError: " + e.message
-        
-        try:    # Problem 4: 15 points
-            points = self.problem4(student_module)
-            score += points
-            self.feedback += "\nScore += " + str(points)
-        except BaseException as e:
-            self.feedback += "\nError: " + e.message
-        
-        try:    # Problem 5: 20 points
-            points = self.problem5(student_module)
-            score += points
-            self.feedback += "\nScore += " + str(points)
-        except BaseException as e:
-            self.feedback += "\nError: " + e.message
-        
-        try:    # Problem 6: 20 points
-            points = self.problem6(student_module)
-            score += points
-            self.feedback += "\nScore += " + str(points)
-        except Exception as e:
-            self.feedback += "\nError: " + e.message
-        except KeyboardInterrupt as e:
-            self.feedback += "\nProblem not graded (code ran for too long)"
+        def test_one(problem, number, value):
+            """Test a single problem, checking for errors."""
+            try:
+                self.feedback += "\n\nProblem %d (%d points):"%(number, value)
+                points = problem(student_module)
+                self.score += points
+                self.feedback += "\nScore += %d"%points
+            except BaseException as e:
+                self.feedback += "\n%s: %s"%(self._errType(e),e)
+
+        # Grade each problem.
+        test_one(self.problem1, 1, 0)   # Problem 1:  5 points.
+        test_one(self.problem2, 2, 0)   # Problem 2:  5 points.
+        test_one(self.problem3, 3, 0)   # Problem 3: 10 points.
+        test_one(self.problem4, 4, 0)   # Problem 4: 10 points.
+        test_one(self.problem5, 5, 0)   # Problem 5: 10 points.
+        test_one(self.problem6, 6, 0)   # Problem 6: 15 points.
+        test_one(self.problem7, 7, 0)   # Problem 7: 15 points.
 
         # Report final score.
-        total = 70
-        percentage = (100.0 * score) / total
-        self.feedback += "\n\nTotal score: " + str(score) + "/"
-        self.feedback += str(total) + " = " + str(percentage) + "%"
-        if   percentage >=  98.0: self.feedback += "\n\nExcellent!"
-        elif percentage >=  90.0: self.feedback += "\n\nGreat job!"
+        percentage = (100. * self.score) / total
+        self.feedback += "\n\nTotal score: {}/{} = {}%%".format(
+                                    self.score, total, percentage)
+        if   percentage >=  98: self.feedback += "\n\nExcellent!"
+        elif percentage >=  90: self.feedback += "\n\nGreat job!"
 
         # Add comments (optionally).
-        print self.feedback
+        print(self.feedback)
         comments = str(raw_input("Comments: "))
         if len(comments) > 0:
-            self.feedback += '\n\n\nComments:\n\t' + comments
-        self.score = score
+            self.feedback += '\n\n\nComments:\n\t%s'%comments
 
-    # Helper Functions
-    def strTest(self, x, y, message):
-        """Test to see if x and y have the same string representation."""
-        if str(x) == str(y):
+    # Helper Functions --------------------------------------------------------
+    @staticmethod
+    def _errType(error):
+        """Get just the name of the exception 'error' in string format."""
+        if isinstance(error, BaseException):
+            return str(type(error)).lstrip("<type 'exceptions.").rstrip("'>")
+        else:
+            return str(error)
+
+    def _eqTest(self, correct, student, message):
+        """Test to see if 'correct' and 'student' are equal.
+        Report the given 'message' if they are not.
+        """
+        if correct == student:
             return 1
         else:
-            self.feedback += message
-            self.feedback += "\n\t\tCorrect response: " + str(x)
-            self.feedback += "\n\t\tStudent response: " + str(y)
+            self.feedback += "\n%s"%message
+            self.feedback += "\n\tCorrect response: %s"%correct
+            self.feedback += "\n\tStudent response: %s"%student
             return 0
-    
-    def grade(self, points, message):
-        """Manually grade a problem and returned points earned."""
+
+    def _strTest(self, correct, student, message):
+        """Test to see if 'correct' and 'student' have the same string
+        representation. Report the given 'message' if they are not.
+        """
+        if str(correct) == str(student):
+            return 1
+        else:
+            self.feedback += "\n{}".format(message)
+            self.feedback += "\n\tCorrect response: {}".format(correct)
+            self.feedback += "\n\tStudent response: {}".format(student)
+            return 0
+
+    def _grade(self, points, message=None):
+        """Manually grade a problem worth 'points'. Return the score."""
         credit = -1
         while credit > points or credit < 0:
             try:
-                credit = int(input("\nScore out of " + str(points) + ": "))
+                credit = int(input("\nScore out of {}: ".format(points)))
             except:
                 credit = -1
         if credit != points:
-            self.feedback += message
+            # Add comments (optionally),
+            comments = raw_input("Comments: ")
+            if len(comments) > 0:
+                self.feedback += "\n{}".format(comments)
+            # Or add a predetermined error message.
+            elif message is not None:
+                self.feedback += "\n{}".format(message)
         return credit
 
-    # Problems
+    # Problems ----------------------------------------------------------------
     def problem1(self, s):
-        """Test the Node class comparison and str magic methods. 5 points."""
-    
-        SNode = s.LinkedListNode
-        self.feedback += "\n\nProblem 1 (5 points):"
+        """Test the Node class for input restrictions. 5 points."""
         points = 0
-
-        # Comparison magic methods
-        n1 = SNode(5)
-        n2 = SNode(5)
-        if not (n1 < n2):
-            points += 1
-        if n1 == n2:
-            points += 1
-        n1 = SNode(4)
-        n2 = SNode(6)
-        if n1 < n2:
-            points += 1
-        if points < 3:
-            self.feedback += "\n\t" + str(3-points) + " "
-            self.feedback += "Node class comparison magic method(s) failed"
-        
-        # Test __str__
-        n1 = SNode(6); n2 = SNode("this is a string")
-        points += self.strTest(6, n1,"\n\tNode.__str__ failed")
-        points += self.strTest("this is a string",n2,"\n\tNode.__str__ failed")
-
-        # TODO: next time, restrict possible inputs (and that's it)
         
         return points
 
     def problem2(self, s):
-        """Test LinkedList.__str__(). 10 Points."""
-
-        self.feedback += "\n\nProblem 2 (10 points):"
+        """Test LinkedList.find(). 5 points."""
         points = 0
+
+        return points
+
+    def problem3(self, s):
+        """Test LinkedList.__len__() and LinkedList.__str__(). 10 Points."""
+        points = 0
+
+        return points
         
         # Test an empty list
         l1 = []; l2 = s.LinkedList()
@@ -436,11 +422,12 @@ class _testDriver(object):
         
         return points
 
-    def problem3(self, s):
-        """Test LinkedList.remove() for Exceptions. 10 points."""
-
-        self.feedback += "\n\nProblem 3 (10 points):"
+    def problem4(self, s):
+        """Test LinkedList.remove(). 10 points."""
         points = 0
+
+        return points
+
         l1 = []; l2 = s.LinkedList()
 
         # Test LinkedList.remove() from empty list (2 points)
@@ -491,13 +478,13 @@ class _testDriver(object):
 
         return points
 
-    def problem4(self, s):
-        """Test LinkedList.insert(). 15 points."""
-
-        self.feedback += "\n\nProblem 4 (15 points):"
+    def problem5(self, s):
+        """Test LinkedList.insert(). 10 points."""
         points = 0
 
-        l1 = LinkedList(); l2 = s.LinkedList()
+        return points
+
+        l1, l2 = LinkedList(), s.LinkedList()
 
         # insert() to empty list (2 points)
         print("\nCorrect output:\t100 is not in the list.\nStudent output:\t"),
@@ -539,152 +526,34 @@ class _testDriver(object):
                                 " failed to report for 'place' not in list")
         return points
 
-    def problem5(self, s):
-        """Test the DoublyLinkedList class. 20 points."""
-
-        self.feedback += "\n\nProblem 5 (20 points):"
+    def problem6(self, s):
+        """Test the SortedList class and sort_file(). 15 points."""
         points = 0
-
-        l1, l2 = DoublyLinkedList(), s.DoublyLinkedList()
-        if not hasattr(l2, "tail"):
-            raise AttributeError("'DoublyLinkedList' "
-                            + "object has no attribute 'tail'.")
-
-        # Test remove() and add() (12 points)
-        function = "DoublyLinkedList.remove()"
-        try:
-            # Test remove() from empty list (2 points)
-            print("\nCorrect output:\t100 is not in the list.")
-            print("Student output:\t"),
-            try:
-                l2.remove(100)
-                self.feedback += "\n\tNo exception raised by " + function
-                self.feedback ++ " on empty list"
-            except ValueError as e:
-                points += 1; print(e.message)
-                points += self.grade(1,
-                    "\n\t" + function + " failed to report on empty list")
-
-            # Test add() (2 points)
-            try:
-                for i in [0, 2, 4, 5, 7, 8, 9]:
-                    l1.add(i); l2.add(i)
-            except Exception as e:
-                raise Exception("DoublyLinkedList.add() failed: " + str(e))
-            points += 2*self.strTest(l1, l2,
-                                        "\n\tDoublyLinkedList.add() failed")
-            
-            # remove() head (2 points)
-            l1.remove(0); l2.remove(0)
-            points += 2*self.strTest(l1, l2, "\n\t" + function + " failed on "
-                + "head removal\n\t(original list: [0, 2, 4, 5, 7, 8, 9])")
-            
-            # remove() end (2 points)
-            l1.remove(9); l2.remove(9)
-            points += 2*self.strTest(l1, l2, "\n\t" + function + "failed on "
-                + "tail removal\n\t(original list: [2, 4, 5, 7, 8, 9])")
-            
-            # remove() from middle (2 points)
-            l1.remove(5); l2.remove(5)
-            points += 2*self.strTest(l1, l2, "\n\t" + function + " failed on "
-                + "middle removal\n\t(original list: [2, 4, 5, 7, 8])")
-            
-            # remove() nonexistent (2 points)
-            print("\nCorrect output:\t100 is not in the list.")
-            print("Student output:\t"),
-            try:
-                l2.remove(100)
-                self.feedback += "\n\tNo exception raised by " + function
-                self.feedback += " for x not in the list"
-            except ValueError as e:
-                points += 1; print(e.message)
-                points += self.grade(1, "\n\t" + function + " failed to "
-                                     + "report for x not in the list")
-        except BaseException as e:
-            raise Exception("DoublyLinkedList.remove() failed: " + str(e))
-
-        # Test insert() (8 points)
-        l1, l2 = DoublyLinkedList(), s.DoublyLinkedList()
-        try:
-            # insert() to empty list (2 points)
-            print("\nCorrect output:\t100 is not in the list.")
-            print("Student output:\t"),
-            try:
-                l2.insert(100,100)
-                self.feedback += "\n\tNo exception raised by "
-                self.feedback += " DoublyLinkedList.insert() on empty list"
-            except ValueError as e:
-                points += 1; print(e.message)
-                points += self.grade(1, "\n\tDoublyLinkedList.insert(x,y) "
-                                        + "failed to report on empty list")
-
-            # insert() before head (2 points)
-            l1.add(7); l1.insert(1,7)
-            l2.add(7); l2.insert(1,7)
-            points += 2*self.strTest(l1, l2,
-                    "\n\tDoublyLinkedList.insert() failed on inserting before "
-                    + "the head\n\t(original list: [7])")
-            
-            # insert() in the middle (2 points)
-            l1.insert(4,7); l2.insert(4,7)
-            points += self.strTest(l1, l2,
-                    "\n\tDoublyLinkedList.insert() failed on middle insertion"
-                    + "\n\t(original list: [1, 7])")
-            l1.insert(6,7); l2.insert(6,7)
-            points += self.strTest(l1, l2,
-                    "\n\tDoublyLinkedList.insert() failed on middle insertion"
-                    + "\n\t(original list: [1, 4, 7])")
-            
-            # insert(data, place) on nonexistant place (2 points)
-            print("\nCorrect output:\t100 is not in the list.")
-            print("Student output:\t"),
-            try:
-                l2.insert(1,100)
-                self.feedback += "\n\tNo exception raised by DoublyLinkedList"
-                self.feedback += ".insert(x,place) for 'place' not in list"
-            except ValueError as e:
-                points += 1; print(e.message)
-                points += self.grade(1, "\n\tDoublyLinkedList.insert(x, place)"
-                                + " failed to report for 'place' not in list")
-        except BaseException as e:
-            raise Exception("DoublyLinkedList.insert() failed: " + str(e))
-
-        # Test inheritance
-        if not issubclass(s.DoublyLinkedList, s.LinkedList):
-            points = 0
-            self.feedback += "\n\tThe DoublyLinkedList class MUST inherit"
-            self.feedback += " from the LinkedList class!"
 
         return points
 
-    def problem6(self, s):
-        """Test the SortedLinkedList class and sort_words. 20 points."""
-
-        self.feedback += "\n\nProblem 6 (20 points):"
-        points = 0
-
         # Test add() (2 point)
-        l1, l2 = SortedLinkedList(), s.SortedLinkedList()
+        l1, l2 = SortedList(), s.SortedList()
         entries = [1, 2, 3, 4, 5, 6, 7, 8, 9]
         for entry in entries:
             l1.add(entry); l2.add(entry)
-        points += 2*self.strTest(l1, l2, "\n\tSortedLinkedList.add() failed"
+        points += 2*self.strTest(l1, l2, "\n\tSortedList.add() failed"
                     + "\n\t(adding 1, 2, 3, 4, 5, 6, 7, 8, and 9 in order)")
 
         # Test add() (3 points)
-        l1, l2 = SortedLinkedList(), s.SortedLinkedList()
+        l1, l2 = SortedList(), s.SortedList()
         entries = [9, 8, 7, 6, 5, 4, 2, 3, 1]
         for entry in entries:
             l1.add(entry); l2.add(entry)
-        points += 3*self.strTest(l1, l2, "\n\tSortedLinkedList.add() failed"
+        points += 3*self.strTest(l1, l2, "\n\tSortedList.add() failed"
                     + "\n\t(adding 9, 8, 7, 6, 5, 4, 2, 3, and 1 in order)")
 
         # Test add() (3 points)
-        l1, l2 = SortedLinkedList(), s.SortedLinkedList()
+        l1, l2 = SortedList(), s.SortedList()
         entries = [1, 3, 5, 7, 9, 2, 4, 6, 8]
         for entry in entries:
             l1.add(entry); l2.add(entry)
-        points += 3*self.strTest(l1, l2, "\n\tSortedLinkedList.add() failed"
+        points += 3*self.strTest(l1, l2, "\n\tSortedList.add() failed"
                     + "\n\t(adding 1, 3, 5, 7, 9, 2, 4, 6, and 8 in order)")
 
         # Test that insert() was disabled (2 point)
@@ -692,13 +561,13 @@ class _testDriver(object):
         print("Student output:\t"),
         try:
             l2.insert(1, 2, 3, 4, 5)
-            self.feedback += "\n\tNo exception raised by SortedLinkedList.insert()"
+            self.feedback += "\n\tNo exception raised by SortedList.insert()"
         except (ValueError, NotImplementedError) as e: # NotImplementedError
             points += 1; print(e.message)
-            points += self.grade(1, "\n\tSortedLinkedList.insert()" + 
+            points += self.grade(1, "\n\tSortedList.insert()" + 
                                 " failed to report as disabled")
         except TypeError:
-            self.feedback += "\n\tSortedLinkedList.insert() not disabled correctly"
+            self.feedback += "\n\tSortedList.insert() not disabled correctly"
             self.feedback +="\n\t\t(insert() should accept any number of arguments)"
 
         # Test sort_words() (10 points)
@@ -716,14 +585,18 @@ class _testDriver(object):
         points += 10*self.strTest(word_list, out, "\n\tsort_words() failed.")
 
         # detect cheating
-        if not isinstance(out, s.SortedLinkedList):
+        if not isinstance(out, s.SortedList):
             points = 0
             self.feedback += "\n\tsort_words() must return a "
-            self.feedback += "SortedLinkedList object!"
-        if not issubclass(s.SortedLinkedList, s.DoublyLinkedList):
+            self.feedback += "SortedList object!"
+        if not issubclass(s.SortedList, s.LinkedList):
             points = 0
-            self.feedback += "\n\tThe SortedLinkedList class must inherit "
-            self.feedback += "from the DoublyLinkedList class!"
+            self.feedback += "\n\tThe SortedList class must inherit "
+            self.feedback += "from the LinkedList class!"
 
         return points        
 
+
+    def problem7(self, s):
+        """Test the Deque class and the reverse_file() function. 15 points."""
+        return 0
