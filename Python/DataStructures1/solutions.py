@@ -216,7 +216,7 @@ class Deque(LinkedList):
             LinkedList.remove(self, data)
             return data
 
-    def popleft():
+    def popleft(self):
         """Remove the first node in the list and return its value."""
         if self.head is None:               # Case 1: Empty list.
             raise ValueError("The list is empty")
@@ -245,6 +245,7 @@ def reverse_file(infile, outfile):
 
 # END OF SOLUTIONS ========================================================== #
 
+from os import remove as rm
 from numpy.random import permutation, randint
 
 def test(student_module):
@@ -332,20 +333,23 @@ class _testDriver(object):
             return str(error)
 
     @staticmethod
-    def _load_lists(s, sorted_list=False):
+    def _load_lists(s, list_type="LinkedList"):
         """Construct a random list of 5 to 10 unique integers. Fill a
         student LinkedList with the same entries, then return the lists.
         """
         int_list = [int(i) for i in randint(1,100,randint(5, 10))]
         driver_list = [i for i in int_list if int_list.count(i)==1]
         if len(driver_list) < 5:
-            return _testDriver._load_lists(s, sorted_list)
-        if sorted_list is True:
+            return _testDriver._load_lists(s, list_type)
+        if list_type == "SortedList":
             student_list = s.SortedList()
             for item in driver_list:
                 student_list.add(item)
         else:
-            student_list = s.LinkedList()
+            if list_type == "Deque":
+                student_list = s.Deque()
+            else:
+                student_list = s.LinkedList()
             for item in driver_list:
                 student_list.append(item)
         return driver_list, student_list
@@ -674,7 +678,7 @@ class _testDriver(object):
 
         # Test SortedList.add() (8 points)
         for i in xrange(8):
-            l1, l2 = self._load_lists(s, True)
+            l1, l2 = self._load_lists(s, "SortedList")
             points += self._strTest(sorted(l1), l2, "SortedList.add() failed")
 
         # Test sort_file() (5 points) -----------------------------------------
@@ -693,6 +697,7 @@ class _testDriver(object):
             data = f.read().split('\n')
             while data[-1] == '': data.pop()
         points += 5*self._strTest(sorted(words), data, "sort_file() failed")
+        rm("__temp__.txt"); rm("__ans__.txt")
 
         return points        
 
@@ -726,11 +731,34 @@ class _testDriver(object):
 
         # TODO: Test Deque.append(), appendleft(), pop(), and popleft() (8 pts)
 
+        # Test Deque.append() (2 points)
+        l1, l2 = self._load_lists(s, list_type="Deque")
+        points += 2*self._strTest(l1, l2, "Deque.append() failed")
 
+        # Test Deque.appendleft() (2 points)
+        l1 = [int(i) for i in randint(1, 60, randint(5, 10))]
+        l2 = s.Deque()
+        for i in l1:
+            l2.appendleft(i)
+        l1.reverse()
+        points += 2*self._strTest(l1, l2, "Deque.appendleft() failed")
 
+        # Test Deque.pop() (2 points)
+        l1, l2 = self._load_lists(s, list_type="Deque")
+        pops = []
+        while len(l2) != 0:
+            pops.append(l2.pop())
+        l1.reverse()
+        points += 2*self._strTest(l1, pops,
+                "Deque.pop() failed (showing sequence of pops)")
 
-
-
+        # Test Deque.popleft() (2 points)
+        l1, l2 = self._load_lists(s, list_type="Deque")
+        pops = []
+        while len(l2) != 0:
+            pops.append(l2.popleft())
+        points += 2*self._strTest(l1, pops,
+                "Deque.popleft() failed (showing sequence of poplefts)")
 
         # Test reverse_file() (5 points) --------------------------------------
         # Get a subset of the data to work with
@@ -749,6 +777,7 @@ class _testDriver(object):
             while data[-1] == '': data.pop()
         points += 5*self._strTest(
                         list(reversed(words)), data, "reverse_file() failed")
+        rm("__temp__.txt"); rm("__ans__.txt")
 
         return points
 
