@@ -30,7 +30,7 @@ Python provides a \emph{profiler} that can identify where code spends most of it
 The output of the profiler will tell you where to begin your optimization efforts.
 
 In IPython\footnote{If you are not using IPython, you will need to use the \li{cProfile} module documented here: \url{https://docs.python.org/2/library/profile.html}.}, 
-you can profile a function from the command line with \texttt{\%prun}.
+you can profile a function with \texttt{\%prun}.
 Here we profile \texttt{qr1()} on a random $300 \times 300$ array.
 \begin{lstlisting}
 In [1]: A = np.random.rand(300, 300)
@@ -287,6 +287,8 @@ def qr(A):
             Q[:,j] = Q[:,j]-R[i, j]*Q[:,i]
     return Q, R
 \end{lstlisting}
+We can compile this code within IPython or from the command line.
+
 To compile this code as Cython, we need to write another script, call it \texttt{setup.py}.
 \lstinputlisting[style=fromfile, language=Python]{setup.py}
 To run the setup script, type the following in the command line.
@@ -310,7 +312,7 @@ Load this function with the following command:
 \begin{lstlisting}
 In [1]: %load_ext Cython
 \end{lstlisting}
-Now you can define any Cython function in the command line by prefacing it with \li{\%\%cython}.
+Now you can define any Cython function in IPython by prefacing it with \li{\%\%cython}.
 \begin{lstlisting}
 In [2]: %%cython
    ...: import numpy as np
@@ -333,7 +335,7 @@ Note the import statements on lines 2 and 3. Even if these modules were already 
 
 It is best to use this method of compilation if you are only using your optimized funcion once or you are in the stages of developing your optimized algorithm. It can be a little frustrating to fix errors in your function if you are using the IPython shell. The IPython Notebook interface is much easier to use for these types of problems.
 
-\subsection*{Compilation from the Command Line}
+\subsubsection*{Compilation from the Command Line}
 Compiling Cython from the command line is particularly useful if you need an optimized module that you will use over and over again. As we will discuss in this section, once a function is written and compiled in Cython, it can be imported as a module.
 
 Cython code is usually written in a \texttt{.pyx} file, which is then compiled to C.
