@@ -4,26 +4,7 @@ Solutions file. Written by Tanner Christensen
 """
 
 import numpy as np
-
-def prob1(numPoints=100000):
-    """Return an estimate of the volume of the unit sphere using Monte
-    Carlo Integration.
-    """
-    points = np.random.rand(3, numPoints)
-    points = points*2 - 1
-    circleMask = [la.norm(points[:,1]) for i in xrange(numPoints)]
-    numInCircle = np.sum(circleMask)
-    return 8.*numInCircle/numPoints
-    
-def prob2(numPoints=100000):
-    """Return an estimate of the area under the curve,
-        f(x) |sin(10x)cos(10x) + sqrt(x)*sin(3x)| 
-    from 1 to 5.
-    """
-    f = lambda x : np.abs(np.sin(10*x)*np.cos(10*x) + np.sqrt(x) * np.sin(3*x))
-    points = np.random.rand(numPoints)
-    points = points * 4 + 1
-    return 4*np.sum(f(points))/numPoints
+import scipy.stats as stats
 
 def mc_int(f, mins, maxs, numPoints=500, numIters=100):
     """Use Monte-Carlo integration to approximate the integral of f
@@ -71,14 +52,30 @@ def mc_int(f, mins, maxs, numPoints=500, numIters=100):
     estimate = np.average(results)
     return estimate
 
-def prob4(numPoints=[500]):
-    mins = -1*np.ones(4)
-    maxs = np.ones(4)
-    f = lambda x : np.sin(x[0])*x[1]**5 - x[1]**3 + x[2]*x[3] + x[1]*x[2]**2
-    errors = []
-    for n in numPoints:
-        errors.append(mc_int(f, mins, maxs, n))
-    return errors
+def joint_normal(mins, maxs):
+    """Caluclate the integral of the joint normal distribution using SciPy and 
+    Monte Carlo integration.
     
-if __name__ == "__main__":
-    print prob4([100,200,300])
+    Inputs:
+        mins (1-D np.ndarray) - Minimum bounds of integration.
+        maxs (1-D np.ndarray) - Maximum bounds of integration.
+    
+    Returns:
+        value (int) - result from intregration using SciPy
+        estimate (1-D np.ndarray) - result of Monte Carlo integration
+            using 'numPoints' = {10,100,1000,10000}
+    """
+    # define means and covs
+    means = np.zeros(len(mins))
+    covs = np.eye(len(mins))
+
+    #calculate integral using SciPy
+    value, inform = stats.mvn.mvnun(mins, maxs, means, covs)
+
+    f = lambda x: (1./np.sqrt((2*np.pi)**(len(x))))*np.exp(-x.dot(x)/2)
+    estimates = []
+    for n in xrange(1,5):
+        estimates.append(mc_int(f,mins,maxs,numPoints=10**n))
+    estimates = np.array(estimates)
+    
+    return value, estimates
