@@ -36,8 +36,9 @@
 
 \begin{document}
 
-%-------------------------------------------------------------
-%Book cover and Front matter
+% INTRODUCTION ================================================================
+
+% Book cover and Front matter -------------------------------------------------
 \thispagestyle{empty}
 
 \begin{center}
@@ -53,8 +54,7 @@ Design and Optimization}
 
 \include{contributors}
 
-%------------------------------------------------------------------
-%The preface, which will presumably be longer in the future
+% The preface -----------------------------------------------------------------
 
 \begin{thepreface}
 This lab manual is designed to accompany the textbook \emph{Foundations of Applied Mathematics} by Humpherys and Jarvis.
@@ -73,113 +73,115 @@ Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 94105
 \centering\includegraphics[height=1.2cm]{by}
 \vfill
 \end{thepreface}
-%-----------------------------------------------------------------
+% End of preface --------------------------------------------------------------
 
 \setcounter{tocdepth}{1}
 \tableofcontents
 
 \mainmatter
 
-% ---------- 2015 Vol II Outline ---------- %
+% LABS ========================================================================
+
+% Introductory Labs -----------------------------------------------------------
 \part{Python Essentials}
-%% Getting Started
+% Getting Started
 \subimport{./Python/GettingStarted/}{GettingStarted}
-%% Standard Library
+% Standard Library
 \subimport{./Python/StandardLibrary/}{stdlib}
-%% NumPy and SciPy
+% NumPy and SciPy
 \subimport{./Python/Arrays/}{Arrays}
-%% Matplotlib
+% Matplotlib
 \subimport{./Python/matplotlib/}{matplotlib}
-%% Object Oriented Programming
+% Object Oriented Programming
 \subimport{./Python/OOP/}{ObjectOriented}
-%$ Exceptions and File I/O
+% Exceptions and File I/O
 \subimport{./Python/Exceptions/}{Exceptions}
 
+% Volume II Labs --------------------------------------------------------------
 \part{Data Structures and Graph Algorithms}
-%% Public Key Encryption: RSA
-\subimport{./Labs/RSA/}{Encryption}
-%% Data Structures I: Linked Lists
+% Data Structures I: Linked Lists
 \subimport{./Python/DataStructures1/}{LinkedLists}
-%% Data structures II: Trees
+% Data structures II: Trees
 \subimport{./Python/DataStructures2/}{BSTrees}
-%% Nearest Neighbor: k-d trees and Postal Data
+% Nearest Neighbor: k-d trees and Postal Data
 \subimport{./Labs/NearestNeighbor/}{Neighbor}
-%% BFS: Kevin Bacon
+% BFS: Kevin Bacon
 \subimport{./Labs/KevinBacon/}{Bacon}
 \part{Probabilistic Algorithms}
-%% Markov Chains
+% Markov Chains
 \subimport{./Labs/MarkovChains/}{Markov}
 \part{Fourier Analysis}
-%% Fourier Analysis: The Fast Fourier Transfrom
+% Fourier Analysis: The Fast Fourier Transfrom
 \subimport{./Labs/FFT/}{fft}
-%% Fourier Analysis: Filtering and Convolution (balloon pop)
+% Fourier Analysis: Filtering and Convolution (balloon pop)
 \subimport{./Labs/FilteringConvolution/}{Filtering_and_Convolution}
-%% Fourier Analysis: Wavelets (fingerprints)
+% Fourier Analysis: Wavelets (fingerprints)
 \subimport{./Labs/Wavelets/}{Haar}
-%% Gaussian Quadrature
+% Gaussian Quadrature
 \subimport{./Labs/GaussianQuadrature/}{GaussQuad}
 
-% End of Semester
+% Semester Break
 
-\part{Unconstrained Optimization}
-%% Optimization Pkg: scipy.optimize
+\part{Optimization}
+% Optimization Pkg: scipy.optimize
 \subimport{./Python/scipyoptimize/}{scipyoptimize}
-%% Optimization Pkg: CVXOPT
+% Optimization Pkg: CVXOPT
 \subimport{./Python/cvxopt/}{cvxopt}
-%% Optimization: Line Search
+% Optimization: Line Search
 \subimport{./Labs/LineSearch/}{LineSearch}
-%% Optimization: Conjugate Gradient
-\subimport{./Labs/ConjugateGradient/}{ConjugateGradient}
-%% Optimization: Trust Region
-\subimport{./Labs/TrustRegion/}{TrustRegion}
-%% Compress Sensing
-\subimport{./Labs/CompressedSensing/}{CompSense}
-\part{Constrained Optimization}
-%% Linear Optimization: Simplex (2 weeks)
+% Linear Optimization: Simplex (2 weeks)
 \subimport{./Labs/Simplex/}{Simplex}
-%% Optimization: Interior Point I
+% Compress Sensing
+\subimport{./Labs/CompressedSensing/}{CompSense}
+% Optimization: Conjugate Gradient
+\subimport{./Labs/ConjugateGradient/}{ConjugateGradient}
+% Optimization: Trust Region
+\subimport{./Labs/TrustRegion/}{TrustRegion}
+% Optimization: Interior Point I
 \subimport{./Labs/InteriorPoint1/}{InteriorPoint1}
-%% Optimization: Interior Point II
+% Optimization: Interior Point II
 \subimport{./Labs/InteriorPoint2/}{InteriorPointII}
-\part{Dynamic Optimization}
-%% Dynamic Optimization: Value Function Iteration
+% Dynamic Optimization: Value Function Iteration
 \subimport{./Labs/ValueFunctionIteration/}{VFI}
-%% Dynamic Optimization: Policy Function Iteration
+% Dynamic Optimization: Policy Function Iteration
 \subimport{./Labs/PolicyFunctionIteration/}{Policy_Function_Iteration}
-%% Dynamic Optimization: Bayesian Bandits
-\subimport{./Labs/MultiArmedBandit/}{Bandits}
 
+% ORPHANS =====================================================================
 
-% ----- ORPHANS ----- %
+% % Floating Point: IEEE
+% \subimport{./Labs/FloatingPointIEEE/}{float}
 
-%% Floating Point: IEEE
-%\subimport{./Labs/FloatingPointIEEE/}{float}
+% % Floating Point: Error
+% \subimport{./Labs/FloatingPointError/}{floatbreak}
 
-%% Floating Point: Error
-%\subimport{./Labs/FloatingPointError/}{floatbreak}
+% % Public Key Encryption: RSA
+% \subimport{./Labs/RSA/}{Encryption}
 
-%% Kruskal's Algorithm
-%\subimport{./Labs/MST/}{mst}
+% % Kruskal's Algorithm
+% \subimport{./Labs/MST/}{mst}
 
-%% Pseudorandom Number Generators: Blackjack
-%\subimport{./Labs/PRNG/}{PRNG}
+% % Pseudorandom Number Generators: Blackjack
+% \subimport{./Labs/PRNG/}{PRNG}
 
-%% Statistical Distributions
-%\subimport{./Labs/Distributions/}{Distributions}
+% % Statistical Distributions
+% \subimport{./Labs/Distributions/}{Distributions}
 
-%% Regression
-%\subimport{./Labs/LinearRegression/}{Regressions}
+% % Regression
+% \subimport{./Labs/LinearRegression/}{Regressions}
 
-%% Fourier Analysis: Fourier Extensions
-%\subimport{./Labs/FourierExtensions/}{FourierExtensions}
+% % Fourier Analysis: Fourier Extensions
+% \subimport{./Labs/FourierExtensions/}{FourierExtensions}
 
-%% Interpolation: Barycentric Interpolation
-%\subimport{./Labs/BarycentricInterpolation/}{Barycentric}
+% % Interpolation: Barycentric Interpolation
+% \subimport{./Labs/BarycentricInterpolation/}{Barycentric}
 
-%% Interpolation: Newton Cotes Integration
-%\subimport{./Labs/NewtonCotes/}{NCInteg}
+% % Interpolation: Newton Cotes Integration
+% \subimport{./Labs/NewtonCotes/}{NCInteg}
 
-%% Interpolation: Chebyshev Interpolation
-%\subimport{./Labs/ChebyshevPolynomials/}{chebyshev_interp}
+% % Interpolation: Chebyshev Interpolation
+% \subimport{./Labs/ChebyshevPolynomials/}{chebyshev_interp}
+
+% % Dynamic Optimization: Bayesian Bandits
+% \subimport{./Labs/MultiArmedBandit/}{Bandits}
 
 \end{document}
