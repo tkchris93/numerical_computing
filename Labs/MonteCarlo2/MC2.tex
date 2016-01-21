@@ -4,7 +4,7 @@
 
 \section*{Introduction}
 
-Using the traditional methods of Monte Carlo integration as discussed in the previous lab are not always the most efficient means to estimate an integral. For example, assume we were trying to find the probability that a randomly chosen variable $X$ from the standard normal distribution is greater than $3$. We know that one way to solve this is by solving the following integral:
+The traditional methods of Monte Carlo integration as discussed in the previous lab are not always the most efficient means to estimate an integral. For example, assume we were trying to find the probability that a randomly chosen variable $X$ from the standard normal distribution is greater than $3$. We know that one way to solve this is by solving the following integral:
 
 \begin{equation} \label{eq:integral} 
 P(X > 3) = \int_{3}^{\infty} f_X(t)\,dt = \frac{1}{\sqrt{2\pi}}\int_{3}^{\infty} e^{-t^2/2}\,dt
@@ -47,7 +47,7 @@ Now that we have defined the estimator, it is now quite manageable to approximat
 \end{comment}
 
 \begin{problem} \label{prob:mc}
-Write a function in Python that estimates the probability that a random draw from the standard normal distribution is greater than 3 using Equation \ref{eq:estimator}. Your answer should approach $0.0013499$ for sufficiently large samples. What estimate do you get when you use a sample with $10^7$ points? Print your results to the terminal.
+Write a function in Python that estimates the probability that a random draw from the standard normal distribution is greater than 3 using Equation \ref{eq:estimator}. Your answer should approach $0.0013499$ for sufficiently large samples.
 \end{problem}
 
 Though this approach gets the job done, it turns out that this isn't very efficient. Since the probability of drawing a number greater than $3$ from the standard normal distribution is so unlikely, it turns out we need many sample points to get a good approximation.
@@ -73,7 +73,19 @@ The corresponding estimator is,
 \end{split}
 \end{equation*}
 
-The function $f_X$ is the p.d.f. of the \emph{target distribution}. The function $g_X$ is the p.d.f. of the \emph{importance distribution}. The fraction $\frac{f_X(X)}{g_X(X)}$ is called the \emph{importance weight}. This allows us to draw a sample from any distribution with p.d.f. $g_X$ as long as we multiply $h(X)$ by the importance weight. We will solve the same problem as in Problem \ref{prob:mc} using importance sampling. We will choose $g_X$ to be the normal distribution with $\mu = 4$ and $\sigma = 1$. We have chosen this distribution for $g_X$ because it will give us more points closer to and greater than 3.
+The function $f_X$ is the p.d.f. of the \emph{target distribution}. The function $g_X$ is the p.d.f. of the \emph{importance distribution}. The fraction $\frac{f_X(X)}{g_X(X)}$ is called the \emph{importance weight}. This allows us to draw a sample from any distribution with p.d.f. $g_X$ as long as we multiply $h(X)$ by the importance weight. 
+
+\subsection*{Choosing the Importance Distribution}
+There is no correct choice for the importance distribution. It may be possible to find the distribution that allows the simulation to converge the fastest, but oftentimes, we don't need a perfect answer. Close is to perfect is good enough.
+
+We will solve the same problem as in Problem \ref{prob:mc} using importance sampling. We will choose $g_X$ to be the normal distribution with $\mu = 4$ and $\sigma = 1$. 
+We have chosen this distribution for $g_X$ because it will give us more points closer to and greater than 3.
+
+\begin{figure}[H]
+\includegraphics[width=\textwidth]{importance_distribution.pdf}
+\caption{In our problem, we choose an importance distribution that will generate more samples that are greater than 3. Though not a perfect choice, choosing a normal distribution with $\mu = 4$ and $\sigma = 1$ will suffice.}
+\label{fig:importance}
+\end{figure}
 
 \begin{lstlisting}
 >>> import scipy.stats as ss
@@ -97,7 +109,7 @@ The function $f_X$ is the p.d.f. of the \emph{target distribution}. The function
 \end{figure}
 
 \begin{problem} \label{prob:gamma}
-A tech support hotline receives an average of 2 calls per minute. What is the probability that they will have to wait at least 10 minutes to receive 9 calls? Implement your estimator using importance sampling. Calculate estimates using 5000, 10000, 15000, $\cdots$, 500000 sample points. Your answers should approach $0.00208725$.
+A tech support hotline receives an average of 2 calls per minute. What is the probability that they will have to wait at least 10 minutes to receive 9 calls? Implement your estimator using importance sampling. Calculate estimates using 5000, 10000, 15000, $\cdots$, 500000 sample points. Return an array of estimates. Your answers should approach $0.00208725$. 
 
 Hint: In Volume 2 \S 3.5, the gamma distribution is defined as, $$f_X(x) = \frac{b^{a}x^{a-1}e^{-xb}}{\Gamma(a)}.$$ The version of the gamma distribution in \li{scipy.stats} is determined by the shape ($a$) and the scale ($\theta$) of the distribution. $$f_X(x) = \frac{1}{\Gamma(a)\theta^a}x^{a-1}e^{-x/\theta}$$
 You can switch between these representations this with the fact that $\theta = 1/b$.
