@@ -1,6 +1,6 @@
 # solutions.py
 """Volume I: Monte Carlo Integration
-Solutions file. Written by Tanner Christensen
+Solutions file. Written by Tanner Christensen, Jan 2016
 """
 
 import numpy as np
