@@ -550,13 +550,14 @@ This algorithm returns orthogonal $Q$ and upper Hessenberg $H$ such that $A = Q\
 \label{Alg:Hessenberg}
 \begin{algorithmic}[1]
 \Procedure{Hessenberg}{$A$}
-\State $m, n \gets \shape{A}$
-\State $H \gets \makecopy{A}$
-\State $Q \gets \Id{m}$
+\State Store the dimensions $(m,n)$ of $A$
+\State Initialize the $H$ matrix as a copy of $A$
+\State Initialize the $Q$ matrix as the $m\times m$ identity matrix
+\State Then create your matrices as follows:
 \For{$k=0 \ldots n-3$}
-    \State $\u \gets \text{copy}\left(H_{k+1:, k}\right)$
-    \State $\u[0] \gets \u[0] + \text{sign}(\u[0]) \norm{\u}$
-    \State $\u \gets \u/\norm{\u}$
+    \State Set $\u$ to $H[k+1:, k]$ %Is this supposed to be the same syntax as the lines below?
+    \State Add sign$(\u[0])$ multiplied by the norm of $\u$ to $\u[0]$
+    \State Divide $u$ by its norm
     \State $H[k+1:,k:] \gets H[k+1:,k:] - 2\u(\u\trp H[k+1:,k:])$
     \State $H[:,k+1:] \gets H[:,k+1:] - 2(H[:,k+1:] \u) \u\trp$
     \State $Q[k+1:] \gets Q[k+1:] - 2\u(\u\trp Q[k+1:])$
