@@ -125,12 +125,13 @@ class _testDriver(object):
         def test_one(problem, number, value):
             """Test a single problem, checking for errors."""
             try:
-                self.feedback += "\n\nProblem %d (%d points):"%(number, value)
+                self.feedback += "\n\nProblem {} ({} points):".format(
+                                                                number, value)
                 points = problem(student_module)
                 self.score += points
-                self.feedback += "\nScore += %d"%points
+                self.feedback += "\nScore += {}".format(points)
             except BaseException as e:
-                self.feedback += "\n%s: %s"%(self._errType(e),e)
+                self.feedback += "\n{}: {}".format(self._errType(e), e)
 
         # Grade each problem.
         test_one(self.problem1, 1, 0)   # Problem 1: X points.
@@ -138,8 +139,8 @@ class _testDriver(object):
 
         # Report final score.
         percentage = (100. * self.score) / total
-        self.feedback += "\n\nTotal score: %d/%d = %s%%"%(
-                                    self.score, total, percentage)
+        self.feedback += "\n\nTotal score: {}/{} = {}%".format(
+                                    self.score, total, round(percentage, 2))
         if   percentage >=  98: self.feedback += "\n\nExcellent!"
         elif percentage >=  90: self.feedback += "\n\nGreat job!"
 
@@ -147,9 +148,9 @@ class _testDriver(object):
         print(self.feedback)
         comments = str(raw_input("Comments: "))
         if len(comments) > 0:
-            self.feedback += '\n\n\nComments:\n\t%s'%comments
+            self.feedback += '\n\n\nComments:\n\t{}'.format(comments)
 
-    # Possible Helper Functions -----------------------------------------------
+    # Helper Functions --------------------------------------------------------
     @staticmethod
     def _errType(error):
         """Get just the name of the exception 'error' in string format."""
@@ -165,9 +166,9 @@ class _testDriver(object):
         if correct == student:
             return 1
         else:
-            self.feedback += "\n%s"%message
-            self.feedback += "\n\tCorrect response: %s"%correct
-            self.feedback += "\n\tStudent response: %s"%student
+            self.feedback += "\n{}".format(message)
+            self.feedback += "\n\tCorrect response: {}".format(correct)
+            self.feedback += "\n\tStudent response: {}".format(student)
             return 0
 
     def _strTest(self, correct, student, message):
@@ -177,9 +178,9 @@ class _testDriver(object):
         if str(correct) == str(student):
             return 1
         else:
-            self.feedback += "\n%s"%message
-            self.feedback += "\n\tCorrect response: %s"%correct
-            self.feedback += "\n\tStudent response: %s"%student
+            self.feedback += "\n{}".format(message)
+            self.feedback += "\n\tCorrect response: {}".format(correct)
+            self.feedback += "\n\tStudent response: {}".format(student)
             return 0
 
     def _evalTest(self, expression, correct, message):
@@ -189,7 +190,7 @@ class _testDriver(object):
         if expression is correct:
             return 1
         else:
-            self.feedback += "\n%s"%message
+            self.feedback += "\n{}".format(message)
             return 0
 
     def _grade(self, points, message=None):
@@ -197,38 +198,31 @@ class _testDriver(object):
         credit = -1
         while credit > points or credit < 0:
             try:
-                credit = int(input("\nScore out of %d: "%points))
+                credit = int(input("\nScore out of {}: ".format(points)))
             except:
                 credit = -1
         if credit != points:
             # Add comments (optionally),
             comments = raw_input("Comments: ")
             if len(comments) > 0:
-                self.feedback += "\n%s"%comments
+                self.feedback += "\n{}".format(comments)
             # Or add a predetermined error message.
             elif message is not None:
-                self.feedback += "\n%s"%message
+                self.feedback += "\n{}".format(message)
         return credit
 
     # Problems ----------------------------------------------------------------
     def problem1(self, s):
         """Test Problem 1. X points."""
-
         points = 0
         # Test problem 1 here.
         return points
 
     def problem2(self, s):
         """Test Problem 2. X points."""
-
         points = 0
         # Test problem 2 here.
         return points
 
-# Grade from the terminal
-if __name__ == '__main__':
-    import sys, imp
-    filename = sys.argv[1]
-    student = imp.load_source("student", filename)
-    score, feedback = test(student)
-    # now use/store the score and feedback as desired.
+
+# END OF FILE =================================================================

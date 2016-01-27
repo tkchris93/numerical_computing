@@ -1,10 +1,38 @@
-# solutions.py
+# spec.py
 """Volume I: Monte Carlo Integration
 <Name>
 <Class>
 <Date>
 """
 
+# Problem 1
+def prob1():
+    """Return an estimate of the volume of the unit sphere using Monte
+    Carlo Integration.
+    
+    Inputs:
+        numPoints (int, optional) - Number of points to sample. Defaults
+            to 10^5.
+    Returns:
+        volume (int) - Approximate value of the area of the unit sphere.
+    """
+    raise NotImplementedError("Problem 1 incomplete.")
+
+# Problem 2
+def prob2():
+    """Return an estimate of the area under the curve,
+    f(x) = |sin(10x)cos(10x) + sqrt(x)*sin(3x)| from 1 to 5.
+    
+    Inputs:
+        numPoints (int, optional) - Number of points to sample. Defautls
+            to 10^5.
+    Returns:
+        area (int) - Apprimate value of the area under the 
+            specified curve.
+    """
+    raise NotImplementedError("Problem 2 incomplete.")
+
+# Problem 3
 def mc_int(f, mins, maxs, numPoints=500, numIters=100):
     """Use Monte-Carlo integration to approximate the integral of f
     on the box defined by mins and maxs.
@@ -29,19 +57,21 @@ def mc_int(f, mins, maxs, numPoints=500, numIters=100):
         >>> mc_int(f, np.array([-1,-1]), np.array([1,1]))
         3.1290400000000007
     """
-    pass
-    
-def joint_normal(mins, maxs):
-    """Caluclate the integral of the joint normal distribution using SciPy and 
-    Monte Carlo integration.
+    raise NotImplementedError("Problem 3 incomplete.")
+       
+# Problem 4
+def prob4(numPoints=[500]):
+    """Calculates an estimate of the integral of 
+    f(x,y,z,w) = sin(x)y^5 - y^5 + zw + yz^3
     
     Inputs:
-        mins (1-D np.ndarray) - Minimum bounds of integration.
-        maxs (1-D np.ndarray) - Maximum bounds of integration.
-    
+        numPoints (list, optional) - a list of the number of points to 
+            use the approximation. Defaults to [500].
     Returns:
-        value (int) - result from intregration using SciPy
-        estimate (1-D np.ndarray) - result of Monte Carlo integration
-            using 'numPoints' = {10,100,1000,10000}
+        errors (list) - a list of the errors when calculating the 
+            approximation using 'numPoints' points.
+    Example:
+    >>> prob4([100,200,300])
+    [-0.061492011289160729, 0.016174426377108819, -0.0014292910207835802]
     """
-    pass
+    raise NotImplementedError("Problem 4 incomplete.")
