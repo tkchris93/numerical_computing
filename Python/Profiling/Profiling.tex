@@ -643,11 +643,11 @@ The correct choice of algorithm is more important than a fast implementation.
 For example, suppose you wish to solve the following tridiagonal system.
 \[\begin{bmatrix}
 b_1 & c_1 & 0 & 0 & \cdots & \cdots & 0 \\
-a_2 & b_2 & c_2 & 0 & \cdots & \cdots & 0 \\
-0 & a_3 & b_3 & c_3 & \cdots & \cdots & 0 \\
+a_1 & b_2 & c_2 & 0 & \cdots & \cdots & 0 \\
+0 & a_2 & b_3 & c_3 & \cdots & \cdots & 0 \\
 \vdots & \vdots & \vdots & \vdots & \ddots & \ddots & \vdots \\
 \vdots & \vdots & \vdots & \vdots & \ddots & \ddots & c_{n-1} \\
-0 & 0 & 0 & 0 & \cdots & a_n & b_n
+0 & 0 & 0 & 0 & \cdots & a_{n-1} & b_n
 \end{bmatrix}
 \begin{bmatrix}
 x_1\\
@@ -670,6 +670,7 @@ One way to do this is with the general \li{solve} method in SciPy's \li{linalg} 
 Alternatively, you could use an algorithm optimized for tridiagonal matrices.
 The code below implements one such algorithm in Python. This is called the Thomas algorithm.
 
+\begin{comment}
 \begin{lstlisting}
 def pytridiag(a,b,c,d):
     """Solve the tridiagonal system Ax = d where A has diagonals a, b, and c.
@@ -701,6 +702,33 @@ def pytridiag(a,b,c,d):
 
     return x
 \end{lstlisting}
+\end{comment}
+
+The final result is stored in \li{x}, and \li{c} is used to store temporary values.
+\begin{lstlisting}
+def pytridiag(a, b, c, x):
+    '''Solve the tridiagonal system Ad = x where A has diagonals a, b, and c.
+    
+    INPUTS:
+    a, b, c, x - All 1-D NumPy arrays.
+    
+    NOTE:
+    The final result is stored in `x` and `c` is used to store temporary values.
+    '''
+    n = x.size
+    temp = 0.
+    c[0] /= b[0]
+    x[0] /= b[0]
+    for i in xrange(n-2):
+        temp = 1. / (b[i+1] - a[i] * c[i])
+        c[i+1] *= temp
+        x[i+1] = (x[i+1] - a[i] * x[i]) * temp
+    x[n-1] = (x[n-1] - a[n-2] * x[n-2]) / (b[n-1] - a[n-2] * c[n-2])
+    for i in xrange(n-2, -1, -1):
+        x[i] = x[i] - c[i] * x[i+1]
+\end{lstlisting}
+
+
 
 \begin{problem} \label{prob:tridiag}
 \leavevmode
@@ -725,10 +753,10 @@ def init_tridiag(n):
     a = np.random.random_integers(-9,9,n).astype("float")
     b = np.random.random_integers(-9,9,n).astype("float")
     c = np.random.random_integers(-9,9,n).astype("float")
-
+    
     A = np.zeros((b.size,b.size))
     np.fill_diagonal(A,b)
-    np.fill_diagonal(A[1:,:-1],a[1:])
+    np.fill_diagonal(A[1:,:-1],a)
     np.fill_diagonal(A[:-1,1:],c)
     return a,b,c,A
 \end{lstlisting}
