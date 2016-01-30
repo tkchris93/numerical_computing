@@ -36,3 +36,18 @@ def plotGrid(dim,level):
 def n_vol(length,dim,level):
     return length**dim/(2**(dim*(level-1))*(dim+1))
 
+def example():
+    # There is an error here. the coefficient for loc [0.25,0.5] should be 0.
+    def f(x):
+        return x[0]
+    dim = 2
+    level = 3
+    sg = pysg.sparseGrid(dim=dim,level=level)
+    sg.setFunctionValues(f)
+    sg.nodal2Hier()
+    sg.setCoefficients()
+    total = 0
+    for i in xrange(len(sg.indices)):
+        total += sg.gP[tuple(sg.indices[i])].coeff
+    total /= 2**((level-1)*dim)*(dim+1)
+    print total
