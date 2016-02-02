@@ -191,14 +191,14 @@ class sparseGrid:
     
   def setFunctionValues(self,f):
     """ Set the value of the function at each of the grid points """
-    # This might have problems
+    # This was added in and has problems
     self.f = f
     for i in xrange(len(self.indices)):
       self.gP[tuple(self.indices[i])].fv = f(self.gP[tuple(self.indices[i])].pos)
 
   def phi(self,p,loc):
     """ This computes the value of the basis function p at loc """
-    # This might have problems.
+    # This was added in and has problems
     def sphi(x):
       return max(0,1-abs(x))
     def phiji(j,i,x):
@@ -212,7 +212,7 @@ class sparseGrid:
 
   def setCoefficients(self):
     """ Set the coefficient for each basis hat function """
-    # This might have problems.
+    # This was added in and has problems.
     for i in xrange(len(self.indices)):
       level = self.indices[i]
       loc = self.gP[tuple(level)].pos
@@ -228,7 +228,41 @@ class sparseGrid:
             #print True
             break
       self.gP[tuple(level)].coeff = difference
-                      
+
+  def plotGrid(self):
+    from matplotlib import pyplot as plt
+    from numpy import empty as npempty
+    pts = len(self.indices)
+    xpts = npempty(pts)
+    if self.dim==1:
+      for i in xrange(pts):
+        pt = tuple(self.indices[i])
+        xpts[i] = self.gP[pt].pointPosition(pt)[0]
+      ax = plt.gca()
+      ax.yaxis.set_visible(False)
+      plt.plot(xpts,xpts/xpts,'*')
+    elif self.dim==2:
+      ypts = npempty(pts)
+      for i in xrange(pts):
+        pt = tuple(self.indices[i])
+        xpts[i], ypts[i] = self.gP[pt].pointPosition(pt)
+      plt.plot(xpts,ypts,'*')
+    else:
+      if self.dim > 3:
+        print "Showing first three dimensions only"
+      from mpl_toolkits.mplot3d import Axes3D
+      Axes3D
+      fig = plt.figure()
+      ax = fig.add_subplot(111, projection='3d')
+      ypts = npempty(pts)
+      zpts = npempty(pts)
+      for i in xrange(pts):
+        pt = tuple(self.indices[i])
+        xpts[i], ypts[i], zpts[i] = self.gP[pt].pointPosition(pt)[:3]
+      ax.scatter(xpts, ypts, zpts)    
+    plt.show()
+
+
 def cross(*args):
   """ compute cross-product of args """
   ans = []
