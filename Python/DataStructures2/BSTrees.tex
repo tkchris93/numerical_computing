@@ -1,7 +1,8 @@
 \lab{Data Structures II: Trees}{Data Structures II}
 \label{lab:Python_DataStructures2}
 
-\objective{Implement tree data structures and understand their relative strengths and weaknesses.}
+% TODO: Better Lab objective.
+\objective{Linear linked lists are inefficient in many situations. However, the ideas of linking nodes together can be extended to trees, linked lists where one node in the list can refer to more than one other node. Most trees are most easily constructed recursively, and so we will begin with an overview of recursion. We will implement a standard doubly-linked Binary Search Tree, and compare it to a linear linked list and an AVL tree. The goal is to understand the relative strengths and weaknesses of the data structures that we have implemented so far.}
 
 \section*{Recursion}
 
@@ -110,14 +111,16 @@ The key to recursion is understanding the base cases correctly and making correc
 Rewrite the following iterative function for finding data in a linked list using recursion.
 Use the basic linked list object from the previous lab to test the function (copy \li{LinkedLists.py} into your folder and import the \li{LinkedList} class).
 \begin{lstlisting}
-# solutions.py
-
 def iterative_search(linkedlist, data):
+    """Search 'linkedlist' iteratively for a node containing 'data'."""
+    # Start the search at the head.
 	current = linkedlist.head
+    # Iterate through the list, checking the value of each node.
 	while current is not None:
-		if current.data == data:
+		if current.value == data:
 			return current
 		current = current.next
+    # If 'current' no longer refers to a Node, raise a ValueError.
 	raise ValueError(str(data) + " is not in the list.")
 \end{lstlisting}
 (Hint: define an inner function to perform the actual recursion)
@@ -127,7 +130,7 @@ def iterative_search(linkedlist, data):
 It is not always better to rewrite an iterative method recursively.
 In Python, a function may only call itself 999 times.
 On the $1000^{th}$ call, a \li{RuntimeError} is raised to prevent a stack overflow.
-Whether or not recursion is appropriate depends on the problem to be solved and the algorithm to solve it.
+Whether or not recursion is appropriate depends on the problem to be solved and the algorithm used to solve it.
 \end{warn}
 
 \section*{Trees}
@@ -222,8 +225,6 @@ The tree on the right in Figure \ref{fig:trees} is an example of a of binary sea
 In practice, binary search tree nodes have attributes that keep track of their data, their children, and (in doubly-linked trees) their parent.
 
 \begin{lstlisting}
-# Trees.py
-
 class BSTNode(object):
     """A Node class for Binary Search Trees. Contains some data, a
     reference to the parent node, and references to two child nodes.
@@ -232,21 +233,15 @@ class BSTNode(object):
         """Construct a new node and set the data attribute. The other
         attributes will be set when the node is added to a tree.
         """
-        self.data = data
-        self.prev = None        # A reference to this node's parent node.
-        self.left = None        # This node's data will be less than self.data
-        self.right = None       # This node's data will be greater than self.data
-        
-    def __str__(self):
-        """String representation: the data contained in the node."""
-        return str(self.data)
+        self.value = data
+        self.prev = None      # A reference to this node's parent node.
+        self.left = None      # This node's value will be less than self.value
+        self.right = None     # This node's value will be greater than self.value
 \end{lstlisting}
 
 The actual binary search tree class has an attribute pointing to its root.
 
 \begin{lstlisting}
-# Trees.py
-
 class BST(object):
     """Binary Search Tree data structure class.
     The first node is referenced to by 'root'.
@@ -261,7 +256,7 @@ class BST(object):
 Many tree algorithms are best understood and implemented using recursion.
 For instance, finding a node in a binary search tree can be done recursively.
 Starting at the root, we check if the data we are looking for matches the current node.
-If it does not, then if the data is less than the current node's data we search again on the left child.
+If it does not, then if the data is less than the current node's value we search again on the left child.
 If the data is greater, we search on the right child.
 This process continues until the data is found or, if the data is not in the tree, an empty child is searched.
 Carefully read the following code; similar techniques will be used for subsequent methods.
@@ -271,8 +266,8 @@ class BST(object):
     # ...
 
     def find(self, data):
-        """Return the node containing 'data'. If there is no such node in the
-        tree, raise a ValueError with error message "<data> is not in the tree."
+        """Return the node containing 'data'. If there is no such node in
+        the tree, raise a ValueError.
         """
         # First, check to see if the tree is empty.
         if self.root is None:
@@ -285,9 +280,9 @@ class BST(object):
             """
             if current is None:                 # Base case 1: dead end.
                 raise ValueError(str(data) + " is not in the tree.")
-            if item == current.data:            # Base case 2: the data matches.
+            if item == current.value:           # Base case 2: the data matches.
                 return current
-            if item < current.data:             # Step to the left
+            if item < current.value:            # Step to the left
                 return _step(current.left,item)
             else:                               # Step to the right
                 return _step(current.right,item)
@@ -298,7 +293,7 @@ class BST(object):
 
 \begin{info}
 Conceptually, each node of a BST partitions the data of its subtree into two halves: the data that is less than the parent, and the data that is greater.
-We can extend this concept to multiple dimensions (see the K-D Trees lab).
+We will extend this concept to multiple dimensions in the next lab.
 \end{info}
 
 \subsection*{Inserting to a Binary Search Tree}
@@ -403,13 +398,13 @@ See Figure \ref{fig:BST.insertion} for an example.
 """Pseudocode for finding the correct parent of a new node
 
 find the parent of node, data
-	if data < node.data:
+	if data < node.value:
 		if node.left is not None 
 			find the parent of node.left, data
 		else:
 			return node
 	if data > node.right:
-		if data > node.data:
+		if data > node.value:
 			if node.right is not None:
 				find the parent of node.right, data
 			else:
@@ -424,10 +419,10 @@ Implement the \li{insert} method in the \li{BST} class.
 To accomplish this, write a recursive \li{_find_parent} method within \li{insert}.
 Find the correct parent, then determine whether the new node will be its left or right child.
 Then double-link the parent and the new child.
-Be sure to consider the special case of inserting to an empty tree.
-To test your tree, use (but do not modify) the provided \li{BST.__str__} method.
+Consider the special case of inserting to an empty tree.
+To test your tree, use (but do not modify) the provided \li{BST.__str__()} method.
 
-Do not allow for duplicates in the tree: if the user executes \li{insert(x)} and there is already a node in the tree containing \li{x}, raise a ValueError.
+Do not allow for duplicates in the tree: if the user executes \li{insert(x)} and there is already a node in the tree containing \li{x}, raise a \li{ValueError}.
 \end{problem}
 
 \subsection*{Removing from a Binary Search Tree}
@@ -653,7 +648,7 @@ The target's successor, however, is pointed to by the target's parent, and so it
 \foreach \s/\t in {2a/1a, 1b/2b, 2a/4a, 4b/2b, 5a/2a, 2b/5b, 5a/9a, 9b/5b} 
     {\draw[->, >=stealth', shorten <=.23cm, shorten >=.1cm](\s)--(\t);}
 \end{tikzpicture}
-\caption{To remove the node containing 2 from the top left BST, start `current' at the root (upper left) and recurse down the tree until it points to the target. Then locate the in-order successor (upper right) and delete it (lower left, recording its data. Finally, swap the data in the target with the data that was in the successor (lower right).}
+\caption{To remove the node containing 2 from the top left BST, start `current' at the root (upper left) and recurse down the tree until it points to the target. Then locate the in-order successor (upper right) and delete it (lower left, recording its value. Finally, swap the data in the target with the data that was in the successor (lower right).}
 \label{fig:BST.remove_twoChild}
 \end{figure}
 
@@ -673,18 +668,18 @@ if the target node has one child:
 
 Removal is more complicated if the target node has two children.
 To delete this kind of node, first we find it's immediate in-order successor.
-This successor is the node with the smallest data that is larger than the target's data.
+This successor is the node with the smallest value that is larger than the target's value.
 It may be found by moving to the right child of the target (so that it's value is greater than the target's value), and then to the left for as long as possible (so that it has the smallest such value).
 Note that because of how the successor is chosen, any in-order successor can only have at most one child.
 
 Once the successor is found, the target and its successor must switch places in the graph, and then the target must be removed.
-This can be done by simply switching the data values for the target and its successor.
+This can be done by simply switching the values for the target and its successor.
 Then the node with the target data has at most one child, and may be deleted accordingly.
 If the successor was chosen appropriately, then the binary search tree structure and ordering will be maintained once the deletion is finished.
 
 The easiest way to implement this is to use recursion.
-First, because the successor has at most one child, we may recursivley remove the successor node by calling \li{remove} on the successor's data.
-Then set the data stored in the target node as the successor's data.
+First, because the successor has at most one child, we may recursivley remove the successor node by calling \li{remove()} on the successor's value.
+Then set the data stored in the target node as the successor's value.
 See Figure \ref{fig:BST.remove_twoChild}.
 
 \begin{comment}
@@ -733,7 +728,7 @@ Make sure to cover all possible cases:
 \end{enumerate}
 Test your solution thoroughly with each case.
 
-(Hint: use \li{find} wherever appropriate.)
+(Hint: use the \li{find()} method wherever appropriate.)
 \end{problem}
 
 There are many variations on the binary search tree, each with their own particular advantages and disadvantages.
@@ -881,7 +876,7 @@ Since the data is already ordered, each node will only have one child, and we es
 
 Problems also arise when one branch of the tree becomes much longer than the others, leading to longer search times.
 
-An AVL tree (named after Georgy Adelson-Velsky and Evgenii Landis) is a tree that prevents any one branch from getting longer than the others.
+An \emph{AVL tree} (named after Georgy Adelson-Velsky and Evgenii Landis) is a tree that prevents any one branch from getting longer than the others.
 It accomplishes this by recursively ``balancing'' the branches as nodes are added.
 See Figure \ref{fig:avl_balance}.
 The AVL's balancing algorithm is beyond the scope of this project, but details and exercises on the algorithm can be found in Chapter 2 of the Volume II text.
@@ -899,6 +894,7 @@ The AVL's balancing algorithm is beyond the scope of this project, but details a
 [4, 6, 9]
 \end{lstlisting}
 
+% TODO: Modify this problem to match the new DS1 lab (DLL -> fast appending)
 % Problem 4: compare build and search speeds
 \begin{problem}
 Compare the speed of building and searching the different data structures we have implemented so far.
