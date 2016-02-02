@@ -6,6 +6,7 @@ class gridPoint:
   def __init__(self, index=None, domain=None):
     self.hv = [] # hierarchical value
     self.fv = [] # function value
+    self.coeff = 0. # This was added in.
     if index is None:
       self.pos = [] # position of grid point
     else:
@@ -190,11 +191,43 @@ class sparseGrid:
     
   def setFunctionValues(self,f):
     """ Set the value of the function at each of the grid points """
-    for i in range(len(self.indices)):
+    # This might have problems
+    self.f = f
+    for i in xrange(len(self.indices)):
       self.gP[tuple(self.indices[i])].fv = f(self.gP[tuple(self.indices[i])].pos)
 
-  def getCoefficients(self):
-    pass
+  def phi(self,p,loc):
+    """ This computes the value of the basis function p at loc """
+    # This might have problems.
+    def sphi(x):
+      return max(0,1-abs(x))
+    def phiji(j,i,x):
+      return sphi(2**(j-1)*x-(2*(i-j)+1))
+    m = 1.
+    for i in xrange(self.dim):
+      t = phiji(p[2*i],p[2*i+1],loc[i])
+      if t < m:
+          m = t
+    return m
+
+  def setCoefficients(self):
+    """ Set the coefficient for each basis hat function """
+    # This might have problems.
+    for i in xrange(len(self.indices)):
+      level = self.indices[i]
+      loc = self.gP[tuple(level)].pos
+      difference = self.f(loc)
+      lesser_pts = []
+      for j in xrange(i-1,-1,-1):
+        p = self.indices[j]
+        #print level[::2],p[::2]
+        for k in xrange(self.dim):
+          if (level[::2][k]) > (p[::2][k]):
+            lesser_pts.append(p)
+            difference -= self.gP[tuple(p)].coeff*self.phi(p,loc)
+            #print True
+            break
+      self.gP[tuple(level)].coeff = difference
                       
 def cross(*args):
   """ compute cross-product of args """
