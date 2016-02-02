@@ -35,7 +35,7 @@ class SimplexSolver(object):
         """
         return NotImplementedError("SimplexSolver Not Started")
 
-    def solve():
+    def solve(self):
         """Solve the linear optimization problem.
 
         Returns:

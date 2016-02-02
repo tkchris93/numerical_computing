@@ -1,3 +1,8 @@
+# Simplex.py
+"""This file is NOT original and does not follow the lab specifications very
+closely. Should be replaced with a more organic solutions file.
+"""
+
 import numpy as np
 from itertools import islice, izip
 
