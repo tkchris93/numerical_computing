@@ -1,12 +1,10 @@
 \lab{Data Structures II: Trees}{Data Structures II}
 \label{lab:Python_DataStructures2}
 
-% TODO: Better Lab objective.
 \objective{Standard linked lists are useful in only a few situations. A \emph{Tree} is a linked list where each node in the list may refer to more than one other node. Many trees are most easily constructed recursively, and so we begin with an overview of recursion. We then implement a recursively structured doubly-linked Binary Search Tree. Finally, we compare the standard linked list, our Binary Search Tree, and an AVL tree to illustrate the relative strengths and weaknesses of each structures.}
 
 \section*{Recursion}
 
-%Recursion is an important problem solving technique in computer programming.
 A \emph{recursive} function is one that calls itself.
 When the function is executed, it continues calling itself until it reaches a specified \emph{base case} where the solution to the problem is known.
 The function then exits without calling itself again, and each previous function call is resolved.
@@ -483,7 +481,34 @@ Then, since the target has no references pointing to it, it is deleted.
 The target's successor, however, is pointed to by the target's parent, and so it remains in the tree.
 % TODO: A figure for this one, as it is the hardest case.
 
-% TODO: Remove two of the four panes to show before and after. Use colors.
+\begin{comment}
+\begin{lstlisting} % Pseudocode for removing a node with one child
+<<if the target node has one child:
+	if target.parent.right is the target:
+		set parent's right child to the target's child.
+	if target.parent.left is the target:
+		set parent's left child to the target's child.>>
+\end{lstlisting}
+\end{comment}
+
+\subsubsection*{Removing a node with two children}
+
+Removal is more complicated if the target node has two children.
+To delete this kind of node, first we find its immediate in-order successor.
+This successor is the node with the smallest value that is larger than the target's value.
+It may be found by moving to the right child of the target (so that it's value is greater than the target's value), and then to the left for as long as possible (so that it has the smallest such value).
+Note that because of how the successor is chosen, any in-order successor can only have at most one child.
+
+Once the successor is found, the target and its successor must switch places in the graph, and then the target must be removed.
+This can be done by simply switching the values for the target and its successor.
+Then the node with the target data has at most one child, and may be deleted accordingly.
+If the successor was chosen appropriately, then the binary search tree structure and ordering will be maintained once the deletion is finished.
+
+The easiest way to implement this is to use recursion.
+First, because the successor has at most one child, we may recursivley remove the successor node by calling \li{remove()} on the successor's value.
+Then set the data stored in the target node as the successor's value.
+See Figure \ref{fig:BST.remove_twoChild}.
+
 \begin{figure} % BST.remove() for removing a node with two children.
 \begin{tikzpicture}[
     auto,
@@ -524,103 +549,11 @@ The target's successor, however, is pointed to by the target's parent, and so it
         child {node[draw=none] (9b) {}edge from parent[draw=none]
         child{node[draw=none](8b){}edge from parent[draw=none]}
         };
-\node [draw=none, node distance=2cm](current)[left of=5a]{current};
-\draw[->, >=stealth', shorten >= .2cm](current)--(5a);
+\node [draw=none, black!20!blue, node distance=2cm](target)[left of=2a]{target};
+\draw[black!20!blue, ->, >=stealth', shorten >= .2cm](target)--(2a);
+\node [draw=none, black!20!blue, node distance=2cm](successor)[right of=3a]{successor};
+\draw[black!20!blue, ->, >=stealth', shorten >= .2cm](successor)--(3a);
 \foreach \s/\t in {2a/1a, 1b/2b, 2a/4a, 4b/2b, 5a/2a, 2b/5b, 5a/9a, 9b/5b, 4a/3a, 3b/4b} 
-    {\draw[->, >=stealth', shorten <=.23cm, shorten >=.1cm](\s)--(\t);}
-\end{tikzpicture}
-\qquad
-\begin{tikzpicture}[
-    auto,
-    level 1/.style={sibling distance=2cm},
-    level 2/.style={sibling distance=20mm}]
-
-    \node [circle,draw] (5){5}
-        child {node[circle,draw] (2) {2}edge from parent[draw=none]
-            child { node[circle,draw] (1) {1}edge from parent[draw=none]
-            child{node[draw=none](invisible){} edge from parent[draw=none]}
-            child{node[draw,circle](3){3} edge from parent[draw=none]}
-       }
-            child {node[draw, circle] (4){4} edge from parent[draw=none]}     
-        }
-    child {node[circle,draw] (9a) {9}edge from parent[draw=none]
-        child{node[draw=none](8){}edge from parent[draw=none]}
-        };
-    \node [draw=none, node distance=.1cm] (5a)[above of=5]{}
-        child {node[draw=none] (2a) {}edge from parent[draw=none]
-            child { node[draw=none] (1a) {}edge from parent[draw=none]
-            child{node[draw=none](invisibleA){} edge from parent[draw=none]}
-            child{node[draw=none](3a){} edge from parent[draw=none]}
-        }
-            child {node[draw = none] (4a){} edge from parent[draw=none]}     
-        }
-        child {node[draw=none] (9a) {}edge from parent[draw=none]
-        child{node[draw=none](8a){}edge from parent[draw=none]}
-        };
-
-    \node [draw=none, node distance=.1cm] (5b)[below of=5]{}
-        child {node[draw=none] (2b) {}edge from parent[draw=none]
-            child { node[draw=none] (1b) {}edge from parent[draw=none]
-            child{node[draw=none](invisibleB){} edge from parent[draw=none]}
-            child{node[draw=none](3b){} edge from parent[draw=none]}
-        }
-            child {node[draw = none] (4b){} edge from parent[draw=none]}     
-        }
-        child {node[draw=none] (9b) {}edge from parent[draw=none]
-        child{node[draw=none](8b){}edge from parent[draw=none]}
-        };
-\node [draw=none, node distance=2cm](current)[left of=2a]{current};
-\draw[->, >=stealth', shorten >= .2cm](current)--(2a);
-\node [draw=none, node distance=2cm](successor)[right of=3a]{successor};
-\draw[->, >=stealth', shorten >= .2cm](successor)--(3a);
-\foreach \s/\t in {2a/1a, 1b/2b, 2a/4a, 4b/2b, 5a/2a, 2b/5b, 5a/9a, 9b/5b, 4a/3a, 3b/4b} 
-    {\draw[->, >=stealth', shorten <=.23cm, shorten >=.1cm](\s)--(\t);}
-\end{tikzpicture}
-\qquad
-\begin{tikzpicture}[
-    auto,
-    level 1/.style={sibling distance=2cm},
-    level 2/.style={sibling distance=20mm}]
-
-    \node [circle,draw] (5){5}
-        child {node[circle,draw] (2) {2}edge from parent[draw=none]
-            child { node[circle,draw] (1) {1}edge from parent[draw=none]
-            child{node[draw=none](invisible){} edge from parent[draw=none]}
-            child{node[draw,circle](3){3} edge from parent[draw=none]}
-       }
-            child {node[draw, circle] (4){4} edge from parent[draw=none]}     
-        }
-    child {node[circle,draw] (9a) {9}edge from parent[draw=none]
-        child{node[draw=none](8){}edge from parent[draw=none]}
-        };
-    \node [draw=none, node distance=.1cm] (5a)[above of=5]{}
-        child {node[draw=none] (2a) {}edge from parent[draw=none]
-            child { node[draw=none] (1a) {}edge from parent[draw=none]
-            child{node[draw=none](invisibleA){} edge from parent[draw=none]}
-            child{node[draw=none](3a){} edge from parent[draw=none]}
-        }
-            child {node[draw = none] (4a){} edge from parent[draw=none]}     
-        }
-        child {node[draw=none] (9a) {}edge from parent[draw=none]
-        child{node[draw=none](8a){}edge from parent[draw=none]}
-        };
-
-    \node [draw=none, node distance=.1cm] (5b)[below of=5]{}
-        child {node[draw=none] (2b) {}edge from parent[draw=none]
-            child { node[draw=none] (1b) {}edge from parent[draw=none]
-            child{node[draw=none](invisibleB){} edge from parent[draw=none]}
-            child{node[draw=none](3b){} edge from parent[draw=none]}
-        }
-            child {node[draw = none] (4b){} edge from parent[draw=none]}     
-        }
-        child {node[draw=none] (9b) {}edge from parent[draw=none]
-        child{node[draw=none](8b){}edge from parent[draw=none]}
-        };
-\node [draw=none, node distance= 2cm](current)[left of=2a]{current};
-\draw[->, >=stealth', shorten >= .2cm](current)--(2a);
-\node [draw=none, node distance=2cm](successor)[right of=3a]{successor};
-\draw[->, >=stealth', shorten >= .2cm](successor)--(3a);
-\foreach \s/\t in {2a/1a, 1b/2b, 2a/4a, 4b/2b, 5a/2a, 2b/5b, 5a/9a, 9b/5b} 
     {\draw[->, >=stealth', shorten <=.23cm, shorten >=.1cm](\s)--(\t);}
 \end{tikzpicture}
 \qquad
@@ -663,44 +596,16 @@ The target's successor, however, is pointed to by the target's parent, and so it
         child {node[draw=none] (9b) {}edge from parent[draw=none]
         child{node[draw=none](8b){}edge from parent[draw=none]}
         };
-\node [draw=none, node distance=2cm](current)[left of=2a]{current};
-\draw[->, >=stealth', shorten >= .2cm](current)--(2a);
-\node [draw=none, node distance=2cm](successor)[right of=3a]{successor};
-\draw[->, >=stealth', shorten >= .2cm](successor)--(3a);
+\node [draw=none, black!20!blue, node distance=2cm](target)[left of=2a]{target};
+\draw[black!20!blue, ->, >=stealth', shorten >= .2cm](target)--(2a);
+\node [draw=none, black!20!blue, node distance=2cm](successor)[right of=3a]{successor};
+\draw[black!20!blue, ->, >=stealth', shorten >= .2cm](successor)--(3a);
 \foreach \s/\t in {2a/1a, 1b/2b, 2a/4a, 4b/2b, 5a/2a, 2b/5b, 5a/9a, 9b/5b} 
     {\draw[->, >=stealth', shorten <=.23cm, shorten >=.1cm](\s)--(\t);}
 \end{tikzpicture}
-\caption{To remove the node containing 2 from the top left BST, start `current' at the root (upper left) and recurse down the tree until it points to the target. Then locate the in-order successor (upper right) and delete it (lower left, recording its value. Finally, swap the data in the target with the data that was in the successor (lower right).}
+\caption{To remove the node containing 2 from the top left BST, locate the target and its in-order successor. Delete the successor, recording its value. Finally, replace the data in the target with the data that was in the successor.}
 \label{fig:BST.remove_twoChild}
 \end{figure}
-
-\begin{comment}
-\begin{lstlisting} % Pseudocode for removing a node with one child
-<<if the target node has one child:
-	if target.parent.right is the target:
-		set parent's right child to the target's child.
-	if target.parent.left is the target:
-		set parent's left child to the target's child.>>
-\end{lstlisting}
-\end{comment}
-
-\subsubsection*{Removing a node with two children}
-
-Removal is more complicated if the target node has two children.
-To delete this kind of node, first we find its immediate in-order successor.
-This successor is the node with the smallest value that is larger than the target's value.
-It may be found by moving to the right child of the target (so that it's value is greater than the target's value), and then to the left for as long as possible (so that it has the smallest such value).
-Note that because of how the successor is chosen, any in-order successor can only have at most one child.
-
-Once the successor is found, the target and its successor must switch places in the graph, and then the target must be removed.
-This can be done by simply switching the values for the target and its successor.
-Then the node with the target data has at most one child, and may be deleted accordingly.
-If the successor was chosen appropriately, then the binary search tree structure and ordering will be maintained once the deletion is finished.
-
-The easiest way to implement this is to use recursion.
-First, because the successor has at most one child, we may recursivley remove the successor node by calling \li{remove()} on the successor's value.
-Then set the data stored in the target node as the successor's value.
-See Figure \ref{fig:BST.remove_twoChild}.
 
 \begin{comment} % Pseudocode for removing a node with two children.
 \begin{lstlisting}
