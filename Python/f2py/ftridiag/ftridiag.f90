@@ -21,7 +21,7 @@ subroutine ftridiag(a, b, c, x, n)
     double precision,dimension(n-1),intent(in) :: a
     double precision,dimension(n-1),intent(inout) :: c
     
-!   Two temporary varaibles.
+!   Two temporary variables.
 !   'm' is a temporary value.
 !   'i' is the index for the loops.
     double precision m
