@@ -6,42 +6,28 @@ from random import randint
 from time import time
 
 
-class LinkedListNode(object):
+class SinglyLinkedListNode(object):
     """Simple singly-linked list node."""
     def __init__(self, data):
-        self.value = data
-        self.next = None
+        self.value, self.<<next>> = data, None
 
-class LinkedList(object):
+class SinglyLinkedList(object):
     """A very simple singly-linked list with a head and a tail."""
     def __init__(self):
-        """Set the head and tail attributes to None."""
-        self.head = None
-        self.tail = None
-    
+        self.head, self.tail = None, None
     def append(self, data):
         """Add a Node containing 'data' to the end of the list."""
-        n = LinkedListNode(data)
+        n = SinglyLinkedListNode(data)
         if self.head is None:
-            self.head = n
-            self.tail = n
+            self.head, self.tail = n, n
         else:
-            self.tail.next = n
+            self.tail.<<next>> = n
             self.tail = n
-    
-    def __str__(self):
-        """String representation: the same as a Python list."""
-        current = self.head
-        values = []
-        while current is not None:
-            values.append(current.value)
-            current = current.next
-        return str(values)
 
 def iterative_search(linkedlist, data):
     """Find the node containing 'data' using an iterative approach.
     If there is no such node in the list, or if the list is empty,
-    raise a ValueError with error message "<data> is not in the list."
+    raise a ValueError.
     
     Inputs:
         linkedlist (LinkedList): a linked list object
@@ -50,20 +36,18 @@ def iterative_search(linkedlist, data):
     Returns:
         The node in 'linkedlist' containing 'data'.
     """
-    # Start the search at the head.
     current = linkedlist.head
-    # Iterate through the list, checking the value of each node.
     while current is not None:
         if current.value == data:
             return current
         current = current.next
-    # If 'current' no longer refers to a Node, raise a ValueError.
     raise ValueError(str(data) + " is not in the list.")
 
 # Problem 1: rewrite iterative_search() using recursion.
 def recursive_search(linkedlist, data):
     """Find the node containing 'data' using a recursive approach.
-    If there is no such node in the list, raise a ValueError."
+    If there is no such node in the list, or if the list is empty,
+    raise a ValueError.
     
     Inputs:
         linkedlist (LinkedList): a linked list object.
@@ -76,7 +60,7 @@ def recursive_search(linkedlist, data):
         """Check the current node, and step right if not found."""
         if current is None:         # Base case 1: dead end
             raise ValueError(str(data) + " is not in the list.")
-        if current.value == data:    # Base case 2: the data matches
+        if current.value == data:   # Base case 2: the data matches
             return current
         else:                       # Recurse if not found
             return _step(current.next)
@@ -101,7 +85,7 @@ class BSTNode(object):
 # Modify this class for problems 2 and 3
 class BST(object):
     """Binary Search Tree data structure class.
-    The first node is referenced to by 'root'.
+    The 'root' attribute references the first node in the tree.
     """
     def __init__(self):
         """Initialize the root attribute."""
@@ -109,7 +93,7 @@ class BST(object):
     
     def find(self, data):
         """Return the node containing 'data'. If there is no such node in the
-        tree, raise a ValueError with error message "<data> is not in the tree."
+        tree, or if the tree is empty, raise a ValueError."
         """
         # First, check to see if the tree is empty
         if self.root is None:
