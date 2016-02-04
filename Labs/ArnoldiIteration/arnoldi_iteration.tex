@@ -181,7 +181,7 @@ def arnoldi(b, Amul, k, tol=1E-8):
 \end{lstlisting}
 Hints: 
 \begin{enumerate}
-\item Since \li{H} and \li{Q} will eventually hold complex numbers, initialize them as complex arrays (e.g., \li{A = np.empty((3,3), dtype=complex128)}). 
+\item Since \li{H} and \li{Q} will eventually hold complex numbers, initialize them as complex arrays (e.g., \li{A = np.empty((3,3), dtype=np.complex128)}). 
 \item Remember to use complex inner products. 
 \end{enumerate}
 \end{problem}
@@ -210,9 +210,9 @@ def ritz(Amul, dim, k, iters):
     Amul    - A function handle. Should describe a linear operator on 
               R^(dim).
     dim     - The dimension of the space on which `Amul' acts.
-    numvals - The number of Ritz values to return.
+    k 	    - The number of Ritz values to return.
     iters   - The number of times to perform the Arnoldi iteration. Must 
-              be between `numvals' and `dim'.
+              be between `k' and `dim'.
     
     RETURN:
     Return `k' Ritz values of the operator defined by `Amul.' 
