@@ -10,6 +10,8 @@ Unit testing only requires you to know what the inputs and outputs of a function
 Beyond that, you can rely on the unit tests that have been written to know whether or not the function, and by extension the software, is working as expected.
 Unit testing helps you understand requirements, keeps you aware of dependency changes, and gives you confidence about where to find bugs when your code breaks.
 
+TODO: Describe exactly what Unit Testing is
+
 Imagine for a few moments that you are hired as a developer for a company. On your first day, you are assigned the task of figuring out why your banner upload tool isn't allowing some particular user to upload a banner.
 Very quickly you discover that the user simply doesn't have sufficient credentials to use the tool. At this point, you have two options: you can either change the individual user's credentials, or change the credential requirements for users wanting to use the upload tool.
 You decide to go with the latter and change the requirments for the upload. Then you mark the task as complete, and your code is shipped for the user to see.
@@ -24,7 +26,7 @@ Test coverage is even sometimes used in the sales arena to describe the quality 
 
 \section*{PyTest}
 
-Okay, so we've disscussed enough of the why. Now we will disscuss and explore the "how" of testing code in python.
+Okay, so we've disscussed enough of the why. Now we will explore the "how" of testing code in python.
 It is easiest and most efficient to think about testing individual functions rather than entire files or modules.
 (As we will discuss later, even testing classes should happen on a function level.)
 For example, we might test the following function
@@ -50,21 +52,33 @@ assert <truth statement>, 'message'
 raises an AssertionError with error message \li{'message'} if \li{<truth statement>} is false.  Otherwise, it does nothing.
 \end{info}
 
-Now this is all good and pretty, we are able to write tests for a function, by asserting that they give us a particular output based on some fixed input.
-But what makes unit testing in python so useful isn't this, it is running the following in your current directory (from the terminal):
-\begin{lstlisting}[language=bash]
+
+Now this is all well and good; we can write tests for a function by using the \li{assert} function with expected inputs and outputs.
+However, there is a more practical and useful way to do this.  PyTest is a tool that allows you to aggregate your tests and give you more information about their results.
+Try running the following from the terminal in your current directory:
+
+\begin{lstlisting}
   $ py.test
 \end{lstlisting}
 
-\begin{info}
-In order for py.test to find the tests that you have written it is required for the file name to have the word "test" and end with ".py".
-Also all the functions that you want the py.test to call should begin with the word "test".
-(If this behavior donsen't work for whatever reason or a new behavior is required look into setting up pytest.ini from the directory where you will be testing)\\
-\end{info}
+Unless you've already written some tests, you probably got something like this:
 
-For exmaple if one runs 'py.test' in the following directory:
+\begin{lstlisting}
+============================= test session starts =============================
+platform win32 -- Python 2.7.10 -- py-1.4.27 -- pytest-2.7.1
+rootdir: C:\Users\Tanner\ACME Labs for class, inifile:
+collected 0 items
+
+==============================  in 0.13 seconds ===============================
+\end{lstlisting}
+
+
+Even if you have already written some tests, pytest may not have found them.  In order for pytest to find test files; the file name needs to have the form test\_*.py or *\_test.py.  (If you need to change this for some reason, consult \href{http://pytest.org/latest/example/pythoncollection.html} {the documentation}.
+
+
+For example, consider the following directory: (the \li{tree} command in a terminal lists the contents of a directory recursively)
 \begin{lstlisting}[language=bash]
-$ tree `to show children directories recursivly`
+$ tree
 |-- api_tests
 |   |-- test_accounts.py
 |   |-- test_auth.py
@@ -76,7 +90,7 @@ $ tree `to show children directories recursivly`
       |-- test_google.py
 \end{lstlisting}
 
-The following output is produced:
+If you run \li{py.test} here, the following output is produced:
 
 \begin{lstlisting}
 ========================= test session starts ==========================
@@ -94,11 +108,11 @@ platform_tests/test_google.py ......
 ======================= 29 passed in 0.07 seconds =======================
 \end{lstlisting}
 \begin{info}
-Those dots represent a test passing. They show up in order so if the third dot is an "F" (meaning the test failed) then you know it would be the third test in that file which failed.
+Each dot represents a test passing. They show up in order, so, for example, if instead of the third dot there is an "F" (meaning test failed), you would know the third test in the respective file failed.
 \end{info}
 
-Understanding which part of your code is being tested and which isn't is a very useful way to get an idea of how well a project is being tested.
-An easy way to do this is to install something called: "pytest-cov". This can be done very simply from the terminal by running:
+Understanding which parts of your code are and are not being tested is a very useful way to get an idea of how well a project is being tested.
+An easy way to do this is to install a tool called \li{pytest-cov}. For some reason, pytest comes bundled with Anaconda while pytest-cov does not.  However, you should be able to install it from the terminal by running:
 \begin{lstlisting}
   $ pip install pytest-cov
 \end{lstlisting}
@@ -134,23 +148,23 @@ TOTAL                                58      0   100%
 ==================== 29 passed in 0.07 seconds =====================
 \end{lstlisting}
 
-The above of course give 100\% coverage because the only files gathered where test files and pytest runs those files in there entirety.
+The above of course give 100\% coverage because the only files gathered were test files, and pytest runs those files in their entirety.  TODO: give examples that are more substantial and relevant.
 
 \begin{problem}
-Install pytest coverage with pip.
+Install pytest-cov with pip.
 Run it in the directory which has the two files "solutions.py" and "test\_solutions.py".
-Test the addition function and the Fibinachi function, be sure to give each function it's own test. (This is more of a convention then it is a mandate,
-as it will allow you to very quickly see which function causes greif in the future) Be sure to get code hitting every statment.
-(The number of statments missed should go from \_\_ to \_\_)
+Test the addition function and the Fibonacci function. Be sure to give each function its own test. (This is more of a convention than mandate,
+but it's good practice and will allow you to track down bugs quickly in the future.) Be sure that your tests cover every statement of your code.
+(The number of statments missed should go from \_\_ to \_\_ TODO)
 \end{problem}
 
-\section*{pytest as a Module}
+\section*{pytest as a module}
 
-Often times when developing software we want to throw exceptions when certain input is given to our code.
-For example if a user feeds a bad value to a calculator (like dividing by 0) we want it to be very explicit as to why the proccess isn't being complete.
-Standard assert functions simply will not do as they did for the addition and Fibinachi functions.
-Instead we must develop methods from the actual pytest module which allow us to not only see the exception message, but also test the type of exception thrown.
-A function might have several different type of exceptions to throw as well, so to gaurentee it is useful to have unique messages and/or excepiton types thrown.
+When developing software, we often want our code to throw exceptions when certain input is given.
+For example, if a user feeds a bad value to a calculator (like dividing by 0), we want it to be very explicit as to why it wasn't able to process our input.
+Standard assert functions simply will not do as they did for the addition and Fibonacci functions.
+Instead, we must develop methods from the actual pytest module which allow us to not only see the exception message, but also test the type of exception thrown.
+A function might have several different type of exceptions to throw as well, so to guarantee it is useful to have unique messages and/or excepiton types thrown.
 For example:
 
 \begin{lstlisting}
