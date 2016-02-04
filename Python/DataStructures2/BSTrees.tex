@@ -628,7 +628,7 @@ If the root has two children, the successor becomes the new root of the tree.
 
 % Problem 3: BST.remove()
 \begin{problem}
-Implement the \li{remove} method in the \li{BST} class.
+Implement the \li{remove()} method in the \li{BST} class.
 If the tree is empty, or if the target node is not in the tree, raise a \li{ValueError}.
 
 Make sure to cover all possible cases:
@@ -723,8 +723,8 @@ Since the data is already ordered, each node will only have one child, and we es
 %\foreach \s/\t in {6b/5b, 5b/4b, 4b/3b, 3b/2b, 2b/1b}
 %    {\draw[->, >=stealth', shorten <=.27cm, shorten >=.1cm](\s)--(\t);}
 
-\node [draw=none, node distance=1.5cm](root)[above right of=1a]{root};
-\draw[->, >=stealth', shorten >= .1cm](root)--(1);
+\node [draw=none, black!20!blue, node distance=1.5cm](root)[above right of=1a]{root};
+\draw[black!20!blue, ->, >=stealth', shorten >= .1cm](root)--(1);
 
 \end{tikzpicture}
 \qquad
@@ -768,8 +768,8 @@ Since the data is already ordered, each node will only have one child, and we es
 %\foreach \s/\t in {6b/5b, 5b/4b, 1b/2b, 3b/2b, 2b/4b}
 %    {\draw[->, >=stealth', shorten <=.27cm, shorten >=.1cm](\s)--(\t);}
 
-\node [draw=none, node distance=1.5cm](root)[above right of=4a]{root};
-\draw[->, >=stealth', shorten >= .1cm](root)--(4);
+\node [draw=none, black!20!blue, node distance=1.5cm](root)[above right of=4a]{root};
+\draw[black!20!blue, ->, >=stealth', shorten >= .1cm](root)--(4);
 
 \end{tikzpicture}
 \caption{On the left, the BST resulting from inserting 1, 2, 3, 4, 5, and 6, in that order. On the right, the balanced AVL tree equivalent.}
