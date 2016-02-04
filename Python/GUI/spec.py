@@ -119,17 +119,7 @@ class matrix_calculator(QtGui.QMainWindow):
         layout.addWidget(self.calculateButton)
         layout.addWidget(self.output)
         
-        # Sets central layout
-        window = QtGui.QWidget()
-        window.setLayout(layout)
-        self.setCentralWidget(window)
         
-        # Sets the location of the window on the screen
-        # The first two numbers are the location of the top left corner
-        # The last two numbers are the size of the window
-        self.setGeometry(50, 50, 500, 600)
-        self.setWindowTitle("Deluxe Matrix Calculator")
-        self.show()
         
         # Adds the functionality of the buttons
         self.calculateButton.clicked.connect(self.clickCalculate)
@@ -145,11 +135,24 @@ class matrix_calculator(QtGui.QMainWindow):
         
         '''Problem 2.1 -
         Add a drop down menu here by adding a QComboBox.  Call it self.matrixFunction.
+        Add the QComboBox to layout.
         '''
         
         '''Problem 2.2 -
         Add options to the QComboBox to calculate the Determinant, Inverse, and
         Multiplication.'''
+        
+        # Sets central layout
+        window = QtGui.QWidget()
+        window.setLayout(layout)
+        self.setCentralWidget(window)
+        
+        # Sets the location of the window on the screen
+        # The first two numbers are the location of the top left corner
+        # The last two numbers are the size of the window
+        self.setGeometry(50, 50, 500, 600)
+        self.setWindowTitle("Deluxe Matrix Calculator")
+        self.show()
 
         
     def clickCalculate(self):
@@ -167,10 +170,11 @@ class matrix_calculator(QtGui.QMainWindow):
                     return;
         
         calculation = self.matrixFunction.currentText()
+        result = "No result"
         
         '''Problem 2.3 and 2.4 - 
-        Implement the Determinant and Inverse portion of the function.  And
-        display the proper text.
+        Implement the Determinant and Inverse portion of the function.  And add
+        the proper text to result then display the result in self.output.
         Hint: Use NumPy.
         The Multiplication portion has been done for you.
         '''
