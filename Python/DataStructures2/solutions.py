@@ -2,14 +2,14 @@
 """Volume II Lab 5: Data Structures II (Trees). Solutions file."""
 
 from matplotlib import pyplot as plt
-from random import randint
+from numpy.random import choice
 from time import time
 
 
 class SinglyLinkedListNode(object):
     """Simple singly-linked list node."""
     def __init__(self, data):
-        self.value, self.<<next>> = data, None
+        self.value, self.next = data, None
 
 class SinglyLinkedList(object):
     """A very simple singly-linked list with a head and a tail."""
@@ -21,7 +21,7 @@ class SinglyLinkedList(object):
         if self.head is None:
             self.head, self.tail = n, n
         else:
-            self.tail.<<next>> = n
+            self.tail.next = n
             self.tail = n
 
 def iterative_search(linkedlist, data):
@@ -405,24 +405,24 @@ def _height(current):
         return -1           # Otherwise, descend down both branches.
     return 1 + max(_height(current.right), _height(current.left))
 
+from sys import stdout
 
 # Problem 4: Test build and search speeds for LinkedList, BST, and AVL objects.
 def plot_times(filename="English.txt", start=500, stop=5500, step=500):
-    """Vary n from 'start' to 'stop', incrementing by 'step'. At each
-    iteration, use the create_word_list() from the 'WordList' module to
-    generate a list of n randomized words from the specified file.
+    """Reach each line from the given file. This will be the data set.
+    Vary n from 'start' to 'stop', incrementing by 'step'. At each
+    iteration, take the first n words from the specified file.
     
-    Time (separately) how long it takes to load a LinkedList, a BST, and
-    an AVL with the data set.
+    Time (separately) how long it takes to load a SinglyLinkedList, a BST, and
+    an AVL with the data set of n items.
     
-    Choose 5 random words from the data set. Time how long it takes to
-    find each word in each object. Calculate the average search time for
-    each object.
+    Choose 5 random items from the data set. Time (separately) how long it
+    takes to find all 5 items in each object.
     
-    Create one plot with two subplots. In the first subplot, plot the
-    number of words in each dataset against the build time for each object.
-    In the second subplot, plot the number of words against the search time
-    for each object.
+    Create one plot with two lin-log subplots (use plt.semilogy() instead of
+    plt.plot()). In the first subplot, plot the number of items in each
+    dataset against the build time for each object. In the second subplot,
+    plot the number of items against the search time for each object.
     
     Inputs:
         filename (str): the file to use in creating the data sets.
@@ -435,21 +435,26 @@ def plot_times(filename="English.txt", start=500, stop=5500, step=500):
     lls_build, lls_search = [], []
     bst_build, bst_search = [], []
     avl_build, avl_search = [], []
+
+    with open(filename, 'r') as f:
+        data = f.readlines()
     
     # Get the values [start, start + step, ..., stop - step]
     domain = []
     for n in xrange(start,stop,step):
+
+        print "\rn =", n,; stdout.flush()
     
         # Initialize wordlist and data structures
-        word_list = create_word_list(filename)[:n]
+        word_list = data[:n]
         bst = BST()
         avl = AVL()
-        lls = LinkedList()
+        lls = SinglyLinkedList()
         
         # Time the singly-linked list build
         start = time()
         for word in word_list:
-            lls.add(word)
+            lls.append(word)
         lls_build.append(time() - start)
         
         # Time the binary search tree build
@@ -464,46 +469,66 @@ def plot_times(filename="English.txt", start=500, stop=5500, step=500):
             avl.insert(word)
         avl_build.append(time() - start)
         
-        # Search Times
-        search1, search2, search3 = list(), list(), list()
-        for i in xrange(5):
-            target = word_list[randint(0, n-1)]
-            
-            # Time LinkedList.find
-            start = time()
+
+        subset = choice(word_list, size=5, replace=False)
+        # Time the singly-linked list search
+
+        start = time()
+        for target in subset:
             iterative_search(lls, target)
-            search1.append(time() - start)
-            
-            # Time BST.find
-            start = time()
+        lls_search.append(time() - start)
+
+        start = time()
+        for target in subset:
             bst.find(target)
-            search2.append(time() - start)
-            
-            # Time AVL.find
-            start = time()
+        bst_search.append(time() - start)
+
+        start = time()
+        for target in subset:
             avl.find(target)
-            search3.append(time() - start)
+        avl_search.append(time() - start)
+
+
+        # # Search Times
+        # search1, search2, search3 = [], [], []
+        # for i in xrange(5):
+        #     target = word_list[randint(0, n-1)]
+            
+        #     # Time LinkedList.find
+        #     start = time()
+        #     iterative_search(lls, target)
+        #     search1.append(time() - start)
+            
+        #     # Time BST.find
+        #     start = time()
+        #     bst.find(target)
+        #     search2.append(time() - start)
+            
+        #     # Time AVL.find
+        #     start = time()
+        #     avl.find(target)
+        #     search3.append(time() - start)
         
-        lls_search.append(sum(search1)/len(search1))
-        bst_search.append(sum(search2)/len(search2))
-        avl_search.append(sum(search3)/len(search3))
+        # lls_search.append(sum(search1)/len(search1))
+        # bst_search.append(sum(search2)/len(search2))
+        # avl_search.append(sum(search3)/len(search3))
         domain.append(n)
     
     # Plot the data
     plt.subplot(121)
     plt.title("Build Times")
-    plt.plot(domain,lls_build,label='Singly-Linked List')
-    plt.plot(domain,bst_build,label='Binary Search Tree')
-    plt.plot(domain,avl_build,label='AVL Tree')
+    plt.semilogy(domain,lls_build,label='Singly-Linked List')
+    plt.semilogy(domain,bst_build,label='Binary Search Tree')
+    plt.semilogy(domain,avl_build,label='AVL Tree')
     plt.ylabel("seconds")
     plt.xlabel("data points")
     plt.legend(loc='upper left')
     
     plt.subplot(122)
     plt.title("Search Times")
-    plt.plot(domain,lls_search,label='Singly-Linked List')
-    plt.plot(domain,bst_search,label='Binary Search Tree')
-    plt.plot(domain,avl_search,label='AVL Tree')
+    plt.semilogy(domain,lls_search,label='Singly-Linked List')
+    plt.semilogy(domain,bst_search,label='Binary Search Tree')
+    plt.semilogy(domain,avl_search,label='AVL Tree')
     plt.ylabel("seconds")
     plt.xlabel("data points")
     plt.legend(loc='upper left')

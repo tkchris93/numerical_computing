@@ -819,16 +819,16 @@ The AVL's balancing algorithm is beyond the scope of this project, but details a
 % TODO: Modify this problem to match the new DS1 lab (DLL -> fast appending)
 % Problem 4: compare build and search speeds
 \begin{problem}
-Compare the speed of building and searching the different data structures we have implemented so far.
+Write a function to compare the speed of building and searching the different data structures of this lab.
+Accept a \li{filename} to read data from and keyword arguments \li{start}, \li{stop}, and \li{step} to determine the domain.
 Visualize the results by creating a plot with two subplots: one for build times, and one for search times.
-Repeat the following for $n$ varying from 500 to 5000 at intervals of 500:
+Repeat the following for $n$ varying from \li{start} to \li{stop} at intervals of \li{step}:
 
-Use the \li{create_word_list} function in the provided \li{WordList} module to generate a list of $n$ randomized words from the file \li{English.txt}.
-Time (separately) how long it takes to load a \li{LinkedList}, a \li{BST}, and an \li{AVL} with the data set.
-Use \li{add} to load the \li{LinkedList} and \li{insert} to load the trees.
-Then choose 5 random words from the data set, and time how long it takes to find each word in each object.
-Use the \li{iterative_search} function from problem 1 to search the \li{LinkedList} and \li{find} to search the trees.
-Calculate the average search time for each object.
+Get the first $n$ items in the data set.
+Time (separately) how long it takes to load a \li{LinkedList}, a \li{BST}, and an \li{AVL} with the $n$ items.
+%Use \li{append()} to load the \li{LinkedList} and \li{insert()} to load the trees.
+Then choose 5 \emph{random} words from the data set, and time how long it takes to find each word in each object.
+Use the \li{iterative_search()} function from problem 1 to search the linked list and \li{find()} to search the trees.
 
 In the first subplot, plot the number of words in each data set against the time it took to build each object.
 In the second subplot, plot the number of words in each data set against the average time it took to search each object.
@@ -840,5 +840,21 @@ Your plot should look similar to Figure \ref{fig:times}.
 \label{fig:times}
 \end{figure}
 
+% \begin{figure}[t!]
+%     %\centering
+%     \begin{subfigure}[t]
+%         %\centering
+%         \includegraphics[width=0.5\textwidth]{BuildTimes.pdf}
+%         \caption{This is a caption.}
+%     \end{subfigure}%
+%     ~
+%     \begin{subfigure}[t]
+%         %\centering
+%         \includegraphics[width=0.5\textwidth]{SearchTimes.pdf}
+%         \caption{This is another caption.}
+%     \end{subfigure}
+%     \caption{This is the big caption.}
+%     \label{fig:times}
+% \end{figure}
 \end{problem}
 

@@ -63,8 +63,8 @@ class SimplexSolver(object):
         """
         # Keep track of the list of variables and the number of basic variables
         m, n = self.A.shape
-        self.vars = np.hstack(
-                            ([i+2 for i in xrange(m)],[i for i in xrange(n)]))
+        self.vars = list(np.hstack(
+                            ([i+2 for i in xrange(m)],[i for i in xrange(n)])))
         
         # Construct the tableau.
         c_bar = np.hstack((-self.c, np.zeros(m)))
@@ -128,8 +128,8 @@ class SimplexSolver(object):
                 self.tableau[i] -= self.tableau[i,col]*self.tableau[row]
 
         # Swap leaving and entering variables.
-        enter = self.vars[col - 1]
-        leave = self.vars[row - 1]
+        enter = self.vars.index(col - 1)
+        leave = self.vars.index(row - 1)
         self.vars[enter], self.vars[leave] = self.vars[leave], self.vars[enter]
 
     def solve(self):
@@ -174,6 +174,8 @@ def prob7(filename='productMix.npz'):
     s = SimplexSolver(c, A, b)
     primal_objective, basic, nonbasic = s.solve()
 
+    print primal_objective
+
     # Construct the final results.
     coordinates = []
     for i in xrange(len(c)):
@@ -183,5 +185,7 @@ def prob7(filename='productMix.npz'):
             coordinates.append(0)
     return np.array(coordinates)
 
+if __name__ == '__main__':
+    print prob7()
 
 # END OF SOLUTIONS ============================================================
