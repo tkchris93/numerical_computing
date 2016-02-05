@@ -833,28 +833,24 @@ Use the \li{iterative_search()} function from problem 1 to search the linked lis
 In the first subplot, plot the number of words in each data set against the time it took to build each object.
 In the second subplot, plot the number of words in each data set against the average time it took to search each object.
 Your plot should look similar to Figure \ref{fig:times}.
+% \end{problem}
 
 \begin{figure}[H]
-\includegraphics[width=\textwidth]{times.pdf}
-\caption{Note that the \li{BST} has the fastest build times, but the \li{AVL} has the fastest search times. How would the graph change if the data were sorted to begin with?}
-\label{fig:times}
+    \centering
+    \begin{subfigure}[b]{.5\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{BuildTimes.pdf}
+    \end{subfigure}%
+    \begin{subfigure}[b]{.5\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{SearchTimes.pdf}
+    \end{subfigure}
+    \caption{The \li{SinglyLinkedList} has the fastest build times, but the \li{AVL} has the fastest search times. How would the graphs be different if the data had been sorted to begin with?}
+    \label{fig:times}
 \end{figure}
 
-% \begin{figure}[t!]
-%     %\centering
-%     \begin{subfigure}[t]
-%         %\centering
-%         \includegraphics[width=0.5\textwidth]{BuildTimes.pdf}
-%         \caption{This is a caption.}
-%     \end{subfigure}%
-%     ~
-%     \begin{subfigure}[t]
-%         %\centering
-%         \includegraphics[width=0.5\textwidth]{SearchTimes.pdf}
-%         \caption{This is another caption.}
-%     \end{subfigure}
-%     \caption{This is the big caption.}
-%     \label{fig:times}
-% \end{figure}
 \end{problem}
 
+\section*{Conclusion}
+
+Pick your data structures wisely.
