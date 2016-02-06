@@ -610,7 +610,7 @@ class _testDriver(object):
 
         points = 0
 
-        lls = SinlgyLinkedList()
+        lls = SinglyLinkedList()
         # Check recursive_search on empty list (1 point)
         try:
             s.recursive_search(lls, 1)
