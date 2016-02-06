@@ -708,7 +708,7 @@ Since the data is already ordered, each node will only have one child, and we es
 \begin{lstlisting}
 # Sequentially adding ordered integers destroys the efficiency of a BST.
 >>> unbalanced_tree = BST()
->>> for i in xrange(10):
+>>> for i in range(10):
 ...     unbalanced_tree.insert(i)
 ... 
 # The tree is perfectly flat, so it loses its search efficiency.
@@ -734,7 +734,7 @@ The AVL's balancing algorithm is beyond the scope of this project, but details a
 
 \begin{lstlisting}
 >>> balanced_tree = AVL()
->>> for i in xrange(10):
+>>> for i in range(10):
 ...     balanced_tree.insert(i)
 ... 
 # The AVL tree is balanced, so it retains (and optimizes) its search efficiency.
@@ -745,7 +745,7 @@ The AVL's balancing algorithm is beyond the scope of this project, but details a
 [4, 6, 9]
 \end{lstlisting}
 
-% Problem 4: compare build and search speeds
+% Problem 4: compare build and search speeds.
 \begin{problem}
 Write a function to compare the build and search speeds the different data structures of this lab.
 Accept a \li{filename} to read data from and keyword arguments \li{start}, \li{stop}, and \li{step} to determine the domain.
@@ -754,14 +754,15 @@ Repeat the following for $n$ varying from \li{start} to \li{stop} at intervals o
 
 Get a subset of $n$ items from the data set.
 Time (separately) how long it takes to load a new \li{LinkedList}, a \li{BST}, and an \li{AVL} with the $n$ items.
-Choose 5 \textbf{random} words from the subset, and time how long it takes to find all 5 words in each object. To avoid recursive overflow, use the provided \li{iterative_search()} function from Problem \ref{prob:recursion} to search the linked list.
+Choose 5 \textbf{random} items from the subset, and time how long it takes to find all 5 items in each data structure.
+To avoid exceeding the maximum recursion depth, use the provided \li{iterative_search()} function from Problem \ref{prob:recursion} to search the linked list.
 
-Create a single plot with two subplots.
-In the first, plot the number of words in each subset against the time it took to build each object.
-In the second, plot the number of words in each subset against the time it took to search each object.
+Create a single plot with two lin-log subplots (use \li{plt.semilogy()} instead of \li{plt.plot()}).
+In the first, plot the number of items in each subset against the time it took to build each object.
+In the second, plot the number of items in each subset against the time it took to search each object.
 With \li{start=500}, \li{stop=5000}, and \li{step=500}, your plot should look similar to Figure \ref{fig:times}, though your results will be less smooth.
 
-\begin{figure}[H]
+\begin{figure}[H] % Solution to problem 4.
     \centering
     \begin{subfigure}[b]{.5\textwidth}
         \centering

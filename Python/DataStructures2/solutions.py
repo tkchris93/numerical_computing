@@ -405,10 +405,8 @@ def _height(current):
         return -1           # Otherwise, descend down both branches.
     return 1 + max(_height(current.right), _height(current.left))
 
-from sys import stdout
-
 # Problem 4: Test build and search speeds for LinkedList, BST, and AVL objects.
-def plot_times(filename="English.txt", start=500, stop=5500, step=500):
+def time_structures(filename="English.txt", start=500, stop=5000, step=500):
     """Reach each line from the given file. This will be the data set.
     Vary n from 'start' to 'stop', incrementing by 'step'. At each
     iteration, take the first n words from the specified file.
@@ -436,99 +434,76 @@ def plot_times(filename="English.txt", start=500, stop=5500, step=500):
     bst_build, bst_search = [], []
     avl_build, avl_search = [], []
 
+    # Read in the data.
     with open(filename, 'r') as f:
         data = f.readlines()
     
-    # Get the values [start, start + step, ..., stop - step]
-    domain = []
-    for n in xrange(start,stop,step):
-
-        print "\rn =", n,; stdout.flush()
+    for n in xrange(start, stop+step, step):
+        print "\rn =", n,
     
-        # Initialize wordlist and data structures
-        word_list = data[:n]
+        # Initialize the subset and data structures.
+        subset = choice(data, size=n, replace=False) # or = data[:n]
         bst = BST()
         avl = AVL()
         lls = SinglyLinkedList()
         
-        # Time the singly-linked list build
-        start = time()
-        for word in word_list:
+        # BUILD TIMES -------------------------------------
+        # SinglyLinkedList
+        begin = time()
+        for word in subset:
             lls.append(word)
-        lls_build.append(time() - start)
+        lls_build.append(time() - begin)
         
-        # Time the binary search tree build
-        start = time()
-        for word in word_list:
+        # BST
+        begin = time()
+        for word in subset:
             bst.insert(word)
-        bst_build.append(time() - start)
+        bst_build.append(time() - begin)
         
-        # Time the AVL tree build
-        start = time()
-        for word in word_list:
+        # AVL
+        begin = time()
+        for word in subset:
             avl.insert(word)
-        avl_build.append(time() - start)
+        avl_build.append(time() - begin)
         
-
-        subset = choice(word_list, size=5, replace=False)
-        # Time the singly-linked list search
-
-        start = time()
-        for target in subset:
+        # SEARCH TIMES -------------------------------------
+        small_subset = choice(subset, size=5, replace=False)
+        
+        # SinglyLinkedList
+        begin = time()
+        for target in small_subset:
             iterative_search(lls, target)
-        lls_search.append(time() - start)
+        lls_search.append(time() - begin)
 
-        start = time()
-        for target in subset:
+        # BST
+        begin = time()
+        for target in small_subset:
             bst.find(target)
-        bst_search.append(time() - start)
+        bst_search.append(time() - begin)
 
-        start = time()
-        for target in subset:
+        # AVL
+        begin = time()
+        for target in small_subset:
             avl.find(target)
-        avl_search.append(time() - start)
-
-
-        # # Search Times
-        # search1, search2, search3 = [], [], []
-        # for i in xrange(5):
-        #     target = word_list[randint(0, n-1)]
-            
-        #     # Time LinkedList.find
-        #     start = time()
-        #     iterative_search(lls, target)
-        #     search1.append(time() - start)
-            
-        #     # Time BST.find
-        #     start = time()
-        #     bst.find(target)
-        #     search2.append(time() - start)
-            
-        #     # Time AVL.find
-        #     start = time()
-        #     avl.find(target)
-        #     search3.append(time() - start)
-        
-        # lls_search.append(sum(search1)/len(search1))
-        # bst_search.append(sum(search2)/len(search2))
-        # avl_search.append(sum(search3)/len(search3))
-        domain.append(n)
+        avl_search.append(time() - begin)
     
-    # Plot the data
+    # Plot the data.
+    domain  = list(xrange(start, stop+step, step))
+    
     plt.subplot(121)
     plt.title("Build Times")
-    plt.semilogy(domain,lls_build,label='Singly-Linked List')
-    plt.semilogy(domain,bst_build,label='Binary Search Tree')
-    plt.semilogy(domain,avl_build,label='AVL Tree')
+    plt.semilogy(domain, lls_build, label='Singly-Linked List')
+    plt.semilogy(domain, bst_build, label='Binary Search Tree')
+    plt.semilogy(domain, avl_build, label='AVL Tree')
     plt.ylabel("seconds")
     plt.xlabel("data points")
     plt.legend(loc='upper left')
     
     plt.subplot(122)
     plt.title("Search Times")
-    plt.semilogy(domain,lls_search,label='Singly-Linked List')
-    plt.semilogy(domain,bst_search,label='Binary Search Tree')
-    plt.semilogy(domain,avl_search,label='AVL Tree')
+    plt.semilogy(domain, lls_search, label='Singly-Linked List')
+    plt.semilogy(domain, bst_search, label='Binary Search Tree')
+    plt.semilogy(domain, avl_search, label='AVL Tree')
     plt.ylabel("seconds")
     plt.xlabel("data points")
     plt.legend(loc='upper left')
@@ -536,21 +511,7 @@ def plot_times(filename="English.txt", start=500, stop=5500, step=500):
     plt.show()
 
 
-''' Garbage
-# Use this function in problem 6 to implement sort_words().
-def create_word_list(filename):
-    """Read in a list of words from the specified file.
-    Randomize the ordering and return the list.
-    """
-    myfile = open(filename, 'r')    # Open the file with read-only access
-    content = myfile.read()         # Read in the text from the file
-    lines = content.split('\n')     # Get each word, separated by '\n'
-    lines = lines[:-1]              # Remove the last endline
-                                    # Randomize, convert to a list, and return.
-    return list(np.random.permutation(lines))
-'''
-
-# ============================= END OF SOLUTIONS ============================ #
+# END OF SOLUTIONS ============================================================
 
 import inspect
 
@@ -649,7 +610,7 @@ class _testDriver(object):
 
         points = 0
 
-        lls = LinkedList()
+        lls = SinlgyLinkedList()
         # Check recursive_search on empty list (1 point)
         try:
             s.recursive_search(lls, 1)
@@ -871,10 +832,10 @@ class _testDriver(object):
         return points
 
     def problem4(self, s):
-        """Test plot_times(). 10 points."""
+        """Test time_structures(). 10 points."""
 
-        print("Running plot_times()...")
-        s.plot_times("English.txt", 1000, 4000, 1000)
+        print("Running time_structures()...")
+        s.time_structures("English.txt", 1000, 4000, 1000)
         points = -1
         while points > 10 or points < 0:
             try:
