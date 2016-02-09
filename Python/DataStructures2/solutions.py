@@ -1,27 +1,72 @@
 # solutions.py
-"""Volume II Lab 5: Data Structures II (Trees)
-Solutions file. Written by Shane A. McQuarrie.
-"""
+"""Volume II Lab 5: Data Structures II (Trees). Solutions file."""
 
-# ================================ WordList.py ============================== #
-# Provided to the students as an auxiliary file.
+from matplotlib import pyplot as plt
+from numpy.random import choice
+from time import time
 
-import numpy as np
 
-# Use this function in problem 6 to implement sort_words().
-def create_word_list(filename):
-    """Read in a list of words from the specified file.
-    Randomize the ordering and return the list.
+class SinglyLinkedListNode(object):
+    """Simple singly-linked list node."""
+    def __init__(self, data):
+        self.value, self.next = data, None
+
+class SinglyLinkedList(object):
+    """A very simple singly-linked list with a head and a tail."""
+    def __init__(self):
+        self.head, self.tail = None, None
+    def append(self, data):
+        """Add a Node containing 'data' to the end of the list."""
+        n = SinglyLinkedListNode(data)
+        if self.head is None:
+            self.head, self.tail = n, n
+        else:
+            self.tail.next = n
+            self.tail = n
+
+def iterative_search(linkedlist, data):
+    """Find the node containing 'data' using an iterative approach.
+    If there is no such node in the list, or if the list is empty,
+    raise a ValueError.
+    
+    Inputs:
+        linkedlist (LinkedList): a linked list object
+        data: the data to find in the list.
+    
+    Returns:
+        The node in 'linkedlist' containing 'data'.
     """
-    myfile = open(filename, 'r')    # Open the file with read-only access
-    content = myfile.read()         # Read in the text from the file
-    lines = content.split('\n')     # Get each word, separated by '\n'
-    lines = lines[:-1]              # Remove the last endline
-                                    # Randomize, convert to a list, and return.
-    return list(np.random.permutation(lines))
+    current = linkedlist.head
+    while current is not None:
+        if current.value == data:
+            return current
+        current = current.next
+    raise ValueError(str(data) + " is not in the list.")
 
-# ============================== Trees.py ============================== #
-# Modify this file for problems 2 and 3
+# Problem 1: rewrite iterative_search() using recursion.
+def recursive_search(linkedlist, data):
+    """Find the node containing 'data' using a recursive approach.
+    If there is no such node in the list, or if the list is empty,
+    raise a ValueError.
+    
+    Inputs:
+        linkedlist (LinkedList): a linked list object.
+        data: the data to find in the list.
+    
+    Returns:
+        The node in 'linkedlist' containing 'data'.
+    """
+    def _step(current):
+        """Check the current node, and step right if not found."""
+        if current is None:         # Base case 1: dead end
+            raise ValueError(str(data) + " is not in the list.")
+        if current.value == data:   # Base case 2: the data matches
+            return current
+        else:                       # Recurse if not found
+            return _step(current.next)
+    
+    return _step(linkedlist.head)
+
 
 class BSTNode(object):
     """A Node class for Binary Search Trees. Contains some data, a
@@ -31,19 +76,16 @@ class BSTNode(object):
         """Construct a new node and set the data attribute. The other
         attributes will be set when the node is added to a tree.
         """
-        self.data = data
-        self.prev = None        # A reference to this node's parent node
-        self.left = None        # self.left.data < self.data
-        self.right = None       # self.data < self.right.data
-        
-    def __str__(self):
-        """String representation: the data contained in the node."""
-        return str(self.data)
+        self.value = data
+        self.prev = None        # A reference to this node's parent node.
+        self.left = None        # self.left.value < self.value
+        self.right = None       # self.value < self.right.value
+    
 
 # Modify this class for problems 2 and 3
 class BST(object):
     """Binary Search Tree data structure class.
-    The first node is referenced to by 'root'.
+    The 'root' attribute references the first node in the tree.
     """
     def __init__(self):
         """Initialize the root attribute."""
@@ -51,7 +93,7 @@ class BST(object):
     
     def find(self, data):
         """Return the node containing 'data'. If there is no such node in the
-        tree, raise a ValueError with error message "<data> is not in the tree."
+        tree, or if the tree is empty, raise a ValueError."
         """
         # First, check to see if the tree is empty
         if self.root is None:
@@ -64,9 +106,9 @@ class BST(object):
             """
             if current is None:                     # Base case 1: dead end
                 raise ValueError(str(data) + " is not in the tree.")
-            if item == current.data:                # Base case 2: data matches
+            if item == current.value:               # Base case 2: data matches
                 return current
-            if item < current.data:                 # Step to the left
+            if item < current.value:                # Step to the left
                 return _step(current.left,item)
             else:                                   # Step to the right
                 return _step(current.right,item)
@@ -94,18 +136,17 @@ class BST(object):
             """Recursively descend through the tree to find the node that
             should be the parent of the new node. Do not allow for duplicates.
             """
-            if item == current.data:                # Base case 1: duplicate
+            assert current is not None              # Base case: failure
+            if item == current.value:               # Base case: duplicate
                 raise ValueError(str(item) + " is already in the tree.")
-            if current is None:                     # Base case 2: failure
-                raise ValueError("_find_parent() failed for " + str(item))
-            if item < current.data:                 # Step to the left
+            elif item < current.value:              # Step to the left
                 if current.left:
-                    return _find_parent(current.left,item)
+                    return _find_parent(current.left, item)
                 else:                               # Base case: parent found
                     return current
             else:                                   # Step to the right
                 if current.right:
-                    return _find_parent(current.right,item)
+                    return _find_parent(current.right, item)
                 else:                               # Base case: parent found
                     return current
         
@@ -114,7 +155,7 @@ class BST(object):
             self.root = n                               # reset the root
         else:                                       # Case 2: use _find_parent
             parent = _find_parent(self.root,data)       # Get the parent
-            if data < parent.data:                      # Insert as left child
+            if data < parent.value:                     # Insert as left child
                 parent.left = n
             else:                                       # Insert as right child
                 parent.right = n
@@ -144,15 +185,14 @@ class BST(object):
             [8]                 |   >>> print(b)        |
         """
         
-        def _predecessor(node):
-            """Find the next-smallest node in the tree by travelling
+        def _successor(node):
+            """Find the next-largest node in the tree by travelling
             right once, then left as far as possible.
             """
-            if node.right is None:          # Function called inappropriately
-                raise ValueError("IOP problem")
+            assert node.right is not None   # Function called inappropriately
             node = node.right               # Step right once
             while node.left:
-                node = node.left            # Step right until done
+                node = node.left            # Step left until done
             return node
         
         # Case 1: the tree is empty
@@ -171,9 +211,9 @@ class BST(object):
                 self.root = target.right
             # Case 2c: two children
             else:
-                pred = _predecessor(target)
-                self.remove(pred.data)
-                target.data = pred.data
+                pred = _successor(target)
+                self.remove(pred.value)
+                target.value = pred.value
             # reset the new root's prev to None
             if self.root:
                 self.root.prev = None
@@ -182,35 +222,35 @@ class BST(object):
             # Case 3a: no children
             if not target.left and not target.right:
                 parent = target.prev
-                if target.data < parent.data:
+                if target.value < parent.value:
                     parent.left = None
-                elif target.data > parent.data:
+                elif target.value > parent.value:
                     parent.right = None
             # Case 3b: one child
             elif not target.right:
                 parent = target.prev
-                if parent.right == target:
+                if parent.right is target:
                     parent.right = target.left
-                elif parent.left == target:
+                elif parent.left is target:
                     parent.left = target.left
                 target.left.prev = parent
             elif not target.left:
                 parent = target.prev
-                if parent.right == target:
+                if parent.right is target:
                     parent.right = target.right
-                elif parent.left == target:
+                elif parent.left is target:
                     parent.left = target.right
                 target.right.prev = parent
             # Case 3c: two children
             else:
-                pred = _predecessor(target)
-                self.remove(pred.data)
-                target.data = pred.data
+                pred = _successor(target)
+                self.remove(pred.value)
+                target.value = pred.value
     
     def __str__(self):
         """String representation: a hierarchical view of the BST.
-        Do not modify this function, but use it often to test this class.
-        (this function uses a depth-first search; can you explain how?)
+        Do not modify this method, but use it often to test this class.
+        (this method uses a depth-first search; can you explain how?)
         
         Example:  (3)
                   / \     '[3]          The nodes of the BST are printed out
@@ -231,14 +271,14 @@ class BST(object):
             list and mark as visited. Continue recusively until all nodes have
             been visited.
             """
-            str_tree[depth].append(current.data)
+            str_tree[depth].append(current.value)
             visited.add(current)
             if current.left and current.left not in visited:
                 _visit(current.left, depth+1)  # travel left recursively (DFS)
             if current.right and current.right not in visited:
                 _visit(current.right, depth+1) # travel right recursively (DFS)
         
-        _visit(self.root,0)                     # Load the list of lists.
+        _visit(self.root, 0)                    # Load the list of lists.
         out = ""                                # Build the final string.
         for level in str_tree:
             if level != list():                 # Ignore empty levels.
@@ -254,10 +294,7 @@ class AVL(BST):
     Do not modify.
     """
     def _checkBalance(self, n):
-        if abs(_height(n.left) - _height(n.right)) >= 2:
-            return True
-        else:
-            return False
+        return abs(_height(n.left) - _height(n.right)) >= 2
     
     def _rotateLeftLeft(self, n):
         temp = n.left
@@ -268,7 +305,7 @@ class AVL(BST):
         temp.prev = n.prev
         n.prev = temp
         if temp.prev:
-            if temp.prev.data > temp.data:
+            if temp.prev.value > temp.value:
                 temp.prev.left = temp
             else:
                 temp.prev.right = temp
@@ -285,7 +322,7 @@ class AVL(BST):
         temp.prev = n.prev
         n.prev = temp
         if temp.prev:
-            if temp.prev.data > temp.data:
+            if temp.prev.value > temp.value:
                 temp.prev.left = temp
             else:
                 temp.prev.right = temp
@@ -346,7 +383,7 @@ class AVL(BST):
             n = self._rebalance(n)
             n = n.prev
     
-    def remove(self, *args):
+    def remove(*args, **kwargs):
         """Disable remove() to keep the tree in balance."""
         raise NotImplementedError("remove() has been disabled for this class.")
 
@@ -368,86 +405,22 @@ def _height(current):
         return -1           # Otherwise, descend down both branches.
     return 1 + max(_height(current.right), _height(current.left))
 
-# ============================== solutions.py ============================== #
-
-# from Trees import BST
-# from Trees import AVL
-# from WordList import create_word_list
-from time import time
-from matplotlib import pyplot as plt
-from random import randint
-
-
-def iterative_search(linkedlist, data):
-    """Find the node containing 'data' using an iterative approach.
-    If there is no such node in the list, or if the list is empty,
-    raise a ValueError with error message "<data> is not in the list."
-    
-    Inputs:
-        linkedlist (LinkedList): a linked list object
-        data: the data to find in the list.
-    
-    Returns:
-        The node in 'linkedlist' containing 'data'.
-    """
-    # Start the search at the head.
-    current = linkedlist.head
-    # Iterate through the list, checking the data of each node.
-    while current is not None:
-        if current.data == data:
-            return current
-        current = current.next
-    # If 'current' no longer points to a Node, raise a value error.
-    raise ValueError(str(data) + " is not in the list.")
-
-# Problem 1: rewrite iterative_search() using recursion.
-def recursive_search(linkedlist, data):
-    """Find the node containing 'data' using a recursive approach.
-    If there is no such node in the list, raise a ValueError with error
-    message "<data> is not in the list."
-    
-    Inputs:
-        linkedlist (LinkedList): a linked list object
-        data: the data to find in the list.
-    
-    Returns:
-        The node in 'linkedlist' containing 'data'.
-    """
-    def _step(current):
-        """Check the current node, and step right if not found."""
-        if current is None:         # Base case 1: dead end
-            raise ValueError(str(data) + " is not in the list.")
-        if current.data == data:    # Base case 2: the data matches
-            return current
-        else:                       # Recurse if not found
-            return _step(current.next)
-    
-    return _step(linkedlist.head)
-
-
-# Problem 2: Implement BST.insert() in BST.py.
-
-
-# Problem 3: Implement BST.remove() in BST.py
-
-
 # Problem 4: Test build and search speeds for LinkedList, BST, and AVL objects.
-def plot_times(filename="English.txt", start=500, stop=5500, step=500):
-    """Vary n from 'start' to 'stop', incrementing by 'step'. At each
-    iteration, use the create_word_list() from the 'WordList' module to
-    generate a list of n randomized words from the specified file.
+def time_structures(filename="English.txt", start=500, stop=5000, step=500):
+    """Reach each line from the given file. This will be the data set.
+    Vary n from 'start' to 'stop', incrementing by 'step'. At each
+    iteration, take the first n words from the specified file.
     
-    Time (separately) how long it takes to load a LinkedList, a BST, and
-    an AVL with the data set.
+    Time (separately) how long it takes to load a SinglyLinkedList, a BST, and
+    an AVL with the data set of n items.
     
-    Choose 5 random words from the data set. Time how long it takes to
-    find each word in each object. Calculate the average search time for
-    each object.
+    Choose 5 random items from the data set. Time (separately) how long it
+    takes to find all 5 items in each object.
     
-    Create one plot with two subplots. In the first subplot, plot the
-    number of words in each dataset against the build time for each object.
-    In the second subplot, plot the number of words against the search time
-    for each object.
+    Create one plot with two lin-log subplots (use plt.semilogy() instead of
+    plt.plot()). In the first subplot, plot the number of items in each
+    dataset against the build time for each object. In the second subplot,
+    plot the number of items against the search time for each object.
     
     Inputs:
         filename (str): the file to use in creating the data sets.
@@ -457,78 +430,80 @@ def plot_times(filename="English.txt", start=500, stop=5500, step=500):
     """
     
     # Initialize lists to hold results
-    lls_build, lls_search = list(), list()
-    bst_build, bst_search = list(), list()
-    avl_build, avl_search = list(), list()
+    lls_build, lls_search = [], []
+    bst_build, bst_search = [], []
+    avl_build, avl_search = [], []
+
+    # Read in the data.
+    with open(filename, 'r') as f:
+        data = f.readlines()
     
-    # Get the values [start, start + step, ..., stop - step]
-    domain = list()
-    for n in xrange(start,stop,step):
+    for n in xrange(start, stop+step, step):
+        print "\rn =", n,
     
-        # Initialize wordlist and data structures
-        word_list = create_word_list(filename)[:n]
+        # Initialize the subset and data structures.
+        subset = choice(data, size=n, replace=False) # or = data[:n]
         bst = BST()
         avl = AVL()
-        lls = LinkedList()
+        lls = SinglyLinkedList()
         
-        # Time the singly-linked list build
-        start = time()
-        for word in word_list:
-            lls.add(word)
-        lls_build.append(time() - start)
+        # BUILD TIMES -------------------------------------
+        # SinglyLinkedList
+        begin = time()
+        for word in subset:
+            lls.append(word)
+        lls_build.append(time() - begin)
         
-        # Time the binary search tree build
-        start = time()
-        for word in word_list:
+        # BST
+        begin = time()
+        for word in subset:
             bst.insert(word)
-        bst_build.append(time() - start)
+        bst_build.append(time() - begin)
         
-        # Time the AVL tree build
-        start = time()
-        for word in word_list:
+        # AVL
+        begin = time()
+        for word in subset:
             avl.insert(word)
-        avl_build.append(time() - start)
+        avl_build.append(time() - begin)
         
-        # Search Times
-        search1, search2, search3 = list(), list(), list()
-        for i in xrange(5):
-            target = word_list[randint(0, n-1)]
-            
-            # Time LinkedList.find
-            start = time()
+        # SEARCH TIMES -------------------------------------
+        small_subset = choice(subset, size=5, replace=False)
+        
+        # SinglyLinkedList
+        begin = time()
+        for target in small_subset:
             iterative_search(lls, target)
-            search1.append(time() - start)
-            
-            # Time BST.find
-            start = time()
+        lls_search.append(time() - begin)
+
+        # BST
+        begin = time()
+        for target in small_subset:
             bst.find(target)
-            search2.append(time() - start)
-            
-            # Time AVL.find
-            start = time()
+        bst_search.append(time() - begin)
+
+        # AVL
+        begin = time()
+        for target in small_subset:
             avl.find(target)
-            search3.append(time() - start)
-        
-        lls_search.append(sum(search1)/len(search1))
-        bst_search.append(sum(search2)/len(search2))
-        avl_search.append(sum(search3)/len(search3))
-        domain.append(n)
+        avl_search.append(time() - begin)
     
-    # Plot the data
+    # Plot the data.
+    domain  = list(xrange(start, stop+step, step))
+    
     plt.subplot(121)
     plt.title("Build Times")
-    plt.plot(domain,lls_build,label='Singly-Linked List')
-    plt.plot(domain,bst_build,label='Binary Search Tree')
-    plt.plot(domain,avl_build,label='AVL Tree')
+    plt.semilogy(domain, lls_build, label='Singly-Linked List')
+    plt.semilogy(domain, bst_build, label='Binary Search Tree')
+    plt.semilogy(domain, avl_build, label='AVL Tree')
     plt.ylabel("seconds")
     plt.xlabel("data points")
     plt.legend(loc='upper left')
     
     plt.subplot(122)
     plt.title("Search Times")
-    plt.plot(domain,lls_search,label='Singly-Linked List')
-    plt.plot(domain,bst_search,label='Binary Search Tree')
-    plt.plot(domain,avl_search,label='AVL Tree')
+    plt.semilogy(domain, lls_search, label='Singly-Linked List')
+    plt.semilogy(domain, bst_search, label='Binary Search Tree')
+    plt.semilogy(domain, avl_search, label='AVL Tree')
     plt.ylabel("seconds")
     plt.xlabel("data points")
     plt.legend(loc='upper left')
@@ -536,32 +511,9 @@ def plot_times(filename="English.txt", start=500, stop=5500, step=500):
     plt.show()
 
 
-# ============================= END OF SOLUTIONS ============================ #
+# END OF SOLUTIONS ============================================================
 
 import inspect
-
-# Simple singly-linked list objects for testing problem 1
-class LinkedListNode(object):
-    """Simple singly-linked list node. Used to test problem 1."""
-    def __init__(self, data):
-        self.data = data
-        self.next = None
-    def __str__(self):
-        return str(self.data)
-
-class LinkedList(object):
-    """Simple singly-linked list. Used to test problem 1."""
-    def __init__(self):
-        self.head = None
-    def add(self, data):
-        """Add a Node containing 'data' to the end of the list."""
-        n = LinkedListNode(data)
-        if self.head is None: self.head = n
-        else:
-            current = self.head
-            while current.next is not None:
-                current = current.next
-            current.next = n
 
 def test(student_module):
     """Test script. You must import the student's 'solutions.py' as a module.
@@ -658,7 +610,7 @@ class _testDriver(object):
 
         points = 0
 
-        lls = LinkedList()
+        lls = SinglyLinkedList()
         # Check recursive_search on empty list (1 point)
         try:
             s.recursive_search(lls, 1)
@@ -880,10 +832,10 @@ class _testDriver(object):
         return points
 
     def problem4(self, s):
-        """Test plot_times(). 10 points."""
+        """Test time_structures(). 10 points."""
 
-        print("Running plot_times()...")
-        s.plot_times("English.txt", 1000, 4000, 1000)
+        print("Running time_structures()...")
+        s.time_structures("English.txt", 1000, 4000, 1000)
         points = -1
         while points > 10 or points < 0:
             try:

@@ -495,10 +495,6 @@ Note that since \li{insert()} places a new node before an existing node, it is n
 The \li{LinkedList} class is now a fully-functional doubly-linked list\footnote{See the end of the lab for ideas on how to further improve the \li{LinkedList} class.}.
 We can use it as the backbone for other basic data structures via inheritance.
 
-% For example, a \emph{sorted list} is a collection elements with a specific ordering.
-% When new data is added, the structure judiciously selects the location for the data so that the ordering of the list is preserved.
-% Any structure satisfying this property is a sorted list, but our particular implementation will be a linked list.
-
 % Problem 6: SortedList class.
 \begin{problem}
 Write a \li{SortedList} class that inherits from the \li{LinkedList} class.
@@ -524,7 +520,7 @@ This is the most general form of a function signature.
 \item Also disable the \li{insert()} method.
 
 \end{enumerate}
-Outside of the class, write a function called \li{sort_file(infile, outfile)} that reads each line of \li{infile}, adds each line to a \li{SortedList} instance, then writes the lines to \li{outfile} in alphabetical order by iterating through the list.
+Outside of the class, write a function called \li{sort_file(infile, outfile)} that reads \li{infile}, adds each line to a \li{SortedList} instance, then writes the lines to \li{outfile} in alphabetical order by iterating through the list.
 
 If the file on the left is \li{infile}, the file on the right should be \li{outfile}.
 \begin{lstlisting}
@@ -534,25 +530,20 @@ a                               this
 test                            test
 \end{lstlisting}
 
-\begin{warn} % Beware big data
-The file \texttt{English.txt} contains over 58,000 English words in random order.
-Sorting the entire data set should take about 15 minutes.
-Test your data structure on small data sets first.
-\end{warn}
 \label{prob:sortedlist}
 \end{problem}
 
-\begin{info} % Sorting in Python
-Python has many quick sorting methods.
-Even on the seemingly large data set of over 58,000 words used in the preceding problem, the \li{sort} method for Python lists is almost instantaneous.
+\begin{info} % Big-O rates for Linked Lists.
+The temporal complexity for inserting to the beginning or end of a linked list is $O(1)$, but inserting anywhere else is $O(n)$, where $n$ is the number of nodes in the list (why?).
+This is quite slow compared other data structures.
 In the next lab we turn our attention to \emph{trees}, special kinds of linked lists that allow for much quicker sorting and data retrieval.
 \end{info}
 
 \section*{Restricted-Access Lists}
-Often it is wise to restrict the user's access to the some of the data within a structure.
+It is sometimes wise to restrict the user's access to the some of the data within a structure.
 The three most common and basic restricted-access structures are stacks, queues, and deques.
 Each structure restricts the user's access differently, making them ideal for different situations.
-These structures will reappear in many future labs and applications.
+These structures will appear in many future labs and applications.
 
 \begin{itemize}
 \item A \emph{stack} is a \emph{Last In, First Out} structure (LIFO): only the last item that was inserted can be accessed.
@@ -572,16 +563,13 @@ If we restrict our usage to \li{append()} and \li{pop()} (or to \li{appendleft()
 Similarly, if we are restricted to \li{append()} and \li{popleft()} (or to \li{appendleft()} and \li{pop()}), we effectively have a queue.
 \end{itemize}
 
-The \li{collections} module in the Python standard library has a \li{deque} object, implemented as a doubly-linked list.
-This is an excellent object to use in practice instead of a Python \li{list} when speed is of the essence and data only needs to be accessed from the ends of the list.
-
 % Problem 7: Deque class.
 \begin{problem}
 Write a \li{Deque} class that inherits from the \li{LinkedList} class.
 \begin{enumerate}
-\item Use inheritance to implement the \li{appendleft()}, \li{pop()}, and \li{popleft()} methods as described in the preceding section (\li{append()} is already implemented by the \li{LinkedList} class).
+\item Use inheritance to implement the \li{appendleft()}, \li{pop()}, and \li{popleft()} methods as described in the preceding section. Note that \li{append()} is already implemented by the \li{LinkedList} class.
 
-The \li{appendleft()} method should accept a single parameter (the data to be added) and return nothing, while \li{pop()} and \li{popleft()} should accept no parameters (except \li{self}) and return a single value (the data removed).
+The \li{appendleft()} method should accept some data to be added and return nothing, while \li{pop()} and \li{popleft()} should accept no parameters (except \li{self}) and return the value of the data removed.
 
 \item Disable all other methods to restrict data access.
 \end{enumerate}
@@ -597,14 +585,13 @@ test                            this
 \end{lstlisting}
 \end{problem}
 
-\section*{Conclusion}
+% from collections import deque
+\begin{info}
+The \li{collections} module in the Python standard library has a \li{deque} object, implemented as a doubly-linked list.
+This is an excellent object to use in practice instead of a Python \li{list} when speed is of the essence and data only needs to be accessed from the ends of the list.
+\end{info}
 
-From problem \ref{prob:sortedlist}, we saw that linked lists are extremely slow at inserting data in the middle of the list.
-This is because to get to the place where the new node will go, we have to iterate each time to get there.
-However, data at the beginning and end of the list can be accessed instantaneously, making it an ideal implementation for a stack, queue, or deque.
-
-% TODO: Concluding words about the Python list. It is **NOT** implemented as a linked list, so it is a little faster about accessing data. RESEARCH THIS (talk to Robot Scott about it).
-
+% Bonus Material: Suggestions for improving the LL class.
 \section*{Additional Material}
 
 The \li{LinkedList} class we have built is still somewhat minimal.
@@ -616,7 +603,7 @@ This makes it possible to cast other iterables as a \li{LinkedList}, like
 Python's standard data structures.
 \begin{lstlisting}
 >>> my_list = [1, 2, 3, 4, 5]
->>> my_linked_list = LinkedList(my_set)     # Cast my_list as a LinkedList.
+>>> my_linked_list = LinkedList(my_list)    # Cast my_list as a LinkedList.
 >>> print(my_linked_list)
 [1, 2, 3, 4, 5]
 \end{lstlisting}
@@ -628,8 +615,10 @@ Repeat this for the \li{SortedList} and \li{Deque} classes.
 \item Implement the \li{__iter__()} magic method to support \li{for} loop iteration, the \li{iter()} built-in function, and the \li{in} statement.
 \end{enumerate}
 
-% \begin{problem}
-% (Optional) Write \li{Stack} and \li{Queue} classes that inherit from the \li{Deque} class.
-% Add a \li{push()} method and overload the \li{pop()} method in each class to match the behaviors described in the preceding section.
-% Disable any other methods.
-% \end{problem}
+\begin{comment} % Extra problem idea: Stack and Queue classes.
+\begin{problem}
+(Optional) Write \li{Stack} and \li{Queue} classes that inherit from the \li{Deque} class.
+Add a \li{push()} method and overload the \li{pop()} method in each class to match the behaviors described in the preceding section.
+Disable any other methods.
+\end{problem}
+\end{comment}
