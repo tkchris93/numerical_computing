@@ -1,5 +1,5 @@
 \lab{Profiling and Optimizing Python Code}{Profiling}
-\objective{Identify which portions of the code are most time consuming using a profiler. Optimize Python code using Cython and Numba and other tools.}
+\objective{Identify which portions of the code are most time consuming using a profiler. Optimize Python code using Cython, Numba, and other tools.}
 \label{lab:ProfilingCode}
 
 The best code goes through multiple drafts.
@@ -7,7 +7,7 @@ In a first draft, you should focus on writing code that does what it is supposed
 After writing a first draft, you may find that your code does not run as quickly as you need it to.
 Then it is time to \emph{optimize} the most time consuming parts of your code so that they run as quickly as possible.
 
-In this lab we will optimize the function \texttt{qr1()} that computes the QR decomposition of a matrix via the modified Gram-Schmidt algorithm (see Lab \ref{lab:QRdecomp}).
+In this lab we will optimize the function \li{qr1()} that computes the QR decomposition of a matrix via the modified Gram-Schmidt algorithm (see Lab \ref{lab:QRdecomp}).
 \begin{lstlisting}
 import numpy as np
 from scipy import linalg as la
@@ -29,9 +29,9 @@ def qr1(A):
 Python provides a \emph{profiler} that can identify where code spends most of its runtime.
 The output of the profiler will tell you where to begin your optimization efforts.
 
-In IPython\footnote{If you are not using IPython, you will need to use the \li{cProfile} module documented here: \url{https://docs.python.org/2/library/profile.html}.}, 
-you can profile a function with \texttt{\%prun}.
-Here we profile \texttt{qr1()} on a random $300 \times 300$ array.
+In IPython\footnote{If you are not using IPython, you will need to use the \li{cProfile} module documented here: \url{https://docs.python.org/2/library/profile.html}.},
+you can profile a function with \li{\%prun}.
+Here we profile \li{qr1()} on a random $300 \times 300$ array.
 \begin{lstlisting}
 In [1]: A = np.random.rand(300, 300)
 In [2]: %prun qr1(A)
@@ -66,13 +66,13 @@ On this computer, we get the following output.
 }
 
 
-The first line of the output tells us that executing \texttt{qr1(A)} results in almost 100,000 function calls.  
+The first line of the output tells us that executing \li{qr1(A)} results in almost 100,000 function calls.
 Then we see a table listing these functions along with data telling us how much time each takes.
-Here, \texttt{ncalls} is the number of calls to the function, \texttt{tottime} is the total time spent in the function, and \texttt{cumtime} is the amount of time spent in the function including calls to other functions.
+Here, \li{ncalls} is the number of calls to the function, \li{tottime} is the total time spent in the function, and \li{cumtime} is the amount of time spent in the function including calls to other functions.
 
-For example, the first line of the table is the function \texttt{qr1(A)} itself. 
+For example, the first line of the table is the function \li{qr1(A)} itself.
 This function was called once, it took 1.342s to run, and 0.344s of that was spent in calls to other functions.
-Of that 0.344s, there were 0.319s spent on 89,700 calls to \texttt{np.dot()}.
+Of that 0.344s, there were 0.319s spent on 89,700 calls to \li{np.dot()}.
 
 With this output, we see that most time is spent in multiplying matrices.
 Since we cannot write a faster method to do this multiplication, we may want to try to reduce the number of matrix multiplications we perform.
@@ -81,19 +81,19 @@ Since we cannot write a faster method to do this multiplication, we may want to 
 Once you have identified those parts of your code that take the most time, how do you make them run faster?
 Here are some of the techniques we will address in this lab:
 \begin{itemize}
-\item Avoid Recomputing Values
-\item Avoid Nested Loops
-\item Use Existing Functions Instead of Writing Your Own
-\item Use Generators When Possible
-\item Avoid Excessive Function Calls
-\item Write Pythonic Code
+\item Avoid recomputing values
+\item Avoid nested loops
+\item Use existing functions instead of writing your own
+\item Use generators when possible
+\item Avoid excessive function calls
+\item Write Pythonic code
 \item Use Cython or Numba
-\item Use a More Efficient Algorithm
+\item Use a more efficient algorithm
 \end{itemize}
 You should always use the profiling and timing functions to help you decide when an optimization is actually useful.
 
 \subsection*{Avoid Recomputing Values}
-In our function \texttt{qr1()}, we can avoid recomputing \texttt{R[i,i]} in the outer loop and \texttt{R[i,j]} in the inner loop.
+In our function \li{qr1()}, we can avoid recomputing \li{R[i,i]} in the outer loop and \li{R[i,j]} in the inner loop.
 The rewritten function is as follows:
 \begin{lstlisting}
 def qr2(A):
@@ -102,14 +102,14 @@ def qr2(A):
     R = np.zeros((ncols, ncols))
     for i in range(ncols):
         R[i, i] = la.norm(Q[:, i])
-        Q[:, i] = Q[:, i]/R[i, i]
+        Q[:, i] = Q[:, i]/R[i, i] # this line changed
         for j in range(i+1, ncols):
             R[i, j] = Q[:, j].dot(Q[:, i])
-            Q[:,j] = Q[:,j]-R[i, j]*Q[:,i]
+            Q[:,j] = Q[:,j]-R[i, j]*Q[:,i] # this line changed
     return Q, R
 \end{lstlisting}
 
-Profiling \texttt{qr2()} on a $300 \times 300$ matrix produces the following output.
+Profiling \li{qr2()} on a $300 \times 300$ matrix produces the following output.
 
 {\scriptsize
 \begin{verbatim}
@@ -143,7 +143,7 @@ Some less obvious ways to eliminate excess computations include moving computati
 
 
 \subsection*{Avoid Nested Loops}
-For many algorithms, the temporal complexity of an algorithm is determined by the loops. Nested loop quickly increase the temporal complexity. 
+For many algorithms, the temporal complexity of an algorithm is determined by its loops. Nested loops quickly increase the temporal complexity.
 The best way to avoid nested loops is to use NumPy array operations instead of iterating through arrays.
 If you must use nested loops, focus your optimization efforts on the innermost loop, which gets called the most times.
 
@@ -154,37 +154,37 @@ We saw an example of this in Lab \ref{lab:NumPyArrays} where we compared NumPy a
 
 \subsection*{Use Generators When Possible}
 When you are iterating through a list, you can often replace the list with a \emph{generator}.
-Instead of storing the entire list in memory, a generator computes each item as it is needed. 
+Instead of storing the entire list in memory, a generator computes each item as it is needed.
 For example, the code
 \begin{lstlisting}
 >>> for i in range(100):
 ...     print i
 \end{lstlisting}
-stores the numbers 0 to 99 in memory, looks up each one in turn, and prints it. 
+stores the numbers 0 to 99 in memory, looks up each one in turn, and prints it.
 On the other hand, the code
 \begin{lstlisting}
 >>> for i in xrange(100):
 ...     print i
 \end{lstlisting}
-uses a generator instead of a list. 
+uses a generator instead of a list.
 This code computes the first number in the specified range (which is 0), and prints it.
 Then it computes the next number (which is 1) and prints that.
 
-It is also possible to write your own generators. 
+It is also possible to write your own generators.
 See \url{https://docs.python.org/2/tutorial/classes.html#generators} and \url{https://wiki.python.org/moin/Generators} for more information.
 
-In our example, replacing each \texttt{range} with \texttt{xrange} does not speed up \texttt{qr2()} by a noticeable amount.
+In our example, replacing each \li{range} with \li{xrange} does not speed up \li{qr2()} by a noticeable amount.
 
 \subsection*{Avoid Excessive Function Calls}
 Function calls take time.
 Moreover, looking up methods associated with objects takes time.
 Removing ``dots'' can significantly speed up execution time.
 
-For example, we could rewrite our function to reduce the number of times we need to look up the function \texttt{la.norm()}.
+For example, we could rewrite our function to reduce the number of times we need to look up the function \li{la.norm()}.
 
 \begin{lstlisting}
 def qr2(A):
-    norm = la.norm
+    norm = la.norm # this reduces the number of function look ups.
     ncols = A.shape[1]
     Q = A.copy()
     R = np.zeros((ncols, ncols))
@@ -196,7 +196,7 @@ def qr2(A):
             Q[:,j] = Q[:,j]-R[i, j]*Q[:,i]
     return Q, R
 \end{lstlisting}
-Once again, an analysis with \texttt{\%prun} reveals that this optimization does not help significantly in this case.
+Once again, an analysis with \li{\%prun} reveals that this optimization does not help significantly in this case.
 
 
 \subsection*{Write Pythonic Code}
@@ -208,11 +208,11 @@ For example, replace
 >>> for i in xrange(100):
 ...     mylist.append(math.sqrt(i))
 \end{lstlisting}
-with 
+with
 \begin{lstlisting}
 >>> mylist = [math.sqrt(i) for i in xrange(100)]
 \end{lstlisting}
-When it can be used, the function \texttt{map()} is even faster.
+When it can be used, the function \li{map()} is even faster.
 \begin{lstlisting}
 >>> mylist = map(math.sqrt, xrange(100))
 \end{lstlisting}
@@ -227,9 +227,9 @@ Second, swap values with a single assignment.
 \end{lstlisting}
 
 Third, many non-Boolean objects in Python have truth values.
-For example, numbers are \texttt{False} when equal to zero and \texttt{True} otherwise.
-Similarly, lists and strings are \texttt{False} when they are empty and \texttt{True} otherwise.
-So when \texttt{a} is a number, instead of
+For example, numbers are \li{False} when equal to zero and \li{True} otherwise.
+Similarly, lists and strings are \li{False} when they are empty and \li{True} otherwise.
+So when \li{a} is a number, instead of
 \begin{lstlisting}
 >>> if a != 0:
 \end{lstlisting}
@@ -250,7 +250,7 @@ def foo(n):
     for j in xrange(n):
         if j%2 == 0:
             evens += my_list[j]
-    return mylist, evens
+    return my_list, evens
 \end{lstlisting}
 
 Hint: If you are unsure where to begin optimizing, walk through the code line by line to determine what the code is accomplishing. Then, write your own function to perform the same task in a more efficient way.
@@ -258,7 +258,7 @@ Hint: If you are unsure where to begin optimizing, walk through the code line by
 
 
 \subsection*{Use Cython or Numba}
-Though it is much easier to write simple, readable code in Python, it is also much closer than compiled languages such as C. Compiled languages, in general, are much faster.
+Though it is much easier to write simple, readable code in Python, it is also much slower than compiled languages such as C. Compiled languages, in general, are much faster.
 Cython and Numba are two tools that you can use to optimize your code. Cython code is compiled before execution whereas Numba uses \emph{just-in-time} (JIT) compilation. We will first discuss Cython.
 
 \subsection*{Cython}
@@ -269,7 +269,7 @@ In this section we will introduce Cython as a language and discuss how it can be
 \begin{comment}
 \subsection*{Compiling Cython}
 With a few exceptions, every Python program is also a Cython program.
-For example, suppose you save the following script as \texttt{cymodule.pyx}.
+For example, suppose you save the following script as \li{cymodule.pyx}.
 \begin{lstlisting}
 import numpy as np
 from scipy import linalg as la
@@ -289,16 +289,16 @@ def qr(A):
 \end{lstlisting}
 We can compile this code within IPython or from the command line.
 
-To compile this code as Cython, we need to write another script, call it \texttt{setup.py}.
+To compile this code as Cython, we need to write another script, call it \li{setup.py}.
 \lstinputlisting[style=fromfile, language=Python]{setup.py}
 To run the setup script, type the following in the command line.
-\footnote{Note that \texttt{python} in this line will need to refer to your version of Python that comes with Cython. 
-Often, you will need to replace \texttt{python} with a path pointing to a specific distribution of Python.}
+\footnote{Note that \li{python} in this line will need to refer to your version of Python that comes with Cython.
+Often, you will need to replace \li{python} with a path pointing to a specific distribution of Python.}
 \begin{lstlisting}
 $ python setup.py build_ext --inplace
 \end{lstlisting}
 Now start up IPython in the same directory where you ran the setup script.
-You can import \texttt{cymodule} just as if it were a Python module.
+You can import \li{cymodule} just as if it were a Python module.
 \begin{lstlisting}
 In [1]: import cymodule
 In [2]: cymodule.qr(A)
@@ -331,14 +331,14 @@ In [2]: %%cython
    ...:     return Q, R
    ...:
 \end{lstlisting}
-Note the import statements on lines 2 and 3. Even if these modules were already loaded in the current IPython session, these lines would still be necessary. Now the \li{qr()} function has been compiled in Cython and can be called from IPython just as any other function. 
+Note the import statements on lines 2 and 3. Even if these modules were already loaded in the current IPython session, these lines are still be necessary. Now the \li{qr()} function has been compiled in Cython and can be called from IPython just as any other function.
 
-It is best to use this method of compilation if you are only using your optimized funcion once or you are in the stages of developing your optimized algorithm. It can be a little frustrating to fix errors in your function if you are using the IPython shell. The IPython Notebook interface is much easier to use for these types of problems.
+It is best to use this method of compilation if you are only using your optimized function once or you are in the stages of developing your optimized algorithm. It can be a little frustrating to fix errors in your function if you are using the IPython shell. The IPython Notebook interface is much easier to use for these types of problems.
 
 \subsubsection*{Compilation from the Command Line}
 Compiling Cython from the command line is particularly useful if you need an optimized module that you will use over and over again. As we will discuss in this section, once a function is written and compiled in Cython, it can be imported as a module.
 
-Cython code is usually written in a \texttt{.pyx} file, which is then compiled to C.
+Cython code is usually written in a \li{.pyx} file, which is then compiled to C.
 Next the C is compiled to a Python extension written in machine code.
 Figure \ref{cython:compilation} shows how Cython code is compiled and called.
 
@@ -350,9 +350,9 @@ The path from calling a Cython function in a Python file to its evaluation is sh
 \label{cython:compilation}
 \end{figure}
 
-These two compilations (first to C and then to a Python extension) are accomplished by the script \texttt{setup.py} discussed earlier in this lab.
+These two compilations (first to C and then to a Python extension) are accomplished by the script \li{setup.py} discussed earlier in this lab.
 \lstinputlisting[style=fromfile, language=Python]{setup.py}
-The call to \texttt{cythonize()} compiles \texttt{cymodule.pyx} to C, and the call to \texttt{setup()} converts the C code to a Python extension.
+The call to \li{cythonize()} compiles \li{cymodule.pyx} to C, and the call to \li{setup()} converts the C code to a Python extension.
 
 \begin{info}
 You can learn more about the Python/C balance in your Cython file with the following line.
@@ -364,13 +364,13 @@ It will show the lines that use Python in bright yellow and lines that use C in 
 \end{info}
 
 \subsubsection*{Speeding up Cython with Type Declarations}
-So far, our Cythonized \texttt{qr()} function does not run any faster than the Python version.\footnote{Sometimes you will see speedup immediately after Cythonizing a Python function.}
+So far, our Cythonized \li{qr()} function does not run any faster than the Python version.\footnote{Sometimes you will see speedup immediately after Cythonizing a Python function.}
 The simplest way to take advantage of the C-compilation is to declare data types, as you would in a C program.
 All Cython data types and their NumPy equivalents are listed in Table \ref{table:cython_types}.
 
 \begin{warn}
 Unlike Python integers, which can be arbitrarily large, Cython integers can overflow.
-\end{warn} 
+\end{warn}
 
 \begin{table}
 \begin{center}
@@ -399,8 +399,8 @@ unsigned long long & uint64 & 64 bit unsigned integer \\
 \label{table:cython_types}
 \end{table}
 
-In our example, when we declare the index \texttt{j} to be an \texttt{int}, the inner for loop is pushed into C (instead of Python), speeding up our code immensely.
-We do this by modifying \texttt{cymodule.pyx} as follows.
+In our example, when we declare the index \li{j} to be an \li{int}, the inner for loop is pushed into C (instead of Python), speeding up our code immensely.
+We do this by modifying \li{cymodule.pyx} as follows.
 \begin{lstlisting}
 ...
 def qr():
@@ -410,10 +410,11 @@ def qr():
     ...
 \end{lstlisting}
 
-We could also declare \texttt{i} to be an int, but the effect of doing so is negligible.
+We could also declare \li{i} to be an int, but the effect of doing so is negligible.
 
-After modifying \texttt{cymodule.pyx}, we must recompile it by running the script \texttt{setup.py}, and then re-import it into Python.
+After modifying \li{cymodule.pyx}, we must recompile it by running the script \li{setup.py}, and then re-import it into Python.
 When we profile this function, we see that it is indeed a good deal faster than its Python cousin, and all the speed up is in the function itself (where the for loops are).
+
 {\scriptsize
 \begin{verbatim}
    ...
@@ -456,8 +457,6 @@ For example, you can add typed memoryviews with \li{c = np.add(a, b)}.
 This may or may not be faster than looping through the array.
 \end{info}
 
-
-
 \subsubsection*{Putting it All Together}
 The following Python function computes the dot product of two 1-D arrays.
 \begin{lstlisting}
@@ -498,7 +497,7 @@ The Cython version runs almost as fast as the version built into NumPy.}
 \begin{lstlisting}
 def pysum(X):
     """ Return the sum of the elements of X.
-    
+
     INPUTS:
     X - a 1-D NumPy array
     """
@@ -506,7 +505,7 @@ def pysum(X):
 
 \item Rewrite the same function in Cython using a typed for-loop, and a typed memoryview of \li{X}. Call this function \li{cysum()}. Assume the input array \li{X} is an array of double precision floating point numbers.
 
-\item Compare the \li{pysum()} function, the \li{cysum()}, the Python builtin \li{<<sum()>>} function, and the \li{<<np.sum()>>} function. Print the results to the terminal.
+\item Compare the \li{pysum()} function, the \li{cysum()}, the Python builtin \li{<<sum()>>} function, and the \li{<<np.sum()>>} function. Print the timing for each function to the terminal.
 \end{enumerate}
 \end{problem}
 
@@ -518,7 +517,7 @@ def LU(A):
     n = A.shape[0]
     U = np.array(np.copy(A), dtype=float)
     L = np.eye(n)
-    
+
     for i in xrange(1,n):
         for j in xrange(i):
             L[i,j] = U[i,j]/U[j,j]
@@ -554,11 +553,11 @@ In the code above, for example, say that our array \li{A} was full of integers. 
 Once all the datatypes have been inferred and assigned, the code is translated to machine code by the LLVM library. Numba will then cache this compiled version of our code. This means that we can bypass this whole inference and compilation process the next time we run our function.
 
 \subsubsection*{More Control Within Numba}
-Though the inference engine within Numba does a good job, it's not always perfect. If you would like to have more control, you may specify datatypes explicity as demonstrated in the code below. 
+Though the inference engine within Numba does a good job, it's not always perfect. If you would like to have more control, you may specify datatypes explicity as demonstrated in the code below.
 
 Also, if you add the keyword argument, \li{nopython=True} to the \li{jit} decorator, an error will be raised if Numba was unable to convert everything to explicit datatypes.
 
-In this example, we will assume that the input will be doubles. Note that is necessary to import the desired datatype from the Numba module. 
+In this example, we will assume that the input will be doubles. Note that is necessary to import the desired datatype from the Numba module.
 
 \begin{lstlisting}
 from numba import double
@@ -578,14 +577,14 @@ If your function is running slower than you would expect, you can find out what 
 >>> numba_sum.inspect_types()
 \end{lstlisting}
 
-If you are trying to achieve the fastest runtimes possible, it will be worth trying both Numba and Cython. Since Numba relies on an LLVM compiler and Cython relies on a C compiler, it is possible that these two techniques will produce different results. 
+If you are trying to achieve the fastest runtimes possible, it will be worth trying both Numba and Cython. Since Numba relies on an LLVM compiler and Cython relies on a C compiler, it is possible that these two techniques will produce different results.
 
 \begin{problem}
 The code below defines a Python function which takes a matrix to the $n$th power.
 \begin{lstlisting}
 def pymatpow(X, power):
     """ Return X^{power}.
-    
+
     Inputs:
         X (array) - A square 2-D NumPy array
         power (int) - The power to which we are taking the matrix X.
@@ -643,11 +642,11 @@ The correct choice of algorithm is more important than a fast implementation.
 For example, suppose you wish to solve the following tridiagonal system.
 \[\begin{bmatrix}
 b_1 & c_1 & 0 & 0 & \cdots & \cdots & 0 \\
-a_1 & b_2 & c_2 & 0 & \cdots & \cdots & 0 \\
-0 & a_2 & b_3 & c_3 & \cdots & \cdots & 0 \\
+a_2 & b_2 & c_2 & 0 & \cdots & \cdots & 0 \\
+0 & a_3 & b_3 & c_3 & \cdots & \cdots & 0 \\
 \vdots & \vdots & \vdots & \vdots & \ddots & \ddots & \vdots \\
 \vdots & \vdots & \vdots & \vdots & \ddots & \ddots & c_{n-1} \\
-0 & 0 & 0 & 0 & \cdots & a_{n-1} & b_n
+0 & 0 & 0 & 0 & \cdots & a_n & b_n
 \end{bmatrix}
 \begin{bmatrix}
 x_1\\
@@ -670,28 +669,27 @@ One way to do this is with the general \li{solve} method in SciPy's \li{linalg} 
 Alternatively, you could use an algorithm optimized for tridiagonal matrices.
 The code below implements one such algorithm in Python. This is called the Thomas algorithm.
 
-\begin{comment}
 \begin{lstlisting}
 def pytridiag(a,b,c,d):
     """Solve the tridiagonal system Ax = d where A has diagonals a, b, and c.
-    
+
     Inputs:
         a, b, c, d (array) - All 1-D NumPy arrays of equal length.
     Returns:
         x (array) - solution to the tridiagonal system.
     """
     n = len(a)
-    
+
     # Make copies so the original arrays remain unchanged
     aa = np.copy(a)
     bb = np.copy(b)
     cc = np.copy(c)
     dd = np.copy(d)
-    
+
     # Forward sweep
     for i in xrange(1, n):
         temp = aa[i]/bb[i-1]
-        bb[i] = bb[i] - temp*cc[i-1] 
+        bb[i] = bb[i] - temp*cc[i-1]
         dd[i] = dd[i] - temp*dd[i-1]
 
     # Back substitution
@@ -702,33 +700,6 @@ def pytridiag(a,b,c,d):
 
     return x
 \end{lstlisting}
-\end{comment}
-
-The final result is stored in \li{x}, and \li{c} is used to store temporary values.
-\begin{lstlisting}
-def pytridiag(a, b, c, x):
-    '''Solve the tridiagonal system Ad = x where A has diagonals a, b, and c.
-    
-    INPUTS:
-    a, b, c, x - All 1-D NumPy arrays.
-    
-    NOTE:
-    The final result is stored in `x` and `c` is used to store temporary values.
-    '''
-    n = x.size
-    temp = 0.
-    c[0] /= b[0]
-    x[0] /= b[0]
-    for i in xrange(n-2):
-        temp = 1. / (b[i+1] - a[i] * c[i])
-        c[i+1] *= temp
-        x[i+1] = (x[i+1] - a[i] * x[i]) * temp
-    x[n-1] = (x[n-1] - a[n-2] * x[n-2]) / (b[n-1] - a[n-2] * c[n-2])
-    for i in xrange(n-2, -1, -1):
-        x[i] = x[i] - c[i] * x[i+1]
-\end{lstlisting}
-
-
 
 \begin{problem} \label{prob:tridiag}
 \leavevmode
@@ -740,23 +711,23 @@ When testing the SciPy algorithm, start with $1000 \times 1000$ systems. You may
 \begin{lstlisting}
 def init_tridiag(n):
     """Initializes a random nxn tridiagonal matrix A.
-    
+
     Inputs:
         n (int) : size of array
-    
+
     Returns:
         a (1-D array) : (-1)-th diagonal of A
         b (1-D array) : main diagonal of A
         c (1-D array) : (1)-th diagonal of A
-        A (2-D array) : nxn tridiagonal matrix defined by a,b,c. 
+        A (2-D array) : nxn tridiagonal matrix defined by a,b,c.
     """
     a = np.random.random_integers(-9,9,n).astype("float")
     b = np.random.random_integers(-9,9,n).astype("float")
     c = np.random.random_integers(-9,9,n).astype("float")
-    
+
     A = np.zeros((b.size,b.size))
     np.fill_diagonal(A,b)
-    np.fill_diagonal(A[1:,:-1],a)
+    np.fill_diagonal(A[1:,:-1],a[1:])
     np.fill_diagonal(A[:-1,1:],c)
     return a,b,c,A
 \end{lstlisting}
@@ -767,7 +738,7 @@ Note that an efficient tridiagonal matrix solver is implemented by \li{scipy.spa
 
 \section*{When to Stop Optimizing}
 You don't need to apply every possible optimization to your code.
-When your code runs acceptably fast, stop optimizing. There is no need spending valuable time making optimizations once the speed is sufficient. 
+When your code runs acceptably fast, stop optimizing. There is no need spending valuable time making optimizations once the speed is sufficient.
 
 Moreover, remember not to prematurely optimize your functions. Make sure the function does exactly what you want it to before worrying about any kind of optimization.
 
@@ -795,9 +766,9 @@ Moreover, remember not to prematurely optimize your functions. Make sure the fun
 
 
 
-      
+
 \section*{More on Cython (Optional)}
-This section has a more complete introduction to Cython. 
+This section has a more complete introduction to Cython.
 For another reference, see \url{http://docs.cython.org/src/tutorial/cython_tutorial.html}.
 
 \subsection*{More on Type Declarations}
@@ -886,7 +857,7 @@ def pyrowdot(A):
     return B
 \end{lstlisting}
 
-Here is the Cython solution. 
+Here is the Cython solution.
 We changed the function \li{cydot()} to a C function since it will only be called by \li{cyrowdot()}.
 Also, the Cython solution uses a typed memoryview of its input.
 
@@ -928,15 +899,3 @@ The arrays used for testing were $n\times 3$ where $n$ is shown along the horizo
 \end{figure}
 
 In both of these examples, NumPy's implementation was faster than the version we wrote in Cython.
-
-
-
-
-
-
-
-
-
-
-
-
