@@ -9,6 +9,7 @@ import math
 import scipy.misc
 from scipy import linalg as la
 import scipy.io as io
+from solutions import l1Min
 
 def l2Min(A,b):
     """
@@ -29,36 +30,6 @@ def l2Min(A,b):
     b = matrix(b)
     sol = solvers.qp(P,q, A=A, b=b)
     return np.array(sol['x']).flatten()
-
-def l1Min(A,b):
-    """
-    Solve min ||x||_1 s.t. Ax = b using CVXOPT.
-    Inputs:
-        A -- numpy array of shape m x n
-        b -- numpy array of shape m
-    Returns:
-        x -- numpy array of shape n
-    """
-    m, n = A.shape
-    A1 = np.zeros((m,2*n))
-    A1[:,n:] = A
-    c = np.zeros(2*n)
-    c[:n] = 1
-    h = np.zeros(2*n)
-    G = np.zeros((2*n,2*n))
-    G[:n,:n] = -np.eye(n)
-    G[:n,n:] = np.eye(n)
-    G[n:,:n] = -np.eye(n)
-    G[n:,n:] = -np.eye(n)
-
-    c = matrix(c)
-    G = matrix(G)
-    h = matrix(h)
-    A = matrix(A1)
-    b = matrix(b)
-
-    sol = solvers.lp(c, G, h, A, b)
-    return np.array(sol['x'])[n:].flatten()
 
 def sparse():
     # build sparse and nonsparse arrays, plot
@@ -126,6 +97,41 @@ def reconstruct():
 
     plt.savefig('reconstruct.pdf')
     plt.clf()
+
+
+def prob2_err(filename='ACME.png'):
+    """Reconstruct the image in the indicated file using 100, 200, 250,
+    and 275 measurements. Seed NumPy's random number generator with
+    np.random.seed(1337) before each measurement to obtain consistent
+    results.
+
+    Plot the Euclidean distance between each reconstruction and the
+    original image. (This isn't currently in the lab, but could be
+    an instructive thing to do).
+
+    This function takes several minutes to run to completion.
+    """
+    plt.clf()
+    image = 1 - plt.imread(filename)[:,:,0]
+    measurements, err = range(100,280,5), []
+    
+    for m in measurements:
+        print "m =", m
+        # Get 'm' random measurements.
+        np.random.seed(1337)
+        A = np.random.randint(0,2,(m,image.shape[0]*image.shape[1]))
+        b = A.dot(image.flatten())
+
+        # Reconstruct the image and calculate the 2-norm error.
+        reconstruction = l1min(A,b).reshape(image.shape)
+        err.append(np.linalg.norm(image - reconstruction))
+    
+    plt.plot(measurements, err, '.-', linewidth=2)
+    plt.xlabel("Measurements"); plt.ylabel("$\|\ \|_{l_2}$ Error")
+    plt.title("Error on Reconstructions of {}".format(filename))
+    plt.savefig("prob2_error.pdf")
+    plt.clf()
+
     
 if __name__ == "__main__":
     sparse()

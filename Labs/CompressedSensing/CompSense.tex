@@ -190,47 +190,42 @@ b.
 Of course, solving this gives values for the optimal $u$ and the optimal $x$, but we only care about the optimal $x$.
 
 \begin{problem}
-Write a function \li{l1Min} that takes a matrix $A$ and vector $b$ as inputs, and returns the solution to the 
-optimization problem 
+Write a function called \li{l1Min()} that takes a matrix $A$ and vector $b$ as inputs, and returns the solution to the optimization problem 
 \begin{align*}
 \text{minimize}\qquad &\|x\|_1\\
 \text{subject to} \qquad &Ax = b.
 \end{align*}
 Formulate the problem as the above linear program and use CVXOPT to obtain the solution.
 
-Hint: recall that CVXOPT requires the entries of the matrices to be floats.
+Hint: CVXOPT requires the entries of the matrices to be floats.
 \end{problem}
 
-Let's reconstruct a sparse image using different numbers of measurements, and compare results.
-Load the image contained in the file \li{ACME.png} into Python as follows:
+We will use our $l_1$ minimizer to reconstruct a sparse image using compressed sensing.
+Load the image contained in the file \texttt{ACME.png} into Python as follows:
 \begin{lstlisting}
 >>> import numpy as np
 >>> from matplotlib import pyplot as plt
 >>> acme = 1 - plt.imread('ACME.png')[:,:,0]
->>> acme.shape
+>>> print(acme.shape)
 (32L, 32L)
 \end{lstlisting}
-The image contains $32^2$ pixels, and so viewed as a flat vector, it has $32^2$ entries.
-Now build a random measurement matrix based on $m$ samples as follows:
+The image contains $32^2$ pixels, so viewed as a flat vector, it has $32^2$ entries.
+Now we build a random sampling matrix to get $m$ measurements, take those measurements, and reconstruct the image.
 \begin{lstlisting}
->>> # assume the variable m has been initialized
->>> np.random.seed(1337)
->>> A = np.random.randint(0,high=2,size=(m,32**2))
-\end{lstlisting}
-Next, calculate the $m$ measurements:
-\begin{lstlisting}
+>>> m = 100                     # The number of measurements.
+>>> np.random.seed(1337)        # Seed the random generator for consistency.
+
+>>> A = np.random.randint(low=0, high=2, size=(m, 32**2))
 >>> b = A.dot(acme.flatten())
-\end{lstlisting}
-We are now ready to reconstruct the image using our function \li{l1Min}:
-\begin{lstlisting}
->>> rec_acme = l1Min(A,b)
+>>> reconstruction = l1Min(A,b)
 \end{lstlisting}
 
 \begin{problem}
-Following the example above, reconstruct the ACME image using 200, 250, and 270 measurements.
-Be sure to execute the code \li{np.random.seed(1337)} prior to each time you initialize
-your measurement matrix, so that you will obtain consistent answers. Report the $2$-norm
-distance between the each reconstructed image and the original ACME image. 
+Following the example above, reconstruct the image using 100, 200, 250, and 275 measurements.
+Seed NumPy's random number generator with \li{np.random.seed(1337)} before each measurement to obtain consistent results.
+
+Resize and plot each reconstruction in a single figure with several subplots (use \li{plt.imshow()} instead of \li{plt.plot()}).
+Return a list containing the Euclidean distance between each reconstruction and the original image.
 \end{problem}
 
 Figure \ref{fig:reconstruct} shows the results of reconstructing a similar sparse image using both the $1$-norm and 
@@ -244,21 +239,21 @@ imperfect reconstruction using $l_2$ minimization (right).}
 \label{fig:reconstruct}
 \end{figure}
 \section*{Tesselated Surfaces and the Single Pixel Camera}
-We now generalize our discussion to reconstructing functions defined on surfaces. Such a function might
-give a color at each point on the surface, or the temperature, or some other property. The surface may be 
-a sphere (to model the surface of the earth), a cube, or some other desired form. To make the problem 
-tractable, we must break the surface up into a set of discrete polygonal faces, called a tessellation. See
-Figure \ref{Fig:Earth} for an example of a tessellated sphere.
+We now generalize our discussion to reconstructing functions defined on surfaces.
+Such a function might give a color at each point on the surface, or the temperature, or some other property.
+The surface may be a sphere (to model the surface of the earth), a cube, or some other desired form.
+To make the problem tractable, we must break the surface up into a set of discrete polygonal faces, called a tessellation.
+See Figure \ref{Fig:Earth} for an example of a tessellated sphere.
 
-Now that we have a tessellation, our function can be represented by a vector, consisting of the function value 
-for each facet (element of the tessellation). We are thus in a position to apply the techniques of compressed
-sensing to recover the function. 
+Now that we have a tessellation, our function can be represented by a vector, consisting of the function value for each facet (element of the tessellation).
+We are thus in a position to apply the techniques of compressed sensing to recover the function. 
 
-How do we go about acquiring color measurements on a tessellated surface? One cheap method is to use a \emph{single-pixel
-camera}. Such a camera can only measure color value at a time. The camera points to a specific spot on the surface, and
-records a weighted average of the colors near that spot. By taking measurements at random spots across the surface,
-the single-pixel camera provides us with a vector of measurements, which we can then use to reconstruct the color value for
-each facet of the tessellation. See Figure \ref{Fig:Earth} for the results of a single-pixel camera taking measurements of the earth.
+How do we go about acquiring color measurements on a tessellated surface?
+One cheap method is to use a \emph{single-pixel camera}.
+Such a camera can only measure a single color value at a time.
+The camera points to a specific spot on the surface, and records a weighted average of the colors near that spot.
+By taking measurements at random spots across the surface, the single-pixel camera provides us with a vector of measurements, which we can then use to reconstruct the color value for each facet of the tessellation.
+See Figure \ref{Fig:Earth} for the results of a single-pixel camera taking measurements of the earth.
 
 \begin{figure}
 \begin{center}
@@ -274,42 +269,45 @@ $\begin{array}{cc}
 \label{Fig:Earth}
 \end{figure}
 
-The single-pixel camera measurement process can be modeled as matrix multiplication
-by a measurement matrix $A$, which fortunately has the Restricted Isometry Property. In the following,
-we provide you with code to take single pixel measurements. It works as follows 
-\begin{lstlisting}
->>> from camera import Camera
->>> myCamera = Camera(faces,vertices,colors)
-\end{lstlisting}
-Where faces, verticies and colors are given by the tesselation. To take a picture you use 
-\begin{lstlisting}
-myCamera.add_pic(theta,phi,r)
-\end{lstlisting}
-Where theta, phi, and r are the spherical coordinates of the camera. Recall to change spherical coordinates to rectangular the formula is   
-\[
-(r\sin(\phi)\cos(\theta),r\sin(\phi)\sin(\theta),r\cos(\phi))
-\]
-Where $\theta \in [0,2\pi),\phi \in [0,\pi), r \in [0,\infty)$
+The single-pixel camera measurement process can be modeled as matrix multiplication by a measurement matrix $A$, which fortunately has the Restricted Isometry Property.
+% In the following, we provide you with code to take single pixel measurements.
+% It works as follows:
+% \begin{lstlisting}
+% >>> from camera import Camera
+% >>> myCamera = Camera(faces, vertices, colors)
+% \end{lstlisting}
+% Where \li{faces}, \li{verticies} and \li{colors} are given by the tesselation. To take a picture, use the function
+% \begin{lstlisting}
+% myCamera.add_pic(theta, phi, r)
+% \end{lstlisting}
+% Where \li{theta}, \li{phi}, and \li{r} are the spherical coordinates of the camera.
+% Recall to change spherical coordinates to rectangular the formula is
+% \[
+% (r\sin(\phi)\cos(\theta),r\sin(\phi)\sin(\theta),r\cos(\phi))
+% \]
+% Where $\theta \in [0,2\pi),\phi \in [0,\pi), r \in [0,\infty)$
 
-Calling \li{add_pic()} many times at different places on a sphere (constant $r$ value, varying $\theta$ and $\phi$) will build the measurement matrix as well as the measurements. You can return these by
-\begin{lstlisting}
-A,b = myCamera.returnData()
-\end{lstlisting}
+% Calling \li{add_pic()} many times at different places on a sphere (constant $r$ value, varying $\theta$ and $\phi$) will build the measurement matrix as well as the measurements.
+% You can return these with
+% \begin{lstlisting}
+% A,b = myCamera.returnData()
+% \end{lstlisting}
 
-In this applications signals are only sparse in some appropriate representation (such as Fourier or wavelet). This method generally can still be applied in such cases. Let $V$ represent the transformation under which $s$ is sparse, or in other words:
-\begin{equation}
-s = V p
-\end{equation}
-$V$ is the inverse Fourier. We can then recast $A s=b$ as
-\begin{equation}
-A V p = b
-\end{equation}
-This then allows us to find $p$ using Compressed Sensing, which in turn allows us to reconstruct $s$ by using $V$. In the the following problem $V$ will be given to you.
+% In this applications signals are only sparse in some appropriate representation (such as Fourier or wavelet).
+% This method generally can still be applied in such cases.
+% Let $V$ represent the transformation under which $s$ is sparse, or in other words:
+% \[s = V p
+% \]
+% $V$ is the inverse Fourier. We can then recast $A s=b$ as
+% \begin{equation}
+% A V p = b
+% \end{equation}
+% This then allows us to find $p$ using Compressed Sensing, which in turn allows us to reconstruct $s$ by using $V$.
+% % In the the following problem $V$ will be given to you.
 
-You must reconstruct the color functions
-for the tesselated surfaces, and then plot these surfaces using the code we provide you.
+% You must reconstruct the color functions for the tesselated surfaces, and then plot these surfaces using the code we provide you.
 
-% Rubik's Cube problem (TODO: was this ever fully fleshed out?)
+% Rubik's Cube problem (TODO: flesh this out and put it back in).
 \begin{comment}
 \begin{problem}
 We will perform compressed sensing on a Rubik's cube.
@@ -318,7 +316,7 @@ Each color can be represented as a vector of length 3, where we have split the c
 The set of colors for the entire Rubik's cube is fairly sparse in each color channel, so we can reconstruct the color values in each color channel separately.
 
 % TODO: Does StudentRubiksData.npz exist?
-In the file \li{StudentRubiksData.npz}, we have given you the measurement matrices for each color channel (accessed by the keys \li{'A1', 'A2', 'A3'}) along with the respective measurements in each color channel (accessed by the keys \li{'b1', 'b2', 'b3'}).
+In the file \texttt{StudentRubiksData.npz}, we have given you the measurement matrices for each color channel (accessed by the keys \li{'A1', 'A2', 'A3'}) along with the respective measurements in each color channel (accessed by the keys \li{'b1', 'b2', 'b3'}).
 Reconstruct the colors in each color channel, obtaining three arrays.
 Then stack these arrays row-wise into an array with three rows. Report this final array.
 
@@ -334,25 +332,32 @@ You should see a plot showing the Rubik's cube.
 \end{problem}
 \end{comment}
 
-\begin{problem}
-We will reconstruct the surface of the earth from sparse satellite imagery. The earth is modeled by a sphere,
-which can be tessellated into triangular faces, each having a color value. There are three color 
-channels, and the colors are sparse in each channel in the appropriate basis. 
+% TODO: What is the matrix V for? It seems that you don't need it if you have StudentEarthData.npz.
+\begin{problem} % Problem 3: Single-Pixel camera (Earth)
+We will reconstruct the surface of the earth from sparse satellite imagery. The earth is modeled by a sphere, which can be tessellated into triangular faces, each having a single color value.
+The colors are sparse in each channel in the appropriate basis. 
 
-In the file \li{StudentEarthData.npz}, we have given you the faces, vertices, colors, and the inverse fourier matrix, (accessed by the key \li{'faces'}, \li{'vertices'}, \li{'C'}, and \li{'V'} respectively), Take pictures with the single pixel camera code (using $r=3$) and then reconstruct the colors in each color channel, obtaining
-three arrays. Then stack these arrays column-wise into an array with three columns. Report this final array.
+The file \texttt{StudentEarthData.npz} contains the faces, vertices, and colors, %and the inverse fourier matrix,
+accessed by the keys \li{'faces'}, \li{'vertices'}, and \li{'C'}, % and \li{'V'},
+respectively.
+%Take pictures with the single pixel camera code (using $r=3$) and then
+There are three channels in the color array, stored as columns.
+Do compressed sensing on each channel of colors, obtaining three arrays.
+Then stack these arrays column-wise so the result matches the dimensions of the original array.
 
-To visualize your result, we have provided code in the file \li{visualize2.py} that you can call.
-Execute the following (assuming that the variable holding the array
-you obtained above containing the reconstructed colors is named \li{s}):
+The file \texttt{visualize2.py} contains code to visualize your results.
 \begin{lstlisting}
 >>> from visualize2 import visualizeEarth
->>> visualizeEarth(faces, vertices, s.clip(0,1))
+>>> results = # Do the compressed sensing and store the results.
+>>> visualizeEarth(faces, vertices, results.clip(0,1))
 \end{lstlisting}
-You should see a plot showing the reconstructed earth. We could have reconstructed a more detailed earth by choosing a finer tessellation, but you should be able to make out the shapes of the major continents. You can compare this to the original by running
+
+We could have reconstructed a more detailed earth by choosing a finer tessellation, but you should be able to make out the shapes of the major continents.
+Compare your results to the original:
 \begin{lstlisting}
 >>> visualizeEarth(faces, vertices, colors)
 \end{lstlisting}
 
-Try the reconstruction with 450, 550, 650 measurements and report the absolute difference between the reconstruction and the actual colors.
+Do the reconstruction with 450, 650, and 850 measurements.
+Return a list containing the Euclidean distance between each reconstruction and the array of actual colors.
 \end{problem}
