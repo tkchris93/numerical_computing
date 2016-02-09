@@ -61,7 +61,7 @@ def prob2(filename='ACME.png'):
 
     Resize and plot each reconstruction in a single figure with several
     subplots (use plt.imshow() instead of plt.plot()). Return a list
-    containing the 2-norm distance between each reconstruction and the
+    containing the Euclidean distance between each reconstruction and the
     original image.
     """
     image = 1 - plt.imread(filename)[:,:,0]
@@ -70,15 +70,15 @@ def prob2(filename='ACME.png'):
     for m in measurements:
         # Get 'm' random measurements.
         np.random.seed(1337)
-        A = np.random.randint(0,2,(m,image.shape[0]*image.shape[1]))
+        A = np.random.randint(0, 2, (m, image.shape[0]*image.shape[1]))
         b = A.dot(image.flatten())
 
         # Reconstruct the image and calculate the 2-norm error.
-        reconstruction = l1Min(A,b).reshape(image.shape)
+        reconstruction = l1Min(A, b).reshape(image.shape)
         err.append(np.linalg.norm(image - reconstruction))
 
         # Plot the image.
-        plt.subplot(2,2,measurements.index(m)+1)
+        plt.subplot(2, 2, measurements.index(m)+1)
         plt.imshow(reconstruction)
         plt.title("{} measurements".format(m))
 
@@ -88,12 +88,12 @@ def prob2(filename='ACME.png'):
     
     return err
 
-
-def prob3(filename="StudentEarthData.npz"):
-    """Reconstruct single-pixel camera data using Compressed Sensing on the
-    data found in StudentEarthData.npz using 450, 650, and 850 measurements.
-    Seed NumPy's random number generator with np.random.seed(1337) before each
-    measurement to obtain consistent results.
+# Problem 3
+def prob3(filename="StudentEarthData.npz", show=False):
+    """Reconstruct single-pixel camera color data in StudentEarthData.npz
+    using 450, 650, and 850 measurements. Seed NumPy's random number generator
+    with np.random.seed(1337) before each measurement to obtain consistent
+    results.
 
     Return a list containing the Euclidean distance between each
     reconstruction and the color array.
@@ -102,27 +102,34 @@ def prob3(filename="StudentEarthData.npz"):
     # Load the data.
     data = np.load(filename)
     faces, vertices, colors = data['faces'], data['vertices'], data['C']
-    # V = data['V'] # TODO: What do we use V for?
-    # visualizeEarth(faces, vertices, colors) # True image.
+    # V = data['V'] # TODO: What is V for?
     measurements, err = [450, 650, 850], []
 
     for m in measurements:
         # Get 'm' random measurements.
         np.random.seed(1337)
         results = []
+    
         # Do compressed sensing on each color channel.
         for channel in colors.T:
             A = np.random.randint(0,2,(m,len(channel)))
             b = A.dot(channel)
             reconstruction = l1Min(A, b)
             results.append(reconstruction) # V.dot(reconstruction) ?
+    
         # Reconstruct the results, calculate the error, and show the globe.
         results = np.column_stack(results)
-        err.append(np.linalg.norm(colors - results))
-        visualizeEarth(faces, vertices, results.clip(0,1))
+        err.append(np.linalg.norm(colors - results, ord=np.inf))
+        if show is True:
+            visualizeEarth(faces, vertices, results.clip(0,1))
+
+    if show is True:
+        # True image.
+        visualizeEarth(faces, vertices, colors)
 
     return err
 
 if __name__ == '__main__':
-    prob2_err()
+    pass
+    # prob2_err()
     # print prob3()
