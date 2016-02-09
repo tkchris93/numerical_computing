@@ -1,12 +1,14 @@
 # solutions.py
 """Volume II: Compressed Sensing. Solutions file."""
 
+
 import numpy as np
 from cvxopt import matrix, solvers
 from matplotlib import pyplot as plt
 from visualize2 import visualizeEarth
-from camera import Camera
 
+
+# Problem 1
 def l1Min(A, b):
     """Calculate the solution to the optimization problem
 
@@ -53,6 +55,8 @@ def l1Min(A, b):
     # Flatten out the array and only get the x value.
     return np.array(sol['x']).ravel()[n:]
 
+
+# Problem 2
 def prob2(filename='ACME.png'):
     """Reconstruct the image in the indicated file using 100, 200, 250,
     and 275 measurements. Seed NumPy's random number generator with
