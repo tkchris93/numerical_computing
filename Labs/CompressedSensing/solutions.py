@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 from visualize2 import visualizeEarth
 from camera import Camera
 
-def l1min(A, b):
+def l1Min(A, b):
     """Calculate the solution to the optimization problem
 
         minimize    ||x||_1
@@ -54,17 +54,18 @@ def l1min(A, b):
     return np.array(sol['x']).ravel()[n:]
 
 def prob2(filename='ACME.png'):
-    """Reconstruct the image in the indicated file using 100, 200, 250, and 270
-    measurements. Seed the pseudorandom number generator before each
-    measurement to obtain consistent results.
+    """Reconstruct the image in the indicated file using 100, 200, 250,
+    and 275 measurements. Seed NumPy's random number generator with
+    np.random.seed(1337) before each measurement to obtain consistent
+    results.
 
-    Produce a plot with 4 subplots, one for each reconstruction.
-
-    Report the 2-norm distance between each reconstructed image and the
+    Resize and plot each reconstruction in a single figure with several
+    subplots (use plt.imshow() instead of plt.plot()). Return a list
+    containing the 2-norm distance between each reconstruction and the
     original image.
     """
     image = 1 - plt.imread(filename)[:,:,0]
-    measurements, err2 = [100, 200, 250, 270], []
+    measurements, err = [100, 200, 250, 275], []
     
     for m in measurements:
         # Get 'm' random measurements.
@@ -73,53 +74,55 @@ def prob2(filename='ACME.png'):
         b = A.dot(image.flatten())
 
         # Reconstruct the image and calculate the 2-norm error.
-        reconstruction = l1min(A,b).reshape(image.shape)
+        reconstruction = l1Min(A,b).reshape(image.shape)
         err.append(np.linalg.norm(image - reconstruction))
 
         # Plot the image.
         plt.subplot(2,2,measurements.index(m)+1)
         plt.imshow(reconstruction)
         plt.title("{} measurements".format(m))
-    
+
     # Show the subplots and return the error list.
     plt.suptitle("Reconstruction of {}".format(filename))
     plt.show()
     
     return err
 
-from sys import stdout
 
-def prob3():
+def prob3(filename="StudentEarthData.npz"):
+    """Reconstruct single-pixel camera data using Compressed Sensing on the
+    data found in StudentEarthData.npz using 450, 650, and 850 measurements.
+    Seed NumPy's random number generator with np.random.seed(1337) before each
+    measurement to obtain consistent results.
+
+    Return a list containing the Euclidean distance between each
+    reconstruction and the color array.
     """
-            UNDER CONSTRUCTION
 
-            Does anyone know where the solutions file is?
-    """
-    raise NotImplementedError("This function is incomplete")
-
-    data = np.load("StudentEarthData.npz")
+    # Load the data.
+    data = np.load(filename)
     faces, vertices, colors = data['faces'], data['vertices'], data['C']
-    V = data['V']
-    visualizeEarth(faces, vertices, colors)
+    # V = data['V'] # TODO: What do we use V for?
+    # visualizeEarth(faces, vertices, colors) # True image.
+    measurements, err = [450, 650, 850], []
 
-    MyCamera = Camera(faces, vertices, colors)
-    theta = np.linspace(0, 2*np.pi, 30)
-    phi = np.linspace(0, np.pi, 30)
-    for t in theta:
-        print '\rtheta = {}'.format(t),; stdout.flush()
-        for p in phi:
-            MyCamera.add_pic(t,p,3)
-    A,b = MyCamera.returnData()
-
-    return A,b
-
-    reconstruction = l1min(A,b)
-
-    print A, '\n', b
-
-    '''
-    measurements = [450, 550, 650]
     for m in measurements:
+        # Get 'm' random measurements.
         np.random.seed(1337)
-        # A = np.random.randint(0,2,(m, ))
-    '''
+        results = []
+        # Do compressed sensing on each color channel.
+        for channel in colors.T:
+            A = np.random.randint(0,2,(m,len(channel)))
+            b = A.dot(channel)
+            reconstruction = l1Min(A, b)
+            results.append(reconstruction) # V.dot(reconstruction) ?
+        # Reconstruct the results, calculate the error, and show the globe.
+        results = np.column_stack(results)
+        err.append(np.linalg.norm(colors - results))
+        visualizeEarth(faces, vertices, results.clip(0,1))
+
+    return err
+
+if __name__ == '__main__':
+    prob2_err()
+    # print prob3()
