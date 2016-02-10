@@ -33,19 +33,15 @@ class SimplexSolver(object):
         Raises:
             ValueError: if the given system is infeasible at the origin.
         """
+
         # Check for feasibility at the origin.
-        if min(b) < 0:
+        if np.min(b) < 0:
             raise ValueError("Infeasible at the origin")
 
-        # Store system vectors, matrices, and dimensions.
-        self.c = c
-        self.A = A
-        self.b = b
-
         # Generate the initial Tableau.
-        self.tableau = self._generateTableau()
+        self.tableau = self._generateTableau(c, A, b)
 
-    def _generateTableau(self):
+    def _generateTableau(self, c, A, b):
         """Generate the initial tableau.
 
         [0,0] is the value of the objective function
@@ -56,29 +52,16 @@ class SimplexSolver(object):
         The non-negative constraints for all variables is assumed.
 
         The remaining entries in the matrix are the constraint equations.
-
-        Set self.tab for the tableau data structure
-        Set self.vars for the variable list (their indices)
-        Set self.nbasic for the number of basic variables
-        """
-        # Keep track of the list of variables and the number of basic variables
-        m, n = self.A.shape
-        self.vars = list(np.hstack(
-                            ([i+2 for i in xrange(m)],[i for i in xrange(n)])))
+        """        
+        # Initialize a tableau of zeros.
+        m, n = A.shape
+        tableau = np.zeros((1+m, 1+m+n))
         
-        # Construct the tableau.
-        c_bar = np.hstack((-self.c, np.zeros(m)))
-        A_bar = np.hstack((self.A, np.eye(m)))
-        
-        # Initialize self.tab with zeros, except the top right corner
-        tableau = np.zeros((1+m,1+m+n))
-        tableau[0,-1] = 1
-        # Slice each piece.
-        tableau[0,1:] = c_bar
-        tableau[1:,0] = self.b
-        tableau[1:,1:] = A_bar
+        # Slice in each piece.
+        tableau[0,1:] = np.hstack((-c, np.zeros(m)))
+        tableau[1:,0] = b
+        tableau[1:,1:] = np.hstack((A, np.eye(m)))
 
-        # print "Initial Tableau:\n{}".format(tableau)
         return tableau
 
     # Problem 4a
@@ -87,7 +70,7 @@ class SimplexSolver(object):
         This is the first negative coefficient of the objective function.
         """
         if np.all(self.tableau[0,1:] >= 0):             # Done pivoting.
-            return 0
+            return "Done"
         return np.argmax(self.tableau[0,1:] < 0) + 1    # First negative.
 
     # Problem 4b
@@ -117,7 +100,7 @@ class SimplexSolver(object):
         elementary vector.
         """
         col = self._pivot_col()
-        if col == 0:                                # Done pivoting
+        if col == "Done":                                # Done pivoting
             return "DONE"
         row = self._pivot_row(col)
 
@@ -126,11 +109,6 @@ class SimplexSolver(object):
         for i in xrange(self.tableau.shape[0]):
             if i != row:
                 self.tableau[i] -= self.tableau[i,col]*self.tableau[row]
-
-        # Swap leaving and entering variables.
-        enter = self.vars.index(col - 1)
-        leave = self.vars.index(row - 1)
-        self.vars[enter], self.vars[leave] = self.vars[leave], self.vars[enter]
 
     def solve(self):
         """Solve the linear optimization problem.
@@ -144,14 +122,16 @@ class SimplexSolver(object):
         progress = self._pivot_col()
         while progress != "DONE":
             progress = self.pivot()
-
-        # Construct final results.
+        
+        # Read the tableau to construct the final results.
         basic, nonbasic = {}, {}
-        for i in xrange(len(self.vars)):
-            if i < self.A.shape[0]:
-                basic[self.vars[i]] = self.tableau[i+1, 0]
+        for i in xrange(self.tableau.shape[1]-1):
+            if self.tableau[0,i+1] == 0:
+                index = self.tableau[1:,i+1].argmax()
+                basic[i] = self.tableau[index+1, 0]
             else:
-                nonbasic[self.vars[i]] = 0
+                nonbasic[i] = 0
+
         return self.tableau[0,0], basic, nonbasic
 
 # Problem 7
@@ -174,8 +154,6 @@ def prob7(filename='productMix.npz'):
     s = SimplexSolver(c, A, b)
     primal_objective, basic, nonbasic = s.solve()
 
-    print primal_objective
-
     # Construct the final results.
     coordinates = []
     for i in xrange(len(c)):
@@ -184,8 +162,5 @@ def prob7(filename='productMix.npz'):
         else:
             coordinates.append(0)
     return np.array(coordinates)
-
-if __name__ == '__main__':
-    print prob7()
 
 # END OF SOLUTIONS ============================================================
