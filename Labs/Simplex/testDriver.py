@@ -4,8 +4,7 @@
 import signal
 import numpy as np
 from functools import wraps
-import simplex_solutions; reload(simplex_solutions)
-from simplex_solutions import SimplexSolver, prob7
+from solutions import SimplexSolver, prob7
 
 # Wrapper =====================================================================
 class TimeoutError(Exception):
