@@ -64,8 +64,8 @@ class Camera(object):
     def add_pic(self, theta, psi, r=3):
         M, b = self._SPC(theta, psi, r)
         if self.b is None:
-            self.b = np.array([b])
-            self.M = np.array([M])
+            self.b = np.array([b], dtype=np.float)
+            self.M = np.array([M], dtype=np.float)
         else:
             self.b = np.concatenate((self.b, np.array([b])), axis=0)
             self.M = np.concatenate((self.M, np.array([M])), axis=0)
