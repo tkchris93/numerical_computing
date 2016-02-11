@@ -6,6 +6,7 @@ import numpy as np
 from cvxopt import matrix, solvers
 from matplotlib import pyplot as plt
 from visualize2 import visualizeEarth
+from camera import Camera
 
 
 # Problem 1
@@ -93,7 +94,7 @@ def prob2(filename='ACME.png'):
     return err
 
 # Problem 3
-def prob3(filename="StudentEarthData.npz", show=False):
+def prob3(filename="StudentEarthData.npz", show=True):
     """Reconstruct single-pixel camera color data in StudentEarthData.npz
     using 450, 650, and 850 measurements. Seed NumPy's random number generator
     with np.random.seed(1337) before each measurement to obtain consistent
@@ -105,21 +106,23 @@ def prob3(filename="StudentEarthData.npz", show=False):
 
     # Load the data.
     data = np.load(filename)
-    faces, vertices, colors = data['faces'], data['vertices'], data['C']
-    # V = data['V'] # TODO: What is V for?
-    measurements, err = [450, 650, 850], []
+    faces, vertices = data['faces'], data['vertices']
+    colors, V = data['C'], data['V']
+    measurements, err = [250, 400, 550], []
 
     for m in measurements:
         # Get 'm' random measurements.
         np.random.seed(1337)
         results = []
-    
-        # Do compressed sensing on each color channel.
-        for channel in colors.T:
-            A = np.random.randint(0,2,(m,len(channel)))
-            b = A.dot(channel)
-            reconstruction = l1Min(A, b)
-            results.append(reconstruction) # V.dot(reconstruction) ?
+
+        camera = Camera(faces, vertices, colors)
+        camera.add_lots_pic(m)
+        A, B = camera.returnData()
+
+        # Do compressed sensing on each channel.
+        for b in B.T:
+            reconstruction = l1Min(A.dot(V), b)
+            results.append(V.dot(reconstruction))
     
         # Reconstruct the results, calculate the error, and show the globe.
         results = np.column_stack(results)
@@ -136,4 +139,4 @@ def prob3(filename="StudentEarthData.npz", show=False):
 if __name__ == '__main__':
     pass
     # prob2_err()
-    # print prob3()
+    print prob3(show=True)

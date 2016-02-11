@@ -270,13 +270,22 @@ $\begin{array}{cc}
 \end{figure}
 
 The single-pixel camera measurement process can be modeled as matrix multiplication by a measurement matrix $A$, which fortunately has the Restricted Isometry Property.
-% In the following, we provide you with code to take single pixel measurements.
-% It works as follows:
-% \begin{lstlisting}
-% >>> from camera import Camera
-% >>> myCamera = Camera(faces, vertices, colors)
-% \end{lstlisting}
-% Where \li{faces}, \li{verticies} and \li{colors} are given by the tesselation. To take a picture, use the function
+In the file \texttt{camera.py}, we provide you with code to take single pixel measurements.
+\begin{lstlisting}
+>>> from camera import Camera
+>>> myCamera = Camera(faces, vertices, colors)
+\end{lstlisting}
+Where \li{faces}, \li{verticies} and \li{colors} are given by the tesselation.
+
+To gather data with $m$ measurements (taking $m$ single-pixel pictures), do the following:
+\begin{lstlisting}
+>>> m = 450
+>>> myCamera.add_lots_pics(m)
+>>> A, b = myCamera.returnData()
+\end{lstlisting}
+The matrix $A$ is the sparse measurement matrix, and $b$ contains the data to do compressed sensing on.
+
+% To take a picture, use the function
 % \begin{lstlisting}
 % myCamera.add_pic(theta, phi, r)
 % \end{lstlisting}
@@ -293,19 +302,18 @@ The single-pixel camera measurement process can be modeled as matrix multiplicat
 % A,b = myCamera.returnData()
 % \end{lstlisting}
 
-% In this applications signals are only sparse in some appropriate representation (such as Fourier or wavelet).
-% This method generally can still be applied in such cases.
-% Let $V$ represent the transformation under which $s$ is sparse, or in other words:
-% \[s = V p
-% \]
-% $V$ is the inverse Fourier. We can then recast $A s=b$ as
-% \begin{equation}
-% A V p = b
-% \end{equation}
-% This then allows us to find $p$ using Compressed Sensing, which in turn allows us to reconstruct $s$ by using $V$.
-% % In the the following problem $V$ will be given to you.
+In this applications signals are only sparse in some appropriate representation (such as Fourier or wavelet).
+This method generally can still be applied in such cases.
+Let $V$ represent the transformation under which $s$ is sparse, or in other words:
+\[s = V p\]
+In this case, $V$ is the inverse Fourier. We can then recast $A s=b$ as
+\begin{equation}
+A V p = b
+\end{equation}
+This then allows us to find $p$ using Compressed Sensing, which in turn allows us to reconstruct $s$ by using $V$.
+% In the the following problem $V$ will be given to you.
 
-% You must reconstruct the color functions for the tesselated surfaces, and then plot these surfaces using the code we provide you.
+You must reconstruct the color functions for the tesselated surfaces, and then plot these surfaces using the code we provide you.
 
 % Rubik's Cube problem (TODO: flesh this out and put it back in).
 \begin{comment}
@@ -337,13 +345,15 @@ You should see a plot showing the Rubik's cube.
 We will reconstruct the surface of the earth from sparse satellite imagery. The earth is modeled by a sphere, which can be tessellated into triangular faces, each having a single color value.
 The colors are sparse in each channel in the appropriate basis. 
 
-The file \texttt{StudentEarthData.npz} contains the faces, vertices, and colors, %and the inverse fourier matrix,
-accessed by the keys \li{'faces'}, \li{'vertices'}, and \li{'C'}, % and \li{'V'},
-respectively.
+The file \texttt{StudentEarthData.npz} contains the faces, vertices, and colors, and the inverse fourier matrix, accessed by the keys \li{'faces'}, \li{'vertices'}, \li{'C'}, and \li{'V'}, respectively.
 %Take pictures with the single pixel camera code (using $r=3$) and then
+Use the faces, vertices, and colors to initialize a camera object as in the example code above.
+Extract the data with the \li{returnData()} function.
+The resulting matrix $A$ is the sparse measurement matrix, and $b$ is an approximation of the array of colors.
 There are three channels in the color array, stored as columns.
 Do compressed sensing on each channel of colors, obtaining three arrays.
 Then stack these arrays column-wise so the result matches the dimensions of the original array.
+Remember to transform the measurement matrix first by multiplying on the right by $V$, then un-transform the results by multiplying on the left by $V$.
 
 The file \texttt{visualize2.py} contains code to visualize your results.
 \begin{lstlisting}
@@ -358,6 +368,6 @@ Compare your results to the original:
 >>> visualizeEarth(faces, vertices, colors)
 \end{lstlisting}
 
-Do the reconstruction with 450, 650, and 850 measurements.
+Do the reconstruction with 250, 400, and 550 measurements.
 Return a list containing the Euclidean distance between each reconstruction and the array of actual colors.
 \end{problem}
