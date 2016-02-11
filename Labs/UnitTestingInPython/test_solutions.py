@@ -1,21 +1,16 @@
 import solutions
 import pytest
 
-#problem 1 test the operator function from solutions.py
+#problem 1 test the addition and fibonacci functions from solutions.py
 def test_addition():
     pass
-
-#problem 2 test the division and operator functions from solutions.py
-def test_operator():
+    
+def test_fib():
     pass
 
-def test_divide():
-    assert solutions.divide(1,2) == .5
-    assert solutions.divide(5,4) == 1.25
-    with pytest.raises(Exception) as excinfo:
-        solutions.divide(4,0)
-    excinfo.typename == 'ValueError'
-    assert excinfo.value.args[0] == "You can't give a zero for b, that breaks this function"
+#problem 2 test the operator function from solutions.py
+def test_operator():
+    pass
 
 #problem 3 finish testing the complex number class
 @pytest.fixture

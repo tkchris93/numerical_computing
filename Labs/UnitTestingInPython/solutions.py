@@ -3,9 +3,21 @@
 <Date>
 """
 
-#Problem 1 Write unit tests to test the addition Be sure to install py test cov inorder to see your code coverage change
+#Problem 1 Write unit tests to test the addition. Be sure to install pytest-cov in order to see your code coverage change
 def addition(a,b):
     return a+b
+    
+def fibonacci(n):
+    """generate the nth fibonacci number recursively.
+    Assume n is a positive integer.
+    """
+    if n == 0:
+        return 1
+    elif n == 1:
+        return 1
+    else:
+        return fibonacci(n-1) + fibonacci(n-2)
+    
 
 #Problem 2 Write unit tests to test the following
 def operator(a,b,oper):
@@ -16,6 +28,8 @@ def operator(a,b,oper):
     if oper == "+":
         return a+b
     if oper == "/":
+        if b == 0:
+            raise ValueError("You can't divide by zero!")
         return a/float(b)
     if oper == "-":
         return a-b
@@ -23,12 +37,6 @@ def operator(a,b,oper):
         return a*b
     else:
         raise ValueError("Oper can only be: '+', '/', '-', or '*'")
-
-def divide(a,b):
-    if b==0:
-        raise ValueError("You can't give a zero for b, that breaks this function")
-    else:
-        return float(a)/float(b)
 
 #Problem 3 Write unit test for this class
 class ComplexNumber(object):
