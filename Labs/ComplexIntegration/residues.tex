@@ -26,7 +26,7 @@ The Laurent series representation provides a simple way to classify singularitie
 Isolated singular points can be classified as removable singular points, poles, or essential singular points.
 These definitions will also be discussed in greater detail in the text.
 Here we will show another method for visualizing complex functions.
-In Lab \ref{Lab:complex_intro} we presented color plots as a useful method functions in the complex plane. 
+In Lab \ref{Lab:complex_intro} we presented color plots as a useful method for visualizing functions in the complex plane. 
 Here we will also show how to use surface plots to visualize the modulus of complex functions.
 
 Now you have to take care when a surface plot is about a singularity.  We must account for the fact that the function is not going to be defined at all of the points we use in our graph.
@@ -121,7 +121,7 @@ There is also a natural relationship between the residues of a function at its p
 Let $f = \frac{p}{q}$ where $p$ and $q$ are polynomials, $q$ has no repeated roots, and the degree of $p$ has degree less than the degree of $q$.
 This means that $f$ has a partial fraction representation
 \[f = \sum \frac{c_i}{z - z_i}\]
-where the $c_i$ are appropriately chosen coefficients and $z_i$ are the distinct zeroes of $q$.
+where the $c_i$ are appropriately chosen coefficients and $z_i$ are the distinct zeros of $q$.
 Consider what happens when we take the residue of this sum.
 Since integrals distribute over sums, so do residues, so we may say
 \[\Res{z=z_i} f = \sum \Res{z=z_i} \frac{c_i}{z - z_i}\]
@@ -136,7 +136,7 @@ Return two arrays.
 The first should contain the coefficients in the partial fraction decomposition.
 The second should contain the corresponding zeros of $q$.
 
-Hint: numpy's \li{poly1d} objects have a \li{roots} attribute that allows you to quickly find the roots of a polynomial.
+Hint: NumPy's \li{poly1d} objects have a \li{roots} attribute that allows you to quickly find the roots of a polynomial.
 \end{problem}
 
 \section*{Evaluating Indefinite Integrals Using Residues}
@@ -168,7 +168,7 @@ So, rewriting, we have
 \[\int_{-R}^R f(z) dz = 2\pi i (\Res{z=p_0} f(z) +\Res{z=p_1} f(z)) - \int_A f(z) dz\]
 so
 \[\int_{-\infty}^{\infty} f(z) dz = \lim_{R\to \infty} \int_{-R}^R f(z) dz = 2\pi i (\Res{z=p_0} f(z) +\Res{z=p_1} f(z)) - \lim_{R\to \infty} \int_A f(z) dz\]
-We would like to show that that $\lim_{R\to\infty} \int_A f(z) dz = 0$, so note that on $A$, $\abs{z}=R$.
+We would like to show that $\lim_{R\to\infty} \int_A f(z) dz = 0$, so note that on $A$, $\abs{z}=R$.
 With some effort, it follows from the triangle inequality that $\abs{z^4+1}\geq \abs{\abs{z}^4-1} = R^4 -1$, so we have that
 \[\abs{\int_A f(z) dz}\leq \int_A \abs{f(z)} dz \leq \int_A \frac{R^2}{R^4 -1}dz = \pi R \frac{R^2}{R^4-1}\]
 so $\lim_{R\to\infty} \int_A f(z) dz = 0$ as desired.
