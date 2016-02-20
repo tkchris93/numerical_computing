@@ -1,17 +1,27 @@
 # testDriver.py
 """Outline for Foundations of Applied Mathematics lab test drivers.
 
-The _testDriver class is designed to be flexible. The test_all() routine will
-grade an entire module, while each problem can be graded individually via the
-different problemX() methods. This allows the instructor to grade from
-IPython, or to automate grading using Git, Google Drive, or another file
-system manager.
+Test driver files should be named testDriver.py and should be placed in the
+same folder as the lab that it corresponds to. The testDriver.py file should
+have dependencies on the corresponding solutions.py file so that student
+submissions are tested directly against the solutions when possible.
 
-Each time this test script is put into a lab, customize the docstrings of the
-test() function and the _testDriver class to give specific instructions about
-how the lab is to be graded, if it is different than normal. All functions and
-classes from this file should be placed below all other code in the lab
-solutions file.
+test() function and _testDriver class -----------------------------------------
+
+The _testDriver class is designed to be flexible. The test_all() routine will
+grade each problem and collect feedback, but each problem can be graded
+individually via the different problemX() methods. This allows the instructor
+to grade from IPython, or to automate grading using Git, Google Drive, or
+another file system manager.
+
+The test() function creates an instance of the _testDriver class, grades every
+problem, and returns the score feedback. Use this function to automate the
+grading process.
+
+Customize the docstrings of the test() function and the _testDriver class to
+give specific instructions about how the lab is to be graded.
+
+Tags --------------------------------------------------------------------------
 
 The @_autoclose tag makes it easy to grade a problem that produces a plot.
 It should only be on a problem-grading function that uses _testDriver._grade()
@@ -21,21 +31,13 @@ immediately after it is created.
 The @_timeout tag prevents a function from running for longer than a
 specificied number of seconds. Be careful not to use this wrapper in
 conjunction with _testDriver._grade() or another pausing command that waits
-for the grader's response. NOTE that this decorator will only work on Unix.
+for the grader's response. NOTE: this decorator will only work on Unix.
 
-To test a particular test driver, navigate to the solutions file and start
-IPython. Import the solutions file, and use it as the input for test().
+Testing -----------------------------------------------------------------------
 
-In [1]: import solutions as s
-
-In [2]: reload(s); feedback, score = s.test(s)
-
-This file can also be run from the terminal. To grade a file called
-student.py, run the following command:
-
-$ python testDriver.py student.py
-
-and the resulting feedback will be printed out.
+To test the test driver, make sure that the solutions file passes with full
+points. The if __name__ == '__main__' clause imports the solutions file and
+grades it.
 """
 
 # Wrappers ====================================================================
@@ -45,7 +47,7 @@ from functools import wraps
 from matplotlib import pyplot as plt
 
 def _autoclose(func):
-    """function decorator for closing figures automatically."""
+    """Decorator for closing figures automatically."""
     @wraps(func)
     def wrapper(*args, **kwargs):
         try:
@@ -88,8 +90,10 @@ def _timeout(seconds):
 
 # Test Script and Class =======================================================
 
+# from solutions import [functions / classes that are needed for testing]
+
 def test(student_module):
-    """Test script. Import the student's solutions file as a module.
+    """Grade a student's entire solutions file.
     
     X points for problem 1
     X points for problem 2
@@ -108,7 +112,12 @@ def test(student_module):
 
 
 class _testDriver(object):
-    """Class for testing a student's work. See test.__doc__ for more info."""
+    """Class for testing a student's work.
+
+    Attributes:
+        Score (int)
+        Feedback (str)
+    """
 
     # Constructor -------------------------------------------------------------
     def __init__(self):
@@ -154,10 +163,7 @@ class _testDriver(object):
     @staticmethod
     def _errType(error):
         """Get just the name of the exception 'error' in string format."""
-        if isinstance(error, BaseException):
-            return str(type(error)).lstrip("<type 'exceptions.").rstrip("'>")
-        else:
-            return str(error)
+        return str(type(error).__name__)
 
     def _eqTest(self, correct, student, message):
         """Test to see if 'correct' and 'student' are equal.
@@ -194,7 +200,9 @@ class _testDriver(object):
             return 0
 
     def _grade(self, points, message=None):
-        """Manually grade a problem worth 'points'. Return the score."""
+        """Manually grade a problem worth 'points'. Return the score.
+        If full points are not earned, get feedback on the problem.
+        """
         credit = -1
         while credit > points or credit < 0:
             try:
@@ -224,5 +232,11 @@ class _testDriver(object):
         # Test problem 2 here.
         return points
 
+
+# Validation ==================================================================
+if __name__ == '__main__':
+    """Validate the test driver by testing the solutions file."""
+    import solutions
+    score, feedback = test(solutions)
 
 # END OF FILE =================================================================
