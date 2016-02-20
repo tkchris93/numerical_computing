@@ -1,62 +1,80 @@
 import numpy as np
-from scipy.optimize import fmin_cg
+from scipy import linalg as la
+from scipy import optimize as opt
+from matplotlib import pyplot as plt
 
-
-def conjugateGradient(b, x, mult):
-    '''
-    Minimize .5x^TQx - b^Tx + c using the method of Steepest Descent.
-    Equivalently, solve Qx = b.
-    Inputs:
-        b -- length n array
-        x -- length n array, the inital guess
-        mult -- a callable function object that performs matrix-vector multiplication by Q.
-                i.e., mult(d) returns Qd.
+# Problem 1
+def conjugateGradient(b,x0,Q,tol = .0001):
+    """Implement the Conjugate Gradient Method
+    
+    Parameters:
+    b  ((n, ) ndarray)
+    x0 ((n, ) ndarray)
+    Q  ((n,n) ndarray)
+    tol (float)
+    
     Returns:
-        a numpy array, the solution to Qx = b.
-    '''
-    r = mult(x) - b
-    d = -r.copy()
-    n2 = (r*r).sum()
-    while not np.allclose((r*r).sum(), 0):
-        n1 = n2
-        m = mult(d)
-        a = (r*r).sum()/(d*m).sum()
-        x += a*d
-        rnew = r + a*m
-        n2 = (rnew*rnew).sum()
-        beta = n2/n1
-        d = -rnew + beta * d
-        r = rnew
-    return x
+        x ((n, ) ndarray): The solution given by the Conjugate Gradient Method
+        to the linear systm Qx = b
+    """
+    xk = x0
+    rk = Q.dot(x0)-b
+    dk = -rk
+    k = 0
+    while la.norm(rk) > tol:
+        alphak = rk.T.dot(rk)/dk.T.dot(Q.dot(dk))
+        xk1 = xk + alphak*dk
+        rk1 = rk + alphak*Q.dot(dk)
+        betak1 = rk1.T.dot(rk1)/rk.T.dot(rk)
+        dk1 = -rk1 + betak1*dk
+        k = k+1
+        xk = xk1
+        rk = rk1
+        dk = dk1
+    return xk1
 
+# Problem 2
+def prob2(filename = 'linregression.txt'):
+    """Use the conjugateGradient() function to solve the linear regression problem.
+    Using the data from linregression.txt.  Return the solution x*."""
     
-def linRegression():
-    '''http://www.itl.nist.gov/div898/strd/lls/data/LINKS/v-Longley.shtml'''
-    
-    def mult(x):
-        return Q.dot(x)
-    
-    data =np.loadtxt('linregression.txt')
-    y = data[:,0]
-    A = np.ones(data.shape)
-    A[:,1:] = data[:,1:]
-    Q = A.T.dot(A)
-    b = A.T.dot(y)
-    x0 = np.random.random(Q.shape[1])
-    x = conjugateGradient(b, x0, mult)
-    print x
+    data = np.loadtxt(filename)
+    m,n = data.shape
+    b = data[:,0]
+    A = np.hstack((np.ones((m,1)),data[:,1:]))
+    x0 = np.random.random(n)
+    return conjugateGradient(A.T.dot(b),x0,A.T.dot(A))
 
-
-def logRegression():
-    '''This data is simulated'''
-    
+# Problem 3
+def prob3(filename = 'logregression.txt'):
+    """Find the maximum likelihood estimate for the data in logregression.txt.
+    Use the function fmin_cg() from scipy.optimize. """
     def objective(b):
-        '''Return -1*l(b), where l is the log likelihood.'''
-        return np.log(1+np.exp(np.dot(x,b))).sum() - (y*(np.dot(x,b))).sum()
+        return (np.log(1+np.exp(x.dot(b))) - y*(x.dot(b))).sum()
     
-    data = np.loadtxt('logregression.txt')
+    data = np.loadtxt(filename)
+    m,n = data.shape
+    y = np.array([0, 0, 0, 0, 1, 0, 1, 0, 1, 1])
+    x = np.ones((10, 2))
+    x[:,1] = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    
     y = data[:,0]
-    x = np.ones(data.shape)
-    x[:,1:] = data[:,1:]
-    guess = np.array([1., 1., 1., 1.])
-    fmin_cg(objective, guess)
+    x = np.hstack((np.ones((m,1)),data[:,1:]))
+    guess = np.random.random(4)
+    b = opt.fmin_cg(objective, guess)
+    dom = np.linspace(0, 1.1, 100)
+    plt.plot(x, y, 'o')
+    plt.plot(dom, 1./(1+np.exp(-b[0]-b[1]*dom)))
+    plt.show()
+    return b
+    
+if __name__ == '__main__':
+    n = 10
+    A = np.random.random((n,n))
+    Q = A.T.dot(A)
+    b = np.random.random(n)
+    x0 = np.random.random(n)
+    x = conjugateGradient(b, x0, Q)
+    print np.allclose(x, la.solve(Q,b))
+    print prob2()
+    print prob3()
