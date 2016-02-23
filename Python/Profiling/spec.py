@@ -183,6 +183,10 @@ def init_tridiag(n):
     b = np.random.random_integers(-9,9,n).astype("float")
     c = np.random.random_integers(-9,9,n).astype("float")
 
+    a[a==0] = 1
+    b[b==0] = 1
+    c[c==0] = 1
+
     A = np.zeros((b.size,b.size))
     np.fill_diagonal(A,b)
     np.fill_diagonal(A[1:,:-1],a[1:])
