@@ -132,7 +132,7 @@ def compare_timings(f, g, *args):
 Hint: You can gain access to the name of many functions by using its
 \li{func_name} method. However, this method does not exist for all functions
 we will be interested in timing. Therefore, even though it is not as clean, use
-\li{str(str(f))} to print a string representation of f.
+\li{str(f)} to print a string representation of f.
 \end{problem}
 
 \subsection*{Avoid Recomputing Values}
@@ -603,6 +603,12 @@ def init_tridiag(n):
     b = np.random.random_integers(-9,9,n).astype("float")
     c = np.random.random_integers(-9,9,n).astype("float")
 
+    # Check for and change 0 values in arrays
+    a[a==0] = 1
+    b[b==0] = 1
+    c[c==0] = 1
+
+    # Create tridiagonal matrix A from a,b,c
     A = np.zeros((b.size,b.size))
     np.fill_diagonal(A,b)
     np.fill_diagonal(A[1:,:-1],a[1:])
