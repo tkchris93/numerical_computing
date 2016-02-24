@@ -5,17 +5,18 @@ from matplotlib import pyplot as plt
 
 # Problem 1
 def conjugateGradient(b,x0,Q,tol = .0001):
-    """Implement the Conjugate Gradient Method
+    """Use the Conjugate Gradient Method to find the solution to the linear
+    system Qx = b.
     
     Parameters:
-    b  ((n, ) ndarray)
-    x0 ((n, ) ndarray)
-    Q  ((n,n) ndarray)
-    tol (float)
+        b  ((n, ) ndarray)
+        x0 ((n, ) ndarray): An initial guess for x.
+        Q  ((n,n) ndarray): A positive-definite square matrix.
+        tol (float)
     
     Returns:
-        x ((n, ) ndarray): The solution given by the Conjugate Gradient Method
-        to the linear systm Qx = b
+        x ((n, ) ndarray): The solution to the linear systm Qx = b, according
+            to the Conjugate Gradient Method.
     """
     xk = x0
     rk = Q.dot(x0)-b
@@ -35,9 +36,10 @@ def conjugateGradient(b,x0,Q,tol = .0001):
 
 # Problem 2
 def prob2(filename = 'linregression.txt'):
-    """Use the conjugateGradient() function to solve the linear regression problem.
-    Using the data from linregression.txt.  Return the solution x*."""
-    
+    """Use conjugateGradient() to solve the linear regression problem with
+    the data from linregression.txt.
+    Return the solution x*.
+    """
     data = np.loadtxt(filename)
     m,n = data.shape
     b = data[:,0]
@@ -47,8 +49,9 @@ def prob2(filename = 'linregression.txt'):
 
 # Problem 3
 def prob3(filename = 'logregression.txt'):
-    """Find the maximum likelihood estimate for the data in logregression.txt.
-    Use the function fmin_cg() from scipy.optimize. """
+    """Use scipy.optimize.fmin_cg() to find the maximum likelihood estimate
+    for the data in logregression.txt.
+    """
     def objective(b):
         return (np.log(1+np.exp(x.dot(b))) - y*(x.dot(b))).sum()
     
