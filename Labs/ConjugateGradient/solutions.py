@@ -43,9 +43,19 @@ def prob2(filename = 'linregression.txt'):
     data = np.loadtxt(filename)
     m,n = data.shape
     b = data[:,0]
-    A = np.hstack((np.ones((m,1)),data[:,1:]))
+    A = np.column_stack((np.ones(m),data[:,1:]))
     x0 = np.random.random(n)
     return conjugateGradient(A.T.dot(b),x0,A.T.dot(A))
+
+    '''Correct Answer:
+    [   -3482258.6159527,   15.06187214,    -0.03581918,    -2.0202298
+        -1.03322686,        -0.05110411,    1829.15145504               ]
+
+    or
+
+    [ -3.48225866e+06   1.50618728e+01  -3.58191800e-02  -2.02022981e+00
+      -1.03322687e+00  -5.11041030e-02   1.82915148e+03 ]
+    '''
 
 # Problem 3
 def prob3(filename = 'logregression.txt'):
@@ -57,27 +67,29 @@ def prob3(filename = 'logregression.txt'):
     
     data = np.loadtxt(filename)
     m,n = data.shape
-    y = np.array([0, 0, 0, 0, 1, 0, 1, 0, 1, 1])
-    x = np.ones((10, 2))
-    x[:,1] = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-    
     y = data[:,0]
-    x = np.hstack((np.ones((m,1)),data[:,1:]))
-    guess = np.random.random(4)
-    b = opt.fmin_cg(objective, guess)
-    dom = np.linspace(0, 1.1, 100)
-    plt.plot(x, y, 'o')
-    plt.plot(dom, 1./(1+np.exp(-b[0]-b[1]*dom)))
-    plt.show()
-    return b
+    x = np.empty_like(data)
+    x[:,0] = np.ones_like(data[:,0])
+    x[:,1:] = data[:,1:]
+    y = data[:,0]
     
-if __name__ == '__main__':
+    guess = np.ones(4)
+    b = opt.fmin_cg(objective, guess)
+    
+    return b
+
+    '''Correct Answer:
+    [-0.41307717, 0.92181585, 0.21007539, -0.55791808]
+    '''
+    
+def test():
     n = 10
     A = np.random.random((n,n))
     Q = A.T.dot(A)
     b = np.random.random(n)
     x0 = np.random.random(n)
     x = conjugateGradient(b, x0, Q)
-    print np.allclose(x, la.solve(Q,b))
+    if not np.allclose(x, la.solve(Q,b)):
+        raise ValueError("Problem 1 Failed")
     print prob2()
     print prob3()
