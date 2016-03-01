@@ -45,7 +45,7 @@ It is easy to convert between coordinate systems in NumPy, which uses the symbol
 >>> from matplotlib import pyplot as plt
 >>> z = 2 - 2*1j
 \end{lstlisting}
-Use \li{np.angle()} and \li{np.absolute()} to compute $\theta$ and $r$, respectively.
+Use \li{np.angle()}, which returns an angle between $-\pi$ and $\pi$, and \li{np.absolute()} to compute $\theta$ and $r$, respectively.
 These functions also operate elementwise on NumPy arrays.
 \begin{lstlisting}
 >>> theta = np.angle(z)
