@@ -100,8 +100,10 @@ and sometimes fewer, depending on the spectrum of the matrix $Q$. Further improv
 but we do not go into detail here.
 
 \begin{problem}
-Implement the basic Conjugate-Gradient algorithm presented above. Write a function \li{conjugateGradient()} that accepts a vector $b$, an initial
-guess $x_0$, and a symmetric positive-definite matrix $Q$, and a default tolerance of .0001 as inputs.  Continue the algorithm until $norm(r_k) < tolerance$.
+Implement the basic Conjugate-Gradient algorithm presented above.
+Write a function \li{conjugateGradient()} that accepts a vector $b$, an initial
+guess $x_0$, a symmetric positive-definite matrix $Q$, and a default tolerance of .0001 as inputs.
+Continue the algorithm until $\|r_k\|$ is less than the tolerance.
 Return the solution $x^*$ to the linear system $Qx = b$.
 \end{problem}
 
@@ -126,7 +128,7 @@ So long as $A$ is of full column rank, the matrix $Q$ will be symmetric positive
 At this point, check to make sure that $Q$ is nonsingular by examining its determinant (use \li{scipy.linalg.det()}).
 Provided that the determinant is nonzero, we proceed by writing a function that performs matrix-vector multiplication by $Q$ (we
 will not take advantage of sparseness just now), randomly selecting a starting point (Conjugate-Gradient is not sensitive to the location of
-the starting point), obtaining the answer using our function, and checking it with the answer obtained by \li{scipy.linalg.solve}.
+the starting point), obtaining the answer using our function, and checking it with the answer obtained by \li{scipy.linalg.solve()}.
 \begin{lstlisting}
 >>> # generate random starting point
 >>> x0 = np.random.random(n)
@@ -202,7 +204,7 @@ These values can be understood as defining the hyperplane that best fits the dat
 
 \begin{problem}
 Using your Conjugate-Gradient function, solve the linear regression problem specified by the data contained in the file
-\li{linregression.txt}. This is a whitespace-delimited text file formatted so that the $i$-th row consists of
+\texttt{linregression.txt}. This is a whitespace-delimited text file formatted so that the $i$-th row consists of
 $y_i, x_{i,1}, \ldots, x_{i,n}$. Use the function \li{numpy.loadtxt()} to load in the data. Report your solution.
 \end{problem}
 
@@ -228,7 +230,7 @@ right choice will depend on the nature of the objective function. A well-known f
 \]
 
 Making these adjustments is not difficult, but we will opt instead to use built-in functions in Python. In particular,
-the SciPy module \li{scipy.optimize} provides a function \li{fmin_cg}, which uses a non-linear Conjugate-Gradient method
+the SciPy module \li{scipy.optimize} provides a function \li{fmin_cg()}, which uses a non-linear Conjugate-Gradient method
 to minimize general functions. Using this function is easy -- we only need to pass to it the objective function and an
 initial guess.
 
@@ -328,7 +330,7 @@ $(\beta_0, \beta_1)$.
 ...    return (np.log(1+np.exp(x.dot(b))) - y*(x.dot(b))).sum()
 \end{lstlisting}
 
-Finally, we minimize the objective function using \li{fmin_cg}.
+Finally, we minimize the objective function using \li{fmin_cg()}.
 \begin{lstlisting}
 >>> guess = np.array([1., 1.])
 >>> b = fmin_cg(objective, guess)
@@ -366,11 +368,11 @@ sigmoidal curve.}
 
 \begin{problem}
 Following along with the example given above, find the maximum likelihood estimate of the parameters for
-the logistic regression data in the file \li{logregression.txt}. This is a whitespace-delimited text file
+the logistic regression data in the file \texttt{logregression.txt}. This is a whitespace-delimited text file
 formatted so that the $i$-th row consists of $y_i, x_{i,1}, x_{i,2}, x_{i,3}.$ Since there are three
 predictor variables, there are four parameters in the model. Report the calculated values.
 
-You should be able to use much of the code above unchanged. In particular, the function \li{objective} does
+You should be able to use much of the code above unchanged. In particular, the function \li{objective()} does
 not need any changes. You simply need to set your variables \li{y} and \li{x} appropriately, and
 choose a new initial guess (an array of length four). Note that \li{x} should be an $m \times 4$ array whose first
 column consists entirely of ones, whose second column contains the values in the second column of the data file,
