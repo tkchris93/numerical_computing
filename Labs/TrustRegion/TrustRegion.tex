@@ -131,7 +131,7 @@ We now combine the two steps of minimizing the model function and choosing the t
 \begin{problem}
 Implement the trust-region algorithm using the following function declaration.  Note that you don't have to actually solve (\ref{eq:step}) for $p_k$; you'll worry about that in Problem \ref{prob:dogleg}. In the mean time, you have a parameter \li{subprob} which you can assume does that for you. The function \li{subprob()} takes as parameters a gradient vector, hessian matrix, and radius.
 \begin{lstlisting}
-def trustRegion(f,grad,hess,subprob,x0,r0,rmax,eta,gtol=1e-5):
+def trustRegion(f,grad,hess,subprob,x0,r0,rmax,eta=1./16,gtol=1e-5):
     """
     Minimize a function using the trust-region algorithm.
 
@@ -179,7 +179,7 @@ This method works by minimizing the model function along a particular path exten
 to the boundary of the trust region.
 This path is piecewise linear and has a shape vaguely reminiscent of a dog's leg, which explains the peculiar name of the method.
 
-To calculate the dogleg minimizer of the model function, we first solve the unconstrained minimizer of the model function,
+To calculate the dogleg minimizer of the model function, we first solve the unconstrained minimizer of the model function.  We $p^B$ as the unconstrained minimizer of the model function:
 \[
 p^B = -H_k^{-1}\nabla f(x_k).
 \]
@@ -241,6 +241,20 @@ given by $p^U + (\tau^*-1)(p^B-p^U)$, where $\tau^*$ satisfies the quadratic equ
 \[
 \|p^U + (\tau^*-1)(p^B-p^U)\|^2 = r_k^2.
 \]
+This quadratic equation can be simplified into 
+\[
+a(\tau^*-1)^2+b(\tau^*-1)+c = 0
+\]
+where the coefficients are defined to be
+\[
+a = p_B^Tp_B - 2p_B^Tp_U+p_U^Tp_U
+\]
+\[
+b = 2p_B^Tp_U-2p_U^Tp_U
+\]
+\[
+c = p_U^Tp_U-r_k^2.
+\]
 See Figure \ref{fig:dl2}.
 \end{itemize}
 
@@ -278,16 +292,19 @@ correct results, is given below.
 \begin{lstlisting}
 >>> from scipy import optimize as op
 >>> x = np.array([10.,10])
->>> rhat=2.
+>>> rmax=2.
 >>> r=.25
 >>> eta=1./16
 >>> tol=1e-5
->>> opts = {'initial_trust_radius':r, 'max_trust_radius':rhat, 'eta':eta, 'gtol':tol}
+>>> opts = {'initial_trust_radius':r, 'max_trust_radius':rmax, 'eta':eta, 'gtol':tol}
 >>> sol1 = op.minimize(op.rosen, x, method='dogleg', jac=op.rosen_der, hess=op.rosen_hess, options=opts)
->>> sol2 = trustRegion(op.rosen, op.rosen_der, op.rosen_hess, dogleg, x, r, rhat, eta, gtol=tol)
+>>> sol2 = trustRegion(op.rosen, op.rosen_der, op.rosen_hess, dogleg, x, r, rmax, eta, gtol=tol)
 >>> print np.allclose(sol1.x, sol2)
 True
 \end{lstlisting}
+\begin{problem}
+Test your \li{trustRegion()} and \li{dogleg()} methods on the Rosenbrock function.  Use the \li{rosen()}, \li{rosen_der()}, and \li{rosen_hess()} methods from \li{scipy.optimize}.  Return the solution \li{x*} from the \li{trustRegion()} method.
+\end{problem}
 
 \subsection*{Solving Systems of Nonlinear Equations}
 Trust-region methods can be used to find solutions of systems of nonlinear equations, which arise in applications across science and engineering.
@@ -366,18 +383,18 @@ In Python, we initialize all of the requisite functions and then find a root as 
 >>>     return J(x).dot(r(x))
 >>>
 >>> # define the Hessian function
->>> def B(x):
+>>> def H(x):
 >>>     return J(x).T.dot(J(x))
 >>>
 >>> # set trust-region parameters
->>> rhat=2.
+>>> rmax=2.
 >>> rr=.25
 >>> eta=1./16
 >>> tol=1e-5
 >>> # set initial point
 >>> x = np.array([3.5, -2.5])
 >>> # find a minimizer of f
->>> xstar = trustRegion(f,g,B,dogleg,x,rr,rhat,eta,gtol=tol)
+>>> xstar = trustRegion(f,g,H,dogleg,x,rr,rmax,eta=eta,gtol=tol)
 >>> print xstar
 [ 3.14159265 -3.14159265]
 >>> # verify that it is a root of r
@@ -388,8 +405,23 @@ In Python, we initialize all of the requisite functions and then find a root as 
 Of course, we are not guaranteed to always find a root, as convergence depends on the choice of initial point.
 However, by running the algorithms with several randomly selected starting points, we are more likely to 
 be successful.
+\begin{problem}
+Solve the following system
+\[
+r(x,y) = \begin{bmatrix}
+\sin x\cos y - 4\cos x\sin y\\
+\sin y\cos x - 4\cos y\sin x
+\end{bmatrix} 
+= \begin{bmatrix}
+0\\
+0
+\end{bmatrix}.
+\]
+\end{problem}
 
+\begin{comment}
 \begin{problem}
 Some problem involving system of nonlinear equations. Consult http://www-sop.inria.fr/coprin/logiciels/ALIAS/Benches/ 
 for ideas.
 \end{problem}
+\end{comment}
