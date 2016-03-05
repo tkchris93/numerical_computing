@@ -1,3 +1,4 @@
+# Old solutions.  Added problem to lab which isn't included here.
 import numpy as np
 from scipy import optimize as op
 from scipy.linalg import norm, solve
