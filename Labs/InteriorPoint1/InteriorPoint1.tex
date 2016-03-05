@@ -1,4 +1,9 @@
 \lab{Interior Point I}{Interior Point I}
+
+% Bold mu and lambda symbols for this lab.
+\def\Mu{\boldsymbol{\mu}}
+\def\Lamb{\boldsymbol{\lambda}}
+
 \objective{For decades after its invention, the Simplex algorithm was the only competitive method for linear programming. The past 30 years, however, have seen the discovery and widespread adoption of a new family of algorithms that rival--and in some cases outperform--the Simplex algorithm, collectively called \emph{Interior Point methods}. One of the major shortcomings of the Simplex algorithm is that the number of steps required to solve the problem can grow exponentially with the size of the linear system. Thus, for certain large linear programs, the Simplex algorithm is simply not viable. Interior Point methods offer an alternative approach and enjoy much better theoretical convergence properties. In this lab we implement an Interior Point method for linear programs, and in the next lab we will turn to the problem of solving quadratic programs.}
 
 \section*{Introduction}
@@ -24,26 +29,55 @@ In general, the Simplex Method requires many more (less expensive) computations.
 Some of the most popular and successful types of Interior Point methods nowadays are known as Primal-Dual Interior Point methods.
 Consider the following linear program:
 \begin{align*}
-\text{minimize }\qquad &c^Tx\\
-\text{subject to }\qquad &Ax = b\\
-&x \geq 0.
+\text{minimize }\qquad &\c^T\x\\
+\text{subject to }\qquad &A\x = \b\\
+&\x \geq \0.
 \end{align*}
-Here, $x, c \in \mathbb{R}^n$, $b \in \mathbb{R}^m$, and $A$ is an $m \times n$ matrix with full row rank.
-By $x \geq 0$, we simply mean that each coordinate of $x$ is nonnegative.
-Note that this formulation is quite general, as any linear program can be posed in this manner, after appropriate transformations.
-This is the primal problem, and its dual takes the form:
+Here, $\x, \c \in \mathbb{R}^n$, $\b \in \mathbb{R}^m$, and $A$ is an $m \times n$ matrix with full row rank.
+% By $x \geq 0$, we simply mean that each coordinate of $x$ is nonnegative.
+% Note that this formulation is quite general, as any linear program can be posed in this manner, after appropriate transformations.
+% TODO: Change \geq to the component-wise inequality that is used in the book.
+This is the \emph{primal} problem, and its \emph{dual} takes the form:
 \begin{align*}
-\text{maximize }\qquad &b^T\lambda\\
-\text{subject to }\qquad &A^T\lambda + s = c\\
-&s \geq 0,
+\text{maximize }\qquad &\b^T\Lamb\\
+\text{subject to }\qquad &A^T\Lamb + \Mu = \c\\
+&\Mu,\Lamb \geq \0,
 \end{align*}
-where $\lambda \in \mathbb{R}^m$ and $s \in \mathbb{R}^n$.
+where $\Lamb \in \mathbb{R}^m$ and $\Mu \in \mathbb{R}^n$.
+% Changed s to \mu to match the textbook.
 
 \subsection*{KKT Conditions}
 
 The theory of convex optimization gives us necessary and sufficient conditions for the solutions to the primal and dual problems via the Karush-Kuhn-Tucker (KKT) conditions.
+The Lagrangian for the primal problem is as follows:
+\[
+\CalL(\x, \Lamb, \Mu)
+= \c^T\x + \Lamb^T(\b - A\x) - \Mu^T\x
+\]
+The KKT conditions are
+\begin{align*}
+A^T\Lamb + \Mu &= \c\\
+A\x &= \b\\
+x_i\mu_i &= 0, \quad i = 1,2,\ldots,n,\\
+\x, \Mu &\geq 0.
+\end{align*}
+It is convenient to write these conditions in a more compact manner, by defining an almost-linear function $F$ and setting it equal to zero:
+\begin{align*}
+F(\x,\Lamb,\Mu) :=
+\begin{bmatrix}
+A^T\Lamb + \Mu - \c\\
+A\x - \b\\
+M\x\\
+\end{bmatrix}
+&= \0,\\
+(\x,\Mu) &\geq 0,
+\end{align*}
+where $M = \text{diag}(\mu_1,\mu_2,\ldots,\mu_n)$.
+Note that the first row of $F$ is the KKT condition for dual feasibility, the second row of $F$ is the KKT condition for the primal problem, and the last row of $F$ accounts for complementary slackness.
+
+\begin{comment} % Derivation overkill vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 First, we calculate the so-called \emph{Lagrangian function} for our linear program.
-The Lagrangian function for a general constrained optimization problem of the form
+Recall that the Lagrangian function for a general constrained optimization problem of the form
 \begin{align*}
 \text{minimize }\qquad &f(x)\\
 \text{subject to }\qquad &c_i(x) = 0, \quad i = 1,2,\ldots,k,\\
@@ -89,13 +123,21 @@ XSe\\
 (x,s) &\geq 0,
 \end{align*}
 where $X = \text{diag}(x_1,x_2,\ldots,x_n)$, $S = \text{diag}(s_1,s_2,\ldots,s_n)$, and $e = (1,1,\ldots,1)^T$.
+\end{comment} % Derivation overkil ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-% MARK THIS AS IMPORTANT or put it somewhere else.
-A Primal-Dual Interior Point method is a line search method that starts with an initial guess $(x_0, \lambda_0, s_0)$ and produces a sequence of points that converge to $(x^*, \lambda^*, s^*)$, the solution to the KKT equations and hence the solution to the original linear program.
+\begin{problem} % First step: define F(x,lamb,mu) -----------------------------
+Define a function \li{interiorPoint()} that will be used to solve the complete interior point problem.
+This function should accept $A$, $\b$, and $\c$ as parameters, along with the keyword argument \li{niter} that gives the number of iterations to perform.
+
+For this problem, within the \li{interiorPoint()} function, write a function for the $F$ described above.
+This function should accept $\x$, $\Lamb$, and $\Mu$ as parameters and return a 1-dimensional NumPy array with $2n+m$ entries.
+\end{problem}
 
 \subsection*{Search Direction and Step Length}
-We now describe how to select the search direction and step length at each iteration of the algorithm.
-The constraints on the problem make this process a little more complicated than the unconstrained line search we have studied previously.
+
+A Primal-Dual Interior Point method is a line search method that starts with an initial guess $(x_0, \lambda_0, s_0)$ and produces a sequence of points that converge to $(x^*, \lambda^*, s^*)$, the solution to the KKT equations and hence the solution to the original linear program.
+%We now describe how to select the search direction and step length at each iteration of the algorithm.
+The constraints on the problem make finding a search direction and step length a little more complicated than for the unconstrained line search we have studied previously.
 
 In the spirit of Newton's Method, we can form a linear approximation of the system $F(x,\lambda,s) = 0$ centered around our current point $(x, \lambda, s)$, and calculate the direction $(\triangle x, \triangle \lambda, \triangle s)$ in which to step to set the linear approximation equal to 0.
 This equates to solving the linear system:
@@ -326,6 +368,7 @@ whether to print out the value of the objective function and $\mu$ at each itera
 The function should return the optimal point $x$ along with the value of the objective function at this
 point.
 \end{problem}
+
 \section*{Least Absolute Deviations}
 We now return to the familiar problem of fitting a line (or hyperplane) to a set of data.
 We have previously approached this problem by minimizing the sum of the squares of the errors between the data points and the line, an approach known as \emph{least squares}.
