@@ -26,7 +26,7 @@ In general, the Simplex Method requires many more (less expensive) computations.
 \end{figure}
 
 \section*{Primal-Dual Interior Point Methods} % ALGORITHM =====================
-Some of the most popular and successful types of Interior Point methods nowadays are known as Primal-Dual Interior Point methods.
+Some of the most popular and successful types of Interior Point methods are known as Primal-Dual Interior Point methods.
 Consider the following linear program:
 \begin{align*}
 \text{minimize }\qquad &\c^T\x\\
@@ -127,7 +127,7 @@ where $X = \text{diag}(x_1,x_2,\ldots,x_n)$, $S = \text{diag}(s_1,s_2,\ldots,s_n
 
 \begin{problem} % First step: define F(x,lamb,mu) -----------------------------
 Define a function \li{interiorPoint()} that will be used to solve the complete interior point problem.
-This function should accept $A$, $\b$, and $\c$ as parameters, along with the keyword argument \li{niter} that gives the number of iterations to perform.
+This function should accept $A$, $\b$, and $\c$ as parameters, along with the keyword argument \li{niter} that gives the number of iterations to perform (default this value to $20$).
 
 For this problem, within the \li{interiorPoint()} function, write a function for the vector-valued function $F$ described above.
 This function should accept $\x$, $\Lamb$, and $\Mu$ as parameters and return a 1-dimensional NumPy array with $2n+m$ entries.
@@ -135,11 +135,11 @@ This function should accept $\x$, $\Lamb$, and $\Mu$ as parameters and return a 
 
 \subsection*{Search Direction}
 
-A Primal-Dual Interior Point method is a line search method that starts with an initial guess $[\x_0^T, \Lamb_0^T, \Mu_0^T]$ and produces a sequence of points that converge to $[{\x^*}^T, {\Lamb^*}^T, {\Mu^*}^T]$, the solution to the KKT equations and hence the solution to the original linear program.
+A Primal-Dual Interior Point method is a line search method that starts with an initial guess $(\x_0^T, \Lamb_0^T, \Mu_0^T)$ and produces a sequence of points that converge to $({\x^*}^T, {\Lamb^*}^T, {\Mu^*}^T)$, the solution to the KKT equations and hence the solution to the original linear program.
 %We now describe how to select the search direction and step length at each iteration of the algorithm.
 The constraints on the problem make finding a search direction and step length a little more complicated than for the unconstrained line search we have studied previously.
 
-In the spirit of Newton's Method, we can form a linear approximation of the system $F(\x,\Lamb,\Mu) = \0$ centered around our current point $(\x, \Lamb, \Mu)$, and calculate the direction $[\triangle \x^T, \triangle \Lamb^T, \triangle \Mu^T]$ in which to step to set the linear approximation equal to $\0$.
+In the spirit of Newton's Method, we can form a linear approximation of the system $F(\x,\Lamb,\Mu) = \0$ centered around our current point $(\x, \Lamb, \Mu)$, and calculate the direction $(\triangle \x^T, \triangle \Lamb^T, \triangle \Mu^T)$ in which to step to set the linear approximation equal to $\0$.
 This equates to solving the linear system:
 \begin{align}
 DF(\x,\Lamb,\Mu)
@@ -180,7 +180,7 @@ Continuing in this manner, we can calculate the entire derivative matrix, which 
 
 \begin{problem} % Second step: define DF(x,lamb,mu) ---------------------------
 Within \li{interiorPoint()}, define a function for the matrix $DF$ described above.
-This function should take $\x$, $\Lamb$, and $\Mu$ as parameters and return a $(2n+m) \times (2n+m)$ NumPy array.
+This function should take $\x$ and $\Mu$ as parameters and return a $(2n+m) \times (2n+m)$ NumPy array.
 \end{problem}
 
 Unfortunately, solving Equation \ref{eq:naiveNewton} often leads to a search direction that is too greedy.
@@ -195,12 +195,12 @@ DF(\x,\Lamb,\Mu)
 \begin{bmatrix} \0 \\ \0 \\ \sigma\nu\e \end{bmatrix}
 \label{eq:newNewton}
 \end{align}
-where $\e = [1,1,\ldots,1]^T$ and $\sigma \in [0,1)$ is called the \emph{centering parameter}.
+where $\e = (1,1,\ldots,1)^T$ and $\sigma \in [0,1)$ is called the \emph{centering parameter}.
 The closer $\sigma$ is to 0, the more similar the resulting direction will be to the plain Newton direction.
 The closer $\sigma$ is to 1, the more the direction points inward to the interior of the of the feasible region.
 
-\begin{problem}
-Within \li{interiorPoint()}, write a subroutine to compute the search direction $[\triangle \x^T, \triangle \Lamb^T, \triangle \Mu^T]$ by solving Equation \ref{eq:newNewton}.
+\begin{problem} % Third step: Search direction --------------------------------
+Within \li{interiorPoint()}, write a subroutine to compute the search direction $(\triangle \x^T, \triangle \Lamb^T, \triangle \Mu^T)$ by solving Equation \ref{eq:newNewton}.
 Use $\sigma = \frac{1}{10}$ for the centering parameter.
 Consider using the functions \li{lu_factor()} and \li{lu_solve()} from the \li{scipy.linalg} module to solving the system of equations efficiently.
 \end{problem}
@@ -287,18 +287,26 @@ Finally, calculate $\sigma$ by the formula
 
 \subsection*{Step Length}
 
-% =============================================================================
-% =============================================================================
-% SHANE HAS EDITED UP TO HERE =================================================
-% =============================================================================
-% =============================================================================
-
-$$\text{TODO}$$
-
-\begin{comment} % Old strategy for step length vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 Now that we have our search direction, it remains to choose our step length.
-We wish to step nearly as far as possible without violating the nonnegativity condition, thus remaining in the interior of the feasible region.
-First, make the following calculations, which give the maximum allowable step lengths for $x$ and $s$, respectively:
+We wish to step nearly as far as possible without violating the problem's constraints, thus remaining in the interior of the feasible region.
+First, we calculate the maximum allowable step lengths for $\x$ and $\Mu$, respectively:
+\begin{align*}
+\alpha_{\max} &= \min\left\{1, \min\{-\mu_i/\triangle \mu_i\ |\ \triangle \mu_i < 0 \}\right\}\\
+\delta_{\max} &= \min\left\{1, \min\{-x_i/\triangle x_i\ |\ \triangle x_i < 0 \}\right\}
+\end{align*}
+Next, we back off from these maximum step lengths slightly:
+\begin{align*}
+\alpha &= \min(1, 0.95\alpha_{\max})\\
+\delta &= \min(1, 0.95\delta_{\max}).
+\end{align*}
+These are our final step lenghts.
+Thus, the next point in the iteration is given by:
+\begin{align*}
+\x_{k+1} &= \x_k + \delta \triangle \x_k\\
+(\Lamb_{k+1}, \Mu_{k+1}) &= (\Lamb_k, \Mu_k) + \alpha(\triangle \Lamb_k, \triangle \Mu_k).
+\end{align*}
+
+\begin{comment} % Old strategy for step length vvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 \begin{align*}
 \beta^p &:= \displaystyle\min_{i : \triangle x_i < 0}-\frac{x_i}{\triangle x_i}\\
 \beta^d &:= \displaystyle\min_{i : \triangle \mu_i < 0}-\frac{s_i}{\triangle \mu_i}.
@@ -333,7 +341,8 @@ We summarize the entire procedure in Algorithm \ref{alg:predcorr}.
 \caption{Predictor-Corrector Algorithm}
 \label{alg:predcorr}
 \end{algorithm}
-
+\end{comment} % Old strategy for step length ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+\begin{comment} % Unnecessary / confusing hints vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 A few notes on the implementation of this algorithm are in order.
 In each iteration, by far the most expensive operations are solving Equations \ref{eq:affine} and \ref{eq:centering}.
 Fortunately, the only difference between the two equations is the right-hand side.
@@ -367,53 +376,55 @@ This can be done in a vectorized fashion in Python as follows (assuming that the
 >>>     myMin = 1
 \end{lstlisting}
 We need the \li{if} statement to deal with the case where no entry of $u$ is negative.
-\end{comment} % Old strategy for step length ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+\end{comment} % Unnecessary / confusing hints ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+\begin{problem} % Fourth Step: Step size --------------------------------------
+Within \li{interiorPoint()}, write a subroutine to compute the step size after the search direction has been computed.
+Avoid using loops when computing $\alpha_{\max}$ and $\beta_{\max}$ (use of masking and NumPy functions instead).
+\end{problem}
 
 \subsection*{Initial Point}
-Finally, the choice of initial point $(x_0, \lambda_0, s_0)$ is an important, nontrivial one.
-A naively or randomly chosen initial point may cause the algorithm to fail to converge.
-We provide code to calculate an appropriate initial point.
-You should include a call to this function in your algorithm to obtain the initial point.
+Finally, the choice of initial point $(\x_0, \Lamb_0, \Mu_0)$ is an important, nontrivial one.
+A na\"{i}vely or randomly chosen initial point may cause the algorithm to fail to converge.
+The following function will calculate an appropriate initial point.
+% Include a call to this function in your algorithm to obtain the initial point.
 
 \begin{lstlisting}
 def startingPoint(A, b, c):
+    """Calculate an initial guess to the solution of the linear program
+    min c^T x, Ax = b, x>=0.
+    Reference: Nocedal and Wright, p. 410.
     """
-    Calculate an initial guess to the solution of the
-    linear program min c^T x, Ax = b, x>=0.
-    Inputs:
-        A -- array of shape (m,n) with linearly independent rows
-        b -- array of length m
-        c -- array of length n
-    Returns:
-        x -- array of length n
-        lam -- array of length m
-        s -- array of length n
-    Ref: Nocedal and Wright, p. 410
-    """
-    # first calculate x, lam, s of minimal norm satisfying the primal and dual constraints
+    # Calculate x, lam, mu of minimal norm satisfying both
+    # the primal and dual constraints.
     B = la.inv(A.dot(A.T))
     x = A.T.dot(B.dot(b))
     lam = B.dot(A.dot(c))
-    s = c - A.T.dot(lam)
+    mu = c - A.T.dot(lam)
 
-    # perturb x and s so they are nonnegative
+    # Perturb x and s so they are nonnegative.
     dx = max((-3./2)*x.min(), 0)
-    ds = max((-3./2)*s.min(), 0)
-    x += dx*np.ones(x.shape)
-    s += ds*np.ones(s.shape)
+    dmu = max((-3./2)*mu.min(), 0)
+    x += dx*np.ones_like(x)
+    mu += dmu*np.ones_like(mu)
 
-    # perturb x and s so they are not too close to zero, not too dissimilar
-    dx = .5*(x*s).sum()/s.sum()
-    ds = .5*(x*s).sum()/x.sum()
-    x += dx*np.ones(x.shape)
-    s += ds*np.ones(s.shape)
+    # Perturb x and mu so they are not too small and not too dissimilar.
+    dx = .5*(x*mu).sum()/mu.sum()
+    dmu = .5*(x*mu).sum()/x.sum()
+    x += dx*np.ones_like(x)
+    mu += dmu*np.ones_like(mu)
 
-    return x, lam, s
+    return x, lam, mu
 \end{lstlisting}
 
 \begin{problem} % Put it all together -----------------------------------------
 Complete the implementation of \li{interiorPoint()}.
-Return function should return the optimal point $\x^*$ along with the value of the objective function at this point.
+Use the function provided above to select an initial point, then run the iteration \li{niter} times.
+Return the optimal point $\x^*$ along with the value of the objective function at this point.
+
+The duality measure $\nu$ tells us in some sense how close our current point is to the minimizer.
+The closer $\nu$ is to 0, the closer we are to the optimal point.
+Thus, by printing the value of $\nu$ at each iteration, you can track how your algorithm is progressing and detect when you have converged.
 \end{problem}
 
 \section*{Least Absolute Deviations} % APPLICATION ============================
