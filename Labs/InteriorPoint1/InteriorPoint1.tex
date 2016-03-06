@@ -25,7 +25,7 @@ In general, the Simplex Method requires many more (less expensive) computations.
 \label{fig:intPath}
 \end{figure}
 
-\section*{Primal-Dual Interior Point Methods}
+\section*{Primal-Dual Interior Point Methods} % ALGORITHM =====================
 Some of the most popular and successful types of Interior Point methods nowadays are known as Primal-Dual Interior Point methods.
 Consider the following linear program:
 \begin{align*}
@@ -113,7 +113,7 @@ x, s &\geq 0.
 \end{align*}
 In fact, it is convenient to write these conditions in a more compact manner, by defining an almost-linear function $F$ and setting it equal to zero:
 \begin{align*}
-F(x,\lambda,s) :=
+F(\x,\Lamb,\Mu) :=
 \begin{bmatrix}
 A^T\lambda + s - c\\
 Ax - b\\
@@ -129,30 +129,37 @@ where $X = \text{diag}(x_1,x_2,\ldots,x_n)$, $S = \text{diag}(s_1,s_2,\ldots,s_n
 Define a function \li{interiorPoint()} that will be used to solve the complete interior point problem.
 This function should accept $A$, $\b$, and $\c$ as parameters, along with the keyword argument \li{niter} that gives the number of iterations to perform.
 
-For this problem, within the \li{interiorPoint()} function, write a function for the $F$ described above.
+For this problem, within the \li{interiorPoint()} function, write a function for the vector-valued function $F$ described above.
 This function should accept $\x$, $\Lamb$, and $\Mu$ as parameters and return a 1-dimensional NumPy array with $2n+m$ entries.
 \end{problem}
 
-\subsection*{Search Direction and Step Length}
+\subsection*{Search Direction}
 
-A Primal-Dual Interior Point method is a line search method that starts with an initial guess $(x_0, \lambda_0, s_0)$ and produces a sequence of points that converge to $(x^*, \lambda^*, s^*)$, the solution to the KKT equations and hence the solution to the original linear program.
+A Primal-Dual Interior Point method is a line search method that starts with an initial guess $[\x_0^T, \Lamb_0^T, \Mu_0^T]$ and produces a sequence of points that converge to $[{\x^*}^T, {\Lamb^*}^T, {\Mu^*}^T]$, the solution to the KKT equations and hence the solution to the original linear program.
 %We now describe how to select the search direction and step length at each iteration of the algorithm.
 The constraints on the problem make finding a search direction and step length a little more complicated than for the unconstrained line search we have studied previously.
 
-In the spirit of Newton's Method, we can form a linear approximation of the system $F(x,\lambda,s) = 0$ centered around our current point $(x, \lambda, s)$, and calculate the direction $(\triangle x, \triangle \lambda, \triangle s)$ in which to step to set the linear approximation equal to 0.
+In the spirit of Newton's Method, we can form a linear approximation of the system $F(\x,\Lamb,\Mu) = \0$ centered around our current point $(\x, \Lamb, \Mu)$, and calculate the direction $[\triangle \x^T, \triangle \Lamb^T, \triangle \Mu^T]$ in which to step to set the linear approximation equal to $\0$.
 This equates to solving the linear system:
+\begin{align}
+DF(\x,\Lamb,\Mu)
+\begin{bmatrix}\triangle \x\\ \triangle \Lamb\\ \triangle \Mu\end{bmatrix}
+= - F(\x,\Lamb,\Mu) \label{eq:naiveNewton}
+\end{align}
+Here $DF(\x,\Lamb,\Mu)$ denotes the total derivative matrix of $F$.
+We can calculate this matrix block-wise by obtaining the partial derivatives of each block entry of $F(\x,\Lamb, \Mu)$ with respect to $\x$, $\Lamb$, and $\Mu$, respectively.
+We thus obtain:
 \[
-DF(x,\lambda,s)
-\begin{bmatrix}
-\triangle x\\
-\triangle \lambda\\
-\triangle s\\
-\end{bmatrix}
-= - F(x,\lambda,s).
+DF(\x,\Lamb,\Mu) = \left[\begin{array}{ccc}
+0 & A^T & I \\
+A & 0 & 0 \\
+M & 0 & X
+\end{array}\right]
 \]
-Here $DF(x,\lambda,s)$ denotes the total derivative matrix of $F$.
-We can calculate this matrix block-wise by obtaining the partial derivatives of each block entry of $F(x,\lambda, s)$ with respect to $x$, $\lambda$, and $s$, respectively.
-For example, consider the topmost block entry of $F(x,\lambda,s)$, given by
+where $X = \text{diag}(x_1,x_2,\ldots,x_n).$
+
+\begin{comment} % More derivation overkill vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+For example, consider the topmost block entry of $F(\x,\Lamb,\Mu)$, given by
 \[
 A^T\lambda + s - c.
 \]
@@ -162,14 +169,43 @@ We calculate the partial derivatives of this expressions as follows:
 \frac{\partial}{\partial \lambda}[A^T\lambda + s - c] &= A^T,\\
 \frac{\partial}{\partial s}[A^T\lambda + s - c] &= I.\\
 \end{align*}
-Hence, the topmost block row of $DF(x,\lambda,s)$ is given by
+Hence, the topmost block row of $DF(\x,\Lamb,\Mu)$ is given by
 \[
 \begin{bmatrix}
 0 \quad A^T \quad I\\
 \end{bmatrix}.
 \]
-
 Continuing in this manner, we can calculate the entire derivative matrix, which leads us to the following linear system:
+\end{comment} % More derivation overkill ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+\begin{problem} % Second step: define DF(x,lamb,mu) ---------------------------
+Within \li{interiorPoint()}, define a function for the matrix $DF$ described above.
+This function should take $\x$, $\Lamb$, and $\Mu$ as parameters and return a $(2n+m) \times (2n+m)$ NumPy array.
+\end{problem}
+
+Unfortunately, solving Equation \ref{eq:naiveNewton} often leads to a search direction that is too greedy.
+Even small steps in this direction may lead the iteration out of the feasible region by violating one of the constraints.
+To remedy this, we define the \emph{duality measure} $\nu$\footnote{$\nu$ is the Greek letter for $n$, pronounced ``nu.''} of the problem: \[\nu = \frac{\x^T\Mu}{n} \]
+The idea is to use Newton's method to identify a direction that stricly decreases $\nu$.
+Thus instead of solving Equation \ref{eq:naiveNewton}, we solve:
+\begin{align}
+DF(\x,\Lamb,\Mu)
+\begin{bmatrix}\triangle \x\\ \triangle \Lamb\\ \triangle \Mu\end{bmatrix}
+= - F(\x,\Lamb,\Mu) +
+\begin{bmatrix} \0 \\ \0 \\ \sigma\nu\e \end{bmatrix}
+\label{eq:newNewton}
+\end{align}
+where $\e = [1,1,\ldots,1]^T$ and $\sigma \in [0,1)$ is called the \emph{centering parameter}.
+The closer $\sigma$ is to 0, the more similar the resulting direction will be to the plain Newton direction.
+The closer $\sigma$ is to 1, the more the direction points inward to the interior of the of the feasible region.
+
+\begin{problem}
+Within \li{interiorPoint()}, write a subroutine to compute the search direction $[\triangle \x^T, \triangle \Lamb^T, \triangle \Mu^T]$ by solving Equation \ref{eq:newNewton}.
+Use $\sigma = \frac{1}{10}$ for the centering parameter.
+Consider using the functions \li{lu_factor()} and \li{lu_solve()} from the \li{scipy.linalg} module to solving the system of equations efficiently.
+\end{problem}
+
+\begin{comment} % Old strategy for search direction vvvvvvvvvvvvvvvvvvvvvvvvvvv
 \begin{equation}
 \begin{bmatrix}
 0 & A^T & I\\
@@ -177,9 +213,9 @@ A & 0 & 0\\
 S & 0 & X
 \end{bmatrix}
 \begin{bmatrix}
-\triangle x\\
-\triangle \lambda\\
-\triangle s
+\triangle \x\\
+\triangle \Lamb\\
+\triangle \Mu
 \end{bmatrix}
 =
 \begin{bmatrix}
@@ -199,7 +235,7 @@ The idea is to actually calculate two directions: we first calculate
 the standard Newton direction described above; that is, we obtain the solution to Equation \ref{eq:affine}.
 This is known as the \emph{predictor step}, since it gives us a direction in which the objective does indeed decrease, hence predicting our
 final search direction.
-Denote the solution to this system by $(\triangle x^a, \triangle \lambda^a, \triangle s^a)$.
+Denote the solution to this system by $(\triangle \x^a, \triangle \Lamb^a, \triangle \Mu^a)$.
 As discussed, however, we must deviate from this direction somewhat, and so we additionally solve the following linear system of equations:
 \begin{equation}
 \begin{bmatrix}
@@ -208,9 +244,9 @@ A & 0 & 0\\
 S & 0 & X
 \end{bmatrix}
 \begin{bmatrix}
-\triangle x\\
-\triangle \lambda\\
-\triangle s
+\triangle \x\\
+\triangle \Lamb\\
+\triangle \Mu
 \end{bmatrix}
 =
 \begin{bmatrix}
@@ -220,13 +256,13 @@ S & 0 & X
 \end{bmatrix}.
 \label{eq:centering}
 \end{equation}
-The solution to this system, which we denote by $(\triangle x, \triangle \lambda, \triangle s)$, is our final search direction.
+The solution to this system, which we denote by $(\triangle \x, \triangle \Lamb, \triangle \Mu)$, is our final search direction.
 
 We now describe the new pieces of Equation \ref{eq:centering}.
 Note that
 \begin{align*}
 \triangle X^a &= \text{diag}(\triangle x_1^a,\ldots,\triangle x_n^a),\\
-\triangle S^a &= \text{diag}(\triangle s_1^a,\ldots,\triangle s_n^a).
+\triangle S^a &= \text{diag}(\triangle \Mu_1^a,\ldots,\triangle \Mu_n^a).
 \end{align*}
 Further, define $\mu := x^Ts/n$.
 This quantity, called the \emph{duality measure}, tells us roughly how close we are to the optimal solution, with values closer to 0 being more desirable.
@@ -236,24 +272,36 @@ The formula for $\sigma$ is somewhat more complicated, and is based on a heurist
 First, make the following calculations (which give the maximum allowable step lengths in the Newton search direction for $x$ and $s$ before the nonnegativity condition is violated):
 \begin{align*}
 \alpha_a^p &:= \min\left(1, \displaystyle\min_{i : \triangle x_i^a < 0}-\frac{x_i}{\triangle x_i^a}\right)\\
-\alpha_a^d &:= \min\left(1, \displaystyle\min_{i : \triangle s_i^a < 0}-\frac{s_i}{\triangle s_i^a}\right).
+\alpha_a^d &:= \min\left(1, \displaystyle\min_{i : \triangle \mu_i^a < 0}-\frac{s_i}{\triangle \mu_i^a}\right).
 \end{align*}
 Next, define
 \[
-\mu_a := \frac{1}{n}(x+\alpha_a^p\triangle x^a)^T(s+\alpha_a^d\triangle s^a),
+\mu_a := \frac{1}{n}(x+\alpha_a^p\triangle \x^a)^T(s+\alpha_a^d\triangle \Mu^a),
 \]
 which is simply the duality measure for the point obtained by taking a full step in the Newton direction.
 Finally, calculate $\sigma$ by the formula
 \[
 \sigma = \left(\frac{\mu_a}{\mu}\right)^3.
 \]
+\end{comment} % Old strategy for search direction ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+\subsection*{Step Length}
+
+% =============================================================================
+% =============================================================================
+% SHANE HAS EDITED UP TO HERE =================================================
+% =============================================================================
+% =============================================================================
+
+$$\text{TODO}$$
+
+\begin{comment} % Old strategy for step length vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 Now that we have our search direction, it remains to choose our step length.
 We wish to step nearly as far as possible without violating the nonnegativity condition, thus remaining in the interior of the feasible region.
 First, make the following calculations, which give the maximum allowable step lengths for $x$ and $s$, respectively:
 \begin{align*}
 \beta^p &:= \displaystyle\min_{i : \triangle x_i < 0}-\frac{x_i}{\triangle x_i}\\
-\beta^d &:= \displaystyle\min_{i : \triangle s_i < 0}-\frac{s_i}{\triangle s_i}.
+\beta^d &:= \displaystyle\min_{i : \triangle \mu_i < 0}-\frac{s_i}{\triangle \mu_i}.
 \end{align*}
 Next, we back off from these maximum step lengths slightly:
 \begin{align*}
@@ -263,21 +311,22 @@ Next, we back off from these maximum step lengths slightly:
 These are our final step lengths.
 That is, our next point $(x', \lambda', s')$ is given by
 \begin{align*}
-x' &= x + \alpha^p\triangle x\\
-(\lambda', s') &= (\lambda, s) + \alpha^d(\triangle \lambda, \triangle s).
+x' &= x + \alpha^p\triangle \x\\
+(\lambda', s') &= (\lambda, s) + \alpha^d(\triangle \Lamb, \triangle \Mu).
 \end{align*}
+
 We summarize the entire procedure in Algorithm \ref{alg:predcorr}.
 \begin{algorithm}
 \begin{algorithmic}[1]
 \Procedure{Predictor-Corrector Algorithm}{}
     \State \textrm{Choose initial point } $(x_0, \lambda_0, s_0)$.
     \For{$k = 0, 1, 2, \ldots$}
-        \State \textrm{Solve for } $(\triangle x^a, \triangle \lambda^a, \triangle s^a)$.
+        \State \textrm{Solve for } $(\triangle \x^a, \triangle \Lamb^a, \triangle \Mu^a)$.
         \State \textrm{Calculate } $\alpha_a^p, \alpha_a^d, \mu_a$, \textrm{and} $\sigma$.
-        \State \textrm{Solve for } $(\triangle x, \triangle \lambda, \triangle s)$.
+        \State \textrm{Solve for } $(\triangle \x, \triangle \Lamb, \triangle \Mu)$.
         \State \textrm{Calculate the step lengths } $\alpha^p, \alpha^d$.
-        \State $x_{k+1} = x_k + \alpha^p\triangle x$,\\
-        $\qquad\quad(\lambda_{k+1}, s_{k+1}) = (\lambda_k, s_k) + \alpha^d(\triangle \lambda, \triangle s)$.
+        \State $x_{k+1} = x_k + \alpha^p\triangle \x$,\\
+        $\qquad\quad(\lambda_{k+1}, s_{k+1}) = (\lambda_k, s_k) + \alpha^d(\triangle \Lamb, \triangle \Mu)$.
     \EndFor
 \EndProcedure
 \end{algorithmic}
@@ -318,7 +367,9 @@ This can be done in a vectorized fashion in Python as follows (assuming that the
 >>>     myMin = 1
 \end{lstlisting}
 We need the \li{if} statement to deal with the case where no entry of $u$ is negative.
+\end{comment} % Old strategy for step length ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+\subsection*{Initial Point}
 Finally, the choice of initial point $(x_0, \lambda_0, s_0)$ is an important, nontrivial one.
 A naively or randomly chosen initial point may cause the algorithm to fail to converge.
 We provide code to calculate an appropriate initial point.
@@ -360,16 +411,12 @@ def startingPoint(A, b, c):
     return x, lam, s
 \end{lstlisting}
 
-\begin{problem} % Split up this problem into several parts!
-Write a function \li{interiorPoint} that implements the interior point method described above.
-The function should accept $A$, $b$, and $c$ as parameters, along with keyword arguments
-\li{niter} that gives the number of iterations to perform, and \li{verbose} that indicates
-whether to print out the value of the objective function and $\mu$ at each iteration.
-The function should return the optimal point $x$ along with the value of the objective function at this
-point.
+\begin{problem} % Put it all together -----------------------------------------
+Complete the implementation of \li{interiorPoint()}.
+Return function should return the optimal point $\x^*$ along with the value of the objective function at this point.
 \end{problem}
 
-\section*{Least Absolute Deviations}
+\section*{Least Absolute Deviations} % APPLICATION ============================
 We now return to the familiar problem of fitting a line (or hyperplane) to a set of data.
 We have previously approached this problem by minimizing the sum of the squares of the errors between the data points and the line, an approach known as \emph{least squares}.
 The least squares solution can be obtained analytically when fitting a linear function, or through a number of optimization methods (such as Conjugate Gradient) when fitting a nonlinear function.
@@ -411,7 +458,7 @@ However, one can expect a unique solution in most cases.
 The least absolute deviations solution arises naturally when we assume that the residual terms $\beta^T\mathbf{x}_i + b - y_i$ have a particular statistical distribution (the Laplace distribution).
 Ultimately, however, the choice between least absolute deviations and least squares depends on the nature of the data at hand, as well as your own good judgment.
 
-\subsection{Least Absolute Deviations as a Linear Program}
+\subsection*{Least Absolute Deviations as a Linear Program}
 We can formulate the least absolute deviations problem as a linear program, and then solve it using our interior point method.
 For $i = 1, 2, \ldots, m$ we introduce the artificial variable $u_i$ to take the place of the error term $|\beta^T\mathbf{x}_i + b - y_i|$, and we require this variable to satisfy $u_i \geq |\beta^T\mathbf{x}_i + b - y_i|$.
 This constraint is not yet linear, but we can split it into an equivalent set of two linear constraints:
