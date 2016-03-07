@@ -16,7 +16,7 @@ Provided the linear program is neither unbounded nor infeasible, the algorithm i
 Interior point methods do away with the feasible polytope and instead generate a sequence of points that cut through the interior (or exterior) of the feasible region and converge iteratively to the optimal point.
 Although it is computationally more expensive to compute such interior points, each step results in significant progress toward the minimizer.
 See Figure \ref{fig:intPath}.
-In general, the Simplex Method requires many more (less expensive) computations.
+In general, the Simplex Method requires many more iterations (though each iteration is less expensive computationally).
 
 \begin{figure}
 \centering
@@ -127,7 +127,8 @@ where $X = \text{diag}(x_1,x_2,\ldots,x_n)$, $S = \text{diag}(s_1,s_2,\ldots,s_n
 
 \begin{problem} % First step: define F(x,lamb,mu) -----------------------------
 Define a function \li{interiorPoint()} that will be used to solve the complete interior point problem.
-This function should accept $A$, $\b$, and $\c$ as parameters, along with the keyword argument \li{niter} that gives the number of iterations to perform (default this value to $20$).
+This function should accept $A$, $\b$, and $\c$ as parameters, along with the keyword arguments \li{niter=30} and \li{tol=1e-16}.
+The keyword arguments will be used in a later problem.
 
 For this problem, within the \li{interiorPoint()} function, write a function for the vector-valued function $F$ described above.
 This function should accept $\x$, $\Lamb$, and $\Mu$ as parameters and return a 1-dimensional NumPy array with $2n+m$ entries.
@@ -178,11 +179,6 @@ Hence, the topmost block row of $DF(\x,\Lamb,\Mu)$ is given by
 Continuing in this manner, we can calculate the entire derivative matrix, which leads us to the following linear system:
 \end{comment} % More derivation overkill ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-\begin{problem} % Second step: define DF(x,lamb,mu) ---------------------------
-Within \li{interiorPoint()}, define a function for the matrix $DF$ described above.
-This function should take $\x$ and $\Mu$ as parameters and return a $(2n+m) \times (2n+m)$ NumPy array.
-\end{problem}
-
 Unfortunately, solving Equation \ref{eq:naiveNewton} often leads to a search direction that is too greedy.
 Even small steps in this direction may lead the iteration out of the feasible region by violating one of the constraints.
 To remedy this, we define the \emph{duality measure} $\nu$\footnote{$\nu$ is the Greek letter for $n$, pronounced ``nu.''} of the problem: \[\nu = \frac{\x^T\Mu}{n} \]
@@ -199,9 +195,11 @@ where $\e = (1,1,\ldots,1)^T$ and $\sigma \in [0,1)$ is called the \emph{centeri
 The closer $\sigma$ is to 0, the more similar the resulting direction will be to the plain Newton direction.
 The closer $\sigma$ is to 1, the more the direction points inward to the interior of the of the feasible region.
 
-\begin{problem} % Third step: Search direction --------------------------------
+\begin{problem} % Search direction --------------------------------------------
 Within \li{interiorPoint()}, write a subroutine to compute the search direction $(\triangle \x^T, \triangle \Lamb^T, \triangle \Mu^T)$ by solving Equation \ref{eq:newNewton}.
 Use $\sigma = \frac{1}{10}$ for the centering parameter.
+
+Note that only the last block row of $DF$ will need to be changed at each iteration (since $M$ and $X$ depend on $\Mu$ and $\x$, respectively).
 Consider using the functions \li{lu_factor()} and \li{lu_solve()} from the \li{scipy.linalg} module to solving the system of equations efficiently.
 \end{problem}
 
@@ -378,9 +376,9 @@ This can be done in a vectorized fashion in Python as follows (assuming that the
 We need the \li{if} statement to deal with the case where no entry of $u$ is negative.
 \end{comment} % Unnecessary / confusing hints ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-\begin{problem} % Fourth Step: Step size --------------------------------------
+\begin{problem} % Step size ---------------------------------------------------
 Within \li{interiorPoint()}, write a subroutine to compute the step size after the search direction has been computed.
-Avoid using loops when computing $\alpha_{\max}$ and $\beta_{\max}$ (use of masking and NumPy functions instead).
+Avoid using loops when computing $\alpha_{\max}$ and $\beta_{\max}$ (use masking and NumPy functions instead).
 \end{problem}
 
 \subsection*{Initial Point}
@@ -419,12 +417,13 @@ def startingPoint(A, b, c):
 
 \begin{problem} % Put it all together -----------------------------------------
 Complete the implementation of \li{interiorPoint()}.
-Use the function provided above to select an initial point, then run the iteration \li{niter} times.
-Return the optimal point $\x^*$ along with the value of the objective function at this point.
 
 The duality measure $\nu$ tells us in some sense how close our current point is to the minimizer.
 The closer $\nu$ is to 0, the closer we are to the optimal point.
 Thus, by printing the value of $\nu$ at each iteration, you can track how your algorithm is progressing and detect when you have converged.
+
+Use the function provided above to select an initial point, then run the iteration \li{niter} times, or until the duality measure is less than \li{tol}.
+Return the optimal point $\x^*$ and the optimal value $\c^T\x^*$.
 \end{problem}
 
 \section*{Least Absolute Deviations} % APPLICATION ============================
@@ -557,7 +556,7 @@ Try writing out the constraint matrix by hand for small $m, n$, and make sure yo
 
 Now we can calculate the solution by calling our interior point function.
 \begin{lstlisting}
->>> sol = interiorPoint(A, y, c, niter=10, verbose=False)[0]
+>>> sol = interiorPoint(A, y, c, niter=10)[0]
 \end{lstlisting}
 
 The variable \li{sol}, however, holds the value for the vector
