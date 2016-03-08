@@ -1,10 +1,16 @@
 \lab{Interior Point I}{Interior Point I}
 
-% Bold mu and lambda symbols for this lab.
+% Bold mu, lambda, and beta symbols for this lab.
 \def\Mu{\boldsymbol{\mu}}
 \def\Lamb{\boldsymbol{\lambda}}
+\def\Beta{\boldsymbol{\beta}}
 
-\objective{For decades after its invention, the Simplex algorithm was the only competitive method for linear programming. The past 30 years, however, have seen the discovery and widespread adoption of a new family of algorithms that rival--and in some cases outperform--the Simplex algorithm, collectively called \emph{Interior Point methods}. One of the major shortcomings of the Simplex algorithm is that the number of steps required to solve the problem can grow exponentially with the size of the linear system. Thus, for certain large linear programs, the Simplex algorithm is simply not viable. Interior Point methods offer an alternative approach and enjoy much better theoretical convergence properties. In this lab we implement an Interior Point method for linear programs, and in the next lab we will turn to the problem of solving quadratic programs.}
+\objective{For decades after its invention, the Simplex algorithm was the only competitive method for linear programming.
+The past 30 years, however, have seen the discovery and widespread adoption of a new family of algorithms that rival--and in some cases outperform--the Simplex algorithm, collectively called \emph{Interior Point methods}.
+One of the major shortcomings of the Simplex algorithm is that the number of steps required to solve the problem can grow exponentially with the size of the linear system.
+Thus, for certain large linear programs, the Simplex algorithm is simply not viable.
+Interior Point methods offer an alternative approach and enjoy much better theoretical convergence properties.
+In this lab we implement an Interior Point method for linear programs, and in the next lab we will turn to the problem of solving quadratic programs.}
 
 \section*{Introduction}
 
@@ -127,7 +133,7 @@ where $X = \text{diag}(x_1,x_2,\ldots,x_n)$, $S = \text{diag}(s_1,s_2,\ldots,s_n
 
 \begin{problem} % First step: define F(x,lamb,mu) -----------------------------
 Define a function \li{interiorPoint()} that will be used to solve the complete interior point problem.
-This function should accept $A$, $\b$, and $\c$ as parameters, along with the keyword arguments \li{niter=30} and \li{tol=1e-16}.
+This function should accept $A$, $\b$, and $\c$ as parameters, along with the keyword arguments \li{niter=20} and \li{tol=1e-16}.
 The keyword arguments will be used in a later problem.
 
 For this problem, within the \li{interiorPoint()} function, write a function for the vector-valued function $F$ described above.
@@ -424,28 +430,74 @@ Thus, by printing the value of $\nu$ at each iteration, you can track how your a
 
 Use the function provided above to select an initial point, then run the iteration \li{niter} times, or until the duality measure is less than \li{tol}.
 Return the optimal point $\x^*$ and the optimal value $\c^T\x^*$.
+
+To test your implementation, use the following code to generate a random linear program, along with the optimal solution.
+\begin{lstlisting}
+def randomLP(m):
+    """Generate a 'square' linear program min c^T x s.t. Ax = b, x>=0.
+    First generate m feasible constraints, then add slack variables.
+    Inputs:
+        m -- positive integer, number of desired constraints and
+             the dimension of space in which to optimize.
+    Outputs:
+        A -- array of shape (m,n).
+        b -- array of shape (m,).
+        c -- array of shape (n,).
+        x -- the solution to the LP.
+    """
+    n = m
+    A = np.random.random((m,n))*20 - 10
+    A[A[:,-1]<0] *= -1
+    x = np.random.random(n)*10
+    b = A.dot(x)
+    c = A.sum(axis=0)/float(n)
+    return A, b, -c, x
+\end{lstlisting}
+\begin{lstlisting}
+>>> A, b, c, x = randomLP(5)
+>>> point, value = interiorPoint(A, b, c)
+>>> np.allclose(x, value)
+True
+\end{lstlisting}
 \end{problem}
 
-\section*{Least Absolute Deviations} % APPLICATION ============================
+% NOTE: The randomLP() function listed above is a bit wimpy, since it only does
+% 'square' linear programs. When we give interiorPoint() LP's with m > n, like
+% m=7 and n=5, it fails about 5% percent of the time. What is wrong with the
+% algorithm or the implementation? Can we explain it to students?
+% Another problem: the function often fails on 'square' linear programs when
+% the dimension gets too high (really not that high, only like 10 or so).
+% It is a problem with randomLP(), or with interiorPoint()?
+
+\begin{info}
+Our implementation of the interior point method is pretty good, but for linear programs where the number of constraints $m$ is strictly greater than the number of decision variables $n$, it fails to get quite the right answer about 11\% of the time.
+If you can discover why this is, fix it, and write up your results in a clear and intelligle way (aka IPython Notebook), then you will earn massive extra credit on this lab.
+-Shane
+\end{info}
+
+% TODO: In the future, time interiorPoint() against a Simplex method. Have a
+% problem to demonstrate that each is advantageous in different settings.
+
+\section*{Least Absolute Deviations (LAD)} % APPLICATION ======================
 We now return to the familiar problem of fitting a line (or hyperplane) to a set of data.
 We have previously approached this problem by minimizing the sum of the squares of the errors between the data points and the line, an approach known as \emph{least squares}.
 The least squares solution can be obtained analytically when fitting a linear function, or through a number of optimization methods (such as Conjugate Gradient) when fitting a nonlinear function.
 
-The method of least absolute deviations also seeks to find a best fit line to a set of data, but the error between the data and the line is measured differently.
-In particular, suppose we have a set of data points $(y_1, \mathbf{x}_1), (y_2, \mathbf{x}_2), \ldots, (y_m, \mathbf{x}_m)$, where $y_i \in \mathbb{R}$, $\mathbf{x}_i \in \mathbb{R}^n$ for $i = 1, 2, \ldots, m$.
-Here, the $\mathbf{x}_i$ vectors are the explanatory variables and the $y_i$ values are the response variables, and we assume the following linear model:
+The method of \emph{least absolute deviations} (LAD) also seeks to find a best fit line to a set of data, but the error between the data and the line is measured differently.
+In particular, suppose we have a set of data points $(y_1, \x_1), (y_2, \x_2), \ldots, (y_m, \x_m)$, where $y_i \in \mathbb{R}$, $\x_i \in \mathbb{R}^n$ for $i = 1, 2, \ldots, m$.
+Here, the $\x_i$ vectors are the \emph{explanatory variables} and the $y_i$ values are the \emph{response variables}, and we assume the following linear model:
 \[
-y_i = \beta^T\mathbf{x}_i + b, \qquad i = 1, 2, \ldots, m,
+y_i = \Beta^T\mathbf{x}_i + b, \qquad i = 1, 2, \ldots, m,
 \]
-where $\beta\in\mathbb{R}^n$ and $b \in \mathbb{R}$.
+where $\Beta\in\mathbb{R}^n$ and $b \in \mathbb{R}$.
 The error between the data and the proposed linear model is given by
 \[
-\sum_{i=1}^n |\beta^T\mathbf{x}_i + b - y_i|,
+\sum_{i=1}^n |\Beta^T\mathbf{x}_i + b - y_i|,
 \]
-and we seek to choose the parameters $\beta, b$ so as to minimize this error.
+and we seek to choose the parameters $\Beta, b$ so as to minimize this error.
 
-Before we explore how to solve this problem, a discussion of the differences between least absolute deviations and least squares is in order.
-The most prominent difference between these two approaches is how they respond to outliers in the data.
+\subsection*{Advantages of LAD}
+The most prominent difference between this approach and least squares is how they respond to outliers in the data.
 Least absolute deviations is robust in the presence of outliers, meaning that one (or a few) errant data points won't severely affect the fitted line.
 Indeed, in most cases, the best fit line is guaranteed to pass through at least two of the data points.
 This is a desirable property when the outliers may be ignored (perhaps because they are due to measurement error or corrupted data).
@@ -465,51 +517,56 @@ Hence, the least absolute deviations solution is less stable than the least squa
 In some cases there are even infinitely many lines that minimize the least absolute deviations error term.
 However, one can expect a unique solution in most cases.
 
-The least absolute deviations solution arises naturally when we assume that the residual terms $\beta^T\mathbf{x}_i + b - y_i$ have a particular statistical distribution (the Laplace distribution).
+The least absolute deviations solution arises naturally when we assume that the residual terms $\Beta^T\mathbf{x}_i + b - y_i$ have a particular statistical distribution (the Laplace distribution).
 Ultimately, however, the choice between least absolute deviations and least squares depends on the nature of the data at hand, as well as your own good judgment.
 
-\subsection*{Least Absolute Deviations as a Linear Program}
+% =============================================================================
+% =============================================================================
+% EDITED TO HERE ==============================================================
+% =============================================================================
+% =============================================================================
+
+\subsection*{LAD as a Linear Program}
 We can formulate the least absolute deviations problem as a linear program, and then solve it using our interior point method.
-For $i = 1, 2, \ldots, m$ we introduce the artificial variable $u_i$ to take the place of the error term $|\beta^T\mathbf{x}_i + b - y_i|$, and we require this variable to satisfy $u_i \geq |\beta^T\mathbf{x}_i + b - y_i|$.
+For $i = 1, 2, \ldots, m$ we introduce the artificial variable $u_i$ to take the place of the error term $|\Beta^T\mathbf{x}_i + b - y_i|$, and we require this variable to satisfy $u_i \geq |\Beta^T\mathbf{x}_i + b - y_i|$.
 This constraint is not yet linear, but we can split it into an equivalent set of two linear constraints:
 \begin{align*}
-u_i &\geq \beta^T\mathbf{x}_i + b - y_i,\\
-u_i &\geq y_i - \beta^T\mathbf{x}_i - b.
+u_i &\geq \Beta^T\mathbf{x}_i + b - y_i,\\
+u_i &\geq y_i - \Beta^T\mathbf{x}_i - b.
 \end{align*}
 The $u_i$ are implicitly constrained to be nonnegative.
 
 Our linear program can now be stated as follows:
 \begin{align*}
 \text{minimize }\qquad &\sum_{i=1}^m u_i\\
-\text{subject to }\qquad &u_i \geq \beta^T\mathbf{x}_i + b - y_i,\\
-&u_i \geq y_i - \beta^T\mathbf{x}_i - b.
+\text{subject to }\qquad &u_i \geq \Beta^T\mathbf{x}_i + b - y_i,\\
+&u_i \geq y_i - \Beta^T\mathbf{x}_i - b.
 \end{align*}
-This is not yet in the form that we need in order to use our interior point method.
-For each inequality constraint, we bring all variables ($u_i, \beta, b$) to the left hand side and introduce a nonnegative slack variable to transform the constraint into an equality:
+Now for each inequality constraint, we bring all variables ($u_i, \Beta, b$) to the left hand side and introduce a nonnegative slack variable to transform the constraint into an equality:
 \begin{align*}
-u_i  - \beta^T\mathbf{x}_i - b - s_{2i-1}&= -y_i,\\
-u_i +\beta^T\mathbf{x}_i + b - s_{2i}&= y_i,\\
+u_i  - \Beta^T\mathbf{x}_i - b - s_{2i-1}&= -y_i,\\
+u_i +\Beta^T\mathbf{x}_i + b - s_{2i}&= y_i,\\
 s_{2i-1}, s_{2i}&\geq 0.
 \end{align*}
 
-Notice that the variables $\beta, b$ are not assumed to be nonnegative, but in our interior point method, all variables are assumed to be nonnegative.
+Notice that the variables $\Beta, b$ are not assumed to be nonnegative, but in our interior point method, all variables are assumed to be nonnegative.
 We can fix this situation by writing these variables as the difference of nonnegative variables:
 \begin{align*}
-  \beta &= \beta_1 - \beta_2,\\
+  \Beta &= \Beta_1 - \Beta_2,\\
   b &= b_1 - b_2,\\
-  &\beta_1, \beta_2, b_1, b_2 \geq 0.
+  &\Beta_1, \Beta_2, b_1, b_2 \geq 0.
 \end{align*}
 Substituting these values into our constraints, we have the following system of constraints:
 \begin{align*}
-u_i  - \beta_1^T\mathbf{x}_i + \beta_2^T\mathbf{x}_i - b_1 + b_2 - s_{2i-1}&= -y_i,\\
-u_i + \beta_1^T\mathbf{x}_i - \beta_2^T\mathbf{x}_i + b_1 - b_2 - s_{2i}&= y_i,\\
-u_i, \beta_1, \beta_2, b_1, b_2, s_{2i-1}, s_{2i}&\geq 0.
+u_i  - \Beta_1^T\mathbf{x}_i + \Beta_2^T\mathbf{x}_i - b_1 + b_2 - s_{2i-1}&= -y_i,\\
+u_i + \Beta_1^T\mathbf{x}_i - \Beta_2^T\mathbf{x}_i + b_1 - b_2 - s_{2i}&= y_i,\\
+u_i, \Beta_1, \Beta_2, b_1, b_2, s_{2i-1}, s_{2i}&\geq 0.
 \end{align*}
-Writing $\mathbf{y} = (-y_1, y_1, -y_2, y_2, \ldots, -y_m, y_m)^T$ and $\beta_i = (\beta_{i,1}, \ldots, \beta_{i,n})^T$ for $i = \{1, 2\}$, we can aggregate all of our variables into one vector as follows:
+Writing $\mathbf{y} = (-y_1, y_1, -y_2, y_2, \ldots, -y_m, y_m)^T$ and $\Beta_i = (\beta_{i,1}, \ldots, \beta_{i,n})^T$ for $i = \{1, 2\}$, we can aggregate all of our variables into one vector as follows:
 \[
 \mathbf{v} = (u_1,\ldots, u_m, \beta_{1,1},\ldots, \beta_{1,n}, \beta_{2,1},\ldots, \beta_{2,n}, b_1, b_2, s_1,\ldots,s_{2m})^T.
 \]
-Defining $\mathbf{c} = (1, 1, \ldots, 1, 0, \ldots, 0)^T$ (where only the first $m$ entries are equal to 1), we can write our objective function as
+Defining $\c = (1, 1, \ldots, 1, 0, \ldots, 0)^T$ (where only the first $m$ entries are equal to 1), we can write our objective function as
 \[
 \sum_{i=1}^m u_i = \mathbf{c}^T\mathbf{v}.
 \]
@@ -521,6 +578,8 @@ Hence, the final form of our linear program is:
 \end{align*}
 where $A$ is a matrix containing the coefficients of the constraints.
 Our constraints are now equalities, and the variables are all nonnegative, so we are ready to use our interior point method to obtain the solution.
+
+\subsection*{LAD Example}
 
 Consider the following example.
 We start with an array \li{data}, each row of which consists of the values $y_i, x_{i,1},\ldots,x_{i,n}$, where $\mathbf{x}_i = (x_{i,1}, x_{i,2}, \ldots, x_{i,n})^T$.
@@ -563,14 +622,14 @@ The variable \li{sol}, however, holds the value for the vector
 \[
 \mathbf{v} = (u_1,\ldots, u_m, \beta_{1,1},\ldots, \beta_{1,n}, \beta_{2,1},\ldots, \beta_{2,n}, b_1, b_2, s_1,\ldots,s_{2m+1})^T.
 \]
-We want the values of $\beta = \beta_1-\beta_2$ and $b = b_1 - b_2$, and we accomplish this with the following:
+We extract values of $\Beta = \Beta_1-\Beta_2$ and $b = b_1 - b_2$ with the following code:
 \begin{lstlisting}
 >>> beta = sol[m:m+n] - sol[m+n:m+2*n]
 >>> b = sol[m+2*n] - sol[m+2*n+1]
 \end{lstlisting}
 
-\begin{problem} % Least Total Deviations Problem
+\begin{problem} % Least Total Deviations Problem ------------------------------
 The file \li{simdata.txt} contains two columns of data.
-The first gives the values of the response variables, and the second column gives the values of the explanatory variables.
+The first gives the values of the response variables ($y_i$), and the second column gives the values of the explanatory variables ($\x_i$).
 Find the least absolute deviations line for this data set, and plot it together with the data.
 \end{problem}
