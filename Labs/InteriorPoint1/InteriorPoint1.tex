@@ -632,4 +632,16 @@ We extract values of $\Beta = \Beta_1-\Beta_2$ and $b = b_1 - b_2$ with the foll
 The file \li{simdata.txt} contains two columns of data.
 The first gives the values of the response variables ($y_i$), and the second column gives the values of the explanatory variables ($\x_i$).
 Find the least absolute deviations line for this data set, and plot it together with the data.
+Plot the least squares solution as well to compare the results.
+\begin{lstlisting}
+>>> from scipy.stats import linregress
+>>> slope, intercept = linregress(data[:,1], data[:,0])
+>>> domain = np.linspace(0,10,200)
+>>> plt.plot(domain, domain*slope + intercept)
+\end{lstlisting}
+% \begin{figure}[H] % solution to the problem with new simdata.
+% \centering
+% \includegraphics[width=\textwidth]{LADprob.pdf}
+% \label{fig:LADprob}
+% \end{figure}
 \end{problem}

@@ -1,10 +1,10 @@
-import matplotlib
-matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
+# import matplotlib
+# matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
 from matplotlib import pyplot as plt
 
 import numpy as np
 from scipy import linalg as la
-import IntPointSolutions as sol
+import solutions as sol
 
 def interiorPath():
     '''
@@ -24,7 +24,7 @@ def interiorPath():
     s += 3.5
 
     # solve the program
-    pts = sol.interiorPoint(-A,-b,-c, niter=5, starting_point = (x,l,s), pts=True)
+    pts = sol.old_interiorPoint(-A,-b,-c, niter=5, starting_point = (x,l,s), pts=True)
 
     # plot the constraints together with the interior path
     dom = np.linspace(0,10,2)
@@ -56,7 +56,7 @@ def leastAbsDev():
     x = np.sort(x, axis=0)
     y = slope*x + np.random.randn(m).reshape((m,1))
     y[-1] -= 20 #insert outlier
-    
+
     #Formulate constraint matrix
     A = np.ones((2*m, m+2+2*n+2*m))
     A[::2, :m] = np.eye(m)
@@ -68,36 +68,37 @@ def leastAbsDev():
     A[1::2, m+2*n] = -1
     A[::2, m+2*n+1] = -1
     A[:, m+2+2*n:] = -np.eye(2*m, 2*m)
-    
+
     b = np.empty((2*m,1))
     b[::2] = y
     b[1::2] = -y
     b = b.flatten()
-    
+
     c = np.zeros(A.shape[1])
     c[:m] = 1
-    
+
     #Obtain and interpret solution
     pts = sol.interiorPoint(A,b,c, niter=10, verbose=False)[0]
     coeffs = pts[m:m+2*n+2:2] - pts[m+1:m+2*n+2:2]
-    
+
     #Obtain the least squares solution
     B = np.ones((m, n+1))
     B[:,0] = x.flatten()
     coeffs2 = la.lstsq(B, y)[0]
-    
+
     #Plot the data, fitted lines
     dom = np.linspace(0, 10, 2)
     plt.subplot(211)
-    plt.scatter(x,y)
-    plt.plot(dom, coeffs[0]*dom+coeffs[1])
+    plt.scatter(x,y, c='k')
+    plt.plot(dom, coeffs[0]*dom+coeffs[1], 'b-', linewidth=2)
     plt.subplot(212)
-    plt.scatter(x,y)
-    plt.plot(dom, coeffs2[0]*dom+coeffs2[1])
+    plt.scatter(x,y, c='k')
+    plt.plot(dom, coeffs2[0]*dom+coeffs2[1], 'g-', linewidth=2)
     plt.savefig('leastAbsDev.pdf')
     plt.clf()
-
 
 if __name__ == "__main__":
     interiorPath()
     leastAbsDev()
+    sol.leastAbsoluteDeviations(True)
+

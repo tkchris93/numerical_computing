@@ -3,6 +3,7 @@
 
 import numpy as np
 from scipy import linalg as la
+from scipy.stats import linregress
 from matplotlib import pyplot as plt
 
 
@@ -162,7 +163,7 @@ def lame_test():
 
 
 # Problem 5 ===================================================================
-def leastAbsoluteDeviations():
+def leastAbsoluteDeviations(save=False):
     """This code should be fairly close to what the students submit for the
     least absolute deviations problem.
     """
@@ -191,10 +192,20 @@ def leastAbsoluteDeviations():
     b = sol[m+2*n] - sol[m+2*n+1]
 
     dom = np.linspace(0,10,2)
-    plt.scatter(data[:,1], data[:,0])
-    plt.plot(dom, beta*dom+b, linewidth=2)
-    plt.title("Problem 5")
-    plt.show()
+    plt.scatter(data[:,1], data[:,0], c='k')
+    plt.plot(dom, beta*dom+b, 'b-', linewidth=2, label="LAD")
+
+    # Compare with least squares
+    slope, intercept = linregress(data[:,1], data[:,0])[:2]
+    lstsq_line = slope*dom + intercept
+    plt.plot(dom, lstsq_line, 'g--', linewidth=2, label="LSTSQ")
+
+    # plt.title("Problem 5")
+    plt.legend()
+    if save is True: # For figure file creation
+        plt.savefig("LADprob.pdf")
+    else:
+        plt.show()
     print 'Beta:', beta
     print 'b:', b
 
@@ -346,3 +357,4 @@ def randomLP(m,n):
     # the optimal solution has x[:n] = v
 
     return A, b, -c, v
+
