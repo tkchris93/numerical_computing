@@ -635,7 +635,7 @@ Find the least absolute deviations line for this data set, and plot it together 
 Plot the least squares solution as well to compare the results.
 \begin{lstlisting}
 >>> from scipy.stats import linregress
->>> slope, intercept = linregress(data[:,1], data[:,0])
+>>> slope, intercept = linregress(data[:,1], data[:,0])[:2]
 >>> domain = np.linspace(0,10,200)
 >>> plt.plot(domain, domain*slope + intercept)
 \end{lstlisting}
