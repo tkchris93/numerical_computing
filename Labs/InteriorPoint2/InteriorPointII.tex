@@ -374,6 +374,11 @@ The correct minimizer is $\left[\frac{2}{3}, \frac{4}{3}\right].$
 % \end{lstlisting}
 % Check that your function gives the same output.
 
+\begin{info}
+The Interior Point methods presented in this and the preceding labs are only special cases of the more general Interior Point algorithm.
+The general version can be used to solve many convex optimization problems, provided that one can derive the corresponding KKT conditions and duality measure $\nu$.
+\end{info}
+
 \section*{Application: Optimal Elastic Membranes}
 The properties of elastic membranes (stretchy materials like a thin rubber sheet) are of interest in certain fields of mathematics and various sciences.
 A mathematical model for such materials can be used by biologists to study interfaces in cellular regions in an organism, or by engineers to design tensile structures.
@@ -389,6 +394,12 @@ In Python, we can store a two-dimensional grid of values as a simple two-dimensi
 We can then flatten this array to give a one-dimensional vector representation of the grid.
 If we let $\x$ be a one-dimensional array giving the tent height at each grid point, and $L$ be the one-dimensional array giving the underlying tent pole structure (consisting mainly of zeros, except at the grid points that contain a tent pole), we have the linear constraints: \[\x \succeq L.\]
 
+\begin{figure}
+\includegraphics[width=\textwidth]{tent.pdf}
+\caption{Tent pole configuration (left) and optimal elastic tent (right).}
+\label{fig:tent}
+\end{figure}
+
 The theory of elastic membranes claims that such materials tend to naturally minimize a quantity known as the \emph{Dirichlet energy}.
 This quantity can be expressed as a quadratic function of the membrane.
 Then since we have modeled our tent with a discrete grid of values, this energy function has the form \[\frac{1}{2}\x^T H \x + \c^T \x,\] where $H$ is a particular positive semidefinite matrix closely related to Laplace's Equation, $\c$ is a vector whose entries are all equal to $-(n-1)^{-2}$, and $n$ is the side length of the grid.
@@ -399,14 +410,9 @@ Our circus tent is therefore given by the solution to the quadratic constrained 
 \end{align*}
 See Figure \ref{fig:tent} for an example of a tent pole configuration and the corresponding tent.
 
-\begin{figure}
-\includegraphics[width=\textwidth]{tent.pdf}
-\caption{Tent pole configuration (left) and optimal elastic tent (right).}
-\label{fig:tent}
-\end{figure}
-
 We provide the following function for producing the Dirichlet energy matrix $H$.
 \begin{lstlisting}
+from scipy.sparse import spdiags
 def laplacian(n):
     """Construct the discrete Dirichlet energy matrix H for an n x n grid."""
     data = -1*np.ones((5, n**2))
@@ -414,7 +420,7 @@ def laplacian(n):
     data[1, n-1::n] = 0
     data[3, ::n] = 0
     diags = np.array([-n, -1, 0, 1, n])
-    return spar.spdiags(data, diags, n**2, n**2).todense()
+    return spdiags(data, diags, n**2, n**2).todense()
 \end{lstlisting}
 Now we initialize the tent pole configuration for a grid of side length $n$, as well as initial guesses for $\x$, $\y$, and $\Mu$.
 \begin{lstlisting}
@@ -528,7 +534,7 @@ In this way, we obtain estimated values for $Q$ and each $\mu_i$.
 The text file \li{portfolio.txt} contains historical stock data for several assets (U.S. bonds, gold, S\&P 500, etc).
 In particular, the first column gives the years corresponding to the data, and the remaining eight columns give the historical returns
 of eight assets over the course of these years.
-Use this data and to estimate the covariance matrix $Q$ as well as the expected rates of return $\mu_i$ for each asset.
+Use this data to estimate the covariance matrix $Q$ as well as the expected rates of return $\mu_i$ for each asset.
 Assuming that we want to guarantee an expected return of $R = 1.13$ for our portfolio, find the optimal portfolio both with and without short selling.
 
 Since the problem contains both equality and inequality constraints, use the QP solver in CVXOPT rather than your \li{qInteriorPoint()} function.

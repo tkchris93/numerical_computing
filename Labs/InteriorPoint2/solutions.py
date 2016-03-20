@@ -4,10 +4,10 @@ import numpy as np
 from scipy import linalg as la
 from matplotlib import pyplot as plt
 from cvxopt import matrix, solvers
-import math
-from scipy import sparse as spar
+from scipy.sparse import spdiags
 from mpl_toolkits.mplot3d import axes3d
 
+# Auxiliary Functions =========================================================
 def startingPoint(G, c, A, b, guess):
     """
     Obtain an appropriate initial point for solving the QP
@@ -230,7 +230,7 @@ def laplacian(n):
     data[1, n-3::n-2] = 0
     data[3, ::n-2] = 0
     diags = np.array([-n+2, -1, 0, 1, n-2])
-    return spar.spdiags(data, diags, (n-2)**2, (n-2)**2).todense()
+    return spdiags(data, diags, (n-2)**2, (n-2)**2).todense()
 
     
 def portfolio():
