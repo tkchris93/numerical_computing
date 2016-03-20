@@ -1,5 +1,6 @@
 # solutions.py
 """Volume II: Interior Point II (Quadratic Optimization). Solutions file."""
+
 import numpy as np
 from scipy import linalg as la
 from matplotlib import pyplot as plt
@@ -7,7 +8,7 @@ from cvxopt import matrix, solvers
 from scipy.sparse import spdiags
 from mpl_toolkits.mplot3d import axes3d
 
-# Auxiliary Functions =========================================================
+
 def startingPoint(G, c, A, b, guess):
     """
     Obtain an appropriate initial point for solving the QP
@@ -47,6 +48,7 @@ def startingPoint(G, c, A, b, guess):
 
     return x0, y0, l0
 
+# Problems 1-2: Implement this function.
 def qInteriorPoint(Q, c, A, b, guess, niter=20, tol=1e-16, verbose=False):
     """Solve the Quadratic program min .5 x^T Q x +  c^T x, Ax >= b
     using an Interior Point method.
@@ -66,6 +68,9 @@ def qInteriorPoint(Q, c, A, b, guess, niter=20, tol=1e-16, verbose=False):
         val (float): The minimum value of the objective function.
     """
     m,n = A.shape
+    assert len(b) == m, "A and b not aligned"
+    assert Q.shape[0] == Q.shape[1] == len(c) == n, "Q, A and c not aligned"
+
     def F(x_, y_, m_):
         """The almost-linear function that accounts for the KKT conditions."""
         return np.hstack((
@@ -79,14 +84,14 @@ def qInteriorPoint(Q, c, A, b, guess, niter=20, tol=1e-16, verbose=False):
             np.zeros((m,2*m+n))
                     ))
 
-    # Get the initial point and verify the dimensions.
+    # Get the initial point and initialize constants.
     x, y, mu = startingPoint(Q, c, A, b, guess)
-    assert len(x) == len(c) == n
-    assert len(y) == len(mu) == len(b) == m
-
     e = np.ones_like(mu)
     sigma = .1
     tau = .95
+
+    assert x.shape[0] == n, "A and x not aligned"
+    assert y.shape[0] == mu.shape[0] == m, "y and mu not aligned"
 
     i = 0
     nu = 1 + tol
@@ -106,12 +111,10 @@ def qInteriorPoint(Q, c, A, b, guess, niter=20, tol=1e-16, verbose=False):
         dx, dy, dmu = direct[:n], direct[n:-m], direct[-m:]
 
         mask = dmu < 0
-        bmin = np.min(-mu[mask]/dmu[mask])
-        beta = min(1, tau*min(1, bmin)) if np.any(mask) else tau
+        beta = min(1, tau*min(1, (-mu[mask]/dmu[mask]).min())) if np.any(mask) else tau
 
         mask = dy < 0
-        dmin = np.min(-y[mask]/dy[mask]).min()
-        delta = min(1, tau*min(1, dmin)) if np.any(mask) else tau
+        delta = min(1, tau*min(1, (-y[mask]/dy[mask]).min())) if np.any(mask) else tau
 
         alpha = min(beta, delta)
 
@@ -138,9 +141,6 @@ def test_qip():
     m0 = np.ones(5)
     point, value = qInteriorPoint(Q, c, A, b, (x0,y0,m0), verbose=True)
     return np.allclose(point, [2/3., 4/3.])
-
-if __name__ == '__main__':
-    test_qip()
 
 def qInteriorPoint_old(G, c, A, b, guess, niter=20, verbose=False):
     '''
@@ -217,22 +217,61 @@ def qInteriorPoint_old(G, c, A, b, guess, niter=20, verbose=False):
 
 
 def laplacian(n):
-    """
-    Construct the discrete Dirichlet energy matrix H for an n x n grid.
-    Inputs:
-        n -- side length of grid
-    Returns:
-        dense array of shape n^2 x n^2
-    """
-    n = n+2
-    data = -1*np.ones((5, (n-2)**2))
+    """Construct the discrete Dirichlet energy matrix H for an n x n grid."""
+    data = -1*np.ones((5, n**2))
     data[2,:] = 4
-    data[1, n-3::n-2] = 0
-    data[3, ::n-2] = 0
-    diags = np.array([-n+2, -1, 0, 1, n-2])
-    return spdiags(data, diags, (n-2)**2, (n-2)**2).todense()
+    data[1, n-1::n] = 0
+    data[3, ::n] = 0
+    diags = np.array([-n, -1, 0, 1, n])
+    return spdiags(data, diags, n**2, n**2).toarray()
 
-    
+# Problem 2
+def prob2(n=15):
+    """Solve the circus tent problem for grid size length 'n'."""
+    # Create the tent pole configuration.
+    L = np.zeros((n,n))
+    L[n//2-1:n//2+1,n//2-1:n//2+1] = .5
+    m = [n//6-1, n//6, int(5*(n/6.))-1, int(5*(n/6.))]
+    mask1, mask2 = np.meshgrid(m, m)
+    L[mask1, mask2] = .3
+    L = L.ravel()
+
+    # Initialize the objective and constraint arrays.
+    A = np.eye(n**2)
+    H = laplacian(n)
+    c = -np.ones(n**2) / float((n-1)**2)
+
+    # Set initial guesses.
+    x = np.ones((n,n)).ravel()
+    y = np.ones(n**2)
+    mu = np.ones(n**2)
+
+    # Solve and plot the solutions.
+    z = qInteriorPoint(H, c, A, L, (x,y,mu), verbose=True)[0].reshape((n,n))
+
+    domain = np.arange(n)
+    X, Y = np.meshgrid(domain, domain)
+    fig = plt.figure()
+    ax1 = fig.add_subplot(111, projection='3d')
+    ax1.plot_surface(X, Y, z,  rstride=1, cstride=1, color='r')
+    plt.show()
+
+    # TODO: This isn't working! CVXOPT works, but not qInteriorPoint() :(
+
+
+    # Solve and plot with CVXOPT, just in case...
+    A1 = matrix(-A)
+    H1 = matrix(H)
+    c1 = matrix(c)
+    L1 = matrix(-L)
+    z1 = np.array(solvers.qp(H1,c1,G=A1,h=L1)['x']).reshape((n,n))
+
+    fig = plt.figure()
+    ax1 = fig.add_subplot(111, projection='3d')
+    ax1.plot_surface(X, Y, z1,  rstride=1, cstride=1, color='r')
+    plt.show()
+
+
 def portfolio():
     # Markowitz portfolio optimization
     data = np.loadtxt('portfolio.txt')

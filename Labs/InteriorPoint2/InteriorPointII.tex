@@ -420,7 +420,7 @@ def laplacian(n):
     data[1, n-1::n] = 0
     data[3, ::n] = 0
     diags = np.array([-n, -1, 0, 1, n])
-    return spdiags(data, diags, n**2, n**2).todense()
+    return spdiags(data, diags, n**2, n**2).toarray()
 \end{lstlisting}
 Now we initialize the tent pole configuration for a grid of side length $n$, as well as initial guesses for $\x$, $\y$, and $\Mu$.
 \begin{lstlisting}
@@ -446,7 +446,7 @@ We can solve and plot the tent with the following code:
 >>> from mpl_toolkits.mplot3d import axes3d
 
 # Calculate the solution.
->>> z = qInteriorPoint(H, c, A, L, (x,y,mu)).reshape((n,n))
+>>> z = qInteriorPoint(H, c, A, L, (x,y,mu))[0].reshape((n,n))
 
 # Plot the solution.
 >>> domain = np.arange(n)
