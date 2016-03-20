@@ -157,6 +157,22 @@ def qInteriorPoint_old(G, c, A, b, guess, niter=20, verbose=False):
     Returns:
         x -- an array of length n, the minimizer of the quadratic program.
     '''
+
+    def stepSize(x, y):
+        '''
+        Return the step size a satisfying max{0 < a <= 1 | x+ay>=0}.
+        Inputs:
+            x -- numpy array of length n with nonnegative entries
+            y -- numpy array of length n
+        Returns:
+            the appropriate step size.
+        '''
+        mask = y<0
+        if np.any(mask):
+            return min(1, (-x[mask]/y[mask]).min())
+        else:
+            return 1
+
     # initialize variables
     m,n = A.shape
     x, y, l = startingPoint(G,c,A,b,guess)
@@ -213,7 +229,7 @@ def qInteriorPoint_old(G, c, A, b, guess, niter=20, verbose=False):
 
         if verbose:
             print '{0:f} {1:f}'.format(.5*(x* G.dot(x)).sum() + (x*c).sum(), mu)
-    return x
+    return x, .5*x.dot(G).dot(x) + c.dot(x)
 
 
 def laplacian(n):
@@ -243,10 +259,12 @@ def prob2(n=15):
 
     # Set initial guesses.
     x = np.ones((n,n)).ravel()
+    x = np.random.random(n**2)
     y = np.ones(n**2)
     mu = np.ones(n**2)
 
     # Solve and plot the solutions.
+    # z = qInteriorPoint_old(H, c, A, L, (x,y,mu), verbose=True)[0].reshape((n,n))
     z = qInteriorPoint(H, c, A, L, (x,y,mu), verbose=True)[0].reshape((n,n))
 
     domain = np.arange(n)
@@ -256,10 +274,10 @@ def prob2(n=15):
     ax1.plot_surface(X, Y, z,  rstride=1, cstride=1, color='r')
     plt.show()
 
-    # TODO: This isn't working! CVXOPT works, but not qInteriorPoint() :(
+    # TODO: This isn't working! CVXOPT works, qInteriorPoint_old() works,
+    # but qInteriorPoint() does not work :(
 
-
-    # Solve and plot with CVXOPT, just in case...
+    # Solve and plot with CVXOPT.
     A1 = matrix(-A)
     H1 = matrix(H)
     c1 = matrix(c)
@@ -271,11 +289,12 @@ def prob2(n=15):
     ax1.plot_surface(X, Y, z1,  rstride=1, cstride=1, color='r')
     plt.show()
 
+if __name__ == '__main__':
+    prob2()
 
 def portfolio():
     # Markowitz portfolio optimization
-    data = np.loadtxt('portfolio.txt')
-    data = data[:,1:]
+    data = np.loadtxt('portfolio.txt')[:,1:]
     n = data.shape[1]
     mu = 1.13
     
