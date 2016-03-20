@@ -17,7 +17,7 @@ def startingPoint(G, c, A, b, guess):
         c -- array of length n
         A -- constraint matrix shape (m,n)
         b -- array of length m
-        guess -- a tuple of arrays (x, y, l) of lengths n, m, and m, resp.
+        guess -- a tuple of arrays (x, y, mu) of lengths n, m, and m, resp.
     Returns:
         a tuple of arrays (x0, y0, l0) of lengths n, m, and m, resp.
     """
@@ -47,7 +47,7 @@ def startingPoint(G, c, A, b, guess):
 
     return x0, y0, l0
 
-def qInteriorPoint(Q, c, A, b, x0, niter=20, tol=1e-16, verbose=False):
+def qInteriorPoint(Q, c, A, b, guess, niter=20, tol=1e-16, verbose=False):
     """Solve the Quadratic program min .5 x^T Q x +  c^T x, Ax >= b
     using an Interior Point method.
 
@@ -56,7 +56,8 @@ def qInteriorPoint(Q, c, A, b, x0, niter=20, tol=1e-16, verbose=False):
         c ((n, ) ndarray): linear objective vector.
         A ((m,n) ndarray): Inequality constraint matrix.
         b ((m, ) ndarray): Inequality constraint vector.
-        x0 ((n, ) ndarray): An initial guesses for the solution x.
+        guess (3-tuple of arrays of lengths n, m, and m): Initial guesses for
+            the solution x and lagrange multipliers y and eta, respectively.
         niter (int > 0): The maximum number of iterations to execute.
         tol (float > 0): The convergence tolerance.
 
@@ -79,7 +80,7 @@ def qInteriorPoint(Q, c, A, b, x0, niter=20, tol=1e-16, verbose=False):
                     ))
 
     # Get the initial point and verify the dimensions.
-    x, y, mu = startingPoint(Q, c, A, b, (x0, np.ones(m), np.ones(m)))
+    x, y, mu = startingPoint(Q, c, A, b, guess)
     assert len(x) == len(c) == n
     assert len(y) == len(mu) == len(b) == m
 
@@ -133,7 +134,9 @@ def test_qip():
     A = np.array([[-1, -1], [1, -2.], [-2, -1], [1, 0], [0,1]])
     b = np.array([-2, -2, -3., 0, 0])
     x0 = np.array([.5, .5])
-    point, value = qInteriorPoint(Q, c, A, b, x0, verbose=True)
+    y0 = np.ones(5)
+    m0 = np.ones(5)
+    point, value = qInteriorPoint(Q, c, A, b, (x0,y0,m0), verbose=True)
     return np.allclose(point, [2/3., 4/3.])
 
 if __name__ == '__main__':
