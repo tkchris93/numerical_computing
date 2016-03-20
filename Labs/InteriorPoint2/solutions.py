@@ -1,6 +1,5 @@
-"""
-Solutions file for Interior Point II, from volume 2.
-"""
+# solutions.py
+"""Volume II: Interior Point II (Quadratic Optimization). Solutions file."""
 import numpy as np
 from scipy import linalg as la
 from matplotlib import pyplot as plt
@@ -8,22 +7,6 @@ from cvxopt import matrix, solvers
 import math
 from scipy import sparse as spar
 from mpl_toolkits.mplot3d import axes3d
-
-def stepSize(x, y):
-    '''
-    Return the step size a satisfying max{0 < a <= 1 | x+ay>=0}.
-    Inputs:
-        x -- numpy array of length n with nonnegative entries
-        y -- numpy array of length n
-    Returns:
-        the appropriate step size.
-    '''
-    mask = y<0
-    if np.any(mask):
-        return min(1, (-x[mask]/y[mask]).min())
-    else:
-        return 1
-
 
 def startingPoint(G, c, A, b, guess):
     """
@@ -64,8 +47,99 @@ def startingPoint(G, c, A, b, guess):
 
     return x0, y0, l0
 
+def qInteriorPoint(Q, c, A, b, x0, niter=20, tol=1e-16, verbose=False):
+    """Solve the Quadratic program min .5 x^T Q x +  c^T x, Ax >= b
+    using an Interior Point method.
 
-def qInteriorPoint(G, c, A, b, guess, niter=20, verbose=False):
+    Parameters:
+        Q ((n,n) ndarray): Positive semidefinite objective matrix.
+        c ((n, ) ndarray): linear objective vector.
+        A ((m,n) ndarray): Inequality constraint matrix.
+        b ((m, ) ndarray): Inequality constraint vector.
+        x0 ((n, ) ndarray): An initial guesses for the solution x.
+        niter (int > 0): The maximum number of iterations to execute.
+        tol (float > 0): The convergence tolerance.
+
+    Returns:
+        x ((n, ) ndarray): The optimal point.
+        val (float): The minimum value of the objective function.
+    """
+    m,n = A.shape
+    def F(x_, y_, m_):
+        """The almost-linear function that accounts for the KKT conditions."""
+        return np.hstack((
+                            np.dot(Q, x_) - np.dot(A.T, y_) + c,
+                            np.dot(A, x_) - y_ - b,
+                            m_*y_                                   ))
+
+    DF = np.vstack((
+            np.hstack((Q, np.zeros((n,m)), -A.T)),
+            np.hstack((A, -np.eye(m), np.zeros((m,m)))),
+            np.zeros((m,2*m+n))
+                    ))
+
+    # Get the initial point and verify the dimensions.
+    x, y, mu = startingPoint(Q, c, A, b, (x0, np.ones(m), np.ones(m)))
+    assert len(x) == len(c) == n
+    assert len(y) == len(mu) == len(b) == m
+
+    e = np.ones_like(mu)
+    sigma = .1
+    tau = .95
+
+    i = 0
+    nu = 1 + tol
+    while i < niter and nu >= tol:
+        i += 1
+
+        # Search Direction.
+        DF[-m:,n:-m] = np.diag(mu)
+        DF[-m:,-m:] = np.diag(y)
+
+        nu = np.dot(y, mu) / m
+        nu_vec = np.hstack((np.zeros(n+m), e*nu*sigma))
+        lu_piv = la.lu_factor(DF)
+        direct = la.lu_solve(lu_piv, nu_vec - F(x,y,mu))
+
+        # Step Length.
+        dx, dy, dmu = direct[:n], direct[n:-m], direct[-m:]
+
+        mask = dmu < 0
+        bmin = np.min(-mu[mask]/dmu[mask])
+        beta = min(1, tau*min(1, bmin)) if np.any(mask) else tau
+
+        mask = dy < 0
+        dmin = np.min(-y[mask]/dy[mask]).min()
+        delta = min(1, tau*min(1, dmin)) if np.any(mask) else tau
+
+        alpha = min(beta, delta)
+
+        # Proceed to the next iterate.
+        x += alpha*dx
+        y += alpha*dy
+        mu += alpha*dmu
+
+        if verbose:
+            print("Iteration {:0>2} nu = {}".format(i, nu))
+    if i < niter and verbose:
+        print("Converged in {} iterations".format(i))
+    elif verbose:
+        print("Maximum iterations reached")
+    return x, .5*x.dot(Q).dot(x) + c.dot(x)
+
+def test_qip():
+    Q = np.array([[1,-1.],[-1,2]])
+    c = np.array([-2,-6.])
+    A = np.array([[-1, -1], [1, -2.], [-2, -1], [1, 0], [0,1]])
+    b = np.array([-2, -2, -3., 0, 0])
+    x0 = np.array([.5, .5])
+    point, value = qInteriorPoint(Q, c, A, b, x0, verbose=True)
+    return np.allclose(point, [2/3., 4/3.])
+
+if __name__ == '__main__':
+    test_qip()
+
+def qInteriorPoint_old(G, c, A, b, guess, niter=20, verbose=False):
     '''
     Solve min .5x^T Gx + x^T c s.t. Ax >= b using a Predictor-Corrector
     Interior Point method.
