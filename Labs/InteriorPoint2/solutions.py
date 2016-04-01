@@ -73,8 +73,7 @@ def qInteriorPoint(Q, c, A, b, guess, niter=20, tol=1e-16, verbose=False):
 
     def F(x_, y_, m_):
         """The almost-linear function that accounts for the KKT conditions."""
-        return np.hstack((
-                            np.dot(Q, x_) - np.dot(A.T, y_) + c,
+        return np.hstack((  np.dot(Q, x_) - np.dot(A.T, m_) + c,
                             np.dot(A, x_) - y_ - b,
                             m_*y_                                   ))
 
@@ -102,7 +101,7 @@ def qInteriorPoint(Q, c, A, b, guess, niter=20, tol=1e-16, verbose=False):
         DF[-m:,n:-m] = np.diag(mu)
         DF[-m:,-m:] = np.diag(y)
 
-        nu = np.dot(y, mu) / m
+        nu = np.dot(y, mu) / float(m)
         nu_vec = np.hstack((np.zeros(n+m), e*nu*sigma))
         lu_piv = la.lu_factor(DF)
         direct = la.lu_solve(lu_piv, nu_vec - F(x,y,mu))
