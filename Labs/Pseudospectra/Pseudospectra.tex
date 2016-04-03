@@ -103,20 +103,21 @@ Using this new definition for $\sigma _{\epsilon}(A)$, we can now plot pseudospe
 
 \begin{algorithm}
 \begin{algorithmic}[1]
-\Procedure{Pseudospectrum}{$A, epsilon, xvals, yvals$}
+\Procedure{Pseudospectrum}{$A, m, epsilon$}
 	\State $T \gets schur(A)$			\Comment{Compute the Schur decomposition of A}
-	\State $sigmin \gets \zeros{m}{m}$
-	\State $Q[:,0] \gets \b/\norm{\b}_2$							
+	\State $eigsA \gets diagonal(T)$
+	\State $xvals,yvals \gets psgrid(eigsA,m)$
+	\State $sigmin \gets \zeros{m}{m}$					
 	\For{$k=0\ldots m-1$}
 	    \For{$j=0\ldots m-1$}		
-		    \State $T_1 \gets (xvals[k]+i*yvals[j])I_N-T$  
-		    \State \Comment{$I_N$ is the $N\times N$ identity matrix.}
+		    \State $T_1 \gets (xvals[k]+i*yvals[j])I_n-T$  
+		    \State \Comment{$I_n$ is the $n\times n$ identity matrix.}
 		    \State $T_2 \gets T1^*$        \Comment{Compute the conjugate transpose.}		
 		    \State $sigold \gets 0$    \Comment{Initialize variables.}
-		    \State $qold \gets \zeros{N}{1}$
+		    \State $qold \gets \zeros{n}{1}$
 		    \State $beta \gets 0$
-		    \State $H \gets \zeros{N}{N}$
-		    \State $q \gets$ random, complex-valued $N \times 1$ array of norm 1 
+		    \State $H \gets \zeros{n}{n}$
+		    \State $q \gets$ random, complex-valued $n \times 1$ array of norm 1 
 		    \State \Comment{Assume both real and imaginary parts are normally distributed}
 		    \For{$p=0 \ldots N-2$}
 			    \State $b_1 \gets$ solution to $T_2x = q$	
@@ -137,13 +138,13 @@ Using this new definition for $\sigma _{\epsilon}(A)$, we can now plot pseudospe
 			    \EndIf
 			    \State $sigold \gets sig$
 			\EndFor
-			\State $sigmin[i,k] \gets \sqrt{sig}$
+			\State $sigmin[j,k] \gets \sqrt{sig}$
 	    \EndFor
 	\EndFor
 	\State Plot the log of the values in $sigmin$ as a contour plot on the grid determined by $xvals$ and $yvals$.
 \EndProcedure
 \end{algorithmic}
-\caption{The Lanczos Method. This algorithm accepts a square matrix, $A$; a value or list of values for $\epsilon$; and two one-dimensional arrays of length $m$, $xvals$ and $yvals$. It computes the $10^{-\epsilon}$-pseudospectrum of $A$ for each value of $\epsilon$ and produces the contour plot on the grid determined by $xvals$ and $yvals$.}
+\caption{The Lanczos Method. This algorithm accepts a $n \times n$ square matrix, $A$; a list of values for $\epsilon$; and an accuracy measure of $m$. It computes the $10^{-\epsilon}$-pseudospectrum of $A$ for each value of $\epsilon$ and produces the contour plot on the grid determined by $xvals$ and $yvals$ as returned by psgrid().}
 \label{alg:lanczos_method}
 \end{algorithm}
 
@@ -163,12 +164,15 @@ Note that while this algorithm gives better results than our previous method of 
 Finish the function below for implementing Algorithm \ref{alg:lanczos_method} in Python. Make the function also plot the eigenvalues of the matrix on the same plot.
 
 \begin{lstlisting}
-def ps_contour_plot(A, epsilon_vals=None):
-    '''Plots the pseudospectrum of the matrix A as a contour plot
+def ps_contour_plot(A, m = 20, epsilon_vals=None):
+    '''Plots the pseudospectrum of the matrix A as a contour plot.  Also,
+    plots the eigenvalues.
     
     Parameters:
         A : square, 2D ndarray
             The matrix whose pseudospectrum is to be plotted
+        m : int
+            accuracy
         epsilon_vals : list of floats
             If k is in epsilon_vals, then the epsilon-pseudospectrum
             is plotted for epsilon=10**-k
@@ -179,6 +183,14 @@ def ps_contour_plot(A, epsilon_vals=None):
 \end{lstlisting}
 
 Test your code on the matrix from Problem 1. Your plot should look like Figure \ref{fig:ps_contour}. You will need to choose a grid on which to plot the values computed in this algorithm. Use a grid that is roughly twice as large as one needed to plot the eigenvalues. To make your code run faster, make sure to use functions designed for Hermitian or triangular matrices whenever possible.
+\begin{enumerate}
+\item Plot the eigenvalues and contour lines on a complex plane.
+\item $m$ defaults to 20 but if you want the plot to look like Figure \ref{fig:ps_contour}, you will need m to be close to 150.  Note that this will take a while longer.
+\item In order to plot the contour lines.  Use the following code.
+\begin{lstlisting}
+plt.contour(xvals,yvals,np.log10(sigmin), levels=epsilon_vals)
+\end{lstlisting}
+\end{enumerate}
 
 \end{problem}
 
