@@ -1,6 +1,6 @@
 \lab{Pseudospectra}{Pseudospectra}
 \label{lab:pseudospectra}
-\objective{Understand and plot the pseudospectra of matrices.}
+\objective{The Pseudospectrum of a matrix is related to its eigenvalues.  The Pesudospectra of normal and non-normal matrices will be investigated.  We will plot pseudospectra and examine the characteristics of different types of matrices.}
 
 
 
@@ -26,7 +26,7 @@ In the case of the 2-norm, the pseudospectrum has an equivalent definition:
 \end{equation}
 When the entries of a matrix are slightly altered, changes in the point spectrum also occur.  The pseudospectrum can then be thought of as the set of eigenvalues that can result from small changes in the entries of a matrix.  If $A$ is an $n \times n$ matrix, then we can use Equation \ref{equ:spec} with some $n \times n$ matrix $E$ satisfying $\lVert E \rVert < \epsilon$ to find the $\epsilon$-pseudospectrum of $A$, which will be a set of all complex numbers $z$ which are in the point spectrum of $A+E$.
 
-One means of plotting the $\epsilon$-pseudospectrum of a $A$ is by generating several random matrices, $E$, with norm $\epsilon$ and plotting the eigenvalues of all of them on the same plot.  The horizontal axis is the real part of $z$, with the vertical axis being the imaginary part of $z$.
+One means of plotting the $\epsilon$-pseudospectrum of $A$ is by generating several random matrices $E$ with norm $\epsilon$, and then plotting the eigenvalues $z$ of all of them together.  The horizontal axis is the real part of $z$, with the vertical axis being the imaginary part of $z$.
 
 \begin{figure}
 \begin{center}
@@ -237,7 +237,7 @@ Using your function from problem \ref{prob:pseudoplot}, investigate how the pseu
 
 For the Hermitian matrix, change the subdiagonal of $1$s to be $-1$.  
 
-For the Normal matrix, reset all of the subdiagonal entries to be zero (change the $1$ diagonal and $-i$ diagonal to zeros).
+For the Normal matrix, reset all of the subdiagonal entries to be zero (change the $1$ diagonal and $-i$ diagonal to zeros).  Set all of the diagonal entries to be random complex values (so as to get different eigenvalues).
 
 Plot your results.
 \end{problem} 
