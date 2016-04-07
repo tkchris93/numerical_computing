@@ -24,9 +24,7 @@ class SinglyLinkedList(object):
             self.tail = n
 
 def iterative_search(linkedlist, data):
-    """Find the node containing 'data' using an iterative approach.
-    If there is no such node in the list, or if the list is empty,
-    raise a ValueError.
+    """Search 'linkelist' iteratively for a node containing 'data'.
     
     Inputs:
         linkedlist (LinkedList): a linked list object
@@ -81,12 +79,9 @@ class BST(object):
         self.root = None
     
     def find(self, data):
-        """Return the node containing 'data'. If there is no such node in the
-        tree, or if the tree is empty, raise a ValueError."
+        """Return the node containing 'data'. If there is no such node
+        in the tree, or if the tree is empty, raise a ValueError.
         """
-        # First, check to see if the tree is empty.
-        if self.root is None:
-            raise ValueError(str(data) + " is not in the tree.")
         
         # Define a recursive function to traverse the tree.
         def _step(current):

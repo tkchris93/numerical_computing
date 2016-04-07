@@ -92,12 +92,9 @@ class BST(object):
         self.root = None
     
     def find(self, data):
-        """Return the node containing 'data'. If there is no such node in the
-        tree, or if the tree is empty, raise a ValueError."
+        """Return the node containing 'data'. If there is no such node
+        in the tree, or if the tree is empty, raise a ValueError.
         """
-        # First, check to see if the tree is empty.
-        if self.root is None:
-            raise ValueError(str(data) + " is not in the tree.")
         
         # Define a recursive function to traverse the tree.
         def _step(current):
