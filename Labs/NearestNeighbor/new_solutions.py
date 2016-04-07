@@ -197,25 +197,34 @@ class KDT(BST):
         if len(data) != self.k:
             raise ValueError("data must have {} entries".format(self.k))
         
-        # Make a new node to insert.
+        # Create the node to be inserted.
         new_node = KDTNode(data)
         
         def _find_parent(current):
             """Recursively descend through the tree to find the node that
             should be the parent of the new node. Do not allow for duplicates.
             """
-            
-            if np.allclose(data, current.value):
-                raise ValueError(str(data) + " is already in the tree.")
-            if data[current.axis] < current.value[current.axis]: # Travel left
+
+            # Base case: error (shouldn't happen).
+            assert current is not None, "_find_parent() error"
+            # Base case: duplicate values.
+            if np.allclose(data, current.value):  
+                raise ValueError("{} is already in the tree".format(data))
+            # Look to the left.
+            elif data[current.axis] < current.value[current.axis]:
+                # Recurse on the left branch.
                 if current.left is not None:
                     return _find_parent(current.left)
-                else:       # Insert the new node on the left and finish.
+                # Base case: insert the node on the left.
+                else:
                     current.left = new_node
-            else:                                                # Travel right
+            # Look to the right.
+            else:
+                # Recurse on the right branch.
                 if current.right is not None:
                     return _find_parent(current.right)
-                else:       # Insert the new node on the right and finish.
+                # Base case: insert the node on the right.
+                else:       
                     current.right = new_node
             return current
         
@@ -224,7 +233,7 @@ class KDT(BST):
             self.root = new_node
             new_node.axis = 0
 
-        # Case 2: The tree is nonempy. Use _find_parent(), double link.
+        # Case 2: The tree is nonempy. Use _find_parent() and double link.
         else:
             # Find the parent and insert the new node as its child.
             parent = _find_parent(self.root)

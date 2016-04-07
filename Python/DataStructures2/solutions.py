@@ -95,26 +95,26 @@ class BST(object):
         """Return the node containing 'data'. If there is no such node in the
         tree, or if the tree is empty, raise a ValueError."
         """
-        # First, check to see if the tree is empty
+        # First, check to see if the tree is empty.
         if self.root is None:
             raise ValueError(str(data) + " is not in the tree.")
         
-        # Define a recursive function to traverse the tree
-        def _step(current, item):
+        # Define a recursive function to traverse the tree.
+        def _step(current):
             """Recursively step through the tree until the node containing
-            'item' is found. If there is no such node, raise a Value Error.
+            'data' is found. If there is no such node, raise a Value Error.
             """
-            if current is None:                     # Base case 1: dead end
+            if current is None:                     # Base case 1: dead end.
                 raise ValueError(str(data) + " is not in the tree.")
-            if item == current.value:               # Base case 2: data matches
+            if data == current.value:               # Base case 2: data found!
                 return current
-            if item < current.value:                # Step to the left
-                return _step(current.left,item)
-            else:                                   # Step to the right
-                return _step(current.right,item)
+            if data < current.value:                # Step to the left.
+                return _step(current.left)
+            else:                                   # Step to the right.
+                return _step(current.right)
         
         # Start the recursion on the root of the tree.
-        return _step(self.root, data)
+        return _step(self.root)
     
     # Problem 2: Implement BST.insert()
     def insert(self, data):
@@ -131,35 +131,48 @@ class BST(object):
             >>> b.insert(7)     |   [8]                 |             \
             >>> b.insert(8)     |                       |             (8)
         """
+
+        # Create the node to be inserted.
+        new_node = BSTNode(data)
         
-        def _find_parent(current, item):
+        def _find_parent(current):
             """Recursively descend through the tree to find the node that
             should be the parent of the new node. Do not allow for duplicates.
             """
-            assert current is not None              # Base case: failure
-            if item == current.value:               # Base case: duplicate
-                raise ValueError(str(item) + " is already in the tree.")
-            elif item < current.value:              # Step to the left
-                if current.left:
-                    return _find_parent(current.left, item)
-                else:                               # Base case: parent found
-                    return current
-            else:                                   # Step to the right
+
+            # Base case: error (shouldn't happen).
+            assert current is not None, "_find_parent() error"
+            # Base case: duplicate values.
+            if data == current.value:
+                raise ValueError("{} is already in the tree".format(data))
+            # Look to the left.
+            elif data < current.value:
+                # Recurse on the left branch.
+                if current.left is not None:
+                    return _find_parent(current.left)
+                # Base case: insert the node on the left.
+                else:
+                    current.left = new_node
+            # Look to the right.
+            else:
+                # Recurse on the right branch.
                 if current.right:
-                    return _find_parent(current.right, item)
-                else:                               # Base case: parent found
-                    return current
+                    return _find_parent(current.right)
+                # Base case: insert the node on the right.
+                else:
+                    current.right = new_node
+            return current
         
-        n = BSTNode(data)                           # Make a new node
-        if self.root is None:                       # Case 1: empty tree
-            self.root = n                               # reset the root
-        else:                                       # Case 2: use _find_parent
-            parent = _find_parent(self.root,data)       # Get the parent
-            if data < parent.value:                     # Insert as left child
-                parent.left = n
-            else:                                       # Insert as right child
-                parent.right = n
-            n.prev = parent                             # Double link
+        # Case 1: The tree is empty. Assign the root to the new node.
+        if self.root is None:
+            self.root = new_node
+
+        # Case 2: The tree is nonempty. Use _find_parent() and double link.
+        else:
+            # Find the parent and insert the new node as its child.
+            parent = _find_parent(self.root)
+            # Double-link the child to its parent.
+            new_node.prev = parent
     
     # Problem 3: Implement BST.remove()
     def remove(self, data):
