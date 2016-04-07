@@ -1,12 +1,10 @@
-# new_neighbor.py
-"""Volume II Lab 7: Nearest Neighbor Search
-Solutions file. Written by Shane A. McQuarrie, Fall 2015
-"""
+# new_solutions.py
+"""Volume II Lab 7: Nearest Neighbor Search. Solutions file."""
 
-# =================== BSTNode / BST Classes from Trees.py =================== #
+# BSTNode / BST Classes from Data Structures II Lab ========================= #
 class BSTNode(object):
     def __init__(self, data):
-        self.data = data
+        self.value = data
         self.prev = None
         self.left = None
         self.right = None
@@ -22,7 +20,7 @@ class BST(object):
         visited = set()
         
         def _visit(current, depth):
-            str_tree[depth].append(current.data)
+            str_tree[depth].append(current.value)
             visited.add(current)
             if current.left and current.left not in visited:
                 _visit(current.left, depth+1)
@@ -43,39 +41,37 @@ def _height(current):
         return -1
     return 1 + max(_height(current.right), _height(current.left))
 
-# ============================== solutions.py =============================== #
+# solutions.py ============================================================== #
 
-# from Trees import BST
 import numpy as np
 from sklearn import neighbors
 from scipy.spatial import KDTree
 
 
 # Problem 1: Implement this function.
-def euclidean_metric(x, y):
-    """Return the euclidean distance between the vectors 'x' and 'y'.
+def metric(x, y):
+    """Return the euclidean distance between the 1-D arrays 'x' and 'y'.
 
     Raises:
-        ValueError: the two vectors 'x' and 'y' are of different lengths.
+        ValueError: if 'x' and 'y' have different lengths.
     
     Example:
-        >>> print(euclidean_metric([1,2],[2,2]))
+        >>> metric([1,2],[2,2])
         1.0
-        >>> print(euclidean_metric([1,2,1],[2,2]))
+        >>> metric([1,2,1],[2,2])
         ValueError: Incompatible dimensions.
     """
     if len(x) != len(y):
-        raise ValueError("Incompatible dimensions.")
+        raise ValueError("Incompatible dimensions")
     return np.linalg.norm(x - y)
     
     # Or a slightly longer way:
-    return np.sqrt(np.sum(np.subtract(x, y)**2))
+    return np.sqrt(np.sum((x - y)**2))
     # Or the longest/worst way:
     total = 0
     for i in xrange(len(x)):
         term = x[i] - y[i]
-        term = term**2
-        total += term
+        total += term**2
     total = np.sqrt(total)
     return total
 
@@ -95,20 +91,21 @@ def exhaustive_search(data_set, target):
         The distance from the nearest neighbor to 'target' (float).
     """
 
-    # Initialize the outputs
+    # Initialize the outputs.
     minimum_distance = float("inf")
     nearest_neighbor = None
 
-    # Search through the data set for the nearest neighbor
+    # Search through the entire data set for the nearest neighbor.
     for point in data_set:
-        distance = euclidean_metric(target, point)
+        distance = metric(target, point)
         if distance < minimum_distance:
             nearest_neighbor = point
             minimum_distance = distance
+
     return nearest_neighbor, minimum_distance
 
 
-# Problem 3: Add magic methods to this class.
+# Problem 3: Write a KDTNode class.
 class KDTNode(BSTNode):
     """Node class for K-D Trees. Inherits from BSTNode.
 
@@ -125,25 +122,22 @@ class KDTNode(BSTNode):
         and prev attributes are set in the constructor of BSTNode.
 
         Raises:
-            TypeError: 'data' is not a a numpy array (of type np.ndarray).
+            TypeError: if 'data' is not a NumPy array (of type np.ndarray).
         """
         if type(data) != np.ndarray:
-            raise TypeError("A numpy array or a list is required.")
+            raise TypeError("input must be a NumPy array")
         BSTNode.__init__(self, data)
         self.axis  = 0
-    
+
+    # Defining these magic methods is not required, but may be useful.
     def __sub__(self, other):
-        return euclidean_metric(self.data, other.data)
+        return metric(self.value, other.value)
 
     def __eq__(self, other):
-        return np.allclose(self.data, other.data)
+        return np.allclose(self.value, other.value)
 
-    def __lt__(self, other):
-        return self.data[other.axis] < other.data[other.axis]
-
-    def __gt__(self, other):
-        return self.data[other.axis] > other.data[other.axis]
-
+    def __repr__(self):
+        return str(self.value)
 
 # Problem 4: Finish implementing this class by overriding
 #            the __init__(), insert(), and remove() methods.
@@ -153,92 +147,101 @@ class KDT(BST):
 
     Attributes:
         root (KDTNode): the root node of the tree. Like all other
-            nodes in the tree, the root houses data as a numpy array.
+            nodes in the tree, the root houses data as a NumPy array.
         k (int): the dimension of the tree (the 'k' of the k-d tree).
     """
 
+    # This constructor is not required, but is a design choice.
     def __init__(self, data_set):
         """Set the k attribute and fill the tree with the points
-        in 'data_set'. Raise a TypeError if the input is not a numpy
+        in 'data_set'. Raise a TypeError if the input is not a NumPy
         array.
         """
         BST.__init__(self)
         if not isinstance(data_set, np.ndarray):
-            raise TypeError("data_set must be a numpy array.")
+            raise TypeError("data_set must be a NumPy array.")
         self.k = data_set.shape[1]
         for point in data_set:
             self.insert(point)
     
     def find(self, data):
-        """Return the node containing 'data'.
-
-        Raises:
-            ValueError: there is node containing 'data' in the tree,
-                or the tree is empty.
+        """Return the node containing 'data'. If there is no such node
+        in the tree, or if the tree is empty, raise a ValueError.
         """
+
+        # Define a recursive function to traverse the tree.
+        def _step(current):
+            """Recursively step through the tree until the node containing
+            'data' is found. If there is no such node, raise a Value Error.
+            """
+            if current is None:                     # Base case 1: dead end.
+                raise ValueError(str(data) + " is not in the tree")
+            elif np.allclose(data, current.value):
+                return current                      # Base case 2: data found!
+            elif data[current.axis] < current.value[current.axis]:
+                return _step(current.left)          # Recursively search left.
+            else:
+                return _step(current.right)         # Recursively search right.
         
-        def _step(current, target):
-            """Recursively approach the target node."""
-            
-            if current is None:             # Base case: target not found.
-                return current
-            if current == other:            # Base case: target found!
-                return current
-            if target < current:            # Recursively search to the left.
-                return _step(current.left, target)
-            else:                           # Recursively search to the right.
-                return _step(current.right, target)
-        
-        if self.root is None:               # Check for empty tree.
-            raise ValueError(str(data) + " is not in the tree.")
-            
-        # Create a new node to use the KDTNode comparison operators.
-        n = KDTNode(data)
-        found = _step(self.root, n)
-        if found is None:                   # Report the data was not found.
-            raise ValueError(str(data) + " is not in the tree.")
-        return found                        # Return the target node.
+        # Start the recursion on the root of the tree.
+        return _step(self.root)
     
     def insert(self, data):
-        """Insert a new node at the appropriate location. Return the new
-        node. This method will need to be totally rewritten.
+        """Insert a new node containing 'data' at the appropriate location.
+        Return the new node. This method should be similar to BST.insert().
         """
+
+        # Check that the data matches the dimension of the tree.
+        if len(data) != self.k:
+            raise ValueError("data must have {} entries".format(self.k))
         
-        def _find_parent(current, node):
+        # Create the node to be inserted.
+        new_node = KDTNode(data)
+        
+        def _find_parent(current):
             """Recursively descend through the tree to find the node that
             should be the parent of the new node. Do not allow for duplicates.
             """
-            
-            if node == current:
-                raise ValueError(str(node.data) + " is already in the tree.")
-            if node < current:                  # Travel left
-                if current.left:
-                    return _find_parent(current.left,node)
+
+            # Base case: error (shouldn't happen).
+            assert current is not None, "_find_parent() error"
+            # Base case: duplicate values.
+            if np.allclose(data, current.value):  
+                raise ValueError("{} is already in the tree".format(data))
+            # Look to the left.
+            elif data[current.axis] < current.value[current.axis]:
+                # Recurse on the left branch.
+                if current.left is not None:
+                    return _find_parent(current.left)
+                # Base case: insert the node on the left.
                 else:
-                    return current
-            else:                               # Travel right
-                if current.right:
-                    return _find_parent(current.right,node)
-                else:
-                    return current
+                    current.left = new_node
+            # Look to the right.
+            else:
+                # Recurse on the right branch.
+                if current.right is not None:
+                    return _find_parent(current.right)
+                # Base case: insert the node on the right.
+                else:       
+                    current.right = new_node
+            return current
         
-        n = KDTNode(data)                        # Make a new node
-        if len(data) != self.k:
-            raise ValueError("data must be of length " + str(self.k))
-        if not self.root:
-            self.root = n                       # Case 1: empty tree
-            n.axis = 0
-        else:                                   # Case 2: use _find_parent
-            parent = _find_parent(self.root, n)         # Get the parent
-            if n < parent: parent.left = n      # Insert the node
-            else: parent.right = n
-            n.prev = parent                             # Double link
-            n.axis = (n.prev.axis + 1) % self.k
-        return n
+        # Case 1: The tree is empty. Assign the root and axis appropriately.
+        if self.root is None:
+            self.root = new_node
+            new_node.axis = 0
+
+        # Case 2: The tree is nonempy. Use _find_parent() and double link.
+        else:
+            # Find the parent and insert the new node as its child.
+            parent = _find_parent(self.root)
+
+            # Double-link the child to its parent and set its axis attribute.
+            new_node.prev = parent
+            new_node.axis = (parent.axis + 1) % self.k
     
     def remove(*args, **kwargs):
-        raise NotImplementedError(
-                            "'remove()' has been disabled for this class.")
+        raise NotImplementedError("'remove()' has been disabled.")
 
 
 # Problem 5: Implement this function
@@ -246,55 +249,57 @@ def nearest_neighbor(data_set, target):
     """Use your KDTree class to solve the nearest neighbor problem.
 
     Inputs:
-        data_set (mxk ndarray): An array of m k-dimensional points.
-        target (1xk ndarray): A k-dimensional point to compare to 'dataset'.
+        data_set ((m,k) ndarray): An array of m k-dimensional points.
+        target ((k,) ndarray): A k-dimensional point to compare to 'dataset'.
 
     Returns:
-        The point in the tree that is nearest to 'target' (1xk ndarray).
+        The point in the tree that is nearest to 'target' ((k,) ndarray).
         The distance from the nearest neighbor to 'target' (float).
     """
     
-    tree = KDT(data_set)
-    k = tree.k
-    p = KDTNode(target)
-    
-    def KDsearch(current, target, neighbor, distance):
+    def KDsearch(current, neighbor, distance):
         """The actual nearest neighbor search algorithm.
+        
         Inputs:
             current (KDTNode): the node to examine.
-            target (KDTNode): the target (stored in a KDTNode).
             neighbor (KDTNode): the current nearest neighbor.
             distance (float): the current minimum distance.
+
+        Returns:
+            neighbor (KDTNode): The new nearest neighbor in the tree.
+            distance (float): the new minimum distance.
         """
         
         # Base case. Return the distance and the nearest neighbor.
         if current is None:
             return neighbor, distance
         index = current.axis
-        d = target - current
+        d = metric(target, current.value)
         if d < distance:
             distance = d
             neighbor = current
-        if target < current:        # Recursively search 'left'
+        if target[index] < current.value[index]: # Recursively search 'left'
             neighbor, distance = KDsearch(
-                current.left, target, neighbor, distance)
+                current.left, neighbor, distance)
                                     # Back up if needed
-            if target.data[index] + distance >= current.data[index]: # (?)
+            if target[index] + distance >= current.value[index]:
                 neighbor, distance = KDsearch(
-                    current.right, target, neighbor, distance)
+                    current.right, neighbor, distance)
         else:                       # Recursively search 'right'
             neighbor, distance = KDsearch(
-                current.right, target, neighbor, distance)
+                current.right, neighbor, distance)
                                     # Back up if needed
-            if target.data[index] - distance <= current.data[index]: # (?)
+            if target[index] - distance <= current.value[index]: # (?)
                 neighbor, distance = KDsearch(
-                    current.left, target, neighbor, distance)
+                    current.left, neighbor, distance)
     
         return neighbor, distance
     
-    # Search the KD-tree.
-    result = KDsearch(tree.root, p, tree.root, tree.root - p)
-    return result[0].data, result[1]
+    # Load and search the KD-Tree.
+    tree = KDT(data_set)
+    start_distance = metric(tree.root.value, target)
+    node, dist = KDsearch(tree.root, tree.root, start_distance)
+    return node.value, dist
 
 def postal_problem(grading=False):
     """Use the neighbors module in sklearn to classify the Postal data set
@@ -371,255 +376,5 @@ def makeplots():
 if __name__ == '__main__':
     makeplots()
 '''
-
-import inspect
-
-def test(student_module):
-    """Test script. You must import the students file as a module.
-    
-     5 points for problem 1
-     5 points for problem 2
-    10 points for problem 3
-    10 points for problem 4
-    20 points for problem 5
-    10 points for problem 6
-    
-    Inputs:
-        student_module: the imported module for the student's file.
-    
-    Returns:
-        score (int): the student's score, out of 80.
-        feedback (str): a printout of test results for the student.
-    """
-    tester = _testDriver()
-    tester.test_all(student_module)
-    return tester.score, tester.feedback
-
-class _testDriver(object):
-    """Class for testing a student's work. See test.__doc__ for more info."""
-    def __init__(self):
-        self.feedback = ""
-
-    # Main routine ------------------------------------------------------------
-    def test_all(self, student_module):
-        self.feedback = ""
-        score = 0
-
-        try:    # Problem 1: 5 points
-            self.feedback += "\n\nProblem 1 (5 points):"
-            points = self.problem1(student_module)
-            score += points
-            self.feedback += "\nScore += " + str(points)
-        except BaseException as e:
-            self.feedback += "\nError: " + e.message
-        
-        try:    # Problem 2: 5 points
-            self.feedback += "\n\nProblem 2 (5 points):"
-            points = self.problem2(student_module)
-            score += points
-            self.feedback += "\nScore += " + str(points)
-        except BaseException as e:
-            self.feedback += "\nError: " + e.message
-
-        try:    # Problem 3: 10 points
-            self.feedback += "\n\nProblem 3 (10 points):"
-            points = self.problem3(student_module)
-            score += points
-            self.feedback += "\nScore += " + str(points)
-        except BaseException as e:
-            self.feedback += "\nError: " + e.message
-
-        try:    # Problems 4 and 5: 30 points
-            self.feedback += "\n\nProblems 4 and 5 (30 points):"
-            points = self.problem5(student_module)
-            score += points
-            self.feedback += "\nScore += " + str(points)
-        except BaseException as e:
-            self.feedback += "\nError: " + e.message
-
-        try:    # Problem 6: 10 points
-            self.feedback += "\n\nProblem 2 (10 points):"
-            points = self.problem6(student_module)
-            score += points
-            self.feedback += "\nScore += " + str(points)
-        except BaseException as e:
-            self.feedback += "\nError: " + e.message
-        
-        # Report final score.
-        total = 60
-        perc = (100. * score) / total
-        self.feedback += "\n\nTotal score: %d/%d = %s%%"%(score, total, perc)
-        if   perc >=  98.0: self.feedback += "\n\nExcellent!"
-        elif perc >=  90.0: self.feedback += "\n\nGreat job!"
-
-        # Add comments (optionally).
-        print self.feedback
-        comments = str(raw_input("Comments: "))
-        if len(comments) > 0:
-            self.feedback += '\n\n\nComments:\n\t' + comments
-        self.score = score
-        
-    # Helper functions --------------------------------------------------------
-    def numTest(self, correct, student, message):
-        """Test to see if correct and student are numerically close.
-        If not, provide feedback. Return 1 for correct and 0 otherwise.
-        """
-        if np.allclose(correct, student, atol=1e-04):
-            return 1
-        else:
-            self.feedback += message
-            self.feedback += "\nCorrect response:\n" + str(correct)
-            self.feedback += "\nStudent response:\n" + str(student)
-            return 0
-
-    def grade(self, points):
-        """Manually grade a problem out of 'points'. Return the points earned.
-        """
-        credit = -1
-        while credit > points or credit < 0:
-            try:
-                credit = int(input("\nScore out of " + str(points) + ": "))
-            except:
-                credit = -1
-        if credit != points:
-            self.feedback += "\n\t" + str(raw_input("Describe problem: "))
-        return credit
-
-    def neighbor(self, m, k, func):
-        """Do a single nearest neighbor search trial for mxk data,
-        solved with the function 'func'.
-        """
-        data = np.random.random((m, k))
-        target = np.random.random(k)
-        tree = KDTree(data)
-        dist, index = tree.query(target)
-        point = tree.data[index]
-        spoint, sdist = func(data, target) # func solves the problem
-        p1 = self.numTest(point, spoint,
-            "\n\t"+func.__name__+"() failed: incorrect nearest neighbor")
-        p2 = self.numTest(dist, sdist, 
-            "\n\t"+func.__name__+"() failed: incorrect minimum distance")
-        return p1 + p2
-
-    @staticmethod
-    def get_code(func):
-        rawcode = inspect.getsource(func).splitlines()[len(
-                                            func.__doc__.splitlines())+1:]
-        for line in rawcode: print line
-
-    # Problems ----------------------------------------------------------------
-    def problem1(self, s):
-        """Test euclidean_metric(). 5 Points."""
-
-        # Test with good inputs (4 points)
-        x = np.array([1, 2])
-        y = np.array([2, 2])
-        points = self.numTest(euclidean_metric(x,y), s.euclidean_metric(x,y),
-                                            "\n\teuclidean_metric() failed.")
-        
-        x = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-        y = np.array([2, 6, 4, 8, 0, 2, 4, 7, 5, 11])
-        points += self.numTest(euclidean_metric(x,y), s.euclidean_metric(x,y),
-                                            "\n\teuclidean_metric() failed.")
-        
-        x = (np.random.random(100)-.5)*200
-        y = (np.random.random(100)-.5)*200
-        points += self.numTest(euclidean_metric(x,y), s.euclidean_metric(x,y),
-                                        "\n\teuclidean_metric() failed.")*2
-        
-        # Test with bad inputs (1 point)
-        x = np.array([1, 2])
-        y = np.array([1, 2, 3])
-        try:
-            s.euclidean_metric(x, y)
-            self.feedback += "\n\teuclidean_metric() failed to raise a "
-            self.feedback += "ValueError for vectors of different lengths"
-        except:
-            points += 1
-
-        return points
-
-    def problem2(self, s):
-        """Test exhaustive_search(). 5 points."""
-    
-        points  = self.neighbor(100, 10, s.exhaustive_search)
-        points += self.neighbor(10, 100, s.exhaustive_search)
-        points += 1
-
-        _testDriver.get_code(s.exhaustive_search)
-        print "\n(Check that scipy.spatial.KDTree is not used)"
-        points *= self.grade(1)
-
-        return points
-
-    def problem3(self, s):
-        """Test the KDTNode class. 10 points."""
-
-        points = 0
-
-        # Test KDTNode.__init__ (can only hold np.ndarrays; 2 points)
-        try:
-            s.KDTNode("This is not a numpy array")
-            self.feedback += "\n\tKDTNode(x) failed to raise a TypeError "
-            self.feedback += "for x not a numpy array (np.ndarray)"
-        except:
-            points += 2
-
-        # Test KDTNode.__sub__ (euclidean distance; 2 points)
-        x = np.random.random(10); y = np.random.random(10)
-        A =   KDTNode(x); B =   KDTNode(y)
-        C = s.KDTNode(x); D = s.KDTNode(y)
-        points += 2*self.numTest(A-B, C-D, "\n\tKDTNode.__sub__ failed")
-
-        # Test KDTNode.__eq__ (1 Point)
-        D = s.KDTNode(1.5*x)
-        if not (C == D):
-            points += 1
-        else:
-            self.feedback += "\n\tKDTNode.__eq__ failed on nonequal"
-
-        # Test KDTNode.__lt__ and KDTNode.__gt__ (5 points)
-        x = s.KDTNode(np.array([3,1,0,5], dtype=np.int)); x.axis = 0
-        y = s.KDTNode(np.array([1,2,4,3], dtype=np.int)); y.axis = 1
-        if x < y: points += 1
-        else: self.feedback += "\n\tKDTNode.__lt__ failed"
-        if y < x: points += 1
-        else: self.feedback += "\n\tKDTNode.__lt__ failed"
-
-        x.axis = 2; y.axis = 3
-        if x > y: points += 1
-        else: self.feedback += "\n\tKDTNode.__gt__ failed"
-        if y > x: points += 2
-        else: self.feedback += "\n\tKDTNode.__gt__ failed"
-
-        return points
-    
-    def problem5(self, s):
-        """Test nearest_neighbor(). 30 points."""
-        points = 0
-
-        points  = self.neighbor( 10,  10, s.nearest_neighbor)*3
-        points += self.neighbor(100,  10, s.nearest_neighbor)*3
-        points += self.neighbor( 10, 100, s.nearest_neighbor)*3
-        points += self.neighbor(100, 100, s.nearest_neighbor)*3
-        points += self.neighbor(100, 100, s.nearest_neighbor)*3
-
-        _testDriver.get_code(s.nearest_neighbor)
-        print "\n(Check that scipy.spatial.KDTree is not used)"
-        points *= self.grade(1)
-        
-        return points
-
-    def problem6(self, s):
-        """Test postal_problem(). 10 points."""
-
-        print("Correct responses:")
-        postal_problem(grading=True)
-        print("\nStudent responses:")
-        x = s.postal_problem()
-        if x is not None:
-            print x
-        
-        return self.grade(10)
 
 # =============================== END OF FILE =============================== #
