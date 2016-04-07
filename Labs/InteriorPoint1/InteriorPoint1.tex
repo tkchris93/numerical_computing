@@ -188,7 +188,7 @@ Continuing in this manner, we can calculate the entire derivative matrix, which 
 Unfortunately, solving Equation \ref{eq:naiveNewton} often leads to a search direction that is too greedy.
 Even small steps in this direction may lead the iteration out of the feasible region by violating one of the constraints.
 To remedy this, we define the \emph{duality measure} $\nu$\footnote{$\nu$ is the Greek letter for $n$, pronounced ``nu.''} of the problem: \[\nu = \frac{\x^T\Mu}{n} \]
-The idea is to use Newton's method to identify a direction that stricly decreases $\nu$.
+The idea is to use Newton's method to identify a direction that strictly decreases $\nu$.
 Thus instead of solving Equation \ref{eq:naiveNewton}, we solve:
 \begin{align}
 DF(\x,\Lamb,\Mu)
@@ -303,7 +303,7 @@ Next, we back off from these maximum step lengths slightly:
 \alpha &= \min(1, 0.95\alpha_{\max})\\
 \delta &= \min(1, 0.95\delta_{\max}).
 \end{align*}
-These are our final step lenghts.
+These are our final step lengths.
 Thus, the next point in the iteration is given by:
 \begin{align*}
 \x_{k+1} &= \x_k + \delta \triangle \x_k\\
