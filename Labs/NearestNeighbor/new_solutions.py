@@ -1,11 +1,7 @@
 # new_solutions.py
-"""Volume II Lab 7: Nearest Neighbor Search. Solutions file.
+"""Volume II Lab 7: Nearest Neighbor Search. Solutions file."""
 
-< IN DEVELOPMENT >
-
-"""
-
-# =================== BSTNode / BST Classes from Trees.py =================== #
+# BSTNode / BST Classes from Data Structures II Lab ========================= #
 class BSTNode(object):
     def __init__(self, data):
         self.value = data
@@ -45,7 +41,7 @@ def _height(current):
         return -1
     return 1 + max(_height(current.right), _height(current.left))
 
-# ============================== solutions.py =============================== #
+# solutions.py ============================================================== #
 
 import numpy as np
 from sklearn import neighbors
@@ -66,7 +62,7 @@ def metric(x, y):
         ValueError: Incompatible dimensions.
     """
     if len(x) != len(y):
-        raise ValueError("Incompatible dimensions.")
+        raise ValueError("Incompatible dimensions")
     return np.linalg.norm(x - y)
     
     # Or a slightly longer way:
@@ -109,7 +105,7 @@ def exhaustive_search(data_set, target):
     return nearest_neighbor, minimum_distance
 
 
-# Problem 3: Add magic methods to this class.
+# Problem 3: Write a KDTNode class.
 class KDTNode(BSTNode):
     """Node class for K-D Trees. Inherits from BSTNode.
 
@@ -129,11 +125,11 @@ class KDTNode(BSTNode):
             TypeError: if 'data' is not a NumPy array (of type np.ndarray).
         """
         if type(data) != np.ndarray:
-            raise TypeError("A NumPy array or a list is required.")
+            raise TypeError("input must be a NumPy array")
         BSTNode.__init__(self, data)
         self.axis  = 0
 
-    # Defining these magic methods is not required, but may be useful.    
+    # Defining these magic methods is not required, but may be useful.
     def __sub__(self, other):
         return metric(self.value, other.value)
 
@@ -155,6 +151,7 @@ class KDT(BST):
         k (int): the dimension of the tree (the 'k' of the k-d tree).
     """
 
+    # This constructor is not required, but is a design choice.
     def __init__(self, data_set):
         """Set the k attribute and fill the tree with the points
         in 'data_set'. Raise a TypeError if the input is not a NumPy
@@ -168,24 +165,25 @@ class KDT(BST):
             self.insert(point)
     
     def find(self, data):
-        """Return the node containing 'data'.
-
-        Raises:
-            ValueError: if there is no node containing 'data' in the tree.
+        """Return the node containing 'data'. If there is no such node
+        in the tree, or if the tree is empty, raise a ValueError.
         """
-        
+
+        # Define a recursive function to traverse the tree.
         def _step(current):
-            """Recursively approach the target array in the tree."""
-            
-            if current is None:         # Base case: target is not in the tree.
+            """Recursively step through the tree until the node containing
+            'data' is found. If there is no such node, raise a Value Error.
+            """
+            if current is None:                     # Base case 1: dead end.
                 raise ValueError(str(data) + " is not in the tree")
             elif np.allclose(data, current.value):
-                return current                      # Base case: target found!
+                return current                      # Base case 2: data found!
             elif data[current.axis] < current.value[current.axis]:
                 return _step(current.left)          # Recursively search left.
             else:
                 return _step(current.right)         # Recursively search right.
-            
+        
+        # Start the recursion on the root of the tree.
         return _step(self.root)
     
     def insert(self, data):

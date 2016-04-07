@@ -1,5 +1,5 @@
 # solutions.py
-"""Volume II Lab 5: Data Structures II (Trees). Solutions file."""
+"""Volume II Lab 5: Data Structures II (Trees). Test Driver."""
 
 from matplotlib import pyplot as plt
 from numpy.random import choice

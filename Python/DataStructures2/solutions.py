@@ -105,9 +105,9 @@ class BST(object):
                 raise ValueError(str(data) + " is not in the tree.")
             if data == current.value:               # Base case 2: data found!
                 return current
-            if data < current.value:                # Step to the left.
+            if data < current.value:                # Recursively search left.
                 return _step(current.left)
-            else:                                   # Step to the right.
+            else:                                   # Recursively search right.
                 return _step(current.right)
         
         # Start the recursion on the root of the tree.
@@ -444,6 +444,7 @@ def time_structures(filename="English.txt", start=500, stop=5000, step=500):
     bst_build, bst_search = [], []
     avl_build, avl_search = [], []
 
+    # TODO: change this to numbers, not strings from a file.
     # Read in the data.
     with open(filename, 'r') as f:
         data = f.readlines()

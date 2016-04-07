@@ -302,9 +302,9 @@ class BST(object):
                 raise ValueError(str(data) + " is not in the tree.")
             if data == current.value:               # Base case 2: data found!
                 return current
-            if data < current.value:                # Step to the left.
+            if data < current.value:                # Recursively search left.
                 return _step(current.left)
-            else:                                   # Step to the right.
+            else:                                   # Recursively search right.
                 return _step(current.right)
         
         # Start the recursion on the root of the tree.
