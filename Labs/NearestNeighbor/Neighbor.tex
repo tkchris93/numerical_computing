@@ -38,7 +38,7 @@ This method is ineffecient however, and only feasible for relatively small train
 % Problem 2: Exhaustive search method
 \begin{problem}
 Write a function that solves the nearest neighbor search problem by exhaustively checking all of the distances between a given point and each point in a data set.
-The function should take in a set of data points (as an $m \times k$ NumPy array) and a single target point (as a $1 \times k$ NumPy array).
+The function should take in a set of data points (as an $m \times k$ NumPy array, where each row represents one of the $m$ points in the data set) and a single target point (as a 1-dimensional NumPy array with $k$ entries).
 Return the point in the training set that is closest to the target point and its distance from the target.
 
 The complexity of this algorithm is $O(mk)$, where $k$ is the number of dimensions and $m$ is the number of data points.
@@ -46,7 +46,8 @@ The complexity of this algorithm is $O(mk)$, where $k$ is the number of dimensio
 
 \section*{K-D Trees}
 
-A \href{https://en.wikipedia.org/wiki/K-d_tree}{\emph{$k$-d tree}} is a special kind of binary search tree\footnote{This lab is a sequel to the Data Structures II lab, and should not be attempted until the reader has successfully implemented a binary search tree in Python.} for high dimensional data (i.e., more dimensions than 1).
+% \footnote{This lab is a sequel to the Data Structures II lab, and should not be attempted until the reader has successfully implemented a binary search tree in Python.}
+A \href{https://en.wikipedia.org/wiki/K-d_tree}{\emph{$k$-d tree}} is a special kind of binary search tree for high dimensional data (i.e., more dimensions than 1).
 While a binary search tree excludes regions of the number line from a search until the search point is found, a $k$-d tree works on regions of $\mathbb{R}^k$.
 So long as the data in the tree meets certain dimensionality requirements, similar efficiency gains may be made.
 
