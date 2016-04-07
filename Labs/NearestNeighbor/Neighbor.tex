@@ -1,7 +1,7 @@
 \lab{Nearest Neighbor Search}{Nearest Neighbor Search}
 \label{lab:NNS}
 
-\objective{Nearest neighbor search is an optimization problem that arises in applications such as computer vision, pattern recognition, internet marketing, and data compression. In this lab we implement a K-D tree to solve the problem efficiently, then learn use scipy's K-D tree in sklearn to implement a handwriting recognition algorithm.}
+\objective{Nearest neighbor search is an optimization problem that arises in applications such as computer vision, pattern recognition, internet marketing, and data compression. In this lab we implement a K-D tree to solve the problem efficiently, then learn use SciPy's K-D tree from the \li{sklearn} module to implement a handwriting recognition algorithm.}
 
 \section*{The Nearest Neighbor Search Problem}
 
@@ -17,27 +17,28 @@ Then $y$ would be the data that represents your new home, and the task is to fin
 
 % Problem 1: Euclidean Distance
 \begin{problem}
-In order to solve the nearest neighbor search problem we need a way to measure distance.
-A function that measures distance between two points is called a \emph{metric}.
-The euclidean metric measures the distance between two points in $\mathbb{R}^n$ by
+Roughly speaking, a function that measures the distance between two points in a set is called a \emph{metric}\footnote{Metrics and metric spaces are examined in detail in Chapter 5 of Volume I.}.
+The \emph{euclidean metric} measures the distance between two points in $\mathbb{R}^n$ with the familiar distance formula:
 \[
-d(x,y) = \sqrt{\displaystyle\sum_{i=1}^n (x_i - y_i)^2} = \| x - y \|_2
+d(\x,\y) = \sqrt{\displaystyle\sum_{i=1}^n (x_i - y_i)^2} = \| \x - \y \|_2
 \]
 
-Write a function that accepts two $1 \times k$ numpy arrays and returns the euclidean distance between them.
-Raise a \li{ValueError} if the vectors don't have the same dimension.
+Write a function that accepts two 1-dimensional NumPy arrays and returns the euclidean distance between them.
+Raise a \li{ValueError} if the arrays don't have the same number of entries.
+
+(Hint: NumPy already has some functions to help do this quickly!)
 \end{problem}
 
 Consider again the post office example.
 One way to find out which post office is closest is to drive from home to each post office, measure the mileage, and then choose the post office that is the closest.
-This is called an exhaustive search.
+This is called an \emph{exhaustive search}.
 More precisely, we measure the distance of $y$ to each point in $X$, and choose the point with the smallest distance.
-This method is ineffecient however, and only feasible if the training set is very small.
+This method is ineffecient however, and only feasible for relatively small training sets.
 
 % Problem 2: Exhaustive search method
 \begin{problem}
 Write a function that solves the nearest neighbor search problem by exhaustively checking all of the distances between a given point and each point in a data set.
-The function should take in a set of data points (as an $m \times k$ numpy array) and a single target point (as a $1 \times k$ numpy array).
+The function should take in a set of data points (as an $m \times k$ NumPy array) and a single target point (as a $1 \times k$ NumPy array).
 Return the point in the training set that is closest to the target point and its distance from the target.
 
 The complexity of this algorithm is $O(mk)$, where $k$ is the number of dimensions and $m$ is the number of data points.
@@ -100,7 +101,7 @@ class KDTNode(BSTNode):
 Import the \li{BSTNode} class from \texttt{Trees.py}%\footnote{The file \texttt{Trees.py} is part of the Data Structures II lab.}
 Write a \li{KDTNode} class that inherits from \li{BSTNode}.
 \begin{enumerate}
-\item Modify the constructor so that a \li{KDTNode} can only hold a numpy array (\li{np.ndarray}).
+\item Modify the constructor so that a \li{KDTNode} can only hold a NumPy array (\li{np.ndarray}).
 If any other data type is given, raise a \li{TypeError}.
 \item Write the \li{__sub__} magic method so that \li{x} - \li{y} returns the euclidean distance between the data in node \li{x} and the data in node \li{y}.
 
@@ -128,7 +129,7 @@ True
 \end{problem}
 
 Now we construct the $k$-d tree class.
-%The constructor accepts a set of data as an $m \times k$ numpy array and inserts each $1 \times k$ point into the tree.
+%The constructor accepts a set of data as an $m \times k$ NumPy array and inserts each $1 \times k$ point into the tree.
 For an optimal $k$-d tree, the data needs to be inserted in a very particular order.
 However, inserting at random still usually produces a good tree.
 Here we simply insert the data in the order that it is given.
@@ -145,12 +146,12 @@ This way if each existing node in the tree has the correct \li{axis}, the correc
         """Set the k attribute and fill the tree with the points in 'data_set'.
 
         Raises:
-            TypeError: 'data_set' is not a numpy array (of type np.ndarray).
+            TypeError: 'data_set' is not a NumPy array (of type np.ndarray).
         """
 
         # Validate the input type.
         if not isinstance(data_set, np.ndarray):
-            raise TypeError("data_set must be a numpy array.")
+            raise TypeError("data_set must be a NumPy array.")
 
         # Set the root and dimension attributes.
         BST.__init__(self)
@@ -169,7 +170,7 @@ class KDT(BST):
     Used to solve the nearest neighbor problem efficiently.
     Attributes:
         root (KDTNode): the root node of the tree. Like all other
-            nodes in the tree, the root houses data as a numpy array.
+            nodes in the tree, the root houses data as a NumPy array.
         k (int): the dimension of the tree (the 'k' of the k-d tree).
     """
 
@@ -355,10 +356,10 @@ A computer image may be thought of a vector in $\mathbb{R}^n$, where $n$ is the 
 If two people write the same number, we would expect the vectors representing a scanned image of those number to be close in the euclidean metric.
 This insight means that given a training set of scanned images along with correct labels, we may confidently infer the label of a new scanned image.
 
-\subsection*{scipy.sklearn}
+\subsection*{sklearn}
 
 %More information about this package can be found at http://scikit-learn.org/stable/modules/neighbors.html.
-The \li{sklearn} module in \li{scipy} contains powerful tools for solving the nearest neighbor problem.
+The \li{sklearn} module contains powerful tools for solving the nearest neighbor problem.
 To start nearest neighbors classification, we import the neighbors module from sklearn.
 This module has a class for setting up a k-nearest neighbors classifier.
 \begin{lstlisting}
@@ -378,8 +379,8 @@ The first, \li{fit}, will take arrays of data (the training set) and labels and 
 This can then be used to find k-nearest neighbors, much like the \li{KDT} class that we implemented previously.
 
 \begin{lstlisting}
-# 'points' is some numpy array of data
-# 'labels' is a numpy array of labels describing the data in points.
+# 'points' is some NumPy array of data
+# 'labels' is a NumPy array of labels describing the data in points.
 >>> nbrs.fit(points, labels)
 \end{lstlisting}
 
