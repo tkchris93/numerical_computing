@@ -131,11 +131,10 @@ class _testDriver(object):
         self.feedback = ""
         self.score = 0
 
-        def test_one(problem, number, value):
+        def test_one(problem, label, value):
             """Test a single problem, checking for errors."""
             try:
-                self.feedback += "\n\nProblem {} ({} points):".format(
-                                                                number, value)
+                self.feedback += "\n\n{} ({} points):".format(label, value)
                 points = problem(student_module)
                 self.score += points
                 self.feedback += "\nScore += {}".format(points)
@@ -143,8 +142,8 @@ class _testDriver(object):
                 self.feedback += "\n{}: {}".format(self._errType(e), e)
 
         # Grade each problem.
-        test_one(self.problem1, 1, 0)   # Problem 1: X points.
-        test_one(self.problem2, 2, 0)   # Problem 2: X points.
+        test_one(self.problem1, "Problem 1", 0)   # Problem 1: X points.
+        test_one(self.problem2, "Problem 2", 0)   # Problem 2: X points.
 
         # Report final score.
         percentage = (100. * self.score) / total

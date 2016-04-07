@@ -3,8 +3,52 @@
 
 from matplotlib import pyplot as plt
 from numpy.random import choice
+from functools import wraps
 from time import time
 import inspect
+import signal
+
+def _autoclose(func):
+    """Decorator for closing figures automatically."""
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            plt.ion()
+            return func(*args, **kwargs)
+        finally:
+            plt.close('all')
+            plt.ioff()
+    return wrapper
+
+def _timeout(seconds):
+    """Decorator for preventing a function from running for too long.
+
+    Inputs:
+        seconds (int): The number of seconds allowed.
+
+    Notes:
+        This decorator uses signal.SIGALRM, which is only available on Unix.
+    """
+    assert isinstance(seconds, int), "@timeout(sec) requires an int"
+    
+    class TimeoutError(Exception):
+        pass
+
+    def _handler(signum, frame):
+        """Handle the alarm by raising a custom exception."""
+        raise TimeoutError("Timeout after {0} seconds".format(seconds))
+
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            signal.signal(signal.SIGALRM, _handler)
+            signal.alarm(seconds)               # Set the alarm.
+            try:
+                result = func(*args, **kwargs)
+            finally:
+                signal.alarm(0)                 # Turn the alarm off.
+            return result
+        return wraps(func)(wrapper)
+    return decorator
 
 from solutions import iterative_search
 from solutions import SinglyLinkedList, BST
@@ -36,59 +80,49 @@ class _testDriver(object):
         self.feedback = ""
 
     # Main routine
-    def test_all(self, student_module):
+    def test_all(self, student_module, total=60):
+        """Grade the provided module on each problem and compile feedback."""
+        # Reset feedback and score.
         self.feedback = ""
-        score = 0
+        self.score = 0
 
-        try:    # Problem 1: 5 points
-            self.feedback += "\n\nProblem 1 (5 points):"
-            points = self.problem1(student_module)
-            score += points
-            self.feedback += "\nScore += " + str(points)
-        except BaseException as e:
-            self.feedback += "\nError: " + e.message
-        
-        try:    # Problem 2: 15 points
-            self.feedback += "\n\nProblem 2 (15 points):"
-            points = self.problem2(student_module)
-            score += points
-            self.feedback += "\nScore += " + str(points)
-        except BaseException as e:
-            self.feedback += "\nError: " + e.message
-        
-        try:    # Problem 3: 30 points
-            self.feedback += "\n\nProblem 3 (30 points):"
-            points = self.problem3(student_module)
-            score += points
-            self.feedback += "\nScore += " + str(points)
-        except BaseException as e:
-            self.feedback += "\nError: " + e.message
-        
-        try:    # Problem 4: 10 points
-            self.feedback += "\n\nProblem 4 (10 points):"
-            points = self.problem4(student_module)
-            score += points
-            self.feedback += "\nScore += " + str(points)
-        except BaseException as e:
-            self.feedback += "\nError: " + e.message
+        def test_one(problem, label, value):
+            """Test a single problem, checking for errors."""
+            try:
+                self.feedback += "\n\n{} ({} points):".format(label, value)
+                points = problem(student_module)
+                self.score += points
+                self.feedback += "\nScore += {}".format(points)
+            except BaseException as e:
+                self.feedback += "\n{}: {}".format(self._errType(e), e)
+
+        # Grade each problem.
+        test_one(self.problem1, "Problem 1",  5)   # Problem 1:  5 points.
+        test_one(self.problem2, "Problem 2", 15)   # Problem 2: 15 points.
+        test_one(self.problem3, "Problem 3", 30)   # Problem 3: 30 points.
+        test_one(self.problem4, "Problem 4", 10)   # Problem 4: 10 points.
 
         # Report final score.
-        total = 60
-        percentage = (100.0 * score) / total
-        self.feedback += "\n\nTotal score: " + str(score) + "/"
-        self.feedback += str(total) + " = " + str(percentage) + "%"
-        if   percentage >=  98.0: self.feedback += "\n\nExcellent!"
-        elif percentage >=  90.0: self.feedback += "\n\nGreat job!"
+        percentage = (100. * self.score) / total
+        self.feedback += "\n\nTotal score: {}/{} = {}%".format(
+                                    self.score, total, round(percentage, 2))
+        if   percentage >=  98: self.feedback += "\n\nExcellent!"
+        elif percentage >=  90: self.feedback += "\n\nGreat job!"
 
         # Add comments (optionally).
-        print self.feedback
+        print(self.feedback)
         comments = str(raw_input("Comments: "))
         if len(comments) > 0:
-            self.feedback += '\n\n\nComments:\n\t' + comments
-        self.score = score
+            self.feedback += '\n\n\nComments:\n\t{}'.format(comments)
 
-    # Helper Function
-    def strTest(self, x, y, message):
+    # Helper Functions --------------------------------------------------------
+    @staticmethod
+    def _errType(error):
+        """Get just the name of the exception 'error' in string format."""
+        return str(type(error).__name__)
+
+    
+    def _strTest(self, x, y, message):
         """Test to see if x and y have the same string representation."""
         if str(x) == str(y):
             return 1
@@ -98,7 +132,7 @@ class _testDriver(object):
             self.feedback += "\nStudent response:\n" + str(y)
             return 0
 
-    # Problems
+    # Problems ----------------------------------------------------------------
     def problem1(self, s):
         """Test recursive_search(). 5 points."""
 
@@ -116,13 +150,13 @@ class _testDriver(object):
         lls.append(1)
         lls.append('a')
         lls.append(2)
-        points += self.strTest(iterative_search(lls,1),
+        points += self._strTest(iterative_search(lls,1),
                                s.recursive_search(lls, 1),
                                "\n\trecursive_search(x) failed for x in list")
-        points += self.strTest(iterative_search(lls, 'a'),
+        points += self._strTest(iterative_search(lls, 'a'),
                                s.recursive_search(lls, 'a'),
                                "\n\trecursive_search(x) failed for x in list")
-        points += self.strTest(iterative_search(lls, 2),
+        points += self._strTest(iterative_search(lls, 2),
                                s.recursive_search(lls, 2),
                                "\n\trecursive_search(x) failed for x in list")
 
@@ -157,30 +191,24 @@ class _testDriver(object):
 
         # Empty tree (0 pts)
         tree1, tree2 = BST(), s.BST()
-        self.strTest(tree1, tree2, "\n\tBST() failed initially!")
+        self._strTest(tree1, tree2, "\n\tBST() failed initially!")
 
         # Inserting root (2 pts)
         tree1.insert(4); tree2.insert(4)
-        points += 2*self.strTest(tree1, tree2, "\n\tBST.insert(4) failed "
+        points += 2*self._strTest(tree1, tree2, "\n\tBST.insert(4) failed "
                                  "on root insertion.\nPrevious tree:\n[]")
 
         def test_insert(value, solTree, stuTree):
             oldTree = str(solTree)
             solTree.insert(value); stuTree.insert(value)
-            p = self.strTest(tree1, tree2, "\n\tBST.insert(" + str(value)
+            p = self._strTest(tree1, tree2, "\n\tBST.insert(" + str(value)
                             + ") failed.\nPrevious tree:\n" + oldTree)
             return p, solTree, stuTree
 
         # Inserting nonroot (9 pts)
-        p, tree1, tree2 = test_insert( 2, tree1, tree2); points += p
-        p, tree1, tree2 = test_insert( 1, tree1, tree2); points += p
-        p, tree1, tree2 = test_insert( 3, tree1, tree2); points += p
-        p, tree1, tree2 = test_insert(10, tree1, tree2); points += p
-        p, tree1, tree2 = test_insert( 5, tree1, tree2); points += p
-        p, tree1, tree2 = test_insert( 6, tree1, tree2); points += p
-        p, tree1, tree2 = test_insert( 9, tree1, tree2); points += p
-        p, tree1, tree2 = test_insert( 7, tree1, tree2); points += p
-        p, tree1, tree2 = test_insert(11, tree1, tree2); points += p
+        for i in [2, 1, 3, 10, 5, 6, 9, 7, 11]:
+            p, tree1, tree2 = test_insert(i, tree1, tree2)
+            points += p
 
         # Inserting already existing value (4 pts)
         def test_duplicate(value, stuTree):
@@ -206,22 +234,11 @@ class _testDriver(object):
 
         points = 0
 
-        def load_trees():
+        def load_trees(entries):
             solutions_tree, student_tree = BST(), s.BST()
-            solutions_tree.insert( 4); student_tree.insert( 4)
-            solutions_tree.insert( 2); student_tree.insert( 2)
-            solutions_tree.insert( 1); student_tree.insert( 1)
-            solutions_tree.insert( 3); student_tree.insert( 3)
-            solutions_tree.insert(10); student_tree.insert(10)
-            solutions_tree.insert( 5); student_tree.insert( 5)
-            solutions_tree.insert( 6); student_tree.insert( 6)
-            solutions_tree.insert( 9); student_tree.insert( 9)
-            solutions_tree.insert( 7); student_tree.insert( 7)
-            solutions_tree.insert(11); student_tree.insert(11)
-            solutions_tree.insert(15); student_tree.insert(15)
-            solutions_tree.insert(14); student_tree.insert(14)
-            solutions_tree.insert(16); student_tree.insert(16)
-            solutions_tree.insert(12); student_tree.insert(12)
+            for i in entries:
+                solutions_tree.insert(i)
+                student_tree.insert(i)
             if str(solutions_tree) != str(student_tree):
                 raise NotImplementedError("BST.remove() cannot be tested "
                                           "until BST.insert() is correct.")
@@ -231,7 +248,7 @@ class _testDriver(object):
             oldTree = str(solTree)
             try:
                 solTree.remove(value); stuTree.remove(value)
-                p = self.strTest(tree1, tree2, "\n\tBST.remove(" + str(value)
+                p = self._strTest(tree1, tree2, "\n\tBST.remove(" + str(value)
                             + ") failed.\nPrevious tree:\n" + oldTree)
             except Exception as e:
                 self.feedback += "\n\tError while removing " + str(value)
@@ -249,66 +266,45 @@ class _testDriver(object):
         except ValueError:
             points += 1
 
+        items = [4, 2, 1, 3, 10, 5, 6, 9, 7, 11, 15, 14, 16, 12]
         # Remove leaf (5 points)
-        tree1, tree2 = load_trees()
-        p, tree1, tree2 = test_remove( 1, tree1, tree2); points += p
-        p, tree1, tree2 = test_remove( 7, tree1, tree2); points += p
-        p, tree1, tree2 = test_remove(12, tree1, tree2); points += p
-        p, tree1, tree2 = test_remove(16, tree1, tree2); points += p
-        p, tree1, tree2 = test_remove(14, tree1, tree2); points += p
+        tree1, tree2 = load_trees(items)
+        for i in [1, 7, 12, 16, 14]:
+            p, tree1, tree2 = test_remove(i, tree1, tree2)
+            points += p
         
         # Remove non-root with 1 child (5 points)
-        tree1, tree2 = load_trees()
-        p, tree1, tree2 = test_remove( 9, tree1, tree2); points += p
-        p, tree1, tree2 = test_remove( 6, tree1, tree2); points += p
-        p, tree1, tree2 = test_remove( 5, tree1, tree2); points += p
-        p, tree1, tree2 = test_remove(11, tree1, tree2); points += p
-        p, tree1, tree2 = test_remove(14, tree1, tree2); points += p
+        tree1, tree2 = load_trees(items)
+        for i in [9, 6, 5, 11, 14]:
+            p, tree1, tree2 = test_remove(i, tree1, tree2)
+            points += p
 
         # Remove non-root with 2 children (5 points)
-        tree1, tree2 = load_trees()
-        p, tree1, tree2 = test_remove( 2, tree1, tree2); points += p
-        p, tree1, tree2 = test_remove(15, tree1, tree2); points += p
-        p, tree1, tree2 = test_remove(10, tree1, tree2); points += p
-        p, tree1, tree2 = test_remove(11, tree1, tree2); points += p
-        p, tree1, tree2 = test_remove(12, tree1, tree2); points += p
+        tree1, tree2 = load_trees(items)
+        for i in [2, 15, 10, 11, 12]:
+            p, tree1, tree2 = test_remove(i, tree1, tree2)
+            points += p
         
         # Remove root with no children (2 point)
         tree1, tree2 = BST(), s.BST()
         tree1.insert(10); tree2.insert(10)
-        p, tree1, tree2 = test_remove(10, tree1, tree2); points += p*2
+        p, tree1, tree2 = test_remove(10, tree1, tree2)
+        points += p*2
 
         # Remove root with one child (5 points)
-        tree1, tree2 = BST(), s.BST()
-        tree1.insert(1); tree2.insert(1)
-        tree1.insert(2); tree2.insert(2)
-        tree1.insert(3); tree2.insert(3)
-        tree1.insert(4); tree2.insert(4)
-        tree1.insert(5); tree2.insert(5)
-        tree1.insert(6); tree2.insert(6)
-        p, tree1, tree2 = test_remove(1, tree1, tree2); points += p
-        p, tree1, tree2 = test_remove(2, tree1, tree2); points += p
-        p, tree1, tree2 = test_remove(3, tree1, tree2); points += p
-        p, tree1, tree2 = test_remove(4, tree1, tree2); points += p
-        p, tree1, tree2 = test_remove(5, tree1, tree2); points += p
+        tree1, tree2 = load_trees([1, 2, 3, 4, 5, 6])
+        for i in [1, 2, 3, 4, 5]:
+            p, tree1, tree2 = test_remove(i, tree1, tree2)
+            points += p
 
         # Remove root with two children (5 points)
-        tree1, tree2 = BST(), s.BST()
-        tree1.insert(2); tree2.insert(2)
-        tree1.insert(1); tree2.insert(1)
-        tree1.insert(7); tree2.insert(7)
-        tree1.insert(6); tree2.insert(6)
-        tree1.insert(5); tree2.insert(5)
-        tree1.insert(4); tree2.insert(4)
-        tree1.insert(3); tree2.insert(3)
-        p, tree1, tree2 = test_remove(2, tree1, tree2); points += p
-        p, tree1, tree2 = test_remove(3, tree1, tree2); points += p
-        p, tree1, tree2 = test_remove(4, tree1, tree2); points += p
-        p, tree1, tree2 = test_remove(5, tree1, tree2); points += p
-        p, tree1, tree2 = test_remove(6, tree1, tree2); points += p
+        tree1, tree2 = load_trees([2, 1, 7, 6, 5, 4, 3])
+        for i in [2, 3, 4, 5, 6]:
+            p, tree1, tree2 = test_remove(i, tree1, tree2)
+            points += p
 
         # Remove nonexistent (2 points)
-        tree1, tree2 = load_trees()
+        tree1, tree2 = load_trees(items)
         try:
             tree2.remove(0)
             self.feedback += "\n\tBST.remove(0) failed for 0 not in tree"
