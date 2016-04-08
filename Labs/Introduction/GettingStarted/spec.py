@@ -1,15 +1,12 @@
-# spec.py
-"""Volume I Lab 1: Getting Started
+# Name this file 'solutions.py'.
+"""Introductory Labs: Getting Started.
 <Name>
 <Class>
 <Date>
 """
 
-# Problem 1: Modify this file so that it prints out "Hello, world!"
-#  when it is run from the terminal or from a Python interpreter.
 
-
-# Problem 2: Implement this function.
+# Problem 2
 def sphere_volume(r):
     """Return the volume of the sphere of radius 'r'.
     Use 3.14159 for pi in your computation.
@@ -17,7 +14,7 @@ def sphere_volume(r):
     pass
 
 
-# Problem 3: Implement the first_half() and reverse() functions.
+# Problem 3
 def first_half(my_string):
     """Return the first half of the string 'my_string'. Exclude the
     middle character if there are an odd number of characters.
@@ -34,15 +31,15 @@ def backward(my_string):
     """Return the reverse of the string 'my_string'.
     
     Examples:
-        >>> reverse("python")
+        >>> backward("python")
         'nohtyp'
-        >>> reverse("ipython")
+        >>> backward("ipython")
         'nohtypi'
     """
     pass
 
-    
-# Problem 4: Perform list operations
+
+# Problem 4
 def list_ops(my_list):
     """Perform the following operations on the list 'my_list':
         - Append "elephant".
@@ -50,6 +47,7 @@ def list_ops(my_list):
         - Remove the entry at index 1.
         - Replace the entry at index 2 with "eagle".
         - Append "fox".
+    Return the resulting list.
 
     Examples:
         >>> list_ops(["ant", "bear", "cat", "dog"])
@@ -57,10 +55,10 @@ def list_ops(my_list):
     """
     pass
 
-    
-# Problem 5: Implement this function.
+
+# Problem 5
 def pig_latin(word):
-    """Translate the string 'word' into Pig Latin.
+    """Translate the string 'word' into Pig Latin
     
     Examples:
         >>> pig_latin("apple")
@@ -68,10 +66,10 @@ def pig_latin(word):
         >>> pig_latin("banana")
         'ananabay'
     """
-    pass
+    pass        
 
-        
-# Problem 6: Implement this function.
+
+# Problem 6
 def int_to_string(my_list):
     """Translate 'my_list', a list of numbers 1-26, to corresponding
     lowercase letters of the alphabet. 1 -> a, 2 -> b, 3 -> c, and so on.
@@ -83,22 +81,12 @@ def int_to_string(my_list):
     pass
 
 
-# Problem 7: Implement this function.
-def stringify(my_list):
-    """Using a list comprehension, convert the list of integers 'my_list'
-    to a list of strings. Return the new list.
-
-    Example:
-        >>> stringify([1, 2, 3])
-        ['1', '2', '3']
-    """
-    pass
-
-
-# Problem 8: Implement this function and use it to approximate ln(2).
+# Problem 7
 def alt_harmonic(n):
-    """Use a list comprehension to calculate the sum of the
-    first n terms of the alternating harmonic series.
+    """Return the partial sum of the first n terms of the alternating
+    harmonic series. Use this function to approximae ln(2).
     """
     pass
 
+
+# END OF FILE =================================================================
