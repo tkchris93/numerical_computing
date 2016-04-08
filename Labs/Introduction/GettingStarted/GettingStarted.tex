@@ -15,7 +15,7 @@ Python is quickly gaining momentum as a fundamental tool in scientific computing
 \item Clear, readable syntax
 \item Full object orientation
 \item Complete memory management (via garbage collection)
-\item High-level, dynamic datatypes
+\item High-level, dynamic data types
 \item Extensibility via C
 \item Ability to interface with other languages such as R, C, C++, and Fortran
 \item Embeddability in applications
@@ -347,12 +347,12 @@ The returned value or values can then be stored in variables for later use.
 \end{info}
 
 \begin{comment}
-% TODO: for Python 3, insert a problem introducting the user to the print function more formally. This problem should be simple, but it should explore the keyword arguments 'sep' and 'end' included in the print function.
+% TODO: for Python 3, insert a problem introducing the user to the print function more formally. This problem should be simple, but it should explore the keyword arguments 'sep' and 'end' included in the print function. (?)
 \begin{problem}
 Python's built-in \li{print} function is extremely useful for formatting output nicely.
 Write a function that prints out the alphabet, separated by tabs, with newlines after every 5th letter. % SUBJECT TO CHANGE.
 \end{problem}
-\end{comment}
+\end{comment} % Could wait until the file I/O lab to do this...
 
 % Problem 2: write a very basic function.
 \begin{problem}
@@ -559,8 +559,8 @@ Accept a parameter (a list) and perform the following operations on it, in order
 \item Remove the entry at index 1.
 \item Replace the entry at index 2 with \li{"eagle"}.
 \item Append \li{"fox"}.
-Return the resulting list.
 \end{enumerate}
+Return the resulting list.
 \end{problem}
 
 % Sets ========================================================================
@@ -744,7 +744,7 @@ yellow!
 
 The \li{break} and \li{continue} statements also work in \li{for} loops, but a \li{continue} in a \li{for} loop will automatically increment the index or item, whereas a \li{continue} in a \li{while} loop makes no automatic changes to any variable.
 
-Python has some very useful built-in functions that can be used in conjunction with the \li{for} statement:
+In addition, Python has some very useful built-in functions that can be used in conjunction with the \li{for} statement:
 \begin{enumerate}
 \item \li{range(start, stop, step)}: Produces a list of integers, following slicing syntax. If only one argument is specified, it produces a list of integers from 0 to the argument, counting by one.
 In Python 2.7, we use \li{xrange()} more often because it is faster\footnote{\li{xrange()} is a generator, whereas \li{range()} creates a \li{list}Generators will be briefly discussed in a future lab.} and does not explicitly create a list in memory.
@@ -787,11 +787,11 @@ u purple
 [2, 5, 8, 11, 14, 17]
 \end{lstlisting}
 
-% Problem 6: int_to_string using Dictionaries and a For loop
+% Problem 6: int_to_string().
 \begin{problem}
 Write a function called \li{int_to_string()}.
 Accept single parameter, which you may assume to be a list of integers, each between 1-26.
-Translate the list of numbers into a single string, where each integer correspondings lower-case letter of the alphabet.
+Translate the list of numbers into a list of strings, where each integer correspondings lower-case letter of the alphabet.
 The number 1 becomes `a', 2 becomes `b', and so on.
 \end{problem}
 
@@ -831,9 +831,8 @@ Tuple, set, and dictionary comprehensions can be done in the same way as list co
 
 % Problem 7: the alternating harmonic series.
 \begin{problem}
-Recall that the alternating harmonic series
-\[\sum_{n=1}^\infty \frac{(-1)^{(n+1)}}{n} = 1 - \frac{1}{2} + \frac{1}{3} - \frac{1}{4} + \frac{1}{5} - ...\]
-converges to $\ln(2)$.
+Recall the alternating harmonic series:
+\[\sum_{n=1}^\infty \frac{(-1)^{(n+1)}}{n} = 1 - \frac{1}{2} + \frac{1}{3} - \frac{1}{4} + \frac{1}{5} - ... = ln(2)\]
 
 Write a function called \li{alt_harmonic()}.
 Use a list comprehension to quickly compute the first $n$ terms of this series, given the parameter \li{n}.
