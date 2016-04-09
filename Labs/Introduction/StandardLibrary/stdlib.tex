@@ -1,19 +1,18 @@
-\lab{The Standard Library}{Standard Library}
-\objective{Python is designed to make it easy to implement complex tasks with little code.
-To that end, any Python distribution includes several built-in functions for accomplishing common tasks.
-In addition, Python is designed to import and reuse code written by others.
-A Python file that can be imported is called a module.
-All Python distributions include a collection of modules for accomplishing a variety of common tasks, collectively called the \emph{Python Standard Library}.
-In this lab we become familiar with the Standard Library and learn how to create, import, and use modules.}
+\lab{The Standard Library}{The Python Standard Library}
 \label{lab:Standard Library}
+\objective{Python is designed to make it easy to implement complex tasks with little code.
+To that end, every Python distribution includes several built-in functions for accomplishing common tasks.
+In addition, Python is designed to import and reuse code written by others.
+A Python file with code that can be imported is called a \emph{module}.
+All Python distributions include a collection of modules for accomplishing a variety of tasks, collectively called the \emph{Python Standard Library}.
+In this lab we will explore some built-in functions, become familiar with the standard library, and learn how to create, import, and use modules.}
 
 % Suggestions for improvement:
 %   - More problems.
 
 \section*{Built-in Functions}
 
-Every Python installation comes with several built-in functions.
-These functions may be used at any time and Python will recognize them.
+Every Python installation comes with several built-in functions that may be used at any time.
 IPython's object introspection feature makes it easy to learn about built-in functions.
 Start IPython from the terminal and use $?$ to bring up technical details on each function.
 
@@ -53,8 +52,9 @@ Function & Returns \\
 \caption{Some common built-in functions. Documentation on all built-in functions can be found at \url{https://docs.python.org/2/library/functions.html}.}
 \label{table:builtin}
 \end{table}
+% Other built-ins to include: any(), all(), map(), round(), type()
 
-The following code demonstrates each of the common built-in functions listed in Table \ref{table:builtin}.
+The following code demonstrates a few of the more common built-in functions (see Table \ref{table:builtin}).
 They are quite intuitive and easy to use.
 
 % TODO: add brackets to the print function for Python 3.
@@ -103,7 +103,7 @@ Can you implement this function in a single line?
 \end{problem}
 % TODO: in Python 3, floating point division is the default, so we can remove the reminder about floating point division.
 
-\section*{Namespaces and Mutability}
+\section*{Namespaces}
 
 \subsection*{Names}
 All objects created in Python resides in memory.
@@ -126,22 +126,39 @@ A \emph{namespace} is a dictionary that maps names to Python objects.
 \end{lstlisting}
 
 A single equals sign assigns an object to a name.
-If a name is assigned to another name, that new name refers to the same object that the orignal name refers to (or a copy of it).
+If a name is assigned to another name, that new name refers to the same object that the original name refers to (or a copy of it).
 
 \begin{lstlisting}
 >>> students = ["John", "Paul", "George", "Ringo"]
 >>> band_members = students
 >>> print(band_members)
-['John', 'Paul', 'George', 'Ringo']
+<<['John', 'Paul', 'George', 'Ringo']>>
+\end{lstlisting}
+
+To see all of the names in the current namespace, use the built-in function \li{dir()} (in IPython, this list will be much longer).
+To delete a variable from the namespace, use the \li{del} keyword.
+
+\begin{lstlisting}
+>>> subjects = ["Statistics", "Technology", "Engineering", "Mathematics"]
+>>> num = 4
+>>> dir()
+<<['__builtins__', '__doc__', '__name__', '__package__', 'num', 'subjects']>>
+>>> del num
+>>> dir()
+<<['__builtins__', '__doc__', '__name__', '__package__', 'subjects']>>
+>>> print(num)
+<<Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'num' is not defined>>
 \end{lstlisting}
 
 \begin{info}
 Many programming languages distinguish between \emph{variables} and \emph{pointers}.
 A pointer typically holds a memory location where the value of some other variable is stored.
-Pointer arithmetic and manipulation is delicate, occasionaly very useful, but often cumbersome.
-
+% Pointer arithmetic and manipulation is delicate, occasionally very useful, but often cumbersome.
+% 
 Python names are essentially pointers, but typical pointer operations are done automatically, and objects in memory that have nothing pointing to them are automatically deleted.
-Understanding how Python handles memory access via names is important for implementing reference-based data structures, such as linked lists and trees.
+% Understanding how Python handles memory access via names is important for implementing reference-based data structures, such as linked lists and trees.
 \end{info}
 
 \subsection*{Mutability}
@@ -152,7 +169,7 @@ A \emph{mutable} object's value may be changed, so assigning a new name to it do
 Therefore, if two names refer to the same mutable object, any changes to the object will be reflected in both names.
 
 \begin{warn}
-Mutability can be very useful in some settings, but it can also cause hard-to-find problems when a copy was intended to be made.
+Mutability can be very useful in some settings, but it can also cause hard-to-find problems when a copy should have been to be made.
 For example, suppose we had a dictionary mapping items to their base prices, and we wanted make a new dictionary that accounts for a small sales tax.
 
 \begin{lstlisting}
@@ -216,7 +233,6 @@ dictionaries & dict\_1[1] = `a' \\
 \hline
 \end{tabular}
 \end{center}
-
 Print a statement of your conclusions to the terminal.
 \end{problem}
 
@@ -275,7 +291,7 @@ NameError: name 'math' is not defined>>
 \end{lstlisting}
 
 \item Often we only need access to a particular function or other object in a module.
-Use \li{from} to specifiy where the object is located, then import it individually.
+Use \li{from} to specify the module where the object is located, then import it individually.
 \begin{lstlisting}
 >>> from math import sqrt       # The name 'sqrt' gives access to the
 >>> sqrt(2)                     # square root function, but the rest of
@@ -388,7 +404,7 @@ In [6]: test.sum_of_squares(3)
 Out[6]: 14
 \end{lstlisting}
 
-% Problem 3: create your own module.
+% Problem 3: create your own module. % TODO: Something more creative!
 \begin{problem}
 Create a module called \texttt{calculator.py}.
 Write a function that returns the sum of two arguments, a function that returns the product of two arguments, and a function that returns the square root of a single argument.
@@ -399,6 +415,9 @@ Using only the functions defined in the module, write a new function that calcul
 \end{problem}
 
 \section*{Python Standard Library}
+
+% TODO: make a table listing some of the common modules in the standard library
+%    (csv, math, random, string, sys, time, timeit)
 
 All Python distributions include a collection of modules for accomplishing a variety of common tasks, collectively called the \emph{Python standard library}.
 A summary of the documentation for these modules, called the \emph{docstring}, is stored in the \li{\_\_doc\_\_} attribute.
@@ -416,7 +435,7 @@ cos(x)
 Return the cosine of x (measured in radians).
 \end{lstlisting}
 
-More extensive documentation is available via the \li{help} built-in function.
+More extensive documentation is available via the \li{help()} built-in function.
 
 Using IPython's object introspection, we can learn about how to use the various modules and functions in the standard library very quickly.
 Similarly, we can list all of the functions included in a module with the \li{tab} key.
