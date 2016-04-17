@@ -38,18 +38,17 @@ Type:      builtin_function_or_method
 \begin{tabular}{c|l}
 Function & Returns \\
 \hline
-\li{abs}() & The absolute value of a real number, or the magnitude \\
+\li{abs()} & The absolute value of a real number, or the magnitude \\
 & of a complex number. \\ \hline
-\li{min}() & The smallest element of a single iterable, or the smallest \\
+\li{min()} & The smallest element of a single iterable, or the smallest \\
 & of several arguments. Strings are compared  based on \\
 & lexicographical order: numerical characters first, then \\
 & upper-case letters, then lower-case letters. \\ \hline
-\li{max}() & The largest element of a single iterable, or the largest \\
+\li{max()} & The largest element of a single iterable, or the largest \\
 & of several arguments. \\ \hline
-\li{len}() & The number of items of a sequence or collection. \\ \hline
-\li{sum}() & The sum of a sequence of numbers. \\
+\li{len()} & The number of items of a sequence or collection. \\ \hline
+\li{sum()} & The sum of a sequence of numbers. \\
 %\hline \li{round()} & A float rounded number to a given precision in decimal digits. \\
-%\hline \li{sorted()} & A list of an iterable's elements, sorted from least to greatest.
 \end{tabular}
 \caption{Some common built-in functions.}
 \label{table:builtin}
@@ -89,7 +88,6 @@ They are quite intuitive and easy to use.
 Documentation on all built-in functions can be found at \url{https://docs.python.org/2/library/functions.html}.
 % Check out \li{map()}, \li{round()}, \li{pow()}, \li{reduce()}, \li{reversed()}, }
 
-
 % Problem 1: using built-in methods with lists.
 \begin{problem}
 Write a function that accepts a list of numbers as input and returns a new list with the minimum, maximum, and average of the original list (in that order).
@@ -103,7 +101,7 @@ Can you implement this function in a single line?
 \subsection*{Names}
 All Python objects reside somewhere in computer memory.
 These objects may be primitive data, data structures, functions, or any other sort of Python object.
-A \emph{name} is a reference to a Python object.
+A \emph{name} (or variable) is a reference to a Python object.
 A \emph{namespace} is a dictionary that maps names to Python objects.
 
 \begin{lstlisting}
@@ -130,7 +128,7 @@ If a name is assigned to another name, that new name refers to the same object t
 <<['John', 'Paul', 'George', 'Ringo']>>
 \end{lstlisting}
 
-To see all of the names in the current namespace, use the built-in function \li{dir()}.% (in IPython, this list will be much longer).
+To see all of the names in the current namespace, use the built-in function \li{dir()}.
 To delete a variable from the namespace, use the \li{del} keyword.
 
 \begin{lstlisting}
@@ -149,10 +147,11 @@ NameError: name 'num' is not defined>>
 
 \begin{info}
 Many programming languages distinguish between \emph{variables} and \emph{pointers}.
-A pointer typically holds a memory location where the value of some other variable is stored.
+A pointer typically holds a memory location where an object is stored.
 % Pointer arithmetic and manipulation is delicate, occasionally very useful, but often cumbersome.
 % 
-Python names are essentially pointers, but typical pointer operations are done automatically, and objects in memory that have nothing pointing to them are automatically deleted.
+Python names are essentially pointers, % but pointer operations are done automatically,
+and objects in memory that have no names pointing to them are automatically deleted.
 % Understanding how Python handles memory access via names is important for implementing reference-based data structures, such as linked lists and trees.
 \end{info}
 
@@ -238,7 +237,7 @@ In general, a Python \emph{module} is a file containing Python code that is mean
 The \li{import} statement loads the code from a specified Python file.
 That is, when a module containing some functions, classes, or other objects is imported, those functions, classes, and objects are made available for use.
 
-In Python files, all \li{import} statements should occur at the top, below the header but before any other code.
+In Python files, all import statements should occur at the top, below the header but before any other code.
 Thus we expand our example of typical Python file from the previous lab to the following:
 
 \begin{lstlisting}
@@ -267,14 +266,14 @@ The NumPy, SciPy, and MatPlotLib modules will be presented in detail in subseque
 There are several ways to use the \li{import} statement.
 \begin{enumerate}
 
-\item Using \li{import} alone makes the module available under the alias of its own name. For example, the \li{math} module has a function called \li{sqrt} that computes the square root of the input.
+\item \li{import <module>} makes the specified module available under the alias of its own name. For example, the \li{math} module has a function called \li{sqrt()} that computes the square root of the input.
 \begin{lstlisting}
 >>> import math                 # The name 'math' now gives access to
 >>> math.sqrt(2)                # the built-in math module.
 1.4142135623730951
 \end{lstlisting}
 
-\item It is often convenient to create an alias for an imported module using the \li{as} statement. Then the alias is added to the namespace, but the module name itself is not.
+\item \li{import <module> as <name>} creates an alias for an imported module. The alias is added to the namespace, but the module name itself is not.
 \begin{lstlisting}
 >>> import math as m            # The name 'm' gives access to the math
 >>> m.sqrt(2)                   # module, but the name 'math' does not.
@@ -285,8 +284,9 @@ There are several ways to use the \li{import} statement.
 NameError: name 'math' is not defined>>
 \end{lstlisting}
 
-\item Often we only need access to a particular function or other object in a module.
-Use \li{from} to specify the module where the object is located, then import it individually.
+\item \li{from <module> import <<<object>>>} loads the specified object into the namespace without loading anything else in the module or the module name itself.
+This is used most often to access specific functions from a module.
+The \li{as} statement can also be tacked on to create an alias.
 \begin{lstlisting}
 >>> from math import sqrt       # The name 'sqrt' gives access to the
 >>> sqrt(2)                     # square root function, but the rest of
@@ -303,14 +303,13 @@ In each case, the far right word of the import statement is the name that is add
 \subsection*{Running Vs. Importing}
 
 % TODO script vs. module.
+% TODO: 'run' in IPython / Spyder adds everything to the namespace.
 
 In addition to expanding the namespace of the current workspace, the \li{import} command also executes any freestanding code in the file to be imported.
-Carefully consider the following example file.
 
 % TODO: put parentheses on the print statements for Python 3.
 \begin{lstlisting}
 # example.py
-"""Illustrate the difference between executing and importing a file."""
 
 data = [1, 2, 3, 4]
 print "Data: ", data
@@ -321,7 +320,7 @@ else:
     print "This file was imported."
 \end{lstlisting}
 
-In IPython, note the difference between when the file is run and when it is imported.
+In IPython, note the difference in behavior between when the file is run and when it is imported.
 
 \begin{lstlisting}
 # First, run the file. The freestanding code is executed, as well
@@ -351,10 +350,12 @@ In [4]: print(example.data)
 Beware of stray code that might be executed unintentionally when a file is imported.
 
 % TODO: Finish this section.
+% WARNING! In Python 3, reload() is no longer a built-in function
+%   (you have to use importlib.reload() instead). Delete this section?
 \subsection*{Reloading and Testing}
 
 In IPython, importing provides a quick way to test code.
-However, if a module has been imported and the source code then changes (you test your code, discover and error, then fix it), the \li{reload} function must be used to access the changes.
+However, if a module has been imported and the source code then changes (you test your code, discover and error, then fix it), the \li{reload()} function must be used to access the changes.
 Using the \li{import} command again will \textbf{not} change the module.
 
 Consider this example where we test a file containing a single function.
