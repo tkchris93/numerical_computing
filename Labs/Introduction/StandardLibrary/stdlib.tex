@@ -14,7 +14,7 @@ In this lab we will explore some built-in functions, learn how to create, import
 
 Every Python installation comes with several built-in functions that may be used at any time.
 IPython's object introspection feature makes it easy to learn about built-in functions.
-Start IPython from the terminal and use $?$ to bring up technical details on each function.
+Start IPython from the terminal and use \li{?} to bring up technical details on each function.
 
 \begin{lstlisting}
 In [1]: min?
@@ -34,7 +34,7 @@ Return the number of items of a sequence or collection.>>
 Type:      builtin_function_or_method
 \end{lstlisting}
 
-\begin{table}
+\begin{table}[H]
 \begin{tabular}{c|l}
 Function & Returns \\
 \hline
@@ -234,7 +234,7 @@ Print a statement of your conclusions to the terminal.
 % Modules and Importing =======================================================
 \section*{Modules}
 
-In general, a Python \emph{module} is a file containing Python code that is meant to be used in some other setting, and not necessarily run directly.
+In general, a Python \emph{module} is a file containing Python code that is meant to be used in some other setting, and not necessarily run directly.\footnote{A Python file that is not meant to be imported is often called a \emph{script}.}
 The \li{import} statement loads the code from a specified Python file.
 That is, when a module containing some functions, classes, or other objects is imported, those functions, classes, and objects are made available for use.
 
@@ -300,7 +300,7 @@ NameError: name 'math' is not defined>>
 \end{enumerate}
 In each case, the far right word of the import statement is the name that is added to the namespace.
 
-\subsection*{Running Vs. Importing}
+\subsection*{Running and Importing}
 
 Consider the following simple Python module, saved as \texttt{example.py}.
 % TODO: put parentheses on the print statements for Python 3.
@@ -345,7 +345,7 @@ Importing the file also executes each line, but only adds the indicated alias to
 In [1]: import example
 <<This file was imported.>>
 
-# display() is not direcly available...
+# The module's names are not direcly available...
 In [2]: display()
 <<---------------------------------------------------------------------------
 NameError                                 Traceback (most recent call last)
@@ -426,12 +426,25 @@ Using only the functions defined in the module, write a new function that calcul
 
 \section*{Python Standard Library}
 
-% TODO: make a table listing some of the common modules in the standard library
-%    (csv, math, random, string, sys, time, timeit)
-
 All Python distributions include a collection of modules for accomplishing a variety of common tasks, collectively called the \emph{Python standard library}.
+See Table \ref{table:stdlib}.
+
+\begin{table}[H]
+\begin{tabular}{c|l}
+Module & Description / Purpose \\
+\hline \li{csv} & Comma Separated Value (CSV) file parsing and writing.\\
+\hline \li{math} & Standard mathematical functions.\\
+\hline \li{random} & Random variable generators.\\
+\hline \li{sys} & Tools for interacting with the interpreter.\\
+\hline \li{time} & Time value generation and manipulation. \\
+\hline \li{timeit} & Measuring execution time of small code snippets.
+\end{tabular}
+\caption{Some common standard library modules.}
+\label{table:stdlib}
+\end{table}
+
+\begin{comment} % __doc__ and __name__ should be discussed in the OOP lab.
 A summary of the documentation for these modules, called the \emph{docstring}, is stored in the \li{\_\_doc\_\_} attribute.
-% __doc__ and __name__ should be discussed in the OOP lab.
 Individual functions also have docstrings.
 
 \begin{lstlisting}
@@ -445,25 +458,25 @@ cos(x)
 
 Return the cosine of x (measured in radians).
 \end{lstlisting}
-
-More extensive documentation is available via the \li{help()} built-in function.
+\end{comment}
 
 Using IPython's object introspection, we can learn about how to use the various modules and functions in the standard library very quickly.
-Similarly, we can list all of the functions included in a module with the \li{tab} key.
+Use \li{?} or \li{help()} for information on the module or one of its names.
+To see the entire module's namespace, use the \li{tab} key.
 
 \begin{lstlisting}
 In [1]: import math
 
 In [2]: math?
 <<Type:        module
-String form: <module 'math' from '/Users/ACME/anaconda/lib/python2.7/lib-dynload/math.so'>
-File:        /Users/ACME/anaconda/lib/python2.7/lib-dynload/math.so
+String form: <module 'math' from '/anaconda/lib/python2.7/lib-dynload/math.so'>
+File:        /anaconda/lib/python2.7/lib-dynload/math.so
 Docstring:
 This module is always available.  It provides access to the
 mathematical functions defined by the C standard.>>
 
-# Type 'math.' then press tab to lists the available functions.
-In [3]: math.
+# Type the module name, a period, then press tab to see the module's namespace.
+In [3]: math.   # Press 'tab'.
 <<math.acos       math.atanh      math.e          math.factorial  
 math.hypot      math.log10      math.sin        math.acosh      
 math.ceil       math.erf        math.floor      math.isinf      
@@ -488,7 +501,8 @@ Return the square root of x.>>
 \subsection*{The Sys Module}
 
 The \li{sys} (system) module includes methods for interacting with the Python interpreter.
-The module has a name \li{argv} that is a list of arguments passed to the interpreter when it runs Python scripts.
+The module has a name \li{argv} that is a list of arguments passed to the interpreter when it runs a Python file.
+Consider the following simple script:
 
 \begin{lstlisting}
 # echo.py
@@ -497,12 +511,12 @@ import sys
 print(sys.argv)
 \end{lstlisting}
 
-If this script is run from the command line with additional arguments it will print them out.
+If this file is run from the command line with additional arguments it will print them out.
 Note that command line arguments are parsed as strings.
 
 \begin{lstlisting}
 $ python echo.py I am the walrus
-['test_script', 'I', 'am', 'the', 'walrus']
+['echo', 'I', 'am', 'the', 'walrus']
 \end{lstlisting}
 
 This method can be used to point a Python script to a file to be analyzed.
@@ -514,7 +528,7 @@ import sys
 
 if len(sys.argv) < 3:
     print("Three arguments are required")
-    sys.exit(1)             # Manually quit the program early.
+    sys.exit(1)                     # Manually quit the program early.
 
 arg = sys.argv[2]
 
@@ -524,8 +538,7 @@ if sys.argv[1] == '1':
 elif sys.argv[1] == '2':
     print(arg.upper())
 \end{lstlisting}
-
-Now provide command line arguments to specify the behavior of the script.
+Now we can specify the behavior of the script with command line arguments.
 
 \begin{lstlisting}
 $ python cipher.py 1
@@ -538,13 +551,13 @@ $ python cipher.py 2 second
 SECOND
 \end{lstlisting}
 
-\subsection*{The Time Module}
+\subsection*{The Time and Timeit Modules}
 
 The \li{time} module includes functions for dealing with time.
 In particular, functions in \li{time} access the computer's system clock.
 This is useful for precisely measuring how long it takes for code to run.
 
-The \li{time} module includes a function also called \li{time} that measures the number of seconds from a fixed starting point, the ``Epoch''.
+The \li{time} module includes a function also called \li{time()} that measures the number of seconds from a fixed starting point, the ``Epoch''.
 For most machines, this starting point will be January 1, 1970.
 
 \begin{lstlisting}
@@ -556,21 +569,21 @@ For most machines, this starting point will be January 1, 1970.
 1436832057.321525
 \end{lstlisting}
 
-In order to measure how long it takes to execute some Python code, a measurement is taken right before and right after it is run.
+In order to measure how long it takes to execute some Python code, record the time just before and just after the code in question.
 Subtracting the first measurement from the second gives the amount of time in seconds that have passed.
 
 \begin{lstlisting}
-def time_for_loop():
-    # Time how long it takes to go through 10000 iterations using 'range'.
-    start = time.time()             # Clock the starting time.
-    for i in range(10000): pass     # Perform the operation.
-    end = time.time()               # Clock the ending time.
-    return end - start              # Report the difference.
+# Time how long it takes to go through 10000 iterations using 'range'.
+>>> def time_for_loop():
+...     start = time.time()         # Clock the starting time.
+...     for i in range(10000):      # Perform the operation.
+...         pass
+...     end = time.time()           # Clock the ending time.
+...     return end - start          # Report the difference.
 \end{lstlisting}
 
 The standard library also has a module called \li{timeit}.
-This library is built to time Python code and has more tools than 
-\li{time}.
+This library is built specifically to time Python code and has more sophisticated tools than the \li{time} module.
 In IPython, \li{timeit} can be used like a built-in function any time with the \li{\%timeit} command.
 
 \begin{lstlisting}
@@ -582,15 +595,15 @@ In [0]: %timeit for i in xrange(10000): pass
 % Problem 4: running a file from the command line and timing code segments
 \begin{problem}
 Download \texttt{matrix\_multiply.py} and \texttt{matrices.npz}.
-The Python file \li{matrix\_multiply.py} is a module that has three methods for multiplying two matrices together, called \li{method1}, \li{method2}, and \li{method3}.
-It also has a \li{load\_matrices} method that returns two matrices from \li{matrices.npz}.
+The Python file \texttt{matrix\_multiply.py} is a module that has three functions for multiplying two matrices together, called \li{method1()}, \li{method2()}, and \li{method3()}.
+It also has a \li{load\_matrices()} function that returns two matrices from \texttt{matrices.npz}.
 
-Modify your solutions function so that when it is run from a Python interpreter (but not when it is imported), the following is executed:
+Modify your solutions file so that when it is run from a Python interpreter (but not when it is imported), the following is executed:
 \begin{enumerate}
-\item If no command line argument is given, print ``No Input."
+\item If no command line arguments are given, print ``No Input."
 \item If anything other than ``matrices.npz'' is given, print ``Incorrect Input."
 \item If ``matrices.npz'' is given as a command line argument, load two matrices from \texttt{matrices.npz}. Time (separately) how long each method takes to multiply the two matrices together, then print the results to the terminal.
 
-(Hint: Read the code in \li{matrix\_multiply.py}, especially the function docstrings, to determine how to use each function.)
+(Hint: Read the code in \texttt{matrix\_multiply.py}, especially the function docstrings, to determine how to use each function.)
 \end{enumerate}
 \end{problem}
