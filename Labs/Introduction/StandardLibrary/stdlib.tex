@@ -13,7 +13,7 @@ In this lab we will explore some built-in functions, learn how to create, import
 \section*{Built-in Functions}
 
 Every Python installation comes with several built-in functions that may be used at any time.
-IPython's object introspection feature makes it easy to learn about built-in functions.
+IPython's object introspection feature makes it easy to learn about these functions.
 Start IPython from the terminal and use \li{?} to bring up technical details on each function.
 
 \begin{lstlisting}
@@ -37,26 +37,24 @@ Type:      builtin_function_or_method
 \begin{table}[H]
 \begin{tabular}{c|l}
 Function & Returns \\
-\hline
-\li{abs()} & The absolute value of a real number, or the magnitude \\
-& of a complex number. \\ \hline
-\li{min()} & The smallest element of a single iterable, or the smallest \\
-& of several arguments. Strings are compared  based on \\
-& lexicographical order: numerical characters first, then \\
-& upper-case letters, then lower-case letters. \\ \hline
-\li{max()} & The largest element of a single iterable, or the largest \\
-& of several arguments. \\ \hline
-\li{len()} & The number of items of a sequence or collection. \\ \hline
-\li{sum()} & The sum of a sequence of numbers. \\
-%\hline \li{round()} & A float rounded number to a given precision in decimal digits. \\
+\hline \li{abs()} & The absolute value of a real number, or the magnitude\\
+& of a complex number.\\
+\hline \li{min()} & The smallest element of a single iterable, or the smallest\\
+& of several arguments. Strings are compared  based on\\
+& lexicographical order: numerical characters first, then\\
+& upper-case letters, then lower-case letters.\\
+\hline \li{max()} & The largest element of a single iterable, or the largest\\
+& of several arguments.\\
+\hline \li{len()} & The number of items of a sequence or collection.\\
+\hline \li{round()} & A float rounded to a given precision in decimal digits.\\
+\hline \li{sum()} & The sum of a sequence of numbers.\\
 \end{tabular}
-\caption{Some common built-in functions.}
+\caption{Some common built-in functions for numerical calculations.}
 \label{table:builtin}
 \end{table}
-% Other built-ins to include: any(), all(), map(), round(), type()
 
-The following code demonstrates a few of the more common built-in functions (see Table \ref{table:builtin}).
-They are quite intuitive and easy to use.
+% The following code demonstrates a few of the functions listed in Table \ref{table:builtin}.
+% They are quite intuitive and easy to use.
 
 % TODO: add brackets to the print function for Python 3.
 \begin{lstlisting}
@@ -66,13 +64,13 @@ They are quite intuitive and easy to use.
 
 # min() and max() can be used on a list, string, or several arguments.
 # String characters are ordered lexicographically.
->>> print min([4, 2, 6]), min('aXbYcZ'), min(1, 'a', 'A')
+>>> print min([4, 2, 6]), min("aXbYcZ"), min(1, 'a', 'A')
 2 X 1
->>> print max([4, 2, 6]), max('aXbYcZ'), max(1, 'a', 'A')
+>>> print max([4, 2, 6]), max("aXbYcZ"), max(1, 'a', 'A')
 6 c a
 
 # len() can be used on a string, list, set, dict, tuple, or other iterable.
->>> print len([2, 7, 1]), len('abcdef'), len({1, 'a', 'a'})
+>>> print len([2, 7, 1]), len("abcdef"), len({1, 'a', 'a'})
 3 6 2
 
 # sum() can be used on iterables containing numbers, but not strings.
@@ -83,10 +81,13 @@ They are quite intuitive and easy to use.
 45
 >>> sum([min(my_list), max(my_tuple), len(my_set)])
 10
+
+# round() is useful for formatting data to be printed.
+>>> round(3.14159265358979323, 2)
+3.14
 \end{lstlisting}
 
-Documentation on all built-in functions can be found at \url{https://docs.python.org/2/library/functions.html}.
-% Check out \li{map()}, \li{round()}, \li{pow()}, \li{reduce()}, \li{reversed()}, }
+More detailed documentation on all of Python's built-in functions can be found at \url{https://docs.python.org/2/library/functions.html}.
 
 % Problem 1: using built-in methods with lists.
 \begin{problem}
@@ -118,7 +119,7 @@ A \emph{namespace} is a dictionary that maps names to Python objects.
 ... 
 \end{lstlisting}
 
-A single equals sign assigns an object to a name.
+A single equals sign assigns a name to an object.
 If a name is assigned to another name, that new name refers to the same object that the original name refers to (or a copy of it).
 
 \begin{lstlisting}
@@ -129,7 +130,7 @@ If a name is assigned to another name, that new name refers to the same object t
 \end{lstlisting}
 
 To see all of the names in the current namespace, use the built-in function \li{dir()}.
-To delete a variable from the namespace, use the \li{del} keyword.
+To delete a variable from the namespace, use the \li{del} keyword (be careful!).
 
 \begin{lstlisting}
 >>> subjects = ["Statistics", "Technology", "Engineering", "Mathematics"]
@@ -147,11 +148,11 @@ NameError: name 'num' is not defined>>
 
 \begin{info}
 Many programming languages distinguish between \emph{variables} and \emph{pointers}.
-A pointer typically holds a memory location where an object is stored.
+A pointer holds a memory location where an object is stored.
 % Pointer arithmetic and manipulation is delicate, occasionally very useful, but often cumbersome.
 % 
-Python names are essentially pointers, % but pointer operations are done automatically,
-and objects in memory that have no names pointing to them are automatically deleted.
+Python names are essentially pointers. %but pointer operations are done automatically,
+Objects in memory that have no names pointing to them are automatically deleted (this is called \emph{garbage collection}).
 % Understanding how Python handles memory access via names is important for implementing reference-based data structures, such as linked lists and trees.
 \end{info}
 
@@ -164,7 +165,7 @@ Therefore, if two names refer to the same mutable object, any changes to the obj
 
 \begin{warn} % Mutability Warning
 Mutability can be very useful in some settings, but it can also cause hard-to-find problems when a copy should have been to be made.
-For example, suppose we had a dictionary mapping items to their base prices, and we wanted make a new dictionary that accounts for a small sales tax.
+For example, suppose we have a dictionary mapping items to their base prices, and we want make a new dictionary that accounts for a small sales tax.
 
 \begin{lstlisting}
 >>> original = {"pencil": 1, "pen": 2, "paper": 3, "computer": 2000}
@@ -236,7 +237,7 @@ Print a statement of your conclusions to the terminal.
 
 In general, a Python \emph{module} is a file containing Python code that is meant to be used in some other setting, and not necessarily run directly.\footnote{A Python file that is not meant to be imported is often called a \emph{script}.}
 The \li{import} statement loads the code from a specified Python file.
-That is, when a module containing some functions, classes, or other objects is imported, those functions, classes, and objects are made available for use.
+That is, when a module containing some functions, classes, or other objects is imported, those functions, classes, and objects are made available for use.% in the current file.
 
 All import statements should occur at the top of the file, below the header but before any other code.
 Thus we expand our example of typical Python file from the previous lab to the following:
@@ -607,3 +608,5 @@ Modify your solutions file so that when it is run from a Python interpreter (but
 (Hint: Read the code in \texttt{matrix\_multiply.py}, especially the function docstrings, to determine how to use each function.)
 \end{enumerate}
 \end{problem}
+
+
