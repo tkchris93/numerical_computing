@@ -1,21 +1,20 @@
-\lab{The Standard Library}{Standard Library}
-\objective{Python is designed to make it easy to implement complex tasks with little code.
-To that end, any Python distribution includes several built-in functions for accomplishing common tasks.
-In addition, Python is designed to import and reuse code written by others.
-A Python file that can be imported is called a module.
-All Python distributions include a collection of modules for accomplishing a variety of common tasks, collectively called the \emph{Python Standard Library}.
-In this lab we become familiar with the Standard Library and learn how to create, import, and use modules.}
+\lab{The Standard Library}{The Python Standard Library}
 \label{lab:Standard Library}
+\objective{Python is designed to make it easy to implement complex tasks with little code.
+To that end, every Python distribution includes several built-in functions for accomplishing common tasks.
+In addition, Python is designed to import and reuse code written by others.
+A Python file with code that can be imported is called a \emph{module}.
+All Python distributions include a collection of modules for accomplishing a variety of tasks, collectively called the \emph{Python Standard Library}.
+In this lab we will explore some built-in functions, learn how to create, import, and use modules, and become familiar with the standard library.}
 
 % Suggestions for improvement:
 %   - More problems.
 
 \section*{Built-in Functions}
 
-Every Python installation comes with several built-in functions.
-These functions may be used at any time and Python will recognize them.
-IPython's object introspection feature makes it easy to learn about built-in functions.
-Start IPython from the terminal and use $?$ to bring up technical details on each function.
+Every Python installation comes with several built-in functions that may be used at any time.
+IPython's object introspection feature makes it easy to learn about these functions.
+Start IPython from the terminal and use \li{?} to bring up technical details on each function.
 
 \begin{lstlisting}
 In [1]: min?
@@ -35,55 +34,44 @@ Return the number of items of a sequence or collection.>>
 Type:      builtin_function_or_method
 \end{lstlisting}
 
-\begin{table}
+\begin{table}[H]
 \begin{tabular}{c|l}
 Function & Returns \\
-\hline
-\li{abs}() & The absolute value of a real number, or the magnitude \\
-& of a complex number. \\ \hline
-\li{min}() & The smallest element of a single iterable, or the smallest \\
-& of several arguments. Strings are compared  based on \\
-& lexicographical order: numerical characters first, then \\
-& upper-case letters, then lower-case letters. \\ \hline
-\li{max}() & The largest element of a single iterable, or the largest \\
-& of several arguments. \\ \hline
-\li{len}() & The number of items of a sequence or collection. \\ \hline
-\li{sum}() & The sum of a sequence of numbers.
+\hline \li{abs()} & The absolute value of a real number, or the magnitude\\
+& of a complex number.\\
+\hline \li{min()} & The smallest element of a single iterable, or the smallest\\
+& of several arguments. Strings are compared  based on\\
+& lexicographical order: numerical characters first, then\\
+& upper-case letters, then lower-case letters.\\
+\hline \li{max()} & The largest element of a single iterable, or the largest\\
+& of several arguments.\\
+\hline \li{len()} & The number of items of a sequence or collection.\\
+\hline \li{round()} & A float rounded to a given precision in decimal digits.\\
+\hline \li{sum()} & The sum of a sequence of numbers.\\
 \end{tabular}
-\caption{Some common built-in functions. Documentation on all built-in functions can be found at \url{https://docs.python.org/2/library/functions.html}.}
+\caption{Some common built-in functions for numerical calculations.}
 \label{table:builtin}
 \end{table}
 
-The following code demonstrates each of the common built-in functions listed in Table \ref{table:builtin}.
-They are quite intuitive and easy to use.
+% The following code demonstrates a few of the functions listed in Table \ref{table:builtin}.
+% They are quite intuitive and easy to use.
 
 % TODO: add brackets to the print function for Python 3.
 \begin{lstlisting}
 # abs() can be used with real or complex numbers.
->>> abs(-7)
-7
->>> abs(3 + 4j)
-5.0
+>>> print abs(-7), abs(3 + 4j)
+7 5.0
 
-# min() can be used on a list, string, or several arguments.
->>> min([4, 2, 6])
-2
->>> min('aXbYcZ')               # Characters are ordered lexicographically.
-<<'X'>>
->>> min(1, 'a', 'A')
-1
-
-# max() works the same way min() does.
->>> print max([4, 2, 6]), max('aXbYcZ'), max(1, 'a', 'A')
-6, c, a
+# min() and max() can be used on a list, string, or several arguments.
+# String characters are ordered lexicographically.
+>>> print min([4, 2, 6]), min("aXbYcZ"), min(1, 'a', 'A')
+2 X 1
+>>> print max([4, 2, 6]), max("aXbYcZ"), max(1, 'a', 'A')
+6 c a
 
 # len() can be used on a string, list, set, dict, tuple, or other iterable.
->>> len([2, 7, 1])
-3
->>> len('abcdef')
-6
->>> len({1, 'a', 'a'})          # Duplicates are not added to sets.
-2
+>>> print len([2, 7, 1]), len("abcdef"), len({1, 'a', 'a'})
+3 6 2
 
 # sum() can be used on iterables containing numbers, but not strings.
 >>> my_list = [1, 2, 3]
@@ -93,7 +81,13 @@ They are quite intuitive and easy to use.
 45
 >>> sum([min(my_list), max(my_tuple), len(my_set)])
 10
+
+# round() is useful for formatting data to be printed.
+>>> round(3.14159265358979323, 2)
+3.14
 \end{lstlisting}
+
+More detailed documentation on all of Python's built-in functions can be found at \url{https://docs.python.org/2/library/functions.html}.
 
 % Problem 1: using built-in methods with lists.
 \begin{problem}
@@ -103,12 +97,12 @@ Can you implement this function in a single line?
 \end{problem}
 % TODO: in Python 3, floating point division is the default, so we can remove the reminder about floating point division.
 
-\section*{Namespaces and Mutability}
+\section*{Namespaces}
 
 \subsection*{Names}
-All objects created in Python resides in memory.
+All Python objects reside somewhere in computer memory.
 These objects may be primitive data, data structures, functions, or any other sort of Python object.
-A \emph{name} is a reference to a Python object.
+A \emph{name} (or variable) is a reference to a Python object.
 A \emph{namespace} is a dictionary that maps names to Python objects.
 
 \begin{lstlisting}
@@ -125,23 +119,41 @@ A \emph{namespace} is a dictionary that maps names to Python objects.
 ... 
 \end{lstlisting}
 
-A single equals sign assigns an object to a name.
-If a name is assigned to another name, that new name refers to the same object that the orignal name refers to (or a copy of it).
+A single equals sign assigns a name to an object.
+If a name is assigned to another name, that new name refers to the same object that the original name refers to (or a copy of it).
 
 \begin{lstlisting}
 >>> students = ["John", "Paul", "George", "Ringo"]
 >>> band_members = students
 >>> print(band_members)
-['John', 'Paul', 'George', 'Ringo']
+<<['John', 'Paul', 'George', 'Ringo']>>
+\end{lstlisting}
+
+To see all of the names in the current namespace, use the built-in function \li{dir()}.
+To delete a variable from the namespace, use the \li{del} keyword (be careful!).
+
+\begin{lstlisting}
+>>> subjects = ["Statistics", "Technology", "Engineering", "Mathematics"]
+>>> num = 4
+>>> dir()
+<<['__builtins__', '__doc__', '__name__', '__package__', 'num', 'subjects']>>
+>>> del num
+>>> dir()
+<<['__builtins__', '__doc__', '__name__', '__package__', 'subjects']>>
+>>> print(num)
+<<Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+NameError: name 'num' is not defined>>
 \end{lstlisting}
 
 \begin{info}
 Many programming languages distinguish between \emph{variables} and \emph{pointers}.
-A pointer typically holds a memory location where the value of some other variable is stored.
-Pointer arithmetic and manipulation is delicate, occasionaly very useful, but often cumbersome.
-
-Python names are essentially pointers, but typical pointer operations are done automatically, and objects in memory that have nothing pointing to them are automatically deleted.
-Understanding how Python handles memory access via names is important for implementing reference-based data structures, such as linked lists and trees.
+A pointer holds a memory location where an object is stored.
+% Pointer arithmetic and manipulation is delicate, occasionally very useful, but often cumbersome.
+% 
+Python names are essentially pointers. %but pointer operations are done automatically,
+Objects in memory that have no names pointing to them are automatically deleted (this is called \emph{garbage collection}).
+% Understanding how Python handles memory access via names is important for implementing reference-based data structures, such as linked lists and trees.
 \end{info}
 
 \subsection*{Mutability}
@@ -151,9 +163,9 @@ An \emph{immutable} object cannot be altered once created, so assigning a new na
 A \emph{mutable} object's value may be changed, so assigning a new name to it does \emph{not} create a copy.
 Therefore, if two names refer to the same mutable object, any changes to the object will be reflected in both names.
 
-\begin{warn}
-Mutability can be very useful in some settings, but it can also cause hard-to-find problems when a copy was intended to be made.
-For example, suppose we had a dictionary mapping items to their base prices, and we wanted make a new dictionary that accounts for a small sales tax.
+\begin{warn} % Mutability Warning
+Mutability can be very useful in some settings, but it can also cause hard-to-find problems when a copy should have been to be made.
+For example, suppose we have a dictionary mapping items to their base prices, and we want make a new dictionary that accounts for a small sales tax.
 
 \begin{lstlisting}
 >>> original = {"pencil": 1, "pen": 2, "paper": 3, "computer": 2000}
@@ -172,7 +184,7 @@ For example, suppose we had a dictionary mapping items to their base prices, and
 <<{'pencil': 1.07, 'pen': 2.14, 'paper': 3.21, 'computer': 2140.0}>>
 \end{lstlisting}
 
-To avoid this, we create a copy of an object.
+To avoid this problem, create a copy of an object.
 Changes made to the copy will not change the original object.
 In this case, we replace the $2^{nd}$ line of the above code with the following:
 \begin{lstlisting}
@@ -198,36 +210,36 @@ True
 Since altering one name altered the other, we conclude that no copy has been made and that therefore Python dictionaries are mutable.
 If we repeat this process with a different type and the two names are different in the end, we will know that a copy had been made and the type is immutable.
 
-Write a function in which you programmatically determine which object types are mutable and which are immutable, as in the example code above.
+Following the example given above, determine which object types are mutable and which are immutable.
 Use the following operations to modify each of the given types.
 
 \begin{center}
 \begin{tabular}{|c|c|}
 \hline
-numbers & num\_1 += 1 \\
+numbers & num += 1 \\
 \hline
-strings & str\_1 += `a' \\
+strings & word += `a' \\
 \hline
-lists & list\_1.append(1) \\
+lists & list.append(1) \\
 \hline
-tuples & tuple\_1 += (1,) \\
+tuples & tuple += (1,) \\
 \hline
-dictionaries & dict\_1[1] = `a' \\
+dictionaries & dict[1] = `a' \\
 \hline
 \end{tabular}
 \end{center}
-
 Print a statement of your conclusions to the terminal.
+% TODO: Evaluate this problem. How can we make this a little clearer?
 \end{problem}
 
 % Modules and Importing =======================================================
 \section*{Modules}
 
-In general, a Python \emph{module} is a file containing Python code that is meant to be used in some other setting, and not necessarily run directly.
+In general, a Python \emph{module} is a file containing Python code that is meant to be used in some other setting, and not necessarily run directly.\footnote{A Python file that is not meant to be imported is often called a \emph{script}.}
 The \li{import} statement loads the code from a specified Python file.
-That is, when a module containing some functions, classes, or other objects is imported, those functions, classes, and objects are made available for use.
+That is, when a module containing some functions, classes, or other objects is imported, those functions, classes, and objects are made available for use.% in the current file.
 
-In Python files, all \li{import} statements should occur at the top, below the header but before any other code.
+All import statements should occur at the top of the file, below the header but before any other code.
 Thus we expand our example of typical Python file from the previous lab to the following:
 
 \begin{lstlisting}
@@ -256,14 +268,14 @@ The NumPy, SciPy, and MatPlotLib modules will be presented in detail in subseque
 There are several ways to use the \li{import} statement.
 \begin{enumerate}
 
-\item Using \li{import} alone makes the module available under the alias of its own name. For example, the \li{math} module has a function called \li{sqrt} that computes the square root of the input.
+\item \li{import <module>} makes the specified module available under the alias of its own name. For example, the \li{math} module has a function called \li{sqrt()} that computes the square root of the input.
 \begin{lstlisting}
 >>> import math                 # The name 'math' now gives access to
 >>> math.sqrt(2)                # the built-in math module.
 1.4142135623730951
 \end{lstlisting}
 
-\item It is often convenient to create an alias for an imported module using the \li{as} statement. Then the alias is added to the namespace, but the module name itself is not.
+\item \li{import <module> as <name>} creates an alias for an imported module. The alias is added to the namespace, but the module name itself is not.
 \begin{lstlisting}
 >>> import math as m            # The name 'm' gives access to the math
 >>> m.sqrt(2)                   # module, but the name 'math' does not.
@@ -274,8 +286,9 @@ There are several ways to use the \li{import} statement.
 NameError: name 'math' is not defined>>
 \end{lstlisting}
 
-\item Often we only need access to a particular function or other object in a module.
-Use \li{from} to specifiy where the object is located, then import it individually.
+\item \li{from <module> import <<<object>>>} loads the specified object into the namespace without loading anything else in the module or the module name itself.
+This is used most often to access specific functions from a module.
+The \li{as} statement can also be tacked on to create an alias.
 \begin{lstlisting}
 >>> from math import sqrt       # The name 'sqrt' gives access to the
 >>> sqrt(2)                     # square root function, but the rest of
@@ -286,64 +299,77 @@ Use \li{from} to specifiy where the object is located, then import it individual
 NameError: name 'math' is not defined>>
 \end{lstlisting}
 \end{enumerate}
-
 In each case, the far right word of the import statement is the name that is added to the namespace.
 
-\subsection*{Running Vs. Importing}
+\subsection*{Running and Importing}
 
-% TODO script vs. module.
-
-In addition to expanding the namespace of the current workspace, the \li{import} command also executes any freestanding code in the file to be imported.
-Carefully consider the following example file.
-
+Consider the following simple Python module, saved as \texttt{example.py}.
 % TODO: put parentheses on the print statements for Python 3.
 \begin{lstlisting}
-# example.py
-"""Illustrate the difference between executing and importing a file."""
-
 data = [1, 2, 3, 4]
-print "Data: ", data
+
+def display():
+    print "Data:", data
 
 if __name__ == '__main__':
     print "This file was executed from the terminal or an interpreter."
+    display()
 else:
     print "This file was imported."
 \end{lstlisting}
 
-In IPython, note the difference between when the file is run and when it is imported.
+% TODO: 'run' in IPython / Spyder adds everything to the namespace.
+
+Executing the file from the terminal will execute the file line by line, including the code under the \li{if __name__ == '__main__'} clause.
 
 \begin{lstlisting}
-# First, run the file. The freestanding code is executed, as well
-# as everything under the 'if __name__ == "__main__"' clause.
-In [1]: run example.py
-Data: [1, 2, 3, 4]
-<<This file was executed from the terminal or an interpreter.>>
-
-# However, the file has not been imported.
-In [2]: print(example.data)
-NameError                                 Traceback (most recent call last)
-<<<ipython-input-2-6bc16431f322> in <module>()
-----> 1 print(example.data)
-
-NameError: name 'example' is not defined>>
-
-# Now when the file is imported, the freestanding code and everything
-# under the 'else' clause is executed, and the names become available.
-In [3]: import example
-Data: [1, 2, 3, 4]
-<<This file was imported.>>
-
-In [4]: print(example.data)
-[1, 2, 3, 4]
+$ python example.py
+<<Data: [1, 2, 3, 4]
+This file was executed from the terminal or an interpreter.>>
 \end{lstlisting}
 
-Beware of stray code that might be executed unintentionally when a file is imported.
+Executing the file with IPython's \li{run} command executes each line and also adds the module's names to the current namespace.
 
-% TODO: Finish this section.
+\begin{lstlisting}
+In [1]: run example.py
+<<Data: [1, 2, 3, 4]
+This file was executed from the terminal or an interpreter.>>
+
+In [2]: display()
+Data: [1, 2, 3, 4]
+\end{lstlisting}
+
+Importing the file also executes each line, but only adds the indicated alias to the namespace.
+% When creating modules, beware of stray code that might be executed unintentionally when a file is imported.
+
+\begin{lstlisting}
+In [1]: import example
+<<This file was imported.>>
+
+# The module's names are not direcly available...
+In [2]: display()
+<<---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+<ipython-input-2-795648993119> in <module>()
+----> 1 display()
+
+NameError: name 'display' is not defined>>
+
+# ...unless accessed via the module name.
+In [3]: example.display()
+Data: [1, 2, 3, 4]
+\end{lstlisting}
+
+Note that code under the \li{if __name__ == '__main__'} clause is \emph{not} executed when a file is imported.
+We will explore the \li{__name__} attribute a little more in a future lab.
+
+% WARNING! In Python 3, reload() is no longer a built-in function
+%   (you have to use importlib.reload() instead). Delete this section?
+\begin{comment}
 \subsection*{Reloading and Testing}
 
 In IPython, importing provides a quick way to test code.
-However, if a module has been imported and the source code then changes (you test your code, discover and error, then fix it), the \li{reload} function must be used to access the changes.
+However, if a module has been imported and the source code then changes (you test your code, discover and error, then fix it), the \li{reload()} function must be used to access the changes.
 Using the \li{import} command again will \textbf{not} change the module.
 
 Consider this example where we test a file containing a single function.
@@ -387,20 +413,38 @@ Out[5]: <<<module 'example2' from 'example2.py'>>>
 In [6]: test.sum_of_squares(3)
 Out[6]: 14
 \end{lstlisting}
+\end{comment}
 
-% Problem 3: create your own module.
+% Problem 3: create your own module. % TODO: Something more compelling!
 \begin{problem}
 Create a module called \texttt{calculator.py}.
 Write a function that returns the sum of two arguments, a function that returns the product of two arguments, and a function that returns the square root of a single argument.
 When the file is either run or imported, nothing should be executed.
 
-In your solutions file, import the \li{calculator} module.
+In your solutions file, import your new calculator module.
 Using only the functions defined in the module, write a new function that calculates the length of the hypotenuse of a right triangle given the lengths of the other two sides.
 \end{problem}
 
 \section*{Python Standard Library}
 
 All Python distributions include a collection of modules for accomplishing a variety of common tasks, collectively called the \emph{Python standard library}.
+See Table \ref{table:stdlib}.
+
+\begin{table}[H]
+\begin{tabular}{c|l}
+Module & Description / Purpose \\
+\hline \li{csv} & Comma Separated Value (CSV) file parsing and writing.\\
+\hline \li{math} & Standard mathematical functions.\\
+\hline \li{random} & Random variable generators.\\
+\hline \li{sys} & Tools for interacting with the interpreter.\\
+\hline \li{time} & Time value generation and manipulation. \\
+\hline \li{timeit} & Measuring execution time of small code snippets.
+\end{tabular}
+\caption{Some common standard library modules.}
+\label{table:stdlib}
+\end{table}
+
+\begin{comment} % __doc__ and __name__ should be discussed in the OOP lab.
 A summary of the documentation for these modules, called the \emph{docstring}, is stored in the \li{\_\_doc\_\_} attribute.
 Individual functions also have docstrings.
 
@@ -415,25 +459,25 @@ cos(x)
 
 Return the cosine of x (measured in radians).
 \end{lstlisting}
-
-More extensive documentation is available via the \li{help} built-in function.
+\end{comment}
 
 Using IPython's object introspection, we can learn about how to use the various modules and functions in the standard library very quickly.
-Similarly, we can list all of the functions included in a module with the \li{tab} key.
+Use \li{?} or \li{help()} for information on the module or one of its names.
+To see the entire module's namespace, use the \li{tab} key.
 
 \begin{lstlisting}
 In [1]: import math
 
 In [2]: math?
 <<Type:        module
-String form: <module 'math' from '/Users/ACME/anaconda/lib/python2.7/lib-dynload/math.so'>
-File:        /Users/ACME/anaconda/lib/python2.7/lib-dynload/math.so
+String form: <module 'math' from '/anaconda/lib/python2.7/lib-dynload/math.so'>
+File:        /anaconda/lib/python2.7/lib-dynload/math.so
 Docstring:
 This module is always available.  It provides access to the
 mathematical functions defined by the C standard.>>
 
-# Type 'math.' then press tab to lists the available functions.
-In [3]: math.
+# Type the module name, a period, then press tab to see the module's namespace.
+In [3]: math.   # Press 'tab'.
 <<math.acos       math.atanh      math.e          math.factorial  
 math.hypot      math.log10      math.sin        math.acosh      
 math.ceil       math.erf        math.floor      math.isinf      
@@ -458,7 +502,8 @@ Return the square root of x.>>
 \subsection*{The Sys Module}
 
 The \li{sys} (system) module includes methods for interacting with the Python interpreter.
-The module has a name \li{argv} that is a list of arguments passed to the interpreter when it runs Python scripts.
+The module has a name \li{argv} that is a list of arguments passed to the interpreter when it runs a Python file.
+Consider the following simple script:
 
 \begin{lstlisting}
 # echo.py
@@ -467,12 +512,12 @@ import sys
 print(sys.argv)
 \end{lstlisting}
 
-If this script is run from the command line with additional arguments it will print them out.
+If this file is run from the command line with additional arguments it will print them out.
 Note that command line arguments are parsed as strings.
 
 \begin{lstlisting}
 $ python echo.py I am the walrus
-['test_script', 'I', 'am', 'the', 'walrus']
+['echo', 'I', 'am', 'the', 'walrus']
 \end{lstlisting}
 
 This method can be used to point a Python script to a file to be analyzed.
@@ -484,7 +529,7 @@ import sys
 
 if len(sys.argv) < 3:
     print("Three arguments are required")
-    sys.exit(1)             # Manually quit the program early.
+    sys.exit(1)                     # Manually quit the program early.
 
 arg = sys.argv[2]
 
@@ -494,8 +539,7 @@ if sys.argv[1] == '1':
 elif sys.argv[1] == '2':
     print(arg.upper())
 \end{lstlisting}
-
-Now provide command line arguments to specify the behavior of the script.
+Now we can specify the behavior of the script with command line arguments.
 
 \begin{lstlisting}
 $ python cipher.py 1
@@ -508,13 +552,13 @@ $ python cipher.py 2 second
 SECOND
 \end{lstlisting}
 
-\subsection*{The Time Module}
+\subsection*{The Time and Timeit Modules}
 
 The \li{time} module includes functions for dealing with time.
 In particular, functions in \li{time} access the computer's system clock.
 This is useful for precisely measuring how long it takes for code to run.
 
-The \li{time} module includes a function also called \li{time} that measures the number of seconds from a fixed starting point, the ``Epoch''.
+The \li{time} module includes a function also called \li{time()} that measures the number of seconds from a fixed starting point, the ``Epoch''.
 For most machines, this starting point will be January 1, 1970.
 
 \begin{lstlisting}
@@ -526,21 +570,21 @@ For most machines, this starting point will be January 1, 1970.
 1436832057.321525
 \end{lstlisting}
 
-In order to measure how long it takes to execute some Python code, a measurement is taken right before and right after it is run.
+In order to measure how long it takes to execute some Python code, record the time just before and just after the code in question.
 Subtracting the first measurement from the second gives the amount of time in seconds that have passed.
 
 \begin{lstlisting}
-def time_for_loop():
-    # Time how long it takes to go through 10000 iterations using 'range'.
-    start = time.time()             # Clock the starting time.
-    for i in range(10000): pass     # Perform the operation.
-    end = time.time()               # Clock the ending time.
-    return end - start              # Report the difference.
+# Time how long it takes to go through 10000 iterations using 'range'.
+>>> def time_for_loop():
+...     start = time.time()         # Clock the starting time.
+...     for i in range(10000):      # Perform the operation.
+...         pass
+...     end = time.time()           # Clock the ending time.
+...     return end - start          # Report the difference.
 \end{lstlisting}
 
 The standard library also has a module called \li{timeit}.
-This library is built to time Python code and has more tools than 
-\li{time}.
+This library is built specifically to time Python code and has more sophisticated tools than the \li{time} module.
 In IPython, \li{timeit} can be used like a built-in function any time with the \li{\%timeit} command.
 
 \begin{lstlisting}
@@ -552,15 +596,42 @@ In [0]: %timeit for i in xrange(10000): pass
 % Problem 4: running a file from the command line and timing code segments
 \begin{problem}
 Download \texttt{matrix\_multiply.py} and \texttt{matrices.npz}.
-The Python file \li{matrix\_multiply.py} is a module that has three methods for multiplying two matrices together, called \li{method1}, \li{method2}, and \li{method3}.
-It also has a \li{load\_matrices} method that returns two matrices from \li{matrices.npz}.
+The Python file \texttt{matrix\_multiply.py} is a module that has three functions for multiplying two matrices together, called \li{method1()}, \li{method2()}, and \li{method3()}.
+It also has a \li{load\_matrices()} function that returns two matrices from \texttt{matrices.npz}.
 
-Modify your solutions function so that when it is run from a Python interpreter (but not when it is imported), the following is executed:
+Modify your solutions file so that when it is run from a Python interpreter (but not when it is imported), the following is executed:
 \begin{enumerate}
-\item If no command line argument is given, print ``No Input."
+\item If no command line arguments are given, print ``No Input."
 \item If anything other than ``matrices.npz'' is given, print ``Incorrect Input."
 \item If ``matrices.npz'' is given as a command line argument, load two matrices from \texttt{matrices.npz}. Time (separately) how long each method takes to multiply the two matrices together, then print the results to the terminal.
 
-(Hint: Read the code in \li{matrix\_multiply.py}, especially the function docstrings, to determine how to use each function.)
+(Hint: Read the code in \texttt{matrix\_multiply.py}, especially the function docstrings, to determine how to use each function.)
 \end{enumerate}
 \end{problem}
+
+\section*{Additional Material}
+
+\subsection*{More Built-in Functions}
+
+Experiment with the following built-in functions.
+
+\begin{table}[H]
+\begin{tabular}{c|l}
+Function & Description \\
+\hline \li{bool()} & Evaluate the input as \li{True} or \li{False}.\\
+\hline \li{all()} & Return \li{True} if every entry in the iterable evaluates to \li{True}.\\
+\hline \li{any()} & Return \li{True} if any entry in the iterable evaluates to \li{True}.\\
+\hline \li{eval()} & Evaluate a string as Python code and return the output.\\
+% \hline \li{hash()} & \\
+\hline \li{raw_input()} & Prompt the user for input (as a string).\\
+% \hline \li{iter()} & \\
+\hline \li{map()} & Apply a function to every item of the iterable and return a list of the results.\\
+% \hline \li{reduce()} &
+% \hline \li{repr()} &
+\end{tabular}
+\end{table}
+Also explore the \li{reduce()} function, which is a little more advanced but extremely useful in some circumstances.
+
+\subsection*{Python Packages}
+
+Importing a module that is not in the same folder as the current file.

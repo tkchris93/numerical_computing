@@ -45,7 +45,7 @@ Try a variety of programming environments and configurations until you find what
 In addition, IPython provides an interactive interface with object introspection, and should be used side-by-side with a text editor or IDE.
 We will discuss IPython in greater depth shortly.
 
-A typical python file\footnote{Python files end with the extension .py.} looks similar to the code below.
+A typical python file (saved with a .py extension) looks similar to the code below.
 
 \begin{lstlisting}
 # filename.py
@@ -249,8 +249,7 @@ Most text editors will allow you to set the indentation type to spaces so you ca
 ...    return result
 \end{lstlisting}
 
-Functions are defined with \emph{parameters} and called with \emph{arguments}\footnote{The terms \emph{parameter} and \emph{argument} are often used interchangeably.
-}.
+Functions are defined with \emph{parameters} and called with \emph{arguments}, though the terms are often used interchangeably.
 Below, \li{width} and \li{height} are parameters for the function \li{area()}.
 The values \li{2} and \li{5} are the arguments that are passed when calling the function.
 
@@ -345,14 +344,6 @@ None
 If you have any intention of using the results of a function, always use a \li{return} statement.
 The returned value or values can then be stored in variables for later use.
 \end{info}
-
-\begin{comment}
-% TODO: for Python 3, insert a problem introducing the user to the print function more formally. This problem should be simple, but it should explore the keyword arguments 'sep' and 'end' included in the print function. (?)
-\begin{problem}
-Python's built-in \li{print} function is extremely useful for formatting output nicely.
-Write a function that prints out the alphabet, separated by tabs, with newlines after every 5th letter. % SUBJECT TO CHANGE.
-\end{problem}
-\end{comment} % Could wait until the file I/O lab to do this...
 
 % Problem 2: write a very basic function.
 \begin{problem}
@@ -485,8 +476,8 @@ Use IPython to quickly test your syntax for each function.
 
 \subsection*{Lists}
 A Python \li{list} is created by enclosing comma-separated values with square brackets \li{[ ]}.
-Entries of a \li{list} do not have to be of the same type.
-Access entries in a \li{list} with the same indexing or slicing operations used with strings.
+Entries of a list do \emph{not} have to be of the same type.
+Access entries in a list with the same indexing or slicing operations used with strings.
 \begin{lstlisting}
 >>> my_list = ["Hello", 93.8, "world", 10]
 >>> my_list
@@ -499,7 +490,7 @@ Access entries in a \li{list} with the same indexing or slicing operations used 
 <<['Hello', 93.8]>>
 \end{lstlisting}
 
-Common \li{list} methods (functions) include \li{append()}, \li{insert()}, \li{remove()}, and \li{pop()}.
+Common list methods (functions) include \li{append()}, \li{insert()}, \li{remove()}, and \li{pop()}.
 Consult IPython for details on each of these methods using object introspection.
 \begin{lstlisting}
 >>> my_list = [1, 2]                # Create a simple list of two integers.
@@ -536,8 +527,8 @@ A Python \li{tuple} is an ordered collection of elements, created by enclosing c
 Tuples are similar to lists, but they are much more rigid, have less built-in operations, and cannot be altered after creation.
 Lists are therefore preferable for managing dynamic ordered collections of objects.
 
-When multiple objects are returned in by a function, they are returned as a \li{tuple}.
-For example, recall that the \li{arithmetic} function returns two values.
+When multiple objects are returned in by a function, they are returned as a tuple.
+For example, recall that the \li{arithmetic()} function returns two values.
 
 \begin{lstlisting}
 >>> x, y = arithmetic(5,2)                      # Get each value individually,
@@ -567,8 +558,8 @@ Return the resulting list.
 
 \subsection*{Sets}
 A Python \li{set} is an unordered collection of distinct objects.
-Objects can be added to or removed from a \li{set} after its creation.
-Initialize a \li{set} with curly braces \li{\{ \}}, separating the values by commas, or use \li{set()} to create an empty set.
+Objects can be added to or removed from a set after its creation.
+Initialize a set with curly braces \li{\{ \}}, separating the values by commas, or use \li{set()} to create an empty set.
 \begin{lstlisting}
 # Initialize some sets. Note that repeats are not added.
 >>> library_members = {"Lytle, Josh", "Henriksen, Amelia", "Webb, Jared"}
@@ -587,7 +578,7 @@ Initialize a \li{set} with curly braces \li{\{ \}}, separating the values by com
 <<set(['Brown, Bob', 'Lytle, Josh', 'Smith, Jane'])>>
 \end{lstlisting}
 
-Like mathematical sets, a Python \li{set} has operations like union, intersection, 
+Like mathematical sets, Python sets have operations like union, intersection, 
 difference, and symmetric difference.
 \begin{lstlisting}
 # Set intersection returns a new set object.
@@ -600,8 +591,8 @@ difference, and symmetric difference.
 \subsection*{Dictionaries}
 % TODO: Dictionaries are a little weirder in Python 3. For example,
 %   the keys() and values() methods are generators.
-Like a \li{set}, a Python \li{dict} (dictionary) is an unordered data type.
-A \li{dict} stores \li{key:value} pairs, called \emph{items}.
+Like a set, a Python \li{dict} (dictionary) is an unordered data type.
+A dictionary stores key-value pairs, called \emph{items}.
 The values of a dictionary are indexed by its keys.
 Dictionaries are initialized with curly braces, colons, and commas.
 Use \li{dict()} or \li{\{\}} to create an empty dictionary.
@@ -625,7 +616,8 @@ Use \li{dict()} or \li{\{\}} to create an empty dictionary.
 \end{lstlisting}
 
 The keys of a dictionary must be \emph{immutable}, which means that they must be objects that cannot be modified after creation.
-We will discuss the mutablility of each of these objects in the next lab.
+We will discuss mutablility more thoroughly in the next lab.
+% TODO: Reference the lab for real
 
 \subsection*{Type Casting}
 
@@ -665,7 +657,7 @@ Python supports the usual control flow statements including \li{if} statements, 
 
 \subsection*{The If Statement}
 An \li{if} statement executes the indented code \emph{if} (and only if) the given condition holds.
-The \li{elif} statement is short for ``else if'' and can be used multiple times following an \li{if} statement, or not at all. 
+The \li{elif} statement is short for ``else if'' and can be used multiple times following an if statement, or not at all. 
 The \li{else} keyword may be used at most once at the end of a series of \li{if}/\li{elif} statements.
 \begin{lstlisting}
 >>> food = "bagel"         
@@ -700,7 +692,7 @@ A \li{while} loop executes an indented block of code \emph{while} the given cond
 0 1 2 3 4 5 6 7 8 9
 \end{lstlisting}
 
-There are two additional useful statements to use in loops:
+There are two additional useful statements to use inside of loops:
 \begin{enumerate}
 \item The \li{break} statement manually exits the loop, regardless of which iteration the loop is on or if the termination condition is met.
 \item The \li{continue} statement skips the current iteration and returns to the top of the loop block if the termination condition is still not met.
@@ -728,9 +720,8 @@ There are two additional useful statements to use in loops:
 \subsection*{The For Loop}
 A \li{for} loop iterates over the items in any \emph{iterable}.
 Iterables include (but are not limited to) strings, lists, sets, and dictionaries.
-There are a few different ways to define a \li{for} loop, with the most common ways demonstrated below.
+% There are a few different ways to define a for loop, with the most common ways demonstrated below.
 
-% TODO: xrange -> range in Python 3.
 \begin{lstlisting}
 >>> colors = ["red", "green", "blue", "yellow"]
 >>> for entry in colors:
@@ -742,15 +733,19 @@ blue!
 yellow!
 \end{lstlisting}
 
-The \li{break} and \li{continue} statements also work in \li{for} loops, but a \li{continue} in a \li{for} loop will automatically increment the index or item, whereas a \li{continue} in a \li{while} loop makes no automatic changes to any variable.
+The \li{break} and \li{continue} statements also work in for loops, but a \li{continue} in a for loop will automatically increment the index or item, whereas a \li{continue} in a while loop makes no automatic changes to any variable.
 
 In addition, Python has some very useful built-in functions that can be used in conjunction with the \li{for} statement:
 \begin{enumerate}
-\item \li{range(start, stop, step)}: Produces a list of integers, following slicing syntax. If only one argument is specified, it produces a list of integers from 0 to the argument, counting by one.
-In Python 2.7, we use \li{xrange()} more often because it is faster\footnote{\li{xrange()} is a generator, whereas \li{range()} creates a \li{list}Generators will be briefly discussed in a future lab.} and does not explicitly create a list in memory.
-\item \li{enumerate()}: Yields both a count and a value from the sequence. Typically used to get both the index of an item and the actual item simultaneously from a sequence.
+\item \li{range(start, stop, step)}: Produces a list of integers, following slicing syntax. If only one argument is specified, it produces a list of integers from 0 to the argument, incrementing by one.
+In Python 2.7, we use \li{xrange()} more often because it is faster than \li{range()} and does not explicitly create a list in memory.
 \item \li{zip()}: Joins multiple sequences so they can be iterated over simultaneously.
+\item \li{enumerate()}: Yields both a count and a value from the sequence. Typically used to get both the index of an item and the actual item simultaneously.
+\item \li{sorted()}: Returns a new list of sorted items that can then be used for iteration.
+\item \li{reversed()}: Reverses the order of the iteration.
 \end{enumerate}
+
+% TODO: get rid of the xrange() note for Python 3.
 
 \begin{lstlisting}
 >>> vowels = "aeiou"
@@ -764,15 +759,6 @@ In Python 2.7, we use \li{xrange()} more often because it is faster\footnote{\li
 3 o blue
 4 u purple
 
->>> for i, color in enumerate(colors):
-...     print i, color
-... 
-0 red
-1 yellow
-2 white
-3 blue
-4 purple
-
 >>> for letter, word in zip(vowels, colors):
 ...     print letter, word
 ... 
@@ -782,8 +768,31 @@ i white
 o blue
 u purple
 
-# Get numbers from 2 to 20 (exclusive) by 3's:
->>> list(xrange(2, 20, 3))
+>>> for i, color in enumerate(colors):
+...     print i, color
+... 
+0 red
+1 yellow
+2 white
+3 blue
+4 purple
+
+>>> for item in sorted(colors):
+...     print item,
+...
+blue purple red white yellow
+
+>>> for item in reversed(colors):
+...     print item,
+...
+yellow white red purple blue
+
+# Range arguments follow slicing syntax.
+>>> range(10)
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+>>> range(4, 8)
+[4, 5, 6, 7]
+>>> range(2, 20, 3)
 [2, 5, 8, 11, 14, 17]
 \end{lstlisting}
 
@@ -791,14 +800,14 @@ u purple
 \begin{problem}
 Write a function called \li{int_to_string()}.
 Accept single parameter, which you may assume to be a list of integers, each between 1-26.
-Translate the list of numbers into a list of strings, where each integer correspondings lower-case letter of the alphabet.
+Translate the list of numbers into a list of strings, where each integer corresponds to a lower-case letter of the alphabet.
 The number 1 becomes `a', 2 becomes `b', and so on.
 \end{problem}
 
 % List Comprehension ==========================================================
 
 \subsection*{List Comprehension}
-A \emph{list comprehension} uses \li{for} loop syntax between square brackets to create a \li{list}.
+A \emph{list comprehension} uses for loop syntax between square brackets to create a list.
 This is a powerful, efficient way to build lists.
 The code is concise and runs quickly.
 
@@ -808,7 +817,7 @@ The code is concise and runs quickly.
 \end{lstlisting}
 
 List comprehensions can be thought of as ``inverted loops'', meaning that the body of the loop comes before the looping condition.
-The following \li{for} loop and list comprehension produce the same list, but the list comprehension takes only about two-thirds the time to execute.
+The following loop and list comprehension produce the same list, but the list comprehension takes only about two-thirds the time to execute.
 
 \begin{lstlisting}
 >>> loop_output = []
@@ -832,7 +841,7 @@ Tuple, set, and dictionary comprehensions can be done in the same way as list co
 % Problem 7: the alternating harmonic series.
 \begin{problem}
 Recall the alternating harmonic series:
-\[\sum_{n=1}^\infty \frac{(-1)^{(n+1)}}{n} = 1 - \frac{1}{2} + \frac{1}{3} - \frac{1}{4} + \frac{1}{5} - ... = ln(2)\]
+\[\sum_{n=1}^\infty \frac{(-1)^{(n+1)}}{n} = 1 - \frac{1}{2} + \frac{1}{3} - \frac{1}{4} + \frac{1}{5} - ... = \log(2)\]
 
 Write a function called \li{alt_harmonic()}.
 Use a list comprehension to quickly compute the first $n$ terms of this series, given the parameter \li{n}.
@@ -841,7 +850,7 @@ The sum of the first 500,000 terms of this series approximates ln(2) to five dec
 (Hint: consider using Python's built-in \li{sum()} function.)
 \end{problem}
 
-\section*{Conclusion}
+% \section*{Conclusion}
 Refer back to this and other introductory labs often as you continue getting used to Python syntax and data types.
 As you continue your study of Python, we strongly recommend the following readings:
 \begin{enumerate}
