@@ -5,7 +5,7 @@ To that end, every Python distribution includes several built-in functions for a
 In addition, Python is designed to import and reuse code written by others.
 A Python file with code that can be imported is called a \emph{module}.
 All Python distributions include a collection of modules for accomplishing a variety of tasks, collectively called the \emph{Python Standard Library}.
-In this lab we will explore some built-in functions, become familiar with the standard library, and learn how to create, import, and use modules.}
+In this lab we will explore some built-in functions, learn how to create, import, and use modules, and become familiar with the standard library.}
 
 % Suggestions for improvement:
 %   - More problems.
@@ -162,7 +162,7 @@ An \emph{immutable} object cannot be altered once created, so assigning a new na
 A \emph{mutable} object's value may be changed, so assigning a new name to it does \emph{not} create a copy.
 Therefore, if two names refer to the same mutable object, any changes to the object will be reflected in both names.
 
-\begin{warn}
+\begin{warn} % Mutability Warning
 Mutability can be very useful in some settings, but it can also cause hard-to-find problems when a copy should have been to be made.
 For example, suppose we had a dictionary mapping items to their base prices, and we wanted make a new dictionary that accounts for a small sales tax.
 
@@ -183,7 +183,7 @@ For example, suppose we had a dictionary mapping items to their base prices, and
 <<{'pencil': 1.07, 'pen': 2.14, 'paper': 3.21, 'computer': 2140.0}>>
 \end{lstlisting}
 
-To avoid this, we create a copy of an object.
+To avoid this problem, create a copy of an object.
 Changes made to the copy will not change the original object.
 In this case, we replace the $2^{nd}$ line of the above code with the following:
 \begin{lstlisting}
@@ -209,25 +209,26 @@ True
 Since altering one name altered the other, we conclude that no copy has been made and that therefore Python dictionaries are mutable.
 If we repeat this process with a different type and the two names are different in the end, we will know that a copy had been made and the type is immutable.
 
-Write a function in which you programmatically determine which object types are mutable and which are immutable, as in the example code above.
+Following the example given above, determine which object types are mutable and which are immutable.
 Use the following operations to modify each of the given types.
 
 \begin{center}
 \begin{tabular}{|c|c|}
 \hline
-numbers & num\_1 += 1 \\
+numbers & num += 1 \\
 \hline
-strings & str\_1 += `a' \\
+strings & word += `a' \\
 \hline
-lists & list\_1.append(1) \\
+lists & list.append(1) \\
 \hline
-tuples & tuple\_1 += (1,) \\
+tuples & tuple += (1,) \\
 \hline
-dictionaries & dict\_1[1] = `a' \\
+dictionaries & dict[1] = `a' \\
 \hline
 \end{tabular}
 \end{center}
 Print a statement of your conclusions to the terminal.
+% TODO: Evaluate this problem. How can we make this a little clearer?
 \end{problem}
 
 % Modules and Importing =======================================================
@@ -237,7 +238,7 @@ In general, a Python \emph{module} is a file containing Python code that is mean
 The \li{import} statement loads the code from a specified Python file.
 That is, when a module containing some functions, classes, or other objects is imported, those functions, classes, and objects are made available for use.
 
-In Python files, all import statements should occur at the top, below the header but before any other code.
+All import statements should occur at the top of the file, below the header but before any other code.
 Thus we expand our example of typical Python file from the previous lab to the following:
 
 \begin{lstlisting}
@@ -297,61 +298,73 @@ The \li{as} statement can also be tacked on to create an alias.
 NameError: name 'math' is not defined>>
 \end{lstlisting}
 \end{enumerate}
-
 In each case, the far right word of the import statement is the name that is added to the namespace.
 
 \subsection*{Running Vs. Importing}
 
-% TODO script vs. module.
-% TODO: 'run' in IPython / Spyder adds everything to the namespace.
-
-In addition to expanding the namespace of the current workspace, the \li{import} command also executes any freestanding code in the file to be imported.
-
+Consider the following simple Python module, saved as \texttt{example.py}.
 % TODO: put parentheses on the print statements for Python 3.
 \begin{lstlisting}
-# example.py
-
 data = [1, 2, 3, 4]
-print "Data: ", data
+
+def display():
+    print "Data:", data
 
 if __name__ == '__main__':
     print "This file was executed from the terminal or an interpreter."
+    display()
 else:
     print "This file was imported."
 \end{lstlisting}
 
-In IPython, note the difference in behavior between when the file is run and when it is imported.
+% TODO: 'run' in IPython / Spyder adds everything to the namespace.
+
+Executing the file from the terminal will execute the file line by line, including the code under the \li{if __name__ == '__main__'} clause.
 
 \begin{lstlisting}
-# First, run the file. The freestanding code is executed, as well
-# as everything under the 'if __name__ == "__main__"' clause.
-In [1]: run example.py
-Data: [1, 2, 3, 4]
-<<This file was executed from the terminal or an interpreter.>>
-
-# However, the file has not been imported.
-In [2]: print(example.data)
-NameError                                 Traceback (most recent call last)
-<<<ipython-input-2-6bc16431f322> in <module>()
-----> 1 print(example.data)
-
-NameError: name 'example' is not defined>>
-
-# Now when the file is imported, the freestanding code and everything
-# under the 'else' clause is executed, and the names become available.
-In [3]: import example
-Data: [1, 2, 3, 4]
-<<This file was imported.>>
-
-In [4]: print(example.data)
-[1, 2, 3, 4]
+$ python example.py
+<<Data: [1, 2, 3, 4]
+This file was executed from the terminal or an interpreter.>>
 \end{lstlisting}
 
-Beware of stray code that might be executed unintentionally when a file is imported.
+Executing the file with IPython's \li{run} command executes each line and also adds the module's names to the current namespace.
 
-% TODO: Finish this section.
+\begin{lstlisting}
+In [1]: run example.py
+<<Data: [1, 2, 3, 4]
+This file was executed from the terminal or an interpreter.>>
+
+In [2]: display()
+Data: [1, 2, 3, 4]
+\end{lstlisting}
+
+Importing the file also executes each line, but only adds the indicated alias to the namespace.
+% When creating modules, beware of stray code that might be executed unintentionally when a file is imported.
+
+\begin{lstlisting}
+In [1]: import example
+<<This file was imported.>>
+
+# display() is not direcly available...
+In [2]: display()
+<<---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+<ipython-input-2-795648993119> in <module>()
+----> 1 display()
+
+NameError: name 'display' is not defined>>
+
+# ...unless accessed via the module name.
+In [3]: example.display()
+Data: [1, 2, 3, 4]
+\end{lstlisting}
+
+Note that code under the \li{if __name__ == '__main__'} clause is \emph{not} executed when a file is imported.
+We will explore the \li{__name__} attribute a little more in a future lab.
+
 % WARNING! In Python 3, reload() is no longer a built-in function
 %   (you have to use importlib.reload() instead). Delete this section?
+\begin{comment}
 \subsection*{Reloading and Testing}
 
 In IPython, importing provides a quick way to test code.
@@ -399,14 +412,15 @@ Out[5]: <<<module 'example2' from 'example2.py'>>>
 In [6]: test.sum_of_squares(3)
 Out[6]: 14
 \end{lstlisting}
+\end{comment}
 
-% Problem 3: create your own module. % TODO: Something more creative!
+% Problem 3: create your own module. % TODO: Something more compelling!
 \begin{problem}
 Create a module called \texttt{calculator.py}.
 Write a function that returns the sum of two arguments, a function that returns the product of two arguments, and a function that returns the square root of a single argument.
 When the file is either run or imported, nothing should be executed.
 
-In your solutions file, import the \li{calculator} module.
+In your solutions file, import your new calculator module.
 Using only the functions defined in the module, write a new function that calculates the length of the hypotenuse of a right triangle given the lengths of the other two sides.
 \end{problem}
 
@@ -417,6 +431,7 @@ Using only the functions defined in the module, write a new function that calcul
 
 All Python distributions include a collection of modules for accomplishing a variety of common tasks, collectively called the \emph{Python standard library}.
 A summary of the documentation for these modules, called the \emph{docstring}, is stored in the \li{\_\_doc\_\_} attribute.
+% __doc__ and __name__ should be discussed in the OOP lab.
 Individual functions also have docstrings.
 
 \begin{lstlisting}
