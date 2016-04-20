@@ -254,8 +254,7 @@ True
 []
 \end{lstlisting}
 
-% Problem 2: create an inheritance class.
-\begin{problem}
+\begin{problem} % Problem 2: Create an inheritance class.
 Create a \li{Jetpack} class that inherits from the \li{Backpack} class.
 \begin{enumerate}
 \item Overwrite the constructor so that in addition to a name, color, and maximum size, it also accepts an amount of fuel.
@@ -339,7 +338,7 @@ class Backpack(object):
         return len(self.contents) + len(other.contents)
 \end{lstlisting}
 
-Using the $+$ binary operator on two \li{Backpack} objects calls the \li{__add__()} method.
+Using the $+$ binary operator on two \li{Backpack} objects calls the class's \li{__add__()} method.
 The object on the left side of the $+$ is passed in to \li{__add__()} as \li{self} and the object on the right side of the $+$ is passed in as \li{other}.
 
 \begin{lstlisting}
@@ -351,8 +350,8 @@ The object on the left side of the $+$ is passed in to \li{__add__()} as \li{sel
 >>> pack2.put("water bottle")
 >>> pack2.put("snacks")
 
-# Now add the backpacks like numbers.
->>> pack1 + pack2
+# Now add the backpacks like numbers
+>>> pack1 + pack2                   # Equivalent to pack1.__add__(pack2).
 3
 \end{lstlisting}
 
@@ -360,10 +359,9 @@ Subtraction, multiplication, division, and other standard operations may be simi
 
 \subsection*{Comparisons} % ---------------------------------------------------
 
-% DO NOT USE __cmp__ ()! cmp has been removed as of Python 3.0.
+% DO NOT USE __cmp__ ()! It has been removed as of Python 3.0.
 Magic methods also facilitate object comparisons.
 For example, the \li{__lt__()} method corresponds to the $<$ operator.
-% Since $<$ is a boolean binary operator, \li{__lt__()} should return either \li{True} or \li{False}.
 Suppose one backpack is considered ``less'' than another if it has fewer items in its list of contents.
 
 \begin{lstlisting}
@@ -389,11 +387,14 @@ As with addition, the object on the left side of the $<$ operator is passed to \
 False
 
 >>> pack2.put('pencils')
->>> pack1 < pack2
+>>> pack1 < pack2                   # Equivalent to pack1.__lt__(pack2).
 True
 \end{lstlisting}
 
 Other standard comparison operators also have corresponding magic methods and should be implemented similarly (see Table \ref{table:magic}).
+Note that comparison methods should return either \li{True} or \li{False}, while arithmetic methods like \li{__add__()} might return a numerical value or another kind of object.
+% For example, we could have defined addition for backpacks as $A + B = C$, where $C$ is a new backpack with the name of backpack $A$, the color of backpack $B$, and the contents of both.
+% Then \li{__add__()} would return a \li{Backpack} object instead of a number.
 
 \begin{table}[H] % Common Magic Methods.
 \begin{tabular}{c|l}
@@ -409,21 +410,18 @@ Method & Corresponding Operation \\
 \hline \li{__eq__()} & Equal (\li{==}).\\
 \hline \li{__ne__()} & Not equal (\li{\!=}).
 \end{tabular}
-\caption{Common magic methods for arithmetic and comparisons. For more details, consult the documentation at \url{https://docs.python.org/2/reference/datamodel.html\#special-method-names}.}
+\caption{Common magic methods for arithmetic and comparisons. What each of these operations do, or should do, is up to the programmer and should be carefully documented. See \url{https://docs.python.org/2/reference/datamodel.html\#special-method-names} for more methods and details.}
 \label{table:magic}
 \end{table}
 
-% What each of these operations do, or should do, is up to the programmer and should be carefully documented.
-
-% Problem 3: __str__ and __eq__(?) magic methods
-\begin{problem}
+\begin{problem} % Problem 3: __eq__() and __str__() for Backpack.
 Endow the \li{Backpack} class with two additional magic methods:
 \begin{enumerate}
 \item The \li{__eq__()} magic method is used to determine if two objects are equal, and is invoked by the \li{==} operator.
-Implement the \li{__eq__()} magic method for the \li{Backpack} class so that two \li{Backpack} objects are equal if and only if they have the same name, color, and contents.
-The two contents lists do not have to have their items in the same order to be considered equal.
+Implement the \li{__eq__()} magic method for the \li{Backpack} class so that two \li{Backpack} objects are equal if and only if they have the same name, color, and number of contents.
+% The two contents lists do not have to have their items in the same order to be considered equal.
 
-% TODO: for Python 3, call the 'print statement' the 'print function'.
+% TODO: for Python 3, call the 'print statement' the 'print() function'.
 \item The \li{__str__()} magic method is used to produce the string representation of an object.
 This method is invoked when an object is cast as a string with the \li{str()} function, or when using the \li{print} statement.
 Implement the \li{__str__()} method in the \li{Backpack} class so that printing a \li{Backpack} object yields the following output:
@@ -434,7 +432,7 @@ Size:       <number of items in contents>
 Max Size:   <max_size>
 Contents:   [<item1>, <item2>, ...]>>
 \end{lstlisting}
-(Hint: Use the tab and newline characters \li{'\\t'} and \li{'\\n'} to help align output.)
+(Hint: Use the tab and newline characters \li{'\\t'} and \li{'\\n'} to help align output nicely.)
 \end{enumerate}
 \end{problem}
 
@@ -448,9 +446,42 @@ def __ne__(self, other):
 \end{lstlisting}
 \end{warn}
 
-% TODO: Subsection and problem on HASHING. Be brief.
+\subsection*{Hashing} % -------------------------------------------------------
 
-\begin{problem} % Problem 4: ComplexNumber class
+A \emph{hash value} is an integer that uniquely identifies an object.
+The built-in \li{hash()} function calculates an object's hash value by calling its \li{__hash__()} magic method.
+
+In Python, the built-in \li{set} and \li{dict} structures use hash values to store and retrieve objects in memory quickly.
+Thus if an object is unhashable, it cannot be put in a set or be used as a key in a dictionary.
+
+\begin{lstlisting}
+# Get the hash value of a hashable object.
+>>> hash("math")
+-8321016616855971138
+
+# Create a dictionary and attempt to get its hash value.
+>>> example = {"math": 320}
+>>> hash(example)
+<<Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: unhashable type: 'dict'>>
+\end{lstlisting}
+
+\begin{problem} % Problem 4: Add __hash__() to the Backpack class.
+Two objects that compare as equal via the \li{__eq__()} magic method must have the same hash value, and objects that are not equal should have different hash values.
+
+Write a simple \li{__hash__()} method for the \li{Backpack} class that conforms to this rule and returns an integer.
+Consider using the \li{hash()} function on the object's attributes that were used in comparing the two backpacks.
+\end{problem}
+
+\begin{warn}
+If a class does not have an \li{__eq__()} method it should not have a \li{__hash__()} operation either; if it defines \li{__eq__()} but not \li{__hash__()}, its instances will not be usable in hashed collections like sets and dictionaries.
+\end{warn}
+
+% From the docs:
+% Custom classes have \li{__hash__()} methods by default; with them, all objects compare unequal (except with themselves) and \li{x.__hash__()} returns a result derived from \li{id(x)}.
+
+\begin{problem} % Problem 5: ComplexNumber class
 Create your own \li{ComplexNumber} class that supports the basic operations of complex numbers.
 \begin{enumerate}
 \item Complex numbers have a real and an imaginary part. The constructor should therefore accept two numbers. Store the first as \li{self.real} and the second as \li{self.imag}.
