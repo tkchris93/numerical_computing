@@ -618,20 +618,48 @@ Experiment with the following built-in functions.
 \begin{table}[H]
 \begin{tabular}{c|l}
 Function & Description \\
-\hline \li{bool()} & Evaluate the input as \li{True} or \li{False}.\\
-\hline \li{all()} & Return \li{True} if every entry in the iterable evaluates to \li{True}.\\
-\hline \li{any()} & Return \li{True} if any entry in the iterable evaluates to \li{True}.\\
-\hline \li{eval()} & Evaluate a string as Python code and return the output.\\
+\hline \li{all()} & Return \li{True} if \li{bool(entry)} evaluates to \li{True} for \emph{every} entry in \\&the input iterable.\\
+\hline \li{any()} & Return \li{True} if \li{bool(entry)} evaluates to \li{True} for \emph{any} entry in the\\&input iterable.\\
+\hline \li{bool()} & Evaluate a single input object as \li{True} or \li{False}.\\
+\hline \li{eval()} & Execute a string as Python code and return the output.\\
 % \hline \li{hash()} & \\
 \hline \li{raw_input()} & Prompt the user for input (as a string).\\
+% TODO: change this to input() for Python 3.
 % \hline \li{iter()} & \\
-\hline \li{map()} & Apply a function to every item of the iterable and return a list of the results.\\
-% \hline \li{reduce()} &
+\hline \li{map()} & Apply a function to every item of the input iterable and return \\&a list of the results.\\
+\hline \li{reduce()} & Apply a function accepting two arguments cumulatively to the \\&items of the input iterable from left to right (thus reducing it to\\&a single output).
 % \hline \li{repr()} &
 \end{tabular}
 \end{table}
-Also explore the \li{reduce()} function, which is a little more advanced but extremely useful in some circumstances.
 
 \subsection*{Python Packages}
 
-Importing a module that is not in the same folder as the current file.
+Suppose that we have a handmade module like \texttt{calculator.py} that we would like to use, but which is saved in a different directory than our current file.
+In order to use the module, we must make the directory where it is located into a Python \emph{package}.
+To do this, create a file named \texttt{\_\_init\_\_.py} in the same directory as the module to be imported.
+To import the module, we specify the path to the module relative to the current file.
+
+As an example, suppose we are currently working on a Python file called \texttt{Trees.py} in a folder called \texttt{structures}.
+The \texttt{structures} folder is contained within the \texttt{projects} folder, which also contains a \texttt{tools} folder where the \texttt{calculator.py} module is stored.
+The complete directory might look something like this.
+
+\begin{lstlisting}
+<<projects/
+    structures/
+        LinkedLists.py
+        Trees.py
+    tools/
+        __init__.py
+        calculator.py
+        abacus.py>>
+\end{lstlisting}
+
+To import the \texttt{calculator.py} module to the \texttt{Trees} file, we use the following import command:
+
+\begin{lstlisting}
+from ..tools import calculator
+\end{lstlisting}
+
+This tells the compiler to look up one level, then to go into the \texttt{tools} directory and look for the \texttt{calculator.py} module.
+For more details and examples on this topic, see \url{https://docs.python.org/2/tutorial/modules.html\#packages}.
+
