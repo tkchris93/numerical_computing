@@ -10,7 +10,7 @@ In this lab we will explore some built-in functions, learn how to create, import
 % Suggestions for improvement:
 %   - More problems.
 
-\section*{Built-in Functions}
+\section*{Built-in Functions} % ===============================================
 
 Every Python installation comes with several built-in functions that may be used at any time.
 IPython's object introspection feature makes it easy to learn about these functions.
@@ -53,9 +53,6 @@ Function & Returns \\
 \label{table:builtin}
 \end{table}
 
-% The following code demonstrates a few of the functions listed in Table \ref{table:builtin}.
-% They are quite intuitive and easy to use.
-
 % TODO: add brackets to the print function for Python 3.
 \begin{lstlisting}
 # abs() can be used with real or complex numbers.
@@ -89,17 +86,16 @@ Function & Returns \\
 
 More detailed documentation on all of Python's built-in functions can be found at \url{https://docs.python.org/2/library/functions.html}.
 
-% Problem 1: using built-in methods with lists.
-\begin{problem}
+\begin{problem} % Problem 1: using built-in methods with lists.
 Write a function that accepts a list of numbers as input and returns a new list with the minimum, maximum, and average of the original list (in that order).
 Remember to use floating point division to calculate the average.
 Can you implement this function in a single line?
 \end{problem}
 % TODO: in Python 3, floating point division is the default, so we can remove the reminder about floating point division.
 
-\section*{Namespaces}
+\section*{Namespaces} % =======================================================
 
-\subsection*{Names}
+\subsection*{Names} % ---------------------------------------------------------
 All Python objects reside somewhere in computer memory.
 These objects may be primitive data, data structures, functions, or any other sort of Python object.
 A \emph{name} (or variable) is a reference to a Python object.
@@ -156,14 +152,14 @@ Objects in memory that have no names pointing to them are automatically deleted 
 % Understanding how Python handles memory access via names is important for implementing reference-based data structures, such as linked lists and trees.
 \end{info}
 
-\subsection*{Mutability}
+\subsection*{Mutability} % ----------------------------------------------------
 
 Python object types are either mutable or immutable.
 An \emph{immutable} object cannot be altered once created, so assigning a new name to it creates a copy in memory.
 A \emph{mutable} object's value may be changed, so assigning a new name to it does \emph{not} create a copy.
 Therefore, if two names refer to the same mutable object, any changes to the object will be reflected in both names.
 
-\begin{warn} % Mutability Warning
+\begin{warn} % Extensive Mutability Warning.
 Mutability can be very useful in some settings, but it can also cause hard-to-find problems when a copy should have been to be made.
 For example, suppose we have a dictionary mapping items to their base prices, and we want make a new dictionary that accounts for a small sales tax.
 
@@ -193,8 +189,7 @@ In this case, we replace the $2^{nd}$ line of the above code with the following:
 Then, after running the same procedure, the two dictionaries will be different.
 \end{warn}
 
-% Problem 2: determine which Python types are immutable.
-\begin{problem}
+\begin{problem} % Problem 2: determine which Python types are immutable.
 Python has several methods that seem to change immutable objects.
 These methods actually work by making copies of objects.
 We can therefore determine which object types are mutable and which are immutable by using the equal sign and ``changing'' the objects.
@@ -232,12 +227,11 @@ Print a statement of your conclusions to the terminal.
 % TODO: Evaluate this problem. How can we make this a little clearer?
 \end{problem}
 
-% Modules and Importing =======================================================
-\section*{Modules}
+\section*{Modules} % ==========================================================
 
 In general, a Python \emph{module} is a file containing Python code that is meant to be used in some other setting, and not necessarily run directly.\footnote{A Python file that is not meant to be imported is often called a \emph{script}.}
 The \li{import} statement loads the code from a specified Python file.
-That is, when a module containing some functions, classes, or other objects is imported, those functions, classes, and objects are made available for use.% in the current file.
+That is, when a module containing some functions, classes, or other objects is imported, those functions, classes, and objects are made available for use.
 
 All import statements should occur at the top of the file, below the header but before any other code.
 Thus we expand our example of typical Python file from the previous lab to the following:
@@ -264,7 +258,8 @@ if __name__ == "__main__":
 The modules imported in this example are some of the most important modules used in Python for scientific computing.
 The NumPy, SciPy, and MatPlotLib modules will be presented in detail in subsequent labs.
 
-\subsection*{Importing Syntax}
+\subsection*{Importing Syntax} % ----------------------------------------------
+
 There are several ways to use the \li{import} statement.
 \begin{enumerate}
 
@@ -276,6 +271,7 @@ There are several ways to use the \li{import} statement.
 \end{lstlisting}
 
 \item \li{import <module> as <name>} creates an alias for an imported module. The alias is added to the namespace, but the module name itself is not.
+
 \begin{lstlisting}
 >>> import math as m            # The name 'm' gives access to the math
 >>> m.sqrt(2)                   # module, but the name 'math' does not.
@@ -289,6 +285,7 @@ NameError: name 'math' is not defined>>
 \item \li{from <module> import <<<object>>>} loads the specified object into the namespace without loading anything else in the module or the module name itself.
 This is used most often to access specific functions from a module.
 The \li{as} statement can also be tacked on to create an alias.
+
 \begin{lstlisting}
 >>> from math import sqrt       # The name 'sqrt' gives access to the
 >>> sqrt(2)                     # square root function, but the rest of
@@ -299,11 +296,13 @@ The \li{as} statement can also be tacked on to create an alias.
 NameError: name 'math' is not defined>>
 \end{lstlisting}
 \end{enumerate}
+
 In each case, the far right word of the import statement is the name that is added to the namespace.
 
-\subsection*{Running and Importing}
+\subsection*{Running and Importing} % -----------------------------------------
 
 Consider the following simple Python module, saved as \texttt{example.py}.
+
 % TODO: put parentheses on the print statements for Python 3.
 \begin{lstlisting}
 data = [1, 2, 3, 4]
@@ -318,7 +317,6 @@ else:
     print "This file was imported."
 \end{lstlisting}
 
-% TODO: 'run' in IPython / Spyder adds everything to the namespace.
 
 Executing the file from the terminal will execute the file line by line, including the code under the \li{if __name__ == '__main__'} clause.
 
@@ -361,12 +359,12 @@ Data: [1, 2, 3, 4]
 \end{lstlisting}
 
 Note that code under the \li{if __name__ == '__main__'} clause is \emph{not} executed when a file is imported.
-We will explore the \li{__name__} attribute a little more in a future lab.
+We will explore the \li{__name__} attribute a little more in a future lab. % ?
 
 % WARNING! In Python 3, reload() is no longer a built-in function
 %   (you have to use importlib.reload() instead). Delete this section?
-\begin{comment}
-\subsection*{Reloading and Testing}
+\begin{comment} % vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+\subsection*{Reloading and Testing} % -----------------------------------------
 
 In IPython, importing provides a quick way to test code.
 However, if a module has been imported and the source code then changes (you test your code, discover and error, then fix it), the \li{reload()} function must be used to access the changes.
@@ -413,7 +411,7 @@ Out[5]: <<<module 'example2' from 'example2.py'>>>
 In [6]: test.sum_of_squares(3)
 Out[6]: 14
 \end{lstlisting}
-\end{comment}
+\end{comment} % ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 % Problem 3: create your own module. % TODO: Something more compelling!
 \begin{problem}
@@ -425,7 +423,7 @@ In your solutions file, import your new calculator module.
 Using only the functions defined in the module, write a new function that calculates the length of the hypotenuse of a right triangle given the lengths of the other two sides.
 \end{problem}
 
-\section*{Python Standard Library}
+\section*{Python Standard Library} % ==========================================
 
 All Python distributions include a collection of modules for accomplishing a variety of common tasks, collectively called the \emph{Python standard library}.
 See Table \ref{table:stdlib}.
@@ -443,23 +441,6 @@ Module & Description / Purpose \\
 \caption{Some common standard library modules.}
 \label{table:stdlib}
 \end{table}
-
-\begin{comment} % __doc__ and __name__ should be discussed in the OOP lab.
-A summary of the documentation for these modules, called the \emph{docstring}, is stored in the \li{\_\_doc\_\_} attribute.
-Individual functions also have docstrings.
-
-\begin{lstlisting}
->>> import math
->>> print(math.__doc__)
-<<This module is always available.  It provides access to the
-mathematical functions defined by the C standard.>>
-
->>> print(math.cos.__doc__)
-cos(x)
-
-Return the cosine of x (measured in radians).
-\end{lstlisting}
-\end{comment}
 
 Using IPython's object introspection, we can learn about how to use the various modules and functions in the standard library very quickly.
 Use \li{?} or \li{help()} for information on the module or one of its names.
@@ -499,7 +480,7 @@ sqrt(x)
 Return the square root of x.>>
 \end{lstlisting}
 
-\subsection*{The Sys Module}
+\subsection*{The Sys Module} % ------------------------------------------------
 
 The \li{sys} (system) module includes methods for interacting with the Python interpreter.
 The module has a name \li{argv} that is a list of arguments passed to the interpreter when it runs a Python file.
@@ -552,7 +533,7 @@ $ python cipher.py 2 second
 SECOND
 \end{lstlisting}
 
-\subsection*{The Time and Timeit Modules}
+\subsection*{The Time and Timeit Modules} % -----------------------------------
 
 The \li{time} module includes functions for dealing with time.
 In particular, functions in \li{time} access the computer's system clock.
@@ -593,8 +574,7 @@ In [0]: %timeit for i in xrange(10000): pass
 1000 loops, best of 3: 303 µs per loop
 \end{lstlisting}
 
-% Problem 4: running a file from the command line and timing code segments
-\begin{problem}
+\begin{problem} % Problem 4: put it all together.
 Download \texttt{matrix\_multiply.py} and \texttt{matrices.npz}.
 The Python file \texttt{matrix\_multiply.py} is a module that has three functions for multiplying two matrices together, called \li{method1()}, \li{method2()}, and \li{method3()}.
 It also has a \li{load\_matrices()} function that returns two matrices from \texttt{matrices.npz}.
@@ -609,9 +589,9 @@ Modify your solutions file so that when it is run from a Python interpreter (but
 \end{enumerate}
 \end{problem}
 
-\section*{Additional Material}
+\section*{Additional Material} % ==============================================
 
-\subsection*{More Built-in Functions}
+\subsection*{More Built-in Functions} % ---------------------------------------
 
 Experiment with the following built-in functions.
 
@@ -632,7 +612,7 @@ Function & Description \\
 \end{tabular}
 \end{table}
 
-\subsection*{Python Packages}
+\subsection*{Python Packages} % -----------------------------------------------
 
 Suppose that we have a handmade module like \texttt{calculator.py} that we would like to use, but which is saved in a different directory than our current file.
 In order to use the module, we must make the directory where it is located into a Python \emph{package}.
@@ -660,6 +640,6 @@ To import the \texttt{calculator.py} module to the \texttt{Trees} file, we use t
 from ..tools import calculator
 \end{lstlisting}
 
-This tells the compiler to look up one level, then to go into the \texttt{tools} directory and look for the \texttt{calculator.py} module.
+This tells the interpreter to look up one level, then to go into the \texttt{tools} directory and look for the \texttt{calculator.py} module.
 For more details and examples on this topic, see \url{https://docs.python.org/2/tutorial/modules.html\#packages}.
 

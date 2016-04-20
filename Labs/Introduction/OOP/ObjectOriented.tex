@@ -450,8 +450,7 @@ def __ne__(self, other):
 
 % TODO: Subsection and problem on HASHING. Be brief.
 
-% Problem 4: ComplexNumber class
-\begin{problem}
+\begin{problem} % Problem 4: ComplexNumber class
 Create your own \li{ComplexNumber} class that supports the basic operations of complex numbers.
 \begin{enumerate}
 \item Complex numbers have a real and an imaginary part. The constructor should therefore accept two numbers. Store the first as \li{self.real} and the second as \li{self.imag}.
@@ -474,14 +473,14 @@ How can your class be improved to act more like true complex numbers?
 \begin{comment}
 \section*{Additional Material} % ==============================================
 
-\subsection*{Static Attributes}
+\subsection*{Static Attributes} % ---------------------------------------------
 
 Static attributes are shared between all instances of the class.
 To make an attribute static, declare it inside of the \li{class} block but outside of any of the class's functions, and do not use \li{self}.
 The attribute is accessed with the class name instead of with \li{self}.
 % TODO: Clarify + Examples
 
-\subsection*{Static Methods}
+\subsection*{Static Methods} % ------------------------------------------------
 
 Individual methods can also be static.
 A static method can have no dependence on individual instances, so there can be no references to \li{self} inside the body of the method.
@@ -495,7 +494,7 @@ In the constructor for the \li{Backpack} class, add an instance variable called 
 Set this ID based on the static ID variable, then increment the static ID so that the next \li{Backpack} object will have a unique ID.
 \end{problem}
 
-\subsection*{Other Magic Methods}
+\subsection*{Other Magic Methods} % -------------------------------------------
 
 \begin{enumerate}
 \item The \li{__hash__()} magic method brands an object with a (hopefully) unique ID for quick comparison and indexing.
