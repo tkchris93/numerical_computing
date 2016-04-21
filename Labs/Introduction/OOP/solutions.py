@@ -17,6 +17,13 @@ class Backpack(object):
         contents (list): the contents of the backpack.
     """
 
+    brand = "Nike"
+
+    @staticmethod
+    def origin():
+        print "Manufactured by " + Backpack.brand + ", inc."
+
+
     def __init__(self, name, color, max_size=5):
         """Set the color, name, and maximum size of the backpack.
         Also initialize an empty contents list.

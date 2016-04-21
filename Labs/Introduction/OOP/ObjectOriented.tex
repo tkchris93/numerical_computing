@@ -501,40 +501,86 @@ Compare your class to Python's built-in \li{complex} type.
 How can your class be improved to act more like true complex numbers?
 \end{problem}
 
-\begin{comment}
+\newpage
+
 \section*{Additional Material} % ==============================================
 
 \subsection*{Static Attributes} % ---------------------------------------------
 
-Static attributes are shared between all instances of the class.
+Attributes that are accessed through \li{self} are called \emph{instance} attributes because they are bound to a particular instance of the class.
+In contrast, a \emph{static} attribute is one that is shared between all instances of the class.
 To make an attribute static, declare it inside of the \li{class} block but outside of any of the class's functions, and do not use \li{self}.
-The attribute is accessed with the class name instead of with \li{self}.
-% TODO: Clarify + Examples
+Since the attribute is not tied to a specific instance of the class, it should be accessed or changed via the class name.
+
+For example, suppose our Backpacks all have the same brand name.
+
+\begin{lstlisting}
+class Backpack(object):
+    # ...
+    brand = "Adidas"
+\end{lstlisting}
+
+Changing the brand name changes it on every backpack instance.
+
+\begin{lstlisting}
+>>> pack1 = Backpack("Bill", "blue")
+>>> pack2 = Backpack("William", "white")
+>>> print pack1.brand, pack2.brand
+Adidas Adidas
+
+# Change the brand name for the class to change it for all class instances.
+>>> print Backpack.brand
+Adidas
+>>> Backpack.brand = "Nike"
+>>> print pack1.brand, pack2.brand
+Nike Nike
+\end{lstlisting}
 
 \subsection*{Static Methods} % ------------------------------------------------
 
-Individual methods can also be static.
-A static method can have no dependence on individual instances, so there can be no references to \li{self} inside the body of the method.
-Accordingly, \li{self} is \textbf{not} listed as an argument like it usually is.
-In addition, static methods need the tag \li{@staticmethod} above them.
+Individual class methods can also be static.
+A static method can have no dependence on the attributes of individual instances of the class, so there can be no references to \li{self} inside the body of the method and \li{self} is \textbf{not} listed as an argument in the function definition.
+Thus only static attributes and other static methods are available within the body of a static method.
+Include the tag \li{@staticmethod} above the function definition to designate a method as static.
+
+\begin{lstlisting}
+class Backpack(object):
+    # ...
+    @staticmethod
+    def origin():
+        print "Manufactured by " + Backpack.brand + ", inc."
+\end{lstlisting}
+
+\begin{lstlisting}
+# We can call static methods before instantiating the class.
+Backpack.origin()
+Manufactured by Nike, inc.
+
+# The method can also be accessed through class instances.
+>>> pack = Backpack("Larry", "lime")
+>>> pack.origin()
+Manufactured by Nike, inc.
+\end{lstlisting}
 
 % Add a static method / attribute to the Backpack class.
-\begin{problem}
-Add a static attribute to the \li{Backpack} class to serve as a counter for an ID.
+To practice these principles, consider adding a static attribute to the \li{Backpack} class to serve as a counter for a unique ID.
 In the constructor for the \li{Backpack} class, add an instance variable called \li{self.ID}.
-Set this ID based on the static ID variable, then increment the static ID so that the next \li{Backpack} object will have a unique ID.
-\end{problem}
+Set this ID based on the static ID variable, then increment the static ID so that the next \li{Backpack} object will have a new ID.
 
-\subsection*{Other Magic Methods} % -------------------------------------------
+\subsection*{More Magic Methods} % -------------------------------------------
 
-\begin{enumerate}
-\item The \li{__hash__()} magic method brands an object with a (hopefully) unique ID for quick comparison and indexing.
-Hash functions are important in many fast data structures and are discussed in Chapter 3 of the Volume II text.
-\item The \li{__getitem__()} magic method tells an object how to be indexed by brackets, including slicing behavior.
+Explore the following magic methods and consider how they could be implemented for the \li{Backpack} class.
 
-% Implement hash and getitem in the Backpack class.
-\begin{problem}
-Implement both of the aforementioned methods for the \li{Backpack} class.
-\end{problem}
-
-\end{comment}
+\begin{table}[H] % Common Magic Methods.
+\begin{tabular}{c|l}
+Method & Corresponding Operation\\
+% \hline \li{__repr__()} & Object representation (\li{repr()}).\\
+\hline \li{__nonzero__()} & Truth value (\li{bool()}).\\
+\hline \li{__len__()} & Object length or size (\li{len()}).\\
+\hline \li{__getitem__()} & Indexing and slicing  (\li{self[index]}).\\
+\hline \li{__setitem__()} & Assignment via indexing  (\li{self[index] = x}).\\
+\hline \li{__iter__()} & Iteration over the object (\li{iter()}).\\
+\hline \li{__reversed__()} & Reverse iteration over the object (\li{reversed()}).\\
+\hline \li{__contains__()} & Membership testing (\li{in}).
+\end{tabular}
+\end{table}
