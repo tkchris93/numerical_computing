@@ -190,11 +190,11 @@ class Knapsack(Backpack):
         Inputs:
             name (str): the name of the knapsack's owner.
             color (str): the color of the knapsack.
-            max_size (int, opt): the maximum number of items that can
-                be stored in the knapsack. Defaults to 3.
+            max_size (int): the maximum number of items that can fit
+                in the knapsack. Defaults to 3.
         
         Returns:
-            A knapsack object with no contents.
+            A Knapsack object with no contents.
         """
         Backpack.__init__(self, name, color, max_size)
         self.closed = True
