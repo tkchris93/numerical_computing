@@ -1,16 +1,12 @@
 # name this file 'solutions.py'
-"""Volume II Lab 1: The Standard Library
+"""Introductory Labs: The Standard Library
 <Name>
 <Class>
 <Date>
 """
 
-# Add import statements here.
-# In future labs, do not modify any PROVIDED import statements.
-# You may always add others as needed.
 
-
-# Problem 1: Implement this function.
+# Problem 1
 def prob1(l):
     """Accept a list 'l' of numbers as input and return a new list with the
     minimum, maximum, and average of the contents of 'l'.
@@ -18,7 +14,7 @@ def prob1(l):
     pass
 
 
-# Problem 2: Implement this function.
+# Problem 2
 def prob2():
     """Programmatically determine which Python objects are mutable and which
     are immutable. Test numbers, strings, lists, tuples, and dictionaries.
@@ -27,7 +23,7 @@ def prob2():
     pass
 
 
-# Problem 3: Create a 'calculator' module and use it to implement this function.
+# Problem 3: Create a 'calculator' module and implement this function.
 def prob3(a,b):
     """Calculate and return the length of the hypotenuse of a right triangle.
     Do not use any methods other than those that are imported from the
@@ -43,8 +39,7 @@ def prob3(a,b):
     pass
 
 
-# Problem 4: Utilize the 'matrix_multiply' module and 'matrices.npz' file to
-#   implement this function.
+# Problem 4
 def prob4():
     """If no command line argument is given, print "No Input."
     If anything other than "matrices.npz is given, print "Incorrect Input."
@@ -54,5 +49,3 @@ def prob4():
     Print your results to the terminal.
     """
     pass
-
-# ============================== END OF FILE ================================ #

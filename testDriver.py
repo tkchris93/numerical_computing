@@ -168,6 +168,7 @@ class _testDriver(object):
         """Test to see if 'correct' and 'student' are equal.
         Report the given 'message' if they are not.
         """
+        # if np.allclose(correct, student):
         if correct == student:
             return 1
         else:
@@ -186,16 +187,6 @@ class _testDriver(object):
             self.feedback += "\n{}".format(message)
             self.feedback += "\n\tCorrect response: {}".format(correct)
             self.feedback += "\n\tStudent response: {}".format(student)
-            return 0
-
-    def _evalTest(self, expression, correct, message):
-        """Test a boolean 'expression' to see if it is 'correct'.
-        Report the given 'message' if it is not.
-        """
-        if expression is correct:
-            return 1
-        else:
-            self.feedback += "\n{}".format(message)
             return 0
 
     def _grade(self, points, message=None):
