@@ -188,11 +188,11 @@ class _testDriver(object):
             self.feedback += "\n\tStudent response: {}".format(student)
             return 0
 
-    def _evalTest(self, expression, correct, message):
-        """Test a boolean 'expression' to see if it is 'correct'.
+    def _evalTest(self, expression, message):
+        """Test a boolean 'expression' to see if it is True.
         Report the given 'message' if it is not.
         """
-        if expression is correct:
+        if expression:
             return 1
         else:
             self.feedback += "\n{}".format(message)
