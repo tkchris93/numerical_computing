@@ -138,15 +138,12 @@ Expand the \li{Backpack} class to match the following specifications.
 \item Modify the constructor so that it accepts a name, a color, and a maximum size (in that order).
 Make \li{max_size} a default argument with default value $5$.
 Store each input as an attribute.
-%the new attributes as \li{self.name} and \li{self.max_size}.
 
 \item Modify the \li{put()} method to ensure that the backpack does not go over capacity.
 If the user tries to put in more than \li{max\_size} items, print ``No Room!'' and do not add the item to the contents list.
 
-\item Add a new method to the backpack called \li{dump()} that empties the contents of the backpack.
-This method should receive no arguments.
-
-(Hint: this method can be implemented in a single line.)
+\item Add a new method called \li{dump()} that resets the contents of the backpack to an empty list.
+This method should not receive any arguments (except \li{self}).
 \end{enumerate}
 
 To ensure that your class works properly, consider writing a test function outside outside of the \li{Backpack} class that instantiates and analyzes a \li{Backpack} object.
@@ -571,7 +568,7 @@ Set this ID based on the static ID variable, then increment the static ID so tha
 
 Explore the following magic methods and consider how they could be implemented for the \li{Backpack} class.
 
-\begin{table}[H] % Common Magic Methods.
+\begin{table}[H] % More Magic Methods.
 \begin{tabular}{c|l}
 Method & Corresponding Operation\\
 % \hline \li{__repr__()} & Object representation (\li{repr()}).\\
@@ -584,3 +581,5 @@ Method & Corresponding Operation\\
 \hline \li{__contains__()} & Membership testing (\li{in}).
 \end{tabular}
 \end{table}
+
+See \url{https://docs.python.org/2/reference/datamodel.html} for more details and documentation on all magic methods.
