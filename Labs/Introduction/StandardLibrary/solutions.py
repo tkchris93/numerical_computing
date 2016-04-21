@@ -1,11 +1,7 @@
 # solutions.py
-"""The Standard Library solutions file."""
+"""Introductory Labs: The Standard Library. Solutions file."""
 
-# In several labs, students will submit multiple files.
-# Every solutions file contains all of the code that students will write,
-# separated by file.
-
-# calculator.py ============================================================= #
+# calculator.py ===============================================================
 # Students write this module as part of problem 3. Do not provide to students.
 
 def add(x,y):
@@ -18,7 +14,7 @@ def sqrt(x):
     return x**.5
     # or, from math import sqrt at the top.
 
-# matrix_multiply.py ======================================================== #
+# matrix_multiply.py ==========================================================
 # This module is provided to students and used to complete problem 4.
 
 import numpy as np
@@ -61,9 +57,7 @@ def method3(A,B):
     return np.dot(A,B)
 
 
-# solutions.py ============================================================== #
-# The students are provided a specifications file called 'spec.py' with the
-# following functions. They are to rename the file as the instructor specifies.
+# solutions.py ================================================================
 
 import sys
 import time
@@ -146,18 +140,17 @@ def prob3(a,b):
     Returns:
         The length of the triangle's hypotenuse.
     """
-    # Students should use calculator.method() instead of method()
+    c = calculator              # or "import calculator as c" at the top
+    return c.sqrt(c.add(c.mult(a,a),c.mult(b,b)))
+
+    # Or, a slightly longer way:
     a2 = mult(a,a)
     b2 = mult(b,b)
     a2plusb2 = add(a2, b2)
     return sqrt(a2plusb2)
-    # Or, simply
-    c = calculator              # or "import calculator as c" at the top
-    return c.sqrt(c.add(c.mult(a,a),c.mult(b,b)))
 
 
-# Problem 4: Utilize the 'matrix_multiply' module and 'matrices.npz' file to
-#   implement this function.
+# Problem 4
 def prob4():
     """If no command line argument is given, print "No Input."
     If anything other than "matrices.npz is given, print "Incorrect Input."
