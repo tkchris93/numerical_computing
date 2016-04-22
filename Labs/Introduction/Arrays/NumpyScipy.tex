@@ -4,34 +4,34 @@
 
 %\footnote{SciPy is also the name of a Python coding environment that includes the NumPy and SciPy libraries, as well as IPython, matplotlib, and other tools.}
 
-%   Lab Outline
-%       Arrays
-%           What is an array?
-%           How to initialize a simple custom array
-%           * Problem 1: matrix multiplication
-%           SMALL Note about speed or Problem: Compare speed
-%           zeros(), ones(), full(), empty() (warning about empty()?)
-%           Basic array operations +, -, *, / component-wise
-%           Data Types
-%               How to initialize an array with a certain type
-%               Changing the type of an array's elements
-%               Compare to list comprehension to change types
-%           * Problem (?): Advantages of choosing the right type
-%       Array Manipulation: THIS SECTION NEED 10 MILLION PICTURES
-%           reshape(), flatten() / ravel()
-%               All 1D numpy arrays are flat!!!!!!
-%           hstack(), vstack(), row_stack(), column_stack()
-%           Slicing Revisited
-%           Fancy Indexing and Masks
-%               * Problem 2: Use fancy indexing to make the entries
-%                   of a matrix nonnegative (add more manipulations)
-%           Views vs Copies (Mutability) ???
-%               np.copy()
-%       Avoid Looping!!
-%           Again, NumPy uses C and Fortran to be SPEEDY!
-%           The 'axis' argument.
-%           all() and any()
-%           max(), min(), argmax(), argmin()
+  % Lab Outline
+  %     Arrays
+  %         What is an array?
+  %         How to initialize a simple custom array
+  %         * Problem 1: matrix multiplication
+  %         SMALL Note about speed or Problem: Compare speed
+  %         zeros(), ones(), full(), empty() (warning about empty()?)
+  %         Basic array operations +, -, *, / component-wise
+  %         Data Types
+  %             How to initialize an array with a certain type
+  %             Changing the type of an array's elements
+  %             Compare to list comprehension to change types
+  %         * Problem (?): Advantages of choosing the right type
+  %     Array Manipulation: THIS SECTION NEED 10 MILLION PICTURES
+  %         reshape(), flatten() / ravel()
+  %             All 1D numpy arrays are flat!!!!!!
+  %         hstack(), vstack(), row_stack(), column_stack()
+  %         Slicing Revisited
+  %         Fancy Indexing and Masks
+  %             * Problem 2: Use fancy indexing to make the entries
+  %                 of a matrix nonnegative (add more manipulations)
+  %         Views vs Copies (Mutability) ???
+  %             np.copy()
+  %     Avoid Looping!!
+  %         Again, NumPy uses C and Fortran to be SPEEDY!
+  %         The 'axis' argument.
+  %         all() and any()
+  %         max(), min(), argmax(), argmin()
 
 \section*{Arrays} % ===========================================================
 
@@ -77,7 +77,7 @@ array([1, 2, 3])
 
 \begin{problem} % Problem 1: Matrix Multiplication
 NumPy's \li{dot()} function perfoms matrix multiplication. % In Python 3.5, we can use the @ operator to perform matrix multiplication.
-Write a function that defines the matrices $A$ and $B$ given below as NumPy arrays and returns their matrix product.
+Write a function that defines the matrices $A$ and $B$ given below as NumPy arrays and returns the matrix product $AB$.
 %
 \begin{align} \nonumber
 A = \left(\begin{array}{rrr}
@@ -92,19 +92,19 @@ B = \left(\begin{array}{rrr}
 \end{align}
 %
 NumPy has excellent documentation.
-For examples of array initialization and matrix multiplication, use IPython's object introspection feature to look up the documentation for \li{np.array()} and \li{np.dot()}.
+For examples of array initialization and matrix multiplication, use IPython's object introspection feature to look up the documentation for \li{np.ndarray}, \li{np.array()} and \li{np.dot()}.
 \begin{lstlisting}
 In [1]: import numpy as np
 
 In [2]: np.array?       # press 'Enter'
 \end{lstlisting}
-\label{prob:multiply_problem}
+\label{prob:simple_multiply}
 \end{problem}
 
 \subsection*{Array Attributes} % ----------------------------------------------
 An \li{ndarray} object has several attributes, some of which are listed below.
 
-\begin{table}[H] % Important ndrray Attributes
+\begin{table}[H] % Important ndarray Attributes
 \centering 
 \begin{tabular}{c|l}%{10cm}}
     Attribute & Description \\
@@ -130,11 +130,7 @@ Note that the \li{ndim} is the number of entries in \li{shape}, and the
 the \li{size} of the array is the product of the entries of \li{shape}.
 
 % =============================================================================
-% =============================================================================
-% =============================================================================
 % DONE TO HERE ================================================================
-% =============================================================================
-% =============================================================================
 % =============================================================================
 
 % Special Array Creations
@@ -142,6 +138,7 @@ the \li{size} of the array is the product of the entries of \li{shape}.
 In addition to casting other structures as arrays via \li{np.array()}, NumPy provides efficient ways to create ceratin specific arrays.
 
 \begin{itemize}
+
 \item \li{np.zeros()} and \li{np.ones()} create arrays of all zeros or all ones, respectively.
 The input is either an integer for the number of entries (producing a 1-D array), or a tuple that gives the shape of the array.
 \begin{lstlisting}
@@ -238,18 +235,20 @@ Apart from being syntactically convenience, element-wise NumPy operations are si
 \begin{lstlisting}
 >>> from time import time
 >>> from random import random
+
 # Make two random lists with 10000 entries each.
 >>> a = [random() for i in xrange(10000)]
 >>> b = [random() for i in xrange(10000)]
+
+# Time the element-wise addition for lists.
+>>> start = time()
+>>> [x + y for x, y in zip(a, b))]
+>>> list_time = time() - start
 
 # Cast each list as a NumPy array.
 >>> A = np.array(a)
 >>> B = np.array(b)
 
-# Time the element-wise addition for lists.
->>> start = time()
->>> [a[i] + b[i] for i in xrange(len(a))]
->>> list_time = time() - start
 
 # Time the element-wise addition for arrays.
 >>> start = time()
@@ -305,7 +304,7 @@ Compare the difference between the pure Python and the NumPy ways:
 Table \ref{table:square_times} documents how long\footnote{You can replicate this experiment yourself. In IPython, you can find the execution time of a line of code by prefacing it with \li{\%timeit}. 
 If you aren't using IPython, you will need
 to use the timeit function documented here: \url{https://docs.python.org/2/library/timeit.html}.} 
-one computer took to square a $k \times k$ matrix in both Python (using the function \li{arr_mult}) and NumPy (using the method you found in Problem \ref{prob:multiply_problem}) for various values of $k$. 
+one computer took to square a $k \times k$ matrix in both Python (using the function \li{arr_mult}) and NumPy (using the method you found in Problem \ref{prob:simple_multiply}) for various values of $k$. 
 As you can see, NumPy is much faster.
 One reason for this is that algorithms in NumPy are usually implemented in C or in Fortran. 
 
@@ -854,3 +853,14 @@ The following online resources are specific to SciPy:
 \item Official SciPy Documentation (\url{http://docs.scipy.org/doc/})
 \item Sections 1.3 and 1.5 of the SciPy Lecture Notes (\url{http://scipy-lectures.github.io/})
 \end{itemize}
+
+\newpage
+
+\section*{Additional Material}
+
+\subsection*{More Creation Routines}
+
+\begin{enumerate}
+\item \li{np.empty()}: (from the docs:) Return a new array of given shape and type, without initializing entries. empty(), unlike zeros(), does not set the array values to zero, and may therefore be marginally faster. On the other hand, it requires the user to manually set all the values in the array, and should be used with caution.
+\item \li{np.full()}: (from the docs:) Return a new array of given shape and type, filled with a given value. Equivalent (but faster than) \li{a*np.ones(shape)}.
+\end{enumerate}
