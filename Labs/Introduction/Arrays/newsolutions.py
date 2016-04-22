@@ -6,10 +6,25 @@ from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 
-# Problem 1: Perform matrix multiplication
-A = np.array([[2,4,0],[-3,1,-1],[0,3,2]])
-B = np.array([[3,-1,2],[-2,-3,0],[1,0,-2]])
-print A.dot(B)
+def prob1():
+    A = np.array([[2,4,0],[-3,1,-1],[0,3,2]])
+    B = np.array([[3,-1,2],[-2,-3,0],[1,0,-2]])
+    return A.dot(B)
+
+
+def prob2():
+    A = np.array([[3,1],[4,1],[5,9]])
+    B = np.array([[2,6],[5,3],[5,8]])
+    C = np.array([[2,7,1],[8,2,8]])
+    D = np.array([[1,8,2],[8,4,5]])
+    return np.dot(A + B, C - D)
+
+
+def prob3():
+    A = np.triu(np.ones((6,6)))
+    C = np.full_like(A, 3)
+    B = np.full_like(A, 2) - np.tril(C) + np.triu(C, 1)
+    return np.dot(np.dot(A, B), A)
 
 
 # Problem 2: Return an array with all nonnegative numbers.
@@ -21,7 +36,6 @@ def nonnegative(my_array):
     >>> nonnegative(my_array)
     array([0,0,3])
     """
-    
     my_array[my_array<0] = 0
     return my_array
 

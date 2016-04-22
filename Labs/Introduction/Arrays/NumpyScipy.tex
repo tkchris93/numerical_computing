@@ -98,7 +98,7 @@ In [1]: import numpy as np
 
 In [2]: np.array?       # press 'Enter'
 \end{lstlisting}
-\label{prob:simple_multiply}
+\label{prob:simple1}
 \end{problem}
 
 \subsection*{Array Attributes} % ----------------------------------------------
@@ -128,10 +128,6 @@ An \li{ndarray} object has several attributes, some of which are listed below.
 
 Note that the \li{ndim} is the number of entries in \li{shape}, and the
 the \li{size} of the array is the product of the entries of \li{shape}.
-
-% =============================================================================
-% DONE TO HERE ================================================================
-% =============================================================================
 
 \subsection*{Basic Array Operations} % ----------------------------------------
 
@@ -190,7 +186,7 @@ Apart from being syntactically convenient, element-wise NumPy operations are als
 0.0030951499939 0.000310897827148
 \end{lstlisting}
 
-\begin{problem}
+\begin{problem} % Simple Matrix Equation 2
 Write a function that defines the matrices $A$, $B$, $C$, and $D$ given below as NumPy arrays and returns the matrix $(A + B)(C - D)$.
 
 \begin{align*}
@@ -216,7 +212,7 @@ D = \left(\begin{array}{rrr}
 % array([[  5, -19,  16],
 %        [  9, -17,   3],
 %        [ 10, -44,  41]])
-\label{prob:simple_equation}
+\label{prob:simple2}
 \end{problem}
 
 \subsection*{Data Types} % ----------------------------------------------------
@@ -250,7 +246,7 @@ Data type & Description
 \label{table:numpytypes} 
 \end{table}
 
-We can specify the data type of an array as it is created with the \li{dtype} keyword argument, or change an array's type afterward with the array's \li{astype()} method.
+Specify the data type of an array as it is created with the keyword argument \li{dtype}, or change the type afterward with the array's \li{astype()} method.
 
 \begin{lstlisting}
 # Specify the data type of an array.
@@ -269,11 +265,11 @@ dtype('float32')
 \end{lstlisting}
 
 \begin{warn}
-Note about overflow.
-Use data types that are precise enough.
+The default data type for most NumPy operations is \li{np.float64}.
+Using smaller data types can speed up computations, but can result in unexpected overflow if you're not careful.
 
 For example, an integer represented in binary with 8 bits (including one bit for the sign) can range from $-128$ to $127$.
-Casting a number outside of this range as an 8-bit integer can cause some unexpected issues.
+Casting a number outside of this range as an 8-bit integer can cause some unexpected overflow issues.
 
 \begin{lstlisting}
 >>> np.int8(200)
@@ -284,24 +280,127 @@ Casting a number outside of this range as an 8-bit integer can cause some unexpe
 \subsection*{Array Creation Routines} % ---------------------------------------
 
 In addition to casting other structures as arrays via \li{np.array()}, NumPy provides efficient ways to create ceratin specific arrays.
-Each of these functions accepts the \li{dtype} keyword argument to specify the data type.
+Each of these functions accepts the keyword argument \li{dtype} to specify the data type.
 
-\begin{itemize}
+\begin{table}[H]
+\centering
+\begin{tabular}{r|l} 
+Function & Returns \\
+\hline \li{empty()} & A new array of given shape and type, without initializing entries. \\ 
+\li{empty_like()} & A new array with the same shape and type as a given array. \\
+\li{eye()} & A 2-D array with ones on the diagonal and zeros elsewhere. \\ 
+\li{identity()} & The square identity array. \\ 
+% \li{meshgrid()} & Return coordinate matrices from two coordinate vectors.\\ 
+\li{ones()} & A new array of given shape and type, filled with ones. \\ 
+\li{ones_like()} & An array of ones with the same shape and type as a given array. \\ 
+\li{zeros()} & A new array of given shape and type, filled with zeros. \\ 
+\li{zeros_like()} & An array of zeros with the same shape and type as a given array. \\
+\li{full()} & A new array of given shape and type, filled with a specified value. \\
+\li{full_like()} & A full array with the same shape and type as a given array.
+\end{tabular} 
+\caption{Some of NumPy's array creation routines. See \url{http://docs.scipy.org/doc/numpy/reference/routines.array-creation.html} for more details.
+}
+\label{table:numpycreate1} 
+\end{table}
 
-\item \li{np.zeros()} and \li{np.ones()} create arrays of all zeros or all ones, respectively.
-The input is either an integer for the number of entries (producing a 1-D array), or a tuple that gives the shape of the array.
 \begin{lstlisting}
 # Make a 1-D array of 5 zeros.
 >>> np.zeros(5)
 array([ 0.,  0.,  0.,  0.,  0.])
 
-# Make a 2x3 matrix (2-D array) of ones.
->>> np.ones((2,3))
-array([[ 1.,  1.,  1.],
-       [ 1.,  1.,  1.]])
+# Make a 2x3 matrix (2-D array) of integer ones.
+>>> np.ones((2,3), dtype=<<np.int>>)    # The shape is specified as a tuple.
+array([[1, 1, 1],
+       [1, 1, 1]])
+
+# Create a 3x3 identity matrix.
+>>> I = np.eye(4)
+>>> print(I)
+[[ 1.  0.  0.]
+ [ 0.  1.  0.]
+ [ 0.  0.  1.]]
+
+# Make an array of 3s the same size as 'I'.
+>>> np.full_like(I, 3)              # Equivalent to np.full(I.shape, 3)
+array([[ 3.,  3.,  3.],
+       [ 3.,  3.,  3.],
+       [ 3.,  3.,  3.]])
 \end{lstlisting}
 
-\item \li{np.arange()}, NumPy's version of the built-in \li{range()} function, creates evenly-spaced values within an interval specified with slicing syntax.
+Once we have an array, we might want to extract its diagonal or get the upper or lower portion of the array.
+The following functions are very helpful for this.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{c|l} 
+Function & Description \\ \hline
+\li{diag()} & Extract a diagonal or construct a diagonal array.\\
+\li{tril()} & Get the lower-triangular portion of an array by replacing entries above\\&the diagonal with zeros.\\
+\li{triu()} & Get the upper-triangular portion of an array by replacing entries below\\&the diagonal with zeros.
+\end{tabular}
+% \caption{Routines for building matrices from existing ones.}
+\label{table:numpycreate2}
+\end{table}
+
+\begin{lstlisting}
+>>> A = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+>>> print(A)
+[[1 2 3]
+ [4 5 6]
+ [7 8 9]]
+
+# Get the diagonal entries of 'A' as a 1-D array.
+>>> np.diag(A)
+array([1, 5, 9])
+
+# Get only the upper triangular entries of 'A'.
+>>> np.triu(A)
+array([[1, 2, 3],
+       [0, 5, 6],
+       [0, 0, 9]])
+
+# diag() can also be used to create a diagonal matrix from a 1-D array.
+>>> np.diag([1, 11, 111])
+array([[  1,   0,   0],
+       [  0,  11,   0],
+       [  0,   0, 111]])
+\end{lstlisting}
+
+% =============================================================================
+% DONE TO HERE ================================================================
+% =============================================================================
+
+\begin{problem} % Simple Matrix Equation 3
+Write a function that defines the matrices $A$ and $B$ given below as NumPy arrays and returns the matrix product $ABA$.
+Use the functions presented in this section instead of \li{np.array()} to construct the matrices.
+\begin{align*}
+A = \left(\begin{array}{rrrrrr}
+1 & 1 & 1 & 1 & 1 & 1\\
+0 & 1 & 1 & 1 & 1 & 1\\
+0 & 0 & 1 & 1 & 1 & 1\\
+0 & 0 & 0 & 1 & 1 & 1\\
+0 & 0 & 0 & 0 & 1 & 1\\
+0 & 0 & 0 & 0 & 0 & 1\end{array}\right)
+&&
+B = \left(\begin{array}{rrrrrr}
+-1 &  5 &  5 &  5 &  5 &  5\\
+-1 & -1 &  5 &  5 &  5 &  5\\
+-1 & -1 & -1 &  5 &  5 &  5\\
+-1 & -1 & -1 & -1 &  5 &  5\\
+-1 & -1 & -1 & -1 & -1 &  5\\
+-1 & -1 & -1 & -1 & -1 & -1\end{array}\right)
+\end{align*}
+% Solution:
+% array([[ -6.,  -6.,   0.,  12.,  30.,  54.],
+%        [ -5., -10.,  -9.,  -2.,  11.,  30.],
+%        [ -4.,  -8., -12., -10.,  -2.,  12.],
+%        [ -3.,  -6.,  -9., -12.,  -9.,   0.],
+%        [ -2.,  -4.,  -6.,  -8., -10.,  -6.],
+%        [ -1.,  -2.,  -3.,  -4.,  -5.,  -6.]])
+\label{prob:simple3}
+\end{problem}
+
+% \item \li{np.arange()}, NumPy's version of the built-in \li{range()} function, creates evenly-spaced values within an interval specified with slicing syntax.
 Specifically, \li{np.arange(start, stop, step)} returns an array of numbers from \li{start} up to (but not including) \li{stop}, with each entry \li{step} apart.
 If they are not specified, \li{start} defaults to $0$ and \li{step} defaults to $1$.
 
@@ -310,16 +409,16 @@ If they are not specified, \li{start} defaults to $0$ and \li{step} defaults to 
 >>> np.arange(5)
 array([0, 1, 2, 3, 4])
 
-# The integers from 3 to 8, exclusive.
->>> np.arange(3, 8)
-array([3, 4, 5, 6, 7])
+# The complex integers from 3 to 8, exclusive.
+>>> np.arange(3, 8, dtype=np.complex)
+array([ 3.+0.j,  4.+0.j,  5.+0.j,  6.+0.j,  7.+0.j])
 
 # Every 2nd integer from 10 to 20, exclusive.
 >>> np.arange(10, 20, 2)
 array([10, 12, 14, 16, 18])
 \end{lstlisting}
 
-\item \li{np.linspace()} also create an array of evenly spaced values in a given interval.
+% \item \li{np.linspace()} also create an array of evenly spaced values in a given interval.
 Instead of specifying the step size, we specify the number of desired points in the array.
 Unlike \li{np.arange()}, the interval includes the endpoint.
 This function is used extensively with plotting and finite difference methods.
@@ -334,7 +433,7 @@ array([  0.        ,  10.66666667,  21.33333333,  32.        ])
 array([-1.  , -0.75, -0.5 , -0.25,  0.  ,  0.25,  0.5 ,  0.75,  1.  ])
 \end{lstlisting} 
 
-\item The submodule \li{np.random} holds many functions for creating arrays of random values chosen from probability distributions such as the uniform, normal, and multinomial distributions.
+% \item The submodule \li{np.random} holds many functions for creating arrays of random values chosen from probability distributions such as the uniform, normal, and multinomial distributions.
 It also contains some utility functions for getting non-distributional random samples, such as random integers or random samples from a given array.
 
 \begin{lstlisting}
@@ -346,35 +445,32 @@ array([ 0.21845499,  0.73352537,  0.28064456,  0.66878454,  0.44138609])
 >>> np.random.randint(10, 20, (2,5))
 array([[17, 12, 13, 13, 18],
        [16, 10, 12, 18, 12]])
-\end{lstlisting} 
+\end{lstlisting}
+
+\begin{problem}
+% There should be more problems like this in the vectorization lab. I'll
+% include this one here for now though.
+Write a function which accepts an integer $n$ as input and does the following:
+\begin{enumerate}
+\item Creates an $n\times n$ array of \li{floats} randomly chosen from a normal distribution
+\item Computes the mean of each row (use a built-in command)
+\item Computes the variance of these means (use a built-in command).
+\end{enumerate}
+As you increase $n$, what happens to the output of 
+your function? This illustrates one version of
+the Law of Large Numbers, about which you will learn more later on.
+\end{problem}
+
 
 % Some other commonly-used functions are \li{np.random.randn()}, which samples from the normal distribution, \li{np.random.randint()}, which randomly selects integers from a range, and \li{np.random.random_integers()} which returns an array of random integers in a given range.
-\end{itemize}
+% \end{itemize}
 
 
 % See \url{http://docs.scipy.org/doc/numpy/reference/routines.array-creation.html} for more details on array creation routines.
 
-There are many functions for creating arrays besides these, some of which are described in Table \ref{table:numpycreate}. 
+There are many functions for creating arrays besides these, some of which are described in Table \ref{table:numpycreate1}. 
 See \url{http://docs.scipy.org/doc/numpy/reference/routines.array-creation.html} for more details.
 
-\begin{table}[H]
-\centering
-\begin{tabular}{c|l} 
-Function & Description \\
- % \hline \li{diag()} & Extract a diagonal or construct a diagonal array.\\
-\hline \li{empty()} & Return a new array of given shape and type, without initializing entries. \\ 
-\li{empty_like()} & Return a new array with the same shape and type as a given array. \\
-\li{eye()} & Return a 2-D array with ones on the diagonal and zeros elsewhere. \\ 
-\li{identity()} & Return the identity array. \\ 
-% \li{meshgrid()} & Return coordinate matrices from two coordinate vectors.\\ 
-% \li{ones()} & Return a new array of given shape and type, filled with ones. \\ 
-\li{ones_like()} & Return an array of ones with the same shape and type as a given array. \\ 
-% \li{zeros()} & Return a new array of given shape and type, filled with zeros. \\ 
-\li{zeros_like()} & Return an array of zeros with the same shape and type as a given array. \\ 
-\end{tabular} 
-% \caption{Some functions for creating arrays in NumPy.}
-\label{table:numpycreate} 
-\end{table}
 
 % THIS SHOULD BE MOVED TO THE COMPLEXITY LAB!!!
 \begin{comment}
@@ -421,7 +517,7 @@ Compare the difference between the pure Python and the NumPy ways:
 Table \ref{table:square_times} documents how long\footnote{You can replicate this experiment yourself. In IPython, you can find the execution time of a line of code by prefacing it with \li{\%timeit}. 
 If you aren't using IPython, you will need
 to use the timeit function documented here: \url{https://docs.python.org/2/library/timeit.html}.} 
-one computer took to square a $k \times k$ matrix in both Python (using the function \li{arr_mult}) and NumPy (using the method you found in Problem \ref{prob:simple_multiply}) for various values of $k$. 
+one computer took to square a $k \times k$ matrix in both Python (using the function \li{arr_mult}) and NumPy (using the method you found in Problem \ref{prob:simple1}) for various values of $k$. 
 As you can see, NumPy is much faster.
 One reason for this is that algorithms in NumPy are usually implemented in C or in Fortran. 
 
@@ -942,3 +1038,44 @@ The following online resources are specific to SciPy:
 \subsection*{More on the Random Submodule}
 
 Something about \li{np.random.choice()} and \li{np.random.randn()} ?
+
+\subsection*{Saving Arrays} It is often useful to save an array as a file.
+NumPy provides several easy methods for saving and loading array data.
+
+\begin{table*}
+\begin{tabular}{l|l}
+\hline
+\li{np.save(file, arr)} & Save an array to a binary file \\
+\li{np.savez(file, *arrs)} & Save multiple arrays to a binary file \\
+\li{np.savetxt(file, arr)} & Save an array to a text file \\
+\hline
+\end{tabular}
+\end{table*}
+
+\begin{table*}
+\begin{tabular}{l|l}
+\hline
+\li{np.load(file)} & Load and return an array from a binary file \\
+\li{np.loadtxt(file)} & Load and return an array from text file \\
+\hline
+\end{tabular}
+\end{table*}
+
+Let's practice saving an array to a file and loading it again.
+Note that, when saving an array, NumPy automatically appends the extension \li{.npy} if it is not already present.
+\begin{lstlisting}
+a = np.arange(30)
+np.save('test_arr', a)
+new_a = np.load('test_arr.npy')
+np.savez('test_multi', a=a, new_a=new_a)
+arrs = np.load('test_multi.npz')
+\end{lstlisting}
+The variable \li{arrs} points to a dictionary object with the keys \li{a} and \li{new_a} which reference the arrays that have been saved.
+The \li{.npz} file extension is the file type used to store multiple arrays.
+
+
+\newpage
+
+\section*{NumPy Visual Guide}
+
+COMING SOON!
