@@ -129,10 +129,6 @@ An \li{ndarray} object has several attributes, some of which are listed below.
 Note that the \li{ndim} is the number of entries in \li{shape}, and the
 the \li{size} of the array is the product of the entries of \li{shape}.
 
-% =============================================================================
-% DONE TO HERE ================================================================
-% =============================================================================
-
 % Special Array Creations
 \subsection*{Array Creation Routines} % ---------------------------------------
 In addition to casting other structures as arrays via \li{np.array()}, NumPy provides efficient ways to create ceratin specific arrays.
@@ -142,23 +138,37 @@ In addition to casting other structures as arrays via \li{np.array()}, NumPy pro
 \item \li{np.zeros()} and \li{np.ones()} create arrays of all zeros or all ones, respectively.
 The input is either an integer for the number of entries (producing a 1-D array), or a tuple that gives the shape of the array.
 \begin{lstlisting}
+# Make a 1-D array of 5 zeros.
 >>> np.zeros(5)
 array([ 0.,  0.,  0.,  0.,  0.])
+
+# Make a 2x3 matrix (2-D array) of ones.
 >>> np.ones((2,3))
 array([[ 1.,  1.,  1.],
        [ 1.,  1.,  1.]])
 \end{lstlisting}
 
-\item \li{np.arange([start], stop, [step])} returns an array of numbers from \li{start} up to, but not including, \li{stop}.
-Like other functions with similar parameters, \li{start} defaults to $0$ and \li{step} defaults to $1$.
-This is NumPy's version of the built-in \li{range()} function.
+\item \li{np.arange()}, NumPy's version of the built-in \li{range()} function, creates evenly-spaced values within an interval specified with slicing syntax.
+Specifically, \li{np.arange(start, stop, step)} returns an array of numbers from \li{start} up to (but not including) \li{stop}, with each entry \li{step} apart.
+If they are not specified, \li{start} defaults to $0$ and \li{step} defaults to $1$.
 
 \begin{lstlisting}
+# The integers from 0 to 5.
 >>> np.arange(5)
 array([0, 1, 2, 3, 4])
->>> np.arange(10, 20, 2) 
+
+# The integers from 3 to 8.
+>>> np.arange(3, 8)
+array([3, 4, 5, 6, 7])
+
+# Every 2nd integer from 10 to 20.
+>>> np.arange(10, 20, 2)
 array([10, 12, 14, 16, 18])
 \end{lstlisting}
+
+% =============================================================================
+% DONE TO HERE ================================================================
+% =============================================================================
 
 \item \li{np.linspace(start, stop, num=50)} to create an array of \li{num} numbers evenly spaced in the interval from \li{start} to \li{stop}, \emph{inclusive}.
 This function is used extensively with plotting and finite difference methods.
@@ -169,7 +179,14 @@ array([  0.        ,  10.66666667,  21.33333333,  32.        ])
 array([-1.  , -0.75, -0.5 , -0.25,  0.  ,  0.25,  0.5 ,  0.75,  1.  ])
 \end{lstlisting} 
 
-\item We can even create arrays of random values chosen from probability distributions.
+\item The submodule \li{np.random} holds many functions for creating arrays of random values chosen from probability distributions.
+The most commonly used of these are:
+\begin{enumerate}
+\item np.random.random() or np.random.uniform()
+\item np.random.randn()
+\end{enumerate}
+
+We can even create arrays of random values chosen from probability distributions.
 These probability distributions are stored in the submodule \li{np.random}.
 \begin{lstlisting}
 # Get uniformly distributed values in the interval [0, 1).
@@ -199,8 +216,6 @@ Function & Description \\
 % \caption{Some functions for creating arrays in NumPy.}
 \label{table:numpycreate} 
 \end{table} 
-
-
 
 \subsection*{Basic Array Operations}
 NumPy arrays support the usual binary operators, including element-wise addition \li{+} and element-wise multiplication \li{*}.
@@ -249,7 +264,6 @@ Apart from being syntactically convenience, element-wise NumPy operations are si
 >>> A = np.array(a)
 >>> B = np.array(b)
 
-
 # Time the element-wise addition for arrays.
 >>> start = time()
 >>> a + b
@@ -260,7 +274,8 @@ Apart from being syntactically convenience, element-wise NumPy operations are si
 0.0030951499939 0.000310897827148
 \end{lstlisting}
 
-
+% THIS SHOULD BE MOVED TO THE COMPLEXITY LAB!!!
+\begin{comment}
 \begin{problem} % Problem 2: Time matrix multiplication.
 For a $m\times n$ matrix $A$ with entries $a_{ij}$ and an $n\times l$ matrix $B$ with entries $b_{ij}$, the matrix product $C = AB$ is defined entrywise by the formula:
 \[c_{ij} = \sum_{k=1}^N a_{ik}b_{kj}\]
@@ -327,7 +342,7 @@ One reason for this is that algorithms in NumPy are usually implemented in C or 
 
 NumPy is optimized for fast array computations.
 
-
+\end{comment}
 
 % Data Types
 \subsection*{Data Types}
