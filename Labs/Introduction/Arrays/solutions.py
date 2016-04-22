@@ -11,6 +11,13 @@ A = np.array([[2,4,0],[-3,1,-1],[0,3,2]])
 B = np.array([[3,-1,2],[-2,-3,0],[1,0,-2]])
 product = A.dot(B)
 
+# TEMPORARY / UNDER CONSTRUCTION
+def prob2():
+    A = np.array([[3,1],[4,1],[5,9]])
+    B = np.array([[2,6],[5,3],[5,8]])
+    C = np.array([[2,7,1],[8,2,8]])
+    D = np.array([[1,8,2],[8,4,5]])
+    return np.dot(A + B, C - D)
 
 # Problem 2: Return an array with all nonnegative numbers.
 def nonnegative(my_array):
@@ -69,7 +76,7 @@ def laplace_plot():
 # Problem 5: Blue shift an RGB image.
 def blue_shift():
     """Create a 100x100x3 array and perform a blue shift"""
-    my_array = np.random.random_integers(0,255,100*100*3).reshape((100,100,3))
+    my_array = np.random.random_integers(0, 255, (100,100,3))
     blue = np.copy(my_array)    # or my_array.copy()
     blue[:,:,:2] = 0.5*my_array[:,:,:2]   
     return my_array, blue 
