@@ -24,7 +24,7 @@ def prob3():
     A = np.triu(np.ones((6,6)))
     C = np.full_like(A, 3)
     B = np.full_like(A, 2) - np.tril(C) + np.triu(C, 1)
-    return np.dot(np.dot(A, B), A)
+    return np.dot(np.dot(A, B), A).astype(np.int32)
 
 
 # Problem 2: Return an array with all nonnegative numbers.
