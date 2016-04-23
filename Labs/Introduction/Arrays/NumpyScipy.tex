@@ -134,8 +134,59 @@ the \li{size} of the array is the product of the entries of \li{shape}.
 
 \subsection*{Basic Array Operations} % ----------------------------------------
 
-NumPy arrays support the usual binary operators, including element-wise addition \li{+} and element-wise multiplication \li{*} for arrays of the same size.
-For Python lists, the \li{+} operator performs concatenation and the \li{*} operator is not even defined.
+NumPy arrays behave differently with respect to the binary arithmetic operators \li{+} and \li{*} than Python lists do.
+For lists, \li{+} concatenates two lists and \li{*} replicates a list by a scalar amount (strings also behave this way).
+
+\begin{lstlisting}
+# Addition performs list concatenation.
+>>> [1, 2, 3] + [4, 5, 6]
+[1, 2, 3, 4, 5, 6]
+
+# Mutliplication concatenates a list with itself a given number of times.
+>>> [1, 2, 3] * 4
+[1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3]
+\end{lstlisting}
+
+These operations are element-wise for NumPy arrays, so that arrays behave the same way that vectors and matrices behave mathematically.
+
+\begin{lstlisting}
+>>> x = np.array([1, 2, 3])
+>>> y = np.array([4, 5, 6])
+
+# Addition or multiplication by a scalar acts on each element of the array.
+>>> x + 2
+array([3, 4, 5])
+>>> x * 4
+array([ 4,  8, 12])
+
+# Add two arrays together (component-wise).
+>>> x + y
+array([5, 7, 9])
+
+# Multiply two arrays together (component-wise).
+>>> x * y
+array([ 4, 10, 18])
+\end{lstlisting}
+
+% Subtraction and division also perform element-wise operations for arrays.
+Apart from being syntactically convenient, element-wise NumPy operations also execute significantly faster than element-wise list operations.
+
+\begin{comment} % Old demonstration, overkill.
+\begin{lstlisting}
+In [1]: import numpy as np
+In [2]: from random import random
+
+# Make two lists of 10000 random entries and corresponding NumPy arrays.
+In [3]: a = [random() for i in xrange(10000)]
+In [4]: b = [random() for i in xrange(10000)]
+In [5]: A, B = np.array(a), np.array(b)
+
+In [6]: %timeit [x + y for x,y in zip(a,b)]
+100 loops, best of 3: 2.02 milisecons per loop          # .00202 seconds.
+
+In [7]: %timeit A + B
+100000 loops, best of 3: 92.9 microseconds per loop     # .0000929 seconds.
+\end{lstlisting}
 
 \begin{lstlisting}
 # For lists, + performs concatenation (not addition) and * is not defined.
@@ -188,42 +239,27 @@ Apart from being syntactically convenient, element-wise NumPy operations are als
 >>> print list_time, array_time
 0.0030951499939 0.000310897827148
 \end{lstlisting}
+\end{comment}
 
-\begin{problem} % Simple Matrix Equation 2
-Write a function that defines the matrices $A$, $B$, $C$, and $D$ given below as NumPy arrays and returns the matrix $(A + B)(C - D)$.
-
-\begin{align*}
-&A = \left(\begin{array}{rr}
-3 & 1 \\ 
-4 & 1 \\
-5 & 9 \end{array}\right)
-&&
-B = \left(\begin{array}{rr}
-2 & 6 \\ 
-5 & 3 \\
-5 & 8 \end{array}\right)
-\\ \\
-&C = \left(\begin{array}{rrr}
-2 & 7 & 1 \\ 
-8 & 2 & 8 \end{array}\right)
-&&
-D = \left(\begin{array}{rrr}
-1 & 8 & 2 \\ 
-8 & 4 & 5 \end{array}\right)
-\end{align*}
-% Solution:
-% array([[  5, -19,  16],
-%        [  9, -17,   3],
-%        [ 10, -44,  41]])
+\begin{problem} % Simple Matrix Equation 2 (Cayley Hamilton)
+Write a function that defines the matrix $A$ given below as a NumPy array and returns the matrix $-A^3 + 12A^2 - 25A$.
+In this context, $A^2 = AA$ (the matrix product).
+\[
+A = \left(\begin{array}{ccc}
+3 & 1 & 4\\ 
+1 & 5 & 9 \\
+3 & 1 & 4 \end{array}\right)
+\]
+The somewhat surpising result is a demonstration of the Cayley-Hamilton theorem, which will be discussed late in the curriculum.
 \label{prob:simple2}
 \end{problem}
 
 \subsection*{Data Types} % ----------------------------------------------------
 
-Unlike native Python data structures, \textbf{a NumPy array requires that all of its elements have the same data type}. 
+Unlike native Python data structures, \textbf{all elements of a NumPy array must have the same data type}. 
 The data types used by NumPy arrays are machine-native and avoid the overhead of Python objects, meaning that they are faster to compute with.
 Thus NumPy's \li{np.float64} and Python's standard \li{float} are not the same; the former has been optimized to speed up numerical computations.
-NumPy's more common data types are listed below in Table \ref{table:numpytypes}.
+NumPy's more common numerical data types are listed below in Table \ref{table:numpytypes}.
 
 \begin{table}[H] % Numpy Data Types
 \centering
@@ -249,22 +285,24 @@ Data type & Description
 \label{table:numpytypes} 
 \end{table}
 
-Specify the data type of an array as it is created with the keyword argument \li{dtype}, or change the type afterward with the array's \li{astype()} method.
+We specify the data type of an array as it is created with the keyword argument \li{dtype}.
+If unspecified, then the type will be determined as the minimum type required to hold the objects in the provided sequence.
+To change an existing array's type, use the array's \li{astype()} method.
 
 \begin{lstlisting}
-# Specify the data type of an array.
->>> x = np.array([0, 1, 2, 3, 4], dtype=np.int16)
->>> print x
+# A list of integers becomes an array of integers.
+>>> x = np.array([0, 1, 2, 3, 4])
+>>> print(x)
 [0 1 2 3 4]
 >>> x.dtype
-dtype('int16')
+<<dtype('int64')>>
 
-# Change the data type.
->>> x = x.astype(np.float32)
->>> print x
+# Change the data type to one of NumPy's float types.
+>>> x = x.astype(np.float64)
+>>> print(x)
 [ 0.  1.  2.  3.  4.]
 >>> x.dtype
-dtype('float32')
+<<dtype('float64')>>
 \end{lstlisting}
 
 \begin{warn}
@@ -290,8 +328,8 @@ Each of these functions accepts the keyword argument \li{dtype} to specify the d
 \begin{tabular}{r|l} 
 Function & Returns \\
 \hline \li{arange()} & An array of evenly spaced values within a given interval (like \li{range()}).\\
-\li{empty()} & A new array of given shape and type, without initializing entries. \\ 
-\li{empty_like()} & A new array with the same shape and type as a given array. \\
+% \li{empty()} & A new array of given shape and type, without initializing entries. \\ 
+% \li{empty_like()} & A new array with the same shape and type as a given array. \\
 \li{eye()} & A 2-D array with ones on the diagonal and zeros elsewhere. \\ 
 \li{identity()} & The square identity array. \\ 
 \li{ones()} & A new array of given shape and type, filled with ones. \\ 
@@ -301,8 +339,6 @@ Function & Returns \\
 \li{full()} & A new array of given shape and type, filled with a specified value. \\
 \li{full_like()} & A full array with the same shape and type as a given array.
 \end{tabular} 
-\caption{Some of NumPy's array creation routines. See \url{http://docs.scipy.org/doc/numpy/reference/routines.array-creation.html} for more details.
-}
 \label{table:numpycreate1} 
 \end{table}
 
@@ -311,23 +347,21 @@ Function & Returns \\
 >>> np.zeros(5)
 array([ 0.,  0.,  0.,  0.,  0.])
 
-# A 2x3 matrix (2-D array) of integer ones.
->>> np.ones((2,3), dtype=<<np.int>>)    # The shape is specified as a tuple.
-array([[1, 1, 1],
-       [1, 1, 1]])
+# A 2x5 matrix (2-D array) of integer ones.
+>>> np.ones((2,5), dtype=<<np.int>>)    # The shape is specified as a tuple.
+array([[1, 1, 1, 1, 1],
+       [1, 1, 1, 1, 1]])
 
-# The 3x3 identity matrix.
->>> I = np.eye(4)
+# The 2x2 identity matrix.
+>>> I = np.eye(2)
 >>> print(I)
-[[ 1.  0.  0.]
- [ 0.  1.  0.]
- [ 0.  0.  1.]]
+[[ 1.  0.]
+ [ 0.  1.]]
 
 # An array of 3s the same size as 'I'.
 >>> np.full_like(I, 3)              # Equivalent to np.full(I.shape, 3)
-array([[ 3.,  3.,  3.],
-       [ 3.,  3.,  3.],
-       [ 3.,  3.,  3.]])
+array([[ 3.,  3.],
+       [ 3.,  3.]])
 \end{lstlisting}
 
 Once we have an array, we might want to extract its diagonal or get the upper or lower portion of the array.
@@ -341,7 +375,6 @@ Function & Description \\ \hline
 \li{tril()} & Get the lower-triangular portion of an array by replacing entries above\\&the diagonal with zeros.\\
 \li{triu()} & Get the upper-triangular portion of an array by replacing entries below\\&the diagonal with zeros.
 \end{tabular}
-% \caption{Routines for building matrices from existing ones.}
 \label{table:numpycreate2}
 \end{table}
 
@@ -369,10 +402,12 @@ array([[  1,   0,   0],
        [  0,   0, 111]])
 \end{lstlisting}
 
+See \url{http://docs.scipy.org/doc/numpy/reference/routines.array-creation.html} for the official documentation on NumPy's array creation routines.
+
 \begin{problem} % Simple Matrix Equation 3
 Write a function that defines the matrices $A$ and $B$ given below as NumPy arrays and returns the matrix product $ABA$.
 
-Use the functions presented in this section instead of \li{np.array()} to construct the matrices, and change the data type of the final matrix to \li{np.int32}.
+Use the functions presented in this section instead of \li{np.array()} to construct the matrices, and change the data type of the final matrix to \li{np.int64}.
 \begin{align*}
 A = \left(\begin{array}{rrrrrr}
 1 & 1 & 1 & 1 & 1 & 1\\
@@ -396,7 +431,7 @@ B = \left(\begin{array}{rrrrrr}
 %        [ -4,  -8, -12, -10,  -2,  12],
 %        [ -3,  -6,  -9, -12,  -9,   0],
 %        [ -2,  -4,  -6,  -8, -10,  -6],
-%        [ -1,  -2,  -3,  -4,  -5,  -6]], dtype=int32)
+%        [ -1,  -2,  -3,  -4,  -5,  -6]], dtype=int64)
 \label{prob:simple3}
 \end{problem}
 
@@ -482,9 +517,8 @@ It should resemble the following figure.
 \end{figure} 
 \end{problem}
 
+\subsection*{Fancy Indexing} % ------------------------------------------------
 
-
-\subsection*{Fancy Indexing}
 Fancy indexing is a second way to access elements of an array. 
 There are two types of fancy indexing: boolean and integer. 
 Boolean indexing uses an array of \li{True} or \li{False} values to 
