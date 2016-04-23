@@ -949,7 +949,65 @@ The \li{.npz} file extension is the file type used to store multiple arrays.
 
 \section*{NumPy Visual Guide}
 
-COMING SOON!
+\begin{align*}
+A = \left(\begin{array}{rrrrr}
+\times & \times & \times & \times & \times\\
+\times & \times & \times & \times & \times\\
+\times & \times & \times & \times & \times\\
+\times & \times & \times & \times & \times
+\end{array}\right)
+&&
+A.T = \left(\begin{array}{rrrr}
+\times & \times & \times & \times\\
+\times & \times & \times & \times\\
+\times & \times & \times & \times\\
+\times & \times & \times & \times\\
+\times & \times & \times & \times
+\end{array}\right)
+\end{align*}
+
+\subsection*{Slicing}
+
+\begin{align*}
+A[0] = A[0,:] = \left(\begin{array}{rrrrr}
+\tikzmarkin{a}\times & \times & \times & \times & \times\tikzmarkend{a}\\
+\times & \times & \times & \times & \times\\
+\times & \times & \times & \times & \times\\
+\times & \times & \times & \times & \times\\
+\end{array}\right)
+&&
+A[:,2] = \left(\begin{array}{rrrrr}
+\times & \times & \tikzmarkin{b}\times & \times & \times\\
+\times & \times & \times & \times & \times\\
+\times & \times & \times & \times & \times\\
+\times & \times & \times\tikzmarkend{b} & \times & \times
+\end{array}\right)
+\end{align*}
+
+\begin{align*}
+A[1:,2:] = \left(\begin{array}{rrrrr}
+\times & \times & \times & \times & \times\\
+\times & \times & \tikzmarkin{c}\times & \times & \times\\
+\times & \times & \times & \times & \times\\
+\times & \times & \times & \times & \times\tikzmarkend{c}
+\end{array}\right)
+&&
+A[1:-1,1:-1] = \left(\begin{array}{rrrrr}
+\times & \times & \times & \times & \times\\
+\times & \tikzmarkin{d} \times & \times & \times & \times\\
+\times & \times & \times & \times \tikzmarkend{d} & \times\\
+\times & \times & \times & \times & \times\end{array}\right)
+\end{align*}
+
+\subsection*{Stacking}
+
+\begin{enumerate}
+\item hstack()
+\item vstack()
+\item column\_stack()
+\item row\_stack()
+\item concatenate()
+\end{enumerate}
 
 % =============================================================================
 % MATERIAL TO BE MOVED TO OTHER LABS ==========================================
