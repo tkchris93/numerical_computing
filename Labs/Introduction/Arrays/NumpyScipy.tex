@@ -289,11 +289,11 @@ Each of these functions accepts the keyword argument \li{dtype} to specify the d
 \centering
 \begin{tabular}{r|l} 
 Function & Returns \\
-\hline \li{empty()} & A new array of given shape and type, without initializing entries. \\ 
+\hline \li{arange()} & An array of evenly spaced values within a given interval (like \li{range()}).\\
+\li{empty()} & A new array of given shape and type, without initializing entries. \\ 
 \li{empty_like()} & A new array with the same shape and type as a given array. \\
 \li{eye()} & A 2-D array with ones on the diagonal and zeros elsewhere. \\ 
 \li{identity()} & The square identity array. \\ 
-% \li{meshgrid()} & Return coordinate matrices from two coordinate vectors.\\ 
 \li{ones()} & A new array of given shape and type, filled with ones. \\ 
 \li{ones_like()} & An array of ones with the same shape and type as a given array. \\ 
 \li{zeros()} & A new array of given shape and type, filled with zeros. \\ 
@@ -307,23 +307,23 @@ Function & Returns \\
 \end{table}
 
 \begin{lstlisting}
-# Make a 1-D array of 5 zeros.
+# A 1-D array of 5 zeros.
 >>> np.zeros(5)
 array([ 0.,  0.,  0.,  0.,  0.])
 
-# Make a 2x3 matrix (2-D array) of integer ones.
+# A 2x3 matrix (2-D array) of integer ones.
 >>> np.ones((2,3), dtype=<<np.int>>)    # The shape is specified as a tuple.
 array([[1, 1, 1],
        [1, 1, 1]])
 
-# Create a 3x3 identity matrix.
+# The 3x3 identity matrix.
 >>> I = np.eye(4)
 >>> print(I)
 [[ 1.  0.  0.]
  [ 0.  1.  0.]
  [ 0.  0.  1.]]
 
-# Make an array of 3s the same size as 'I'.
+# An array of 3s the same size as 'I'.
 >>> np.full_like(I, 3)              # Equivalent to np.full(I.shape, 3)
 array([[ 3.,  3.,  3.],
        [ 3.,  3.,  3.],
@@ -404,43 +404,20 @@ B = \left(\begin{array}{rrrrrr}
 % DONE TO HERE ================================================================
 % =============================================================================
 
-\section*{Array Manipulation} % ===============================================
+\section*{Data Access} % ======================================================
 
-\subsection*{Shaping} % -------------------------------------------------------
+\subsection*{Slicing Revisited} % ---------------------------------------------
 
-You can view the length of each dimension with the \li{shape} command, and change the shape of an array with the \li{np.reshape()} function. 
-The number of arguments passed to \li{reshape} tells NumPy the dimension of the new array, and the arguments specify the length of each dimension. 
-An argument of \li{-1} tells NumPy to make that dimension as long as necessary.
+Indexing for a 1-D NumPy array works exactly like indexing for a Python list. 
+To access a single entry of a multi-dimensional array, say a 3-D array, use the syntax \li{f[i, j, k]}. 
+While the syntax \li{f[i][j][k]} will also work, it is significantly slower because each bracket returns an array slice.
+
 \begin{lstlisting}
-# The 0-axis of ex1 has length 2.
->>> ex1.shape
-(2, 3)
->>> ex1.reshape(3, 2)
-array([[1, 1],
-       [2, 3],
-       [3, 4]])
-
-# Fill the 0-axis.
->>> ex1.reshape(-1)
-array([1, 1, 2, 3, 3, 4])
-# If we know we want two columns, but don't know how many rows will result.
->>> ex1.reshape(-1, 2)
-array([[1, 1],
-      [2, 3],
-      [3, 4]])
+# Make an array of the integers from 0 to 10 (exclusive).
 \end{lstlisting}
 
-\begin{info}
-1-D NumPy arrays are flat, but in linear algebra we tend to think of matrices as vertical vectors.
-Don't worry about it!
-\end{info}
-
-% Slicing and stuff
-\subsection*{Slicing Revisited} 
-Indexing for a 1-D NumPy array works exactly like indexing for a Python list. 
-To access a single entry of a multi-dimenional array, say a 3-D array, you should use the syntax \li{f[i, j, k]}. 
-While the syntax \li{f[i][j][k]} will also work, it is significantly slower because each bracket returns an array slice. 
 Similarly, slicing an array works just like slicing a list, but with more dimensions. Using a single colon as an argument extracts everything in the specified axis.
+See the visual guide at the end for pictures!!
 \begin{lstlisting}
 >>> ex4 = np.arange(25).reshape((5,5)) 
 >>> ex4
@@ -469,6 +446,43 @@ array([[ 4,  3,  2,  1,  0],
        [19, 18, 17, 16, 15],
        [24, 23, 22, 21, 20]])
 \end{lstlisting}
+
+\begin{problem} % Laplace's equation.
+One good application of array slicing is the Jacobi method for solving Laplace's equation, which is used to model steady-state heat flow on a square.
+This problem will help you implement the Jacobi method.
+
+Make a function that accepts an array and a float (which represents a tolerance) as input and does the
+following: 
+\begin{enumerate}
+\item Makes a copy of the array. 
+\item Creates a variable to track the difference between the arrays. Initialize
+it as the tolerance parameter your function accepts. 
+\item While the difference is greater than or equal
+to the tolerance 
+\begin{enumerate} 
+\item Sets all points that are not on an edge of the new array equal to the average of their 4 immediate neighbors. 
+Use the values from the old array for this computation. 
+This should only take one line and should be based entirely on array slicing, NOT iterating through the array.
+(Hint: given a 2D array \li{A}, the slice \li{A[1:-1,1:-1]} references
+all non-edge entries, \li{A[:-2,1:-1]} references the upper neighbors,
+and \li{A[1:-1,2:]} references the right neighbors.) 
+\item Updates the difference to be the maximum of the absolute value of the new array
+minus the old one. 
+\item Copies the values from the new array into the old
+one (without creating a new array). 
+\end{enumerate} 
+\end{enumerate}
+
+Now use the following code to generate a plot of your results.
+\lstinputlisting[style=fromfile]{laplace_plot.py} 
+It should resemble the following figure.
+
+\begin{figure} [H]
+\includegraphics[width=.75\textwidth]{laplace.pdf}
+\end{figure} 
+\end{problem}
+
+
 
 \subsection*{Fancy Indexing}
 Fancy indexing is a second way to access elements of an array. 
@@ -509,25 +523,59 @@ Integer indexing uses Python lists to determine what array values to access.
 array([20,30,10])
 \end{lstlisting}
 
-Fancy indexing can
-be used for assignment. For example, we can set all values of an array
-that are less than \li{25} to \li{0} in the following way:
+Fancy indexing can also be used for assignment.
+For example, we can set all values of an array that are less than \li{25} to \li{0} in the following way:
 \begin{lstlisting} 
 >>> my_array[my_array<25] = 0
 >>> my_array
 array([0, 0, 0, 30, 40])
 \end{lstlisting}
 
-\begin{problem}
-Write a function that accepts an array and returns an array with all nonnegative numbers. If an entry in the inputed array is negative, set it to $0$. Though one of your first instincts may be to use a \li{for} loop, it is much more efficient to solve this problem using fancy indexing.
+\begin{problem} % Fancy indexing
+Write a function that accepts an array and returns an array with all nonnegative numbers.
+If an entry in the inputed array is negative, set it to $0$.
+Though one of your first instincts may be to use a \li{for} loop, it is much more efficient to solve this problem using fancy indexing.
 \end{problem}
 
+\section*{Array Manipulation} % ===============================================
+
+\subsection*{Shaping} % -------------------------------------------------------
+
+Recall that arrays have a \li{shape} attribute that describes the dimensions of the array.
+We can change the shape of an array with \li{np.reshape()} or the array's \li{reshape()} method.
+The total number of entries in the old array and the new array must be the same in order for the shaping to work correctly.
+Put a $-1$ in the new shape tuple to make the specified dimension as long as necessary.
+
+\begin{lstlisting}
+# Make an array of the integers from 0 to 12 (exclusive).
+>>> A = np.arange(12)
+>>> print(A)
+[ 0  1  2  3  4  5  6  7  8  9 10 11]
+
+# 'A' has 12 entries, so it can be reshaped into a 3x4 matrix.
+>>> A.reshape((3,4))                # The new shape as specified as a tuple.
+array([[ 0,  1,  2,  3],
+       [ 4,  5,  6,  7],
+       [ 8,  9, 10, 11]])
+
+# Reshape 'A' into an array with 2 rows and the appropriate number of columns.
+>>> A.reshape((2,-1))
+array([[ 0,  1,  2,  3,  4,  5],
+       [ 6,  7,  8,  9, 10, 11]])
+\end{lstlisting}
+
+\begin{info}
+Note about how 1-D NumPy arrays are flat by default.
+In the array broadcasting section we'll talk about how to fix this behavior when necessary.
+\end{info}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% TODO: Turn this into a big warning. Needs to be simpler.
 \subsection*{Array Views and Copies} 
 NumPy has two ways of returning an array. Slice operations and indexing always return
 a \emph{view} and fancy indexing always returns a \emph{copy}.
 Understand that even though they may look the same, views and copies are different.
-
 
 A view of an array is a distinct object from the original array in Python, but it references the same place in memory. 
 Thus, when you change elements in a view, you also change the array it references.
@@ -645,67 +693,6 @@ array([9, 12, 15])
 >>> ex6.sum(axis=1)
 array([3, 12, 21])
 \end{lstlisting}
-
-
-\begin{problem}
-% There should be more problems like this in the vectorization lab. I'll
-% include this one here for now though.
-Write a function which accepts an integer $n$ as input and does the following:
-\begin{enumerate}
-\item Creates an $n\times n$ array of \li{floats} randomly chosen from a normal distribution.
-\item Computes the mean of each row (use a built-in command).
-\item Computes the variance of these means (use a built-in command).
-\end{enumerate}
-As you increase $n$, what happens to the output of 
-your function? This illustrates one version of
-the Law of Large Numbers, about which you will learn more later on.
-\end{problem}
-
-\begin{problem} 
-One good application of array slicing is the Jacobi
-method for solving Laplace's equation, which is used to model
-steady-state heat flow on a square. This problem will help you implement the Jacobi method.
-
-Make a function that accepts an array and a float (which represents a tolerance) as input and does the
-following: 
-\begin{enumerate}
-\item Makes a copy of the array. 
-\item Creates a variable to track the difference between the arrays. Initialize
-it as the tolerance parameter your function accepts. 
-\item While the difference is greater than or equal
-to the tolerance 
-\begin{enumerate} 
-\item Sets all points that are not on an edge of the new array equal to the average of their 4 immediate neighbors. 
-Use the values from the old array for this computation. 
-This should only take one line and should be based entirely on array slicing, NOT iterating through the array.
-(Hint: given a 2D array \li{A}, the slice \li{A[1:-1,1:-1]} references
-all non-edge entries, \li{A[:-2,1:-1]} references the upper neighbors,
-and \li{A[1:-1,2:]} references the right neighbors.) 
-\item Updates the difference to be the maximum of the absolute value of the new array
-minus the old one. 
-\item Copies the values from the new array into the old
-one (without creating a new array). 
-\end{enumerate} 
-\end{enumerate}
-
-Now use the following code to generate a plot of your results.
-\lstinputlisting[style=fromfile]{laplace_plot.py} 
-It should resemble the following figure.
-
-\begin{figure} [H]
-\includegraphics[width=.75\textwidth]{laplace.pdf}
-\end{figure} 
-\end{problem}
-
-\subsection*{Iterating Through Arrays}
-
-Iterating through an array negates most speed advantages of NumPy. 
-You should avoid doing this whenever possible.
-You can often avoid iterating through arrays by using \emph{array broadcasting} and \emph{universal functions}, discussed in the next section.
-
-It is occasionally valid to iterate through an array. 
-The function \li{np.nditer()} will create an object that iterates through an array as quickly as possible.
-
 
 \section*{NumPy and SciPy}
 We now introduce some additional features of NumPy and SciPy.
@@ -910,6 +897,7 @@ A table with np.random functions.
 
 \subsection*{Saving and Loading Arrays} % -------------------------------------
 
+% TODO: revise.
 It is often useful to save an array as a file.
 NumPy provides several easy methods for saving and loading array data.
 
@@ -943,6 +931,16 @@ arrs = np.load('test_multi.npz')
 \end{lstlisting}
 The variable \li{arrs} points to a dictionary object with the keys \li{a} and \li{new_a} which reference the arrays that have been saved.
 The \li{.npz} file extension is the file type used to store multiple arrays.
+
+\subsection*{Iterating Through Arrays} % --------------------------------------
+
+% TODO: revise.
+Iterating through an array negates most speed advantages of NumPy. 
+You should avoid doing this whenever possible.
+You can often avoid iterating through arrays by using \emph{array broadcasting} and \emph{universal functions}, discussed in the next section.
+
+It is occasionally valid to iterate through an array. 
+The function \li{np.nditer()} will create an object that iterates through an array as quickly as possible.
 
 
 \newpage
@@ -1009,8 +1007,11 @@ A[1:-1,1:-1] = \left(\begin{array}{rrrrr}
 \item concatenate()
 \end{enumerate}
 
+
+% =============================================================================
 % =============================================================================
 % MATERIAL TO BE MOVED TO OTHER LABS ==========================================
+% =============================================================================
 % =============================================================================
 
 
