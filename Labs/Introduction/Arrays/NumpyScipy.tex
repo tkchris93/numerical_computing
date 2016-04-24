@@ -84,16 +84,17 @@ Write a function that defines the matrices $A$ and $B$ given below as NumPy arra
 %
 \begin{align*}
 A = \left(\begin{array}{rrr}
-2 & 4 & 0 \\ 
--3 & 1 &-1 \\
-0 & -3 & 2 \end{array}\right)
+3 & -1 &  4 \\ 
+1 &  5 & -9 \end{array}\right)
 &&
-B = \left(\begin{array}{rrr}
-3 & -1 & 2 \\ 
--2 & -3 & 0 \\
-1 & 0 & -2 \end{array}\right)
+B = \left(\begin{array}{cccc}
+2 &  6 & -5 &  3\\
+5 & -8 &  9 &  7\\
+9 & -3 & -2 & -3\end{array}\right)
 \end{align*}
-%
+% Solution:
+% array([[ 37,  14, -32, -10],
+%        [-54,  -7,  58,  65]])
 NumPy has excellent documentation.
 For examples of array initialization and matrix multiplication, use IPython's object introspection feature to look up the documentation for \li{np.ndarray}, \li{np.array()} and \li{np.dot()}.
 \begin{lstlisting}
@@ -441,17 +442,39 @@ B = \left(\begin{array}{rrrrrr}
 
 \section*{Data Access} % ======================================================
 
-\subsection*{Slicing Revisited} % ---------------------------------------------
+\subsection*{Array Slicing} % -------------------------------------------------
 
 Indexing for a 1-D NumPy array works exactly like indexing for a Python list. 
-To access a single entry of a multi-dimensional array, say a 3-D array, use the syntax \li{f[i, j, k]}. 
+To access a single entry of a multi-dimensional array, say a 3-D array, use the syntax \li{f[i, j, k]}.
 While the syntax \li{f[i][j][k]} will also work, it is significantly slower because each bracket returns an array slice.
 
-\begin{lstlisting}
-# Make an array of the integers from 0 to 10 (exclusive).
-\end{lstlisting}
+Recall that in slicing syntax, the colon \li{:} separates the arguments \li{start}, \li{stop}, and \li{step}.
+If there is no colon, a single entry of that dimension will be accessed.
+With a colon, a range of values is accessed.
+See the 
 
-Similarly, slicing an array works just like slicing a list, but with more dimensions. Using a single colon as an argument extracts everything in the specified axis.
+% \begin{lstlisting}
+% # Make an array of the integers from 0 to 10 (exclusive).
+% >>> x = np.arange(10)
+% >>> x
+% array([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9])
+
+% >>> x = np.arange(0,12,2)
+% >>> x
+% array([ 0,  2,  4,  6,  8, 10])
+% >>> x[3]
+% 6
+% >>> x[2:4]
+% array([4, 6])
+% >>> x[5:]
+% array([10])
+% >>> x[3:]
+% array([ 6,  8, 10])
+% >>> x[3:-1]
+% array([6, 8])
+% \end{lstlisting}
+
+Using a single colon as an argument extracts everything in the specified axis.
 See the visual guide at the end for pictures!!
 \begin{lstlisting}
 >>> ex4 = np.arange(25).reshape((5,5)) 
@@ -598,140 +621,15 @@ array([[ 0,  1,  2,  3,  4,  5],
        [ 6,  7,  8,  9, 10, 11]])
 \end{lstlisting}
 
+\subsection*{Stacking}
+
 \begin{info}
 Note about how 1-D NumPy arrays are flat by default.
 In the array broadcasting section we'll talk about how to fix this behavior when necessary.
 \end{info}
 
+\subsection*{Array Broadcasting} % --------------------------------------------
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% TODO: Turn this into a big warning. Needs to be simpler.
-\subsection*{Array Views and Copies} 
-NumPy has two ways of returning an array. Slice operations and indexing always return
-a \emph{view} and fancy indexing always returns a \emph{copy}.
-Understand that even though they may look the same, views and copies are different.
-
-A view of an array is a distinct object from the original array in Python, but it references the same place in memory. 
-Thus, when you change elements in a view, you also change the array it references.
-\begin{lstlisting}
->>> ex5 = np.arange(5)
-
-# Slicing produces a view of ex5. 
->>> view_ex5 = ex5[:]
->>> view_ex5
-array([0, 1, 2, 3, 4])
-
-# Check that ex5 and view_ex5 are distinct objects in Python.
->>> id(view_ex5) == id(ex5) 
-False
-
-# Change the third element of view_ex5 to 500
-# Changing view_ex5 also changes ex5.
->>> view_ex5[2] = 500 
->>> view_ex5
-array([  0,   1, 500,   3,   4])
->>> ex5 
-array([  0,   1, 500,   3,   4])
-\end{lstlisting} 
-
-A copy of an array is a separate array with its own place in memory. 
-Thus, when you change a copy of an array, you do not affect the original array. 
-Because copying an array uses more memory and also more time, it should only be done when necessary. 
-An array can be copied using the \li{np.copy()} function (also available as a method of 
-the array object, for example \li{my_array.copy()} returns a copy of \li{my_array}). 
-
-\begin{lstlisting}
->>> copy_ex5 = np.copy(ex5) 
-
-# Check that ex5 and copy_ex5 are distinct objects in Python.
->>> id(copy_ex5) == id(ex5) 
-False
-
-# Change the third element of copy_ex5 to 1000
-# Changing copy_ex5 does not affect ex5.
->>> copy_ex5[2] = 1000 
->>> copy_ex5
-array([  0,   1, 1000,   3,   4])
->>> ex5
-array([  0,   1, 500,   3,   4])
-\end{lstlisting} 
-
-Whenever possible, the function \li{np.reshape()} returns a view. 
-See the documentation for more information. 
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section*{More Methods of NumPy Arrays} 
-Some of the more common methods of NumPy arrays are described in Table \ref{table:ndarraymethods}. 
-A more comprehensive list can be found at
-\url{http://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.
-html}.
-
-\begin{table}
-\centering 
-\begin{tabular}{l|p{10cm}}
-    \hline
-    Function & Description \\
-    \hline
-    \li{all} & returns True if all elements evaluate to True \\
-    \li{any} & returns True if any elements evaluate to True \\
-    \li{argmax} & indices of maximum value(s) \\
-    \li{argmin} & indices of minimum value(s) \\
-    \li{argsort} & indices that would sort the array \\
-    \li{astype} & casts a copy of an array to a different data type \\
-    \li{clip} & restrict values in an array to fit within a given range\\
-    \li{conj} & return the complex conjugate of the array \\
-    \li{copy} & return a copy of the array\\
-    \li{diagonal} & return a given diagonal of the array \\
-    \li{dot} & matrix multiplication \\
-    \li{max} & max element of the array \\
-    \li{mean} & average of the array \\
-    \li{min} & minimum element of the array \\
-    \li{prod} & product of elements of the array \\
-    \li{ravel} & make a flattened version of an array, return a view if
-    possible \\
-    \li{reshape} & return a view of the array with a changed shape \\
-    \li{round} & return a rounded version of the array \\
-    \li{sort} & sort the array in place \\
-    \li{std} & compute the standard deviation \\
-    \li{sum} & sum the elements of the array \\
-    \li{swapaxes} & return a view with the given axes swapped \\
-    \li{tolist} & return the array represented as a list or nested list\\
-    \li{trace} & return the sum of the elements along the main diagonal\\
-    \li{var} & return the variance of the array \\
-    \li{vstack} & stack arrays in sequence vertically \\
-    \hline
-    \end{tabular} \caption{A few of the methods of NumPy arrays.}
-    \label{table:ndarraymethods} \end{table}
-
-Many of these methods have the option to operate \emph{along an axis}. 
-When called in this way on an $n$-D array, these methods return an $(n-1)$-D array (the specified axis is collapsed in the evaluation process).
-
-\begin{lstlisting}
->>> ex6 = np.arange(9).reshape(3, 3)
->>> ex6
-array([[0, 1, 2],
-       [3, 4, 5],
-       [6, 7, 8]])
-       
-# Return the maximum value in the array
->>> ex6.max() 
-8
-
-# Return the sum along the 0-axis (the columns)
->>> ex6.sum(axis=0)
-array([9, 12, 15])
-
-# Return the sum along the 1-axis (the rows)
->>> ex6.sum(axis=1)
-array([3, 12, 21])
-\end{lstlisting}
-
-\section*{NumPy and SciPy}
-We now introduce some additional features of NumPy and SciPy.
-
-\subsection*{Array Broadcasting}
 Many matrix operations make sense only when the two operands have the same shape. 
 Two examples are addition and element-wise multiplication. 
 Broadcasting is NumPy's way of extending such operations to accept some (not all) operands with different shapes. 
@@ -797,7 +695,61 @@ To visualize your solutions, you may use the following function.
 \lstinputlisting[style=fromfile]{blue_shift_plot.py} 
 \end{problem}
 
-\subsection*{Universal Functions}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% TODO: Turn this into a big warning (mutability). Needs to be simpler.
+\subsection*{Array Views and Copies} % Does this go here?
+NumPy has two ways of returning an array. Slice operations and indexing always return
+a \emph{view} and fancy indexing always returns a \emph{copy}.
+Understand that even though they may look the same, views and copies are different.
+
+A view of an array is a distinct object from the original array in Python, but it references the same place in memory. 
+Thus, when you change elements in a view, you also change the array it references.
+\begin{lstlisting}
+>>> ex5 = np.arange(5)
+
+# Slicing produces a view of ex5. 
+>>> view_ex5 = ex5[:]
+>>> view_ex5
+array([0, 1, 2, 3, 4])
+
+# Check that ex5 and view_ex5 are distinct objects in Python.
+>>> id(view_ex5) == id(ex5) 
+False
+
+# Change the third element of view_ex5 to 500
+# Changing view_ex5 also changes ex5.
+>>> view_ex5[2] = 500 
+>>> view_ex5
+array([  0,   1, 500,   3,   4])
+>>> ex5 
+array([  0,   1, 500,   3,   4])
+\end{lstlisting} 
+
+A copy of an array is a separate array with its own place in memory. 
+Thus, when you change a copy of an array, you do not affect the original array. 
+Because copying an array uses more memory and also more time, it should only be done when necessary. 
+An array can be copied using the \li{np.copy()} function (also available as a method of the array object, for example \li{my_array.copy()} returns a copy of \li{my_array}). 
+
+\begin{lstlisting}
+>>> copy_ex5 = np.copy(ex5) 
+
+# Check that ex5 and copy_ex5 are distinct objects in Python.
+>>> id(copy_ex5) == id(ex5) 
+False
+
+# Change the third element of copy_ex5 to 1000
+# Changing copy_ex5 does not affect ex5.
+>>> copy_ex5[2] = 1000 
+>>> copy_ex5
+array([  0,   1, 1000,   3,   4])
+>>> ex5
+array([  0,   1, 500,   3,   4])
+\end{lstlisting} 
+
+Whenever possible, the function \li{np.reshape()} returns a view. 
+See the documentation for more information.
+
+\subsection*{Universal Functions} % -------------------------------------------
 
 A universal function, or \li{ufunc}, operates on an array element-wise. 
 It outputs an array of the same shape and datatype as the input array. 
@@ -809,7 +761,9 @@ If you have a simple operation that you want to perform element-wise on an array
 For a list of available \li{ufuncs}, see \url{http://docs.scipy.org/doc/numpy/reference/ufuncs.html#available-ufuncs}.
 
 Most universal functions also allow you to specify an output array, which must have the same shape as the input array.
-Doing so can reduce memory allocation. 
+Doing so can reduce memory allocation.
+
+% Better examples!!!
 
 \begin{lstlisting}
 >>> ex7 = np.arange(3, dtype=float)
@@ -820,83 +774,87 @@ Doing so can reduce memory allocation.
 array([ 1.        ,  2.71828183,  7.3890561 ])
 \end{lstlisting}
 
+% Warning?
 Although universal functions also accept scalar inputs, they can be much slower than the corresponding standard library function. 
 Thus, use standard library functions on scalars and universal functions on arrays.
 
-\subsection*{Linear Algebra}
-Both NumPy and SciPy have a linear algebra library, but the SciPy library is larger. The SciPy linear algebra library is typically imported as follows:
+% \section*{More Methods of NumPy Arrays}
+Some of the more common methods of NumPy arrays are described in Table \ref{table:ndarraymethods}. 
+A more comprehensive list can be found at
+\url{http://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.
+html}.
+
+\begin{table}
+\centering 
+\begin{tabular}{l|p{10cm}}
+    \hline
+    Function & Description \\
+    \hline
+    \li{all} & returns True if all elements evaluate to True \\
+    \li{any} & returns True if any elements evaluate to True \\
+    \li{argmax} & indices of maximum value(s) \\
+    \li{argmin} & indices of minimum value(s) \\
+    \li{argsort} & indices that would sort the array \\
+    % \li{astype} & casts a copy of an array to a different data type \\
+    \li{clip} & restrict values in an array to fit within a given range\\
+    % \li{conj} & return the complex conjugate of the array \\
+    % \li{copy} & return a copy of the array\\
+    % \li{diagonal} & return a given diagonal of the array \\
+    % \li{dot} & matrix multiplication \\
+    \li{max} & max element of the array \\
+    \li{mean} & average of the array \\
+    \li{min} & minimum element of the array \\
+    \li{prod} & product of elements of the array \\
+    % \li{ravel} & make a flattened version of an array, return a view if
+    possible \\
+    % \li{reshape} & return a view of the array with a changed shape \\
+    \li{round} & return a rounded version of the array \\
+    % \li{sort} & sort the array in place \\
+    \li{std} & compute the standard deviation \\
+    \li{sum} & sum the elements of the array \\
+    % \li{swapaxes} & return a view with the given axes swapped \\
+    % \li{tolist} & return the array represented as a list or nested list\\
+    \li{trace} & return the sum of the elements along the main diagonal\\
+    \li{var} & return the variance of the array \\
+    % \li{vstack} & stack arrays in sequence vertically \\
+    \hline
+    \end{tabular} \caption{A few of the methods of NumPy arrays.}
+    \label{table:ndarraymethods} \end{table}
+
+% The axis argument!!!
+Many of these methods have the option to operate \emph{along an axis}. 
+When called in this way on an $n$-D array, these methods return an $(n-1)$-D array (the specified axis is collapsed in the evaluation process).
 
 \begin{lstlisting}
-from scipy import linalg as la
+>>> ex6 = np.arange(9).reshape(3, 3)
+>>> ex6
+array([[0, 1, 2],
+       [3, 4, 5],
+       [6, 7, 8]])
+       
+# Return the maximum value in the array
+>>> ex6.max() 
+8
+
+# Return the sum along the 0-axis (the columns)
+>>> ex6.sum(axis=0)
+array([9, 12, 15])
+
+# Return the sum along the 1-axis (the rows)
+>>> ex6.sum(axis=1)
+array([3, 12, 21])
 \end{lstlisting}
 
-The linear algebra library contains several functions to construct special 
-matrices, located in 
-\li{linalg.special_matrices}. There are also functions that will invert matrices, find determinants and norms, solve linear systems and least squares problems, and find special matrix decompositions. You can read more about the linear algebra capabilities of SciPy in the 
-documentation for the \li{linalg} module found at
-\url{http://docs.scipy.org/doc/scipy/reference/linalg.html}.
 
-Finally, the \li{scipy.linalg} library has a \li{matrix} class that is very 
-similar to a 2-D NumPy array. The matrix class can be convenient when doing matrix 
-operations. However, in such situations we still recommend using NumPy arrrays, which have many of the same features and are also compatible with all other SciPy operations.
 
-The \li{scipy.linalg} library will be essential for the remainder of the labs in this manual. We will address the details of this package at length in future labs. 
+% FINAL PROBLEM HERE!!!!
 
-\begin{comment}
-\subsection*{Polynomials} % ===================================================
-
-The \li{np.poly1d} object represents a polynomial in NumPy.
-The constructor is called with the coefficients of the desired polynomial. 
-
-\begin{lstlisting}
->>> poly_array = np.poly1d([3, 5, 1, 2, 0, 1])
->>> print poly_array
-   5     4     3     2
-3 x + 5 x + 1 x + 2 x + 1
-\end{lstlisting}
-
-The object \li{poly_array} represents the polynomial $3x^5+5x^4+x^3+2x^2+1$.
-NumPy provides many functions to operate on \li{poly1d} objects (see \url{http://docs.scipy.org/doc/numpy/reference/routines.polynomials.polynomial.html}).
-
-Here is an example using the \li{poly1d} class. Recall that
-\[
-e^x = \sum_{n=0}^{\infty} \frac{x^n}{n!}.
-\]
-The following function evaluates the $n^{th}$ partial sum of this series at the value $a$.
-
-\lstinputlisting[style=fromfile]{exp.py}
-
-The last two lines can be condensed by using the following command.
-
-\begin{lstlisting}
-np.polyval(p, a)
-\end{lstlisting}
-
-\begin{problem}
-\leavevmode
-\begin{enumerate}
-\item Use NumPy's polynomial objects to approximate the following series.
-\[
-\arcsin x = \sum_{n=0}^{\infty} \frac{\left(2 n\right) ! x^{2 n + 1}}{\left(2 n + 1\right)\left(n!\right)^2 4^n}
-\]
-This series converges on $(-1, 1)$. Use your series approximation to approximate $\pi$. Hint: think of the powers of $x$ that
-are not included in the series as having zero coefficients.
-
-\item The lambert W function is the inverse of $x e^x$.
-Its Taylor series is below (note the index starts at 1).
-\[
-W(x) = \sum_{n=1}^{\infty} \frac{\left(-n\right)^{n-1} x^n}{n!}
-\]
-This series has a radius of convergence of $\frac{1}{e}$.
-Use the series to approximate a number $x$ such that $x e^x = \frac{1}{4}$.
-Verify that your approximation is close.
-\end{enumerate}
-\end{problem}
-\end{comment}
-
-\section*{Further Reading} % ==================================================
+\section*{Conclusion} % =======================================================
 
 % TODO: Revise this section.
+Refer often to NumPy's documentation.
+If there's something simple you would like to with an array, there's probably already a way to do it built in to NumPy.
+
 The following online resources are specific to SciPy:
 \begin{itemize}
 \item Official SciPy Documentation (\url{http://docs.scipy.org/doc/})
@@ -976,6 +934,78 @@ You can often avoid iterating through arrays by using \emph{array broadcasting} 
 It is occasionally valid to iterate through an array. 
 The function \li{np.nditer()} will create an object that iterates through an array as quickly as possible.
 
+\begin{comment}
+\subsection*{Linear Algebra} % ------------------------------------------------
+Both NumPy and SciPy have a linear algebra library, but the SciPy library is larger. The SciPy linear algebra library is typically imported as follows:
+
+\begin{lstlisting}
+from scipy import linalg as la
+\end{lstlisting}
+
+The linear algebra library contains several functions to construct special 
+matrices, located in 
+\li{linalg.special_matrices}. There are also functions that will invert matrices, find determinants and norms, solve linear systems and least squares problems, and find special matrix decompositions. You can read more about the linear algebra capabilities of SciPy in the 
+documentation for the \li{linalg} module found at
+\url{http://docs.scipy.org/doc/scipy/reference/linalg.html}.
+
+Finally, the \li{scipy.linalg} library has a \li{matrix} class that is very 
+similar to a 2-D NumPy array. The matrix class can be convenient when doing matrix 
+operations. However, in such situations we still recommend using NumPy arrrays, which have many of the same features and are also compatible with all other SciPy operations.
+
+The \li{scipy.linalg} library will be essential for the remainder of the labs in this manual. We will address the details of this package at length in future labs. 
+\end{comment}
+
+\begin{comment}
+\subsection*{Polynomials} % ---------------------------------------------------
+
+The \li{np.poly1d} object represents a polynomial in NumPy.
+The constructor is called with the coefficients of the desired polynomial. 
+
+\begin{lstlisting}
+>>> poly_array = np.poly1d([3, 5, 1, 2, 0, 1])
+>>> print poly_array
+   5     4     3     2
+3 x + 5 x + 1 x + 2 x + 1
+\end{lstlisting}
+
+The object \li{poly_array} represents the polynomial $3x^5+5x^4+x^3+2x^2+1$.
+NumPy provides many functions to operate on \li{poly1d} objects (see \url{http://docs.scipy.org/doc/numpy/reference/routines.polynomials.polynomial.html}).
+
+Here is an example using the \li{poly1d} class. Recall that
+\[
+e^x = \sum_{n=0}^{\infty} \frac{x^n}{n!}.
+\]
+The following function evaluates the $n^{th}$ partial sum of this series at the value $a$.
+
+\lstinputlisting[style=fromfile]{exp.py}
+
+The last two lines can be condensed by using the following command.
+
+\begin{lstlisting}
+np.polyval(p, a)
+\end{lstlisting}
+
+\begin{problem}
+\leavevmode
+\begin{enumerate}
+\item Use NumPy's polynomial objects to approximate the following series.
+\[
+\arcsin x = \sum_{n=0}^{\infty} \frac{\left(2 n\right) ! x^{2 n + 1}}{\left(2 n + 1\right)\left(n!\right)^2 4^n}
+\]
+This series converges on $(-1, 1)$. Use your series approximation to approximate $\pi$. Hint: think of the powers of $x$ that
+are not included in the series as having zero coefficients.
+
+\item The lambert W function is the inverse of $x e^x$.
+Its Taylor series is below (note the index starts at 1).
+\[
+W(x) = \sum_{n=1}^{\infty} \frac{\left(-n\right)^{n-1} x^n}{n!}
+\]
+This series has a radius of convergence of $\frac{1}{e}$.
+Use the series to approximate a number $x$ such that $x e^x = \frac{1}{4}$.
+Verify that your approximation is close.
+\end{enumerate}
+\end{problem}
+\end{comment}
 
 \newpage
 
