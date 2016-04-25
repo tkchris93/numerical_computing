@@ -24,6 +24,10 @@ def prob3():
     B = np.full_like(A, 2) - np.tril(C) + np.triu(C, 1)
     return np.dot(np.dot(A, B), A).astype(np.int64)
 
+def prob4(A):
+    B = A.copy()
+    B[A < 0] = 0
+    return B
 
 # Problem 2: Return an array with all nonnegative numbers.
 def nonnegative(my_array):

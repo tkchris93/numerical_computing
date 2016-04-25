@@ -490,103 +490,64 @@ Changes to a copy of an array does not affect the original array, but copying an
 An array can be copied using \li{np.copy()} or the array's \li{copy()} method.
 \end{info}
 
-% Slice operations and indexing always return a \emph{view}
+\subsection*{Fancy Indexing} % ------------------------------------------------
+
+So-called ``fancy indexing'' is a second way to access elements of an array.
+Instead of providing indices to obtain a slice of an array, we provide either an array of integers or an array of boolean values (called a \emph{mask}).
+
+\begin{lstlisting}
+# Make an array of every 10th integer from 0 to 50 (exclusive).
+>>> x = np.arange(0, 50, 10)
+>>> x
+array([ 0, 10, 20, 30, 40])
+
+# An array of integers extracts the entries of 'x' at the given indices.
+>>> index = np.array([3, 1, 4])
+>>> x[index]                        # Same as np.array([x[i] for i in index]).
+array([30, 10, 40])
+
+# A boolean array extracts the elements of 'x' at the same places as 'True'.
+>>> mask = np.array([True, False, False, True, False])
+>>> x[mask]
+array([ 0, 30])
+\end{lstlisting}
+
+Fancy indexing is especially useful for extracting or changing the values of an array that meet some sort of criterion.
+Comparison operators like \li{<} and \li{==} may be used to create masks.
+
+\begin{lstlisting}
+# Make an array of every other integer form 10 to 20 (exclusive).
+>>> y = np.arange(10, 20, 2)
+>>> y
+array([10, 12, 14, 16, 18])
+
+# Extract the values of 'y' larger than 15.
+>>> mask = y > 15
+>>> mask
+array([False, False, False,  True,  True], dtype=bool)
+>>> y[mask]
+array([16, 18])
+
+# Change the values of 'y' larger than 15 to 0.
+>>> y[mask] = 0
+>>> print(y)
+[10 12 14  0  0]
+
+# If the mask doesn't need to be saved, use this very readable syntax.
+>>> y[y > 15]
+array([16, 18])
+\end{lstlisting}
+
+Note that slice operations and indexing always return a view and fancy indexing always returns a copy.
 
 % =============================================================================
 % DONE TO HERE ================================================================
 % =============================================================================
 
-% Algorithm Box
-
-\begin{problem} % Laplace's equation.
-One good application of array slicing is the Jacobi method for solving Laplace's equation, which is used to model steady-state heat flow on a square.
-This problem will help you implement the Jacobi method.
-
-Make a function that accepts an array and a float (which represents a tolerance) as input and does the
-following: 
-\begin{enumerate}
-\item Makes a copy of the array. 
-\item Creates a variable to track the difference between the arrays. Initialize
-it as the tolerance parameter your function accepts. 
-\item While the difference is greater than or equal
-to the tolerance 
-\begin{enumerate} 
-\item Sets all points that are not on an edge of the new array equal to the average of their 4 immediate neighbors. 
-Use the values from the old array for this computation. 
-This should only take one line and should be based entirely on array slicing, NOT iterating through the array.
-(Hint: given a 2D array \li{A}, the slice \li{A[1:-1,1:-1]} references
-all non-edge entries, \li{A[:-2,1:-1]} references the upper neighbors,
-and \li{A[1:-1,2:]} references the right neighbors.) 
-\item Updates the difference to be the maximum of the absolute value of the new array
-minus the old one. 
-\item Copies the values from the new array into the old
-one (without creating a new array). 
-\end{enumerate} 
-\end{enumerate}
-
-Now use the following code to generate a plot of your results.
-\lstinputlisting[style=fromfile]{laplace_plot.py} 
-It should resemble the following figure.
-
-\begin{figure} [H]
-\includegraphics[width=.75\textwidth]{laplace.pdf}
-\end{figure} 
-\end{problem}
-
-\subsection*{Fancy Indexing} % ------------------------------------------------
-
-Fancy indexing is a second way to access elements of an array. 
-There are two types of fancy indexing: boolean and integer. 
-Boolean indexing uses an array of \li{True} or \li{False} values to 
-determine which elements of the array to take. 
-
-%np.argsort
-\begin{lstlisting}
->>> my_array = np.array([0, 10, 20, 30, 40])
->>> bool_mask = np.array([1,0,1,1,0], dtype=bool)
->>> my_array[bool_mask]
-array([0,20,30])
-
-# Return only the values larger than 25.
->>> comparision_mask = my_array > 25
->>> comparision_mask
-array([False, False, False, True, True], dtype=bool)
->>> my_array[comparison_mask]
-array([30, 40])
-
-# If we do not need to save the mask for other uses, we can achieve the same result by doing the following:
->>> my_array[my_array>25]
-array([30, 40])
-
-# np.argsort returns a list of indices that would sort an array.
->>> my_array = np.array([4,1,6,3,7,2,5])
->>> mask = np.argsort(my_array)
->>> my_array[mask]
-array([1, 2, 3, 4, 5, 6, 7])
-\end{lstlisting}
-
-Integer indexing uses Python lists to determine what array values to access.
-\begin{lstlisting}
->>> my_array = np.array([0,10,20,30,40])
->>> int_mask = [2,3,1]
->>> my_array[int_mask]
-array([20,30,10])
-\end{lstlisting}
-
-Fancy indexing can also be used for assignment.
-For example, we can set all values of an array that are less than \li{25} to \li{0} in the following way:
-\begin{lstlisting} 
->>> my_array[my_array<25] = 0
->>> my_array
-array([0, 0, 0, 30, 40])
-\end{lstlisting}
-
-% Slice operations and indexing always return a \emph{view} and fancy indexing always returns a \emph{copy}.
-
-\begin{problem} % Fancy indexing
-Write a function that accepts an array and returns an array with all nonnegative numbers.
-If an entry in the inputed array is negative, set it to $0$.
-Though one of your first instincts may be to use a \li{for} loop, it is much more efficient to solve this problem using fancy indexing.
+\begin{problem} % Slicing / Fancy Indexing
+Write a function that accepts a single array.
+Make a copy of the array, and set all negative entries of the copy to $0$.
+Return the copy.
 \end{problem}
 
 \section*{Array Manipulation} % ===============================================
@@ -596,7 +557,7 @@ Though one of your first instincts may be to use a \li{for} loop, it is much mor
 Recall that arrays have a \li{shape} attribute that describes the dimensions of the array.
 We can change the shape of an array with \li{np.reshape()} or the array's \li{reshape()} method.
 The total number of entries in the old array and the new array must be the same in order for the shaping to work correctly.
-Put a $-1$ in the new shape tuple to make the specified dimension as long as necessary.
+A $-1$ in the new shape tuple to makes the specified dimension as long as necessary.
 
 \begin{lstlisting}
 # Make an array of the integers from 0 to 12 (exclusive).
@@ -616,8 +577,9 @@ array([[ 0,  1,  2,  3,  4,  5],
        [ 6,  7,  8,  9, 10, 11]])
 \end{lstlisting}
 
-Whenever possible, the function \li{np.reshape()} returns a view. 
-See the documentation for more information.
+Whenever possible, \li{np.reshape()} returns a view.
+
+% TODO: np.ravel() and np.transpose().
 
 \subsection*{Stacking}
 
@@ -765,6 +727,14 @@ html}.
     \end{tabular} \caption{A few of the methods of NumPy arrays.}
     \label{table:ndarraymethods} \end{table}
 
+% \begin{lstlisting}
+% # np.argsort returns a list of indices that would sort an array.
+% >>> my_array = np.array([4,1,6,3,7,2,5])
+% >>> mask = np.argsort(my_array)
+% >>> my_array[mask]
+% array([1, 2, 3, 4, 5, 6, 7])
+% \end{lstlisting}
+
 % The axis argument!!!
 Many of these methods have the option to operate \emph{along an axis}. 
 When called in this way on an $n$-D array, these methods return an $(n-1)$-D array (the specified axis is collapsed in the evaluation process).
@@ -789,9 +759,57 @@ array([9, 12, 15])
 array([3, 12, 21])
 \end{lstlisting}
 
+\begin{algorithm} % Laplace's equation procedure.
+\begin{algorithmic}[1]
+\Procedure{Laplace}{$U$, tol}
+\State diff = 1 + tol
+\While {diff > tol}
+    \State Set all points that are not on an edge of the new array equal to the average of their 4 immediate neighbors.
 
+    \State Update the differences to be the maximum of the absolute value of the new array minus the old one.
+    \State Copy the values from the new array into the old one.
+\EndWhile
+\EndProcedure
+\end{algorithmic}
+\caption{The Jacobi method for solving Laplace's equation.}
+\label{alg:laplace}
+\end{algorithm}
 
-% FINAL PROBLEM HERE!!!!
+\begin{problem} % Laplace's equation.
+One good application of array slicing is the Jacobi method for solving Laplace's equation, which is used to model steady-state heat flow on a square.
+This problem will help you implement the Jacobi method.
+
+Make a function that accepts an array and a float (which represents a tolerance) as input and does the
+following: 
+\begin{enumerate}
+\item Makes a copy of the array. 
+\item Creates a variable to track the difference between the arrays. Initialize
+it as the tolerance parameter your function accepts. 
+\item While the difference is greater than or equal
+to the tolerance 
+\begin{enumerate} 
+\item Sets all points that are not on an edge of the new array equal to the average of their 4 immediate neighbors. 
+Use the values from the old array for this computation. 
+This should only take one line and should be based entirely on array slicing, NOT iterating through the array.
+(Hint: given a 2D array \li{A}, the slice \li{A[1:-1,1:-1]} references
+all non-edge entries, \li{A[:-2,1:-1]} references the upper neighbors,
+and \li{A[1:-1,2:]} references the right neighbors.) 
+\item Updates the difference to be the maximum of the absolute value of the new array
+minus the old one. 
+\item Copies the values from the new array into the old
+one (without creating a new array). 
+\end{enumerate} 
+\end{enumerate}
+
+Now use the following code to generate a plot of your results.
+\lstinputlisting[style=fromfile]{laplace_plot.py} 
+It should resemble the following figure.
+
+\begin{figure} [H]
+\includegraphics[width=.75\textwidth]{laplace.pdf}
+\end{figure} 
+\end{problem}
+
 
 \section*{Conclusion} % =======================================================
 
