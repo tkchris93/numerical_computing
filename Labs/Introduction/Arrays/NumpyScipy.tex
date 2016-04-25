@@ -243,13 +243,13 @@ Apart from being syntactically convenient, element-wise NumPy operations are als
 \end{comment}
 
 \begin{problem} % Simple Matrix Equation 2 (Cayley Hamilton)
-Write a function that defines the matrix $A$ given below as a NumPy array and returns the matrix $-A^3 + 12A^2 - 25A$.
+Write a function that defines the matrix $A$ given below as a NumPy array and returns the matrix $-A^3 + 9A^2 - 15A$.
 In this context, $A^2 = AA$ (the matrix product).
 \[
-A = \left(\begin{array}{ccc}
+A = \left(\begin{array}{rrr}
 3 & 1 & 4\\ 
 1 & 5 & 9 \\
-3 & 1 & 4 \end{array}\right)
+-5 & 3 & 1 \end{array}\right)
 \]
 The somewhat surpising result is a demonstration of the Cayley-Hamilton theorem, which will be discussed late in the curriculum.
 \label{prob:simple2}
@@ -436,10 +436,6 @@ B = \left(\begin{array}{rrrrrr}
 \label{prob:simple3}
 \end{problem}
 
-% =============================================================================
-% DONE TO HERE ================================================================
-% =============================================================================
-
 \section*{Data Access} % ======================================================
 
 \subsection*{Array Slicing} % -------------------------------------------------
@@ -451,59 +447,56 @@ While the syntax \li{f[i][j][k]} will also work, it is significantly slower beca
 Recall that in slicing syntax, the colon \li{:} separates the arguments \li{start}, \li{stop}, and \li{step}.
 If there is no colon, a single entry of that dimension will be accessed.
 With a colon, a range of values is accessed.
-See the 
 
-% \begin{lstlisting}
-% # Make an array of the integers from 0 to 10 (exclusive).
-% >>> x = np.arange(10)
-% >>> x
-% array([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9])
-
-% >>> x = np.arange(0,12,2)
-% >>> x
-% array([ 0,  2,  4,  6,  8, 10])
-% >>> x[3]
-% 6
-% >>> x[2:4]
-% array([4, 6])
-% >>> x[5:]
-% array([10])
-% >>> x[3:]
-% array([ 6,  8, 10])
-% >>> x[3:-1]
-% array([6, 8])
-% \end{lstlisting}
-
-Using a single colon as an argument extracts everything in the specified axis.
-See the visual guide at the end for pictures!!
 \begin{lstlisting}
->>> ex4 = np.arange(25).reshape((5,5)) 
->>> ex4
-array([[ 0,  1,  2,  3,  4],
-       [ 5,  6,  7,  8,  9],
-       [10, 11, 12, 13, 14],
-       [15, 16, 17, 18, 19],
-       [20, 21, 22, 23, 24]])
->>> ex4[4, -2]
-23
+# Make an array of the integers from 0 to 10 (exclusive).
+>>> x = np.arange(10)
+>>> x
+array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
 
-# Extract the lower right 2x2 subarray.
->>> ex4[3:, 3:] 
-array([[18, 19],
-       [23, 24]])
-       
-# Extract the second column. The returned array is 1-D.
->>> ex4[:, 1] 
-array([ 1,  6, 11, 16, 21]) 
+# Access a elements of the array with slicing syntax.
+>>> x[3]                            # The element at index 3.
+3
+>>> x[:3]                           # Everything up to index 3.
+array([0, 1, 2])
+>>> x[3:]                           # Everything from index 3 on.
+array([3, 4, 5, 6, 7, 8, 9])
+>>> x[3:8]                          # The elements from index 3 to 8.
+array([3, 4, 5, 6, 7])
 
-# Reverse the order of the columns.
->>> ex4[:, ::-1] 
-array([[ 4,  3,  2,  1,  0],
-       [ 9,  8,  7,  6,  5],
-       [14, 13, 12, 11, 10],
-       [19, 18, 17, 16, 15],
-       [24, 23, 22, 21, 20]])
+>>> A = np.array([[0,1,2,3,4],[5,6,7,8,9]])
+>>> A
+array([[0, 1, 2, 3, 4],
+       [5, 6, 7, 8, 9]])
+
+# Use a comma to separate the dimensions for multi-dimensional arrays.
+>>> A[1, 2]                         # A single element of a 2-D array.
+7
+>>> A[:3, 2:]                       # A 2x3 sub-array.
+array([[2, 3, 4],
+       [7, 8, 9]])
 \end{lstlisting}
+
+See the visual guide at the end of the lab for more demonstrations.
+
+\begin{info} % Views vs. Copies.
+NumPy has two ways of returning an array: as a \emph{view} and as a \emph{copy}.
+A view of an array is distinct from the original array in Python, but it references the same place in memory. 
+Thus changing a array view also change the array it references.
+In other words, \textbf{arrays are mutable}.
+
+A copy of an array is a separate array with its own place in memory. 
+Changes to a copy of an array does not affect the original array, but copying an array uses more time and memory than getting a view.
+An array can be copied using \li{np.copy()} or the array's \li{copy()} method.
+\end{info}
+
+% Slice operations and indexing always return a \emph{view}
+
+% =============================================================================
+% DONE TO HERE ================================================================
+% =============================================================================
+
+% Algorithm Box
 
 \begin{problem} % Laplace's equation.
 One good application of array slicing is the Jacobi method for solving Laplace's equation, which is used to model steady-state heat flow on a square.
@@ -588,6 +581,8 @@ For example, we can set all values of an array that are less than \li{25} to \li
 array([0, 0, 0, 30, 40])
 \end{lstlisting}
 
+% Slice operations and indexing always return a \emph{view} and fancy indexing always returns a \emph{copy}.
+
 \begin{problem} % Fancy indexing
 Write a function that accepts an array and returns an array with all nonnegative numbers.
 If an entry in the inputed array is negative, set it to $0$.
@@ -610,7 +605,7 @@ Put a $-1$ in the new shape tuple to make the specified dimension as long as nec
 [ 0  1  2  3  4  5  6  7  8  9 10 11]
 
 # 'A' has 12 entries, so it can be reshaped into a 3x4 matrix.
->>> A.reshape((3,4))                # The new shape as specified as a tuple.
+>>> A.reshape((3,4))                # The new shape is specified as a tuple.
 array([[ 0,  1,  2,  3],
        [ 4,  5,  6,  7],
        [ 8,  9, 10, 11]])
@@ -620,6 +615,9 @@ array([[ 0,  1,  2,  3],
 array([[ 0,  1,  2,  3,  4,  5],
        [ 6,  7,  8,  9, 10, 11]])
 \end{lstlisting}
+
+Whenever possible, the function \li{np.reshape()} returns a view. 
+See the documentation for more information.
 
 \subsection*{Stacking}
 
@@ -694,60 +692,6 @@ image appear more blue.)
 To visualize your solutions, you may use the following function.
 \lstinputlisting[style=fromfile]{blue_shift_plot.py} 
 \end{problem}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% TODO: Turn this into a big warning (mutability). Needs to be simpler.
-\subsection*{Array Views and Copies} % Does this go here?
-NumPy has two ways of returning an array. Slice operations and indexing always return
-a \emph{view} and fancy indexing always returns a \emph{copy}.
-Understand that even though they may look the same, views and copies are different.
-
-A view of an array is a distinct object from the original array in Python, but it references the same place in memory. 
-Thus, when you change elements in a view, you also change the array it references.
-\begin{lstlisting}
->>> ex5 = np.arange(5)
-
-# Slicing produces a view of ex5. 
->>> view_ex5 = ex5[:]
->>> view_ex5
-array([0, 1, 2, 3, 4])
-
-# Check that ex5 and view_ex5 are distinct objects in Python.
->>> id(view_ex5) == id(ex5) 
-False
-
-# Change the third element of view_ex5 to 500
-# Changing view_ex5 also changes ex5.
->>> view_ex5[2] = 500 
->>> view_ex5
-array([  0,   1, 500,   3,   4])
->>> ex5 
-array([  0,   1, 500,   3,   4])
-\end{lstlisting} 
-
-A copy of an array is a separate array with its own place in memory. 
-Thus, when you change a copy of an array, you do not affect the original array. 
-Because copying an array uses more memory and also more time, it should only be done when necessary. 
-An array can be copied using the \li{np.copy()} function (also available as a method of the array object, for example \li{my_array.copy()} returns a copy of \li{my_array}). 
-
-\begin{lstlisting}
->>> copy_ex5 = np.copy(ex5) 
-
-# Check that ex5 and copy_ex5 are distinct objects in Python.
->>> id(copy_ex5) == id(ex5) 
-False
-
-# Change the third element of copy_ex5 to 1000
-# Changing copy_ex5 does not affect ex5.
->>> copy_ex5[2] = 1000 
->>> copy_ex5
-array([  0,   1, 1000,   3,   4])
->>> ex5
-array([  0,   1, 500,   3,   4])
-\end{lstlisting} 
-
-Whenever possible, the function \li{np.reshape()} returns a view. 
-See the documentation for more information.
 
 \subsection*{Universal Functions} % -------------------------------------------
 
@@ -1011,53 +955,80 @@ Verify that your approximation is close.
 
 \section*{NumPy Visual Guide}
 
+% \begin{align*}
+% A = \left(\begin{array}{rrrrr}
+% \times & \times & \times & \times & \times\\
+% \times & \times & \times & \times & \times\\
+% \times & \times & \times & \times & \times\\
+% \times & \times & \times & \times & \times
+% \end{array}\right)
+% &&
+% A.T = \left(\begin{array}{rrrr}
+% \times & \times & \times & \times\\
+% \times & \times & \times & \times\\
+% \times & \times & \times & \times\\
+% \times & \times & \times & \times\\
+% \times & \times & \times & \times
+% \end{array}\right)
+% \end{align*}
+
+\subsection*{Data Access}
+
+The entries of a 2-D array are the rows of the matrix (as 1-D arrays).
+To get a single entry enter the row index, a comma, and the column index.
+% Single entries of the array are not extracted as arrays like rows are.
+Indices begin at 0.
+
 \begin{align*}
-A = \left(\begin{array}{rrrrr}
+A[0] = \left(\begin{array}{rrrrr}
+\tikzmarkin{row1}\times & \times & \times & \times & \times\tikzmarkend{row1}\\
 \times & \times & \times & \times & \times\\
 \times & \times & \times & \times & \times\\
 \times & \times & \times & \times & \times\\
-\times & \times & \times & \times & \times
 \end{array}\right)
 &&
-A.T = \left(\begin{array}{rrrr}
-\times & \times & \times & \times\\
-\times & \times & \times & \times\\
-\times & \times & \times & \times\\
-\times & \times & \times & \times\\
-\times & \times & \times & \times
+A[2,1] = \left(\begin{array}{rrrrr}
+\times & \times & \times & \times & \times\\
+\times & \times & \times & \times & \times\\
+\times & \tikzmarkin{entry}\times\tikzmarkend{entry} & \times & \times & \times\\
+\times & \times & \times & \times & \times
 \end{array}\right)
 \end{align*}
 
 \subsection*{Slicing}
 
+A lone colon extracts an entire row or column.
+The syntax \li{[a:b]} can be read as ``the $a^{th}$ entry up to (but not including) the $b^{th}$ entry.''
+Similarly, \li{[a:]} means ``the $a^{th}$ entry to the end'' and \li{[:b]} means ``everything up to (but not including) the $b^{th}$ entry.''
+
 \begin{align*}
-A[0] = A[0,:] = \left(\begin{array}{rrrrr}
-\tikzmarkin{a}\times & \times & \times & \times & \times\tikzmarkend{a}\\
+A[1] = A[1,:] = \left(\begin{array}{rrrrr}
 \times & \times & \times & \times & \times\\
+\tikzmarkin{row2}\times & \times & \times & \times & \times\tikzmarkend{row2}\\
 \times & \times & \times & \times & \times\\
 \times & \times & \times & \times & \times\\
 \end{array}\right)
 &&
 A[:,2] = \left(\begin{array}{rrrrr}
-\times & \times & \tikzmarkin{b}\times & \times & \times\\
+\times & \times & \tikzmarkin{col}\times & \times & \times\\
 \times & \times & \times & \times & \times\\
 \times & \times & \times & \times & \times\\
-\times & \times & \times\tikzmarkend{b} & \times & \times
+\times & \times & \times\tikzmarkend{col} & \times & \times
 \end{array}\right)
 \end{align*}
 
 \begin{align*}
-A[1:,2:] = \left(\begin{array}{rrrrr}
+A[1:,:2] = \left(\begin{array}{rrrrr}
 \times & \times & \times & \times & \times\\
-\times & \times & \tikzmarkin{c}\times & \times & \times\\
+\tikzmarkin{block}\times & \times & \times & \times & \times\\
 \times & \times & \times & \times & \times\\
-\times & \times & \times & \times & \times\tikzmarkend{c}
+\times & \times\tikzmarkend{block} & \times & \times & \times
 \end{array}\right)
 &&
 A[1:-1,1:-1] = \left(\begin{array}{rrrrr}
 \times & \times & \times & \times & \times\\
-\times & \tikzmarkin{d} \times & \times & \times & \times\\
-\times & \times & \times & \times \tikzmarkend{d} & \times\\
+\times & \tikzmarkin{interior} \times & \times & \times & \times\\
+\times & \times & \times & \times \tikzmarkend{interior} & \times\\
 \times & \times & \times & \times & \times\end{array}\right)
 \end{align*}
 

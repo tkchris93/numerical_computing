@@ -14,9 +14,9 @@ def prob1():
     return A.dot(B)
 
 def prob2():
-    A = np.array([[3,1,4],[1,5,9],[3,1,4]])
+    A = np.array([[3,1,4],[1,5,9],[-5,3,1]])
     A2 = np.dot(A, A)
-    return -np.dot(A, A2) + 12*A2 - 25*A
+    return -np.dot(A, A2) + 9*A2 - 15*A
 
 def prob3():
     A = np.triu(np.ones((6,6)))
