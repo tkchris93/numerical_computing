@@ -29,6 +29,16 @@ def prob4(A):
     B[A < 0] = 0
     return B
 
+def prob5():
+    A = np.arange(6).reshape((3,2)).T
+    m, n = A.shape
+    B = np.tril(np.full((3,3), 3, dtype=np.float64))
+    C = -2*np.eye(3)
+    O = np.zeros_like(A)
+    return np.vstack((  np.hstack((np.zeros((n,n)), A.T,     np.eye(n))),
+                        np.hstack((A,               np.zeros((m,m)), O)),
+                        np.hstack((B,               O.T,             C))  ))
+
 # Problem 2: Return an array with all nonnegative numbers.
 def nonnegative(my_array):
     """Changes all negative entries in the inputed array to 0.
