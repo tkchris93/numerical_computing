@@ -540,10 +540,6 @@ array([16, 18])
 
 Note that slice operations and indexing always return a view and fancy indexing always returns a copy.
 
-% =============================================================================
-% DONE TO HERE ================================================================
-% =============================================================================
-
 \begin{problem} % Slicing / Fancy Indexing
 Write a function that accepts a single array.
 Make a copy of the array, and set all negative entries of the copy to $0$.
@@ -579,14 +575,40 @@ array([[ 0,  1,  2,  3,  4,  5],
 
 Whenever possible, \li{np.reshape()} returns a view.
 
-% TODO: np.ravel() and np.transpose().
+% =============================================================================
+% DONE TO HERE ================================================================
+% =============================================================================
 
-\subsection*{Stacking}
+Use \li{np.ravel()} to flatten a multi-dimensional array into a (flat) 1-D array and \li{np.transpose()} to transpose a 2-D array (in the matrix sense).
+Transposition can also be done with an array's \li{T} attribute.
+
+\begin{lstlisting}
+>>> A = np.arange(12).reshape((3,4))
+>>> A
+array([[ 0,  1,  2,  3],
+       [ 4,  5,  6,  7],
+       [ 8,  9, 10, 11]])
+
+# Flatten 'A' into a one-dimensional array.
+>>> np.ravel(A)                     # Equivalent to np.reshape(A, A.size)
+array([ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11])
+
+# Transpose the matrix 'A'.
+>>> A.T                             # Equivalent to np.transpose(A).
+array([[ 0,  4,  8],
+       [ 1,  5,  9],
+       [ 2,  6, 10],
+       [ 3,  7, 11]])
+\end{lstlisting}
 
 \begin{info}
 Note about how 1-D NumPy arrays are flat by default.
 In the array broadcasting section we'll talk about how to fix this behavior when necessary.
 \end{info}
+
+\subsection*{Stacking}
+
+hstack, etc.
 
 \subsection*{Array Broadcasting} % --------------------------------------------
 
