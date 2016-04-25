@@ -8,9 +8,9 @@
 % - Arrays
 %     - [x] What is an array?
 %     - [x] How to initialize a simple custom array
-%     - [x] **Problem**: Matrix Equation 1
+%     - [x] **Problem 1**: Matrix Equation 1
 %     - [x] Basic array operations +, -, *, / component-wise
-%     - [x] **Problem**: Matrix Equation 2
+%     - [x] **Problem 2**: Matrix Equation 2 (Cayley-Hamilton preview)
 %     - Data Types
 %         - [x] How to initialize an array with a certain type
 %         - [x] Changing the type of an array's elements
@@ -18,23 +18,32 @@
 %     - Special Creation routines
 %         - [x] `zeros()`, `ones()`, `eye()`, `identity()`, `full()`, etc.
 %         - [x] `diag()`, `tril()`, `triu()`
-%         - [x] **Problem**: Matrix Equation 3
-% - Array Manipulation: *THIS SECTION NEEDS 10 MILLION PICTURES*
-%     - [ ] Slicing Revisited (data access)
-%     - [ ] **Problem**: Laplace's equation (needs rewording)
-%     - [ ] Fancy Indexing and Masks
-%     - [ ] **Problem**: Use fancy indexing to make all entries of a matrix nonnegative.
-%     - [ ] `reshape()`, `ravel()` / `flatten()`
-%     - [ ] `np.newaxis` and Array Broadcasting
-%     - [ ] Note / Warning: All 1D numpy arrays are flat!!!!!!
+%         - [x] **Problem 3**: Matrix Equation 3
+% - Data Access
+%     - [x] Slicing Revisited (refer to the visual guide included at the end of the lab)
+%     - [x] Warning: views vs copies (mutability, `np.copy()`)
+%     - [x] Fancy Indexing and Masks
+%     - [x] **Problem 4**: Use fancy indexing to make all entries of a matrix nonnegative (something harder!!)
+% - Array Manipulation
+%     - [x] `reshape()`, `ravel()` / `flatten()`, `transpose()`
 %     - [ ] `hstack()`, `vstack()`, `row_stack()`, `column_stack()`, `concatenate()`
-%     - [ ] **Problem**: A final, hardest matrix equation (block matrices)
-%     - [ ] Warning: views vs copies (mutability, `np.copy()`)
+%     - [ ] Note / Warning: All 1D numpy arrays are flat!!!!!!
+%     - [ ] **Problem 5**: A final, hardest matrix equation (block matrices)
+%     - [ ] `np.newaxis` and Array Broadcasting
 % - Universal Functions / Avoid Looping!!
 %     - NumPy uses C and Fortran to be SPEEDY!
 %     - [ ] `max()`, `min()`, `argmax()`, `argmin()`
 %     - [ ] The `axis` argument.
-% - [ ] A final, more challenging problem (blue shift plot is dumb)
+%     - [ ] **Problem 6**: Laplace's equation (needs rewording and algorithm box, but it's legit)
+% - Additional Material
+%     - Random Sampling
+%     - Saving / Loading arrays
+%     - Iterating through arrays
+% - Visual Reference Guide
+%     - [x] Data Access
+%     - [x] Slicing
+%     - [ ] Stacking
+%     - [ ] Broadcasting
 
 \section*{Arrays} % ===========================================================
 
@@ -79,7 +88,7 @@ array([1, 2, 3])
 \end{lstlisting}
 
 \begin{problem} % Problem 1: Matrix Multiplication
-NumPy's \li{dot()} function perfoms matrix multiplication. % In Python 3.5, we can use the @ operator to perform matrix multiplication.
+NumPy's \li{dot()} function performs matrix multiplication. % In Python 3.5, we can use the @ operator to perform matrix multiplication.
 Write a function that defines the matrices $A$ and $B$ given below as NumPy arrays and returns the matrix product $AB$.
 %
 \begin{align*}
@@ -251,7 +260,7 @@ A = \left(\begin{array}{rrr}
 1 & 5 & 9 \\
 -5 & 3 & 1 \end{array}\right)
 \]
-The somewhat surpising result is a demonstration of the Cayley-Hamilton theorem, which will be discussed late in the curriculum.
+The somewhat surprising result is a demonstration of the Cayley-Hamilton theorem, which will be discussed late in the curriculum.
 \label{prob:simple2}
 \end{problem}
 
@@ -472,7 +481,7 @@ array([[0, 1, 2, 3, 4],
 # Use a comma to separate the dimensions for multi-dimensional arrays.
 >>> A[1, 2]                         # A single element of a 2-D array.
 7
->>> A[:3, 2:]                       # A 2x3 sub-array.
+>>> A[:, 3:]
 array([[2, 3, 4],
        [7, 8, 9]])
 \end{lstlisting}
@@ -554,6 +563,7 @@ Recall that arrays have a \li{shape} attribute that describes the dimensions of 
 We can change the shape of an array with \li{np.reshape()} or the array's \li{reshape()} method.
 The total number of entries in the old array and the new array must be the same in order for the shaping to work correctly.
 A $-1$ in the new shape tuple to makes the specified dimension as long as necessary.
+% Whenever possible, \li{np.reshape()} returns a view.
 
 \begin{lstlisting}
 # Make an array of the integers from 0 to 12 (exclusive).
@@ -573,14 +583,26 @@ array([[ 0,  1,  2,  3,  4,  5],
        [ 6,  7,  8,  9, 10, 11]])
 \end{lstlisting}
 
-Whenever possible, \li{np.reshape()} returns a view.
-
-% =============================================================================
-% DONE TO HERE ================================================================
-% =============================================================================
-
 Use \li{np.ravel()} to flatten a multi-dimensional array into a (flat) 1-D array and \li{np.transpose()} to transpose a 2-D array (in the matrix sense).
 Transposition can also be done with an array's \li{T} attribute.
+
+\begin{table}[H]
+\centering 
+\begin{tabular}{r|l}
+    Function & Description\\
+    \hline
+    \li{reshape()} & Return a view of the array with a changed shape.\\
+    \li{ravel()} & Make a flattened version of an array, return a view if possible.\\
+    \li{transpose()} & Permute the dimensions of the array (also \li{ndarray.T}).\\
+    \hline
+    % \li{concatenate()} & Join a sequence of arrays along an existing axis\\
+    \li{hstack()} & Stack arrays in sequence horizontally (column wise).\\
+    \li{vstack()} & Stack arrays in sequence vertically (row wise).\\
+    \li{column_stack()} & Stack 1-D arrays as columns into a 2-D array.
+\end{tabular}
+% \caption{Some array manipulation routines.}
+\label{table:manipulation}
+\end{table}
 
 \begin{lstlisting}
 >>> A = np.arange(12).reshape((3,4))
@@ -601,14 +623,49 @@ array([[ 0,  4,  8],
        [ 3,  7, 11]])
 \end{lstlisting}
 
-\begin{info}
-Note about how 1-D NumPy arrays are flat by default.
-In the array broadcasting section we'll talk about how to fix this behavior when necessary.
+\begin{info} % All 1-D Numpy arrays are flat!
+By default, all NumPy arrays that can be represented by a single dimension, including column slices, are automatically reshaped into ``flat'' 1-D arrays.
+Therefore an array will usually have 10 elements instead of 10 arrays with one element each.
+Though we usually represent vectors vertically in mathematical notation, NumPy methods such as \li{dot()} are implemented purposefully to play nicely with 1-D ``row arrays''.
+
+\begin{lstlisting}
+>>> A = np.arange(10).reshape((2,5))
+>>> A
+array([[0, 1, 2, 3, 4],
+       [5, 6, 7, 8, 9]])
+
+# Slicing out a column of A still produces a "flat" 1-D array.
+>>> x = A[:,1]
+>>> x
+array([1, 6])
+>>> x.shape
+(2,)
+>>> x.ndim
+1
+\end{lstlisting}
+
+Occasionally it is appropriate to override this behavior.
+To force a 1-D array to be a ``column array'' (an array of arrays, each with 1 entry), use a reshape command or use slicing syntax and \li{np.newaxis}.
+
+\begin{lstlisting}
+>>> x = np.arange(3)
+>>> x
+array([0, 1, 2])
+
+>>> x.reshape((3,1))                # Equivalent to x[:, np.newaxis].
+array([[0],
+       [1],
+       [2]])
+\end{lstlisting}
 \end{info}
+
+% =============================================================================
+% DONE TO HERE ================================================================
+% =============================================================================
 
 \subsection*{Stacking}
 
-hstack, etc.
+See \url{http://docs.scipy.org/doc/numpy-1.10.1/reference/routines.array-manipulation.html} for more array manipulation routines.
 
 \subsection*{Array Broadcasting} % --------------------------------------------
 
@@ -734,7 +791,7 @@ html}.
     \li{min} & minimum element of the array \\
     \li{prod} & product of elements of the array \\
     % \li{ravel} & make a flattened version of an array, return a view if
-    possible \\
+    % possible \\
     % \li{reshape} & return a view of the array with a changed shape \\
     \li{round} & return a rounded version of the array \\
     % \li{sort} & sort the array in place \\
@@ -1030,14 +1087,14 @@ A[0] = \left(\begin{array}{rrrrr}
 A[2,1] = \left(\begin{array}{rrrrr}
 \times & \times & \times & \times & \times\\
 \times & \times & \times & \times & \times\\
-\times & \tikzmarkin{entry}\times\tikzmarkend{entry} & \times & \times & \times\\
+\times & \tikzmarkin{entry} \times \tikzmarkend{entry} & \times & \times & \times\\
 \times & \times & \times & \times & \times
 \end{array}\right)
 \end{align*}
 
 \subsection*{Slicing}
 
-A lone colon extracts an entire row or column.
+A lone colon extracts an entire row or column from a 2-D array.
 The syntax \li{[a:b]} can be read as ``the $a^{th}$ entry up to (but not including) the $b^{th}$ entry.''
 Similarly, \li{[a:]} means ``the $a^{th}$ entry to the end'' and \li{[:b]} means ``everything up to (but not including) the $b^{th}$ entry.''
 
@@ -1081,6 +1138,10 @@ A[1:-1,1:-1] = \left(\begin{array}{rrrrr}
 \item row\_stack()
 \item concatenate()
 \end{enumerate}
+
+\subsection*{Broadcasting}
+
+Really only need two pictures here.
 
 
 % =============================================================================
