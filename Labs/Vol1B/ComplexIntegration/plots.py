@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib
-matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
+#matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
 from matplotlib import pyplot as plt
 from matplotlib.cm import jet as cmap
 from mpl_toolkits.mplot3d import Axes3D
