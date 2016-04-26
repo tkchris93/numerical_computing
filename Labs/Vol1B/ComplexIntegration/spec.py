@@ -1,3 +1,10 @@
+# Name this file 'solutions.py'.
+"""Volume I: Complex Integration.
+<Name>
+<Class>
+<Date>
+"""
+
 import numpy as np
 from sympy import mpmath as mp
 from matplotlib import pyplot as plt
