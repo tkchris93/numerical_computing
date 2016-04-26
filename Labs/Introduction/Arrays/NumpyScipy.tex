@@ -91,14 +91,14 @@ array([1, 2, 3])
 NumPy's \li{dot()} function performs matrix multiplication. % In Python 3.5, we can use the @ operator to perform matrix multiplication.
 Write a function that defines the following matrices as NumPy arrays.
 \begin{align*}
-A = \left(\begin{array}{rrr}
+A = \left[\begin{array}{rrr}
 3 & -1 &  4 \\ 
-1 &  5 & -9 \end{array}\right)
+1 &  5 & -9 \end{array}\right]
 &&
-B = \left(\begin{array}{cccc}
+B = \left[\begin{array}{cccc}
 2 &  6 & -5 &  3\\
 5 & -8 &  9 &  7\\
-9 & -3 & -2 & -3\end{array}\right)
+9 & -3 & -2 & -3\end{array}\right]
 \end{align*}
 Return the matrix product $AB$.
 % Solution:
@@ -254,10 +254,10 @@ Apart from being syntactically convenient, element-wise NumPy operations are als
 \begin{problem} % Simple Matrix Equation 2 (Cayley Hamilton)
 Write a function that defines the following matrix as a NumPy array.
 \[
-A = \left(\begin{array}{rrr}
+A = \left[\begin{array}{rrr}
 3 & 1 & 4\\ 
 1 & 5 & 9 \\
--5 & 3 & 1 \end{array}\right)
+-5 & 3 & 1 \end{array}\right]
 \]
 Return the matrix $-A^3 + 9A^2 - 15A$.
 In this context, $A^2 = AA$ (the matrix product).
@@ -420,21 +420,21 @@ See \url{http://docs.scipy.org/doc/numpy/reference/routines.array-creation.html}
 Write a function that defines the following matrices as NumPy arrays.
 Use the functions presented in this section instead of \li{np.array()} to construct the matrices, and change the data type of the final matrix to \li{np.int64}.
 \begin{align*}
-A = \left(\begin{array}{rrrrrr}
+A = \left[\begin{array}{rrrrrr}
 1 & 1 & 1 & 1 & 1 & 1\\
 0 & 1 & 1 & 1 & 1 & 1\\
 0 & 0 & 1 & 1 & 1 & 1\\
 0 & 0 & 0 & 1 & 1 & 1\\
 0 & 0 & 0 & 0 & 1 & 1\\
-0 & 0 & 0 & 0 & 0 & 1\end{array}\right)
+0 & 0 & 0 & 0 & 0 & 1\end{array}\right]
 &&
-B = \left(\begin{array}{rrrrrr}
+B = \left[\begin{array}{rrrrrr}
 -1 &  5 &  5 &  5 &  5 &  5\\
 -1 & -1 &  5 &  5 &  5 &  5\\
 -1 & -1 & -1 &  5 &  5 &  5\\
 -1 & -1 & -1 & -1 &  5 &  5\\
 -1 & -1 & -1 & -1 & -1 &  5\\
--1 & -1 & -1 & -1 & -1 & -1\end{array}\right)
+-1 & -1 & -1 & -1 & -1 & -1\end{array}\right]
 \end{align*}
 % Solution:
 % array([[ -6,  -6,   0,  12,  30,  54],
@@ -702,26 +702,26 @@ visit \url{http://docs.scipy.org/doc/numpy-1.10.1/reference/routines.array-manip
 \begin{problem} % Simple Matrix Equation 4
 Write a function that defines the following matrices as NumPy arrays.
 \begin{align*}
-A = \left(\begin{array}{rrr}
+A = \left[\begin{array}{rrr}
 0 & 2 & 4\\ 
-1 & 3 & 5\end{array}\right)
+1 & 3 & 5\end{array}\right]
 &&
-B = \left(\begin{array}{rrr}
+B = \left[\begin{array}{rrr}
 3 & 0 & 0\\ 
 3 & 3 & 0\\
-3 & 3 & 3\end{array}\right)
+3 & 3 & 3\end{array}\right]
 &&
-C = \left(\begin{array}{rrr}
+C = \left[\begin{array}{rrr}
 -2 & 0 & 0\\ 
 0 & -2 & 0\\
-0 & 0 & -2\end{array}\right)
+0 & 0 & -2\end{array}\right]
 \end{align*}
 Use NumPy's stacking functions to create and return the block matrix:
 \begin{align*}
-\left(\begin{array}{ccc}
+\left[\begin{array}{ccc}
 \0 & A^T & I\\ 
 A & \0 & \0 \\
-B & \0 & C \end{array}\right),
+B & \0 & C \end{array}\right],
 \end{align*}
 where $I$ is the identity matrix of the appropriate size and each $\0$ is a matrix of all zeros, also of appropriate sizes.
 
@@ -887,13 +887,13 @@ A more comprehensive list of array methods can be found at
 html}.
 See the visual guide at the end of the lab for more examples of the \li{axis} keyword argument.
 
-\begin{problem} % Problem 6: Row stochasticity.
-A matrix is called \emph{row-stochastic} if each of its rows sum to $1$.\footnote{Similarly, a matrix is called \emph{column-stochastic} if its columns all sum to $1$.}
-Stochastic matrices are critically important for discrete random processes and some machine learning algorithms.
+\begin{problem} % Problem 6: Row stochastic matrices.
+A matrix is called \emph{row-stochastic} if its rows each sum to $1$.\footnote{Similarly, a matrix is called \emph{column-stochastic} if its columns each sum to $1$.}
+Stochastic matrices are fundamentally important for finite discrete random processes and some machine learning algorithms.
 
 Write a function than accepts a matrix (as a 2-D array).
 Divide each row of the matrix by the row sum and return the new row-stochastic matrix.
-Use array broadcasting instead of a \li{for} loop.
+Use array broadcasting instead of a loop, and be careful to avoid integer division.
 \end{problem}
 
 % =============================================================================
@@ -902,69 +902,92 @@ Use array broadcasting instead of a \li{for} loop.
 
 \begin{algorithm} % Laplace's equation procedure.
 \begin{algorithmic}[1]
-\Procedure{Laplace}{$U$, tol}
-\State diff = 1 + tol
-\While {diff > tol}
-    \State Set all points that are not on an edge of the new array equal to the average of their 4 immediate neighbors.
-
-    \State Update the differences to be the maximum of the absolute value of the new array minus the old one.
-    \State Copy the values from the new array into the old one.
+\Procedure{Jacobi}{$n$, tol}
+\State $U \gets$ an $n\times n$ array of zeros.
+\State Set the boundaries of $U$.
+\State $U^\prime \gets$ a copy of $U$.
+\State diff $\gets$ tol
+\While {diff $\ge$ tol}
+    \State Set all interior points of $U^\prime$ equal to the average of their neighbors.
+    \State diff $\gets$ the maximum of the absolute value of $U - U^\prime$.
+    \State Interior of $U \gets$ interior of $U^\prime $.
 \EndWhile
+\State \pseudoli{return} $U$
 \EndProcedure
 \end{algorithmic}
 \caption{The Jacobi method for solving Laplace's equation.}
-\label{alg:laplace}
+\label{alg:jacobi}
 \end{algorithm}
 
-\begin{problem} % Laplace's equation.
-One good application of array slicing is the Jacobi method for solving Laplace's equation, which is used to model steady-state heat flow on a square.
-This problem will help you implement the Jacobi method.
+\begin{problem}
+Laplace's equation is used to model steady-state heat flow on a square plate.
+The plate can be approximated by a matrix, where each entry of the matrix represents the average temperature over a small square portion of the plate.
+Suppose the plate starts at $0^\circ$ Celsius everywhere except on the east and west boundaries, which are held at a constant temperature of $100^\circ$.
+In addition, the north and south boundaries are held constant at $0^\circ$.
 
-Make a function that accepts an array and a float (which represents a tolerance) as input and does the
-following: 
-\begin{enumerate}
-\item Makes a copy of the array. 
-\item Creates a variable to track the difference between the arrays. Initialize
-it as the tolerance parameter your function accepts. 
-\item While the difference is greater than or equal
-to the tolerance 
-\begin{enumerate} 
-\item Sets all points that are not on an edge of the new array equal to the average of their 4 immediate neighbors. 
-Use the values from the old array for this computation. 
-This should only take one line and should be based entirely on array slicing, NOT iterating through the array.
-(Hint: given a 2D array \li{A}, the slice \li{A[1:-1,1:-1]} references
-all non-edge entries, \li{A[:-2,1:-1]} references the upper neighbors,
-and \li{A[1:-1,2:]} references the right neighbors.) 
-\item Updates the difference to be the maximum of the absolute value of the new array
-minus the old one. 
-\item Copies the values from the new array into the old
-one (without creating a new array). 
-\end{enumerate} 
-\end{enumerate}
+\[
+U = \left[\begin{array}{ccccc}
+\textcolor[rgb]{0.,0.,1.}0 & \textcolor[rgb]{0.,0.,1.}0 & \textcolor[rgb]{0.,0.,1.}\cdots & \textcolor[rgb]{0.,0.,1.}0 & \textcolor[rgb]{0.,0.,1.}0\\
+\textcolor[rgb]{1.,0.,0.}{100} & 0 & \cdots & 0 & \textcolor[rgb]{1.,0.,0.}{100}\\
+\textcolor[rgb]{1.,0.,0.}\vdots & \vdots & \ddots & \vdots & \textcolor[rgb]{1.,0.,0.}\vdots \\
+\textcolor[rgb]{1.,0.,0.}{100} & 0 & \cdots & 0 & \textcolor[rgb]{1.,0.,0.}{100}\\
+\textcolor[rgb]{0.,0.,1.}0 & \textcolor[rgb]{0.,0.,1.}0 & \textcolor[rgb]{0.,0.,1.}\cdots & \textcolor[rgb]{0.,0.,1.}0 & \textcolor[rgb]{0.,0.,1.}0\\
 
-Now use the following code to generate a plot of your results.
-\lstinputlisting[style=fromfile]{laplace_plot.py} 
-It should resemble the following figure.
+\end{array}\right]
+\]
 
-\begin{figure} [H]
-\includegraphics[width=.75\textwidth]{laplace.pdf}
-\end{figure} 
+The non-boundary, interior portion of the matrix (with black text) can be accessed with the slice \li{U[1:-1,1:-1]}.
+To find the steady state of the hot plate, set each entry of the interior of $U$ equal to the average of its 4 immediate neighbors (the entries above, below, and to the left and right).
+This step should take only \emph{one line} and should be based entirely on array slicing.
+
+Continue updating the interior entries of $U$ until they stop changing significantly.
+The entire procedure is summarized in Algorithm \ref{alg:jacobi}.
+
+(Hint: The slice \li{U[:-2,1:-1]} references the upper neighbors of the interior points of $U$ and \li{U[1:-1,2:]} references the right neighbors. How can you reference the lower and left neighbors?)
+
+Use the following code to visualize your results.
+% from mpl_toolkits.mplot3d import Axes 3D
+
+%     x, y = np.linspace(0, 1, n), np.linspace(0, 1, n)
+%     X, Y = np.meshgrid(x, y)
+%     fig = plt.figure()
+%     ax = fig.gca(projection='3d')
+%     ax.plot_surface(X, Y, U, rstride=5)
+%     plt.show()
+
+\begin{lstlisting}
+from matplotlib import pyplot as plt
+
+def jacobi(n=100, tol=1e-8):
+    
+    # Perform the algorithm, storing the result in the array 'U'.
+
+    # Visualize the results.
+    plt.imshow(U)
+    plt.show()
+\end{lstlisting}
+
+This Jacobi iteration is a \emph{finite difference method}, and is similar to many of the methods that we will use to find numerical solutions to differential equations in Volume IV.
 \end{problem}
 
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{jacobi_small.pdf}
+    \caption{$10\times 10$ approximation.}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{jacobi_big.pdf}
+    \caption{$100\times 100$ approximation.}
+\end{subfigure}
+\caption{Hot plates in steady state with different resolutions.}
+\end{figure}
 
-\section*{Conclusion} % =======================================================
+% The module used for visualizing these results, \li{matplotlib}, will be the subject one of our next labs.
 
-% TODO: Revise this section.
-Refer often to NumPy's documentation.
-If there's something simple you would like to with an array, there's probably already a way to do it built in to NumPy.
-
-The following online resources are specific to SciPy:
-\begin{itemize}
-\item Official SciPy Documentation (\url{http://docs.scipy.org/doc/})
-\item Sections 1.3 and 1.5 of the SciPy Lecture Notes (\url{http://scipy-lectures.github.io/})
-\end{itemize}
-
-\newpage
+\newpage % ====================================================================
 
 \section*{Additional Material} % ==============================================
 
@@ -1119,7 +1142,7 @@ np.polyval(p, a)
 \begin{enumerate}
 \item Use NumPy's polynomial objects to approximate the following series.
 \[
-\arcsin x = \sum_{n=0}^{\infty} \frac{\left(2 n\right) ! x^{2 n + 1}}{\left(2 n + 1\right)\left(n!\right)^2 4^n}
+\arcsin x = \sum_{n=0}^{\infty} \frac{\left[2 n\right] ! x^{2 n + 1}}{\left[2 n + 1\right]\left[n!\right]^2 4^n}
 \]
 This series converges on $(-1, 1)$. Use your series approximation to approximate $\pi$. Hint: think of the powers of $x$ that
 are not included in the series as having zero coefficients.
@@ -1127,7 +1150,7 @@ are not included in the series as having zero coefficients.
 \item The lambert W function is the inverse of $x e^x$.
 Its Taylor series is below (note the index starts at 1).
 \[
-W(x) = \sum_{n=1}^{\infty} \frac{\left(-n\right)^{n-1} x^n}{n!}
+W(x) = \sum_{n=1}^{\infty} \frac{\left[-n\right]^{n-1} x^n}{n!}
 \]
 This series has a radius of convergence of $\frac{1}{e}$.
 Use the series to approximate a number $x$ such that $x e^x = \frac{1}{4}$.
@@ -1147,19 +1170,19 @@ To access a single entry, enter the row index, a comma, and the column index.
 Remember that indexing begins with $0$.
 
 \begin{align*}
-A[0] = \left(\begin{array}{rrrrr}
+A[0] = \left[\begin{array}{rrrrr}
 \tikzmarkin{row1}\times & \times & \times & \times & \times\tikzmarkend{row1}\\
 \times & \times & \times & \times & \times\\
 \times & \times & \times & \times & \times\\
 \times & \times & \times & \times & \times\\
-\end{array}\right)
+\end{array}\right]
 &&
-A[2,1] = \left(\begin{array}{rrrrr}
+A[2,1] = \left[\begin{array}{rrrrr}
 \times & \times & \times & \times & \times\\
 \times & \times & \times & \times & \times\\
 \times & \tikzmarkin{entry} \times \tikzmarkend{entry} & \times & \times & \times\\
 \times & \times & \times & \times & \times
-\end{array}\right)
+\end{array}\right]
 \end{align*}
 
 \subsection*{Slicing}
@@ -1169,34 +1192,34 @@ The syntax \li{[a:b]} can be read as ``the $a^{th}$ entry up to (but not includi
 Similarly, \li{[a:]} means ``the $a^{th}$ entry to the end'' and \li{[:b]} means ``everything up to (but not including) the $b^{th}$ entry.''
 
 \begin{align*}
-\text{\li{A[1]}} = \text{\li{A[1,:]}} = \left(\begin{array}{rrrrr}
+\text{\li{A[1]}} = \text{\li{A[1,:]}} = \left[\begin{array}{rrrrr}
 \times & \times & \times & \times & \times\\
 \tikzmarkin{row2}\times & \times & \times & \times & \times\tikzmarkend{row2}\\
 \times & \times & \times & \times & \times\\
 \times & \times & \times & \times & \times\\
-\end{array}\right)
+\end{array}\right]
 &&
-\text{\li{A[:,2]}} = \left(\begin{array}{rrrrr}
+\text{\li{A[:,2]}} = \left[\begin{array}{rrrrr}
 \times & \times & \tikzmarkin{col}\times & \times & \times\\
 \times & \times & \times & \times & \times\\
 \times & \times & \times & \times & \times\\
 \times & \times & \times\tikzmarkend{col} & \times & \times
-\end{array}\right)
+\end{array}\right]
 \end{align*}
 
 \begin{align*}
-\text{\li{A[1:,:2]}} = \left(\begin{array}{rrrrr}
+\text{\li{A[1:,:2]}} = \left[\begin{array}{rrrrr}
 \times & \times & \times & \times & \times\\
 \tikzmarkin{block}\times & \times & \times & \times & \times\\
 \times & \times & \times & \times & \times\\
 \times & \times\tikzmarkend{block} & \times & \times & \times
-\end{array}\right)
+\end{array}\right]
 &&
-\text{\li{A[1:-1,1:-1]}} = \left(\begin{array}{rrrrr}
+\text{\li{A[1:-1,1:-1]}} = \left[\begin{array}{rrrrr}
 \times & \times & \times & \times & \times\\
 \times & \tikzmarkin{interior} \times & \times & \times & \times\\
 \times & \times & \times & \times \tikzmarkend{interior} & \times\\
-\times & \times & \times & \times & \times\end{array}\right)
+\times & \times & \times & \times & \times\end{array}\right]
 \end{align*}
 
 \subsection*{Stacking}
@@ -1204,31 +1227,31 @@ Similarly, \li{[a:]} means ``the $a^{th}$ entry to the end'' and \li{[:b]} means
 \li{np.hstack()} stacks sequence of arrays horizontally and \li{np.vstack()} stacks a sequence of arrays vertically.
 
 \begin{align*}
-A = \left(\begin{array}{ccc}
+A = \left[\begin{array}{ccc}
 \times & \times & \times\\
 \times & \times & \times\\
 \times & \times & \times
-\end{array}\right)
+\end{array}\right]
 &&
-B = \left(\begin{array}{ccc}
+B = \left[\begin{array}{ccc}
 * & * & * \\
 * & * & * \\
 * & * & *
-\end{array}\right)
+\end{array}\right]
 \end{align*}
 
 \begin{align*}
 \text{\li{np.hstack((A,B,A))}} =
-\left(\begin{array}{ccccccccc}
+\left[\begin{array}{ccccccccc}
 \times & \times & \times & * & * & * & \times & \times & \times\\
 \times & \times & \times & * & * & * & \times & \times & \times\\
 \times & \times & \times & * & * & * & \times & \times & \times
-\end{array}\right)
+\end{array}\right]
 \end{align*}
 
 \begin{align*}
 \text{\li{np.vstack((A,B,A))}} =
-\left(\begin{array}{ccc}
+\left[\begin{array}{ccc}
 \times & \times & \times\\
 \times & \times & \times\\
 \times & \times & \times\\
@@ -1238,43 +1261,43 @@ B = \left(\begin{array}{ccc}
 \times & \times & \times\\
 \times & \times & \times\\
 \times & \times & \times
-\end{array}\right)
+\end{array}\right]
 \end{align*}
 Because 1-D arrays are flat, \li{np.hstack()} concatenates 1-D arrays and \li{np.vstack()} stacks them vertically.
 To make several 1-D arrays into the columns of a 2-D array, use \li{np.column_stack()}.
 
 \begin{align*}
-x = \left(\begin{array}{cccc}
-\times & \times & \times & \times\end{array}\right)
+x = \left[\begin{array}{cccc}
+\times & \times & \times & \times\end{array}\right]
 &&
-y = \left(\begin{array}{cccc}
-* & * & * & *\end{array}\right)
+y = \left[\begin{array}{cccc}
+* & * & * & *\end{array}\right]
 \end{align*}
 
 \begin{align*}
 \text{\li{np.hstack((x,y,x))}} =
-\left(\begin{array}{cccccccccccc}
+\left[\begin{array}{cccccccccccc}
 \times & \times & \times & \times &
 * & * & * & * &
 \times & \times & \times & \times
-\end{array}\right)
+\end{array}\right]
 \end{align*}
 
 \begin{align*}
 \text{\li{np.vstack((x,y,x))}} =
-\left(\begin{array}{cccc}
+\left[\begin{array}{cccc}
 \times & \times & \times & \times\\
 * & * & * & *\\
 \times & \times & \times & \times
-\end{array}\right)
+\end{array}\right]
 &&
 \text{\li{np.column_stack((x,y,x))}} =
-\left(\begin{array}{ccc}
+\left[\begin{array}{ccc}
 \times & * & \times\\
 \times & * & \times\\
 \times & * & \times\\
 \times & * & \times
-\end{array}\right)
+\end{array}\right]
 \end{align*}
 
 \subsection*{Broadcasting}
@@ -1282,6 +1305,8 @@ y = \left(\begin{array}{cccc}
 Really only need two pictures here.
 
 \subsection*{Operations along an Axis}
+
+Similar pictures to the Broadcasting section (really only need 2)
 
 % =============================================================================
 % =============================================================================
