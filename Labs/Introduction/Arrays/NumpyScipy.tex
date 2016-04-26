@@ -298,7 +298,7 @@ Data type & Description
 \end{table}
 
 We specify the data type of an array as it is created with the keyword argument \li{dtype}.
-If unspecified, then the type will be determined as the minimum type required to hold the objects in the provided sequence.
+If unspecified, then the type is determined as the minimum type required to hold the objects in the provided sequence.
 To change an existing array's type, use the array's \li{astype()} method.
 
 \begin{lstlisting}
@@ -456,7 +456,7 @@ To access a single entry of a multi-dimensional array, say a 3-D array, use the 
 While the syntax \li{f[i][j][k]} will also work, it is significantly slower because each bracket returns an array slice.
 
 Recall that in slicing syntax, the colon \li{:} separates the arguments \li{start}, \li{stop}, and \li{step}.
-If there is no colon, a single entry of that dimension will be accessed.
+If there is no colon, a single entry of that dimension is accessed.
 With a colon, a range of values is accessed.
 
 \begin{lstlisting}
@@ -781,25 +781,37 @@ array([[ 0,  1,  2],
        [30, 31, 32]])
 \end{lstlisting}
 
+\section*{Numerical Computing with NumPy} % ===================================
+
 \subsection*{Universal Functions} % -------------------------------------------
 
-% =============================================================================
-% DONE TO HERE ================================================================
-% =============================================================================
+A universal function is one that operates on an entire array element-wise. 
+Using a universal function is almost always significantly more efficient than iterating through the array.
 
-A universal function, or \li{ufunc}, operates on an array element-wise. 
-It outputs an array of the same shape and datatype as the input array. 
-Using a universal function is usually much faster than iterating through the array yourself.
+\begin{table}[H]
+\centering 
+\begin{tabular}{r|l}
+    Function & Description \\
+    \hline
+    \li{<<abs()>>} or \li{absolute()} & Calculate the absolute value element-wise. \\
+    % \li{conj()} & Return the complex conjugate of the array.\\
+    \li{exp()} / \li{log()} & Exponential ($e^x$) / natural log element-wise.\\
+    \li{maximum()} / \li{minimum()}& Element-wise maximum / minimum of two arrays.\\
+    % \li{<<round()>>} & Return a rounded version of the array.\\
+    \li{sqrt()} & The positive square-root, element-wise.\\
+    \li{sin()}, \li{cos()}, \li{tan()}, etc. & Element-wise trigonometric operations.
+\end{tabular}
+\label{table:ufuncs}
+\end{table}
 
-Many scalar functions from the Python standard library have a universal analog that operates on arrays. 
-For example, \li{math.sin()} operates on scalars, and \li{numpy.sin()} operates on arrays. 
-If you have a simple operation that you want to perform element-wise on an array, you should see if SciPy has a universal function that will do it (it probably does). 
-For a list of available \li{ufuncs}, see \url{http://docs.scipy.org/doc/numpy/reference/ufuncs.html#available-ufuncs}.
+Many scalar functions from the Python standard library have a corresponding universal function in NumPy.
+% For instance, \li{math.sin()} operates on scalars, while \li{np.sin()} operates on arrays.
+If you have a simple operation to perform element-wise on an array, check if NumPy has a universal function for it (it probably does).
+See \url{http://docs.scipy.org/doc/numpy/reference/ufuncs.html#available-ufuncs} for a more comprehensive list of universal functions.
 
+\begin{comment} % Unnecessary detail.
 Most universal functions also allow you to specify an output array, which must have the same shape as the input array.
 Doing so can reduce memory allocation.
-
-% Better examples!!!
 
 \begin{lstlisting}
 >>> ex7 = np.arange(3, dtype=float)
@@ -813,81 +825,80 @@ array([ 1.        ,  2.71828183,  7.3890561 ])
 % Warning? Or just delete it...
 Although universal functions also accept scalar inputs, they can be much slower than the corresponding standard library function. 
 Thus, use standard library functions on scalars and universal functions on arrays.
+\end{comment}
 
-% \section*{More Methods of NumPy Arrays}
-Some of the more common methods of NumPy arrays are described in Table \ref{table:ndarraymethods}. 
-A more comprehensive list can be found at
-\url{http://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.
-html}.
+\subsection*{Other Array Methods}
 
-\begin{table}
+Often the easiest way to compute information is by using methods of the \li{np.ndarray} class on existing arrays.
+
+\begin{table}[H]
 \centering 
-\begin{tabular}{l|p{10cm}}
+\begin{tabular}{r|l}
+    Method & Returns \\
     \hline
-    Function & Description \\
-    \hline
-    \li{all} & returns True if all elements evaluate to True \\
-    \li{any} & returns True if any elements evaluate to True \\
-    \li{argmax} & indices of maximum value(s) \\
-    \li{argmin} & indices of minimum value(s) \\
-    \li{argsort} & indices that would sort the array \\
-    % \li{astype} & casts a copy of an array to a different data type \\
-    \li{clip} & restrict values in an array to fit within a given range\\
-    % \li{conj} & return the complex conjugate of the array \\
-    % \li{copy} & return a copy of the array\\
-    % \li{diagonal} & return a given diagonal of the array \\
-    % \li{dot} & matrix multiplication \\
-    \li{max} & max element of the array \\
-    \li{mean} & average of the array \\
-    \li{min} & minimum element of the array \\
-    \li{prod} & product of elements of the array \\
-    % \li{ravel} & make a flattened version of an array, return a view if
-    % possible \\
-    % \li{reshape} & return a view of the array with a changed shape \\
-    \li{round} & return a rounded version of the array \\
-    % \li{sort} & sort the array in place \\
-    \li{std} & compute the standard deviation \\
-    \li{sum} & sum the elements of the array \\
-    % \li{swapaxes} & return a view with the given axes swapped \\
-    % \li{tolist} & return the array represented as a list or nested list\\
-    \li{trace} & return the sum of the elements along the main diagonal\\
-    \li{var} & return the variance of the array \\
-    % \li{vstack} & stack arrays in sequence vertically \\
-    \hline
-    \end{tabular} \caption{A few of the methods of NumPy arrays.}
-    \label{table:ndarraymethods} \end{table}
+    \li{<<all()>>} & \li{True} if all elements evaluate to \li{True}.\\
+    \li{<<any()>>} & \li{True} if any elements evaluate to \li{True}.\\
+    \li{argmax()} & Index of the maximum value.\\
+    \li{argmin()} & Index of the minimum value.\\
+    \li{argsort()} & Indices that would sort the array.\\
+    % \li{clip} & restrict values in an array to fit within a given range\\
+    \li{<<max()>>} & The maximum element of the array.\\
+    \li{mean()} & The average value of the array.\\
+    \li{<<min()>>} & The minimum element of the array.\\
+    \li{sort()} & Return nothing; sort the array in-place.\\
+    \li{std()} & The standard deviation of the array.\\
+    \li{<<sum()>>} & The sum of the elements of the array.\\
+    % \li{trace()} & return the sum of the elements along the main diagonal\\
+    \li{var()} & The variance of the array.\\
+\end{tabular}
+\label{table:ndarraymethods}
+\end{table}
 
-% \begin{lstlisting}
-% # np.argsort returns a list of indices that would sort an array.
-% >>> my_array = np.array([4,1,6,3,7,2,5])
-% >>> mask = np.argsort(my_array)
-% >>> my_array[mask]
-% array([1, 2, 3, 4, 5, 6, 7])
-% \end{lstlisting}
+Each of these \li{np.ndarray} methods has a corresponding (and equivalent) NumPy function.
+Thus \li{A.<<max>>()} and \li{np.<<max>>(A)} are equivalent.
+The one exception is the \li{sort()} function: \li{np.sort()} returns a sorted copy of the array, while \li{A.sort()} sorts the array in-place and returns nothing.
 
-% The axis argument!!!
-Many of these methods have the option to operate \emph{along an axis}. 
-When called in this way on an $n$-D array, these methods return an $(n-1)$-D array (the specified axis is collapsed in the evaluation process).
+Every method listed above has the option to operate \emph{along an axis} via the keyword argument \li{axis}.
+If \li{axis} is specified for a method on an $n$-D array, the return value is an $(n-1)$-D array, the specified axis having been collapsed in the evaluation process.
+If \li{axis} is not specified, the return value is usually a scalar.
 
 \begin{lstlisting}
->>> ex6 = np.arange(9).reshape((3,3))
->>> ex6
+>>> A = np.arange(9).reshape((3,3))
+>>> A
 array([[0, 1, 2],
        [3, 4, 5],
        [6, 7, 8]])
        
-# Return the maximum value in the array
->>> ex6.max() 
+# Find the maximum value in the entire array.
+>>> A.<<max>>() 
 8
 
-# Return the sum along the 0-axis (the columns)
->>> ex6.sum(axis=0)
-array([9, 12, 15])
+# Find the minimum value of each column.
+>>> A.<<min>>(axis=0)                   # np.array([min(A[:,i]) for i in xrange(3)])
+array([0, 1, 2])
 
-# Return the sum along the 1-axis (the rows)
->>> ex6.sum(axis=1)
+# Compute the sum of each row.
+>>> A.<<sum>>(axis=1)                   # np.array([sum(A[i,:]) for i in xrange(3)])
 array([3, 12, 21])
 \end{lstlisting}
+
+A more comprehensive list of array methods can be found at
+\url{http://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.
+html}.
+See the visual guide at the end of the lab for more examples of the \li{axis} keyword argument.
+
+\begin{problem} % Problem 6: Row stochasticity.
+A matrix is called \emph{row-stochastic} if each of its rows sum to $1$.\footnote{Similarly, a matrix is called \emph{column-stochastic} if its columns all sum to $1$.}
+Stochastic matrices are critically important for discrete random processes and some machine learning algorithms.
+
+Write a function than accepts a matrix (as a 2-D array).
+Divide each row of the matrix by the row sum and return the new row-stochastic matrix.
+Use array broadcasting instead of a \li{for} loop.
+\end{problem}
+
+% =============================================================================
+% DONE TO HERE ================================================================
+% =============================================================================
 
 \begin{algorithm} % Laplace's equation procedure.
 \begin{algorithmic}[1]
@@ -998,8 +1009,6 @@ array([ 0.21845499,  0.73352537,  0.28064456,  0.66878454,  0.44138609])
 array([[17, 12, 13, 13, 18],
        [16, 10, 12, 18, 12]])
 \end{lstlisting}
-
-% Some other commonly-used functions are \li{np.random.randn()}, which samples from the normal distribution, \li{np.random.randint()}, which randomly selects integers from a range, and \li{np.random.random_integers()} which returns an array of random integers in a given range.
 
 \subsection*{Saving and Loading Arrays} % -------------------------------------
 
