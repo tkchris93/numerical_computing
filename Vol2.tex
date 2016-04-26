@@ -1,55 +1,18 @@
 \documentclass[nociteref]{SIAM-GH-book}
 
-\usepackage{hyperref}
-\usepackage{import}
-\usepackage{amsmath, amsfonts, amscd, amssymb}
-\usepackage{epsfig}
-\usepackage{graphicx}
-\usepackage{url}
-\usepackage{mathrsfs}
-\usepackage{makeidx}
-\usepackage{color}
-\usepackage{verbatim}
-\usepackage{listings}
-\usepackage{multicol}
-\usepackage{algorithmicx}
-\usepackage[plain]{algorithm}
-\usepackage[noend]{algpseudocode}
-\usepackage{float}
-\usepackage{paralist}
-\usepackage{caption}
-\usepackage{subcaption}
-\usepackage{textcomp}
-\usepackage[framemethod=tikz]{mdframed}
-\usepackage[style=alphabetic,refsection=chapter,backref=true]{biblatex}
-\usepackage{tikz}
-\usetikzlibrary{shapes,arrows, automata, backgrounds, calendar, chains, decorations,
-	matrix, mindmap, patterns, petri, positioning, shadows, shapes.geometric,
-	trees}
-
-\usepackage{mathtools}
-
-\usepackage[customcolors]{hf-tikz}
-\hfsetfillcolor{red!02}
-\hfsetbordercolor{red}
-
-
+% See command.tex for all package imports, environmens, and special commands.
 \input{command}
 
 \makeindex
 
-\begin{document}
+\begin{document} % ============================================================
 
-% INTRODUCTION ================================================================
-
-% Book cover and Front matter -------------------------------------------------
-\thispagestyle{empty}
+\thispagestyle{empty} % Book cover and Front matter ---------------------------
 
 \begin{center}
 {\huge \bf Labs for Foundations of Applied Mathematics} \\
 \vspace{5mm}
-{\Large \bf Volume II: Algorithm
-Design and Optimization}
+{\Large \bf Volume II: Algorithm Design and Optimization}
 \vspace{20mm}
 
 \includegraphics[scale = .25]{Cover}
@@ -58,9 +21,8 @@ Design and Optimization}
 
 \include{contributors}
 
-% The preface -----------------------------------------------------------------
+\begin{thepreface} % Preface --------------------------------------------------
 
-\begin{thepreface}
 This lab manual is designed to accompany the textbook \emph{Foundations of Applied Mathematics} by Humpherys and Jarvis.
 
 \vfill
@@ -77,7 +39,6 @@ Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 94105
 \centering\includegraphics[height=1.2cm]{by}
 \vfill
 \end{thepreface}
-% End of preface --------------------------------------------------------------
 
 \setcounter{tocdepth}{1}
 \tableofcontents
@@ -88,66 +49,38 @@ Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 94105
 
 % Introductory Labs -----------------------------------------------------------
 \part{Python Essentials}
-% Getting Started
 \subimport{./Labs/Introduction/GettingStarted/}{GettingStarted}
-% Standard Library
 \subimport{./Labs/Introduction/StandardLibrary/}{stdlib}
-% NumPy and SciPy
-\subimport{./Labs/Introduction/Arrays/}{Arrays}
-% Matplotlib
-\subimport{./Labs/Introduction/matplotlib/}{matplotlib}
-% Object Oriented Programming
 \subimport{./Labs/Introduction/OOP/}{ObjectOriented}
-% Exceptions and File I/O
+\subimport{./Labs/Introduction/Arrays/}{Arrays}
+\subimport{./Labs/Introduction/matplotlib/}{matplotlib}
 \subimport{./Labs/Introduction/Exceptions/}{Exceptions}
 
 % Volume II Labs --------------------------------------------------------------
 \part{Data Structures and Graph Algorithms}
-% Data Structures I: Linked Lists
 \subimport{./Python/DataStructures1/}{LinkedLists}
-% Data structures II: Trees
 \subimport{./Python/DataStructures2/}{BSTrees}
-% Nearest Neighbor: k-d trees and Postal Data
 \subimport{./Labs/NearestNeighbor/}{Neighbor}
-% BFS: Kevin Bacon
 \subimport{./Labs/KevinBacon/}{Bacon}
-\part{Probabilistic Algorithms}
-% Markov Chains
 \subimport{./Labs/MarkovChains/}{Markov}
+
 \part{Fourier Analysis}
-% Fourier Analysis: The Fast Fourier Transfrom
 \subimport{./Labs/FFT/}{fft}
-% Fourier Analysis: Filtering and Convolution (balloon pop)
 \subimport{./Labs/FilteringConvolution/}{Filtering_and_Convolution}
-% Fourier Analysis: Wavelets (fingerprints)
 \subimport{./Labs/Wavelets/}{Haar}
-% Gaussian Quadrature
 \subimport{./Labs/GaussianQuadrature/}{GaussQuad}
 
-% Semester Break
-
 \part{Optimization}
-% Optimization Pkg: scipy.optimize
 \subimport{./Python/scipyoptimize/}{scipyoptimize}
-% Optimization Pkg: CVXOPT
 \subimport{./Python/cvxopt/}{cvxopt}
-% Optimization: Line Search
 \subimport{./Labs/LineSearch/}{LineSearch}
-% Linear Optimization: Simplex (2 weeks)
 \subimport{./Labs/Simplex/}{Simplex}
-% Compress Sensing
 \subimport{./Labs/CompressedSensing/}{CompSense}
-% Optimization: Conjugate Gradient
 \subimport{./Labs/ConjugateGradient/}{ConjugateGradient}
-% Optimization: Trust Region
 \subimport{./Labs/TrustRegion/}{TrustRegion}
-% Optimization: Interior Point I
 \subimport{./Labs/InteriorPoint1/}{InteriorPoint1}
-% Optimization: Interior Point II
 \subimport{./Labs/InteriorPoint2/}{InteriorPointII}
-% Dynamic Optimization: Value Function Iteration
 \subimport{./Labs/ValueFunctionIteration/}{VFI}
-% Dynamic Optimization: Policy Function Iteration
 \subimport{./Labs/PolicyFunctionIteration/}{Policy_Function_Iteration}
 
 % ORPHANS =====================================================================

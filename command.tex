@@ -1,11 +1,52 @@
 %------------------------------------------------------------------------------%
-% command.tex                                                                  %
-% This file contains the various environments and other misc. commands         %
+% command.tex                                                                  % 
+% This file contains the various package imports, environment declarations,
+% and other misc. commands.
+%
 %------------------------------------------------------------------------------%
 
-%%%%%%%%%%%%%%%%%%%%%
-% Document settings
-%%%%%%%%%%%%%%%%%%%%%
+\usepackage{algorithmicx}
+\usepackage{amsmath, amsfonts, amscd, amssymb}
+\usepackage{appendix}
+\usepackage{bbm}
+\usepackage{caption}
+\usepackage{color}
+\usepackage{epsfig}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{import}
+\usepackage{listings}
+\usepackage{mathrsfs}
+\usepackage{mathtools}
+\usepackage{makeidx}
+\usepackage{multicol}
+\usepackage{paralist}
+\usepackage{relsize}
+\usepackage{subcaption}
+\usepackage{textcomp}
+\usepackage{verbatim}
+\usepackage{tikz}
+\usepackage{xparse}
+\usepackage{xcolor}
+\usepackage{url}
+
+\usepackage[plain]{algorithm}
+\usepackage[noend]{algpseudocode}
+\usepackage[style=alphabetic,refsection=chapter,backref=true]{biblatex}
+\usepackage[customcolors]{hf-tikz}
+\usepackage[framemethod=tikz]{mdframed}
+
+\usetikzlibrary{arrows, automata, backgrounds, calendar, chains, decorations,
+    matrix, mindmap, patterns, petri, positioning, shadows, shapes.geometric,
+    trees, shapes, decorations.pathreplacing}
+
+\hfsetfillcolor{red!02}
+\hfsetbordercolor{red}
+
+
+% Document settings ===========================================================
+
 %set lengths that are pleasing for screen display.
 \setlength{\paperheight}{11in}
 \setlength{\paperwidth}{8.5in}
@@ -15,8 +56,10 @@
 \setlength{\parskip} {2pt plus1pt minus1pt}
 
 \makeatletter
+
 %Make all floats centered
 \g@addto@macro\@floatboxreset\centering
+
 % Reset footnote counter every chapter
 \@addtoreset{footnote}{chapter}
 \makeatother
@@ -31,16 +74,13 @@
 }
 \makeatother
 
+% Bibliography settings =======================================================
 
-%%%%%%%%%%%%%%%%%%%%%%%%
-%Bibliography settings
-%%%%%%%%%%%%%%%%%%%%%%%%
 \addbibresource{references.bib}
 \renewcommand{\bibname}{References}
 
-%%%%%%%%%%%%%%%%%
-% Lab Commands
-%%%%%%%%%%%%%%%%%
+% Lab Commands ================================================================
+
 \renewcommand{\chaptername}{Lab}
 \newcommand{\lab}[2]{\chapter[#2]{#1}}
 \newcommand{\objective}[1]{{\bf Lab Objective: } \emph{#1} \bigskip}
@@ -48,9 +88,9 @@
 %% Full line comments in the Algorithmic environment.
 \algnewcommand{\LineComment}[1]{\State \(\triangleright\) #1}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%
-% Misc. Environments
-%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Misc. Environments ==========================================================
+
 \newcounter{problemnum}[chapter]
 \newenvironment{problem}{\begin{mdframed}[style=problem]\begin{problemnum}}{\end{problemnum}\end{mdframed}}
 \newtheoremup{problemnum}{Problem}
@@ -58,9 +98,8 @@
 \newenvironment{problem*}{\begin{mdframed}[style=problem]\begin{problemnum*}}{\end{problemnum*}\end{mdframed}}
 \newtheoremup{problemnum*}[problemnum]{*Problem}
 
-%%%%%%%%%%%%%%%%%%%%%%%
-% Colors
-%%%%%%%%%%%%%%%%%%%%%%%
+% Colors ======================================================================
+
 \definecolor{shadecolor}{RGB}{186, 207, 188}
 \definecolor{warning}{RGB}{255, 188, 163}
 \definecolor{warnline}{RGB}{255, 15, 15}
@@ -71,9 +110,9 @@
 \definecolor{codecomment}{RGB}{108, 153, 8}
 \definecolor{codestring}{RGB}{203, 75, 22}
 
-%%%%%%%%%%%%%%%%%%%%%%%
-% Frame environments
-%%%%%%%%%%%%%%%%%%%%%%%
+
+% Frame environments ==========================================================
+
 \mdfdefinestyle{problem}{backgroundcolor=shadecolor,
                          hidealllines=true,
                          skipabove=10pt,
@@ -128,9 +167,8 @@
   frametitle={\sc Note}
 ]{info}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Listings Environments
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Listings Environments ======================================================
+
 % Default Environment
 \lstset{
         language=Python,
@@ -196,9 +234,9 @@
 \newcommand{\li}[1]{\lstinline[prebreak=]!#1!}
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Special Math Characters
-%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Special Math Characters =====================================================
+
 \def\0{\mathbf{0}}
 \def\a{\mathbf{a}}
 \def\b{\mathbf{b}}
@@ -225,9 +263,9 @@
 \def\I{\Im m}
 \def\M{M_n}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Various commands that make life easier
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Various commands that make life easier ======================================
+
 \newcommand{\argmax}{\mbox{argmax}}
 \newcommand{\indicator}[1]{\mathbb{1}_{\left[#1\right] }}
 \providecommand{\abs}[1]{\left\lvert#1\right\rvert}
@@ -245,13 +283,13 @@
 
 %These commands are specifically for use in the pseudocode environment
 % Load the xparse package to use these commands
-\NewDocumentCommand\allocate{m+g}{		% Empty array
+\NewDocumentCommand\allocate{m+g}{		    % Empty array
   \IfNoValueTF{#2}
     {\mathrm{empty}(#1)}					% 1 dimension
     {\mathrm{empty}(#1, #2)}				% 2 dimensions
 }
 
-\NewDocumentCommand\zeros{m+g}{		% Zero array
+\NewDocumentCommand\zeros{m+g}{		        % Zero array
   \IfNoValueTF{#2}
     {\mathrm{zeros}(#1)}
     {\mathrm{zeros}(#1, #2)}%
@@ -262,12 +300,12 @@
 \newcommand{\shape}[1]{\mathrm{shape}(#1)}
 \newcommand{\size}[1]{\mathrm{size}(#1)}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Math Operators
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Math Operators ==============================================================
+
 % Many of these are for use in the pseudocode environments
 \DeclareMathOperator{\sign}{sign}
 \DeclareMathOperator{\sech}{sech}
-\DeclareMathOperator{\Out}{Out}	%Used in PageRank lab
-\DeclareMathOperator{\In}{In}		%Used in PageRank lab
+\DeclareMathOperator{\Out}{Out}	    % Used in PageRank lab
+\DeclareMathOperator{\In}{In}		% Used in PageRank lab
 \DeclareMathOperator\erf{erf}
