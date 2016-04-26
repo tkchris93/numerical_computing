@@ -1,50 +1,19 @@
 \documentclass[nociteref]{SIAM-GH-book}
 
-\usepackage{hyperref}
-\usepackage{import}
-\usepackage{amsmath, amsfonts, amscd, amssymb}
-\usepackage{epsfig}
-\usepackage{graphicx}
-\usepackage{url}
-\usepackage{mathrsfs}
-\usepackage{makeidx}
-\usepackage{multicol}
-\usepackage{algorithmicx}
-\usepackage[plain]{algorithm}
-\usepackage[noend]{algpseudocode}
-\usepackage{color}
-\usepackage{verbatim}
-\usepackage{listings}
-\usepackage{float}
-\usepackage{paralist}
-\usepackage{caption}
-\usepackage{subcaption}
-\usepackage{bbm}
-\usepackage{textcomp}
-\usepackage{tikz}
-\usepackage[framemethod=tikz]{mdframed}
-\usepackage[style=alphabetic,refsection=chapter,backref=true]{biblatex}
-\usepackage{mathtools}
-\usepackage{xcolor}
-\usetikzlibrary{automata,positioning, arrows, backgrounds, calendar, chains, decorations,
-	matrix, mindmap, patterns, petri, shadows, shapes.geometric,
-	trees}
-
-
+% See command.tex for all package imports, environmens, and special commands.
 \input{command}
 
 \makeindex
 
-\begin{document}
+\begin{document} % ============================================================
 
-%----------------------------------------------------------------
-%Book cover and Front matter
-\thispagestyle{empty}
+\thispagestyle{empty} % Book cover and Front matter ---------------------------
+
 \begin{center}
-{\Large Labs for Foundations of Applied Mathematics} \\
+{\huge \bf Labs for Foundations of Applied Mathematics} \\
 \vspace{5mm}
-{\Large Volume III: Modeling with Uncertainty and Data}
-\vspace{5mm}
+{\Large \bf Volume III: Modeling with Uncertainty and Data}
+\vspace{20mm}
 
 \includegraphics[scale = .25]{Cover}
 \end{center}
@@ -52,10 +21,8 @@
 
 \include{contributors}
 
-%------------------------------------------------------------------
-%The preface, which will presumably be longer in the future
+\begin{thepreface} % Preface --------------------------------------------------
 
-\begin{thepreface}
 This lab manual is designed to accompany the textbook \emph{Foundations of Applied Mathematics} by Humpherys and Jarvis.
 
 \vfill
@@ -72,12 +39,15 @@ Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 94105
 \centering\includegraphics[height=1.2cm]{by}
 \vfill
 \end{thepreface}
-%-----------------------------------------------------------------
 
 \setcounter{tocdepth}{1}
 \tableofcontents
 
 \mainmatter
+
+% LABS ========================================================================
+
+% THIS NEEDS TO BE REVISED TO MATCH THE CURRENT OUTLINE.
 
 \part{Labs}
 \subimport{./Python/UnixShell1/}{shell1.tex}
