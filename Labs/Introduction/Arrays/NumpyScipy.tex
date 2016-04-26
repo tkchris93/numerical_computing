@@ -962,7 +962,31 @@ The following online resources are specific to SciPy:
 The submodule \li{np.random} holds many functions for creating arrays of random values chosen from probability distributions such as the uniform, normal, and multinomial distributions.
 It also contains some utility functions for getting non-distributional random samples, such as random integers or random samples from a given array.
 
-% Another table here.
+\begin{table}[H] % The np.random submodule.
+\begin{tabular}{r|l}
+Function & Description\\
+\hline
+\li{choice()} & Take random samples from a 1-D array.\\
+\li{random()} & Uniformly distributed floats over [0, 1).\\
+\li{randint()} & Random integers over a half-open interval.\\
+\li{random_integers()} & Random integers over a closed interval.\\
+\li{randn()} & Sample from the standard normal distribution.\\
+\li{permutation()} & Randomly permute a sequence / generate a random sequence.\\
+\\
+Function & Distribution\\
+\hline
+\li{beta()} & Beta distribution over [0, 1].\\
+\li{binomial()} & Binomial distribution.\\
+\li{exponential()} & Exponential distribution.\\
+\li{gamma()} & Gamma distribution.\\
+\li{geometric()} & Geometric distribution.\\
+\li{multinomial()} & Multivariate generalization of the binomial distribution.\\
+\li{multivariate_normal()} & Multivariate generalization of the normal distribution.\\
+\li{normal()} & Normal / Gaussian distribution.\\
+\li{poisson()} & Poisson distribution.\\
+\li{uniform()} & Uniform distribution.
+\end{tabular}
+\end{table}
 
 \begin{lstlisting}
 # 5 uniformly distributed values in the interval [0, 1).
@@ -975,56 +999,60 @@ array([[17, 12, 13, 13, 18],
        [16, 10, 12, 18, 12]])
 \end{lstlisting}
 
-Some other commonly-used functions are \li{np.random.randn()}, which samples from the normal distribution, \li{np.random.randint()}, which randomly selects integers from a range, and \li{np.random.random_integers()} which returns an array of random integers in a given range.
-
-A table with np.random functions.
+% Some other commonly-used functions are \li{np.random.randn()}, which samples from the normal distribution, \li{np.random.randint()}, which randomly selects integers from a range, and \li{np.random.random_integers()} which returns an array of random integers in a given range.
 
 \subsection*{Saving and Loading Arrays} % -------------------------------------
 
-% TODO: revise.
 It is often useful to save an array as a file.
 NumPy provides several easy methods for saving and loading array data.
 
-\begin{table*}[H]
-\begin{tabular}{l|l}
+\begin{table}[H]
+\begin{tabular}{r|l}
+Function & Description\\
 \hline
-\li{np.save(file, arr)} & Save an array to a binary file \\
-\li{np.savez(file, *arrs)} & Save multiple arrays to a binary file \\
-\li{np.savetxt(file, arr)} & Save an array to a text file \\
+\li{save()} & Save a single array to a \texttt{.npy} file.\\
+\li{savez()} & Save multiple arrays to a \texttt{.npz} file.\\
+\li{savetxt()} & Save a single array to a text file (\texttt{.txt}).\\
 \hline
+\li{load()} & Load and return an array or arrays from a \texttt{.npy} or \texttt{.npz} file.\\
+\li{loadtxt()} & Load and return an array from a text file.
 \end{tabular}
-\end{table*}
+\end{table}
 
-\begin{table*}[H]
-\begin{tabular}{l|l}
-\hline
-\li{np.load(file)} & Load and return an array from a binary file \\
-\li{np.loadtxt(file)} & Load and return an array from text file \\
-\hline
-\end{tabular}
-\end{table*}
-
-Let's practice saving an array to a file and loading it again.
-Note that, when saving an array, NumPy automatically appends the extension \li{.npy} if it is not already present.
 \begin{lstlisting}
-a = np.arange(30)
-np.save('test_arr', a)
-new_a = np.load('test_arr.npy')
-np.savez('test_multi', a=a, new_a=new_a)
-arrs = np.load('test_multi.npz')
+# Save a 100x100 matrix of uniformly distributed random values.
+>>> x = np.random.random((100,100))
+>>> np.save("uniform.npy", x)       # Or np.savetxt("uniform.txt", x).
+
+# Read the array from the file and check that it matches the original.
+>>> y = np.load("uniform.npy")      # Or np.loadtxt("uniform.txt").
+>>> np.allclose(x, y)
+True
 \end{lstlisting}
-The variable \li{arrs} points to a dictionary object with the keys \li{a} and \li{new_a} which reference the arrays that have been saved.
-The \li{.npz} file extension is the file type used to store multiple arrays.
+
+To save several arrays to a single file, specify a keyword argument for each array in \li{np.savez()}.
+Then \li{np.load()} will return a dictionary-like object with the keyword parameter names from the save command as the keys.
+
+\begin{lstlisting}
+# Save two 100x100 matrices of normally distributed random values.
+>>> x = np.random.randn(100,100)
+>>> y = np.random.randn(100,100)
+>>> np.savez("normal.npz", x=x, y=y})
+
+# Read the arrays from the file and check that they match the original.
+>>> arrays = np.loadz("normal.npz")
+>>> np.allclose(x, arrays['x'])
+True
+>>> np.allclose(y, arrays['y'])
+True
+\end{lstlisting}
 
 \subsection*{Iterating Through Arrays} % --------------------------------------
 
-% TODO: revise.
-Iterating through an array negates most speed advantages of NumPy. 
-You should avoid doing this whenever possible.
-You can often avoid iterating through arrays by using \emph{array broadcasting} and \emph{universal functions}, discussed in the next section.
-
-It is occasionally valid to iterate through an array. 
-The function \li{np.nditer()} will create an object that iterates through an array as quickly as possible.
+Iterating through an array (using a \li{for} loop) negates most of the advantages of using NumPy.
+Avoid iterating through arrays as much as possible by using array broadcasting and universal functions.
+When absolutely necessary, use \li{np.nditer()} to create an efficient iterator for the array.
+See \url{http://docs.scipy.org/doc/numpy/reference/arrays.nditer.html} for details.
 
 \begin{comment}
 \subsection*{Linear Algebra} % ------------------------------------------------
@@ -1207,47 +1235,50 @@ Because 1-D arrays are flat, \li{np.hstack()} concatenates 1-D arrays and \li{np
 To make several 1-D arrays into the columns of a 2-D array, use \li{np.column_stack()}.
 
 \begin{align*}
-x = \left(\begin{array}{ccc}\times & \times & \times\end{array}\right)
+x = \left(\begin{array}{cccc}
+\times & \times & \times & \times\end{array}\right)
 &&
-y = \left(\begin{array}{ccc}* & * & *\end{array}\right)
+y = \left(\begin{array}{cccc}
+* & * & * & *\end{array}\right)
 \end{align*}
 
 \begin{align*}
 \text{\li{np.hstack((x,y,x))}} =
-\left(\begin{array}{ccccccccc}
-\times & \times & \times & * & * & * & \times & \times & \times
+\left(\begin{array}{cccccccccccc}
+\times & \times & \times & \times &
+* & * & * & * &
+\times & \times & \times & \times
 \end{array}\right)
 \end{align*}
 
 \begin{align*}
 \text{\li{np.vstack((x,y,x))}} =
-\left(\begin{array}{ccc}
-\times & \times & \times\\
-* & * & *\\
-\times & \times & \times
+\left(\begin{array}{cccc}
+\times & \times & \times & \times\\
+* & * & * & *\\
+\times & \times & \times & \times
 \end{array}\right)
 &&
 \text{\li{np.column_stack((x,y,x))}} =
 \left(\begin{array}{ccc}
 \times & * & \times\\
 \times & * & \times\\
+\times & * & \times\\
 \times & * & \times
 \end{array}\right)
 \end{align*}
-
-
 
 \subsection*{Broadcasting}
 
 Really only need two pictures here.
 
+\subsection*{Operations along an Axis}
 
 % =============================================================================
 % =============================================================================
 % MATERIAL TO BE MOVED TO OTHER LABS ==========================================
 % =============================================================================
 % =============================================================================
-
 
 \begin{comment} % Matplotlib lab vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 \li{np.arange()}, NumPy's version of the built-in \li{range()} function, creates evenly-spaced values within an interval specified with slicing syntax.
