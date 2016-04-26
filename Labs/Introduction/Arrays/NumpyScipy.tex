@@ -665,7 +665,7 @@ array([[0],
 \subsection*{Stacking} % ------------------------------------------------------
 
 Suppose we have two or more matrices that we would like to join together into a single block matrix.
-NumPy has methods for \emph{stacking} arrays with similar dimensions together for this very purpose.
+NumPy has functions for \emph{stacking} arrays with similar dimensions together for this very purpose.
 Each of these methods takes in a single tuple of arrays to be stacked in sequence.
 
 \begin{lstlisting}
@@ -677,6 +677,22 @@ Each of these methods takes in a single tuple of arrays to be stacked in sequenc
 array([[ 0.,  1.,  1.,  1.,  1.,  1.,  0.,  1.],
        [ 2.,  3.,  1.,  1.,  1.,  1.,  2.,  3.],
        [ 4.,  5.,  1.,  1.,  1.,  1.,  4.,  5.]])
+\end{lstlisting}
+
+\begin{lstlisting}
+>>> A = np.arange(6).reshape((2,3))
+>>> B = np.zeros((4,3))
+
+# vstack() stacks arrays vertically (row-wise).
+>>> np.vstack((A,B,A))
+array([[ 0.,  1.,  2.],
+       [ 3.,  4.,  5.],
+       [ 0.,  0.,  0.],
+       [ 0.,  0.,  0.],
+       [ 0.,  0.,  0.],
+       [ 0.,  0.,  0.],
+       [ 0.,  1.,  2.],
+       [ 3.,  4.,  5.]])
 \end{lstlisting}
 
 See the visual guide at the end of the lab for more examples of stacking, and 
@@ -1101,23 +1117,6 @@ Verify that your approximation is close.
 
 \section*{NumPy Visual Guide}
 
-% \begin{align*}
-% A = \left(\begin{array}{rrrrr}
-% \times & \times & \times & \times & \times\\
-% \times & \times & \times & \times & \times\\
-% \times & \times & \times & \times & \times\\
-% \times & \times & \times & \times & \times
-% \end{array}\right)
-% &&
-% A.T = \left(\begin{array}{rrrr}
-% \times & \times & \times & \times\\
-% \times & \times & \times & \times\\
-% \times & \times & \times & \times\\
-% \times & \times & \times & \times\\
-% \times & \times & \times & \times
-% \end{array}\right)
-% \end{align*}
-
 \subsection*{Data Access}
 
 The entries of a 2-D array are the rows of the matrix (as 1-D arrays).
@@ -1148,14 +1147,14 @@ The syntax \li{[a:b]} can be read as ``the $a^{th}$ entry up to (but not includi
 Similarly, \li{[a:]} means ``the $a^{th}$ entry to the end'' and \li{[:b]} means ``everything up to (but not including) the $b^{th}$ entry.''
 
 \begin{align*}
-A[1] = A[1,:] = \left(\begin{array}{rrrrr}
+\text{\li{A[1]}} = \text{\li{A[1,:]}} = \left(\begin{array}{rrrrr}
 \times & \times & \times & \times & \times\\
 \tikzmarkin{row2}\times & \times & \times & \times & \times\tikzmarkend{row2}\\
 \times & \times & \times & \times & \times\\
 \times & \times & \times & \times & \times\\
 \end{array}\right)
 &&
-A[:,2] = \left(\begin{array}{rrrrr}
+\text{\li{A[:,2]}} = \left(\begin{array}{rrrrr}
 \times & \times & \tikzmarkin{col}\times & \times & \times\\
 \times & \times & \times & \times & \times\\
 \times & \times & \times & \times & \times\\
@@ -1164,14 +1163,14 @@ A[:,2] = \left(\begin{array}{rrrrr}
 \end{align*}
 
 \begin{align*}
-A[1:,:2] = \left(\begin{array}{rrrrr}
+\text{\li{A[1:,:2]}} = \left(\begin{array}{rrrrr}
 \times & \times & \times & \times & \times\\
 \tikzmarkin{block}\times & \times & \times & \times & \times\\
 \times & \times & \times & \times & \times\\
 \times & \times\tikzmarkend{block} & \times & \times & \times
 \end{array}\right)
 &&
-A[1:-1,1:-1] = \left(\begin{array}{rrrrr}
+\text{\li{A[1:-1,1:-1]}} = \left(\begin{array}{rrrrr}
 \times & \times & \times & \times & \times\\
 \times & \tikzmarkin{interior} \times & \times & \times & \times\\
 \times & \times & \times & \times \tikzmarkend{interior} & \times\\
@@ -1180,13 +1179,79 @@ A[1:-1,1:-1] = \left(\begin{array}{rrrrr}
 
 \subsection*{Stacking}
 
-\begin{enumerate}
-\item hstack()
-\item vstack()
-\item column\_stack()
-\item row\_stack()
-\item concatenate()
-\end{enumerate}
+\li{np.hstack()} stacks sequence of arrays horizontally and \li{np.vstack()} stacks a sequence of arrays vertically.
+
+\begin{align*}
+A = \left(\begin{array}{ccc}
+\times & \times & \times\\
+\times & \times & \times\\
+\times & \times & \times
+\end{array}\right)
+&&
+B = \left(\begin{array}{ccc}
+* & * & * \\
+* & * & * \\
+* & * & *
+\end{array}\right)
+\end{align*}
+
+\begin{align*}
+\text{\li{np.hstack((A, B, A))}} =
+\left(\begin{array}{ccccccccc}
+\times & \times & \times & * & * & * & \times & \times & \times\\
+\times & \times & \times & * & * & * & \times & \times & \times\\
+\times & \times & \times & * & * & * & \times & \times & \times
+\end{array}\right)
+\end{align*}
+
+\begin{align*}
+\text{\li{np.vstack((A, B, A))}} =
+\left(\begin{array}{ccc}
+\times & \times & \times\\
+\times & \times & \times\\
+\times & \times & \times\\
+* & * & * \\
+* & * & * \\
+* & * & * \\
+\times & \times & \times\\
+\times & \times & \times\\
+\times & \times & \times
+\end{array}\right)
+\end{align*}
+
+Because 1-D arrays are flat, \li{np.hstack()} concatenates 1-D arrays and \li{vstack()} stacks them vertically.
+To make several 1-D arrays into the columns of a 2-D array, use \li{np.column_stack()}.
+
+\begin{align*}
+x = \left(\begin{array}{ccc}\times & \times & \times\end{array}\right)
+&&
+y = \left(\begin{array}{ccc}* & * & *\end{array}\right)
+\end{align*}
+
+\begin{align*}
+\text{\li{np.hstack((x,y,x))}} =
+\left(\begin{array}{ccccccccc}
+\times & \times & \times & * & * & * & \times & \times & \times
+\end{array}\right)
+\end{align*}
+
+\begin{align*}
+\text{\li{np.vstack((x,y,x))}} =
+\left(\begin{array}{ccc}
+\times & \times & \times\\
+* & * & *\\
+\times & \times & \times
+\end{array}\right)
+&&
+\text{\li{np.column_stack((x,y,x))}} =
+\left(\begin{array}{ccc}
+\times & * & \times\\
+\times & * & \times\\
+\times & * & \times
+\end{array}\right)
+\end{align*}
+
+
 
 \subsection*{Broadcasting}
 
