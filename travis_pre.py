@@ -4,8 +4,8 @@ import sys
 import travis_common as tc
 
 
-# 100KB in bytes
-MAX_FILESIZE = 104400
+# 500KB in bytes
+MAX_FILESIZE = 512000
 
 def getOutput(cmd):
     return os.popen(cmd).read()
