@@ -31,7 +31,7 @@ def plotGrid(dim,level):
             pt = tuple(points[i])
             xpts[i], ypts[i], zpts[i] = sg.gP[pt].pointPosition(pt)[:3]
         ax.scatter(xpts, ypts, zpts)    
-    plt.show()
+    #plt.show()
 
 def n_vol(length,dim,level):
     return length**dim/(2**(dim*(level-1))*(dim+1))

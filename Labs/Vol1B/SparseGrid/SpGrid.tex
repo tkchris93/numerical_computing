@@ -61,7 +61,7 @@ The first few basis functions are listed in Table \ref{table:functions}, and are
 \begin{subfigure}{.49\textwidth}
 \includegraphics[width=\textwidth]{j4.png}
 \end{subfigure}
-\caption{Plots of the first few standard hat functions.  Note that the value of $j$ gives the number of ``hats" in the domain $[-1,1]$, and $i$ gives which hat, counting from the left-most hat.}
+\caption{Plots of the first few standard hat functions.  Note that the value of $j$ gives the number of "hats" in the domain $[-1,1]$, and $i$ gives which hat, counting from the left-most hat.}
 \label{fig:basis_functions}
 \end{figure}
 \end{center}
@@ -92,7 +92,7 @@ This is the area of a semi-circle of radius $1$, and can easily be computed math
 \begin{equation*}
 f(x) \approx \sum_{n=1}^l \sum_{m=1}^{2^{n-1}} c_{nm} \phi_{nm}(x) 
 \end{equation*}
-where $c_{nm}$ are the apropriate constants which can be found by evaluating the difference between $f(x)$ and the sum of the basis hat functions of lower order at the peak of each hat:
+where $c_{nm}$ are the appropriate constants which can be found by evaluating the difference between $f(x)$ and the sum of the basis hat functions of lower order at the peak of each hat:
 \begin{equation}
 c_{nm} = f(p_{nm}) - \sum_{s=1}^{n-1} \sum_{t=1}^{2^{s-1}} c_{st}*\phi_{st}(p_{nm})
 \end{equation}
@@ -148,7 +148,9 @@ def hat_approximation(f,l):
 
 \begin{problem}
 Write a function that, given the coefficients returned by the function in Problem \ref{prob:one}, returns the value of the integral.
+\end{problem}
 
+\begin{problem}
 Using the function $f(x)=\sqrt{1-x^2}$, calculate the error of $\int_{-1}^1 f(x)$ in regards to the actual value $\pi/2$.  Do this for the order $l = 1,2,\cdots,10$, and plot the error as a function of $l$.  Your results should match Figure \ref{fig:errors}.  Additionally, time how long it takes to execute the code for each $l$, and plot your results in another graph.
 \end{problem}
 
@@ -157,16 +159,28 @@ Keep in mind that thus far we have only used a function of one variable.  For ea
 \section*{Sparse Grids}
 Rather than dividing each dimension into $n$ sections, which for $d$ dimensions would give $n^d$ points, sparse grids use only a few of these points.  There are many types of sparse grids, and each is useful for certain purposes.  Which type of sparse grid is used will often depend on the nature of the problem you are trying to solve.  For this lab, we will use the basic sparse grid for purposes of integration.
 
-The basic sparse grid has two main properties, the dimension and the level.  Using these two variables and Equation \ref{eq:points}, we can construct a sparse grid.  Visualizing this in one dimesion is simple: we use as our evaluation points each $p_{nm}$.  A level $1$ grid has one point at the center, which is the peak of the level $1$ hat.  A level $2$ grid has the level $1$ point with two level $2$ points, which are the peaks of the two level $2$ hats.  The third level adds its $4$ points, etc.  So for one dimension of level $l$ we have $\sum_{i=1}^l 2^{i-1}$ points.
+The basic sparse grid has two main properties, the dimension and the level.  Using these two variables and Equation \ref{eq:points}, we can construct a sparse grid.  Visualizing this in one dimension is simple: we use as our evaluation points each $p_{nm}$.  A level $1$ grid has one point at the center, which is the peak of the level $1$ hat.  A level $2$ grid has the level $1$ point with two level $2$ points, which are the peaks of the two level $2$ hats.  The third level adds its $4$ points, etc.  So for one dimension of level $l$ we have $\sum_{i=1}^l 2^{i-1}$ points.
 
 Understanding a $2$-dimensional grid  is a bit more complicated.  Our level $1$ point goes at the center of the grid.  To expand to level $2$, we add in the peaks of the level $2$ hats \emph{in both dimensions}, for an additional $4$ points.  Level $3$ is where it gets a little bit tricky mathematically.  We can't just keep expanding only along the axes of the grid, because we need points on the interior as well.  Conceptually, what we do is take our current points and divide the space between points and the end of the grid into two, and there we create a new point.  This is synonymous to adding a hat between the peaks of currently existing points.
 
 We can make a lot more sense of that last paragraph by actually plotting the points.  The file \li{pysg.py} contains a sparse grid class with many useful functions.  Using \li{plotGrid}, you can plot the grid points.  You will first need to create a sparse grid object, and then generate the points using the built in function.  Unfortunately, \li{plotGrid} can only plot up to three dimensions.  Note that in this file, our domain is $[0,1]^d$ rather than $[-1,1]^d$.  
 %Be sure to take note of this when computing the integrals in the following problem.  
 
+\begin{center}
+\begin{figure}
+\includegraphics[width=.7\textwidth]{gridpoints.png}
+\caption{Sparse grid points for 2-D grid of level 5}
+\label{fig:gridpoints}
+\end{figure}
+\end{center}
+
+
+
 \begin{problem}
-Wrtie a function called \li{points} that takes no inputs and returns an array of size (31, 3), where each row contains the location of a grid point for the $3$-dimensional basic sparse grid of level $3$.
+Explore the \li{sparseGrid} class contained in the module \li{pysg.py}. Figure out how to create a sparse grid object, generate the points, and plot them. This function should plot the sparse grid points for a grid of dimension 2 and level 5. See the figure above.
 \end{problem}
+
+
 
 Multi-dimensional integration for functions with independent endpoints (those that are numbers that do not depend on other variables) is simplified greatly by using sparse grids.  Functions must be manipulated appropriately before sparse grid classes like those in \li{pysg.py} can be used to do the integration, but once this has been done, their evaluation becomes rather simple.  Once the coefficients for the hat functions have been computed, the integrals can be evaluated without having to perform any integration.  Sparse grids are powerful tools for fast computation of high-dimension integrals.  
 %In general, note that
