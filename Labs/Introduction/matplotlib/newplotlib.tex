@@ -99,11 +99,11 @@ array([  0.        ,  10.66666667,  21.33333333,  32.        ])
 \end{lstlisting}
 
 The result of this plotting command is shown in Figure \ref{fig:basic2}.
-This time, the $x$-axis is correctly aligned with the $y$-axis.
+Note that this time, the $x$-axis is correctly aligned with the $y$-axis.
 The resolution is also much better because \li{x} and \li{y} have $50$ entries each instead of only $10$.
 
-All calls to \li{plt} functions modify the same figure until \li{plt.show()} is executed, which displays the current figure(s) and resets the system.
-The next \li{plt} function will then modify a new figure.
+All calls to \li{plt} functions modify the same figure until \li{plt.show()} is executed, which displays the current figure and resets the system.
+The next time a \li{plt} function is called a new figure is created.
 This makes it possible to plot several lines in a single figure.
 
 \begin{comment} % Wordy details and unnecessary plots for multi-line plotting.
@@ -132,46 +132,38 @@ plt.show()
 \end{comment}
 
 \begin{problem} % Plot two lines (sin() and cos()).
-Plot the function $\sin(x)$ from $0$ to $2\pi$, then plot $\cos(x)$ on the same domain (use \li{np.pi} for $\pi$).
-Make sure your domain is refined enough to produce a figure with good resolution.
+Plot the functions $\sin(x)$, $\cos(x)$, and $\arctan(x)$ on the domain $[-2\pi, 2\pi]$ (use \li{np.pi} for $\pi$).
+% Call \li{plt.xlim(-2*np.pi, 2*np.pi)} before \li{plt.show()} to stretch the $x$-axis appropriately.
+Make sure the domain is refined enough to produce a figure with good resolution.
 \end{problem}
 
-\begin{comment} % More thorough explanation of np.arange() vs. np.linspace().
-\li{np.arange()}, NumPy's version of the built-in \li{range()} function, creates evenly-spaced values within an interval specified with slicing syntax.
-Specifically, \li{np.arange(start, stop, step)} returns an array of numbers from \li{start} up to (but not including) \li{stop}, with each entry \li{step} apart.
-If they are not specified, \li{start} defaults to $0$ and \li{step} defaults to $1$.
+\begin{info} % Interactive Mode.
+Plotting can seem a little mystical because the actual plot doesn't appear until \li{plt.show()} is executed.
+Matplotlib's \emph{interactive mode}, particularly useful in IPython, allows the user to see the plot be constructed one piece at a time.
+Use \li{plt.ion()} to turn interactive mode on and \li{plt.ioff()} to turn it off.
+This is very useful for customizing a plot on the fly.
+
+As an example, try executing the following commands in IPython:
 
 \begin{lstlisting}
-# The integers from 0 to 5, exclusive.
->>> np.arange(5)
-array([0, 1, 2, 3, 4])
+In [1]: import numpy as np
+In [2]: from matplotlib import pyplot as plt
 
-# The complex integers from 3 to 8, exclusive.
->>> np.arange(3, 8, dtype=np.complex)
-array([ 3.+0.j,  4.+0.j,  5.+0.j,  6.+0.j,  7.+0.j])
+# Turn interactive mode on and make some plots.
+In [3]: plt.ion()
+In [4]: x = np.linspace(1, 4, 100)
+In [5]: plt.plot(x, np.log(x))
+In [6]: plt.plot(x, np.exp(x))
 
-# Every 2nd integer from 10 to 20, exclusive.
->>> np.arange(10, 20, 2)
-array([10, 12, 14, 16, 18])
+# Clear the figure, then turn interactive mode off.
+In [7]: plt.clf()
+In [8]: plt.ioff()
 \end{lstlisting}
 
-\li{np.linspace()} also create an array of evenly spaced values in a given interval.
-Instead of specifying the step size, we specify the number of desired points in the array.
-Unlike \li{np.arange()}, the interval includes the endpoint.
-This function is used extensively with plotting and finite difference methods.
+It is wise to use interactive mode \textbf{only} with IPython, as it exhibits erratic behavior when producing subplots or multiple figures.
+\end{info}
 
-\begin{lstlisting}
-# 4 evenly spaced values between 0 and 32, inclusive.
->>> np.linspace(0, 32, 4) 
-array([  0.        ,  10.66666667,  21.33333333,  32.        ])
-
-# 9 evenly spaced values between -1 and 1, inclusive.
->>> np.linspace(-1, 1, 9)
-array([-1.  , -0.75, -0.5 , -0.25,  0.  ,  0.25,  0.5 ,  0.75,  1.  ])
-\end{lstlisting}
-\end{comment} % ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-\subsection*{Color and Style}
+\section*{Plot Customization} % ===============================================
 
 \begin{comment} % A little old, but might be useful to have a table like this.
 There are also many functions that we may use to set different values in
@@ -239,19 +231,19 @@ Your final plot should look like the figure below.
 \end{figure}
 \end{problem}
 
-\begin{comment} % Could still be a good problem if simplified.
-\begin{problem} Plot the curve $\sin(x)\frac{1}{x+1}$ from $0$ to $10$.
+\begin{comment} % Could still maybe be a good problem if simplified (?)
+\begin{problem} Plot the curve $\frac{\sin(x)}{x+1}$ from $0$ to $10$.
 
-Use blue shading under the curve when it is positive and red when it is negative (you may want to consider using the \li{fill_between} command.
+Use blue shading under the curve when it is positive and red when it is negative (you may want to consider using \li{plt.fill_between()}.
 Make the line dotted.
 Label the x-axis ``x-axis'', the y-axis ``y-axis'',and the plot ``My Plot''.
 Enable the grid lines.
 
-Finally, use the \li{scatter} command to include a scatter plot of half of the value of the function at each of its maxima and minima in the range.
+Finally, use \li{plt.scatter()} to include a scatter plot of half of the value of the function at each of its maxima and minima in the range.
 Display these points as upward-pointing triangles.
 Don't forget to make sure the x limits of the plot are still 0 and 10.
 
-\emph{Helpful Hint}: Since you are working with arrays of discrete values, you will want to find the index values where your $x$ and $y$ values are closest to the actual maxima and minima. As you work, consider the following:
+\emph{Hint}: Since you are working with arrays of discrete values, you will want to find the index values where your $x$ and $y$ values are closest to the actual maxima and minima. As you work, consider the following:
 \begin{itemize}
 \item How would you manually find maxima and minima of a function?
 \item How could you do something similar with your $x$ and $y$ arrays?
@@ -264,6 +256,121 @@ Your plot should look like the figure below.
 \end{figure}
 \end{problem}
 \end{comment}
+
+\subsection*{Subplots}
+\emph{Subplots} are nonoverlapping plots arranged in a grid within a single figure (see Figure \ref{fig:subplots}).
+In \li{matplotlib}, specify which subplot you wish to modify with command \li{plt.subplot(numrows, numcols, fignum)}.
+Here, \li{numrows} is the number of rows of subplots in the figure, \li{numcols} is the number of columns of subplots in the figure, and \li{fignum} is the index of the subplot you wish to modify.
+This index starts at 1 and increments across rows first.
+
+The following code draws Figure \ref{fig:subplots}.
+\begin{lstlisting}
+x = np.linspace(-np.pi, np.pi, 400)
+y1 = np.sin(x)
+y2 = np.cos(x)
+
+# Draw the first subplot.
+plt.subplot(2, 1, 1)
+plt.plot(x, y1)
+
+# Draw the second subplot.
+plt.subplot(2, 1, 2)
+plt.plot(x, y2)
+
+plt.show()
+\end{lstlisting}
+
+\begin{figure}
+\includegraphics[width=.7\textwidth]{subplots.pdf}
+\caption{The graphs of $\sin(x)$ and $\cos(x)$ as subplots in a single figure.}
+\label{fig:subplots}
+\end{figure}
+
+\begin{comment}
+\begin{problem} % Need a new subplots problem. Bernstein? (DataVis lab has it)
+Make a plot with 4 subplots.
+In the subplots place graphs of $e^x$, $sin(x)$, $cos(x)$, and $x^2$.
+Plot each graph over the interval $(-\pi,\pi)$.
+Title each graph accordingly and title the entire figure ``My Different Plots."
+\end{problem}
+\end{comment}
+
+\section*{Other Kinds of Plots}
+
+\subsection*{Histograms}
+A \emph{histogram} is a way to visualize a 1-D data set, or list of values. 
+A histogram is created by dividing up the range of the values into a finite number of intervals, or \emph{bins}.
+Then, the number of values in each bin is added up.
+Graphically, these totals are represented by bars whose length is equal to the number of values in the bin.
+
+For example, suppose we randomly choose 20 integers between 1 and 10.
+This code creates a histogram depicting how many of each number we chose.
+Its output is in Figure \ref{fig:histogram}.
+
+\begin{lstlisting}
+x = np.random.randint(1, 11, 20)
+plt.hist(x, bins=10, range=[.5, 10.5])
+plt.show()
+\end{lstlisting}
+
+In this example our data set \li{x} consists of only integer values.
+We created 10 bins in the range [.5, 10.5] so that each bin contains exactly one integer.
+
+The function \li{plt.hist()} also returns some arrays, the first of which is a list of the total number of values in each bin.
+
+We could also use a \emph{scatter plot} to visualize the random integers \li{x} that we generated in the previous example. 
+The \li{matplotlib} function call \li{plt.scatter(x,y)} draws a scatter plot from two 1-D arrays \li{x} and \li{y} by plotting the points \li{(x[i], y[i])}.
+As an example, the code below produces Figure \ref{fig:scatter}.
+
+\begin{lstlisting}
+t = np.linspace(1,20,20)
+# The argument 's' specifies the marker size.
+plt.scatter(t, x, s=100)
+plt.show()
+\end{lstlisting}
+
+
+\begin{figure}
+\centering
+\begin{subfigure}[t]{.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{histogram.pdf}
+\caption{A histogram.}
+\label{fig:histogram}
+\end{subfigure}
+\begin{subfigure}[t]{.49\textwidth}
+\centering
+\includegraphics[width=\textwidth]{scatter.pdf}
+\caption{A scatter plot.}
+\label{fig:scatter}
+\end{subfigure}
+
+\caption{A histogram produced with \li{plt.hist()} and a scatter plot produced with \li{plt.scatter()}.}
+\label{fig:otherplots}
+\end{figure}
+
+\begin{problem} % Find some real data to use with this problem. age v height?
+\label{prob:subplot}
+Follow these steps to generate a plot similar to that in Figure \ref{fig:subplotProb}:
+\begin{enumerate}
+\item Generate 50 random numbers in the interval $[0,1)$ with the function \li{np.random.rand()}.
+\item Create a plot with two subplots. 
+In the first subplot, draw a histogram of your data with 5 equally-sized bins.
+\item In the second subplot, 
+\begin{enumerate}
+\item Draw a scatter plot of your data. 
+Use the integers 1-50 for the $x$-coordinates and use your data for the $y$-coordinates.
+\item Plot a red horizontal line whose height is equal to the mean of your data.
+\end{enumerate}
+\end{enumerate}
+
+\begin{figure}[H]
+\includegraphics[width=.7\textwidth]{subplotProb.pdf}
+% \caption{Correct output for Problem \ref{prob:subplot}.}
+\label{fig:subplotProb}
+\end{figure}
+\end{problem}
+
 
 \subsection*{Heatmaps} % ------------------------------------------------------
 
@@ -351,7 +458,7 @@ This plot is shown in Figure \ref{fig:pcmexample}
 \label{prob:heatmap}
 \leavevmode
 \begin{enumerate}
-\item Plot the function $f(x,y) = \sin(x)\sin(y)/(xy)$ on $[-2\pi,2\pi] \times [-2\pi,2\pi]$. 
+\item Plot the function $f(x,y) = \frac{\sin(x)\sin(y)}{xy}$ on $[-2\pi,2\pi] \times [-2\pi,2\pi]$. 
 Include the scale bar in your plot.
 \item Change the color scheme of your plot with the keyword argument \li{cmap='seismic'} in the call to \li{plt.pcolormesh()}. 
 You can see a list of all possible color schemes at \url{http://matplotlib.org/examples/color/colormaps_reference.html}.
@@ -366,153 +473,6 @@ Your finished plot should look like Figure below.
 % \label{fig:heatmapProb}
 \end{figure}
 \end{problem}
-
-\begin{comment} % 3D plotting with Matplotlib (shorten and reinsert)
-Matplotlib can also be used for 3D plotting. The following is an example
-of how to use Matplotlib to plot the function $z=\sin(x)\sin(y)$ with
-both x and y ranging from -6 to 6. The resulting plot is shown in Figure
-\ref{mpl:3dplot}. If you change the number of sample points used you
-will notice that graphs look much nicer with large numbers of sample
-points, but it will also take much longer for your computer to render
-the image.
-
-\begin{lstlisting} 
-from mpl_toolkits.mplot3d import Axes3D 
-from matplotlib import pyplot as plt 
-import numpy as np 
-fig = plt.figure() 
-ax= fig.gca(projection='3d') 
-x = np.linspace(-6, 6, 301) 
-y = np.linspace(-6, 6, 301) 
-X, Y = np.meshgrid(x, y) 
-Z = np.sin(X) * np.sin(Y) 
-ax.plot_surface(X, Y, Z) 
-plt.show() 
-\end{lstlisting}
-
-\begin{figure} \includegraphics[width=\textwidth]{3dplot.pdf} \caption{A
-3D plot of $\sin\left(x\right)\times\sin\left(y\right)$.}
-\label{mpl:3dplot} \end{figure}
-
-\begin{problem} Plot the function \begin{equation*}
-\frac{\cos\left(\sqrt{x^2 + y^2}\right)}{\frac{x^2 + y^2}{10} + 1}
-\end{equation*} on $[-10, 10] \times [-10, 10]$. \end{problem}
-\end{comment}
-
-
-\subsection*{Other plots}
-A \emph{histogram} is a way to visualize a 1-D data set, or list of values. 
-A histogram is created by dividing up the range of the values into a finite number of intervals, or \emph{bins}.
-Then, the number of values in each bin is added up.
-Graphically, these totals are represented by bars whose length is equal to the number of values in the bin.
-
-For example, suppose we randomly choose 20 integers between 1 and 10.
-This code creates a histogram depicting how many of each number we chose.
-Its output is in Figure \ref{fig:histogram}.
-
-\begin{lstlisting}
-x = np.random.randint(1, 11, 20)
-plt.hist(x, bins=10, range=[.5, 10.5])
-plt.show()
-\end{lstlisting}
-
-In this example our data set \li{x} consists of only integer values.
-We created 10 bins in the range [.5, 10.5] so that each bin contains exactly one integer.
-
-The function \li{plt.hist()} also returns some arrays, the first of which is a list of the total number of values in each bin.
-
-We could also use a \emph{scatter plot} to visualize the random integers \li{x} that we generated in the previous example. 
-The \li{matplotlib} function call \li{plt.scatter(x,y)} draws a scatter plot from two 1-D arrays \li{x} and \li{y} by plotting the points \li{(x[i], y[i])}.
-As an example, the code below produces Figure \ref{fig:scatter}.
-
-\begin{lstlisting}
-t = np.linspace(1,20,20)
-# The argument 's' specifies the marker size.
-plt.scatter(t, x, s=100)
-plt.show()
-\end{lstlisting}
-
-
-\begin{figure}
-\centering
-\begin{subfigure}[t]{.49\textwidth}
-\centering
-\includegraphics[width=\textwidth]{histogram.pdf}
-\caption{A histogram.}
-\label{fig:histogram}
-\end{subfigure}
-\begin{subfigure}[t]{.49\textwidth}
-\centering
-\includegraphics[width=\textwidth]{scatter.pdf}
-\caption{A scatter plot.}
-\label{fig:scatter}
-\end{subfigure}
-
-\caption{A histogram produced with \li{plt.hist()} and a scatter plot produced with \li{plt.scatter()}.}
-\label{fig:otherplots}
-\end{figure}
-
-
-\subsection*{Subplots}
-\emph{Subplots} are nonoverlapping plots arranged in a grid within a single figure (see Figure \ref{fig:subplots}).
-In \li{matplotlib}, specify which subplot you wish to modify with command \li{plt.subplot(numrows, numcols, fignum)}.
-Here, \li{numrows} is the number of rows of subplots in the figure, \li{numcols} is the number of columns of subplots in the figure, and \li{fignum} is the index of the subplot you wish to modify.
-This index starts at 1 and increments across rows first.
-
-The following code draws Figure \ref{fig:subplots}.
-\begin{lstlisting}
-x = np.linspace(-np.pi, np.pi, 400)
-y1 = np.sin(x)
-y2 = np.cos(x)
-
-# Draw the first subplot.
-plt.subplot(2, 1, 1)
-plt.plot(x, y1)
-
-# Draw the second subplot.
-plt.subplot(2, 1, 2)
-plt.plot(x, y2)
-
-plt.show()
-\end{lstlisting}
-
-\begin{figure}
-\includegraphics[width=.7\textwidth]{subplots.pdf}
-\caption{The graphs of $\sin(x)$ and $\cos(x)$ as subplots in a single figure.}
-\label{fig:subplots}
-\end{figure}
-
-\begin{problem}\label{prob:subplot}
-Follow these steps to generate a plot similar to that in Figure \ref{fig:subplotProb}:
-\begin{enumerate}
-\item Generate 50 random numbers in the interval $[0,1)$ with the function \li{np.random.rand()}.
-\item Create a plot with two subplots. 
-In the first subplot, draw a histogram of your data with 5 equally-sized bins.
-\item In the second subplot, 
-\begin{enumerate}
-\item Draw a scatter plot of your data. 
-Use the integers 1-50 for the $x$-coordinates and use your data for the $y$-coordinates.
-\item Plot a red horizontal line whose height is equal to the mean of your data.
-\end{enumerate}
-\end{enumerate}
-
-\begin{figure}[H]
-\includegraphics[width=.7\textwidth]{subplotProb.pdf}
-\caption{Correct output for Problem \ref{prob:subplot}.}
-\label{fig:subplotProb}
-\end{figure}
-
-\end{problem}
-
-
-\begin{comment}
-\begin{problem} % Old problem
-Make a plot with 4 subplots.
-In the subplots place graphs of $e^x$, $sin(x)$, $cos(x)$, and $x^2$.
-Plot each graph over the interval $(-\pi,\pi)$.
-Title each graph accordingly and title the entire figure ``My Different Plots."
-\end{problem}
-\end{comment}
 
 \begin{comment}
 \begin{table} % Different plotting commands. Might be useful to put this back in.
@@ -547,6 +507,38 @@ Title each graph accordingly and title the entire figure ``My Different Plots."
 \caption{Some basic functions in Matplotlib.}
 \label{mpl:basics}
 \end{table}
+\end{comment}
+
+\begin{comment} % 3D plotting with Matplotlib (shorten and reinsert)
+Matplotlib can also be used for 3D plotting. The following is an example
+of how to use Matplotlib to plot the function $z=\sin(x)\sin(y)$ with
+both x and y ranging from -6 to 6. The resulting plot is shown in Figure
+\ref{mpl:3dplot}. If you change the number of sample points used you
+will notice that graphs look much nicer with large numbers of sample
+points, but it will also take much longer for your computer to render
+the image.
+
+\begin{lstlisting} 
+from mpl_toolkits.mplot3d import Axes3D 
+from matplotlib import pyplot as plt 
+import numpy as np 
+fig = plt.figure() 
+ax= fig.gca(projection='3d') 
+x = np.linspace(-6, 6, 301) 
+y = np.linspace(-6, 6, 301) 
+X, Y = np.meshgrid(x, y) 
+Z = np.sin(X) * np.sin(Y) 
+ax.plot_surface(X, Y, Z) 
+plt.show() 
+\end{lstlisting}
+
+\begin{figure} \includegraphics[width=\textwidth]{3dplot.pdf} \caption{A
+3D plot of $\sin\left(x\right)\times\sin\left(y\right)$.}
+\label{mpl:3dplot} \end{figure}
+
+\begin{problem} Plot the function \begin{equation*}
+\frac{\cos\left(\sqrt{x^2 + y^2}\right)}{\frac{x^2 + y^2}{10} + 1}
+\end{equation*} on $[-10, 10] \times [-10, 10]$. \end{problem}
 \end{comment}
 
 \section*{3-D plotting with Mayavi}
@@ -644,10 +636,22 @@ mlab.plot3d(x, y, z)
 mlab.show()
 \end{lstlisting}
 
+% TODO: merge this figure with the mlab.points3d() figure.
 \begin{figure}
-\includegraphics[width=.7\textwidth]{plot3d.png}
-\caption{Sample output of \li{mlab.plot3d()}.}
-\label{fig:plot3d}
+\captionsetup[subfigure]{justification=centering}
+\centering
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{plot3d.png}
+    \caption{Sample output of \li{mlab.plot3d()}.}
+    \label{fig:plot3d}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{points3d.png}
+    \caption{Sample output of \li{mlab.points3d()}.}
+    \label{fig:points3d}
+\end{subfigure}
 \end{figure}
 
 \subsection*{Points} % --------------------------------------------------------
@@ -666,12 +670,6 @@ s = 2+np.sin(pts)
 mlab.points3d(x, y, z, s, scale_factor=.15)
 mlab.show()
 \end{lstlisting}
-
-\begin{figure}
-\includegraphics[width=.7\textwidth]{points3d.png}
-\caption{Sample output of \li{mlab.points3d()}.}
-\label{fig:points3d}
-\end{figure}
 
 \subsection*{Surfaces} % ------------------------------------------------------
 
@@ -702,7 +700,7 @@ For example, the plot in Figure \ref{fig:surf_example} uses the colormap \li{'Rd
 For a list of all colormaps in Mayavi, see \url{http://docs.enthought.com/mayavi/mayavi/mlab_changing_object_looks.html}.
 
 \begin{problem}
-Plot the function $z = \sin(10(x^2+y^2))/10$ on $[-1,1] \times [-1,1]$ using Mayavi.
+Plot the function $z = \frac{1}{10}\sin(10(x^2+y^2))$ on $[-1,1] \times [-1,1]$ using Mayavi.
 \end{problem}
 
 %TODO: this problem is copied from https://github.com/enthought/mayavi/blob/master/examples/mayavi/mlab/canyon.py.
@@ -744,7 +742,7 @@ See \url{http://matplotlib.org} for Matplotlib documentation.
 
 % =============================================================================
 % =============================================================================
-% GARBAGE =====================================================================
+% Stuff to move ===============================================================
 % =============================================================================
 % =============================================================================
 
