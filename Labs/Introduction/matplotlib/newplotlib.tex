@@ -3,7 +3,7 @@
 Python has several standard packages that work in conjunction with NumPy and SciPy to visualize data contained in arrays.
 In this lab we introduce Matplotlib, the most commonly-used visualization library in Python.
 We also introduce Mayavi, a module with extensive 3-D visualization capabilities.
-These plotting techinques will be used in the majority of the labs in this curriculum.}
+These plotting techniques will be used in the majority of the labs in this curriculum.}
 \label{lab:Matplotlib_and_Mayavi}
 
 
@@ -94,7 +94,7 @@ array([  0.        ,  10.66666667,  21.33333333,  32.        ])
 >>> plt.show()
 \end{lstlisting}
 
-The result of this plotting command is shown in Figure \ref{fig:basic2}.
+The resulting plot is shown in Figure \ref{fig:basic2}.
 Note that this time, the $x$-axis is correctly aligned with the $y$-axis.
 The resolution is also much better because \li{x} and \li{y} have $50$ entries each instead of only $10$.
 
@@ -162,7 +162,7 @@ It is wise to use interactive mode \textbf{only} with IPython, as it exhibits er
 \section*{Plot Customization} % ===============================================
 
 \li{plt.plot()} receives several keyword arguments for customizing the drawing.
-First, the color and style of the line are specified by a single string argument.
+For example, the color and style of the line are specified by the following string arguments.
 
 \begin{table}[H] % Color and style.
 \begin{tabular}{r|l}
@@ -201,7 +201,7 @@ Other \li{plt} functions further customize a figure.
 \begin{tabular}{r|l}
     Function & Description\\
     \hline
-    % \li{grid()} & Add gridlines\\
+    % \li{grid()} & Add grid lines\\
     \li{legend()} & Place a legend in the plot\\
     % \li{text()} & Add text at a given position on the plot\\
     \li{title()} & Add a title to the plot\\
@@ -291,45 +291,54 @@ Your plot should look like the figure below.
 
 \subsection*{Subplots} % ------------------------------------------------------
 
-% =============================================================================
-% DONE TO HERE ================================================================
-% =============================================================================
-
-\emph{Subplots} are nonoverlapping plots arranged in a grid within a single figure (see Figure \ref{fig:subplots}).
-In \li{matplotlib}, specify which subplot you wish to modify with command \li{plt.subplot(numrows, numcols, fignum)}.
-Here, \li{numrows} is the number of rows of subplots in the figure, \li{numcols} is the number of columns of subplots in the figure, and \li{fignum} is the index of the subplot you wish to modify.
-This index starts at 1 and increments across rows first.
+\emph{Subplots} are non-overlapping plots arranged in a grid within a single figure.
+To create a figure with a grid of subplots, use \li{plt.subplot(numrows, numcols, fignum)}.
+Here, \li{numrows} is the number of rows of subplots in the figure, \li{numcols} is the number of columns, and \li{fignum} specifies which subplot to modify.
+% This index starts at 1 and increments across rows first.
+See Figure \ref{fig:subplots}.
 
 \begin{lstlisting}
->>> x = np.linspace(-np.pi, np.pi, 400)
-
+>>> x = np.linspace(-np.pi, np.pi, 200)
 >>> plt.subplot(2, 1, 1)            # Draw the first subplot.
->>> plt.plot(x, np.sin(x))
-
+>>> plt.plot(x, np.sin(x), 'b', linewidth=2)
+>>> plt.xlim(-np.pi, np.pi)
 >>> plt.subplot(2, 1, 2)            # Draw the second subplot.
->>> plt.plot(x, np.cos(x))
-
->>> plt.show()
+>>> plt.plot(x, np.cos(x), 'c', linewidth=2)
+>>> plt.xlim(-np.pi, np.pi)
+>>> plt.show()                      # Show the figure with two subplots.
 \end{lstlisting}
 
-\begin{figure}
-\includegraphics[width=.7\textwidth]{subplots.pdf}
-\caption{The graphs of $\sin(x)$ and $\cos(x)$ as subplots in a single figure.}
+\begin{figure}[H] % Subplots
+\captionsetup[subfigure]{justification=centering}
+\centering
+\begin{subfigure}{.49\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{layout.pdf}
+    \caption{The layout of subplots with \li{plt.subplot(2,3,i)} (2 rows, 3 columns), where \li{i} is the index pictured above.}
+    \label{fig:layout}
+\end{subfigure}
+%
+\begin{subfigure}{.49\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{subplots.pdf}
+    \caption{The graphs of $\sin(x)$ and $\cos(x)$ as subplots in a single figure with 2 rows\\and 1 column.}
+    \label{fig:sincossubplots}
+\end{subfigure}
 \label{fig:subplots}
 \end{figure}
 
-\begin{comment}
 \begin{problem} % Need a new subplots problem. Bernstein? (DataVis lab has it)
 Make a plot with 4 subplots.
 In the subplots place graphs of $e^x$, $sin(x)$, $cos(x)$, and $x^2$.
 Plot each graph over the interval $(-\pi,\pi)$.
 Title each graph accordingly and title the entire figure ``ALL THE PLOTS!"
 \end{problem}
-\end{comment}
 
 \section*{Other Kinds of Plots} % =============================================
 
-\subsection*{Histograms} % ----------------------------------------------------
+% =============================================================================
+% DONE TO HERE ================================================================
+% =============================================================================
 
 A \emph{histogram} is a way to visualize a 1-D data set, or list of values. 
 A histogram is created by dividing up the range of the values into a finite number of intervals, or \emph{bins}.
@@ -352,7 +361,7 @@ We created 10 bins in the range [.5, 10.5] so that each bin contains exactly one
 The function \li{plt.hist()} also returns some arrays, the first of which is a list of the total number of values in each bin.
 
 We could also use a \emph{scatter plot} to visualize the random integers \li{x} that we generated in the previous example. 
-The \li{matplotlib} function call \li{plt.scatter(x,y)} draws a scatter plot from two 1-D arrays \li{x} and \li{y} by plotting the points \li{(x[i], y[i])}.
+The Matplotlib function call \li{plt.scatter(x,y)} draws a scatter plot from two 1-D arrays \li{x} and \li{y} by plotting the points \li{(x[i], y[i])}.
 As an example, the code below produces Figure \ref{fig:scatter}.
 
 \begin{lstlisting}
@@ -576,7 +585,7 @@ plt.show()
 
 \section*{3-D plotting with Mayavi}
 
-Although \li{matplotlib} is capable of creating 3-D plots, Mayavi does it much faster and with better visuals. 
+Although Matplotlib is capable of creating 3-D plots, Mayavi does it much faster and with better visuals. 
 We will use Mayavi for all 3-D plots in these labs. % O RLY?
 For information beyond what is found in this tutorial, see \url{http://docs.enthought.com/mayavi/mayavi/}.
 To get started, import \li{mlab} from \li{mayavi}.
