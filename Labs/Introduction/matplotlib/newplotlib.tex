@@ -33,11 +33,22 @@ The call \li{plt.plot(y)} creates a figure and draws straight lines connecting t
 The $x$-axis is by default the index of the array, namely the integers from $0$ to $10$.
 The call \li{plt.show()} then displays the figure.
 
-\begin{figure}[H] % TODO: add a subfigure on the right w/ correct x-axis.
+\begin{figure}[H] % plt.plot(y) compared to plt.plot(x,y).
+\captionsetup[subfigure]{justification=centering}
 \centering
-\includegraphics[width=.5\textwidth]{basic.pdf}
-\caption{A simple plot for $f(x) = x^2$, $x\in[-5,5]$.}
-\label{fig:basic1}
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{basic1.pdf}
+    \caption{\li{plt.plot(y)} uses the indices of\\the array for the $x$-axis.}
+    \label{fig:basic1}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{basic2.pdf}
+    \caption{\li{plt.plot(x,y)} specifies both the\\domain and the range.}
+    \label{fig:basic2}
+\end{subfigure}
+\caption{Simple plots of $f(x) = x^2$ over the interval $x\in[-5,5]$.}
 \end{figure}
 
 \begin{problem} % Law of Large Numbers / NumPy review.
@@ -48,28 +59,50 @@ Write a function that accepts an integer $n$ as input.
 \\(Hint: use \li{np.mean()} and specify the \li{axis} keyword argument.)
 \item Return the variance of these means (this should be a single scalar).
 \end{enumerate}
-
-Now define a new function that creates an array of the results of the first function with $n = 100, 200, \ldots, 1000$.
-\begin{lstlisting}
->>> y = np.array([prob1(n) for n in xrange(100,1100,100)])
-\end{lstlisting}
-
+Define a new function that creates an array of the results of the first function with inputs $n = 100,\ 200,\ \ldots,\ 1000$.
+% \begin{lstlisting}
+% >>> y = np.array([prob1(n) for n in xrange(100,1100,100)])
+% \end{lstlisting}
+%
 Plot (and show) the resulting array.
+
 This illustrates one version of the \emph{Law of Large Numbers}, which will be discussed later on in Volume II.
 \end{problem}
 
 \subsection*{Specifying the Domain} % -----------------------------------------
 
-An obvious problem with Figure \ref{fig:basic1} is that the $x$-axis does not reflect the actual values used to compute the array \li{y}.
-To rectify this, we provide an additional array to serve as the domain.
-Then \li{plt.plot(x,y)} plots \li{x} against \li{y}.
-Hence both arrays must have the same shape.
-
 % =============================================================================
 % DONE TO HERE ================================================================
 % =============================================================================
 
-\begin{comment} % Matplotlib lab vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+An obvious problem with Figure \ref{fig:basic1} is that the $x$-axis does not correspond correctly to the $y$-axis for the function $f(x) = x^2$ that is being drawn.
+To correct this, we provide an array for the domain as well as one for the range.
+That is, we first define an array \li{x} for the domain, then use that array to calculate the range \li{y} of the function we would like to plot.
+The command \li{plt.plot(x,y)} then plots \li{x} against \li{y}.
+Both arrays must have the same number of elements to be compatible.
+
+Another problem with Figure \ref{fig:basic1} is its poor resolution; the curve is visibly bumpy, especially near the origin.
+NumPy's \li{np.linspace()} function makes it easy to get a higher-resolution domain.
+Recall that \li{range()} and \li{np.arange()} return a list or array of evenly spaced values in a given interval, where the \emph{spacing} between the entries is specified.
+In contrast, \li{np.linspace()} creates an array of evenly spaced values in a given interval where the \emph{number of elements} is specified.
+
+\begin{lstlisting}
+# 4 evenly spaced values between 0 and 32 (including endpoints).
+>>> np.linspace(0, 32, 4) 
+array([  0.        ,  10.66666667,  21.33333333,  32.        ])
+
+# Get 50 evenly-spaced values from -5 to 5 (including endpoints).
+>>> x = np.linspace(-5, 5, 50)
+>>> y = x**2                        # Calculate the range of f(x) = x**2.
+>>> plt.plot(x, y)
+>>> plt.show()
+\end{lstlisting}
+
+The result of this plotting command is shown in Figure \ref{fig:basic2}.
+This time, the $x$-axis is correctly aligned with the $y$-axis.
+The resolution is also much better because \li{x} and \li{y} have $50$ entries each instead of only $10$.
+
+\begin{comment} % More thorough explanation of np.arange() vs. np.linspace().
 \li{np.arange()}, NumPy's version of the built-in \li{range()} function, creates evenly-spaced values within an interval specified with slicing syntax.
 Specifically, \li{np.arange(start, stop, step)} returns an array of numbers from \li{start} up to (but not including) \li{stop}, with each entry \li{step} apart.
 If they are not specified, \li{start} defaults to $0$ and \li{step} defaults to $1$.
@@ -102,40 +135,7 @@ array([  0.        ,  10.66666667,  21.33333333,  32.        ])
 >>> np.linspace(-1, 1, 9)
 array([-1.  , -0.75, -0.5 , -0.25,  0.  ,  0.25,  0.5 ,  0.75,  1.  ])
 \end{lstlisting}
-\end{comment} % Matplotlib lab ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-
-The function call \li{plt.plot(x, y)} takes two 1-D NumPy arrays, \li{x} and \li{y}, and plots the points \li{(x[i], y[i])}, connecting them with straight lines.
-
-For example, this code plots $y=e^x$ on the interval $[-2,3]$. The output is in Figure \ref{fig:exp_plot}.
-
-\begin{lstlisting}
-import numpy as np
-# Create an array of 501 evenly spaced points in [-2,3].
-x = np.linspace(-2, 3, 501)
-y = np.exp(x)
-plt.plot(x, y)
-plt.show()
-\end{lstlisting}
-
-\begin{figure}[H] % Basic line plots.
-\centering
-\begin{subfigure}[t]{.49\textwidth}
-\centering
-\includegraphics[width=\textwidth]{exp_plot.pdf}
-\caption{A graph of $e^x$.}
-\label{fig:exp_plot}
-\end{subfigure}
-\begin{subfigure}[t]{.49\textwidth}
-\centering
-\includegraphics[width=\textwidth]{statemachine.pdf}
-\caption{A graph of ten lines with randomly generated $y$ values.}
-\label{fig:statemachine}
-\end{subfigure}
-\caption{Plots created with \li{plt.plot()}.}
-\label{fig:lineplots}
-\end{figure}
+\end{comment} % ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 All calls to \li{plt} functions will modify the same figure until you call \li{plt.show()}. 
 The function \li{plt.show()} displays the current figure and resets the system, so that the next call to a \li{plt} function modifies a new figure. 
