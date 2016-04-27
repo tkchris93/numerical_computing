@@ -1,31 +1,31 @@
-\lab{More Matplotlib}{More Matplotlib}
+\lab{Plot Customization and Matplotlib Syntax Guide}{Matplotlib Customization}
 \label{mpltables}
 
-\objective{Display relevant matplotlib information}
+% \objective{Display relevant matplotlib information}
 
 The documentation for matplotlib can be frustrating to maneuver and relevant information is sometimes difficult to find. For this reason, we have supplied some of the more applicable and useful information here. 
 For a more general introduction to matplotlib, see lab \ref{lab:Matplotlib_and_Mayavi}.
 
+% TODO: Clean this up along with Matplotlib.
 
 \section*{Colors}
-By default, every plot is assigned a different color specified by a ''color cycle". It can be overwritten by specifying what color is desired. \li{matplotlib} recognizes some basic built-in colors. 
+By default, every plot is assigned a different color specified by a ``color cycle''. It can be overwritten by specifying what color is desired. \li{matplotlib} recognizes some basic built-in colors. 
 
-\begin{tabular}
-{|l||l|}
-\hline
-color & command \\
-\hline
-black & k \\
-green & g \\
-blue & b \\
-red & r \\
-cyan & c \\
-magenta & m \\
-yellow & y \\
-white & w\\
-\hline
-
+\begin{table}[H]
+\centering
+\begin{tabular}{r|l}
+    color & command \\
+    \hline
+    black & \li{'k'}\\
+    green & \li{'g'}\\
+    blue & \li{'b'}\\
+    red & \li{'r'}\\
+    cyan & \li{'c'}\\
+    magenta & \li{'m'}\\
+    yellow & \li{'y'}\\
+    white & \li{'w'}\\
 \end{tabular}
+\end{table}
 
 
 The following displays how these colors can be implemented. All the built-in colors are displayed for your convenience in Figure \ref{colors}
@@ -63,39 +63,39 @@ The following displays how \li{linewidth} is implemented. It is displayed in Fig
 \subsection*{Style}
 By default, plots are executed with a solid line style. We can easily change that. The following are accepted format string characters to indicate line style. 
 
-\begin{tabular}
-{|c||l|}
-\hline
-character & description \\
-\hline
-- & solid line style \\
--{}- & dashed line style\\
--. & dash-dot line style \\
-: & dotted line style \\
-. & point marker \\
-, & pixel marker \\
-o & circle marker \\
-v & triangle\_down marker \\
-\^{} & triangle\_up marker \\
-$<$ & triangle\_left marker \\
-$>$ & triangle\_right marker \\
-1 & tri\_down marker \\
-2 & tri\_up marker \\
-3 & tri\_left marker \\
-4 & tri\_right marker \\
-s & square marker \\
-p & pentagon marker \\
-* & star marker \\
-h & hexagon1 marker \\
-H & hexagon2 marker \\
-+ & plus marker \\
-x & x marker \\
-D & diamond marker \\
-d & thin\_diamond marker \\
-$|$ & vline marker \\
-\_{} & hline marker \\
-\hline 
+\begin{table}[H]
+\centering
+\begin{tabular}{c|l}
+    character & description \\
+    \hline
+    - & solid line style \\
+    -{}- & dashed line style\\
+    -. & dash-dot line style \\
+    : & dotted line style \\
+    . & point marker \\
+    , & pixel marker \\
+    o & circle marker \\
+    v & triangle\_down marker \\
+    \^{} & triangle\_up marker \\
+    $<$ & triangle\_left marker \\
+    $>$ & triangle\_right marker \\
+    1 & tri\_down marker \\
+    2 & tri\_up marker \\
+    3 & tri\_left marker \\
+    4 & tri\_right marker \\
+    s & square marker \\
+    p & pentagon marker \\
+    * & star marker \\
+    h & hexagon1 marker \\
+    H & hexagon2 marker \\
+    + & plus marker \\
+    x & x marker \\
+    D & diamond marker \\
+    d & thin\_diamond marker \\
+    $|$ & vline marker \\
+    \_{} & hline marker \\
 \end{tabular}
+\end{table}
 
 
 The following displays how \li{linestyle} can be implemented. 
