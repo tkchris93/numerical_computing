@@ -32,7 +32,26 @@ def basic2():
     plt.plot(x, y)
     plt.savefig("basic2.pdf", format='pdf')
 
+@_clear
+def custom1():
+    x = np.linspace(-2, 4, 100)
+    plt.plot(x, np.exp(x), 'g:', linewidth=4, label="Exponential")
+    # plt.xlabel("The x axis.")
+    plt.title("This is the title.")
+    plt.legend(loc="upper left")
+    plt.savefig("custom1.pdf", format='pdf')
+
+@_clear
+def custom2():
+    x = np.linspace(1, 4, 100)
+    plt.plot(x, np.log(x), 'r+', linewidth=2)
+    # plt.grid()
+    plt.xlim(0, 5)
+    plt.xlabel("The x axis")
+    plt.savefig("custom2.pdf", format='pdf')
 
 if __name__ == '__main__':
     basic1()
     basic2()
+    custom1()
+    custom2()

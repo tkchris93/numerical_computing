@@ -71,10 +71,6 @@ This illustrates one version of the \emph{Law of Large Numbers}, which will be d
 
 \subsection*{Specifying a Domain} % -----------------------------------------
 
-% =============================================================================
-% DONE TO HERE ================================================================
-% =============================================================================
-
 An obvious problem with Figure \ref{fig:basic1} is that the $x$-axis does not correspond correctly to the $y$-axis for the function $f(x) = x^2$ that is being drawn.
 To correct this, we provide an array for the domain as well as one for the range.
 That is, we first define an array \li{x} for the domain, then use that array to calculate the range \li{y} of the function we would like to plot.
@@ -143,7 +139,7 @@ Matplotlib's \emph{interactive mode}, particularly useful in IPython, allows the
 Use \li{plt.ion()} to turn interactive mode on and \li{plt.ioff()} to turn it off.
 This is very useful for customizing a plot on the fly.
 
-As an example, try executing the following commands in IPython:
+Try executing the following commands in IPython:
 
 \begin{lstlisting}
 In [1]: import numpy as np
@@ -165,52 +161,90 @@ It is wise to use interactive mode \textbf{only} with IPython, as it exhibits er
 
 \section*{Plot Customization} % ===============================================
 
-\begin{comment} % A little old, but might be useful to have a table like this.
-There are also many functions that we may use to set different values in
-the plotting environment. A few examples are shown in Table
-\ref{mpl:useful_functions}.
+\li{plt.plot()} receives several keyword arguments for customizing the drawing.
+First, the color and style of the line are specified by a single string argument.
 
-\begin{table}
-\centering
-\begin{tabular}{|l|p{6cm}|p{4cm}|}
+\begin{table}[H] % Color and style.
+\begin{tabular}{r|l}
+    Code & Color \\
     \hline
-    Function & Description & Usage\\
-    \hline
-    \li{annotate} & adds a commentary at a given point on the plot &
-    annotate('text',(x,y))\\
-    \li{arrow} & draws an arrow from a given point on the plot &
-    arrow(x,y,dx,dy)\\
-    \li{axhline} & draws a horizontal line at y from xmin to xmax &
-    axhline(y=0, xmin=0, xmax=1)\\
-    \li{axvline} & draws a vertical line at x from ymin to ymax &
-    axvline(x=0, ymin=0, ymax=1)\\
-    \li{axhspan} & draws a rectangle from xmin to xmax and ymin to ymax,
-    if no xmin and xmax are given it goes across the plot &
-    axhspan(ymin, ymax, xmin=0, xmax=1)\\
-    \li{axvspan} & draws a rectangle from ymin to ymax and xmin to xmax,
-    if no ymin and ymax are given it goes across the entire plot &
-    axvspan(xmin, xmax, ymin=0, ymin=1)\\
-    \li{figlegend} & place a legend in the plot & figlegend(handles,
-    labels, loc)\\
-    \li{grid} & add gridlines & grid()\\
-    \li{text} & add text at a given position on the plot &
-    text(x,y,'text')\\
-    \li{title} & add a title to the plot & title('text')\\
-    \li{xlim} & set the x limits, returns current limits if no arguments
-    are given & xlim(xmin,xmax)\\
-    \li{ylim} & set the y limits, returns current limits if no arguments
-    are given & ylim(ymin,ymax)\\
-    \li{xticks} & set the location of the tick marks on the x axis,
-    returns current locations if no arguments are given & xticks(x)\\
-    \li{yticks} & set the location of the tick marks on the y axis,
-    returns current locations if no arguments are given & yticks(y)\\
-    \li{xlabel} & add a label to the x axis & xlabel('text')\\
-    \li{ylabel} & add a label to the y axis & ylabel('text')\\
+    \li{'b'} & blue\\
+    \li{'g'} & green\\
+    \li{'r'} & red\\
+    \li{'c'} & cyan\\
+    \li{'m'} & magenta\\
+    % \li{'y'} & yellow\\
+    \li{'k'} & black\\
+    % \li{'w'} & white
 \end{tabular}
-\caption{Some Functions to Set Plotting Options}
-\label{mpl:useful_functions}
+\qquad
+\begin{tabular}{r|l}
+    Code & Style \\
+    \hline
+    \li{'-'}' & solid line\\
+    \li{'--'} & dashed line\\
+    \li{'-.'} & dash-dot line\\
+    \li{':'} & dotted line\\
+    % \li{'.'} & point marker\\
+    \li{'o'} & circle marker\\
+    % \li{'*'} & star marker\\
+    \li{'+'} & plus marker
+\end{tabular}
+% \caption{Common colors and line styles. See Appendix \ref{mpltables} for more.}
 \end{table}
-\end{comment}
+
+Specify one or both of these string codes as an argument to \li{plt.plot()} to change from the default color and style.
+Other \li{plt} functions further customize a figure.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{r|l}
+    Function & Description\\
+    \hline
+    % \li{grid()} & Add gridlines\\
+    \li{legend()} & Place a legend in the plot\\
+    % \li{text()} & Add text at a given position on the plot\\
+    \li{title()} & Add a title to the plot\\
+    \li{xlim()} & Set the limits of the $x$-axis\\
+    \li{ylim()} & Set the limits of the $y$-axis\\
+    % \li{xticks()} & set the location of the tick marks on the x axis, returns current locations if no arguments are given\\
+    % \li{yticks()} & set the location of the tick marks on the y axis, returns current locations if no arguments are given\\
+    \li{xlabel()} & Add a label to the $x$-axis\\
+    \li{ylabel()} & Add a label to the $y$-axis
+\end{tabular}
+\end{table}
+
+\begin{lstlisting}
+>>> x1 = np.linspace(-2, 4, 100)
+>>> plt.plot(x1, np.exp(x1), 'g:', linewidth=2, label="Exponential")
+>>> plt.title("This is the title.")
+>>> plt.legend(loc="upper left")    # plt.legend() uses the 'label' argument of
+>>> plt.show()                      # plt.plot() to create a legend.
+
+>>> x2 = np.linspace(1, 4, 100)
+>>> plt.plot(x2, np.log(x2), 'r+', linewidth=2)
+>>> plt.xlim(0, 5)                  # Set the visible limits of the x axis.
+>>> plt.xlabel("The x axis")        # Give the x axis a label.
+>>> plt.show()
+\end{lstlisting}
+
+\begin{figure}[H] % Figure customizations.
+\captionsetup[subfigure]{justification=centering}
+\centering
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{custom1.pdf}
+    \label{fig:custom1}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{custom2.pdf}
+    \label{fig:custom2}
+\end{subfigure}
+\label{fig:custom}
+\end{figure}
+
+See Appendix \ref{mpltables} for more comprehensive lists of colors, line styles, and figure customization routines.
     
 \begin{problem} % Line plots with different domains but uniform style.
 \label{prob:lineplot}
@@ -218,16 +252,14 @@ Write a function to plot the curve $f(x) = \frac{1}{x-1}$ on the domain $[-2,6]$
 Although $f(x)$ has a discontinuity at $x=1$, a single call to \li{plt.plot()} will attempt to make the curve look continuous.
 \begin{enumerate}
 \item Split up the domain and plot the two sides of the curve separately so that the graph looks discontinuous at $x=1$.
-\item Plot both curves with a thick, dashed magenta line.
-% that is magenta, dashed, and thick (see Appendix \ref{mpltables}).
+\item Plot both curves with a thick, dashed magenta line.\\
+The keyword argument \li{linewidth} specifies the thickness of the line.
 \item Change the range of the $y$-axis to be $[-6, 6]$.
 \end{enumerate}
-Your final plot should look like the figure below.
+Your plot should look like the figure below.
 
 \begin{figure}[H]
 \includegraphics[width=.7\textwidth]{soln2.pdf}
-% \caption{Correct output for Problem \ref{prob:lineplot}.}
-% \label{fig:problem2}
 \end{figure}
 \end{problem}
 
@@ -257,27 +289,27 @@ Your plot should look like the figure below.
 \end{problem}
 \end{comment}
 
-\subsection*{Subplots}
+\subsection*{Subplots} % ------------------------------------------------------
+
+% =============================================================================
+% DONE TO HERE ================================================================
+% =============================================================================
+
 \emph{Subplots} are nonoverlapping plots arranged in a grid within a single figure (see Figure \ref{fig:subplots}).
 In \li{matplotlib}, specify which subplot you wish to modify with command \li{plt.subplot(numrows, numcols, fignum)}.
 Here, \li{numrows} is the number of rows of subplots in the figure, \li{numcols} is the number of columns of subplots in the figure, and \li{fignum} is the index of the subplot you wish to modify.
 This index starts at 1 and increments across rows first.
 
-The following code draws Figure \ref{fig:subplots}.
 \begin{lstlisting}
-x = np.linspace(-np.pi, np.pi, 400)
-y1 = np.sin(x)
-y2 = np.cos(x)
+>>> x = np.linspace(-np.pi, np.pi, 400)
 
-# Draw the first subplot.
-plt.subplot(2, 1, 1)
-plt.plot(x, y1)
+>>> plt.subplot(2, 1, 1)            # Draw the first subplot.
+>>> plt.plot(x, np.sin(x))
 
-# Draw the second subplot.
-plt.subplot(2, 1, 2)
-plt.plot(x, y2)
+>>> plt.subplot(2, 1, 2)            # Draw the second subplot.
+>>> plt.plot(x, np.cos(x))
 
-plt.show()
+>>> plt.show()
 \end{lstlisting}
 
 \begin{figure}
@@ -291,13 +323,14 @@ plt.show()
 Make a plot with 4 subplots.
 In the subplots place graphs of $e^x$, $sin(x)$, $cos(x)$, and $x^2$.
 Plot each graph over the interval $(-\pi,\pi)$.
-Title each graph accordingly and title the entire figure ``My Different Plots."
+Title each graph accordingly and title the entire figure ``ALL THE PLOTS!"
 \end{problem}
 \end{comment}
 
-\section*{Other Kinds of Plots}
+\section*{Other Kinds of Plots} % =============================================
 
-\subsection*{Histograms}
+\subsection*{Histograms} % ----------------------------------------------------
+
 A \emph{histogram} is a way to visualize a 1-D data set, or list of values. 
 A histogram is created by dividing up the range of the values into a finite number of intervals, or \emph{bins}.
 Then, the number of values in each bin is added up.
@@ -351,7 +384,7 @@ plt.show()
 
 \begin{problem} % Find some real data to use with this problem. age v height?
 \label{prob:subplot}
-Follow these steps to generate a plot similar to that in Figure \ref{fig:subplotProb}:
+Write a function to generate the following plot:
 \begin{enumerate}
 \item Generate 50 random numbers in the interval $[0,1)$ with the function \li{np.random.rand()}.
 \item Create a plot with two subplots. 
@@ -374,7 +407,7 @@ Use the integers 1-50 for the $x$-coordinates and use your data for the $y$-coor
 
 \subsection*{Heatmaps} % ------------------------------------------------------
 
-A function from $\mathbb{R}^2$ to $\mathbb{R}$ is usually plotted as a surface in $\mathbb{R}^3$.
+A function $f: \mathbb{R}^2 \rightarrow \mathbb{R}$ is usually plotted as a surface in $\mathbb{R}^3$.
 A \emph{heatmap} visualizes such a function in only two dimensions by assigning the output of the function to a color (instead of a height).
 For example, Figure \ref{fig:pcmexample} uses a heatmap to graph $f(x,y) = \sin(x)\sin(y)$ on $[-6,6] \times [-6,6]$.
 
