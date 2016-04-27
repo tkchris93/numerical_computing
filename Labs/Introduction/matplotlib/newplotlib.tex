@@ -31,7 +31,7 @@ Just as \li{np} is a standard alias for NumPy, \li{plt} is a standard alias for 
 
 The call \li{plt.plot(y)} creates a figure and draws straight lines connecting the entries of \li{y} relative to the $y$-axis.
 The $x$-axis is by default the index of the array, namely the integers from $0$ to $10$.
-The call \li{plt.show()} then displays the figure.
+Calling \li{plt.show()} then displays the figure.
 
 \begin{figure}[H] % plt.plot(y) compared to plt.plot(x,y).
 \captionsetup[subfigure]{justification=centering}
@@ -69,7 +69,7 @@ Plot (and show) the resulting array.
 This illustrates one version of the \emph{Law of Large Numbers}, which will be discussed later on in Volume II.
 \end{problem}
 
-\subsection*{Specifying the Domain} % -----------------------------------------
+\subsection*{Specifying a Domain} % -----------------------------------------
 
 % =============================================================================
 % DONE TO HERE ================================================================
@@ -83,11 +83,11 @@ Both arrays must have the same number of elements to be compatible.
 
 Another problem with Figure \ref{fig:basic1} is its poor resolution; the curve is visibly bumpy, especially near the bottom of the curve.
 NumPy's \li{np.linspace()} function makes it easy to get a higher-resolution domain.
-Recall that \li{range()} and \li{np.arange()} return a list or array of evenly spaced values in a given interval, where the \emph{spacing} between the entries is specified.
-In contrast, \li{np.linspace()} creates an array of evenly spaced values in a given interval where the \emph{number of elements} is specified.
+Recall that \li{range()} and \li{np.arange()} return a list or array of evenly-spaced values in a given interval, where the \emph{spacing} between the entries is specified.
+In contrast, \li{np.linspace()} creates an array of evenly-spaced values in a given interval where the \emph{number of elements} is specified.
 
 \begin{lstlisting}
-# 4 evenly spaced values between 0 and 32 (including endpoints).
+# 4 evenly-spaced values between 0 and 32 (including endpoints).
 >>> np.linspace(0, 32, 4) 
 array([  0.        ,  10.66666667,  21.33333333,  32.        ])
 
@@ -101,6 +101,40 @@ array([  0.        ,  10.66666667,  21.33333333,  32.        ])
 The result of this plotting command is shown in Figure \ref{fig:basic2}.
 This time, the $x$-axis is correctly aligned with the $y$-axis.
 The resolution is also much better because \li{x} and \li{y} have $50$ entries each instead of only $10$.
+
+All calls to \li{plt} functions modify the same figure until \li{plt.show()} is executed, which displays the current figure(s) and resets the system.
+The next \li{plt} function will then modify a new figure.
+This makes it possible to plot several lines in a single figure.
+
+\begin{comment} % Wordy details and unnecessary plots for multi-line plotting.
+We can take advantage of this system to plot multiple lines on the same axes.
+For example, the following code plots ten lines, each with random values at integers from 1 to 10. 
+The output is in Figure \ref{fig:statemachine}.
+
+\begin{lstlisting}
+x = np.linspace(1, 10, 10)
+
+# Create a 10x10 array of uniformly distributed values in [0,1).
+y = np.random.rand(10, 10)
+
+# Plot each row of y
+for row in y:
+    plt.plot(x, row)
+plt.show()
+\end{lstlisting}
+
+Alternatively, we can produce the same graph with a single call to \li{plt.plot()}.
+
+\begin{lstlisting}
+plt.plot(x, y[0], x, y[1], x, y[2], x, y[3], x, y[4], x, y[5], x, y[6], x, y[7], x, y[8], x, y[9])
+plt.show()
+\end{lstlisting}
+\end{comment}
+
+\begin{problem} % Plot two lines (sin() and cos()).
+Plot the function $\sin(x)$ from $0$ to $2\pi$, then plot $\cos(x)$ on the same domain (use \li{np.pi} for $\pi$).
+Make sure your domain is refined enough to produce a figure with good resolution.
+\end{problem}
 
 \begin{comment} % More thorough explanation of np.arange() vs. np.linspace().
 \li{np.arange()}, NumPy's version of the built-in \li{range()} function, creates evenly-spaced values within an interval specified with slicing syntax.
@@ -137,39 +171,7 @@ array([-1.  , -0.75, -0.5 , -0.25,  0.  ,  0.25,  0.5 ,  0.75,  1.  ])
 \end{lstlisting}
 \end{comment} % ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-All calls to \li{plt} functions will modify the same figure until you call \li{plt.show()}. 
-The function \li{plt.show()} displays the current figure and resets the system, so that the next call to a \li{plt} function modifies a new figure. 
-
-We can take advantage of this system to plot multiple lines on the same axes.
-For example, the following code plots ten lines, each with random values at integers from 1 to 10. 
-The output is in Figure \ref{fig:statemachine}.
-
-\begin{lstlisting}
-x = np.linspace(1, 10, 10)
-
-# Create a 10x10 array of uniformly distributed values in [0,1).
-y = np.random.rand(10, 10)
-
-# Plot each row of y
-for row in y:
-    plt.plot(x, row)
-plt.show()
-\end{lstlisting}
-
-Alternatively, we can produce the same graph with a single call to \li{plt.plot()}.
-
-\begin{lstlisting}
-plt.plot(x, y[0], x, y[1], x, y[2], x, y[3], x, y[4], x, y[5], x, y[6], x, y[7], x, y[8], x, y[9])
-plt.show()
-\end{lstlisting}
-
-\begin{comment} % Replace this with Law of Large Numbers plot.
-\begin{problem} Plot the function $\sin(x)$ from $0$ to $2\pi$ with a red dashed line.
-Then plot the function $\cos(x)$ on the same domain with a blue dotted line.
-% Implement both with a single call to the \li{plot()} function.
-Information on how to do this can be found in Appendix \ref{mpltables}.
-\end{problem}
-\end{comment}
+\subsection*{Color and Style}
 
 \begin{comment} % A little old, but might be useful to have a table like this.
 There are also many functions that we may use to set different values in
@@ -220,21 +222,20 @@ the plotting environment. A few examples are shown in Table
     
 \begin{problem} % Line plots with different domains but uniform style.
 \label{prob:lineplot}
-Plot the curve $1/(x-1)$ on [-2,6].
-Do the following to your plot:
-
+Write a function to plot the curve $f(x) = \frac{1}{x-1}$ on the domain $[-2,6]$.
+Although $f(x)$ has a discontinuity at $x=1$, a single call to \li{plt.plot()} will attempt to make the curve look continuous.
 \begin{enumerate}
-\item The function \li{plt.plot()} will make the curve look continuous at $x=1$. 
-Plot the two sides of the curve separately (still with a single call to \li{plt.plot()}) so that the graph looks discontinuous at $x=1$.
-\item Plot the curve with a line that is magenta, dashed, and thick (see Appendix \ref{mpltables}).
+\item Split up the domain and plot the two sides of the curve separately so that the graph looks discontinuous at $x=1$.
+\item Plot both curves with a thick, dashed magenta line.
+% that is magenta, dashed, and thick (see Appendix \ref{mpltables}).
 \item Change the range of the $y$-axis to be $[-6, 6]$.
 \end{enumerate}
-Your final plot should look like Figure \ref{fig:problem2}.
+Your final plot should look like the figure below.
 
 \begin{figure}[H]
 \includegraphics[width=.7\textwidth]{soln2.pdf}
-\caption{Correct output for Problem \ref{prob:lineplot}.}
-\label{fig:problem2}
+% \caption{Correct output for Problem \ref{prob:lineplot}.}
+% \label{fig:problem2}
 \end{figure}
 \end{problem}
 
@@ -274,7 +275,7 @@ The plot in Figure \ref{fig:pcmexample} was created with the function \li{plt.pc
 To draw Figure \ref{fig:pcmexample}, we must first create a grid of points at which to evaluate $f$.
 We do this with the function \li{np.meshgrid()}, which is explained in Figure \ref{fig:meshgrid}.
 
-\begin{figure} % np.meshgrid() visual demonstration.
+\begin{figure}[H] % np.meshgrid() visual demonstration.
 \begin{tikzpicture}[>=stealth', shorten <= .1cm,shorten >=.1cm, dot/.style=
     {circle,fill=black,minimum size=3pt,inner sep=0pt, outer sep=-1pt} ]
 
@@ -310,11 +311,11 @@ We do this with the function \li{np.meshgrid()}, which is explained in Figure \r
 \node[draw=none, node distance=2cm](point3)
     [right of=point2]{2\big]};
 \node[draw=none, rotate=270](point4)at(4.4,4.25)
-    {\texttt{y}=\big[0,};
+    {\texttt{y}=\big[2,};
 \node[draw=none, rotate=270, node distance=2.35cm](point5)
     [right of=point4]{1,};
 \node[draw=none, rotate=270, node distance=2cm](point6)
-    [right of=point5]{2\big]};
+    [right of=point5]{0\big]};
 \end{tikzpicture}
 \caption{This figure illustrates the function call \li{np.meshgrid(x, y)}, which returns the arrays \li{X} and \li{Y}. 
 The returned arrays give the $x$- and $y$-coordinates of the points in the grid formed by \li{x} and \li{y}.}
@@ -357,12 +358,12 @@ You can see a list of all possible color schemes at \url{http://matplotlib.org/e
 \item Change the limits on the $x$- and $y$-axes so that the plot is only over the domain $[-2\pi,2\pi] \times [-2\pi,2\pi]$.
 \item Fix the aspect ratio of your plot so that it is a square using the line \li{plt.gca().set_aspect('equal')}.
 \end{enumerate}
-Your finished plot should look like Figure \ref{fig:heatmapProb}.
+Your finished plot should look like Figure below.
 
 \begin{figure}[H]
 \includegraphics[width=.7\textwidth]{pcolor2.png}
-\caption{Correct output for Problem \ref{prob:heatmap}.}
-\label{fig:heatmapProb}
+% \caption{Correct output for Problem \ref{prob:heatmap}.}
+% \label{fig:heatmapProb}
 \end{figure}
 \end{problem}
 

@@ -45,7 +45,8 @@ You may have noticed the use of \li{plt.ylim([ymin, ymax])} in the previous code
 Doing both commands simultaneously is possible with the \li{plt.axis([xmin, xmax, ymin, ymax])}. 
 Remember that these commands must be executed after the plot. 
 
-Another popular command is \li{plt.axis("tight")} which adjusts the axes so all data is visible and centered. 
+% BAD! plt.axis("tight") has a bug that messes with OS X on Macs.
+% Another popular command is \li{plt.axis("tight")} which adjusts the axes so all data is visible and centered. 
 
 \section*{Lines}
 \subsection*{Width}
