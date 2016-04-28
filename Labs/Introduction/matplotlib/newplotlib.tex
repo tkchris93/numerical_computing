@@ -349,10 +349,6 @@ The plot should look like the figure below.
 
 \section*{Other Kinds of Plots} % =============================================
 
-% =============================================================================
-% DONE TO HERE ================================================================
-% =============================================================================
-
 A \emph{histogram} groups entries of a 1-D data set into a given number of intervals, called \emph{bins}.
 Each bin has a bar whose height indicates the number of values that fall in the range of the bin.
 To create a histogram, use \li{plt.hist()} instead of \li{plt.plot()}.
@@ -392,42 +388,54 @@ Use \li{plt.scatter()}, or use \li{plt.plot()} and specify a point marker (such 
 In this example the data set \li{x} consists of only integer values.
 Specifying 10 bins in the range [.5, 10.5] creates one bin per integer.
 
-% \begin{lstlisting}
-% t = np.linspace(1,20,20)
-% # The argument 's' specifies the marker size.
-% plt.scatter(t, x, s=100)
-% plt.show()
-% \end{lstlisting}
-
-
 \begin{problem} % Find some real data to use with this problem. age v height?
 \label{prob:subplot}
+The file \texttt{TODO.npz} contains some interesting data that is described here.
+Use \li{np.load()} to load the two arrays in the file:
+\begin{lstlisting}
+>>> data = np.load("TODO.npz")
+>>> x, y = data['key1'], data['key2']
+\end{lstlisting}
+
 Write a function to generate the following plot:
 \begin{enumerate}
-\item Generate 50 random numbers in the interval $[0,1)$ with the function \li{np.random.rand()}.
-\item Create a plot with two subplots. 
-In the first subplot, draw a histogram of your data with 5 equally-sized bins.
-\item In the second subplot, 
-\begin{enumerate}
-\item Draw a scatter plot of your data. 
-Use the integers 1-50 for the $x$-coordinates and use your data for the $y$-coordinates.
-\item Plot a red horizontal line whose height is equal to the mean of your data.
-\end{enumerate}
+\item In one subplot, draw a histogram of the first array (\li{x}).
+Choose an appropriate range and number of bins to display the data accurately.
+\item In a second subplot, draw a scatter plot of \li{x} against \li{y}. 
+Plot a red horizontal line whose height is equal to the mean of the \li{x} data.\\
+(Hint: \li{plt.hlines()} may be useful.)
 \end{enumerate}
 
 \begin{figure}[H]
-\includegraphics[width=.7\textwidth]{subplotProb.pdf}
-% \caption{Correct output for Problem \ref{prob:subplot}.}
-\label{fig:subplotProb}
+\centering
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{histogram.pdf}
+    % \caption{A histogram.}
+    \label{fig:histogram}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{scatter.pdf}
+    % \caption{A scatter plot.}
+    \label{fig:scatter}
+\end{subfigure}
+\caption{TODO: Replace this figure (or erase it).}
 \end{figure}
 \end{problem}
 
+Other kinds of plots for 1-D data includes bar plots, box plots, and others.
+See Appendix \ref{mpltables} for more.
 
-\subsection*{Heatmaps} % ------------------------------------------------------
+% =============================================================================
+% DONE TO HERE ================================================================
+% =============================================================================
+
+\subsection*{Visualizing 2-D Data} % ------------------------------------------
 
 A function $f: \mathbb{R}^2 \rightarrow \mathbb{R}$ is usually plotted as a surface in $\mathbb{R}^3$.
-A \emph{heatmap} visualizes such a function in only two dimensions by assigning the output of the function to a color (instead of a height).
-For example, Figure \ref{fig:pcmexample} uses a heatmap to graph $f(x,y) = \sin(x)\sin(y)$ on $[-6,6] \times [-6,6]$.
+A \emph{heat map} visualizes such a function in only two dimensions by assigning the output of the function to a color (instead of a height).
+For example, Figure \ref{fig:pcmexample} uses a heat map to graph $f(x,y) = \sin(x)\sin(y)$ on $[-6,6] \times [-6,6]$.
 
 The plot in Figure \ref{fig:pcmexample} was created with the function \li{plt.pcolormesh()}.
 To draw Figure \ref{fig:pcmexample}, we must first create a grid of points at which to evaluate $f$.
