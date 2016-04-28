@@ -75,7 +75,8 @@ An obvious problem with Figure \ref{fig:basic1} is that the $x$-axis does not co
 To correct this, we provide an array for the domain as well as one for the range.
 That is, we first define an array \li{x} for the domain, then use that array to calculate the range \li{y} of the function we would like to plot.
 The command \li{plt.plot(x,y)} then plots \li{x} against \li{y}.
-Both arrays must have the same number of elements to be compatible.
+That is, each point \li{(x[i], y[i])} is drawn and consecutive points are connected.
+% Thus both arrays must have the same number of elements to be compatible.
 
 Another problem with Figure \ref{fig:basic1} is its poor resolution; the curve is visibly bumpy, especially near the bottom of the curve.
 NumPy's \li{np.linspace()} function makes it easy to get a higher-resolution domain.
@@ -217,7 +218,7 @@ Other \li{plt} functions further customize a figure.
 \begin{lstlisting}
 >>> x1 = np.linspace(-2, 4, 100)
 >>> plt.plot(x1, np.exp(x1), 'g:', linewidth=2, label="Exponential")
->>> plt.title("This is the title.")
+>>> plt.title("This is the title.", fontsize=18)
 >>> plt.legend(loc="upper left")    # plt.legend() uses the 'label' argument of
 >>> plt.show()                      # plt.plot() to create a legend.
 
@@ -256,7 +257,7 @@ Although $f(x)$ has a discontinuity at $x=1$, a single call to \li{plt.plot()} w
 The keyword argument \li{linewidth} specifies the thickness of the line.
 \item Change the range of the $y$-axis to be $[-6, 6]$.
 \end{enumerate}
-Your plot should look like the figure below.
+The plot should look like the figure below.
 
 \begin{figure}[H]
 \includegraphics[width=.7\textwidth]{soln2.pdf}
@@ -280,7 +281,7 @@ Don't forget to make sure the x limits of the plot are still 0 and 10.
 \item How would you manually find maxima and minima of a function?
 \item How could you do something similar with your $x$ and $y$ arrays?
 \end{itemize}
-Your plot should look like the figure below.
+The plot should look like the figure below.
 
 \begin{figure}[H]
 \includegraphics[width=\textwidth]{soln3.pdf}
@@ -327,12 +328,24 @@ See Figure \ref{fig:subplots}.
 \label{fig:subplots}
 \end{figure}
 
-\begin{problem} % Need a new subplots problem. Bernstein? (DataVis lab has it)
-Make a plot with 4 subplots.
-In the subplots place graphs of $e^x$, $sin(x)$, $cos(x)$, and $x^2$.
-Plot each graph over the interval $(-\pi,\pi)$.
-Title each graph accordingly and title the entire figure ``ALL THE PLOTS!"
+If the inputs for \li{plt.subplot()} are all integers, the commas between the entries can be omitted.
+For example, \li{plt.subplot(3,2,2)} and \li{plt.subplot(322)} are equivalent.
+
+\begin{comment}
+\begin{problem} % A new subplots problem (?)
+Write a function to plot the functions $sin(x)$, $sin(2x)$, $2sin(x)$, and $2sin(2x)$ over the interval $[0, 4pi]$.
+\begin{enumerate}
+\item Arrange the plots in a square grid of 4 subplots.
+\item Use \li{plt.title()} to give each subplot an appropriate title.
+\item Use \li{plt.suptitle()} to give the overall figure a title.
+\item Adjust the color and linewidth of each line to match the figure below.
+\end{enumerate}
+The plot should look like the figure below.
+
+% FIGURE HERE
+
 \end{problem}
+\end{comment}
 
 \section*{Other Kinds of Plots} % =============================================
 
@@ -340,56 +353,52 @@ Title each graph accordingly and title the entire figure ``ALL THE PLOTS!"
 % DONE TO HERE ================================================================
 % =============================================================================
 
-A \emph{histogram} is a way to visualize a 1-D data set, or list of values. 
-A histogram is created by dividing up the range of the values into a finite number of intervals, or \emph{bins}.
-Then, the number of values in each bin is added up.
-Graphically, these totals are represented by bars whose length is equal to the number of values in the bin.
+A \emph{histogram} groups entries of a 1-D data set into a given number of intervals, called \emph{bins}.
+Each bin has a bar whose height indicates the number of values that fall in the range of the bin.
+To create a histogram, use \li{plt.hist()} instead of \li{plt.plot()}.
+% We may specify the number of bins and the range of values to control the precision of the plot.
 
-For example, suppose we randomly choose 20 integers between 1 and 10.
-This code creates a histogram depicting how many of each number we chose.
-Its output is in Figure \ref{fig:histogram}.
-
-\begin{lstlisting}
-x = np.random.randint(1, 11, 20)
-plt.hist(x, bins=10, range=[.5, 10.5])
-plt.show()
-\end{lstlisting}
-
-In this example our data set \li{x} consists of only integer values.
-We created 10 bins in the range [.5, 10.5] so that each bin contains exactly one integer.
-
-The function \li{plt.hist()} also returns some arrays, the first of which is a list of the total number of values in each bin.
-
-We could also use a \emph{scatter plot} to visualize the random integers \li{x} that we generated in the previous example. 
-The Matplotlib function call \li{plt.scatter(x,y)} draws a scatter plot from two 1-D arrays \li{x} and \li{y} by plotting the points \li{(x[i], y[i])}.
-As an example, the code below produces Figure \ref{fig:scatter}.
+A \emph{scatter plot} plots two arrays against each other without drawing lines between the points.
+Use \li{plt.scatter()}, or use \li{plt.plot()} and specify a point marker (such as \li{'o'} or \li{'+'}) for the line style.
 
 \begin{lstlisting}
-t = np.linspace(1,20,20)
-# The argument 's' specifies the marker size.
-plt.scatter(t, x, s=100)
-plt.show()
+# Get 2 sets of 20 random integers in the interval [1, 11).
+>>> x, y = np.random.randint(1, 11, 20), np.random.randint(1, 11, 20)
+
+# Draw a histograms and a scatter plot to display the data.
+>>> plt.subplot(121)
+>>> plt.hist(x, bins=10, <<range>>=[.5, 10.5])
+>>> plt.subplot(122)
+>>> plt.scatter(x, y, s=100)        # The 's' argument specifies the marker size.
+>>> plt.show()
 \end{lstlisting}
 
-
-\begin{figure}
+\begin{figure}[H]
 \centering
-\begin{subfigure}[t]{.49\textwidth}
-\centering
-\includegraphics[width=\textwidth]{histogram.pdf}
-\caption{A histogram.}
-\label{fig:histogram}
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{histogram.pdf}
+    % \caption{A histogram.}
+    \label{fig:histogram}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{scatter.pdf}
+    % \caption{A scatter plot.}
+    \label{fig:scatter}
 \end{subfigure}
-\begin{subfigure}[t]{.49\textwidth}
-\centering
-\includegraphics[width=\textwidth]{scatter.pdf}
-\caption{A scatter plot.}
-\label{fig:scatter}
-\end{subfigure}
-
-\caption{A histogram produced with \li{plt.hist()} and a scatter plot produced with \li{plt.scatter()}.}
-\label{fig:otherplots}
 \end{figure}
+
+In this example the data set \li{x} consists of only integer values.
+Specifying 10 bins in the range [.5, 10.5] creates one bin per integer.
+
+% \begin{lstlisting}
+% t = np.linspace(1,20,20)
+% # The argument 's' specifies the marker size.
+% plt.scatter(t, x, s=100)
+% plt.show()
+% \end{lstlisting}
+
 
 \begin{problem} % Find some real data to use with this problem. age v height?
 \label{prob:subplot}
@@ -841,7 +850,7 @@ and set the default value to zero. \end{problem}
 \begin{problem} Use \li{plt.pcolormesh()} to plot the absolute value of the function $x^3 +2x^2 -x +3$ on the complex plane with 0 $\leq$ \li{x} $\leq$ 2 and 0 $\leq$ \li{y} $\leq$ 2.
 \emph{Helpful Hint}: First create your domain arrays, then convert these to a single array of complex variables to evaluate the function.
 
-Your plot should look like Figure \ref{fig:pcolormesh}.
+The plot should look like Figure \ref{fig:pcolormesh}.
 
 \begin{figure}[H] % Complex colorplot
 \includegraphics[width=\textwidth]{pcolor2.png}

@@ -36,7 +36,7 @@ def custom1():
     x = np.linspace(-2, 4, 100)
     plt.plot(x, np.exp(x), 'g:', linewidth=4, label="Exponential")
     # plt.xlabel("The x axis.")
-    plt.title("This is the title.")
+    plt.title("This is the title.", fontsize=18)
     plt.legend(loc="upper left")
 
 @_save
@@ -68,6 +68,18 @@ def subplots():
     plt.plot(x, np.cos(x), 'c', linewidth=2)
     plt.xlim(-np.pi, np.pi)
 
+@_save
+def scatter():
+    x = np.random.randint(1, 11, 20)
+    y = np.random.randint(1, 11, 20)
+
+    # Draw two histograms and a scatter plot to display the data.
+    plt.hist(x, bins=10, range=[.5, 10.5])
+    plt.savefig("histogram.pdf", format='pdf')
+    plt.clf()
+
+    plt.scatter(x, y, s=100)
+
 if __name__ == '__main__':
     basic1()
     basic2()
@@ -75,3 +87,4 @@ if __name__ == '__main__':
     custom2()
     layout()
     subplots()
+    scatter()
