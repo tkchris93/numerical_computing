@@ -1,7 +1,7 @@
 from __future__ import division
 
-import matplotlib
-matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
+# import matplotlib
+# matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
 
 from scipy.integrate import ode
 import numpy as np
@@ -72,7 +72,7 @@ def Exercise2():  # SIR
     plt.legend(loc=1)
     plt.xlabel('T (days)')
     plt.ylabel('Proportion of Population')
-    plt.savefig("SIR1.pdf")
+    # plt.savefig("SIR1.pdf")
     plt.clf()
 
 
@@ -183,7 +183,7 @@ def Exercise4():   # measles
     plt.axis([0., 1., -.01, .1])
     plt.xlabel('T (days)')
     plt.ylabel('Proportion of Population')
-    plt.savefig("measles.pdf")
+    # plt.savefig("measles.pdf")
     plt.clf()
 
 

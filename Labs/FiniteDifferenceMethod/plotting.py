@@ -95,7 +95,7 @@ def prob3():
 										  a=0.,b=np.pi/2., alpha=0.,beta=1.,N=subintervals)
 		return X,Y
 	
-	eps, subintervals = 0.1, 400
+	eps, subintervals = 0.1, 10
 	X,Y = bvp(eps, subintervals)
 	plt.plot(X,Y,'-k',mfc="None",linewidth=2.0)
 	plt.ylabel('$y$',fontsize=16)
@@ -104,6 +104,7 @@ def prob3():
 	# plt.savefig('figure3.pdf')
 	plt.show()
 	plt.clf()
+	raise SystemError 
 	num_approx = 6 # Number of Approximations
 	N = 2560*np.array([2**j for j in range(num_approx)])
 	approx_order(num_approx,N,bvp,eps)
@@ -124,7 +125,7 @@ def prob4():
 	eps, subintervals = 0.1, 20
 	X,Y = bvp(eps, subintervals)
 	plt.plot(X,Y,'-k',mfc="None",linewidth=2.0)
-	
+	plt.show()
 	import sys; sys.exit()
 	eps, subintervals = 0.01, 400
 	X,Y = bvp(eps, subintervals)
@@ -252,9 +253,9 @@ def prob3_again():
 
 # prob1()
 # prob2()
-# prob3()
+prob3()
 # prob4()      # Profile correct; taken from 32 test problems for analysis
-prob5()
+# prob5()
 
 # A check that fd_order2_ode works for problems 3 and 5. 
 # Uses bvp_solver from scikits

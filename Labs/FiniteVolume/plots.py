@@ -1,5 +1,5 @@
 import matplotlib
-matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
+# matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
 
 import numpy as np
 import matplotlib.pyplot as plt

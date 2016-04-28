@@ -15,21 +15,21 @@ Note that the total amount of the quantity in $V$ is
 and the rate at which the quantity enters $V$ is
 \[-\int_{\partial V} \vec{J}(\vec{x},t) \cdot \vec{n}(x) \, dA.\]
 
-We let the source term be given by $f(\vec{x},t,u)$; we may interpret this to mean that the rate at which the quantity is produced in $V$ is
-\[\int_V f(\vec{x},t,u)\, dt.\]
+We let the source term be given by $g(\vec{x},t,u)$; we may interpret this to mean that the rate at which the quantity is produced in $V$ is
+\[\int_V g(\vec{x},t,u)\, dt.\]
 Then the integral form of the conservation law for $u$ is expressed as
-\[\frac{d}{dt} \int_V u(\vec{x},t) \, d\vec{x} = -\int_{\partial V} \vec{J}\cdot \vec{n}\, dA + \int_V f(\vec{x},t,u)\, d\vec{x}.\]
+\[\frac{d}{dt} \int_V u(\vec{x},t) \, d\vec{x} = -\int_{\partial V} \vec{J}\cdot \vec{n}\, dA + \int_V g(\vec{x},t,u)\, d\vec{x}.\]
 
 If $u$ and $J$ are sufficiently smooth functions, then we have
 \[ \frac{d}{dt} \int_V u\, d\vec{x} = \int_V u_t \, d\vec{x},\]
 and
 \[ \int_{\partial V} \vec{J}\cdot \vec{n}\, dA = \int_V \nabla \cdot \vec{J}\, d\vec{x} .\]
 Since this holds for all nice subsets $V \subset \Omega$ with $V$ arbitrarily small, we obtain the differential form of the conservation law for $u$:
-\[ u_t + \nabla \cdot \vec{J} = f(\vec{x},t,u) .\]
+\[ u_t + \nabla \cdot \vec{J} = g(\vec{x},t,u) .\]
 
 \section*{Constitutive Relations}
 Currently our conservation law appears in the form
-\[u_t + \nabla \vec{J} = f(\vec{x},t,u).\]
+\[u_t + \nabla \vec{J} = g(\vec{x},t,u).\]
 Thus the conservation law consists of one equation and 2 unknowns ($u$ and $J$).
 To this equation we add other equations, called constitutive relations, which are used to fully determine the system.
 
@@ -39,8 +39,8 @@ Since heat flows from warmer regions to colder regions, and the rate of heat flo
 where $\nu$ is a diffusion constant.
 This constitutive relation is called Fick's law, and is the basic model for any diffusive process.
 Substituting into the conservation law we obtain
-\[u_t -\nu \triangle u(x,t) = f(\vec{x},t,u).\]
-The function $f$ represents heat sources/sinks within the region.
+\[u_t -\nu \triangle u(x,t) = g(\vec{x},t,u).\]
+The function $g$ represents heat sources/sinks within the region.
 
 \section*{Numerically modeling heat flow}
 Consider the heat flow equation in one dimension together with appropriate initial conditions and homogeneous Dirichlet boundary conditions:
@@ -282,7 +282,7 @@ Using the Crank Nicolson method, numerically approximate the solution $u(x,t)$ o
 \begin{align}
 	\begin{split}
 	&{ } u_t = u_{xx}, \quad x \in [-12,12],\quad t \in [0,1],\\
-	&{ } u(0,t) = 0,\quad u(1,t) = 0,\\
+	&{ } u(-12,t) = 0,\quad u(12,t) = 0,\\
 	&{ } u(x,0) = \max\{1 - x^2,0\}.
 	\end{split}
 \end{align}

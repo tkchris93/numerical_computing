@@ -36,7 +36,7 @@ After plotting these solutions (see Figure \ref{ivp:int_curves}), it becomes obv
 \begin{figure}
 \centering
 \includegraphics[width=\textwidth]{example.pdf}
-\caption{Several solutions of \eqref{ivp:example}, using the Numpy's IVP solver \li{dopri5}. }
+\caption{Several solutions of \eqref{ivp:example}, using Numpy's IVP solver \li{dopri5}. }
 \label{ivp:int_curves}
 \end{figure}
 
@@ -274,7 +274,7 @@ However, the fact that the equation predicts large oscillations suggests the spr
 Mechanical resonance has been known to cause failure of bridges, buildings, and airplanes.
 
 \begin{problem}
-Use the RK4 method to solve for the undamped forced harmonic oscillator satisfying 
+Use the RK4 method to solve for the damped and forced harmonic oscillator satisfying 
 \begin{align*}
 &{}2y'' + \gamma y' + 2y = 2 \cos (\omega x), \quad 0 \leq x \leq 40,\\
 &{}y(0) = 2, \quad
