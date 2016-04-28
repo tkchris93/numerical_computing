@@ -1,7 +1,11 @@
 \lab{Data Structures II: Trees}{Data Structures II}
 \label{lab:Python_DataStructures2}
 
-\objective{A \emph{Tree} is a linked list where each node in the list may refer to more than one other node. This structural flexibility makes trees more useful than regular linked lists in many applications. Many trees are most easily constructed recursively, so we begin with an overview of recursion. We then implement a recursively structured doubly-linked Binary Search Tree. Finally, we compare the standard linked list, our Binary Search Tree, and an AVL tree to illustrate the relative strengths and weaknesses of each structure.}
+\objective{A \emph{Tree} is a linked list where each node in the list may refer to more than one other node. This structural flexibility makes trees more useful and efficient than regular linked lists in many applications. Many trees are most easily constructed recursively, so we begin with an overview of recursion. We then implement a recursively structured doubly-linked Binary Search Tree. Finally, we compare the standard linked list, our Binary Search Tree, and an AVL tree to illustrate the relative strengths and weaknesses of each structure.}
+
+
+% TODO:
+%     - No need to have 'item' as an argument to _step() in BST.find().
 
 \section*{Recursion}
 
@@ -169,7 +173,7 @@ This continues on each branch until its end is reached.
 A node with no children is called a \emph{leaf node}.
 
 Mathematically, a tree is a directed graph with no cycles.
-Therefore a linked lists qualifies as a tree, albeit a boring one.
+Therefore a linked lists as a graph qualifies as a tree, albeit a boring one.
 The head node is the root node, and it has one child node.
 That child node also has one child node, which in turn has one child.
 The last node in the list is the only leaf node.
@@ -285,32 +289,31 @@ This process continues until the data is found or, if the data is not in the tre
 class BST(object):
     # ...
     def find(self, data):
-        """Return the node containing 'data'. If there is no such node in the
-        tree, or if the tree is empty, raise a ValueError."
+        """Return the node containing 'data'. If there is no such node
+        in the tree, or if the tree is empty, raise a ValueError.
         """
-        if self.root is None:
-            raise ValueError("The tree is empty.")
+
         # Define a recursive function to traverse the tree.
-        def _step(current, item):
+        def _step(current):
             """Recursively step through the tree until the node containing
-            'item' is found. If there is no such node, raise a Value Error.
+            'data' is found. If there is no such node, raise a Value Error.
             """
-            if current is None:                 # Base case 1: dead end.
+            if current is None:                     # Base case 1: dead end.
                 raise ValueError(str(data) + " is not in the tree.")
-            if item == current.value:           # Base case 2: the data matches.
+            if data == current.value:               # Base case 2: data found!
                 return current
-            if item < current.value:            # Step to the left
-                return _step(current.left,item)
-            else:                               # Step to the right
-                return _step(current.right,item)
+            if data < current.value:                # Recursively search left.
+                return _step(current.left)
+            else:                                   # Recursively search right.
+                return _step(current.right)
         
         # Start the recursion on the root of the tree.
-        return _step(self.root, data)
+        return _step(self.root)
 \end{lstlisting}
 
 \begin{info}
 Conceptually, each node of a BST partitions the data of its subtree into two halves: the data that is less than the parent, and the data that is greater.
-We will extend this concept to multiple dimensions in the next lab.
+We will extend this concept to higher dimensions in the next lab.
 \end{info}
 
 \subsection*{insert()}
@@ -644,7 +647,7 @@ Test your solutions thoroughly, accounting for all possible cases:
 	\item the target has two children.
 	\end{enumerate}
 \end{enumerate}
-(Hints: \textbf{Before coding anything} outline the entire function with comments and \li{if else} statements.
+(Hints: \textbf{Before coding anything} outline the entire function with comments and \li{if else} blocks.
 Use the \li{BST.find()} method wherever appropriate.)
 \end{problem}
 
@@ -746,6 +749,8 @@ The AVL's balancing algorithm is beyond the scope of this project, but details a
 \end{lstlisting}
 
 % Problem 4: compare build and search speeds.
+% TODO (?): Instead of a file to read from, have them generate random numbers.
+%   Reading data from a file is an over-complication (abolish English.txt).
 \begin{problem}
 Write a function to compare the build and search speeds the different data structures of this lab.
 Accept a \li{filename} to read data from and keyword arguments \li{start}, \li{stop}, and \li{step} to determine the domain.
@@ -777,13 +782,14 @@ With \li{start=500}, \li{stop=5000}, and \li{step=500}, your plot should look si
 \end{figure}
 \end{problem}
 
-\begin{comment}
+\begin{comment} % TODO: Add this back in?
 \section*{Conclusion}
 Every data structure has advantages and disadvantages.
 Recognizing when an application may take advantage of a certain structure, especially when that structure is more complicated than a \li{list} or \li{set}, is an important skill.
 Choosing your structures wisely often results in huge speedups in applications.
 \end{comment}
 
+% TODO: Add this back in?
 \begin{comment} % Additional material: improve the BST class, etc.
 \section*{Additional Material}
 

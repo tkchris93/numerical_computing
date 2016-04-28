@@ -1,4 +1,4 @@
-#This is a kdtree written by A Zaitzeff to be used by the students for problem 2 of NNS
+#This is a kdtree written by A Zaitzeff to be used by the students for problem 2 of NNS (OUTDATED, but good to keep around)
 class Node: 
     pass
  

@@ -131,11 +131,10 @@ class _testDriver(object):
         self.feedback = ""
         self.score = 0
 
-        def test_one(problem, number, value):
+        def test_one(problem, label, value):
             """Test a single problem, checking for errors."""
             try:
-                self.feedback += "\n\nProblem {} ({} points):".format(
-                                                                number, value)
+                self.feedback += "\n\n{} ({} points):".format(label, value)
                 points = problem(student_module)
                 self.score += points
                 self.feedback += "\nScore += {}".format(points)
@@ -143,8 +142,8 @@ class _testDriver(object):
                 self.feedback += "\n{}: {}".format(self._errType(e), e)
 
         # Grade each problem.
-        test_one(self.problem1, 1, 0)   # Problem 1: X points.
-        test_one(self.problem2, 2, 0)   # Problem 2: X points.
+        test_one(self.problem1, "Problem 1", 0)   # Problem 1: X points.
+        test_one(self.problem2, "Problem 2", 0)   # Problem 2: X points.
 
         # Report final score.
         percentage = (100. * self.score) / total
@@ -169,6 +168,7 @@ class _testDriver(object):
         """Test to see if 'correct' and 'student' are equal.
         Report the given 'message' if they are not.
         """
+        # if np.allclose(correct, student):
         if correct == student:
             return 1
         else:
@@ -187,16 +187,6 @@ class _testDriver(object):
             self.feedback += "\n{}".format(message)
             self.feedback += "\n\tCorrect response: {}".format(correct)
             self.feedback += "\n\tStudent response: {}".format(student)
-            return 0
-
-    def _evalTest(self, expression, correct, message):
-        """Test a boolean 'expression' to see if it is 'correct'.
-        Report the given 'message' if it is not.
-        """
-        if expression is correct:
-            return 1
-        else:
-            self.feedback += "\n{}".format(message)
             return 0
 
     def _grade(self, points, message=None):

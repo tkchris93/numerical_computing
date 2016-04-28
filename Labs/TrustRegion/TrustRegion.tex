@@ -24,7 +24,7 @@ x_{k+1} := x_k + \alpha_k d_k.
 A trust-region algorithm, on the other hand, does away with a search direction and
 step length, and instead approximates the function $f$ with some simpler function
 $m_k$ (called the \emph{model function}) in a neighborhood of $x_k$.
-The model $m_k$ will likely not be close to $f$ over the entire
+The model $m_k$ will likely not be a good approximation for $f$ over the entire
 domain, and so we must restrict our attention to a ball of radius $r_k$ centered at
 the point $x_k$, inside of which $m_k$ is reasonably close to $f$. We then minimize
 $m_k$ over this ball, and set $x_{k+1}$ equal to this minimizer. That is, we compute $x_{k+1}$ by
@@ -42,13 +42,13 @@ The model function is commonly taken to be a linear or quadratic approximation o
 $f$ based on its Taylor Series expansion about the point $x_k$. In the linear case,
 our model function has the form
 \[
-f(x_k) + (y-x_k)^T \nabla f(x_k).
+m_k(x) = f(x_k) + (x-x_k)^T \nabla f(x_k).
 \]
 In the quadratic case, we simply add on a quadratic term to obtain
 \[
-f(x_k) + (y-x_k)^T \nabla f(x_k) + \frac{1}{2}(y - x_k)^T B_k (y-x_k),
+m_k(x) = f(x_k) + (x-x_k)^T \nabla f(x_k) + \frac{1}{2}(x - x_k)^T H_k (x-x_k),
 \]
-where $B_k$ is the Hessian matrix of $f$ at $x_k$, or some approximation thereof.
+where $H_k$ is the Hessian matrix of $f$ at $x_k$, or some approximation thereof.
 Given a trust region with radius $r_k$, note that our sub-problem can be
 written in the following way:
 \begin{align*}
@@ -57,13 +57,18 @@ x_{k+1} &= \underset{x \in B(x_k, r_k)}{\text{argmin}} m_k(x)\\
 \end{align*}
 where
 \begin{equation}
-p_k = \underset{\|p\| < r_k}{\text{argmin}}\, \{f(x_k) + p^T \nabla f(x_k) + \frac{1}{2}p^T B_k p\}
+p_k = \underset{\|p\| < r_k}{\text{argmin}}\, \{f(x_k) + p^T \nabla f(x_k) + \frac{1}{2}p^T H_k p\}.
 \label{eq:step}
 \end{equation}
-($p_k$ is called a \emph{step}).
+$p_k$ is called a \emph{step}.
+Also we define $p$ to be
+\begin{equation}
+p = x - x_k
+\end{equation}
+
 For the remainder of the lab, we define
 \[
-m_k(p) = f(x_k) + p^T \nabla f(x_k) + \frac{1}{2}p^T B_k p,
+m_k(p) = f(x_k) + p^T \nabla f(x_k) + \frac{1}{2}p^T H_k p,
 \]
 and refer to \emph{this} function as the model function.
 
@@ -93,13 +98,13 @@ then the point $x_k+p_k$ is a poor improvement over $x_k$ (and perhaps is worse)
 In this case, we reject the new point and set $x_{k+1} = x_k$.
 
 \subsection*{The Trust-Region Algorithm}
-We now combine the two steps of minimizing the model function and choosing the trust-region radius to build the algorithm.
+We now combine the two steps of minimizing the model function and choosing the trust-region radius to build the algorithm.  In practice, we halt the algorithm once $\|\nabla f(x_k)\|$ is less than some threshold value.
 \begin{algorithm}
 \begin{algorithmic}[1]
 \Procedure{Trust-Region Algorithm}{}
     \State Choose initial point $x_0$, initial radius $r_0$, and threshold $\eta \in [0,0.25)$.
-    \For{$k=0, 1, 2, \ldots$}
-        \State Solve the sub-problem in Equation \ref{eq:step}.
+    \While{$\|\nabla f(x_k)\|>tol$}
+        \State Calculate $p_k$ by solving the sub-problem in Equation \ref{eq:step}.
         \State Compute $\rho_k$.
         \If{$\rho_k < 0.25$}
             \State $r_{k+1} = 0.25r_k$
@@ -116,52 +121,22 @@ We now combine the two steps of minimizing the model function and choosing the t
         \Else
             \State $x_{k+1} = x_k$
         \EndIf
-    \EndFor
+    \EndWhile
 \EndProcedure
 \end{algorithmic}
 \caption{Trust-Region Algorithm}
 \label{alg:trustregion}
 \end{algorithm}
-In practice, we halt the algorithm once $\|\nabla f(x_k)\|$ is less than some threshold value.
+
 \begin{problem}
-Implement the trust-region algorithm using the following function declaration.
-\begin{lstlisting}
-def trustRegion(f,grad,hess,subprob,x0,r0,rmax,eta,gtol=1e-5):
-    """
-    Minimize a function using the trust-region algorithm.
-
-    Parameters
-    ----------
-    f : callable function object
-        The objective function to minimize
-    g : callable function object
-        The gradient (or approximate gradient) of the objective function
-    hess : callable function object
-        The hessian (or approximate hessian) of the objective function
-    subprob: callable function object
-        Returns the step p_k
-    x0 : numpy array of shape (n,)
-        The initial point
-    r0 : float
-        The initial trust-region radius
-    rmax : float
-        The max value for trust-region radii
-    eta : float in [0,0.25)
-        Acceptance threshold
-    gtol : float
-        Convergence threshold
-
-    Returns
-    -------
-    x : the minimizer of f
-
-    Notes
-    -----
-    The functions f, g, and hess should all take a single parameter.
-    The function subprob takes as parameters a gradient vector, hessian matrix, and radius.
-    """
-    pass
-\end{lstlisting}
+Implement the trust-region algorithm (see the specifications file). % using the following function signature.
+% \begin{lstlisting}
+% def trustRegion(f,grad,hess,subprob,x0,r0,rmax,eta=1./16,gtol=1e-5):
+%     pass
+% \end{lstlisting}
+At this stage, do not solve Equation (\ref{eq:step}) for $p_k$.
+Instead, assume the parameter \li{subprob} is a function that does that for you (see Problem \ref{prob:dogleg})
+The function \li{subprob()} takes as parameters a gradient vector, hessian matrix, and radius.
 \end{problem}
 
 \subsection*{Solving the Sub-problem: the Dogleg Method}
@@ -174,13 +149,13 @@ This method works by minimizing the model function along a particular path exten
 to the boundary of the trust region.
 This path is piecewise linear and has a shape vaguely reminiscent of a dog's leg, which explains the peculiar name of the method.
 
-To calculate the dogleg minimizer of the model function, we first solve the unconstrained minimizer of the model function,
+To calculate the dogleg minimizer of the model function, we first solve the unconstrained minimizer of the model function.  We $p^B$ as the unconstrained minimizer of the model function:
 \[
-p^B = -B_k^{-1}\nabla f(x_k).
+p^B = -H_k^{-1}\nabla f(x_k).
 \]
 We then calculate the direction of steepest descent for the model function, given by
 \[
-p^U = -\frac{\nabla f(x_k)^T\nabla f(x_k)}{\nabla f(x_k)^TB_k\nabla f(x_k)}\nabla f(x_k).
+p^U = -\frac{\nabla f(x_k)^T\nabla f(x_k)}{\nabla f(x_k)^TH_k\nabla f(x_k)}\nabla f(x_k).
 \]
 We define the dogleg path using these two points as follows:
 \[
@@ -236,52 +211,69 @@ given by $p^U + (\tau^*-1)(p^B-p^U)$, where $\tau^*$ satisfies the quadratic equ
 \[
 \|p^U + (\tau^*-1)(p^B-p^U)\|^2 = r_k^2.
 \]
+This quadratic equation can be simplified into 
+\[
+a(\tau^*-1)^2+b(\tau^*-1)+c = 0
+\]
+where the coefficients are defined to be
+\[
+a = p_B^Tp_B - 2p_B^Tp_U+p_U^Tp_U
+\]
+\[
+b = 2p_B^Tp_U-2p_U^Tp_U
+\]
+\[
+c = p_U^Tp_U-r_k^2.
+\]
 See Figure \ref{fig:dl2}.
 \end{itemize}
 
 \begin{problem}
-Implement the dogleg method using the following function declaration.
+Implement the dogleg method.
 Remember to avoid calculating the inverse of a matrix.
-\begin{lstlisting}
-def dogleg(gk,Bk,rk):
-    """
-    Calculate the dogleg minimizer of the quadratic model function.
+% \begin{lstlisting}
+% def dogleg(gk,Bk,rk):
+%     """
+%     Calculate the dogleg minimizer of the quadratic model function.
 
-    Parameters
-    ----------
-    gk : ndarray of shape (n,)
-        The current gradient of the objective function
-    Bk : ndarray of shape (n,n)
-        The current (or approximate) hessian
-    rk : float
-        The current trust region radius
+%     Parameters
+%     ----------
+%     gk : ndarray of shape (n,)
+%         The current gradient of the objective function
+%     Bk : ndarray of shape (n,n)
+%         The current (or approximate) hessian
+%     rk : float
+%         The current trust region radius
 
-    Returns
-    -------
-    pk : ndarray of shape (n,)
-        The dogleg minimizer of the model function.
-    """
-    pass
-\end{lstlisting}
-
-
+%     Returns
+%     -------
+%     pk : ndarray of shape (n,)
+%         The dogleg minimizer of the model function.
+%     """
+%     pass
+% \end{lstlisting}
+\label{prob:dogleg}
 \end{problem}
 
 Test your implementation of the trust-region algorithm on the Rosenbrock function contained the {\tt scipy.optimize} module.
 Compare your answer with that obtained by SciPy's trust-region implementation. The code to accomplish this, together with the
 correct results, is given below.
 \begin{lstlisting}
+>>> from scipy import optimize as op
 >>> x = np.array([10.,10])
->>> rhat=2.
+>>> rmax=2.
 >>> r=.25
 >>> eta=1./16
 >>> tol=1e-5
->>> opts = {'initial_trust_radius':r, 'max_trust_radius':rhat, 'eta':eta, 'gtol':tol}
+>>> opts = {'initial_trust_radius':r, 'max_trust_radius':rmax, 'eta':eta, 'gtol':tol}
 >>> sol1 = op.minimize(op.rosen, x, method='dogleg', jac=op.rosen_der, hess=op.rosen_hess, options=opts)
->>> sol2 = trustRegion(op.rosen, op.rosen_der, op.rosen_hess, dogleg, x, r, rhat, eta, gtol=tol)
+>>> sol2 = trustRegion(op.rosen, op.rosen_der, op.rosen_hess, dogleg, x, r, rmax, eta, gtol=tol)
 >>> print np.allclose(sol1.x, sol2)
 True
 \end{lstlisting}
+\begin{problem}
+Test your \li{trustRegion()} and \li{dogleg()} methods on the Rosenbrock function.  Use the \li{rosen()}, \li{rosen_der()}, and \li{rosen_hess()} methods from \li{scipy.optimize}.  Return the solution \li{x*} from the \li{trustRegion()} method.
+\end{problem}
 
 \subsection*{Solving Systems of Nonlinear Equations}
 Trust-region methods can be used to find solutions of systems of nonlinear equations, which arise in applications across science and engineering.
@@ -320,7 +312,7 @@ J_k = \begin{bmatrix}
 \nabla r_n(x_k)^T
 \end{bmatrix},
 \]
-then we can write the gradient $\nabla f(x_k) = J_k^Tr(x_k)$ and the Hessian $B_k = J_k^TJ_k$.
+then we can write the gradient $\nabla f(x_k) = J_k^Tr(x_k)$ and the Hessian $H_k = J_k^TJ_k$.
 We can now use the same model function described earlier.
 
 Let's work through an example. Consider the system
@@ -360,18 +352,18 @@ In Python, we initialize all of the requisite functions and then find a root as 
 >>>     return J(x).dot(r(x))
 >>>
 >>> # define the Hessian function
->>> def B(x):
+>>> def H(x):
 >>>     return J(x).T.dot(J(x))
 >>>
 >>> # set trust-region parameters
->>> rhat=2.
+>>> rmax=2.
 >>> rr=.25
 >>> eta=1./16
 >>> tol=1e-5
 >>> # set initial point
 >>> x = np.array([3.5, -2.5])
 >>> # find a minimizer of f
->>> xstar = trustRegion(f,g,B,dogleg,x,rr,rhat,eta,gtol=tol)
+>>> xstar = trustRegion(f,g,H,dogleg,x,rr,rmax,eta=eta,gtol=tol)
 >>> print xstar
 [ 3.14159265 -3.14159265]
 >>> # verify that it is a root of r
@@ -382,8 +374,23 @@ In Python, we initialize all of the requisite functions and then find a root as 
 Of course, we are not guaranteed to always find a root, as convergence depends on the choice of initial point.
 However, by running the algorithms with several randomly selected starting points, we are more likely to 
 be successful.
+\begin{problem}
+Solve the following nonlinear system.
+\[
+r(x,y) = \begin{bmatrix}
+\sin x\cos y - 4\cos x\sin y\\
+\sin y\cos x - 4\cos y\sin x
+\end{bmatrix} 
+= \begin{bmatrix}
+0\\
+0
+\end{bmatrix}.
+\]
+\end{problem}
 
+\begin{comment}
 \begin{problem}
 Some problem involving system of nonlinear equations. Consult http://www-sop.inria.fr/coprin/logiciels/ALIAS/Benches/ 
 for ideas.
 \end{problem}
+\end{comment}
