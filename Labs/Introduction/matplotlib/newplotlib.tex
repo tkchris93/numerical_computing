@@ -504,12 +504,6 @@ Use \li{plt.pcolormesh()} to create a heat map.
 >>> plt.show()
 \end{lstlisting}
 
-% # Draw the corresponding 3-D plot.
-% >>> from mpl_toolkits.mplot3d import Axes3D
-% >>> fig = plt.figure()
-% >>> ax = fig.gca(projection='3d')
-% >>> ax.plot_surface(X, Y, Z)
-% >>> plt.show()
 
 \begin{figure}[H] % 2D heat map vs 3D surface.
 \captionsetup[subfigure]{justification=centering}
@@ -518,13 +512,13 @@ Use \li{plt.pcolormesh()} to create a heat map.
     \centering
     \includegraphics[width=\linewidth]{sinxsiny.png}
     \caption{A heat map of $f$.}
-    \label{fig:plot3d}
+    \label{fig:heatmap}
 \end{subfigure}%
 \begin{subfigure}{.5\textwidth}
     \centering
     \includegraphics[width=\linewidth]{sinxsiny_3d.pdf}
     \caption{The 3-D surface that corresponds to the heat map.}
-    \label{fig:points3d}
+    \label{fig:surface}
 \end{subfigure}
 \caption{Visualization of the function $f(x,y) = \sin(x)\sin(y)$.}
 \end{figure}
@@ -559,34 +553,6 @@ This kind of data does not require a domain, and is easily visualized with \li{p
 % =============================================================================
 % DONE TO HERE ================================================================
 % =============================================================================
-
-\begin{comment} % 3D plotting with Matplotlib (shorten and reinsert, AddMat?)
-Matplotlib can also be used for 3D plotting. The following is an example
-of how to use Matplotlib to plot the function $z=\sin(x)\sin(y)$ with
-both x and y ranging from -6 to 6. The resulting plot is shown in Figure
-\ref{mpl:3dplot}. If you change the number of sample points used you
-will notice that graphs look much nicer with large numbers of sample
-points, but it will also take much longer for your computer to render
-the image.
-
-\begin{lstlisting} 
-from mpl_toolkits.mplot3d import Axes3D 
-from matplotlib import pyplot as plt 
-import numpy as np 
-fig = plt.figure() 
-ax= fig.gca(projection='3d') 
-x = np.linspace(-6, 6, 301) 
-y = np.linspace(-6, 6, 301) 
-X, Y = np.meshgrid(x, y) 
-Z = np.sin(X) * np.sin(Y) 
-ax.plot_surface(X, Y, Z) 
-plt.show() 
-\end{lstlisting}
-
-\begin{problem} Plot the function \begin{equation*}
-\frac{\cos\left(\sqrt{x^2 + y^2}\right)}{\frac{x^2 + y^2}{10} + 1}
-\end{equation*} on $[-10, 10] \times [-10, 10]$. \end{problem}
-\end{comment}
 
 \section*{3-D Plotting with Mayavi} % =========================================
 
@@ -745,12 +711,13 @@ The plotting functions in Mayavi allow you to specify the color of a plot, eithe
 For example, the plot in Figure \ref{fig:surf_example} uses the colormap \li{'RdYlGn'}.
 For a list of all colormaps in Mayavi, see \url{http://docs.enthought.com/mayavi/mayavi/mlab_changing_object_looks.html}.
 
+% TODO: More exercises with Mayavi!!! Don't have to be too hard either...
 \begin{problem}
 Plot the function $z = \frac{1}{10}\sin(10(x^2+y^2))$ on $[-1,1] \times [-1,1]$ using Mayavi.
 \end{problem}
 
-%TODO: this problem is copied from https://github.com/enthought/mayavi/blob/master/examples/mayavi/mlab/canyon.py.
-% we either need to cite this (and thus give the solution) or find a different problem.
+% TODO: this problem is copied from https://github.com/enthought/mayavi/blob/master/examples/mayavi/mlab/canyon.py.
+% We need to find a different problem.
 \begin{comment}
 \begin{problem}
 \label{prob:grand_canyon}
@@ -777,14 +744,80 @@ This should produce Figure \ref{fig:GrandCanyon}
 \end{problem}
 \end{comment}
 
-\section*{References}
-
-See \url{http://matplotlib.org} for Matplotlib documentation.
-
 \newpage
 
 \section*{Additional Material} % ==============================================
 
+\subsection*{3-D Plotting with Matplotlib} % ----------------------------------
+
+Matplotlib can also be used for 3D plotting, though it is much slower and not as visually appealing as Mayavi plots.
+The following code produces Figure \ref{fig:surface}.
+
+\begin{lstlisting}
+# Create the domain and calculate the range.
+>>> x = np.linspace(-np.pi, np.pi, n)
+>>> y = np.copy(x)
+>>> X, Y = np.meshgrid(x, y)
+>>> Z = np.sin(X)*np.sin(Y)
+
+# Draw the corresponding 3-D plot.
+>>> from mpl_toolkits.mplot3d import Axes3D
+>>> fig = plt.figure()
+>>> ax = fig.gca(projection='3d')
+>>> ax.plot_surface(X, Y, Z)
+>>> plt.show()
+\end{lstlisting}
+
+\begin{comment}
+\begin{problem}
+Plot the function $\frac{\cos\left(\sqrt{x^2 + y^2}\right)}{\frac{x^2 + y^2}{10} + 1}$ on $[-10, 10] \times [-10, 10]$.
+\end{problem}
+\end{comment}
+
+\subsection*{Interactive Plots}
+
+Matplotlib plots can be made interactive by adding \emph{widgets}.
+Consider the following example, TAKEN FROM THE MATPLOTLIB DOCS BASICALLY AHHH
+
+\begin{lstlisting} 
+>>> from matplotlib import widgets as wg 
+
+>>> ax = plt.subplot(111)
+>>> plt.subplots_adjust(bottom=.25)         # Make some space for a slider bar.
+>>> t = np.arange(0., 1., .001)     
+>>> a0 = 5. 
+>>> f0 = 3. 
+>>> s = a0 * np.sin(2 * np.pi * f0 * t) 
+>>> l = plt.plot(t, s)[0]
+>>> plt.axis([0, 1, -10, 10]) 
+>>> axfreq = plt.axes([.25, .05, .65, .03]) 
+>>> axamp = plt.axes([.25, .1, .65, .03]) 
+
+# Make some slider bars.
+>>> sfreq = wg.Slider(axfreq, 'Freq', .1, 30., valinit=f0) 
+>>> samp = wg.Slider(axamp, 'Amp', .1, 10., valinit=a0) 
+>>> def update(val):                        # Function for updating the plot.
+...     amp = samp.val                          # Read from one slider.
+...     freq = sfreq.val                        # Read from the other slider.
+...     l.set_ydata(amp * np.sin(2 * np.pi * freq * t)) 
+...     plt.draw()                              # Refresh the plot.
+>>> sfreq.on_changed(update)                # Connect the sliders to update().
+>>> samp.on_changed(update)
+>>> plt.show() 
+\end{lstlisting}
+
+\begin{figure}[H]
+\includegraphics[width=.7\textwidth]{interact.pdf}
+\caption{A snapshot of an interactive plot made using Matplotlib.}
+\label{mpl:interact} \end{figure}
+
+% \begin{problem} Modify the code above to add a third slider to
+% manipulate the phase of the wave shown. Have it range from 0 to $2\pi$
+% and set the default value to zero. \end{problem}
+
+\subsection*{Animations} % ----------------------------------------------------
+
+Stuff from Volume 4.
 
 % =============================================================================
 % =============================================================================
@@ -798,48 +831,6 @@ If you are executing these Matplotlib commands in an IPython shell, executing th
 \end{info}
 \end{comment}
 
-\begin{comment} % Interactive graphs with widgets. Additional Info?
-Matplotlib also allows us to make interactive graphs as follows:
-
-% This example is largely based on one of the examples in the Matplotlib
-% docs. I have simplified it and changed the way the libraries are
-% imported, but we could do a citation anyway.
-%
-\begin{lstlisting} 
-import numpy as np 
-from matplotlib import pyplot as plt 
-from matplotlib import widgets as wg 
-ax = plt.subplot(111)
-plt.subplots_adjust(bottom=.25) 
-t = np.arange(0., 1., .001) 
-a0 = 5. 
-f0 = 3. 
-s = a0 * np.sin(2 * np.pi * f0 * t) 
-l = plt.plot(t, s)[0]
-plt.axis([0, 1, -10, 10]) 
-axfreq = plt.axes([.25, .05, .65, .03]) 
-axamp = plt.axes([.25, .1, .65, .03]) 
-sfreq = wg.Slider(axfreq, 'Freq', .1, 30., valinit=f0) 
-samp = wg.Slider(axamp, 'Amp', .1, 10., valinit=a0) 
-def update(val): 
-    amp = samp.val 
-    freq = sfreq.val 
-    l.set_ydata(amp * np.sin(2 * np.pi * freq * t)) 
-    plt.draw() 
-sfreq.on_changed(update)
-samp.on_changed(update) 
-plt.show() 
-\end{lstlisting} The resulting plot is shown in Figure \ref{mpl:interact}.
-
-\begin{figure} \includegraphics[width=\textwidth]{interact.pdf}
-\caption{A snapshot of an interactive plot made using Matplotlib.}
-\label{mpl:interact} \end{figure}
-
-\begin{problem} Modify the code above to add a third slider to
-manipulate the phase of the wave shown. Have it range from 0 to $2\pi$
-and set the default value to zero. \end{problem}
-
-\end{comment}
 
 \begin{comment} % This will be covered in the Complex labs.
 \begin{problem} Use \li{plt.pcolormesh()} to plot the absolute value of the function $x^3 +2x^2 -x +3$ on the complex plane with 0 $\leq$ \li{x} $\leq$ 2 and 0 $\leq$ \li{y} $\leq$ 2.

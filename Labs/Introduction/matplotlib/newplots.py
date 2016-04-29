@@ -3,8 +3,10 @@
 
 import numpy as np
 from matplotlib import pyplot as plt
+from mayavi import mlab
+
 from mpl_toolkits.mplot3d import Axes3D
-# from mayavi import mlab
+from matplotlib import widgets as wg 
 
 from functools import wraps
 def _save(func):
@@ -81,7 +83,6 @@ def scatter():
 
     plt.scatter(x, y, s=100)
 
-# @_save
 def sinxsiny(n=201):
     x = np.linspace(-np.pi, np.pi, n) 
     y = x.copy()
@@ -104,7 +105,7 @@ def sinxsiny_3d():
     ax.view_init(elev=26, azim=-76)
     ax.plot_surface(X, Y, np.sin(X)*np.sin(Y))
 
-def cmeshprob(n=200):
+def pcolor2(n=200):
     x = np.linspace(-2*np.pi, 2*np.pi, n)
     y = np.copy(x)
     X, Y = np.meshgrid(x,y)
@@ -118,6 +119,31 @@ def cmeshprob(n=200):
     plt.clf()
 
 
+
+def widget_plot():
+
+    ax = plt.subplot(111)
+    plt.subplots_adjust(bottom=.25) 
+    t = np.arange(0., 1., .001) 
+    a0 = 5. 
+    f0 = 3. 
+    s = a0 * np.sin(2 * np.pi * f0 * t) 
+    l = plt.plot(t, s)[0]
+    plt.axis([0, 1, -10, 10]) 
+    axfreq = plt.axes([.25, .05, .65, .03]) 
+    axamp = plt.axes([.25, .1, .65, .03]) 
+    sfreq = wg.Slider(axfreq, 'Freq', .1, 30., valinit=f0) 
+    samp = wg.Slider(axamp, 'Amp', .1, 10., valinit=a0) 
+    def update(val): 
+        amp = samp.val 
+        freq = sfreq.val 
+        l.set_ydata(amp * np.sin(2 * np.pi * freq * t)) 
+        plt.draw() 
+    sfreq.on_changed(update)
+    samp.on_changed(update) 
+    plt.show() 
+
+
 if __name__ == '__main__':
     basic1()
     basic2()
@@ -129,3 +155,4 @@ if __name__ == '__main__':
     sinxsiny()
     sinxsiny_3d()
     cmeshprob()
+    # test()
