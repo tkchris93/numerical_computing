@@ -26,7 +26,7 @@ def prob3():
     plt.ylim(-6, 6)
     plt.show()
 
-def prob4():
+def prob4_OLD():
     x = np.linspace(-np.pi, np.pi, 200)
     
     plt.subplot(221)
@@ -55,5 +55,17 @@ def prob4():
 
     plt.show()
 
+def prob5():
+    x = np.linspace(-2*np.pi, 2*np.pi, 200)
+    y = np.copy(x)
+    X, Y = np.meshgrid(x,y)
+    Z = np.sin(X)*np.sin(Y)/(X*Y)
+
+    plt.pcolormesh(X, Y, Z, cmap="seismic")
+    plt.colorbar()
+    plt.xlim(-2*np.pi, 2*np.pi)
+    plt.ylim(-2*np.pi, 2*np.pi)
+    plt.show()
+
 if __name__ == '__main__':
-    prob4()
+    prob5()

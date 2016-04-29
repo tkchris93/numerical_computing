@@ -3,6 +3,7 @@
 
 import numpy as np
 from matplotlib import pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 # from mayavi import mlab
 
 from functools import wraps
@@ -26,22 +27,22 @@ def basic1():
     plt.plot(y)
 
 @_save
-def basic2():
-    x = np.linspace(-5, 5, 50)
+def basic2(n=50):
+    x = np.linspace(-5, 5, n)
     y = x**2
     plt.plot(x, y)
 
 @_save
-def custom1():
-    x = np.linspace(-2, 4, 100)
+def custom1(n=100):
+    x = np.linspace(-2, 4, n)
     plt.plot(x, np.exp(x), 'g:', linewidth=4, label="Exponential")
     # plt.xlabel("The x axis.")
     plt.title("This is the title.", fontsize=18)
     plt.legend(loc="upper left")
 
 @_save
-def custom2():
-    x = np.linspace(1, 4, 100)
+def custom2(n=100):
+    x = np.linspace(1, 4, n)
     plt.plot(x, np.log(x), 'r+', linewidth=2)
     # plt.grid()
     plt.xlim(0, 5)
@@ -59,8 +60,8 @@ def layout():
             labelbottom='off', labelleft='off') 
 
 @_save
-def subplots():
-    x = np.linspace(-np.pi, np.pi, 200)
+def subplots(n=200):
+    x = np.linspace(-np.pi, np.pi, n)
     plt.subplot(2, 1, 1)            # Draw the first subplot.
     plt.plot(x, np.sin(x), 'b', linewidth=2)
     plt.xlim(-np.pi, np.pi)
@@ -80,6 +81,43 @@ def scatter():
 
     plt.scatter(x, y, s=100)
 
+# @_save
+def sinxsiny(n=201):
+    x = np.linspace(-np.pi, np.pi, n) 
+    y = x.copy()
+    X, Y = np.meshgrid(x, y)
+
+    plt.pcolormesh(X, Y, np.sin(X) * np.sin(Y))
+                        # edgecolors='face', shading='flat')
+    plt.colorbar()
+    plt.xlim(-np.pi, np.pi); plt.ylim(-np.pi, np.pi)
+    plt.savefig("sinxsiny.png", size=(1024, 768))
+    plt.clf()
+    
+@_save
+def sinxsiny_3d():
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    x = np.linspace(-np.pi, np.pi, 101)
+    y = x.copy()
+    X, Y = np.meshgrid(x, y)
+    ax.view_init(elev=26, azim=-76)
+    ax.plot_surface(X, Y, np.sin(X)*np.sin(Y))
+
+def cmeshprob(n=200):
+    x = np.linspace(-2*np.pi, 2*np.pi, n)
+    y = np.copy(x)
+    X, Y = np.meshgrid(x,y)
+    Z = np.sin(X)*np.sin(Y)/(X*Y)
+
+    plt.pcolormesh(X, Y, Z, cmap="Spectral")
+    plt.colorbar()
+    plt.xlim(-2*np.pi, 2*np.pi)
+    plt.ylim(-2*np.pi, 2*np.pi)
+    plt.savefig("pcolor2.png", size=(1024, 768))
+    plt.clf()
+
+
 if __name__ == '__main__':
     basic1()
     basic2()
@@ -88,3 +126,6 @@ if __name__ == '__main__':
     layout()
     subplots()
     scatter()
+    sinxsiny()
+    sinxsiny_3d()
+    cmeshprob()

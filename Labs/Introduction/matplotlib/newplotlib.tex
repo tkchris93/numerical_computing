@@ -394,7 +394,7 @@ The file \texttt{TODO.npz} contains some interesting data that is described here
 Use \li{np.load()} to load the two arrays in the file:
 \begin{lstlisting}
 >>> data = np.load("TODO.npz")
->>> x, y = data['key1'], data['key2']
+>>> x, y = data['TODO_1'], data['TODO_2']
 \end{lstlisting}
 
 Write a function to generate the following plot:
@@ -420,28 +420,21 @@ Plot a red horizontal line whose height is equal to the mean of the \li{x} data.
     % \caption{A scatter plot.}
     \label{fig:scatter}
 \end{subfigure}
-\caption{TODO: Replace this figure (or erase it).}
+\caption{TODO: Replace this figure (or nuke it).}
 \end{figure}
 \end{problem}
 
 Other kinds of plots for 1-D data includes bar plots, box plots, and others.
 See Appendix \ref{mpltables} for more.
 
-% =============================================================================
-% DONE TO HERE ================================================================
-% =============================================================================
-
 \subsection*{Visualizing 2-D Data} % ------------------------------------------
 
-A function $f: \mathbb{R}^2 \rightarrow \mathbb{R}$ is usually plotted as a surface in $\mathbb{R}^3$.
-A \emph{heat map} visualizes such a function in only two dimensions by assigning the output of the function to a color (instead of a height).
-For example, Figure \ref{fig:pcmexample} uses a heat map to graph $f(x,y) = \sin(x)\sin(y)$ on $[-6,6] \times [-6,6]$.
+To plot a function $f: \mathbb{R}^2 \rightarrow \mathbb{R}$, we must choose and construct a 2-D domain, then calculate the function at each point of that domain.
+NumPy's \li{np.meshgrid()} is the standard tool for creating a 2-D domain in the Cartesian plane.
+Given two 1-D coordinate arrays, \li{np.meshgrid()} creates two corresponding coordinate matrices.
+See Figure \ref{fig:meshgrid} for a visual explanation.
 
-The plot in Figure \ref{fig:pcmexample} was created with the function \li{plt.pcolormesh()}.
-To draw Figure \ref{fig:pcmexample}, we must first create a grid of points at which to evaluate $f$.
-We do this with the function \li{np.meshgrid()}, which is explained in Figure \ref{fig:meshgrid}.
-
-\begin{figure}[H] % np.meshgrid() visual demonstration.
+\begin{figure} % np.meshgrid() visual demonstration.
 \begin{tikzpicture}[>=stealth', shorten <= .1cm,shorten >=.1cm, dot/.style=
     {circle,fill=black,minimum size=3pt,inner sep=0pt, outer sep=-1pt} ]
 
@@ -471,60 +464,84 @@ We do this with the function \li{np.meshgrid()}, which is explained in Figure \r
 \node[draw=none](X)at(6.3,.9){\texttt{Y}=};
 \node[draw=none](y)at(6.3,3.15){\texttt{X}=};
 
-\node[draw=none](point1)at(-.3, -.4){\texttt{x}=\big[0,};
+\node[draw=none](point1)at(-.3, -.6){\texttt{x}=\big[0,};
 \node[draw=none, node distance=2.35cm](point2)
     [right of=point1]{1,};
 \node[draw=none, node distance=2cm](point3)
     [right of=point2]{2\big]};
-\node[draw=none, rotate=270](point4)at(4.4,4.25)
+\node[draw=none, rotate=270](point4)at(4.6,4.25)
     {\texttt{y}=\big[2,};
 \node[draw=none, rotate=270, node distance=2.35cm](point5)
     [right of=point4]{1,};
 \node[draw=none, rotate=270, node distance=2cm](point6)
     [right of=point5]{0\big]};
 \end{tikzpicture}
-\caption{This figure illustrates the function call \li{np.meshgrid(x, y)}, which returns the arrays \li{X} and \li{Y}. 
-The returned arrays give the $x$- and $y$-coordinates of the points in the grid formed by \li{x} and \li{y}.}
+\caption{\li{np.meshgrid(x, y)}, returns the arrays \li{X} and \li{Y}. 
+The returned arrays give the $x$- and $y$-coordinates of the points in the grid formed by \li{x} and \li{y}.
+Specifically, the arrays \li{X} and \li{Y} satisfy \li{(X[i,j], Y[i,j]) = (x[i],y[j])}.}
 \label{fig:meshgrid}
 \end{figure}
 
-\begin{lstlisting}
-# Create an XY meshgrid
-x = np.linspace(-6, 6, 401)
-y = np.linspace(-6, 6, 401)
-X, Y = np.meshgrid(x, y)
-\end{lstlisting}
-The arrays $X$ and $Y$ satisfy \li{(X[i,j], Y[i,j]) = (x[i],y[j])}.
-
-Now we can evaluate $f(x,y)$ at each point in the grid and plot the result.
+With a domain, we can visualize $f$ with a \emph{heat map}.% or a \emph{surface plot}.
+A heat map assigns a color to each entry in the matrix, producing a 2-D picture describing a 3-D shape.
+Use \li{plt.pcolormesh()} to create a heat map.
+% Matplotlib can also produce 3-D surface plots, but we will prefer to use Mayavi for 3-D plots.
 
 \begin{lstlisting}
-f = np.sin(X) * np.sin(Y)
-plt.pcolormesh(X, Y, f)
-plt.colorbar()    # Show scale
-plt.show()
-\end{lstlisting}
-This plot is shown in Figure \ref{fig:pcmexample}
+# Create a 2-D domain with np.meshgrid().
+>>> x = np.linspace(-np.pi, np.pi, n)
+>>> y = np.copy(x)
+>>> X, Y = np.meshgrid(x, y)
 
-\begin{figure} % 2D heat map
-\includegraphics[width=.7\textwidth]{sinxsiny.png}
-\caption{A heatmap of $f(x,y)=\sin\left(x\right)\times\sin\left(y\right)$ drawn by \li{plt.pcolormesh()}.}
-\label{fig:pcmexample}
+# Calculate z = f(x,y) = sin(x)sin(y) using the meshgrid coordinates.
+>>> Z = np.sin(X)*np.sin(Y)
+
+# Plot the heat map.
+>>> plt.pcolormesh(X, Y, Z)
+>>> plt.colorbar()                  # Show the color scale.
+>>> plt.xlim(-np.pi, np.pi)
+>>> plt.ylim(-np.pi, np.pi)
+>>> plt.show()
+\end{lstlisting}
+
+% # Draw the corresponding 3-D plot.
+% >>> from mpl_toolkits.mplot3d import Axes3D
+% >>> fig = plt.figure()
+% >>> ax = fig.gca(projection='3d')
+% >>> ax.plot_surface(X, Y, Z)
+% >>> plt.show()
+
+\begin{figure}[H] % 2D heat map vs 3D surface.
+\captionsetup[subfigure]{justification=centering}
+\centering
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{sinxsiny.png}
+    \caption{A heat map of $f$.}
+    \label{fig:plot3d}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{sinxsiny_3d.pdf}
+    \caption{The 3-D surface that corresponds to the heat map.}
+    \label{fig:points3d}
+\end{subfigure}
+\caption{Visualization of the function $f(x,y) = \sin(x)\sin(y)$.}
 \end{figure}
-
 
 \begin{problem} % Heatmap problem
 \label{prob:heatmap}
-\leavevmode
+Write a function to plot a heat map of $f(x,y) = \frac{\sin(x)\sin(y)}{xy}$ on the domain $[-2\pi,2\pi] \times [-2\pi,2\pi]$.
+
 \begin{enumerate}
-\item Plot the function $f(x,y) = \frac{\sin(x)\sin(y)}{xy}$ on $[-2\pi,2\pi] \times [-2\pi,2\pi]$. 
-Include the scale bar in your plot.
-\item Change the color scheme of your plot with the keyword argument \li{cmap='seismic'} in the call to \li{plt.pcolormesh()}. 
-You can see a list of all possible color schemes at \url{http://matplotlib.org/examples/color/colormaps_reference.html}.
+\item The keyword \li{cmap} for \li{plt.pcolormesh()} determines the coloring scheme for the heat map.
+Choose a non-default color scheme (\li{'Spectral'} is used in the figure displayed below).
+For the list of all Matplotlib color schemes, see\\\url{http://matplotlib.org/examples/color/colormaps_reference.html}.
+\item Include the color scale bar.
 \item Change the limits on the $x$- and $y$-axes so that the plot is only over the domain $[-2\pi,2\pi] \times [-2\pi,2\pi]$.
-\item Fix the aspect ratio of your plot so that it is a square using the line \li{plt.gca().set_aspect('equal')}.
+% \item Fix the aspect ratio of your plot so that it is a square using the line \li{plt.gca().set_aspect('equal')}.
 \end{enumerate}
-Your finished plot should look like Figure below.
+The plot should similar to the Figure below.
 
 \begin{figure}[H]
 \includegraphics[width=.7\textwidth]{pcolor2.png}
@@ -533,42 +550,17 @@ Your finished plot should look like Figure below.
 \end{figure}
 \end{problem}
 
-\begin{comment}
-\begin{table} % Different plotting commands. Might be useful to put this back in.
-\centering
-\begin{tabular}{|l|p{7cm}|p{3cm}|}
-    \hline
-    Function & Description & Usage\\
-    \hline
-    \li{bar} & makes a bar graph & bar(left,height)\\
-    \li{barh} & makes a horizontal bar graph & barh(bottom,width)\\
-    \li{fill} & plots lines with shading under the curve & fill(x,y)\\
-    \li{fill\_between} & plots lines with shading between two given y
-    values & fill\_ between(x,y1, y2=0)\\
-    \li{hist} & plots a histogram from data & hist(data)\\
-    \li{pie} & makes a pie chart & pie(x)\\
-    \li{plot} & plots lines and data on standard axes & plot(x,y)\\
-    \li{polar} & plots lines and data on polar axes & polar(theta,r)\\
-    \li{loglog} & plots lines and data on logarithmic x and y axes &
-    loglog(x,y)\\
-    \li{scatter} & plots data, has more options for scatter plots than
-    the plot function & scatter(x,y)\\
-    \li{semilogx} & plots lines and data with a log scaled x axis &
-    semilogx(x,y)\\
-    \li{semilogy} & plots lines and data with a log scaled y axis &
-    semilogy(x,y)\\
-    \li{specgram} & makes a spectogram from data & specgram(x)\\
-    \li{spy} & plots the sparsity pattern of a 2D array & spy(Z)\\
-    \li{triplot} & plots triangulation between given points &
-    triplot(x,y)\\
-\end{tabular}
-\end{center}
-\caption{Some basic functions in Matplotlib.}
-\label{mpl:basics}
-\end{table}
-\end{comment}
+\begin{info} % Note about plt.imshow().
+Images are usually stored as either a 2-D array (for black-and-white pictures) or a 3-D array (a stack of 2-D arrays, one for each RGB value).
+This kind of data does not require a domain, and is easily visualized with \li{plt.imshow()}.
+% We will use this function often in future labs.
+\end{info}
 
-\begin{comment} % 3D plotting with Matplotlib (shorten and reinsert)
+% =============================================================================
+% DONE TO HERE ================================================================
+% =============================================================================
+
+\begin{comment} % 3D plotting with Matplotlib (shorten and reinsert, AddMat?)
 Matplotlib can also be used for 3D plotting. The following is an example
 of how to use Matplotlib to plot the function $z=\sin(x)\sin(y)$ with
 both x and y ranging from -6 to 6. The resulting plot is shown in Figure
@@ -591,16 +583,12 @@ ax.plot_surface(X, Y, Z)
 plt.show() 
 \end{lstlisting}
 
-\begin{figure} \includegraphics[width=\textwidth]{3dplot.pdf} \caption{A
-3D plot of $\sin\left(x\right)\times\sin\left(y\right)$.}
-\label{mpl:3dplot} \end{figure}
-
 \begin{problem} Plot the function \begin{equation*}
 \frac{\cos\left(\sqrt{x^2 + y^2}\right)}{\frac{x^2 + y^2}{10} + 1}
 \end{equation*} on $[-10, 10] \times [-10, 10]$. \end{problem}
 \end{comment}
 
-\section*{3-D plotting with Mayavi}
+\section*{3-D Plotting with Mayavi} % =========================================
 
 Although Matplotlib is capable of creating 3-D plots, Mayavi does it much faster and with better visuals. 
 We will use Mayavi for all 3-D plots in these labs. % O RLY?
@@ -695,8 +683,7 @@ mlab.plot3d(x, y, z)
 mlab.show()
 \end{lstlisting}
 
-% TODO: merge this figure with the mlab.points3d() figure.
-\begin{figure}
+\begin{figure} % Mayavi line and point plots.
 \captionsetup[subfigure]{justification=centering}
 \centering
 \begin{subfigure}{.5\textwidth}
