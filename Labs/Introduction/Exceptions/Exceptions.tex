@@ -1,25 +1,22 @@
 \lab{Exceptions and File I/O}{Exceptions and File I/O Protocol}
 \label{lab:Exceptions}
-
 \objective{
-Python uses \emph{Exceptions} to handle errors.
-Understanding and utilizing the exception class hierarchy is an important skill for regulating program usage and informing the programmer of problems.
-Python also has a powerful file object that allows data to be read in from and out to files easily.
-Understanding how this object's class attributes and methods is essential to data manipulation and analysis.
-In this final introductory lab, we explore exceptions and file I/O protocol from the view of Object Oriented Programming.}
+In Python, an \emph{exception} is an error detected during execution.
+Exceptions are important for regulating program usage and correctly informing the programmer of problems.
+Understanding exceptions allows us to safely read data from and export data to external files.
+Reading and parsing data is an essential skill in scientific computing, and will be an important element of many future labs.
+}
 
 % TODO
 %       - print statments --> print function calls in Python 3 (parentheses)
 %       - String Formatting section. ALMOST THERE!!!!
 %       - Additional material section?
 
-% EXCEPTIONS ==================================================================
-
-\section*{Exceptions}
+\section*{Exceptions} % =======================================================
 
 Every programming language has a formal way of indicating and handling errors.
-In Python, we raise and handle \emph{Exceptions}.
-There are different kinds of exceptions, each with its appropriate usage and meaning\footnote{See \url{https://docs.python.org/2/library/exceptions.html} for the complete list of Python's built-in exception classes.}.
+In Python, we raise and handle \emph{exceptions}.
+There are different kinds of exceptions, each with its appropriate usage.
 
 \begin{lstlisting}
 # A 'NameError' exception indicates that a nonexistant name was used.
@@ -43,10 +40,12 @@ AttributeError: 'list' object has no attribute 'fly'>>
 SyntaxError: invalid syntax>>
 \end{lstlisting}
 
+See \url{https://docs.python.org/2/library/exceptions.html} for the complete list of Python's built-in exception classes.
+
 \subsection*{Raising Exceptions}
 
 Many exceptions, like the ones demonstrated above, are due to coding mistakes and typos.
-Exceptions can also be used programmatically and intentionally to indicate a problem to the user or programmer.
+Exceptions can also be used intentionally to indicate a problem to the user or programmer.
 To raise an exception, use the keyword \li{raise}, followed by the name of the exception class.
 As soon as an exception is raised, the program stops running unless the exception is handled properly.
 
@@ -78,9 +77,9 @@ ValueError: 'x' should not exceed 5.>>
 % Problem 1: Raising Exceptions 101
 % Note that this my_func already raises TypeErrors, but the students' messages should be more informative than what pops up on the interpreter.
 \begin{problem}
-Python functions do not require specific types for each parameter.
-Sometimes, however, it is important to validate functional inputs before they are utilized.
-Consider the following function.
+Python is a \emph{dynamically typed} language, meaning that the type of a variable need not be specified upon initialization.
+Therefore Python functions do not require specific types of data for each functional input.
+Sometimes, however, it is important to validate input types before they are utilized.
 \begin{lstlisting}
 def my_func(a, b, c, d, e):
     print("The first argument is " + a)
@@ -95,8 +94,8 @@ Modify \li{my_func()} so that it raises a \li{TypeError} if:
 \item $d$ and $e$ are not the same type.
 \end{enumerate}
 Include an informative error message with each exception.
-
-(Hint: investigate the \li{type} and \li{isinstance} built-in functions.)
+\\
+(Hint: investigate the \li{type()} and \li{isinstance()} built-in functions.)
 \end{problem}
 
 \subsection*{Handling Exceptions}
@@ -115,10 +114,10 @@ If an exception is thrown, the compiler exits the \li{try} block and enters the 
 ... except:
 ...     print("Exception raised!")
 ... # The program then continues as usual.
-... print("Got to the end.")
+... print("Good for you.")
 ... 
 Exception raised!
-Got to the end.
+Good for you.
 \end{lstlisting}
 
 Exceptions can be caught generally or by class.
@@ -157,9 +156,7 @@ Multiple kinds of exceptions can be caught by a single \li{except} statement usi
 There can also be more than one \li{except} statements corresponding to a single \li{try} statement, each indicating which exception class(es) to catch.
 An \li{else} statement can also be attached after \li{except} statements, which is only executed if the \li{try} block is executed to completion.
 
-Trace through the following examples carefully.
-Understanding this control flow is vital to being able to use exceptions effectively.
-
+% TODO: Move this to "Additional Info" or delete.
 \begin{lstlisting}
 # Catch two kinds of exceptions in the same except statement.
 >>> try:
@@ -277,7 +274,7 @@ StandardError: This is a StandardError!>>
 \end{lstlisting}
 
 Why was the first error caught, but not the second?
-It turns out that the \li{ValueError} class inherits from the \li{StandardError}.
+It turns out that the \li{ValueError} class inherits from the \li{StandardError} class.
 Thus a \li{ValueError} \emph{is} a \li{StandardError}, so the first \li{except} statement was able to catch the exception, but a \li{StandardError} is \emph{not} a \li{ValueError}, so the second \li{except} statement could not catch the exception.
 
 See \url{https://docs.python.org/2/library/exceptions.html#exception-hierarchy} for the complete hierarchy of built-in exception classes.
@@ -513,9 +510,11 @@ Number of lines:          <The number of lines>>>
 \end{lstlisting}
 \end{problem}
 
+\newpage
+
 % These sections are incomplete. If desired, it needs some serious attention first.
 \begin{comment}
-\section*{Additional / Advanced Material}
+\section*{Additional Material} % ==============================================
 
 \subsection*{The Finally Block}
 Another optional block after a \li{try} block with the header \li{finally}.
@@ -536,7 +535,8 @@ It is \textbf{always} executed, even if there is another exception raised in the
 'input'>>
 \end{lstlisting}
 
-\subsection*{Function Wrappers}
+\subsection*{Function Wrappers} % ---------------------------------------------
+
 A \emph{function wrapper} or \emph{decorator} is a function that is meant to ``wrap'' another function by being called on top of the target function.
 That is, if we have a function $f$, wrapped by function $g$, then whenever $f$ is called, we actually are calling $f(g(x))$. % Or is it the other way around?
 
