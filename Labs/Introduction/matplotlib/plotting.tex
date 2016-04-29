@@ -550,16 +550,20 @@ This kind of data does not require a domain, and is easily visualized with \li{p
 % We will use this function often in future labs.
 \end{info}
 
-% =============================================================================
-% DONE TO HERE ================================================================
-% =============================================================================
-
 \section*{3-D Plotting with Mayavi} % =========================================
 
 Although Matplotlib is capable of creating 3-D plots, Mayavi\footnote{If Mayavi is not installed on your machine, run \li{conda install mayavi} from the command line. See Appendix \ref{updateinstall} for more info.} does it much faster and with better visuals.
 Here we introduce methods for plotting space curves, scatter plots, and surfaces in 3-D.
 The \li{mlab} submodule within the \li{mayavi} package contains the functions for creating these plots.
 % We will use Mayavi for all 3-D plots in these labs. % O RLY?
+
+\begin{warn}
+Mayavi must be imported before Matplotlib.
+\begin{lstlisting}
+from mayavi import mlab
+from matplotlib import pyplot as plt
+\end{lstlisting}
+\end{warn}
 
 \begin{comment}
 \begin{info} % Installation note. Make into a footnote?
