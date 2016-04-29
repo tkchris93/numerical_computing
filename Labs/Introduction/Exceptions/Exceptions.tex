@@ -50,7 +50,7 @@ To raise an exception, use the keyword \li{raise}, followed by the name of the e
 As soon as an exception is raised, the program stops running unless the exception is handled properly.
 
 Exception objects can be initialized with any number of arguments.
-These arguments are stored in the exception object as a class attribute called \li{args}, and also serve as the string representation of the object.
+These arguments are stored in the exception object as a an attribute called \li{args}, and also serve as the string representation of the object.
 Most commonly, we provide a simple message with information about the error.
 
 \begin{lstlisting}
@@ -74,11 +74,9 @@ Exception>>
 ValueError: 'x' should not exceed 5.>>
 \end{lstlisting}
 
-% Problem 1: Raising Exceptions 101
-% Note that this my_func already raises TypeErrors, but the students' messages should be more informative than what pops up on the interpreter.
-\begin{problem}
-Python is a \emph{dynamically typed} language, meaning that the type of a variable need not be specified upon initialization.
-Therefore Python functions do not require specific types of data for each functional input.
+% TODO: Make this much more interesting.
+\begin{problem} % Raising Exceptions 101.
+Python functions do not require specific types of data for each functional input.
 Sometimes, however, it is important to validate input types before they are utilized.
 \begin{lstlisting}
 def my_func(a, b, c, d, e):
@@ -98,33 +96,66 @@ Include an informative error message with each exception.
 (Hint: investigate the \li{type()} and \li{isinstance()} built-in functions.)
 \end{problem}
 
-\subsection*{Handling Exceptions}
+\subsection*{Handling Exceptions} % -------------------------------------------
 
 To prevent an exception from stopping the program, it must be handled by
 putting the problematic lines of code in a \li{try} block.
 An \li{except} block then follows.
-If an exception is thrown, the compiler exits the \li{try} block and enters the \li{except} block.
+If an exception is raised, the interpreter exits the \li{try} block and enters the \li{except} block.
 
 \begin{lstlisting}
-# the 'try' block should hold any lines of code that might raise an exception.
+# The 'try' block should hold any lines of code that might raise an exception.
 >>> try:
 ...     raise Exception("for no reason.")
 ...     print("No exception raised")
-... # the 'except' block is entered into when an exception is raised.
+... # The 'except' block is entered into when an exception is raised.
 ... except:
 ...     print("Exception raised!")
 ... # The program then continues as usual.
 ... print("Good for you.")
 ... 
-Exception raised!
-Good for you.
+<<Exception raised!
+Good for you.>>
 \end{lstlisting}
 
-Exceptions can be caught generally or by class.
-Having \li{except} by itself will catch \emph{any} exception raised in the \li{try} block, but this approach is very broad and is typically considered bad coding practice.
-Instead, be specific about the kind (or kinds) of exceptions you expect to encounter.
+% =============================================================================
+% Done to here ================================================================
+% =============================================================================
 
-Additionally, an exception that is caught by an \li{except} statement can be captured as a variable within the \li{except} block if it is declared using the keyword \li{as}.
+\begin{warn} % Don't use except: by itself; specify an exception class.
+Having \li{except} by itself will catch \emph{any} exception raised in the \li{try} block, but this approach can mistakenly mask unexpected errors.
+Consider the following function, which intends to avoid dividing by zero.
+
+\begin{lstlisting}
+>>> def divider(x, y):
+...     try:
+...         return x / float(yy)
+...     except:
+...         print("y must not equal zero!")
+... 
+>>> divider(2, 3)
+<<y must not equal zero!>>
+\end{lstlisting}
+
+Because \li{y} was misspelled, a \li{NameError} will be raised every time this function is called.
+Be specific about the kind of exception you expect to encounter.
+
+\begin{lstlisting}
+>>> def divider(x, y):
+...     try:
+...         return x / float(yy)
+...     except ZeroDivisionError:
+...         print("y must not equal zero!")
+... 
+>>> divider(2, 3)
+<<Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "<stdin>", line 3, in divider
+NameError: global name 'yy' is not defined>>
+\end{lstlisting}
+\end{warn}
+
+An exception that is caught by an \li{except} statement can be captured as a variable within the \li{except} block if it is declared using the keyword \li{as}.
 
 \begin{lstlisting}
 # Catch only a specific class of exceptions.
