@@ -206,6 +206,66 @@ It is displayed in Figure \ref{text}.
 \end{table}
 \end{comment}
 
+\section*{Mayavi} % ===========================================================
+
+\begin{comment}
+\begin{table} % Mayavi plotting functions. Probably should put this back in.
+\begin{center}
+\begin{tabular}
+{|c|l|}
+\hline
+Function & Description \\
+\hline
+\li{barchart} & Produces 3D histogram-like plots\\
+\li{contour3d} & Plots level surfaces of functions of three variables\\
+\li{flow} & Creates a trajectory of particles following the flow of a vector field\\
+\li{imshow} & Use a colormap to view a 2D array as an image\\
+\li{mesh} & Plot a surface using \li{(x,y,z)} coordinates supplied as three 2D arrays\\
+\li{plot3d} & Draws lines between points\\
+\li{points3d} & Plots glyphs (like points) at the coordinates supplied\\
+\li{quiver3d} & Generate 3D vector fields\\
+\li{surf} & Plot a surface with a 2D array as elevation data\\
+\hline
+\end{tabular}
+\end{center}
+\caption{Some plotting functions in \li{mlab}.}
+\label{table:mlab_functions}
+\end{table}
+\end{comment}
+
+\begin{comment}
+All these functions can be ``tested" (which provides an example figure for the function) with the command:
+\begin{lstlisting}
+mlab.test_<plotting function>()
+mlab.show()
+\end{lstlisting}
+Note that pressing tab after typing \li{mlab.test_} will provide a list of available commands and that, like Matplotlib, we use the \li{show()} command to actually view our plot.
+
+For example, to test the \li{fancy_mesh()} function, we run the following:
+\begin{lstlisting}
+mlab.test_fancy_mesh()
+mlab.show()
+\end{lstlisting}
+
+The result should resemble Figure \ref{fig:fancymesh}.
+
+\begin{figure}
+\includegraphics[width=\textwidth]{fancymesh.png}
+\caption{An example of the fancy mesh plotting function}
+\label{fig:fancymesh}
+\end{figure}
+
+In this lab, we will focus our attention on introducing the \li{mesh}, \li{plot3d}, and \li{points3d} functions.
+
+Like matplotlib, \li{mlab} takes a set of data points and plots it.
+However, instead of passing just \li{x} and \li{y} coordinates as we did in Matplotlib, we also send \li{z} coordinates to produce a 3D plot.
+\end{comment}
+
 \section*{References}
 
 See \url{http://matplotlib.org} for Matplotlib documentation.
+
+% For information beyond what is found in this tutorial, see \url{http://docs.enthought.com/mayavi/mayavi/}.
+
+% We will introduce a few in this lab; for more see \url{http://docs.enthought.com/mayavi/mayavi/auto/mlab_helper_functions.html}.
+% You can also browse examples at \url{http://docs.enthought.com/mayavi/mayavi/auto/examples.html}.

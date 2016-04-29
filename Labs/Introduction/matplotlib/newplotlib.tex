@@ -517,7 +517,7 @@ Use \li{plt.pcolormesh()} to create a heat map.
 \begin{subfigure}{.5\textwidth}
     \centering
     \includegraphics[width=\linewidth]{sinxsiny_3d.pdf}
-    \caption{The 3-D surface that corresponds to the heat map.}
+    \caption{A 3-D surface plot of $f$.}
     \label{fig:surface}
 \end{subfigure}
 \caption{Visualization of the function $f(x,y) = \sin(x)\sin(y)$.}
@@ -535,7 +535,7 @@ For the list of all Matplotlib color schemes, see\\\url{http://matplotlib.org/ex
 \item Change the limits on the $x$- and $y$-axes so that the plot is only over the domain $[-2\pi,2\pi] \times [-2\pi,2\pi]$.
 % \item Fix the aspect ratio of your plot so that it is a square using the line \li{plt.gca().set_aspect('equal')}.
 \end{enumerate}
-The plot should similar to the Figure below.
+The plot should be similar to the figure below.
 
 \begin{figure}[H]
 \includegraphics[width=.7\textwidth]{pcolor2.png}
@@ -556,15 +556,12 @@ This kind of data does not require a domain, and is easily visualized with \li{p
 
 \section*{3-D Plotting with Mayavi} % =========================================
 
-Although Matplotlib is capable of creating 3-D plots, Mayavi does it much faster and with better visuals. 
-We will use Mayavi for all 3-D plots in these labs. % O RLY?
-For information beyond what is found in this tutorial, see \url{http://docs.enthought.com/mayavi/mayavi/}.
-To get started, import \li{mlab} from \li{mayavi}.
+Although Matplotlib is capable of creating 3-D plots, Mayavi\footnote{If Mayavi is not installed on your machine, run \li{conda install mayavi} from the command line. See Appendix \ref{updateinstall} for more info.} does it much faster and with better visuals.
+Here we introduce methods for plotting space curves, scatter plots, and surfaces in 3-D.
+The \li{mlab} submodule within the \li{mayavi} package contains the functions for creating these plots.
+% We will use Mayavi for all 3-D plots in these labs. % O RLY?
 
-\begin{lstlisting}
-from mayavi import mlab
-\end{lstlisting}
-
+\begin{comment}
 \begin{info} % Installation note. Make into a footnote?
 If you do not have the \li{Mayavi} package installed on your system, you may download it by running the following commands from the command line:
 \begin{lstlisting}
@@ -573,15 +570,9 @@ $ conda install anaconda            # Update all packages.
 $ conda install mayavi              # Installs mayavi.
 \end{lstlisting}
 
-For more information regarding installing Python packages, see Appendix \ref{updateinstall}.
+% For more information regarding installing Python packages, see Appendix \ref{updateinstall}.
 \end{info}
-%$
 
-The module \li{mlab} has many plotting functions.
-We will introduce a few in this lab; for more see \url{http://docs.enthought.com/mayavi/mayavi/auto/mlab_helper_functions.html}.
-You can also browse examples at \url{http://docs.enthought.com/mayavi/mayavi/auto/examples.html}.
-
-\begin{comment}
 \begin{table} % Mayavi plotting functions. Probably should put this back in.
 \begin{center}
 \begin{tabular}
@@ -606,47 +597,33 @@ Function & Description \\
 \end{table}
 \end{comment}
 
-\begin{comment}
-All these functions can be ``tested" (which provides an example figure for the function) with the command:
-\begin{lstlisting}
-mlab.test_<plotting function>()
-mlab.show()
-\end{lstlisting}
-Note that pressing tab after typing \li{mlab.test_} will provide a list of available commands and that, like Matplotlib, we use the \li{show()} command to actually view our plot.
-
-For example, to test the \li{fancy_mesh()} function, we run the following:
-\begin{lstlisting}
-mlab.test_fancy_mesh()
-mlab.show()
-\end{lstlisting}
-
-The result should resemble Figure \ref{fig:fancymesh}.
-
-\begin{figure}
-\includegraphics[width=\textwidth]{fancymesh.png}
-\caption{An example of the fancy mesh plotting function}
-\label{fig:fancymesh}
-\end{figure}
-
-In this lab, we will focus our attention on introducing the \li{mesh}, \li{plot3d}, and \li{points3d} functions.
-
-Like matplotlib, \li{mlab} takes a set of data points and plots it.
-However, instead of passing just \li{x} and \li{y} coordinates as we did in Matplotlib, we also send \li{z} coordinates to produce a 3D plot.
-\end{comment}
-
 \subsection*{Lines} % ---------------------------------------------------------
 
-The function call \li{mlab.plot3d(x,y,z)} plots the points \li{(x[i], y[i], z[i])} and connects them with straight lines.
-The code below produces the flower in Figure \ref{fig:plot3d}
+The function \li{mlab.plot3d()} is the 3-D Mayavi equivalent for Matplotlib's \li{plt.plot()}.
+Because the plot is 3-D, we must provide $x$, $y$, and $z$ coordinates, each contained in 1-D arrays of the same length.
+The points \li{(x[i], y[i], z[i])} are graphed in $\mathbb{R}^3$ and connected with straight lines.
+
+Consider the following curve, parametrized by time:
+\begin{align*}
+x(t) &= \cos(t)(1+\cos(6t))\\
+y(t) &= \sin(t)(1+\sin(6t)\\
+z(t) &= \sin\left(\frac{6}{11}t\right)
+\end{align*}
+The following code plots the curve over the time domain $t \in [0,2\pi]$.
+The resulting plot is shown in Figure \ref{fig:plot3d}.
 
 \begin{lstlisting}
-num = np.pi/1000
-pts = np.arange(0, 2*np.pi + num, num)
-x = np.cos(pts) * (1 + np.cos(pts*6))
-y = np.sin(pts) * (1 + np.cos(pts*6))
-z = np.sin(pts*6/11)
-mlab.plot3d(x, y, z)
-mlab.show()
+>>> from mayavi import mlab
+
+# Calculate the coordinates of a curve parametrized by time.
+>>> t = np.linspace(0, 2*np.pi, 100)
+>>> x = np.cos(t) * (1 + np.cos(t*6))
+>>> y = np.sin(t) * (1 + np.cos(t*6))
+>>> z = np.sin(t*6/11.)
+
+# Plot and show the figure.
+>>> mlab.plot3d(x, y, z)
+>>> mlab.show()
 \end{lstlisting}
 
 \begin{figure} % Mayavi line and point plots.
@@ -655,50 +632,50 @@ mlab.show()
 \begin{subfigure}{.5\textwidth}
     \centering
     \includegraphics[width=\linewidth]{plot3d.png}
-    \caption{Sample output of \li{mlab.plot3d()}.}
+    \caption{A 3-D curve generated by \li{mlab.plot3d()}.}
     \label{fig:plot3d}
 \end{subfigure}%
 \begin{subfigure}{.5\textwidth}
     \centering
     \includegraphics[width=\linewidth]{points3d.png}
-    \caption{Sample output of \li{mlab.points3d()}.}
+    \caption{A 3-D scatter plot generated by \li{mlab.points3d()}.}
     \label{fig:points3d}
 \end{subfigure}
 \end{figure}
 
 \subsection*{Points} % --------------------------------------------------------
 
-The function call \li{mlab.points3d(x,y,z)} plots the points \li{(x[i], y[i], z[i])}, but does not connect them. 
+The function \li{mlab.points3d()} is the 3-D Mayavi equivalent for Matplotlib's \li{plt.scatter()}.
+Each point is plotted, but not connected with lines.
 In the code below, the optional input array \li{s} defines a scalar for each point that modifies the color and size of the point.
 The output is in Figure \ref{fig:points3d}.
 
 \begin{lstlisting}
-pts = np.linspace(0, 4 * np.pi, 30)
-x = np.sin(2 * pts)
-y = np.cos(pts)
-z = np.cos(2 * pts)
-s = 2+np.sin(pts)
+>>> t = np.linspace(0, 4*np.pi, 30)
+>>> x = np.sin(2*t)
+>>> y = np.cos(t)
+>>> z = np.cos(2*t)
+>>> s = 2 + np.sin(t)
+
 # Adjust the keyword argument 'scale_factor' so all points are visible.
-mlab.points3d(x, y, z, s, scale_factor=.15)
-mlab.show()
+>>> mlab.points3d(x, y, z, s, scale_factor=.15)
+>>> mlab.show()
 \end{lstlisting}
 
 \subsection*{Surfaces} % ------------------------------------------------------
 
-You can draw a surface in mayavi with \li{mlab.surf()}.
-This function accepts three arrays, \li{X}, \li{Y}, and \li{Z}, where \li{X} and \li{Y} determine a grid of points similar to the output of \li{np.meshgrid()}.
-The array \li{Z} gives the height of the surface at each of these points.
+The function \li{mlab.surf()} renders a 3-D surface.
+Because the surface is over a 2-D domain, we create a coordinate grid with \li{np.mgrid()} (similar to \li{np.meshgrid()}).
+This function uses the slicing syntax \li{[start:stop:step]}, similar to \li{range()} and \li{np.arange()}, but is accessed with brackets instead of parentheses.
 
-The output of \li{np.meshgrid()} is the transpose of what \li{mlab.surf()} expects.
-To avoid confusion, use the function \li{np.mgrid()} instead.
-This function uses the slicing syntax \li{[start:stop:step]} 
-The code below produces the hyperbolic paraboloid in Figure \ref{fig:surf_example}.
+The following code produces the hyperbolic paraboloid $f(x,y) = \frac{x^2}{4} - \frac{y^2}{4}$ over the domain $[-4,4]\times[-4,4]$.
+The result is displayed in Figure \ref{fig:surf_example}.
 
 \begin{lstlisting}
-X, Y = np.mgrid[-4:4:0.025, -4:4:0.025]
-Z = X**2/4-Y**2/4
-mlab.surf(X, Y, Z, colormap='RdYlGn')
-mlab.show()
+>>> X, Y = np.mgrid[-4:4:.025, -4:4:.025]
+>>> Z = (X**2)/4. - (Y**2)/4.
+>>> mlab.surf(X, Y, Z, colormap='RdYlGn')
+>>> mlab.show()
 \end{lstlisting}
 
 \begin{figure}
@@ -707,7 +684,7 @@ mlab.show()
 \label{fig:surf_example}
 \end{figure}
 
-The plotting functions in Mayavi allow you to specify the color of a plot, either as a solid color or with a varying colormap.
+Like Matplotlib, Mayavi supports various color schemes, either as a solid color or with a varying colormap.
 For example, the plot in Figure \ref{fig:surf_example} uses the colormap \li{'RdYlGn'}.
 For a list of all colormaps in Mayavi, see \url{http://docs.enthought.com/mayavi/mayavi/mlab_changing_object_looks.html}.
 
