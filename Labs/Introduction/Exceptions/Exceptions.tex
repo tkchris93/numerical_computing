@@ -77,7 +77,7 @@ ValueError: 'x' should not exceed 5.>>
 % TODO: Make this much more interesting.
 \begin{problem} % Raising Exceptions 101.
 Python functions do not require specific types of data for each functional input.
-Sometimes, however, it is important to validate input types before they are utilized.
+Sometimes, however, it is important to validate input types before they are utilized. TODO: Make \li{my_func()} more interesting.
 \begin{lstlisting}
 def my_func(a, b, c, d, e):
     print("The first argument is " + a)
@@ -101,27 +101,82 @@ Include an informative error message with each exception.
 To prevent an exception from stopping the program, it must be handled by
 putting the problematic lines of code in a \li{try} block.
 An \li{except} block then follows.
-If an exception is raised, the interpreter exits the \li{try} block and enters the \li{except} block.
 
 \begin{lstlisting}
 # The 'try' block should hold any lines of code that might raise an exception.
 >>> try:
 ...     raise Exception("for no reason.")
-...     print("No exception raised")
+...     print "No exception raised"
 ... # The 'except' block is entered into when an exception is raised.
-... except:
-...     print("Exception raised!")
+... except Exception as e:
+...     print "Exception raised", e
 ... # The program then continues as usual.
-... print("Good for you.")
+... print "Good for you."
 ... 
-<<Exception raised!
+<<Exception raised for no reason.
 Good for you.>>
 \end{lstlisting}
+
+Other clauses can be attached to the \li{try}-\li{except} control flow.
+% The interpreter's progression through the program is as follows.
+
+\begin{description}
+\item \li{try}: Executed until an exception is raised.
+\item \li{except <Exception Class> as e}: Executed if an exception of the indicated class is raised anywhere in the \li{try} block. There may be multiple \li{except} statements that specify different kinds of exceptions to catch, and a single except statement may catch several kinds of exceptions.
+\item \li{else}: Executed if an exception is \emph{not} raised in the \li{try} block.
+\item \li{finally}: Always executed, regardless of any exceptions.
+\end{description}
 
 % =============================================================================
 % Done to here ================================================================
 % =============================================================================
 
+\begin{lstlisting}
+>>> try:
+...     raise ValueError("The house is on fire!")
+... # Check for multiple kinds of exceptions using parentheses.
+... except (ValueError, TypeError) as e:
+...     house_on_fire = True
+... else:                           # Skipped due to the exception.
+...     house_on_fire = False
+... finally:
+...     print "The house is on fire:", house_on_fire
+...
+<<The house is on fire: True>>
+
+>>> try:
+...     house_on_fire = False
+... except Exception as e:
+...     house_on_fire = True
+... else:                           # Executed because there was no exception.
+...     print "The house is probably okay."
+... finally:
+...     print "The house is on fire:", house_on_fire
+...
+<<The house is probably okay.
+The house is on fire: False>>
+\end{lstlisting}
+
+The code in the \li{finally} block is \emph{always} executed, even if a \li{return} statement or an uncaught exception occurs in any block following the \li{try} statement.
+
+\begin{lstlisting}
+>>> try:
+...     house_on_fire = False
+...     raise ValueError("The house is on fire!")
+... except TypeError as e:
+...     house_on_fire = True
+... else:
+...     print "The house is probably okay."
+... finally:                        # Executes before the error is reported.
+...     print "The house may be on fire."
+... 
+<<The house may be on fire.
+Traceback (most recent call last):
+  File "<stdin>", line 3, in <module>
+ValueError: The house is on fire!>>
+\end{lstlisting}
+
+\begin{comment} % Additional material...
 \begin{warn} % Don't use except: by itself; specify an exception class.
 Having \li{except} by itself will catch \emph{any} exception raised in the \li{try} block, but this approach can mistakenly mask unexpected errors.
 Consider the following function, which intends to avoid dividing by zero.
@@ -154,7 +209,9 @@ Be specific about the kind of exception you expect to encounter.
 NameError: global name 'yy' is not defined>>
 \end{lstlisting}
 \end{warn}
+\end{comment}
 
+\begin{comment} % Overkill
 An exception that is caught by an \li{except} statement can be captured as a variable within the \li{except} block if it is declared using the keyword \li{as}.
 
 \begin{lstlisting}
@@ -186,70 +243,9 @@ Sorry! No module named magic
 Multiple kinds of exceptions can be caught by a single \li{except} statement using a parenthesized list of exceptions.
 There can also be more than one \li{except} statements corresponding to a single \li{try} statement, each indicating which exception class(es) to catch.
 An \li{else} statement can also be attached after \li{except} statements, which is only executed if the \li{try} block is executed to completion.
-
-\begin{comment}
-\begin{enumerate}
-\item \li{try}: Put lines of code that might raise an exception here.
-\item \li{except <Exception Class> as <e>}: Executed if an exception of the indicated class is raised anywhere in the \li{try} block.
-\item \li{else}: Executed if an exception is not raised in the \li{try} block.
-\item \li{finally}: Executed no matter what, even if there is a \li{return} statement or another exception is raised somewhere in the mix.
-\end{enumerate}
 \end{comment}
 
-% TODO: Move this to "Additional Info" or delete.
-\begin{lstlisting}
-# Catch two kinds of exceptions in the same except statement.
->>> try:
-...     print "Started in the try block."
-...     raise ValueError("This is a ValueError!")
-...     print "Got the the end of the try block."
-... except (ValueError, TypeError, ArithmeticError) as e:
-...     print "An exception was raised:", e
-...
-<<Started in the try block.
-An exception was raised: This is a ValueError!>>
-
-# Equivalently, catch each kind of exception with a separate except statement.
->>> try:
-...     print "Started in the try block."
-...     raise TypeError("This is a TypeError!")
-... except ValueError as e:
-...     print "Bad value:", e
-... except TypeError as e:
-...     print "Bad type:", e
-... except ArithmeticError as e:
-...     print "Bad math:", e
-...
-<<Started in the try block.
-Bad type: This is a TypeError!>>
-
-# The 'else' block is executed if no exceptions are raised.
->>> try:
-...     print "Started in the try block."
-... except (ValueError, TypeError, ArithmeticError) as e:
-...     print "An exception was raised:", e
-... else:
-...     print "No exceptions were raised."
-...
-<<Started in the try block.
-No exceptions were raised.>>
-
-# Note that the else statement does not catch any exceptions.
->>> try:
-...     print "Started in the try block."
-...     raise ValueError("This is a ValueError!")
-... except (TypeError, ArithmeticError) as e:
-...     print "An exception was raised:", e
-... else:
-...     print "No exceptions were raised."
-...
-<<Started in the try block.
-Traceback (most recent call last):
-  File "<stdin>", line 3, in <module>
-ValueError: This is a ValueError!>>
-\end{lstlisting}
-
-More examples of raising and handling exceptions can be found at \url{https://docs.python.org/2/tutorial/errors.html}.
+More extensive examples of raising and handling exceptions can be found at \url{https://docs.python.org/2/tutorial/errors.html}.
 
 % Catch a KeyboardInterrupt.
 % This example is very simple; it could be expanded to a simple random walk.
@@ -257,20 +253,18 @@ More examples of raising and handling exceptions can be found at \url{https://do
 A \li{KeyboardInterrupt} is a special exception that can be triggered at any time by entering \li{ctrl c} (on most systems) in the keyboard.
 Usually a \li{KeyboardInterrupt} is used to manually escape faulty code that runs forever, but it can also be used intentionally to truncate a process.
 
-Consider the following function.
-
 \begin{lstlisting}
-def forever(max_iters=1000000000):
-    iters = 0
-    while True:
-        iters += 1
-        if iters >= max_iters:
-            break
-    print "Process Completed."
-    return iters
+from random import choice
+
+def random_walk(max_iters=1000000000):
+    walk = 0
+    direction = [1, -1]
+    for i in xrange(max_iters):
+        walk += choice(direction)
+    return walk
 \end{lstlisting}
-Modify \li{forever()} so that if the user raises a \li{KeyboardInterrupt} before \li{iters} reaches \li{max_iters}, the function prints ``Process Interrupted'' and returns the current value of \li{iters}.
-If no \li{KeyboardInterrupt} is raised, the function should still print ``Process Completed'' and return \li{iters} as before.
+Modify \li{random_walk()} so that if the user raises a \li{KeyboardInterrupt} before completion, the function prints ``Process Interrupted at $x$\%'' (where $x$ is the percent completion through the loop), and returns the current value of \li{walk}.
+If no \li{KeyboardInterrupt} is raised, the function should print ``Process Completed'' and return \li{walk} like usual.
 \end{problem}
 
 % TODO: For Python 3, discuss chaining Exceptions.
@@ -296,48 +290,29 @@ Consider the following example:
 ...     raise ValueError("This is a ValueError!")
 ... except StandardError as e:
 ...     print e
-... print "Process finished."
 ...
-<<This is a ValueError!
-Process finished.>>
+<<This is a ValueError!>>
 
 # But in this case, the exception is not caught.
 >>> try:
 ...     raise StandardError("This is a StandardError!")
 ... except ValueError as e:
 ...     print e
-... print "Process finished."
 ...
 <<Traceback (most recent call last):
   File "<stdin>", line 2, in <module>
 StandardError: This is a StandardError!>>
 \end{lstlisting}
 
-Why was the first error caught, but not the second?
 It turns out that the \li{ValueError} class inherits from the \li{StandardError} class.
 Thus a \li{ValueError} \emph{is} a \li{StandardError}, so the first \li{except} statement was able to catch the exception, but a \li{StandardError} is \emph{not} a \li{ValueError}, so the second \li{except} statement could not catch the exception.
 
 See \url{https://docs.python.org/2/library/exceptions.html#exception-hierarchy} for the complete hierarchy of built-in exception classes.
 
-\subsection*{Custom Exceptions}
-
-Custom exceptions can be defined by writing a class that inherits from some existing exception class.
-The generic \li{Exception} class is typically the parent class of choice.
-
-% Problem 3: Create a custom exception class.
-\begin{problem}
-Create a class called \li{InvalidOptionError} that inherits from the built-in \li{Exception} class.
-This class should behave exactly like \li{Exception}, without any additional methods or attributes.
-
-(Hint: the entire class definition can be done in two short lines.)
-\end{problem}
-
-% FILE I/O ====================================================================
-
-\section*{File Input and Output in Python}
+\section*{File Input and Output} % ============================================
 
 Python has a useful \li{file} object which acts as an interface to all kinds of different file streams.
-The built-in function \li{open} creates a \li{file} object.
+The built-in function \li{open()} creates a \li{file} object.
 
 \begin{lstlisting}
 >>> myfile = open('in.txt', 'r')        # Open 'in.txt' with read-only access.
@@ -347,7 +322,7 @@ The built-in function \li{open} creates a \li{file} object.
 >>> myfile.close()                      # Close the file connection.
 \end{lstlisting}
 
-The \li{open} command accepts up to three arguments: the filename, mode, and buffering options.
+\li{open()} accepts up to three arguments: the filename, mode, and buffering options.
 The mode determines the kind of access to use when opening the file.
 Possible mode strings are:
 \begin{description}
@@ -360,52 +335,48 @@ This mode is like write-only, but instead of overwriting existing data any new d
 This mode also creates a new file if it doesn't already exist.
 \end{description}
 
-\subsection*{The With Statement}
+\subsection*{The With Statement} % --------------------------------------------
 
 If a file cannot be opened for any reason, an \li{IOException} is raised and the file object is not initialized.
-Files can be opened and closed safely with a careful \li{try}-\li{except}-\li{else} control flow.
+Files can be opened and closed safely with a careful \li{try}-\li{finally} control flow.
 
 The keyword \li{with} can also be used in conjunction with an \li{open} statement to create an indented block in which the file is open.
 Upon exiting the block, the file is closed safely and automatically.
-This is the preferred method when a file only needs to be accessed briefly, but it is not quite as flexible as the \li{try}-\li{except}-\li{else} approach.
+This is the preferred method when a file only needs to be accessed briefly, but it is not quite as flexible as the \li{try}-\li{except}-\li{finally} approach.
 
 \begin{lstlisting}
 >>> try:
-...     myfile = open('in.txt', 'r')    # Open 'in.txt' with read-only access.
+...     myfile = open("in.txt", 'r')    # Open 'in.txt' with read-only access.
 ...     contents = myfile.readlines()   # Read in the content by line.
 ... except IOError as e:                # Check for errors.
 ...     print "File error:", e
-... else:
+... finally:
 ...     myfile.close()                  # Explicitly close the file.
 
 # Equivalently, use a 'with' statement to take care of errors.
->>> with open('in.txt', 'r') as myfile:     # Open 'in.txt' using 'with'.
+>>> with open("in.txt", 'r') as myfile:     # Open 'in.txt' using 'with'.
 ...    contents = myfile.readlines()        # Read in the content by line.
 ...                                         # The file is closed automatically.
 \end{lstlisting}
 
-\subsection*{Reading and Writing}
+\subsection*{Reading and Writing} % -------------------------------------------
 
-\begin{table}
-\begin{tabular}{|l|l|}
- \hline
+\begin{table}[H]
+\begin{tabular}{r|l}
 Attribute & Description \\
 \hline
 \li{closed} & True if file object is closed. \\
 \li{mode} & The access mode used to open the file object. \\
-\li{name} & The name of the file. \\
-\hline
-\hline
-Method & Description \\
+\li{name} & The name of the file. \\ \\
+Method & Description\\
 \hline
 \li{close()} & Flush any delayed writes and close the file object. \\
 \li{read()} & Read the next string of the file (probably the whole file). \\
-\li{readline()} & Read a line of the file, including the newline character at the end. \\
-\li{readlines()} & Read lines of the file until the end of file (returned as a \li{list}). \\
+\li{readline()} & Read a line of the file, including the newline character at the end.\\
+\li{readlines()} & Read lines of the file until the end of file (returned as a list).\\
 \li{write()} & Write a string to the file. \\
-\li{writelines()} & Write a sequence of strings to the file (input a \li{list}). Note that \\
+\li{writelines()} & Write a sequence of strings to the file (input a list). Note that \\
  & newline characters are not added automatically.\\
-\hline
 \end{tabular}
 \caption{Important \li{file} object attributes and methods.}
 \label{table:fileattribs}
@@ -470,7 +441,7 @@ If the filename argument is not a string, raise a \li{TypeError}.
 %Talk about the is stuff (\li{isalnum}/\li{isspace}), formatting (\li{capitalize}/\li{lower}/\li{swapcase}), and \li{split} and \li{strip}.
 
 
-Python's \li{str} class has several useful methods for formatting and arranging strings.
+Python's \li{str} type class has several useful methods for formatting and arranging strings.
 They are particularly useful for processing data from a source file.
 As always, IPython's object introspection allows us to learn about these methods quickly.
 
@@ -493,16 +464,9 @@ S.upper() -> string
 
 Return a copy of the string S converted to uppercase.
 Type:      method_descriptor
-
-In [2]: str.isupper?
-<<Docstring:
-S.isupper() -> bool
-
-Return True if all cased characters in S are uppercase and there is
-at least one cased character in S, False otherwise.
-Type:      method_descriptor>>
 \end{lstlisting}
 
+% TODO: a little table of string methods.
 Use IPython to learn about and get a feel for the following \li{str} methods: \li{isalpha()}, \li{isdigit()}, \li{isspace()}, \li{join()}, \li{lower()}, \li{replace()}, \li{split()}, \li{strip()}, and \li{upper()}.
 
 Below, we demostrate the \li{join()} and \li{split()} methods.
@@ -522,7 +486,7 @@ Below, we demostrate the \li{join()} and \li{split()} methods.
 \begin{problem}
 Add the following methods to the \li{ContentFilter} class for writing the contents of the original file to new files.
 Each method should accept a filename to write to and a keyword argument \li{mode} that specifies the file access mode, defaulting to \li{'w'}.
-If \li{mode} is not either \li{'w'} or \li{'a'}, raise an \li{InvalidOptionError} with an informative message.
+If \li{mode} is not either \li{'w'} or \li{'a'}, raise an \li{ValueError} with an informative message.
 
 \begin{enumerate}
 
@@ -530,11 +494,11 @@ If \li{mode} is not either \li{'w'} or \li{'a'}, raise an \li{InvalidOptionError
 
 \item \li{uniform()}: write the data to the outfile with uniform case. Include an additional keyword argument, \li{case}, that defaults to \li{'upper'}.
 
-If \li{case='upper'}, write the data in upper case. If \li{case='lower'}, write the data in lower case. If \li{case} is not one of these two values, raise an \li{InvalidOptionError}.
+If \li{case='upper'}, write the data in upper case. If \li{case='lower'}, write the data in lower case. If \li{case} is not one of these two values, raise an \li{ValueError}.
 
 \item \li{reverse()}: write the data to the outfile in reverse order. Include an additional keyword argument \li{unit} that defaults to \li{'line'}.
 
-If \li{unit='word'}, reverse the ordering of the words in each line, but write the lines in the same order as the original file. If \li{unit='line'}, reverse the ordering of the lines, but do not change the ordering of the words on each individual line. If \li{unit} is not one of these two values, raise an \li{InvalidOptionError}.
+If \li{unit='word'}, reverse the ordering of the words in each line, but write the lines in the same order as the original file. If \li{unit='line'}, reverse the ordering of the lines, but do not change the ordering of the words on each individual line. If \li{unit} is not one of these two values, raise an \li{ValueError}.
 
 \item \li{transpose()}: write a ``transposed'' version of the data to the outfile. That is, write the first word of each line of the data to the first line of the new file, the second word of each line of the data to the second line of the new file, and so on.
 \end{enumerate}
@@ -554,6 +518,23 @@ Number of lines:          <The number of lines>>>
 
 % TODO: This stuff.
 \section*{Additional Material} % ==============================================
+
+\subsection*{Custom Exceptions}
+
+Custom exceptions can be defined by writing a class that inherits from some existing exception class.
+The generic \li{Exception} class is typically the parent class of choice.
+
+\begin{lstlisting}
+>>> class TooHardError(Exception):
+...     pass
+... 
+>>> raise TooHardError("This lab is impossible!")
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+__main__.TooHardError: This lab is impossible!
+\end{lstlisting}
+
+This class seems like a trivial extension of the \li{Exception} class, but it is useful because nothing automatically raises it.
 
 \subsection*{Assertions} % ----------------------------------------------------
 
@@ -599,8 +580,10 @@ For example, the following wrapper prints out the current time whenever the inne
 
 >>> def time_stamp(func):
 ...     def wrapper(*args, **kwargs):
-...         print strftime("%H:%M:%S")          # Print the current time.
-...         return func(*args, **kwargs)        # Execute the inner function.
+...         try:
+...             return func(*args, **kwargs)
+...         finally:
+...             print strftime("%H:%M:%S")
 ...     return wrapper
 ...
 >>> @time_stamp
@@ -608,8 +591,8 @@ For example, the following wrapper prints out the current time whenever the inne
 ...     return 10
 
 >>> example()
-16:27:17
 10
+16:27:17
 \end{lstlisting}
 
 Create a decorator that raises a \li{RuntimeError} after 10 seconds.
