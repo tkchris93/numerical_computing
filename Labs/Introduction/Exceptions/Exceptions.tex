@@ -33,7 +33,7 @@ NameError: name 'x' is not defined>>
 AttributeError: 'list' object has no attribute 'fly'>>
 
 # A 'SyntaxError' exception indicates bad Python syntax.
->>> def myFunction(a, b)             # forgot the colon!
+>>> def myFunction(a, b)             # Forgot the colon!
 <<  File "<stdin>", line 1
     def myFunction(a, b)
                        ^
@@ -42,7 +42,7 @@ SyntaxError: invalid syntax>>
 
 See \url{https://docs.python.org/2/library/exceptions.html} for the complete list of Python's built-in exception classes.
 
-\subsection*{Raising Exceptions}
+\subsection*{Raising Exceptions} % --------------------------------------------
 
 Many exceptions, like the ones demonstrated above, are due to coding mistakes and typos.
 Exceptions can also be used intentionally to indicate a problem to the user or programmer.
@@ -50,8 +50,8 @@ To raise an exception, use the keyword \li{raise}, followed by the name of the e
 As soon as an exception is raised, the program stops running unless the exception is handled properly.
 
 Exception objects can be initialized with any number of arguments.
-These arguments are stored in the exception object as a an attribute called \li{args}, and also serve as the string representation of the object.
-Most commonly, we provide a simple message with information about the error.
+These arguments are stored as a an attribute called \li{args}, and also serve as the string representation of the object.
+Most commonly, we provide a single argument giving information about the error.
 
 \begin{lstlisting}
 # Raise a generic exception, without an error message.
@@ -186,6 +186,15 @@ Sorry! No module named magic
 Multiple kinds of exceptions can be caught by a single \li{except} statement using a parenthesized list of exceptions.
 There can also be more than one \li{except} statements corresponding to a single \li{try} statement, each indicating which exception class(es) to catch.
 An \li{else} statement can also be attached after \li{except} statements, which is only executed if the \li{try} block is executed to completion.
+
+\begin{comment}
+\begin{enumerate}
+\item \li{try}: Put lines of code that might raise an exception here.
+\item \li{except <Exception Class> as <e>}: Executed if an exception of the indicated class is raised anywhere in the \li{try} block.
+\item \li{else}: Executed if an exception is not raised in the \li{try} block.
+\item \li{finally}: Executed no matter what, even if there is a \li{return} statement or another exception is raised somewhere in the mix.
+\end{enumerate}
+\end{comment}
 
 % TODO: Move this to "Additional Info" or delete.
 \begin{lstlisting}
@@ -543,11 +552,23 @@ Number of lines:          <The number of lines>>>
 
 \newpage
 
-% These sections are incomplete. If desired, it needs some serious attention first.
-\begin{comment}
+% TODO: This stuff.
 \section*{Additional Material} % ==============================================
 
-\subsection*{The Finally Block}
+\subsection*{Assertions} % ----------------------------------------------------
+
+\begin{lstlisting}
+>>> assert <statement>, <message>
+
+# In other words...
+>>> if not <statement>:
+...     raise AssertionError(<message>)
+\end{lstlisting}
+
+Assertion errors are mostly for testing purposes and shouldn't be seen by a non-programmer.
+
+\subsection*{The Finally Block} % ---------------------------------------------
+% TODO: Put this section in the main content again. Maybe put 'else' here.
 Another optional block after a \li{try} block with the header \li{finally}.
 The code in a \li{finally} block executes after either the try or any subsequent block completes, regardless of whether or not an exception was actually raised.
 It is \textbf{always} executed, even if there is another exception raised in the \li{except} block or if a value is returned!
@@ -561,40 +582,35 @@ It is \textbf{always} executed, even if there is another exception raised in the
 ...     finally:
 ...         print "This is a test."
 ...
->>> finally_test("input")
+>>> finally_test("Yes it is.")
 <<This is a test.
-'input'>>
+'Yes it is.'>>
 \end{lstlisting}
 
 \subsection*{Function Wrappers} % ---------------------------------------------
 
 A \emph{function wrapper} or \emph{decorator} is a function that is meant to ``wrap'' another function by being called on top of the target function.
-That is, if we have a function $f$, wrapped by function $g$, then whenever $f$ is called, we actually are calling $f(g(x))$. % Or is it the other way around?
+That is, if we have a function $f$, wrapped by function $g$, then whenever $f$ is called, we actually are calling $g(f(x))$.
 
-For example, let's create a wrapper that prints out the current time whenever the inner function is called.
-\begin{lstlisting}
-from time import strftime
-
-def time_stamp(func):
-    def wrapper(*args, **kwargs):
-        print strftime("%H:%M:%S")
-        return f(*args, **kwargs)
-    return wrapper
-\end{lstlisting}
+For example, the following wrapper prints out the current time whenever the inner function is called.
 
 \begin{lstlisting}
-@time_stamp
-def example():
-    return 10
+>>> from time import strftime
+
+>>> def time_stamp(func):
+...     def wrapper(*args, **kwargs):
+...         print strftime("%H:%M:%S")          # Print the current time.
+...         return func(*args, **kwargs)        # Execute the inner function.
+...     return wrapper
+...
+>>> @time_stamp
+>>> def example():
+...     return 10
 
 >>> example()
 16:27:17
 10
 \end{lstlisting}
 
-% Function decorator: timeout
-\begin{problem}
 Create a decorator that raises a \li{RuntimeError} after 10 seconds.
-Consider using the \li{system} module.
-\end{problem}
-\end{comment}
+Consider using the \li{signal} module.\footnote{The \li{signal} module only works on unix machines (mac, linux).}
