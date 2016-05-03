@@ -46,12 +46,12 @@ See \url{https://docs.python.org/2/library/exceptions.html} for the complete lis
 
 Many exceptions, like the ones demonstrated above, are due to coding mistakes and typos.
 Exceptions can also be used intentionally to indicate a problem to the user or programmer.
-To raise an exception, use the keyword \li{raise}, followed by the name of the exception class.
+To create an exception, use the keyword \li{raise}, followed by the name of the exception class.
 As soon as an exception is raised, the program stops running unless the exception is handled properly.
 
 Exception objects can be initialized with any number of arguments.
-These arguments are stored as a an attribute called \li{args}, and also serve as the string representation of the object.
-Most commonly, we provide a single argument giving information about the error.
+These arguments are stored as a tuple attribute called \li{args}, which serves as the string representation of the object.
+We typically provide a single string detailing the reasons for the error.
 
 \begin{lstlisting}
 # Raise a generic exception, without an error message.
@@ -77,7 +77,7 @@ ValueError: 'x' should not exceed 5.>>
 % TODO: Make this much more interesting.
 \begin{problem} % Raising Exceptions 101.
 Python functions do not require specific types of data for each functional input.
-Sometimes, however, it is important to validate input types before they are utilized. TODO: Make \li{my_func()} more interesting.
+Sometimes, however, it is important to validate input types before they are utilized. TODO: Make \li{my_func()} waaay more interesting.
 \begin{lstlisting}
 def my_func(a, b, c, d, e):
     print("The first argument is " + a)
@@ -99,7 +99,7 @@ Include an informative error message with each exception.
 \subsection*{Handling Exceptions} % -------------------------------------------
 
 To prevent an exception from stopping the program, it must be handled by
-putting the problematic lines of code in a \li{try} block.
+placing the problematic lines of code in a \li{try} block.
 An \li{except} block then follows.
 
 \begin{lstlisting}
@@ -107,7 +107,7 @@ An \li{except} block then follows.
 >>> try:
 ...     raise Exception("for no reason.")
 ...     print "No exception raised"
-... # The 'except' block is entered into when an exception is raised.
+... # The 'except' block is executed when an exception is raised.
 ... except Exception as e:
 ...     print "Exception raised", e
 ... # The program then continues as usual.
@@ -116,20 +116,16 @@ An \li{except} block then follows.
 <<Exception raised for no reason.
 Good for you.>>
 \end{lstlisting}
-
-Other clauses can be attached to the \li{try}-\li{except} control flow.
-% The interpreter's progression through the program is as follows.
-
+%
+The try statement induces a control flow that proceeds as follows:
 \begin{description}
-\item \li{try}: Executed until an exception is raised.
-\item \li{except <Exception Class> as e}: Executed if an exception of the indicated class is raised anywhere in the \li{try} block. There may be multiple \li{except} statements that specify different kinds of exceptions to catch, and a single except statement may catch several kinds of exceptions.
-\item \li{else}: Executed if an exception is \emph{not} raised in the \li{try} block.
-\item \li{finally}: Always executed, regardless of any exceptions.
+\item The \li{try} block is executed until an exception is raised.
+\item An \li{except} statement specifying the \emph{same kind} of exception that was raised in the try block ``catches'' the exception, and the block is then executed.
+There may be multiple except blocks following a single try block (similiar to having several \li{elif} statements following a single \li{if} statement), and a single except statement may specify multiple kinds of exceptions to catch.
+\item The optional \li{else} block is executed if an exception was \emph{not} raised in the try block.
+% Thus either an except block or the else block are executed, but not both.
+\item Lastly, the optional \li{finally} block is always executed if it is included.
 \end{description}
-
-% =============================================================================
-% Done to here ================================================================
-% =============================================================================
 
 \begin{lstlisting}
 >>> try:
@@ -157,16 +153,11 @@ Other clauses can be attached to the \li{try}-\li{except} control flow.
 The house is on fire: False>>
 \end{lstlisting}
 
-The code in the \li{finally} block is \emph{always} executed, even if a \li{return} statement or an uncaught exception occurs in any block following the \li{try} statement.
+The code in the \li{finally} block is \emph{always} executed, even if a \li{return} statement or an uncaught exception occurs in any block following the try statement.
 
 \begin{lstlisting}
 >>> try:
-...     house_on_fire = False
 ...     raise ValueError("The house is on fire!")
-... except TypeError as e:
-...     house_on_fire = True
-... else:
-...     print "The house is probably okay."
 ... finally:                        # Executes before the error is reported.
 ...     print "The house may be on fire."
 ... 
@@ -176,7 +167,7 @@ Traceback (most recent call last):
 ValueError: The house is on fire!>>
 \end{lstlisting}
 
-\begin{comment} % Additional material...
+\begin{comment} % Additional material ?
 \begin{warn} % Don't use except: by itself; specify an exception class.
 Having \li{except} by itself will catch \emph{any} exception raised in the \li{try} block, but this approach can mistakenly mask unexpected errors.
 Consider the following function, which intends to avoid dividing by zero.
@@ -245,26 +236,27 @@ There can also be more than one \li{except} statements corresponding to a single
 An \li{else} statement can also be attached after \li{except} statements, which is only executed if the \li{try} block is executed to completion.
 \end{comment}
 
-More extensive examples of raising and handling exceptions can be found at \url{https://docs.python.org/2/tutorial/errors.html}.
+See \url{https://docs.python.org/2/tutorial/errors.html} for more examples.
 
 % Catch a KeyboardInterrupt.
 % This example is very simple; it could be expanded to a simple random walk.
 \begin{problem}
 A \li{KeyboardInterrupt} is a special exception that can be triggered at any time by entering \li{ctrl c} (on most systems) in the keyboard.
-Usually a \li{KeyboardInterrupt} is used to manually escape faulty code that runs forever, but it can also be used intentionally to truncate a process.
+% Usually a \li{KeyboardInterrupt} is used to manually escape faulty code that runs forever, but it can also be used intentionally to truncate a process.
 
 \begin{lstlisting}
 from random import choice
 
-def random_walk(max_iters=1000000000):
+def random_walk(max_iters=1e9):
     walk = 0
     direction = [1, -1]
     for i in xrange(max_iters):
         walk += choice(direction)
     return walk
 \end{lstlisting}
-Modify \li{random_walk()} so that if the user raises a \li{KeyboardInterrupt} before completion, the function prints ``Process Interrupted at $x$\%'' (where $x$ is the percent completion through the loop), and returns the current value of \li{walk}.
-If no \li{KeyboardInterrupt} is raised, the function should print ``Process Completed'' and return \li{walk} like usual.
+Modify \li{random_walk()} so that if the user raises a \li{KeyboardInterrupt}, the function prints ``Process Interrupted at $x$\%'' (where $x$ is the percent completion through the loop).
+If no \li{KeyboardInterrupt} is raised, print ``Process Completed''.
+In both cases, return \li{walk} as before.
 \end{problem}
 
 % TODO: For Python 3, discuss chaining Exceptions.
@@ -281,19 +273,16 @@ If no \li{KeyboardInterrupt} is raised, the function should print ``Process Comp
 \subsection*{The Exception Hierarchy}
 
 The built-in Python exceptions are organized into a class hierarchy.
-This can lead to some confusing behavior if one is not aware of the relationships between exception classes.
-Consider the following example:
+This can lead to some confusing behavior if you aren't careful!
 
 \begin{lstlisting}
-# In this example, the exception is caught.
 >>> try:
 ...     raise ValueError("This is a ValueError!")
 ... except StandardError as e:
 ...     print e
 ...
-<<This is a ValueError!>>
+<<This is a ValueError!>>                       # The exception was caught.
 
-# But in this case, the exception is not caught.
 >>> try:
 ...     raise StandardError("This is a StandardError!")
 ... except ValueError as e:
@@ -301,13 +290,16 @@ Consider the following example:
 ...
 <<Traceback (most recent call last):
   File "<stdin>", line 2, in <module>
-StandardError: This is a StandardError!>>
+StandardError: This is a StandardError!>>     # The exception wasn't caught!
 \end{lstlisting}
 
 It turns out that the \li{ValueError} class inherits from the \li{StandardError} class.
 Thus a \li{ValueError} \emph{is} a \li{StandardError}, so the first \li{except} statement was able to catch the exception, but a \li{StandardError} is \emph{not} a \li{ValueError}, so the second \li{except} statement could not catch the exception.
+The complete exception classes hierarchy is documented at \url{https://docs.python.org/2/library/exceptions.html#exception-hierarchy}.
 
-See \url{https://docs.python.org/2/library/exceptions.html#exception-hierarchy} for the complete hierarchy of built-in exception classes.
+% =============================================================================
+% Done to here ================================================================
+% =============================================================================
 
 \section*{File Input and Output} % ============================================
 
@@ -337,27 +329,31 @@ This mode also creates a new file if it doesn't already exist.
 
 \subsection*{The With Statement} % --------------------------------------------
 
-If a file cannot be opened for any reason, an \li{IOException} is raised and the file object is not initialized.
-Files can be opened and closed safely with a careful \li{try}-\li{finally} control flow. % Make sure this is right!
+An \li{IOError} indicates that some input or output operation has failed.
+Thus if a file cannot be opened for any reason, an \li{IOError} is raised and the file object is not initialized.
+Files can be opened and closed safely with a careful \li{try}-\li{finally} control flow.
 
-The keyword \li{with} can also be used in conjunction with an \li{open} statement to create an indented block in which the file is open.
-Upon exiting the block, the file is closed safely and automatically.
-This is the preferred method when a file only needs to be accessed briefly, but it is not quite as flexible as the \li{try}-\li{except}-\li{finally} approach.
+The \li{with} statement provides an alternative method for safely opening and closing files.
+
+Use \li{with open(<filename>, <mode>) as <alias>:} to create an indented block in which the file is open and available under the specified alias.
+At the end of the block, the file is safely and automatically closed.
+This is the preferred file-reading method when a file only needs to be accessed briefly, though it is not quite as flexible as the \li{try}-\li{finally} approach.
 
 \begin{lstlisting}
->>> try:
-...     myfile = open("in.txt", 'r')    # Open 'in.txt' with read-only access.
+>>> myfile = open("in.txt", 'r')        # Open 'in.txt' with read-only access.
+>>> try:    
 ...     contents = myfile.readlines()   # Read in the content by line.
-... except IOError as e:                # Check for errors.
-...     print "File error:", e
 ... finally:
 ...     myfile.close()                  # Explicitly close the file.
 
 # Equivalently, use a 'with' statement to take care of errors.
->>> with open("in.txt", 'r') as myfile:     # Open 'in.txt' using 'with'.
-...    contents = myfile.readlines()        # Read in the content by line.
-...                                         # The file is closed automatically.
+>>> with open("in.txt", 'r') as myfile: # Open 'in.txt' with read-only access.
+...    contents = myfile.readlines()    # Read in the content by line.
+...                                     # The file is closed automatically.
 \end{lstlisting}
+
+In both cases, if the file \texttt{in.txt} does not exist in the current directory, an \li{IOError} will be raised.
+However, errors in the \li{try} or \li{with} blocks will not prevent the file from being safely closed.
 
 \subsection*{Reading and Writing} % -------------------------------------------
 
