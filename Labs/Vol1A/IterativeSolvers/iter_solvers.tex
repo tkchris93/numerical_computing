@@ -253,14 +253,67 @@ Implement the Gauss-Seidel Method using Equation \ref{eq:gauss_seidel}. Your fun
 For a treatment on the theory of positive definite matrices, see Chapter ?? of Volume 1 of the textbook.
 
 \subsection*{Sparse Matrices}
-As mentioned in the introduction, there are some systems that have tens of thousands of parameters. Storing such matrices in memory can become difficult. For example, when dealing with a system that is $100000 \times 100000$, it requires approximately 40 GB to store this matrix in its entirety (4 bytes per entry $\times$ $10^{10}$ entries).
+As mentioned in the introduction, there are some systems that have tens of thousands of parameters. Storing such matrices in memory can become difficult. For example, when dealing with a system that is $100000 \times 100000$, it requires around 40 GB to store this matrix in its entirety (4 bytes per entry $\times$ $10^{10}$ entries).
 
-However, in applications where systems of this size arise, it is also common that such matrices are sparse. As discussed in Lab \ref{lab:complexity}, using SciPy's Sparse module, we can store such matrices by only storing the nonzero values. This allows us to store matrices of such size on many of today's modest desktops and laptops.
+However, in applications where systems of this size arise, it is also common that such matrices are sparse. By sparse, we mean that most of the entries in the matrix are zeros. The \li{scipy.sparse} module provides a solution to this problem. A \li{sparse} matrix only stores the nonzero values and the positions of these values. For sufficiently sparse matrices, storing the matrix as a \li{sparse} matrix may take merely megabytes rather than gigabytes.
+
+There are different kinds of matrices in the \li{sparse} module. Each has their strengths and weaknesses. In Table \ref{table:sparse_matrices}, we briefly address the uses of these matrices. We direct the interested reader to the online documentation for more in-depth information. \url={http://docs.scipy.org/doc/scipy/reference/sparse.html}
+
+\begin{center}
+    \begin{tabular} {c | l }
+                  & \multicolumn{1}{c}{Intended Uses} \\
+        \hline
+        \li{coo\_matrix} & Create a matrix using arrays of \\
+                         & coordinates and values. Also fast \\
+                         & sparse matrix type conversion. \\
+        \li{csc\_matrix} & Perform column-based matrix operations. \\
+        \li{csr\_matrix} & Perform row-based matrix operations.  \\
+        \li{dia\_matrix} & Create a matrix with diagonal structure.  \\
+        \li{dok\_matrix} & Access individual elements of the matrix.  \\
+        \li{lil\_matrix} & Create a matrix one entry at a time.  \\
+        \end{tabular}
+\end{center}
+
+The following is a quick example of how the different types of sparse matrices can be used to optimize performance.
+
+\begin{lstlisting}
+# Initialize the matrix using a coo_matrix.
+>>> rows = np.array([0,1,2,3,0,2])
+>>> cols = np.array([0,1,2,3,1,0])
+>>> values = np.array([3,5,4,1,2,1])
+>>> A = spar.coo_matrix((values, (rows,cols)), shape=(4,4))
+
+# To visualize the matrix, use .todense(). Keep in mind doing
+#   operations on this dense matrix forfeits all sparse-related
+#   optimizations.
+>>> print A.todense()
+matrix([[3, 2, 0, 0],
+        [0, 5, 0, 0],
+        [1, 0, 4, 0],
+        [0, 0, 0, 1]])
+
+# perform matrix multiplicaton after converting to a csr_matrix.
+>>> Acsr = A.tocsr()
+>>> x = np.array([1,0,-1,2])
+>>> b = Acsr.dot(x)
+array([3,0,-3,2])
+
+# access individual elements of the matrix after converting to a dok_matrix.
+>>> Adok = A.todok()
+>>> print Adok[2,0]
+1
+>>> print Adok[1,1]
+5
+\end{lstlisting}
+
+Since the \li{coo_matrix} type allows for fast sparse matrix type conversion, it is usually worth the time and memory to convert to the sparse matrix type that corresponds with the operations you are performing.
+
+Many of the same methods you are used to using with NumPy arrays have similar functions in the \li{scipy.sparse} module. These methods take advantage of the sparse structure of the matrices and are, therefore, usually significantly faster. Note that there is also a \li{scipy.sparse.linalg} module that has linear algebra methods that have been optimized for sparse matrices. We will use the \li{scipy.sparse} module more in future labs.
 
 \begin{problem}
 To be able to use the Gauss-Seidel method on sparse matrices, you must translate the code you wrote in \ref{prob:gauss_seidel} from \li{numpy} to \li{scipy.sparse}. The algorithm is the same, but there are some functions that are named differently between these two packages.
 
-Write a new function that accepts a lil\_matrix \li{A}, a NumPy array \li{b}, an optional parameter \li{tol} that defauls to \li{1e-8}, and an optional parameter \li{maxiters} that defaults to 200. Your function should return the solution vector \li{x} as well as an array of all the approximations of \li{x} at each iteration.
+Write a new function that accepts a sparse matrix \li{A}, a NumPy array \li{b}, an optional parameter \li{tol} that defauls to \li{1e-8}, and an optional parameter \li{maxiters} that defaults to 200. Your function should return the solution vector \li{x} as well as an array of all the approximations of \li{x} at each iteration. Be sure to use different types of sparse matrices to optimize performance.
 \end{problem}
 
 \section*{Successive Over-Relaxation}
