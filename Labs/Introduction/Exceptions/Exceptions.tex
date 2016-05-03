@@ -251,7 +251,7 @@ def random_walk(max_iters=1e9):
         walk += choice(direction)
     return walk
 \end{lstlisting}
-Modify \li{random_walk()} so that if the user raises a \li{KeyboardInterrupt}, the function prints ``Process Interrupted at $x$\%'' (where $x$ is the percent completion through the loop).
+Modify \li{random_walk()} so that if the user raises a \li{KeyboardInterrupt}, the function prints ``Process Interrupted at iteration $i$''.
 If no \li{KeyboardInterrupt} is raised, print ``Process Completed''.
 In both cases, return \li{walk} as before.
 \end{problem}
@@ -545,9 +545,9 @@ The \li{csv} module in the standard library has some methods that work with the 
 This can also be useful for STUFF.
 \end{comment}
 
-\subsection*{Format} % --------------------------------------------------------
+\subsection*{More String Formatting} % ----------------------------------------
 
-See \url{https://docs.python.org/2/library/string.html#format-string-syntax}.
+See \url{https://docs.python.org/2/library/string.html\#format-string-syntax}.
 
 % TODO: Does this really belong here?
 \begin{comment}
