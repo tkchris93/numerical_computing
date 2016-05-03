@@ -10,7 +10,6 @@ Reading and parsing data is an essential skill in scientific computing, and will
 % TODO
 %       - print statments --> print function calls in Python 3 (parentheses)
 %       - String Formatting section. ALMOST THERE!!!!
-%       - Additional material section?
 
 \section*{Exceptions} % =======================================================
 
@@ -74,8 +73,8 @@ Exception>>
 ValueError: 'x' should not exceed 5.>>
 \end{lstlisting}
 
-% TODO: Make this much more interesting.
-\begin{problem} % Raising Exceptions 101.
+% TODO: Make this much more interesting. Like so much more.
+\begin{problem} % Problem: Raising Exceptions 101.
 Python functions do not require specific types of data for each functional input.
 Sometimes, however, it is important to validate input types before they are utilized. TODO: Make \li{my_func()} waaay more interesting.
 \begin{lstlisting}
@@ -238,9 +237,7 @@ An \li{else} statement can also be attached after \li{except} statements, which 
 
 See \url{https://docs.python.org/2/tutorial/errors.html} for more examples.
 
-% Catch a KeyboardInterrupt.
-% This example is very simple; it could be expanded to a simple random walk.
-\begin{problem}
+\begin{problem} % Problem: Catch a KeyboardInterrupt to stop a random walk.
 A \li{KeyboardInterrupt} is a special exception that can be triggered at any time by entering \li{ctrl c} (on most systems) in the keyboard.
 % Usually a \li{KeyboardInterrupt} is used to manually escape faulty code that runs forever, but it can also be used intentionally to truncate a process.
 
@@ -268,9 +265,10 @@ In both cases, return \li{walk} as before.
 >>> except ValueError as e:
 >>>     raise ZeroDivisionError("Second Exception") from e
 \end{lstlisting}
+This syntax makes it possible to see where an error originated from and to ``pass it up'' to the next process.
 \end{comment}
 
-\subsection*{The Exception Hierarchy}
+\subsection*{The Exception Hierarchy} % ---------------------------------------
 
 The built-in Python exceptions are organized into a class hierarchy.
 This can lead to some confusing behavior if you aren't careful!
@@ -304,9 +302,8 @@ The built-in function \li{open()} creates a \li{file} object.
 
 \begin{lstlisting}
 >>> myfile = open("in.txt", 'r')        # Open 'in.txt' with read-only access.
->>> for line in myfile:                 # Print out each line of the file.
-...     print(line)
-...
+>>> print myfile.read()                 # Print the contents of the file.
+Hello World!                            # (it's a really small file.)
 >>> myfile.close()                      # Close the file connection.
 \end{lstlisting}
 
@@ -349,96 +346,95 @@ The more flexible \li{try}-\li{finally} approach is typically better for working
 In both cases, if the file \texttt{in.txt} does not exist in the current directory, an \li{IOError} will be raised.
 However, errors in the \li{try} or \li{with} blocks will not prevent the file from being safely closed.
 
-% =============================================================================
-% Done to here ================================================================
-% =============================================================================
-
 \subsection*{Reading and Writing} % -------------------------------------------
+
+Open file objects have an implicit \emph{cursor} that determines the location in the file to read from or write data to.
+After reading a file once, the cursor must be reset to the beginning of the file with \li{seek(0)}.
+
+Most of the time, we only need to read a file once and store the result in memory.
+Usually the \li{read()} or \li{readlines()} methods get the job done.
 
 \begin{table}[H]
 \begin{tabular}{r|l}
 Attribute & Description \\
 \hline
-\li{closed} & True if file object is closed. \\
-\li{mode} & The access mode used to open the file object. \\
-\li{name} & The name of the file. \\ \\
+\li{closed} & \li{True} if the object is closed.\\
+\li{mode} & The access mode used to open the file object.\\
+\li{name} & The name of the file.\\ \\
 Method & Description\\
 \hline
-\li{close()} & Flush any delayed writes and close the file object. \\
-\li{read()} & Read the next string of the file (probably the whole file). \\
+\li{close()} & Close the connection to the file.\\%Flush any delayed writes
+% \li{flush()} & Flush the internal I/O buffer.\\
+% \li{<<next()>>} & Read the next value.\\
+\li{read()} & Read a given number of bytes; with no input, read the entire file.\\
 \li{readline()} & Read a line of the file, including the newline character at the end.\\
-\li{readlines()} & Read lines of the file until the end of file (returned as a list).\\
-\li{write()} & Write a string to the file. \\
-\li{writelines()} & Write a sequence of strings to the file (input a list). Note that \\
- & newline characters are not added automatically.\\
+% \li{readlines()} & [readlines() for line in file]\\
+\li{readlines()} & Call \li{readline()} repeatedly and return a list of the resulting lines.\\
+\li{seek()} & Move the cursor to a new position.\\
+\li{tell()} & Report the current position of the cursor.\\
+\li{write()} & Write a single string to the file (spaces are \emph{not} added).\\
+\li{writelines()} & Write a list of strings to the file (newline characters are \emph{not} added).\\
 \end{tabular}
 \caption{Important \li{file} object attributes and methods.}
 \label{table:fileattribs}
 \end{table}
 
-Every file object has several attributes and methods.
-Some of the most notable are described in Table \ref{table:fileattribs}.
-Only strings can be written to files; to write a non-string type, first cast it as a string using the \li{str} function.
+Only strings can be written to files; to write a non-string type, first cast it as a string with \li{str()}.
+Be mindful of spaces and newlines to separate the data.
 
 \begin{lstlisting}
->>> try:
-...     outfile = open('out.txt', 'w') # Open 'out.txt' with write-only access.
-...     for i in xrange(10):
-...         outfile.write(str(i**2))        # Write some strings to the file.
-... except IOError as e:
-...     print "Problem writing to file:", e
-... else:
-...     outfile.close()                     # Explicitly close the file.
-
-# The flow is much less cumbersome using a 'with' statement.
->>> with open('out.txt', 'w') as outfile:   # Open 'out.txt' using 'with'.
+>>> with open("out.txt", 'w') as outfile:   # Open 'out.txt' for writing.
 ...     for i in xrange(10):                
-...         outfile.write(str(i**2))        # Write some strings to the file.
+...         outfile.write(str(i**2)+' ')    # Write some strings (and spaces).
 ...
 >>> outfile.closed                          # The file is closed automatically.
 True
 \end{lstlisting}
 
-% Problem 4: Start the ContentFilter class.
-\begin{problem}
-Write a \li{ContentFilter} class.
-The constructor should accept the name of a file to be read.
-Store the name of the file and its contents as class attributes.
-Remember to securely close the file.
+Executing this code replaces whatever used to be in \texttt{out.txt} (if it even existed) with the following:
 
+\begin{lstlisting}
+0 1 4 9 16 25 36 49 64 81 
+\end{lstlisting}
+
+\begin{problem} % Problem: Start the ContentFilter class.
+Define a class called \li{ContentFilter}.
+Implement the constructor so that it accepts the name of a file to be read.
+Store the name of the file and its contents as attributes and securely close the file stream.
 If the filename argument is not a string, raise a \li{TypeError}.
 \end{problem}
 
-\subsection*{String Formatting}
+% =============================================================================
+% Done to here ================================================================
+% =============================================================================
 
-% \begin{table}
-% \begin{tabular}{|l|l|}
-%  \hline
-% Method & Returns \\
-% \hline
-% \li{isalpha()} & True if all characters in the string are alphabetic. \\
-% \li{isdigit()} & True if all characters in the string are digits. \\
-% \li{isspace()} & True if all characters in the string are whitespace (\li{" "}, \li{\\t}, \li{\\n}, etc). \\
-% \li{capitalize()} & A copy of the string with only its first character capitalized. \\
-% \li{lower()} & A copy of the string converted to lowercase. \\
+\section*{String Formatting} % ================================================
+
+Python's \li{str} type class has several useful methods for parsing and formatting strings.
+They are particularly useful for processing data from a source file and for preparing data to be written to an external file.
+
+\begin{table}[H]
+\begin{tabular}{r|l}
+Method & Returns \\
+\hline
+\li{isalpha()} & \li{True} if all characters in the string are alphabetic (a, b, c, \ldots).\\
+\li{isdigit()} & \li{True} if all characters in the string are digits (0, 1, 2, \ldots).\\
+\li{isspace()} & \li{True} if all characters in the string are whitespace (\li{" "}, \li{'\\t'}, \li{'\\n'}, \ldots).\\
+\li{capitalize()} & A copy of the string with only its first character capitalized. \\
+\li{lower()} / \li{upper()} & A copy of the string converted to lowercase / uppercase. \\
 % \li{upper()} & A copy of the string converted to uppercase. \\
-% \li{split()} & A list of segments of the string, using a given character or string \\
-%  & as a delimiter. The default is to separate on whitespace. \\
-% \li{strip()} & A copy of the string with leading and trailing whitespace removed. \\
-% \hline
-% \end{tabular}
-% \caption{Some of the important \li{str} object methods.}
-% \label{table:strmethods}
-% \end{table}
+\li{split()} & A list of segments of the string, using a given character or string \\
+ & as a delimiter. The default is to separate on whitespace. \\
+\li{strip()} & A copy of the string with leading and trailing whitespace removed. \\
+\end{tabular}
+\caption{Some of the more important \li{str} object methods.}
+\label{table:strmethods}
+\end{table}
 
-%A few of the more useful methods are listed in Table \ref{table:strmethods}.
-%Talk about the is stuff (\li{isalnum}/\li{isspace}), formatting (\li{capitalize}/\li{lower}/\li{swapcase}), and \li{split} and \li{strip}.
+Most of these methods are self-explanatory, but the \li{split()} and \li{strip()} methods require a little more explanation.
 
-
-Python's \li{str} type class has several useful methods for formatting and arranging strings.
-They are particularly useful for processing data from a source file.
 As always, IPython's object introspection allows us to learn about these methods quickly.
-
+% TODO: Get rid of this.
 \begin{lstlisting}
 In [1]: str.    # Press 'tab'.
 <<str.capitalize  str.isalnum     str.lstrip      str.splitlines
@@ -476,8 +472,7 @@ Below, we demostrate the \li{join()} and \li{split()} methods.
 ['One fish', 'Two fish', 'Red fish', 'Blue fish', '']
 \end{lstlisting}
 
-% Problem 5: Add methods to the ContentFilter class.
-\begin{problem}
+\begin{problem} % Problem: Add methods to the ContentFilter class.
 Add the following methods to the \li{ContentFilter} class for writing the contents of the original file to new files.
 Each method should accept a filename to write to and a keyword argument \li{mode} that specifies the file access mode, defaulting to \li{'w'}.
 If \li{mode} is not either \li{'w'} or \li{'a'}, raise an \li{ValueError} with an informative message.
@@ -542,26 +537,20 @@ This class seems like a trivial extension of the \li{Exception} class, but it is
 
 Assertion errors are mostly for testing purposes and shouldn't be seen by a non-programmer.
 
-\subsection*{The Finally Block} % ---------------------------------------------
-% TODO: Put this section in the main content again. Maybe put 'else' here.
-Another optional block after a \li{try} block with the header \li{finally}.
-The code in a \li{finally} block executes after either the try or any subsequent block completes, regardless of whether or not an exception was actually raised.
-It is \textbf{always} executed, even if there is another exception raised in the \li{except} block or if a value is returned!
+\begin{comment}
+\subsection*{Buffering} % -----------------------------------------------------
+Details about file.flush(), the buffer argument for open(), and reading large files.
+\end{comment}
 
-\begin{lstlisting}
->>> def finally_test(param):
-...     try:
-...         raise ValueError(str(param))
-...     except ValueError as e:
-...         return str(e)
-...     finally:
-...         print "This is a test."
-...
->>> finally_test("Yes it is.")
-<<This is a test.
-'Yes it is.'>>
-\end{lstlisting}
+\begin{comment}
+\subsection*{The CSV Module} % ------------------------------------------------
 
+The CSV format (comma separated value) is a common file format for spreadsheets and grid-like data.
+The \li{csv} module in the standard library has some methods that work with the \li{file} object to read a CSV file.
+This can also be useful for STUFF.
+\end{comment}
+
+% TODO: Does this really belong here?
 \subsection*{Function Wrappers} % ---------------------------------------------
 
 A \emph{function wrapper} or \emph{decorator} is a function that is meant to ``wrap'' another function by being called on top of the target function.
@@ -589,5 +578,9 @@ For example, the following wrapper prints out the current time whenever the inne
 16:27:17
 \end{lstlisting}
 
-Create a decorator that raises a \li{RuntimeError} after 10 seconds.
-Consider using the \li{signal} module.\footnote{The \li{signal} module only works on unix machines (mac, linux).}
+% The syntax \li{def wrapper(*args, **kwargs)} means that \li{wrapper()} accepts any number of positional or keyword arguments.
+
+Decorators are very useful for pre-processing functional inputs or formatting returned values.
+
+% Create a decorator that raises a \li{RuntimeError} after 10 seconds.
+% Consider using the \li{signal} module.\footnote{The \li{signal} module only works on unix machines (mac, linux).}
