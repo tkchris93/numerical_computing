@@ -297,47 +297,41 @@ It turns out that the \li{ValueError} class inherits from the \li{StandardError}
 Thus a \li{ValueError} \emph{is} a \li{StandardError}, so the first \li{except} statement was able to catch the exception, but a \li{StandardError} is \emph{not} a \li{ValueError}, so the second \li{except} statement could not catch the exception.
 The complete exception classes hierarchy is documented at \url{https://docs.python.org/2/library/exceptions.html#exception-hierarchy}.
 
-% =============================================================================
-% Done to here ================================================================
-% =============================================================================
-
 \section*{File Input and Output} % ============================================
 
 Python has a useful \li{file} object which acts as an interface to all kinds of different file streams.
 The built-in function \li{open()} creates a \li{file} object.
 
 \begin{lstlisting}
->>> myfile = open('in.txt', 'r')        # Open 'in.txt' with read-only access.
+>>> myfile = open("in.txt", 'r')        # Open 'in.txt' with read-only access.
 >>> for line in myfile:                 # Print out each line of the file.
-...     print line
+...     print(line)
 ...
 >>> myfile.close()                      # Close the file connection.
 \end{lstlisting}
 
 \li{open()} accepts up to three arguments: the filename, mode, and buffering options.
 The mode determines the kind of access to use when opening the file.
-Possible mode strings are:
 \begin{description}
-\item \li{'r'}: opens a file for read-only access.
+\item \li{'r'}: opens an existing file for read-only access.
 This is the default mode.
 \item \li{'w'}: opens a file for write-only access.
-This mode creates the file if it doesn't already exist, and \textbf{overwrites everything} in the file if it does exist.
-\item \li{'a'}: opens a file for appending.
-This mode is like write-only, but instead of overwriting existing data any new data is appended to the end of the file.
+This mode creates the file if it doesn't already exist, and \textbf{\emph{overwrites everything}} in the file if it does exist.
+\item \li{'a'}: opens a file for appending, meaning new data is written to the end of the file.
 This mode also creates a new file if it doesn't already exist.
 \end{description}
 
 \subsection*{The With Statement} % --------------------------------------------
 
 An \li{IOError} indicates that some input or output operation has failed.
-Thus if a file cannot be opened for any reason, an \li{IOError} is raised and the file object is not initialized.
-Files can be opened and closed safely with a careful \li{try}-\li{finally} control flow.
+If a file cannot be opened for any reason, an \li{IOError} is raised and the file object is not initialized.
+A simple \li{try}-\li{finally} control flow can ensure that a file stream is closed safely.
 
 The \li{with} statement provides an alternative method for safely opening and closing files.
-
 Use \li{with open(<filename>, <mode>) as <alias>:} to create an indented block in which the file is open and available under the specified alias.
-At the end of the block, the file is safely and automatically closed.
-This is the preferred file-reading method when a file only needs to be accessed briefly, though it is not quite as flexible as the \li{try}-\li{finally} approach.
+At the end of the block, the file is automatically closed.
+This is the preferred file-reading method when a file only needs to be accessed briefly.
+The more flexible \li{try}-\li{finally} approach is typically better for working with several file streams at once.
 
 \begin{lstlisting}
 >>> myfile = open("in.txt", 'r')        # Open 'in.txt' with read-only access.
@@ -354,6 +348,10 @@ This is the preferred file-reading method when a file only needs to be accessed 
 
 In both cases, if the file \texttt{in.txt} does not exist in the current directory, an \li{IOError} will be raised.
 However, errors in the \li{try} or \li{with} blocks will not prevent the file from being safely closed.
+
+% =============================================================================
+% Done to here ================================================================
+% =============================================================================
 
 \subsection*{Reading and Writing} % -------------------------------------------
 
