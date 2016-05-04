@@ -1,5 +1,5 @@
-\lab{Overview of Git}{Git}
-\label{appendix:git}
+\lab{Git and Bitbucket (BYU ACME Edition)}{BYU ACME Git}
+\label{appendix:git2}
 \objective{
 Computer code is delicate.
 A rogue or clumsy programmer can easily damage a program with a simple spelling error.
@@ -10,7 +10,7 @@ In this appendix we introduce Git and Bitbucket, a web-based hosting service for
 This tutorial does not require any previous programming experience.
 }
 
-% This appendix is meant to be general and not provide classroom-specific instructions. See byuacmegit.tex in this folder for our specific instructions.
+% TODO: Set up a BYU ACME TA account on Bitbucket with two repositories: one for the students to import, and one for the TA's to import.
 
 \section*{Overview} % =========================================================
 
@@ -33,25 +33,27 @@ Most Linux and Macintosh machines come with Git pre-installed.
 
 A repository is the place where all of the code for an associated project resides.
 Many different companies have websites for hosting Git repositories.
-\href{https://github.com/}{Github}, \href{https://bitbucket.org/}{Bitbucket}, and \href{https://gitlab.com/}{Gitlab} are just a few of the options.
-Github is by far the most popular, especially for open-source projects, but Bitbucket offers free private repositories.
+We will use Atlassian Inc.'s \href{https://bitbucket.org/}{\emph{Bitbucket}} because it is free to set up a limited number of private repositories.
+Other popular repository hosts include \href{https://github.com/}{Github}, \href{https://gitlab.com/}{Gitlab}, and others.
 
 There are two ways to set up a new repository: by importing an existing repository, or by starting from scratch.
-Imported repositories are ready to be cloned, but new or empty repositories require a little more setup.
+We have a template repository for you to import, but most Git hosts present easy instructions for creating and setting up an empty repository.
+For now, complete these steps to import the template repository:
 
-Once a new or empty repository has been created on-line, it must be manually connected to a local folder on a computer.
-On your machine, navigate through the terminal to the location where you would like the repository to reside locally.
-Then execute the following bash commands:
-
-\begin{lstlisting}[language=bash]
-$ mkdir /path/to/your/project       # Make a new directory for the repository.
-$ cd /path/to/your/project          # Enter the new directory.
-$ git init                          # Turn the directory into a Git folder.
-# Finally, connect the local folder to the repository in the cloud.
-$ git remote add origin https://<host website>/<username>/<repo_name>
-\end{lstlisting}
-
-The key word ``origin'' now references the repository in the cloud
+\begin{enumerate}
+\item Make an account at \url{https://bitbucket.org}.
+Choose a user name and password that will be easy to remember!
+\item Click ``not now'' if it asks to set up your first repository.
+\item Click ``Repositories,'' then ``Import Repository.''
+\item Give it the URL for the template repository: \url{https://bitbucket.org/byuacmeta/template}. % TODO: SET THIS UP!!
+\item Fill in the description for the repository.
+\item Name the repository ``Volume1'' (or ``Volume2''), \textbf{no spaces.}
+% Once your repository is created, renaming it may cause connectivity issues, so choose wisely!
+\item Check the box marked ``Issue tracking''.
+\item Make sure the box marked ``This is a private repository'' is checked.
+\item For the language, select ``Python''.
+\item Press ``Import repository.''
+\end{enumerate}
 
 \subsection*{Cloning a Repository} % ------------------------------------------
 
@@ -63,8 +65,8 @@ Navigate to the directory where you want to place the repository.
 On Bitbucket, go to the repository page.
 In the menu on the left, click ``Clone'' and copy the text that pops up (it should like like \li{git clone https://bitbucket.org/username/repo}).
 
-In the command terminal, run the command
-\li{\$ git clone <repo_url> <directory_name>}, where \li{<repo\_url>} is the web address to the new repository and \li{<directory_name>} is the name of the directory you want to create.
+In the command terminal, run the command\\
+\li{\$ git clone <repo_url> <directory_name>},\\where \li{<repo\_url>} is the web address to the new repository and \li{<directory_name>} is the name of the directory you want to create.
 % For example, the command
 % \li{\$ git clone https://bitbucket.org/shanemcq/volume2 Volume2} will clone the Git repository ``bitbucket.org/shanemcq/volume2'' into a new folder called ``Volume2'' (if you try this exact command, you will probably get a ``does not exist'' error.)
 You will probably be asked to enter in your Bitbucket password to authenticate the cloning, since the repository is private.
@@ -100,7 +102,7 @@ To summarize, here all of the Git commands you absolutely need to know:
 Command & Description \\ \hline
 \li{git pull origin master} & Pull down changes from the master copy (synchronize).\\
 \li{git add <filename(s)>} & Add a file to the list of things to be synced.\\
-\li{git commit -m <<\"<message>\">>} & Package up the changes and give them a label (checkpoint).\\
+\li{git commit -m ``<message>''} & Package up the changes and give them a label (checkpoint).\\
 \li{git push origin master} & Push committed changes up to the master copy\\
 \li{git status} & See which files have been changed and which have been added to the commit.\\
 \li{git diff <filename>} & See the changes made on a particular file since the latest commit.\\
