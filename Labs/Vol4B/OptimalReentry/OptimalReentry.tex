@@ -208,16 +208,16 @@ However, if the control lasts too long, the craft will overheat or crash.
 
 Since this is a sensitive problem, we will use a heuristic method to construct good initial guesses for $v, \gamma, \xi, \lambda_1, \lambda_2,\lambda_2$, and $u$.
 From aerospace engineers we know that the control $u$ should empirically look like Figure \ref{fig:reentry:estimate_u}; 
-we can create a smooth approximation of the form $u = p_0\erf(p_1(p_2-t/T))$, where $p_0, p_1,$ and $p_2$ are unknown constants. 
+we can create a smooth approximation of the form $u = p_1\erf(p_2(p_3-t/T))$, where $p_1, p_2,$ and $p_3$ are unknown constants. 
 To help us determine these constants, and to find good initial guesses for $v, \gamma$, and $\xi$, we define an auxiliary BVP
 \begin{align}
 \begin{split}
 \dot{y_0} &= -s\rho y_0^2C_D(u) - \frac{g\sin(y_1)}{(1+y_2)^2},\\
 \dot{y_1} &= s \rho y_0 C_L(u) + \frac{y_0 \cos(y_1)}{R(1+y_2)} - \frac{g \cos y_1}{y_0(1+y_2)^2},\\
 \dot{y_2} &= \frac{y_0 \sin y_1}{R} ,\\
-\dot{p_0} &= 0, \\
 \dot{p_1} &= 0, \\
-\dot{p_2} &= 0.
+\dot{p_2} &= 0, \\
+\dot{p_3} &= 0.
 \end{split} \label{eqn:reentry:control_system_auxiliary}
 \end{align}
 
