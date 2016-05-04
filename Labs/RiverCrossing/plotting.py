@@ -176,8 +176,8 @@ def newfunc():
 if __name__=="__main__":
 	# current_plot()	
 	print time_functional()
-	# trajectory()
-	# angle()
+	trajectory()
+	angle()
 	# newfunc()
 
 

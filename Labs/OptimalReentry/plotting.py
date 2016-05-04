@@ -155,8 +155,10 @@ def reentry(x_guess,guess,N=240,plot=False):
 		else: 
 			if sol.success == True: 
 				yint[5,0] = sol.x
-	# plt.plot(x_guess,yint[5,:])
-	# plt.show(); plt.clf()
+
+				
+	plt.plot(x_guess,yint[5,:])
+	plt.show(); plt.clf()
 	
 	problem = bvp_solver.ProblemDefinition(num_ODE = 7,			   
 										  num_parameters = 0,				   
@@ -176,6 +178,11 @@ def reentry(x_guess,guess,N=240,plot=False):
 	numerical_soln = solution(linspace(0,1,N+1))
 	u =	 arctan((6*numerical_soln[4,:])/(9*numerical_soln[0,:]*numerical_soln[3,:] )) 
 	domain = linspace(0,numerical_soln[6,0],N+1)
+	
+	plt.plot(domain,np.real(numerical_soln[5,:]),'-k',linewidth=2.0)
+	plt.xlabel('$t$',fontsize=18); plt.ylabel(r'$\lambda_2$',fontsize=18)
+	# plt.savefig('solution_xi.pdf')
+	plt.show(); plt.clf()
 	
 	if plot==True:
 		# Plot guess for v

@@ -12,8 +12,7 @@
 % \end{enumerate}
 
 \section*{The Gradient Descent method}
-Consider an energy functional $E[u]$, defined over a collection of admissible functions $u:\Omega \subset \mathbb{R}^n \to \mathbb{R}$. 
-We suppose the energy functional $E$ has the form 
+Consider an energy functional $E[u]$, defined over a collection of admissible functions $u:\Omega \subset \mathbb{R}^n \to \mathbb{R}$, with the form 
 \[E[u] = \int_{\Omega} L(x,u,\nabla u) \, dx\]
 where $L = L(x,y,w)$ is a function $\mathbb{R}^n \times \mathbb{R} \times \mathbb{R}^n \to \mathbb{R}$. 
 A standard result from the calculus of variations states that a minimizing function $u^*$ satisfies the Euler-Lagrange equation
@@ -22,73 +21,73 @@ L_y - {\rm div}\,(L_w) &= 0.	\label{EL:multivar_domain}
 \end{align}
 
 This equation is typically an elliptic PDE, possessing boundary conditions associated with  restrictions on the class of admissible functions $u$.
-To more easily compute $\eqref{EL:multivar_domain}$, we may consider a related parabolic PDE:
+To more easily compute $\eqref{EL:multivar_domain}$, we consider a related parabolic PDE,
 \begin{align}
 	\begin{split}
-	&{ } u_t = -(L_y - {\rm div}\, L_w),\\
-	&{ } u(x,t=0) = u_0(x).
+	&{ } u_t = -(L_y - {\rm div}\, L_w), \quad t > 0,\\
+	&{ } u(x,0) = u_0(x), \quad t = 0. 
 	\end{split} \label{grad_desc_pde}
 \end{align}
-A steady state solution of \eqref{grad_desc_pde} does not depend on time, and thus is a solution of the Euler-Lagrange equation. 
-In practice, it is often easier to evolve an initial guess $u_0$ using \eqref{grad_desc_pde}, stopping whenever its steady state is well-approximated, then to solve \eqref{EL:multivar_domain} directly. 
+A steady state solution of \eqref{grad_desc_pde} does not depend on time, and thus solves the Euler-Lagrange equation. 
+It is often easier to evolve an initial guess using \eqref{grad_desc_pde}, and stop whenever its steady state is well-approximated, than to solve \eqref{EL:multivar_domain} directly. 
 
 \begin{example}
 Consider the energy functional 
-\[ E[u] = \int_{\Omega} \|\nabla u\|^2 \, dx,\]
-where the class of admissible functions $u$ satisfy appropriate Dirichlet conditions on $\partial \Omega$. 
+\[ E[u] = \int_{\Omega} \|\nabla u\|^2 \, dx.\]
+% where the class of admissible functions $u$ satisfy appropriate Dirichlet conditions on $\partial \Omega$.
 The minimizing function $u^*$ satisfies the Euler-Lagrange equation
 \[-{\rm div}\, \nabla u	= - \triangle u = 0.\]
-The related PDE (called the gradient descent flow) is the well-known equation
-\[u_t = \triangle u\]
-describing heat flow.
+The gradient descent flow is the well-known heat equation
+\[u_t = \triangle u.\]
 \end{example}
 
-The previous example brings to mind an interesting question: The Euler-Lagrange equation could equivalently be described as $\triangle u = 0$, leading to the PDE $u_t = -\triangle u$. 
-Since this (backward) heat equation is ill-posed, it will not be helpful in our search for a steady-state. 
+The Euler-Lagrange equation could equivalently be described as $\triangle u = 0$, leading to the PDE $u_t = -\triangle u$. 
+Since the backward heat equation is ill-posed, it would not be helpful in a search for the steady-state. 
 
-Let us take the time to put \eqref{grad_desc_pde} on a more rigorous footing. 
-Recalling the derivation of the Euler-Lagrange equation, we note that 
+Let us take the time to make \eqref{grad_desc_pde} more rigorous. 
+We recall that 
 \begin{align*}
 		\delta E(u;v) &= \left.\frac{d}{dt}E(u + tv)\right|_{t=0},\\
-		&= \int_{\Omega} (L_y(u) - {\rm div}\, L_w(u)) v\, dx
+		&= \int_{\Omega} (L_y(u) - {\rm div}\, L_w(u)) v\, dx,\\
+		&= \langle L_y(u) - {\rm div}\, L_w(u), v \rangle_{L^2(\Omega)},
 \end{align*}
 for each $u$ and each admissible perturbation $v$.
-We can now employ the Cauchy-Schwarz inequality: 
+Then using the Cauchy-Schwarz inequality,
 \begin{align*}
-	|\delta E(u;v)| &= | \langle L_y(u) - {\rm div}\, L_w(u), v \rangle_{L^2(\Omega)} |,\\
-	&\leq \|L_y(u) - {\rm div}\, L_w(u)\| \cdot \| v \|,
+	|\delta E(u;v)| &\leq \|L_y(u) - {\rm div}\, L_w(u)\| \cdot \| v \|
 \end{align*}
 with equality iff $v =\alpha u$ for some $\alpha \in \mathbb{R}$. 
 This implies that the ``direction" 
-$v = L_y(u) - {\rm div}\, L_w(u)$
-maximizes $\delta E(u)$. 
+$v = L_y(u) - {\rm div}\, L_w(u)$ is the direction of steepest ascent and 
+maximizes $\delta E(u;v)$. 
 Similarly,
 \[v = -(L_y(u) - {\rm div}\, L_w(u))\]
  points in the direction of steepest descent, and the flow described by \eqref{grad_desc_pde} tends to move toward a state of lesser energy. 
 
 
-\subsection*{Example: Finding the curve that surface of revolution minimizes surface area}
-Consider the collection of smooth curves defined on $[a,b]$, with fixed end points $y(a) = y_a$, $y(b) = y_b$. The surface obtained by revolving a curve $y(x)$ about the $x$-axis has area given by the functional 
+\subsection*{Minimizing the area of a surface of revolution}
+The area of the surface obtained by revolving a curve $y(x)$ about the $x$-axis is 
 \[A[y] = \int_a^b 2 \pi y \sqrt{1 + (y')^2} \, dx.
 \]
-The Euler-Lagrange equation is 
+To minimize the functional $A$ over the collection of smooth curves with fixed end points $y(a) = y_a$, $y(b) = y_b$, we use the Euler-Lagrange equation 
 \begin{align}
 	\begin{split}
 	0 &= 1 - y \frac{y''}{1 + (y')^2} , \\
 	&= 1 + (y')^2 - y y'',
 	\end{split}\label{tv_images:SA_EL_equation}
 \end{align}
-and the resulting gradient descent flow is given by
+with the gradient descent flow given by 
 \begin{align}
 	\begin{split}
-	&{ } u_t = -1 - (y')^2 + y y'', \\
-	&{ } u(a,t) = y_a, \quad u(b,t) = y_b,\\
-	&{ } u(x,0) = g(x),
+	&{ } u_t = -1 - (y')^2 + y y'',\quad t > 0,\, x \in (a,b), \\
+	&{ } u(x,0) = g(x), \quad t = 0,\\
+	&{ } u(a,t) = y_a, \quad u(b,t) = y_b.
 	\end{split}\label{tv_images:SA_flow}
 \end{align}
-where $g(x)$ is an appropriate initial guess.
 
-Consider a second-order order discretization in space, with a simple forward Euler step in time. Let us impose the conditions $y(-1) = 1$, $y(1) = 7$. We begin by creating a grid to approximate the solution on: 
+\subsection*{Numerical Implementation}
+We will construct a numerical solution of \eqref{tv_images:SA_flow} using the conditions $y(-1) = 1$, $y(1) = 7$.
+A simple solution can be found by using a second-order order discretization in space  with a simple forward Euler step in time. We create the grid and set our end states below.  
 \begin{lstlisting}
 import numpy as np
 
@@ -99,9 +98,8 @@ delta_t, delta_x = final_T/time_steps, (b-a)/x_steps
 x0 = np.linspace(a,b,x_steps+1)
 \end{lstlisting}
 
-Often there is a stability condition required for a numerical scheme. 
-One that is common for this discretization is that $\frac{\triangle t}{(\triangle x)^2} \leq \frac{1}{2}$.  
-We continue by checking that this condition is satisfied, and setting our initial guess to be the straight line connecting the end points. 
+Most numerical schemes have a stability condition that must be satisfied. Our discretization requires that $\frac{\triangle t}{(\triangle x)^2} \leq \frac{1}{2}$.  
+We continue by checking that this condition is satisfied, and the straight line connecting the end points as initial data. 
 
 \begin{lstlisting}
 # Check a stability condition for this numerical method
@@ -113,8 +111,7 @@ u[0]  = (beta - alpha)/(b-a)*(x0-a)  + alpha
 u[1] = (beta - alpha)/(b-a)*(x0-a)  + alpha
 \end{lstlisting}
 
-Finally, we define the right hand side of our difference scheme, and time step until we 
-achieve a desired accuracy. 
+Finally, we define the right hand side of our difference scheme, and time step until the scheme converges. 
 \begin{lstlisting}
 def rhs(y):
 	# Approximate first and second derivatives to second order accuracy.
@@ -144,8 +141,8 @@ print "Final time = ", iteration*delta_t
 \end{figure}
 
 
-\section*{Image Processing: A First Attempt}
-We represent a (greyscale) image by a function $u:\Omega \to \mathbb{R}$, $\Omega \subset \mathbb{R}^2$. We use the following code to read an image into an array of floating point numbers, add some noise, and save the noisy image: 
+\section*{Image Processing: Denoising}
+A greyscale image can be represented by a scalar-valued function $u:\Omega \to \mathbb{R}$, $\Omega \subset \mathbb{R}^2$. The following code reads an image into an array of floating point numbers, adds some noise, and saves the noisy image. 
 \begin{lstlisting}
 from numpy.random import random_integers, uniform, randn
 import matplotlib.pyplot as plt
@@ -166,28 +163,28 @@ for lost in xrange(changed_pixels):
 	IM[x_,y_] = max( min(val,1.), 0.)
 imsave(name=("noised_"+imagename),arr=IM)	
 \end{lstlisting}
-We note that a color image can be represented by three functions $u_1, u_2,$ and $u_3$. In this lab we will work with black and white images, but the techniques can easily be used on more general images. 
+A color image can be represented by three functions $u_1, u_2,$ and $u_3$. In this lab we will work with black and white images, but total variation techniques can easily be used on more general images. 
 
-
-Here is our first attempt at denoising: given a noisy image $f$, we look to find a denoised image $u$ minimizing the energy functional 
+\subsection*{A simple approach to image processing}
+Here is a first attempt at denoising: given a noisy image $f$, we look for a denoised image $u$ minimizing the energy functional 
 \begin{align}
-E[u] = \int_{\Omega} L(x,\nabla u, u) \, dx, \label{tv_images:diffusion}
+E[u] = \int_{\Omega} L(x,u,\nabla u) \, dx, \label{tv_images:diffusion}
 \end{align}
 where
 \begin{align*}
-L(x,\nabla u, u) &= \frac{1}{2}(u-f)^2 + \frac{\lambda}{2} | \nabla u|^2,\\
+L(x,u,\nabla u) &= \frac{1}{2}(u-f)^2 + \frac{\lambda}{2} | \nabla u|^2,\\
 &= \frac{1}{2}(u-f)^2 + \frac{\lambda}{2} (u_x^2 + u_y^2)^2.
 \end{align*}
-This energy functional penalizes 1) images that are too different from the original noisy image, and 2) images that have a large derivatives. The minimizing denoised image $u$ will balance these two different costs. 
+This energy functional penalizes 1) images that are too different from the original noisy image, and 2) images that have large derivatives. The minimizing denoised image $u$ will balance these two different costs. 
 
-Solving for the original denoised image $u$ is a difficult inverse problem; some information about the image is irretrievably lost when the noise is introduced. A priori information can however be used to guess at the structure of the original image.  For example, in this problem $\lambda$ represents our best guess on how much noise was added to the image. $\lambda$ is known as a regularization parameter in inverse problem theory. 
+Solving for the original denoised image $u$ is a difficult inverse problem-some information is irretrievably lost when noise is introduced. However, a priori information can be used to guess at the structure of the original image.  For example, here $\lambda$ represents our best guess on how much noise was added to the image, and is known as a regularization parameter in inverse problem theory. 
 
-The Euler-Lagrange equation determined from \eqref{tv_images:diffusion} is
+The Euler-Lagrange equation corresponding to \eqref{tv_images:diffusion} is
 \begin{align*}
 L_u - \text{div } L_{\nabla u} &= (u-f) - \lambda \triangle u,\\
 &= 0.
 \end{align*}
-The resulting gradient descent flow is then given by 
+and the gradient descent flow is 
 \begin{align}
 	\begin{split}
 u_t &= -(u-f -\lambda \triangle u),\\
@@ -204,9 +201,9 @@ Let $u_{ij}^n$ represent our approximation to $u(x_i,y_j)$ at time $t_n$. We wil
 
 
 \begin{problem}
-Using $\triangle t = 1e-3, \lambda = 40, \triangle x = 1,$ and $ \triangle y = 1$, implement the numerical scheme mentioned above to obtain a solution $u$. (So $\Omega = [0,n_x]\times [0,n_y]$, where $n_x$ and $n_y$ represent the number of pixels in the $x$ and $y$ dimensions, respectively.) Take 250 steps in time. Compare your results with Figure \ref{fig:noise_compare_attempts}.
+Using $\triangle t = 1e{-3},$ $\lambda = 40,$ $\triangle x = 1,$ and $\triangle y = 1$, implement the numerical scheme mentioned above to obtain a solution $u$. (So $\Omega = [0,n_x]\times [0,n_y]$, where $n_x$ and $n_y$ represent the number of pixels in the $x$ and $y$ dimensions, respectively.) Take 250 steps in time. Compare your results with Figure \ref{fig:noise_compare_attempts}.
 
-Hint: use the function \li{np.roll} to compute the spatial derivatives. Consider the following: 
+Hint: Use the function \li{np.roll} to compute the spatial derivatives. For example, the second derivative can be approximated at interior grid points using 
 \begin{lstlisting}
 u_xx = np.roll(u,-1,axis=0) - 2*u + np.roll(z,1,axis=0)	
 \end{lstlisting}
