@@ -1,38 +1,40 @@
 \lab{Git and Bitbucket}{Git}
 \label{appendix:git}
 \objective{
-Most significant software projects require teams of programmers and careful collaboration.
+Computer code is delicate.
+A rogue or clumsy programmer can easily damage a program with a simple spelling error.
+Maintaining a working product is therefore a serious endeavor in software development, requiring checks, collaboration, and careful coordination.
 \emph{Git} is a version control system that facilitates code development involving multiple contributors.
-It is commonly used to manage large projects, especially open source projects, but it can also be used for personal code storage and management.
+It is commonly used to manage large projects, especially open-source projects, but it can also be used for personal code storage and management.
 In this appendix we introduce Git and Bitbucket, a web-based hosting service for Git.
 }
 
-Computer code is delicate.
-A small spelling error is usually enough to stop a program in its tracks.
-Imagine, then, the damage that a rouge or clumsy programmer could do to your code if they had access to it.
-Maintaining a working product is a serious endeavor in software development, so most companies use Git or another version control system to manage their code.
+\section*{Overview} % =========================================================
 
-The main idea behind git is that the master copy (the official version) of the code is kept on the cloud in a repository. All certified contributors can clone the repository onto their machine so that they can make changes to the code. All changes are then submitted to the cloud, reviewed, and approved before the master copy is merged with the changes. If two contributors make changes to the same piece of code, it creates a merge conflict, which much be solved on the cloud.
+The main idea behind Git is that a master copy (the official version) of a program's code is kept in the cloud in a \emph{repository}.
+All certified contributors can \emph{clone} the repository onto their machine so that they can make changes to the code.
+All changes are then submitted to the cloud, reviewed, and approved before the changes are \emph{merged} into the master copy.
 
-Because our repositories will be small and only accessible by you and a TA, merges will be automatic and we shouldn’t have to worry about merge conflicts. Next year, we will use git to collaborate with group projects.
+If two contributors make changes to the same piece of code, it may create a \emph{merge conflict}, which must be resolved before any changes can be merged in.
+For small repositories with few collaborators, merge conflicts are very rarely a problem.
+The main issue then becomes understanding how to communicate edits between a local copy and the master copy in the cloud.
 
 \subsection*{Installation} % --------------------------------------------------
 
-First, you will need to have git installed on your machine.
+Download the appropriate installer at \url{http://git-scm.com/downloads}.
+Git is underlying software that will be accessed through the command line, so the installation will not create a new visible application.
+On Windows machines, however, it will also download a terminal-like interface just for Git called \emph{git bash}.
+Most Linux and Macintosh machines come with Git pre-installed.
 
-Go to \url{http://git-scm.com/downloads} and download the appropriate installer.
+\subsection*{Creating Repositories} % -----------------------------------------
 
-Git is underlying software that will be accessed through the terminal, so it the installation will not create a visible new application. On Windows machines, however, it will also download a terminal-like interface just for git. Most Mac and Linux machines come with git built in.
-
-Creating Repositories
-
-There are many different websites that serve as the host for a git repository. For this semester, we will use Bitbucket.org. If you’re interested, you might want to check out github or gitlab for other projects.
+There are many different websites that serve as the host for a Git repository. For this semester, we will use Bitbucket.org. If you're interested, you might want to check out Github or Gitlab for other projects.
 
 Remember, you will have to go through this process twice to make two repositories.
 
 Go to https://bitbucket.org and make an account. Choose a username and password that will be easy to remember! You will have to use the password often if you use the lab machines.
 Click “not now” if it asks you to set up your first repository.
-Once you are logged in, get a copy of the TA’s template repository:
+Once you are logged in, get a copy of the TA's template repository:
 Click “Repositories”, then “Import Repository”.
 Give it the URL https://bitbucket.org/joshualy645/solutions (for both classes).
 Fill in the description for your repository.
@@ -43,7 +45,7 @@ Make sure the box marked “This is a private repository” is checked.
 For the language, select “Python”.
 Press “Import repository”.
 Give the TA access to the new repository:
-Go to the page for your new repository: click the “Repositories” menu and select the name of the repository you just made. If you aren’t there already, click “Overview” in the menu on the left.
+Go to the page for your new repository: click the “Repositories” menu and select the name of the repository you just made. If you aren't there already, click “Overview” in the menu on the left.
 Click the “Send Invitation” button. For Volume I, enter “jesslm83@gmail.com”. For Volume II, enter “shanemcq18@gmail.com”.
 Mark the “admin” box to give the TAs administrator access.
 Click the “Share” button.
@@ -57,14 +59,14 @@ In the command terminal, run the command git clone <repo\_url> <directory\_name>
 
 For example, the command
   git clone https://bitbucket.org/shanemcq/volume2 Volume2
-will clone the git repository “bitbucket.org/shanemcq/volume2” into a new folder called “Volume2” (if you try this exact command, you will probably get a “does not exist” error.) The command you copied in the last step will give you the <repo\_url>.
+will clone the Git repository “bitbucket.org/shanemcq/volume2” into a new folder called “Volume2” (if you try this exact command, you will probably get a “does not exist” error.) The command you copied in the last step will give you the <repo\_url>.
 
 You will probably be asked to enter in your Bitbucket password to authenticate the cloning, since the repository is private.
 
 
 Using Git
 
-Git is very similar to Google Drive, but synchronization with the cloud must be done manually. You’ll have to do this several times to get used to it. To edit your repository, execute the following commands:
+Git is very similar to Google Drive, but synchronization with the cloud must be done manually. You'll have to do this several times to get used to it. To edit your repository, execute the following commands:
 
 In the command line, navigate to the cloned copy of the repository on your machine (on Windows machines, use the Git command prompt).
 Run the command git pull origin master. This updates the copy of the repository on the machine.
@@ -74,7 +76,7 @@ Run git add <filename> for each of the files that you want stored (or submitted)
 After all of the desired files have been added, run the command git commit -m “<type a message here>”. This packs the changes together.
 Finally, run the command git push origin master. This updates the master copy of the repository hosted by Bitbucket.
 
-To summarize, here all of the git commands you absolutely need to know:
+To summarize, here all of the Git commands you absolutely need to know:
 
 git pull origin master    – pull down changes from the master copy (synchronize)
 
@@ -86,11 +88,11 @@ The following commands may also be useful:
 
 git status        – see which files have been changed and which have been
    added to the commit
-git diff <filename>       – see the changes you’ve made on a particular file since
+git diff <filename>       – see the changes you've made on a particular file since
    the last pull
 git checkout -- <filename>    – revoke the changes that you made since the last pull
 
-If you have any questions about a git command or its usage, run the command git by itself to see a list of common commands. Run the command git help <command> to pull up documentation on a particular command (press “q” to exit).
+If you have any questions about a Git command or its usage, run the command git by itself to see a list of common commands. Run the command git help <command> to pull up documentation on a particular command (press “q” to exit).
 
 
 Lab Submission and File Organization
@@ -102,12 +104,12 @@ Git is designed to store source code files, not large data files. When a lab use
 Please do not submit anything other than the source code needed to run your solutions.
 Do not submit any binary files (.pdf, .npz, etc).
 Do not submit any of the datasets used in the lab. The TAs will provide data when grading.
-No file you submit should ever execute any code in its main body. The only things you should include in the main body of the file are import statements, function declarations, and class declarations. Anything else should be placed in an “if \_\_name\_\_ == ‘\_\_main\_\_’:” block at the end of the file.
-Test your solutions! Little mercy will be granted for labs that don’t run at all.
+No file you submit should ever execute any code in its main body. The only things you should include in the main body of the file are import statements, function declarations, and class declarations. Anything else should be placed in an “if \_\_name\_\_ == ‘\_\_main\_\_':” block at the end of the file.
+Test your solutions! Little mercy will be granted for labs that don't run at all.
 
 Git Branches (extra)
 
-For those of you who are already familiar with Git, you may want to create several branches and merge them in with the master branch manually. This is fine, but keep in mind that the TA’s will pull from the master branch to get your submissions and push to the master branch to give feedback. If you’re new to git, don’t worry about branches.
+For those of you who are already familiar with Git, you may want to create several branches and merge them in with the master branch manually. This is fine, but keep in mind that the TA's will pull from the master branch to get your submissions and push to the master branch to give feedback. If you're new to Git, don't worry about branches.
 
 
 https://xkcd.com/1597/
