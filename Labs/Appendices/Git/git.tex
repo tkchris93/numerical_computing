@@ -42,7 +42,7 @@ Click ``Repositories'' on the top bar, then ``Create Repository'' or ``Import Re
 \begin{enumerate}
 \item Make an account at \url{https://bitbucket.org}.
 Choose a user name and password that will be easy to remember!
-\item Click ``not now'' if it asks you to set up your first repository.
+\item Click ``not now'' if it asks to set up your first repository.
 \item To import an existing repository:
 \begin{enumerate}
     \item Click ``Repositories,'' then ``Import Repository.''
@@ -64,13 +64,6 @@ Choose a user name and password that will be easy to remember!
 \end{enumerate}
 \end{comment}
 
-To give someone else access to the repository, they must also have a Bitbucket account.
-Click the ``Repositories'' menu and select the new repository, then click the ``Send Invitation'' button.
-Enter your collaborator's email address or Bitbucket user name. %For Volume I, enter ``jesslm83@gmail.com''. For Volume II, enter ``shanemcq18@gmail.com''.
-Select the level of authorization you want this author to have (a TA or professor should have at least ``write'' privileges).
-%Mark the ``admin'' box to give the TAs administrator access.
-Finally, click the ``Share'' button.
-
 \subsection*{Cloning a Repository} % ------------------------------------------
 
 Now the new repository is set up in the cloud, but we still need to clone it to a machine.
@@ -89,6 +82,16 @@ You will probably be asked to enter in your Bitbucket password to authenticate t
 % 
 % This command creates a folder and places all files from the repository in that folder.
 
+\subsection*{Collaboration} % -------------------------------------------------
+
+To give someone else access to the repository, they must also have a Bitbucket account.
+Click the ``Repositories'' menu and select the new repository, then click the ``Send Invitation'' button.
+Enter your collaborator's email address or Bitbucket user name. %For Volume I, enter ``jesslm83@gmail.com''. For Volume II, enter ``shanemcq18@gmail.com''.
+Select the level of authorization you want this author to have (a TA or professor should have at least ``write'' privileges).
+%Mark the ``admin'' box to give the TAs administrator access.
+Finally, click the ``Share'' button.
+
+% This should be the main section of the lab.
 \section*{Using Git} % ========================================================
 
 Git is very similar to Google Drive, but synchronization with the cloud must be done manually. You'll have to do this several times to get used to it. To edit your repository, execute the following commands:
@@ -103,39 +106,43 @@ Finally, run the command git push origin master. This updates the master copy of
 
 To summarize, here all of the Git commands you absolutely need to know:
 
-git pull origin master    – pull down changes from the master copy (synchronize)
+% Put a table here.
 
-git add <filename>      – add a file to the list of things to synced
-git commit -m ``<message>''   – package up the changes and give them a label
-git push origin master    – send the changes up to the master copy
-
-The following commands may also be useful:
-
-git status        – see which files have been changed and which have been
-   added to the commit
-git diff <filename>       – see the changes you've made on a particular file since
-   the last pull
-git checkout -- <filename>    – revoke the changes that you made since the last pull
+\begin{table}[H]
+\begin{tabular}{c|l}
+Command & Description \hline
+\li{git pull origin master} & Pull down changes from the master copy (synchronize).\\
+\li{git add <filename(s)>} & Add a file to the list of things to be synced.\\
+\li{git commit -m ``<message>''} & Package up the changes and give them a label (checkpoint).\\
+\li{git push origin master} & Push committed changes up to the master copy\\
+\li{git status} & See which files have been changed and which have been added to the commit.\\
+\li{git diff <filename>} & See the changes made on a particular file since the latest commit.\\
+\li{git checkout -- <filename>} & Revoke the changes made since the last commit.
 
 If you have any questions about a Git command or its usage, run the command git by itself to see a list of common commands. Run the command git help <command> to pull up documentation on a particular command (press ``q'' to exit).
 
+\begin{comment}
+\section*{Lab Submission and File Organization} % =============================
 
-Lab Submission and File Organization
+Since the repositories for each class are entirely separate, we will use the convention repository / lab\# / solutions.py.
+As long as we set up the repositories correctly online, the repository folder on your machine can be called whatever you want.
 
-Last semester, we used the convention studentID -> Volume\# -> lab\# -> solutions.py for file organization and to submit solutions. This semester, since the repositories for each class are entirely separate, we will use the convention repository -> lab\# -> solutions.py. As long as we set up the repositories correctly online, the repository folder on your machine can be called whatever you want.
-
-Git is designed to store source code files, not large data files. When a lab uses a large data set, download the data and put it in your repository folder, but do not add/commit the data file. That way, you can use the data without pushing it up to the cloud.
+Git is designed to store source code files, not large data files.
+When a lab uses a large data set, download the data and put it in your repository folder, but do not add/commit the data file.
+That way, you can use the data without pushing it up to the cloud.
 
 Please do not submit anything other than the source code needed to run your solutions.
-Do not submit any binary files (.pdf, .npz, etc).
-Do not submit any of the datasets used in the lab. The TAs will provide data when grading.
-No file you submit should ever execute any code in its main body. The only things you should include in the main body of the file are import statements, function declarations, and class declarations. Anything else should be placed in an ``if \_\_name\_\_ == ‘\_\_main\_\_':'' block at the end of the file.
-Test your solutions! Little mercy will be granted for labs that don't run at all.
+% Do not submit any binary files (.pdf, .npz, etc).
+% Do not submit any of the datasets used in the lab. The TAs will provide data when grading.
+No file you submit should ever execute any code in its main body.
+The only things you should include in the main body of the file are import statements, function declarations, and class declarations.
+Anything else (tests, etc.) should be placed in an \li{if __name__ == "__main__":} block at the end of the file so that it is not executed when we import the file for grading.
+% Test your solutions! Little mercy will be granted for labs that don't run at all.
+\end{comment}
 
-Git Branches (extra)
+\section*{Branches} % =========================================================
 
 For those of you who are already familiar with Git, you may want to create several branches and merge them in with the master branch manually. This is fine, but keep in mind that the TA's will pull from the master branch to get your submissions and push to the master branch to give feedback. If you're new to Git, don't worry about branches.
 
-
-https://xkcd.com/1597/
-https://xkcd.com/1296/
+\url{https://xkcd.com/1597/}
+\url{https://xkcd.com/1296/}
