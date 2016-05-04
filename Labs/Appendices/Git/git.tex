@@ -7,6 +7,7 @@ Maintaining a working product is therefore a serious endeavor in software develo
 \emph{Git} is a version control system that facilitates code development involving multiple contributors.
 It is commonly used to manage large projects, especially open-source projects, but it can also be used for personal code storage and management.
 In this appendix we introduce Git and Bitbucket, a web-based hosting service for Git.
+This tutorial does not require any previous programming experience.
 }
 
 \section*{Overview} % =========================================================
@@ -26,45 +27,69 @@ Git is underlying software that will be accessed through the command line, so th
 On Windows machines, however, it will also download a terminal-like interface just for Git called \emph{git bash}.
 Most Linux and Macintosh machines come with Git pre-installed.
 
-\subsection*{Creating Repositories} % -----------------------------------------
+\subsection*{Creating a New Repository} % -------------------------------------
 
-There are many different websites that serve as the host for a Git repository. For this semester, we will use Bitbucket.org. If you're interested, you might want to check out Github or Gitlab for other projects.
+A repository is the place where all of the code for an associated project resides.
+Many different companies have websites for hosting Git repositories.
+We will use Atlassian Inc.'s \href{https://bitbucket.org/}{\emph{Bitbucket}} because it is free to set up a limited number of private repositories.
+Other popular repository hosts include \href{https://github.com/}{Github}, \href{https://gitlab.com/}{Gitlab}, and others.
 
-Remember, you will have to go through this process twice to make two repositories.
+There are two ways to set up a new repository: by importing an existing repository, or by starting from scratch.
+Make an account at \url{https://bitbucket.org} (choose a user name and password that will be easy to remember!).
+Click ``Repositories'' on the top bar, then ``Create Repository'' or ``Import Repository,'' and fill in the details for the repository.
 
-Go to https://bitbucket.org and make an account. Choose a username and password that will be easy to remember! You will have to use the password often if you use the lab machines.
-Click “not now” if it asks you to set up your first repository.
-Once you are logged in, get a copy of the TA's template repository:
-Click “Repositories”, then “Import Repository”.
-Give it the URL https://bitbucket.org/joshualy645/solutions (for both classes).
-Fill in the description for your repository.
-Name your repository “Volume1” or “Volume2” (or whatever you want).
-Once your repository is created, renaming it will cause issues with connectivity, so choose carefully!
-Check the box marked “Issue tracking”.
-Make sure the box marked “This is a private repository” is checked.
-For the language, select “Python”.
-Press “Import repository”.
-Give the TA access to the new repository:
-Go to the page for your new repository: click the “Repositories” menu and select the name of the repository you just made. If you aren't there already, click “Overview” in the menu on the left.
-Click the “Send Invitation” button. For Volume I, enter “jesslm83@gmail.com”. For Volume II, enter “shanemcq18@gmail.com”.
-Mark the “admin” box to give the TAs administrator access.
-Click the “Share” button.
+\begin{comment} % This is self-explanatory :P
+\begin{enumerate}
+\item Make an account at \url{https://bitbucket.org}.
+Choose a user name and password that will be easy to remember!
+\item Click ``not now'' if it asks you to set up your first repository.
+\item To import an existing repository:
+\begin{enumerate}
+    \item Click ``Repositories,'' then ``Import Repository.''
+    \item Give it the URL for the existing repository.% https://bitbucket.org/joshualy645/solutions (for both classes). TODO: change this!!!!
+    \item Fill in the description for the repository.
+    \item Name the repository. %``Volume1'', \textbf{no spaces.}
+    Once your repository is created, renaming it may cause connectivity issues, so choose wisely!
+    % \item Check the box marked ``Issue tracking''.
+    % \item Make sure the box marked ``This is a private repository'' is checked.
+    % \item For the language, select ``Python''.
+    \item Press ``Import repository.''
+\end{enumerate}
+\item To create an empty repository from scratch:
+\begin{enumerate}
+    \item Click ``Repositories,'' then ``Create Repository.''
+    \item Fill in the name of the repository
 
-Now the repository is set up in the cloud, but we still need to clone it to a machine.
+\end{enumerate}
+\end{enumerate}
+\end{comment}
 
-Open up a command terminal (on windows, use the Git command terminal).
-Navigate to the directory where you want to place the repository. On the lab computers, this should be in the myacmeshare directory.
-On Bitbucket, go to your repository page. In the menu on the left, click “Clone” and copy the text that pops up (it should like like git clone https://bitbucket.org/username/repo).
-In the command terminal, run the command git clone <repo\_url> <directory\_name>, where <repo\_url> is the url to your new repository on bitbucket (it should look kind of like the one you imported), and <directory\_name> is the name of the directory you want to create.
+To give someone else access to the repository, they must also have a Bitbucket account.
+Click the ``Repositories'' menu and select the new repository, then click the ``Send Invitation'' button.
+Enter your collaborator's email address or Bitbucket user name. %For Volume I, enter ``jesslm83@gmail.com''. For Volume II, enter ``shanemcq18@gmail.com''.
+Select the level of authorization you want this author to have (a TA or professor should have at least ``write'' privileges).
+%Mark the ``admin'' box to give the TAs administrator access.
+Finally, click the ``Share'' button.
 
-For example, the command
-  git clone https://bitbucket.org/shanemcq/volume2 Volume2
-will clone the Git repository “bitbucket.org/shanemcq/volume2” into a new folder called “Volume2” (if you try this exact command, you will probably get a “does not exist” error.) The command you copied in the last step will give you the <repo\_url>.
+\subsection*{Cloning a Repository} % ------------------------------------------
 
+Now the new repository is set up in the cloud, but we still need to clone it to a machine.
+
+Open up a command terminal (on Windows, use the Git bash application).
+Navigate to the directory where you want to place the repository.
+% On the lab computers, this should be in the myacmeshare directory.
+On Bitbucket, go to the repository page.
+In the menu on the left, click ``Clone'' and copy the text that pops up (it should like like \li{git clone https://bitbucket.org/username/repo}).
+
+In the command terminal, run the command
+\li{\$ git clone <repo_url> <directory_name>}, where \li{<repo\_url>} is the web address to the new repository and \li{<directory_name>} is the name of the directory you want to create.
+% For example, the command
+% \li{\$ git clone https://bitbucket.org/shanemcq/volume2 Volume2} will clone the Git repository ``bitbucket.org/shanemcq/volume2'' into a new folder called ``Volume2'' (if you try this exact command, you will probably get a ``does not exist'' error.)
 You will probably be asked to enter in your Bitbucket password to authenticate the cloning, since the repository is private.
+% 
+% This command creates a folder and places all files from the repository in that folder.
 
-
-Using Git
+\section*{Using Git} % ========================================================
 
 Git is very similar to Google Drive, but synchronization with the cloud must be done manually. You'll have to do this several times to get used to it. To edit your repository, execute the following commands:
 
@@ -73,7 +98,7 @@ Run the command git pull origin master. This updates the copy of the repository 
 Make any changes to the files in the repository (this is the part when you make new files, edit code, etc.).
 To save changes, run the following commands.
 Run git add <filename> for each of the files that you want stored (or submitted) in the master repository.
-After all of the desired files have been added, run the command git commit -m “<type a message here>”. This packs the changes together.
+After all of the desired files have been added, run the command git commit -m ``<type a message here>''. This packs the changes together.
 Finally, run the command git push origin master. This updates the master copy of the repository hosted by Bitbucket.
 
 To summarize, here all of the Git commands you absolutely need to know:
@@ -81,7 +106,7 @@ To summarize, here all of the Git commands you absolutely need to know:
 git pull origin master    – pull down changes from the master copy (synchronize)
 
 git add <filename>      – add a file to the list of things to synced
-git commit -m “<message>”   – package up the changes and give them a label
+git commit -m ``<message>''   – package up the changes and give them a label
 git push origin master    – send the changes up to the master copy
 
 The following commands may also be useful:
@@ -92,7 +117,7 @@ git diff <filename>       – see the changes you've made on a particular file s
    the last pull
 git checkout -- <filename>    – revoke the changes that you made since the last pull
 
-If you have any questions about a Git command or its usage, run the command git by itself to see a list of common commands. Run the command git help <command> to pull up documentation on a particular command (press “q” to exit).
+If you have any questions about a Git command or its usage, run the command git by itself to see a list of common commands. Run the command git help <command> to pull up documentation on a particular command (press ``q'' to exit).
 
 
 Lab Submission and File Organization
@@ -104,7 +129,7 @@ Git is designed to store source code files, not large data files. When a lab use
 Please do not submit anything other than the source code needed to run your solutions.
 Do not submit any binary files (.pdf, .npz, etc).
 Do not submit any of the datasets used in the lab. The TAs will provide data when grading.
-No file you submit should ever execute any code in its main body. The only things you should include in the main body of the file are import statements, function declarations, and class declarations. Anything else should be placed in an “if \_\_name\_\_ == ‘\_\_main\_\_':” block at the end of the file.
+No file you submit should ever execute any code in its main body. The only things you should include in the main body of the file are import statements, function declarations, and class declarations. Anything else should be placed in an ``if \_\_name\_\_ == ‘\_\_main\_\_':'' block at the end of the file.
 Test your solutions! Little mercy will be granted for labs that don't run at all.
 
 Git Branches (extra)
