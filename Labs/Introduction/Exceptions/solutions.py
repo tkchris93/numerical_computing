@@ -1,6 +1,8 @@
 # solution.py
 """Exceptions and File I/O Protocol solutions file."""
 
+from random import choice
+
 # Problem 1: Modify this function to account for bad inputs.
 def my_func(a, b, c, d, e):
     # Validate arg 1.
@@ -21,25 +23,22 @@ def my_func(a, b, c, d, e):
     
     return a, x, y
 
+
 # Problem 2: Modify this function to account for KeyboardInterrupts.
-def forever(max_iters=1000000000000):
-    iters = 0
+def random_walk(max_iters=1e9):
+    walk = 0
+    direction = [-1, 1]
     try:
-        while True:
-            iters += 1
-            if iters >= max_iters:
-                break
+        for i in xrange(max_iters):
+            walk += choice(direction)
     except KeyboardInterrupt:
-        print("Process Interrupted")
+        print("Process Interrupted at iteration {}%".format(i))
     else:
         print("Process Completed")
-    return iters
+    return walk
 
-# Problem 3: Write a custom Exception class.
-class InvalidOptionError(Exception):
-    pass
 
-# Problems 4 and 5: Write the ContentFilter class.
+# Problems 3 and 4: Write the ContentFilter class.
 class ContentFilter(object):
     """docstring for ContentFilter"""
     def __init__(self, filename):
@@ -52,7 +51,7 @@ class ContentFilter(object):
     def _validate_mode(self, mode):
         """Validate the 'mode' keyword argument for each method."""
         if mode not in {'a', 'w'}:
-            raise InvalidOptionError("'mode' must be 'a' or 'w'")
+            raise ValueError("'mode' must be 'a' or 'w'")
     
     def hyphenate(self, outfile, mode='w'):
         """Write the data to the outfile in a single line,
@@ -81,7 +80,7 @@ class ContentFilter(object):
         elif case == "lower":
             data = self.contents.lower()
         else:
-            raise InvalidOptionError("'case' must be 'upper' or 'lower'")
+            raise ValueError("'case' must be 'upper' or 'lower'")
 
         # Write the data.
         with open(outfile, mode) as f:
@@ -104,7 +103,7 @@ class ContentFilter(object):
         elif unit == 'line':
             data = list(reversed(lines))
         else:
-            raise InvalidOptionError("'unit' must be 'word' or 'line'")
+            raise ValueError("'unit' must be 'word' or 'line'")
 
         # Paste each line back together.
         data = [" ".join(line) for line in data]
@@ -133,8 +132,7 @@ class ContentFilter(object):
         for i in xrange(max_len):
             for line in lines:
                 try:
-                    f.write(line[i])
-                    f.write(" ")
+                    f.write(line[i] + " ")
                 except IndexError:
                     # Catch errors
                     pass
@@ -163,15 +161,14 @@ class ContentFilter(object):
 import signal
 from os import system
 
-# Test script
+# Test script (out of date!!)
 def test(student_module):
     """Test script. Import the student's solutions file as a module.
     
     5  points for problem 1
     5  points for problem 2
     5  points for problem 3
-    5  points for problem 4
-    20 points for problem 5
+    25 points for problem 4
     
     Inputs:
         student_module: the imported module for the student's file.
@@ -329,22 +326,22 @@ class _testDriver(object):
         return points
 
     def problem3(self, s):
-        """Test InvalidOptionError. 5 points."""
-        if not hasattr(s, "InvalidOptionError"):
+        """Test ValueError. 5 points."""
+        if not hasattr(s, "ValueError"):
             raise NotImplementedError("Problem 3 Incomplete")
 
-        # Check that InvalidOptionError inherits from Exception (1 point).
+        # Check that ValueError inherits from Exception (1 point).
         points = 0
-        if issubclass(s.InvalidOptionError, Exception):
+        if issubclass(s.ValueError, Exception):
             points += 1
 
-        # Check that InvalidOptionError behaves like Exception (4 points).
+        # Check that ValueError behaves like Exception (4 points).
         try:
-            raise s.InvalidOptionError("This", "is", "a", "test")
-        except s.InvalidOptionError as e:
+            raise s.ValueError("This", "is", "a", "test")
+        except s.ValueError as e:
             points += 4
         except BaseException as e:
-            self.feedback += "\nFailed to raise an InvalidOptionError "
+            self.feedback += "\nFailed to raise an ValueError "
             self.feedback += "(got a %s instead)"%self._errType(e)
 
         return points
@@ -378,21 +375,21 @@ class _testDriver(object):
         sFilter = s.ContentFilter(sourcefile)
 
         def test_bad(x, statement, method):
-            """Test that eval(statement) raises an InvalidOptionError."""
+            """Test that eval(statement) raises an ValueError."""
             try:
                 eval(statement)
-            except s.InvalidOptionError:
+            except s.ValueError:
                 return 1
             except BaseException as e:
                 self.feedback += "\nContentFilter.%s() "%method
-                self.feedback += "failed to raise an InvalidOptionError "
+                self.feedback += "failed to raise an ValueError "
                 self.feedback += "(got a %s instead)"%self._errType(e)
             else:
                 self.feedback += "\nContentFilter.%s() "%method
-                self.feedback += "failed to raise an InvalidOptionError"
+                self.feedback += "failed to raise an ValueError"
             return 0
 
-        # Test that each method raises an InvalidOptionError for bad 'mode'.
+        # Test that each method raises an ValueError for bad 'mode'.
         points  = test_bad(sFilter, 'x.hyphenate("out.txt", mode="z")',
                                                                 "hyphenate")
         points += test_bad(sFilter, 'x.uniform("out.txt", mode="z")',
@@ -402,7 +399,7 @@ class _testDriver(object):
         points += test_bad(sFilter, 'x.transpose("out.txt", mode="z")',
                                                                 "transpose")
 
-        # Test that uniform() and reverse() raise InvalidOptionErrors correctly
+        # Test that uniform() and reverse() raise ValueErrors correctly
         points += test_bad(sFilter, 'x.uniform("out.txt", case="middle")',
                                                                     'uniform')
         points += test_bad(sFilter, 'x.reverse("out.txt", unit="chunk")',

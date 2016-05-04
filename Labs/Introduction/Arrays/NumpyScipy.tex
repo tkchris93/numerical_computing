@@ -6,44 +6,45 @@
 
 % Lab Outline
 % - Arrays
-%     - [x] What is an array?
-%     - [x] How to initialize a simple custom array
-%     - [x] **Problem 1**: Matrix Equation 1
-%     - [x] Basic array operations +, -, *, / component-wise
-%     - [x] **Problem 2**: Matrix Equation 2 (Cayley-Hamilton preview)
+%     - How to initialize a simple custom array
+%     - **Problem 1**: Matrix Equation 1
+%     - Basic array operations +, -, *, / component-wise
+%     - **Problem 2**: Matrix Equation 2 (Cayley-Hamilton preview)
 %     - Data Types
-%         - [x] How to initialize an array with a certain type
-%         - [x] Changing the type of an array's elements
-%         - [x] Warning: precision limits on data types (int16)
+%         - How to initialize an array with a certain type
+%         - Changing the type of an array's elements
+%         - Warning: precision limits on data types (int16)
 %     - Special Creation routines
-%         - [x] `zeros()`, `ones()`, `eye()`, `identity()`, `full()`, etc.
-%         - [x] `diag()`, `tril()`, `triu()`
-%         - [x] **Problem 3**: Matrix Equation 3
+%         - `zeros()`, `ones()`, `eye()`, `identity()`, `full()`, etc.
+%         - `diag()`, `tril()`, `triu()`
+%         - **Problem 3**: Matrix Equation 3
 % - Data Access
-%     - [x] Slicing Revisited (refer to the visual guide included at the end of the lab)
-%     - [x] Warning: views vs copies (mutability, `np.copy()`)
-%     - [x] Fancy Indexing and Masks
-%     - [x] **Problem 4**: Use fancy indexing to make all entries of a matrix nonnegative (something harder!!)
+%     - Slicing Revisited (refer to the visual guide at the end of the lab)
+%     - Warning: views vs copies (mutability, `np.copy()`)
+%     - Fancy Indexing and Masks
+%     - **Problem 4**: Use fancy indexing to make all entries of a matrix nonnegative (something harder!!)
 % - Array Manipulation
-%     - [x] `reshape()`, `ravel()` / `flatten()`, `transpose()`
-%     - [x] `hstack()`, `vstack()`, `column_stack()`
-%     - [x] Note / Warning: All 1D numpy arrays are flat! (`np.newaxis`)
-%     - [x] **Problem 5**: A final, hardest matrix equation (block matrices)
-%     - [ ] Array Broadcasting
-% - Universal Functions / Avoid Looping!!
-%     - NumPy uses C and Fortran to be SPEEDY!
-%     - [ ] `max()`, `min()`, `argmax()`, `argmin()`
-%     - [ ] The `axis` argument.
-%     - [ ] **Problem 6**: Laplace's equation (needs rewording and algorithm box, but it's legit)
+%     - `reshape()`, `ravel()`, `transpose()`
+%     - `hstack()`, `vstack()`, `column_stack()`
+%     - Note: All 1-D arrays are flat! (`np.newaxis`)
+%     - **Problem 5**: A final matrix equation (Interior Point block matrices)
+%     - Array Broadcasting
+% - Numerical Calculations
+%     - Universal Functions
+%     - Array methods: `max()`, `min()`, `argmax()`, `argmin()`, etc.
+%     - The `axis` argument.
+%     - **Problem 6**: Make an input matrix row-stochastic.
+% - **Problem 7**: Jacobi method for Laplace's equation (hot plate)
 % - Additional Material
 %     - Random Sampling
 %     - Saving / Loading arrays
 %     - Iterating through arrays
 % - Visual Reference Guide
-%     - [x] Data Access
-%     - [x] Slicing
-%     - [x] Stacking
-%     - [ ] Broadcasting
+%     - Data Access
+%     - Slicing
+%     - Stacking
+%     - Broadcasting (might need an illustrator's help)
+%     - The `axis` Argument (might need an illustrator's help)
 
 \section*{Arrays} % ===========================================================
 
@@ -1314,55 +1315,6 @@ Similar pictures to the Broadcasting section (really only need 2)
 % =============================================================================
 % =============================================================================
 
-\begin{comment} % Matplotlib lab vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-\li{np.arange()}, NumPy's version of the built-in \li{range()} function, creates evenly-spaced values within an interval specified with slicing syntax.
-Specifically, \li{np.arange(start, stop, step)} returns an array of numbers from \li{start} up to (but not including) \li{stop}, with each entry \li{step} apart.
-If they are not specified, \li{start} defaults to $0$ and \li{step} defaults to $1$.
-
-\begin{lstlisting}
-# The integers from 0 to 5, exclusive.
->>> np.arange(5)
-array([0, 1, 2, 3, 4])
-
-# The complex integers from 3 to 8, exclusive.
->>> np.arange(3, 8, dtype=np.complex)
-array([ 3.+0.j,  4.+0.j,  5.+0.j,  6.+0.j,  7.+0.j])
-
-# Every 2nd integer from 10 to 20, exclusive.
->>> np.arange(10, 20, 2)
-array([10, 12, 14, 16, 18])
-\end{lstlisting}
-
-\li{np.linspace()} also create an array of evenly spaced values in a given interval.
-Instead of specifying the step size, we specify the number of desired points in the array.
-Unlike \li{np.arange()}, the interval includes the endpoint.
-This function is used extensively with plotting and finite difference methods.
-
-\begin{lstlisting}
-# 4 evenly spaced values between 0 and 32, inclusive.
->>> np.linspace(0, 32, 4) 
-array([  0.        ,  10.66666667,  21.33333333,  32.        ])
-
-# 9 evenly spaced values between -1 and 1, inclusive.
->>> np.linspace(-1, 1, 9)
-array([-1.  , -0.75, -0.5 , -0.25,  0.  ,  0.25,  0.5 ,  0.75,  1.  ])
-\end{lstlisting}
-\end{comment} % Matplotlib lab ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-\begin{comment} % Matplotlib lab vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-\begin{problem}
-Write a function which accepts an integer $n$ as input and does the following:
-\begin{enumerate}
-\item Creates an $n\times n$ array of \li{floats} randomly chosen from a normal distribution
-\item Computes the mean of each row (use a built-in command)
-\item Computes the variance of these means (use a built-in command).
-\end{enumerate}
-As you increase $n$, what happens to the output of 
-your function? This illustrates one version of
-the Law of Large Numbers, about which you will learn more later on.
-\end{problem}
-\end{comment} % Matplotlib lab ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
 \begin{comment} % Complexity lab vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 \begin{problem} % Time matrix multiplication.
 For a $m\times n$ matrix $A$ with entries $a_{ij}$ and an $n\times l$ matrix $B$ with entries $b_{ij}$, the matrix product $C = AB$ is defined entrywise by the formula:
@@ -1394,9 +1346,7 @@ a = [[random() for j in xrange(1000)] for i in xrange(1000)]
 
 \end{problem}
 
-
 % SIMPLIFIED VERSION OF THE CODE BELOW (don't include from other file)
-
 
 Iterating through this triple \li{for} loop is very expensive.
 NumPy also uses loops, but it uses C loops instead of Python loops.
