@@ -76,7 +76,7 @@ def NonlinearGrid():
 	plt.plot(x2,y2,'--ro',label='Clustered grid points',linewidth=1.5)
 	plt.axis([0.,1.1,1.8,4.2])
 	plt.legend(loc='best')
-	plt.savefig('FEM_compare_methods.pdf')
+	# plt.savefig('FEM_compare_methods.pdf')
 	plt.show()
 	plt.clf()
 	
@@ -178,4 +178,4 @@ class ODESolverSpectral:
 
 
 # Example3(N=100,epsilon=.02)
-NonlinearGrid()
+# NonlinearGrid()

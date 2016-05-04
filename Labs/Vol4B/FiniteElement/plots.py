@@ -6,10 +6,11 @@ import matplotlib
 import numpy as np
 from numpy import array as arr
 from scipy.interpolate import interp1d
+from scipy.linalg import solve
 import matplotlib.pyplot as plt
 from matplotlib.axis import Axis
 
-from solutions import ode_fe, ODESolverSpectral
+from solutions import ode_fe, cheb  
 from tridiag import tridiag
 
 
@@ -28,15 +29,11 @@ def tridiagonal_approach():
 		a, c= np.zeros(N), np.zeros(N)
 		b[0], b[N] = 1., 1.
 		f[0], f[N] = alpha, beta
-				
-				
 		# i = 0 to N-2
 		b[1:N] = -epsilon*(1./h[0:N-1] + 1./h[1:N])
 		f[1:N] = -.5*(h[0:N-1] + h[1:N])
 		c[1:N] = epsilon/h[1:N] - .5
 		a[0:N-1] = epsilon/h[0:N-1] + .5
-				
-				
 		return a, b, c, f, x
 	
 	n = [2**i for i in range(4,22)]
@@ -49,26 +46,34 @@ def tridiagonal_approach():
 		analytic_soln = AnalyticSolution(x, alpha, beta,epsilon)
 		max_error_fe[j] = np.max(np.abs(numerical_soln - analytic_soln))
 	
-	#print "max_error = ", max_error_fe
+	n2 = [2*i for i in range(4,50)]
+	max_error_cheb = [10]*len(n2)
+	for j in range(len(n2)):
+		N = n2[j]
+		D,x = cheb(N)
+		M = 4*epsilon*D.dot(D) -2.*D
+		M[0] = 0.
+		M[-1] = 0.
+		M[0,0] = 1. 
+		M[-1,-1] = 1.
+		
+		F = -np.ones(len(x))
+		F[0] = 4    # beta
+		F[-1] = 2   # alpha
+		
+		cheb_sol = solve(M,F)
+		analytic_soln = AnalyticSolution((x+1.)/2., alpha, beta,epsilon)
+		max_error_cheb[j] = np.max(np.abs(cheb_sol - analytic_soln))
 	
+	plt.loglog(n2,max_error_cheb,'-b',linewidth=2.,label='Chebychev Error')
 	
 	plt.loglog(n,max_error_fe,'-k',linewidth=2.)
 	plt.xlabel('$n$',fontsize=16)
 	plt.ylabel('$E(n)$',fontsize=16)
 	# plt.savefig("FEM_error_2nd_order.pdf")
 	plt.show()
-	# plt.clf()
-	
-	N = 500
-	a, b, c, f, x = matrix_diagonals(N)
-	numerical_soln = tridiag(a,b,c,f)
-	epsilon = .02
-	analytic_soln = AnalyticSolution(x,alpha, beta,epsilon)
-	#print "Error = ", np.max(np.abs(numerical_soln- analytic_soln))
-	# plt.plot(x,numerical_soln,'-*r',lw=2.)
-	plt.plot(x,analytic_soln,'-k',lw=2.)
-	plt.savefig("FEM_singular_solution.pdf")
 	plt.clf()
+
 
 def basis_functions_plot():
 	fig = plt.figure()
@@ -109,7 +114,7 @@ def basis_functions_plot():
 	ax.set_xlim(-.1,1.1)
 	plt.xticks(np.linspace(0.,1.,6),['$x_0$','$x_1$','$x_2$','$x_3$','$x_4$','$x_5$'],fontsize=18)
 	# print Axis.get_majorticklabels(plt.axis)
-	plt.savefig("basis_functions.pdf")
+	# plt.savefig("basis_functions.pdf")
 	plt.clf()
 	 
 
@@ -130,13 +135,13 @@ def one_basis_function_plot():
 	# plt.xticks(np.linspace(0.,1.,6),['$x_0$','$x_1$','$x_2$','$x_3$','$x_4$','$x_5$'],fontsize=18)
 	plt.xticks(arr([.4,.6,.8]),['$x_2$','$x_3$','$x_4$'],fontsize=18)
 	# print Axis.get_majorticklabels(plt.axis)
-	plt.savefig("one_basis_function.pdf")
+	# plt.savefig("one_basis_function.pdf")
 	
 	# plt.show()
 	plt.clf()
 
 
 if __name__ == "__main__":
-	basis_functions_plot()
-	one_basis_function_plot()
+	# basis_functions_plot()
+	# one_basis_function_plot()
 	tridiagonal_approach()
