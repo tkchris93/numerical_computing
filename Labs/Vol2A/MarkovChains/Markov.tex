@@ -1,45 +1,47 @@
 \lab{Markov Chains}{Markov Chains}
 \label{lab:Markov}
+\objective{A \emph{Markov chain} is a finite collection of states with specified probabilities for transitioning from one state to another.
+They are characterized by the fact that the future behavior of the system depends only on its current state. Markov chains have far ranging applications; in this lab, we create a Markov chain for generating random English sentences.}
 
 % TODO: recommend changing column_sum = 1 to row_sum = 1 (transpose all transition matrices, ij^th entry --> probability of going from from state i to state j (instead of the other way around). Makes implementing everything easier.)
 
-\objective{A \emph{Markov chain} is a finite collection of states with specified probabilities for transitioning from one state to another. They are characterized by the fact that future behavior of the system depends only on its current state. Markov chains have far ranging applications; in this lab, we create a Markov chain for generating random English sentences.}
+% TODO: Change this section header.
+\section*{Definition and Implementation} % ====================================
 
-\section*{Definition and Implementation}
-
-Suppose that we wish to model a system that can be described by a finite number of states.
-A Markov chain is a collection of states, together with the probabilities of moving from one state to another.
-An example of a Markov chain is a board game where players move around the board based on die rolls.
+Many systems can be described by a finite number of states.
+% A Markov chain is a collection of states, together with the probabilities of moving from one state to another.
+For example, a board game where players move around the board based on die rolls can be modeled by a Markov chain.
 Each space represents a state, and a player is said to be in a state if their piece is currently on the corresponding space.
 In this case, the probability of moving from one space to another only depends on the players current location.
 Where the player was on a previous turn does not affect their current turn.
 
-Markov chains have an associated transition matrix that stores all the information about the chain.
+Finite Markov chains have an associated transition matrix that stores all the information about the chain.
 The $(ij)^{th}$ entry of the matrix gives the probability of moving from state $j$ to state $i$.
-Thus the columns of the transition matrix must sum to 1.
+Thus the columns of the transition matrix must sum to 1. %\footnote{This type of transition matrix is called \emph{column-stochastic}. Row stochastic matrices are also often used ti model Markov chains.}
+% TODO: Note about column-stochastic v row-stochastic transition matrices.
 
 Consider a very simple weather model, where the probability of being hot or cold depends on the weather of the previous day.
 If the probability that tomorrow is hot given that today is hot is 0.7, and the probability that tomorrow is cold given that today is cold is 0.4, then by assigning hot to the $0^{th}$ column and cold to the $1^{st}$ column, the Markov chain has the following transition matrix:
-\[ W = \left( \begin{array}{cc}
+\[W = \left[\begin{array}{cc}
 0.7 & 0.6 \\
-0.3 & 0.4 \end{array} \right)\] 
+0.3 & 0.4 \end{array} \right]\] 
 
-We interpret the matrix $W$ as follows.
-If it is hot today, examine the $0^{th}$ column of $W$.
+If it is hot today, we examine the $0^{th}$ column of $W$.
 There is a $70\%$ chance that tomorrow will be hot ($0^{th}$ row), and a $30\%$ chance that tomorrow will be cold ($1^{st}$ row).
-Conversely, if it is cold today, here is a $60\%$ chance that tomorrow will be hot, and a $40\%$ chance that tomorrow will be cold.
+Conversely, if it is cold today, there is a $60\%$ chance that tomorrow will be hot, and a $40\%$ chance that tomorrow will be cold.
 
-\begin{problem}
+\begin{problem} % Problem: stochasticity. 
 Transition matrices for Markov chains are efficiently stored as NumPy arrays.
 Write a function that accepts a dimension $n$ and returns the transition matrix for a random Markov chain with $n$ states.
 \end{problem}
 
-\section*{Simulating State Transitions}
+\section*{Simulating State Transitions} % =====================================
 
-We may simulate moving from state to state by sampling from a uniform distribution.
-In a general Markov chain, if we are in state $j$ then the $j^{th}$ column of the transition matrix gives the probabilities of moving to any other state $i$.
+% We may simulate moving from state to state by sampling from a uniform distribution.
+In a general finite Markov chain, if we are in state $j$ then the $j^{th}$ column of the transition matrix gives the probabilities of moving to any other state $i$.
 By definition, these probabilities sum to $1$.
 Thus, the entries of each column partition the interval $[0, 1]$, and we can choose the next state to move to by generating a random number between $0$ and $1$.
+% To simulate moving from state to state, then, we sample from a uniform distribution and choose the corresponding row. 
 
 Consider again the weather model example from the previous section.
 Suppose that today is hot, and that we want to simulate tomorrow's weather.
@@ -55,8 +57,8 @@ def forecast():
 	"""Forecast tomorrow's weather given that today is hot."""
 
 	transition_matrix = np.array([[0.7, 0.6], [0.3, 0.4]])
-	random_number = np.random.random()
-	if random_number < transition_matrix[1,0]:
+	# Sample from the standard uniform distribution to choose a new state.
+	if np.random.random() < transition_matrix[1,0]:
 		print "Cold"
 		return 1
 	else:
@@ -64,20 +66,19 @@ def forecast():
 		return 0
 \end{lstlisting}
 
-% Problem 2: Forcasting over several days.
-\begin{problem}
-Modify the \li{forecast} function so that it accepts a parameter \li{num\_days} and runs a simulation of the weather for the number of days given.
+\begin{problem} % Problem: Forcasting over several days.
+Modify \li{forecast()} so that it accepts a parameter \li{num\_days} and runs a simulation of the weather for the number of days given.
 Return a list containing the day-by-day weather predictions (0 for hot, 1 for cold).
 Assume the first day is hot, but do not include the data from the first day in the list of predictions.
 The resulting list should therefore have \li{num\_days} entries.
 \end{problem}
 
-For Markov chains with very few states, the approach in the \li{forecast} function is practical and the implementation is fairly simple.
-However, small Markov chains are typically useless in applications.
+For Markov chains with very few states, the approach in \li{forecast()} is practical and the implementation is fairly simple.
+However, small Markov chains are typically not very useful in applications.
 
-\subsection*{Larger Chains}
+\subsection*{Larger Chains} % -------------------------------------------------
 
-The \li{forecast} function makes one random draw from a \emph{uniform} distribution to simulate a state change.
+The \li{forecast()} function makes one random draw from a \emph{uniform} distribution to simulate a state change.
 For larger Markov chains, we draw from a \emph{multinomial} distribution.
 A multinomial distribution is a mulitvariate generalization of the binomial distribution.
 A single draw from a binomial distribution with parameter $p$ indicates successes or failure of a single experiment with probability $p$ of success.
@@ -94,16 +95,15 @@ In this case the classic example is a dice roll, with $6$ possible outcomes inst
 array([0, 0, 0, 1, 0, 0])                       # The roll resulted in a 4.
 \end{lstlisting}
 
-% Problem 3: 4 states instead of 2. Multinomial transitioning.
-\begin{problem}
+\begin{problem} % Problem: 4 states instead of 2. Multinomial transitioning.
 Let the following be the transition chain for a Markov chain modeling weather with four states: hot, mild, cold, and freezing.
 
-\[ W^\prime = \left( \begin{array}{cccc}
+\[ W^\prime = \left[\begin{array}{cccc}
 0.5 & 0.3 & 0.1 & 0\\
 0.3 & 0.3 & 0.3 & 0.3\\
 0.2 & 0.3 & 0.4 & 0.5\\
-  0 & 0.1 & 0.2 & 0.2\end{array} \right)\]
-with hot, mild, cold, and freezing corresponding to columns 0, 1, 2, and 3, respectively.
+  0 & 0.1 & 0.2 & 0.2\end{array} \right]\]
+with hot, mild, cold, and freezing corresponding to columns (and rows) 0, 1, 2, and 3, respectively.
 
 Write a new function that accepts a parameter \li{num\_days} and runs the same kind of simulation as \li{forecast}, but that uses the new four-state transition matrix.
 This time, assume the first day is mild.
@@ -111,21 +111,20 @@ Return a list containing the day-to-day results (0 for hot, 1 for mild, 2 for co
 \label{problem:transition}
 \end{problem}
 
-% Problem 4: Analysis of results.
-\begin{problem}
+\begin{problem} % Problem: Analysis of results.
 Write a function that investigates and interprets the results of the simulations in the previous two problems.
 Specifically, find the average percentage of days that are hot, mild, cold, and freezing in each simulation.
 Does changing the starting day alter the results?
-Print a report of your findings to the terminal.
+Print a report of your findings.
 \end{problem}
 
-\section*{Using Markov Chains to Simulate English}
+\section*{Using Markov Chains to Simulate English} % ==========================
 % TODO: is it okay to make this reference?
-One of the original applications of Markov chains was to study natural languages\footnote{See \url{http://langvillea.people.cofc.edu/MCapps7.pdf} for some details}.
+One of the original applications of Markov chains was to study natural languages.\footnote{See \url{http://langvillea.people.cofc.edu/MCapps7.pdf} for some details}
 In the early $20^{th}$ century, Markov used his chains to model how Russian switched from vowels to consonants.
 By midcentury, they had been used to try and model English.
 It turns out that Markov chains are, by themselves, insufficient to model very good English.
-However, they can approach a model of bad English, with sometimes amusing results.
+However, they can approach a fairly good model of bad English, with sometimes amusing results.
 
 A Markov chain model of English has each word as a state.
 By nature, a Markov chain is only concerned with its current state.
@@ -145,11 +144,36 @@ We will restrict ourselves to a subproblem of modeling the English of a specific
 Thus, the transition probabilities of our Markov chains will reflect the sort of English that the source authors speak.
 For example, the transition matrix built from the Complete Works of William Shakespeare will differ greatly from, say, a collection of academic journals.
 We will call the source collection of works in the next problems the \emph{training set}.
-%Specifically, we will use the posts from the math stack exchange website.
-%(See \texttt{stack_exchange_posts.txt}).
 
-% Problem 5: Text file to file of ints.
-\begin{problem}
+% TODO:
+	% 1. Write a summary of the procedure and give an example.
+	% 2. Consolidate the next three problems into two parts: constructing the
+	% 	chain, and transitioning through the chain.
+	% 3. Formulate the solution as a class. This makes it reuseable.
+
+% Outline of procedure (algorithm format?)
+% \begin{enumerate}
+% \item Read a source file and convert it into a Markov chain:
+% 	\begin{enumerate}
+% 	\item Count the number of unique words in the file.
+% 	\item Initialize a square array of zeros of the appropriate size to be the transition matrix (remember to account for beginning and end states).
+% 	\item Initialize a list of states, beginning with ``\$tart.''
+% 	\item Process each line of the data file:
+% 		\begin{enumerate}
+% 		\item Convert the sentence to a list of words.
+% 		\item Add each \emph{new} word to the list of states.
+% 		\item Convert the list of words to a list of integers, where each integer is the index of the word in the list of states. (hint: list comprehension)
+% 		\item Add 1 to the entry of the transition matrix corresponding to ``\$tart'' $\rightarrow$ first word.
+% 		\item For each consecutive pair $(i, j)$ of integers in the list of integers, add 1 to the entry of the transition matrix corresponding to moving from state $i$ to state $j$.
+% 		\item Add 1 to the entry of the transition matrix corresponding to last word $\rightarrow$ ``en\&.''
+% 		\end{enumerate}
+% 	\item Make sure the ``en\&'' state transitions to itself.
+% 	\item Normalize each column by dividing by the column sums (hint: array broadcasting)
+% 	\end{enumerate}
+% \item Transition through the chain to generate a random sentence.
+% \end{enumerate}
+
+\begin{problem} % Problem: Text file to file of ints.
 First we must convert a file of English words to numbers.
 Each unique word in the file will correspond to a single number, and each of these numbers will correspond to a row and column in the transition matrix (to be built in the next problem).
 
@@ -196,7 +220,7 @@ The line break structure should be maintained.
 \label{problem:str_to_int}
 \end{problem}
 
-\subsection*{Starting and Stopping states}
+\subsection*{Starting and Stopping States} % ----------------------------------
 
 Now that we have converted our English text into numbers, we can build the transition matrix for the Markov chain.
 We will scan the file we created in the previous problem and use it to create the matrix.
@@ -209,8 +233,7 @@ The start state may transition to any of the words that are at the beginning of 
 Words that are at the end of the sentences in the training set will have a probability of moving to the end state.
 Once the chain has moved to the end state, we terminate the sentence.
 
-% Problem 6: Generate the Markov chain's transition matrix.
-\begin{problem}
+\begin{problem} % Problem: Generate the Markov chain's transition matrix.
 Write a function that accepts the path to the file created in the previous problem and the number of unique words in the training.
 Initialize a square zero matrix of zeros whose dimension is the number of unique words in the text, plus 2 (to include the start and stop state).
 Then, read each line of the file and for each pair of subsequent numbers add one to the corresponding entry of the matrix.
@@ -226,12 +249,7 @@ Then each column will sum to one, with the $ij^{th}$ entry corresponding to the 
 \label{problem:chainmaker}
 \end{problem}
 
-%\subsection*{Teaching the Markov Chain}
-
-%Now that we know how to travel through a Markov chain, we will build one to simulate English.
-
-% Problem 7: Random Sentences
-\begin{problem}
+\begin{problem} % Problem: Random Sentences
 Write a function that accepts a file name to read data in from (the training set), a file name to write data out to, and an optional integer argument \li{num\_sentences}.
 Use Problem \ref{problem:str_to_int} to write the file of numbers that corresponds to the training set, and to get the data structure describing the one-to-one relationship between the words and the numbers.
 Then use Problem \ref{problem:chainmaker} to generate the corresponding transition matrix.
@@ -243,14 +261,15 @@ Write the resulting sentence to the outfile, followed by a newline character.
 Write as many sentences to the file as is specified by \li{num\_sentences}.
 \end{problem}
 
-\section*{Additional Exercises}
+\section*{Additional Material} % ==============================================
 
-\begin{problem}
-The approach in the previous three problems begins to fail as the training set grows larger.
+The approach in the previous problems begins to fail as the training set grows larger.
 For example, a single Shakespearean play may not be large enough to cause memory problems, but the Complete Works of William Shakespeare certainly will.
 
-Consolidate the functions from the previous three problems into a single function.
-Then, to accommodate larger data sets, use a sparse matrix for the transition matrix in instead of a regular NumPy array (use the \li{lil_matrix} from the \li{scipy.sparse} library).
+To accommodate larger data sets, consider use a sparse matrix for the transition matrix in instead of a regular NumPy array (use the \li{lil_matrix} from the \li{scipy.sparse} library). % Why lil_matrix?
 Ensure that the process still works on small training sets, then proceed to larger training sets.
 How are the resulting sentences different if a very large training set is used instead of a small training set?
-\end{problem}
+
+% \subsection*{Natural Language Tools}
+
+% A brief overview of the \li{nltk} package.
