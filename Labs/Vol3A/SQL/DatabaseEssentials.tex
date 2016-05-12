@@ -12,7 +12,7 @@ The DBMS is software that allows users to interact directly with the database.
 
 \section*{Relational Databases}
 A \emph{relational database} is a paradigm for organizing data inside of a database.
-In this paradigm, the data are broken down into tuples of information.
+In this paradigm, the data is broken down into tuples of information.
 These tuples are then grouped into tables, or \emph{relations}, each of which is simply a set of tuples.
 Each table has a \emph{schema} that defines the attributes of the tuples within the table.
 If we fix an order to the attributes in the schema, we can think of each attribute as a column
@@ -71,7 +71,7 @@ Let's look at an example SQL statement:
 SELECT * FROM table WHERE id=3+1 AND name='Bob';
 \end{lstlisting}
 This statement includes a SELECT clause and a WHERE clause.
-The WHERE clause contains two predicates: \texttt{id=3+1} and \texttt{name='Bob'}.
+The WHERE clause contains two predicates: \texttt{id=3+1} and \texttt{name=`Bob'}.
 These two predicates limit the effect of the SELECT clause because any resulting tuples in the table must satisfy both conditions.
 This entire statement is classified as a query since it does not modify the database in any way.
 
@@ -121,11 +121,23 @@ The \li{connect()} function is used to connect to a database.
 If it does not already exist, then a new database will be created using the string passed as the argument for the name.
 The new database was created as a file in the current working directory.
 
+\subsection*{Ending the SQL Session}
+Once we are finished performing SQL statements and interacting with the database, we need to commit our changes and safely close the connection
+to the database.
+This can be done by calling methods on the database connection object.
+\begin{lstlisting}
+db.commit()     #save changes made in the transaction
+db.close()      #safely close the database
+\end{lstlisting}
+
+A database connection is automatically closed in Python when the connection object is garbage-collected.  However, it is nice to be safe and explicit in closing a database connection using the \li{close()} method.
+
+\subsection*{Cursor}
 To execute SQL commands, we need to get a cursor object from the database.
 \begin{lstlisting}
 cur = db.cursor()
 \end{lstlisting}
-The cursor object has several useful methods (Table \ref{table:cursormethods}).
+The cursor object has several useful methods (Table \ref{table:cursormethods}).  Through the cursor, we will execute all of our SQL commands.
 \begin{table}
 \begin{tabular}{|l|l|}
 \hline
@@ -164,17 +176,17 @@ Python Type & SQLite Type \\
 \subsection*{Creating and Dropping Tables}
 Let's create a table.
 \begin{lstlisting}
-cur.execute('CREATE TABLE student_information (StudentID INTEGER NOT NULL, Name TEXT, SSN INTEGER, MajorCode INTEGER);')
+cur.execute('CREATE TABLE StudentInformation (StudentID INTEGER NOT NULL, Name TEXT, MajorCode INTEGER);')
 \end{lstlisting}
-This will create the empty table in Table \ref{table:student_information}.
+This will create the empty table in Table \ref{table:StudentInformation}.
 \begin{table}
 \begin{tabular}{|l|l|l|l|}
 \hline
-StudentID & Name & SSN & MajorCode \\
+StudentID & Name & MajorCode \\
 \hline
 \end{tabular}
-\caption{student\_information}
-\label{table:student_information}
+\caption{StudentInformation}
+\label{table:StudentInformation}
 \end{table}
 
 The arguments in parentheses are the column names followed by the data type that entries in that column will be,
@@ -197,21 +209,29 @@ That is because the create table command does not return a result set.
 
 Now we want to build a relation between students, the courses they've had, and their grades in those courses.
 \begin{lstlisting}
-cur.execute('CREATE TABLE student_classes (StudentID INT NOT NULL, CourseID INT, Grade TEXT);')
+cur.execute('CREATE TABLE StudentGrades (StudentID INT NOT NULL, CourseID INT, Grade TEXT);')
 \end{lstlisting}
 
 \begin{problem}
-In this problem you will create two new tables.
-The first table will be called MajorInfo and have a column called MajorCode and MajorName.
-MajorCode is an integer and MajorName is a string.
+In this problem, you will create two new tables in the database ``sql1''.
+The first table will be called MajorInfo and have a column called MajorID and MajorName.
+MajorID is an integer and MajorName is a string.
 
 The second table will be called CourseInfo and have columns called CourseID and CourseName, also integers and strings, respectively.
+
+Hint: In order to view information about the columns of the table, run the following command:
+\begin{lstlisting}
+cur.execute("PRAGMA table_info('table_name')")
+for info in cur:
+    print info
+\end{lstlisting}
+For each column, this command will output (ID, name, type, notnull, default value, primary key).  Also, don't forget to commit and close your database.
 \label{prob:new_tables}
 \end{problem}
 
 We can also destroy tables using the \lsql{DROP TABLE} command.
 \begin{lstlisting}
-cur.execute("CREATE TABLE test_table (id int, name text);")
+cur.execute("CREATE TABLE test_table (id INT, name TEXT);")
 \end{lstlisting}
 We can delete the table by dropping it.
 \begin{lstlisting}
@@ -224,25 +244,25 @@ We can tell the database to drop the table only if it really exists by using \ls
 Let's insert some data into our new tables.
 We can add rows to tables using the \lsql{INSERT INTO} command.
 \begin{lstlisting}
-cur.execute("INSERT INTO student_information VALUES(55, 'John Smith', 372897382, 2);")
+cur.execute("INSERT INTO StudentInformation VALUES(55, 'John Smith', 2);")
 \end{lstlisting}
-After running this statement, we will have the table in Table \ref{table:student_information1}.
+After running this statement, we will have the table in Table \ref{table:StudentInformation1}.
 \begin{table}
 \begin{tabular}{|l|l|l|l|}
 \hline
-StudentID & Name & SSN & MajorCode \\
+StudentID & Name & MajorCode \\
 \hline
-55 & John Smith & 372897382 & 2 \\
+55 & John Smith & 2 \\
 \hline
 \end{tabular}
-\caption{student\_information}
-\label{table:student_information1}
+\caption{StudentInformation}
+\label{table:StudentInformation1}
 \end{table}
 
 Note that SQLite will assume that values match sequentially with the schema of the table.
 We can also specify the schema of the table to use in the mapping of the values.
 \begin{lstlisting}
-cur.execute("INSERT INTO student_information(MajorCode, Name, SSN, StudentID)  VALUES(55, 'John Smith', 372897382, 2);")
+cur.execute("INSERT INTO StudentInformation(MajorCode, Name, StudentID)  VALUES(55, 'John Smith', 2);")
 \end{lstlisting}
 This will map the value 55 to MajorCode and the value 2 to StudentID.  This may be useful sometimes.
 
@@ -250,14 +270,14 @@ It can quickly become tedious to insert large amounts of data into a table, one 
 We can automate the process somewhat by using the \li{executemany} method of the cursor object.
 To insert several rows into a table using a single command, we can do the following:
 \begin{lstlisting}
-cur.executemany("INSERT INTO student_information VALUES (?, ?, ?, ?);", rows)
+cur.executemany("INSERT INTO StudentInformation VALUES (?, ?, ?, ?);", rows)
 \end{lstlisting}
 In the code above, we assume that \li{rows} is a Python list of tuples, each tuple containing the data for one
 row.
 
 We may remove rows from a table using the \lsql{DELETE FROM} command.
 \begin{lstlisting}
-cur.execute("DELETE FROM student_information WHERE MajorCode=55;")
+cur.execute("DELETE FROM StudentInformation WHERE MajorCode=55;")
 \end{lstlisting}
 
 \begin{warn}
@@ -268,22 +288,11 @@ Parameter substitution can be used to construct dynamic queries.
 In the simplest way, it involves using a `?' character whenever you want to use a value and providing a
 sequence of values as a second argument to \li{execute()}.
 \begin{lstlisting}
-statement = "INSERT INTO student_information VALUES(?, ?, ?, ?);"
+statement = "INSERT INTO StudentInformation VALUES(?, ?, ?, ?);"
 values = (55, 'John Smith', 372897382, 2)
 cur.execute(statement, values)
 \end{lstlisting}
 \end{warn}
-
-\subsection*{Updating Rows of a Table}
-We can modify records in a table by using the \lsql{UPDATE} command.
-\begin{lstlisting}
-cur.execute("UPDATE student_information SET MajorCode=2, StudentID=55, Name='Jonathan Smith' WHERE StudentID=2;")
-\end{lstlisting}
-
-\begin{info}
-When updating a table, having a sufficient \lsql{WHERE} clause is essential.  Any record that matches the criteria will be modified.
-If we omitted the \lsql{WHERE} clause, every record in the table would be set to the values given in the example.
-\end{info}
 
 \begin{problem}
 The ICD is a large collection of codes used to classify any diagnosis that a doctor would make.
@@ -292,8 +301,8 @@ Insurance companies, the government, and researchers find this data useful.
 The data file provided to you, \li{icd9.csv}, has simulated health histories for one million persons.
 Each line has columns for identification number, gender, and age, followed by ICD-9 codes of various quantities.
 Note that the codes for each individual are written in a single string, each code separated by semicolons.
-Create a new database with a single table to store all the simulated data.
-Yourn table should have four columns, one each for id number, gender, age, and codes.
+Create a new database with a single table to store all the simulated data.  Call the database ``sql2'' and the table ``ICD.''
+Your table should have four columns, one each for id number, gender, age, and codes.
 
 Because of the volume of data, it is highly recommended you use the \li{executemany()} method of the cursor.
 It will be about twice as fast as using an \li{execute()} for each line of the CSV file.
@@ -304,11 +313,12 @@ import csv
 with open('filename', 'rb') as csvfile:
     rows = [row for row in csv.reader(csvfile, delimiter=',')]
 \end{lstlisting}
+Hint: Don't forget to commit and close your database.
 \label{prob:icd9tables}
 \end{problem}
 
 \begin{problem}
-Create the following tables in the same database you created in Problem \ref{prob:icd9tables}.  You may do so however you think is best.
+Create the following tables in the same database you created in Problem \ref{prob:new_tables} (``sql1'').  You may do so however you think is best.
 
 \begin{table}[H]
 \begin{tabular}{|l|l|l|}
@@ -327,7 +337,7 @@ StudentID & Name & MajorCode \\
 622665098 & Sammy Burke &2 \\
 \hline
 \end{tabular}
-\caption{students}
+\caption{StudentInformation}
 \end{table}
 
 \begin{table}[H]
@@ -341,7 +351,7 @@ ID & Name \\
 4 & Art \\
 \hline
 \end{tabular}
-\caption{majors}
+\caption{MajorInfo}
 \end{table}
 
 \begin{table}[H]
@@ -372,7 +382,7 @@ StudentID & ClassID & Grade \\
 622665098 & 2 & A- \\
 \hline
 \end{tabular}
-\caption{grades}
+\caption{StudentGrades}
 \end{table}
 
 \begin{table}[H]
@@ -386,11 +396,27 @@ ClassID & Name \\
 4 & History \\
 \hline
 \end{tabular}
-\caption{classes}
+\caption{CourseInfo}
 \end{table}
 \label{prob:sampletables}
 \end{problem}
 
+\subsection*{Updating Rows of a Table}
+We can modify records in a table by using the \lsql{UPDATE} command.
+\begin{lstlisting}
+cur.execute("UPDATE StudentInformation SET MajorCode=2, StudentID=55, Name='Jonathan Smith' WHERE StudentID=2;")
+\end{lstlisting}
+
+\begin{info}
+When updating a table, having a sufficient \lsql{WHERE} clause is essential.  Any record that matches the criteria will be modified.
+If we omitted the \lsql{WHERE} clause, every record in the table would be set to the values given in the example.
+\end{info}
+
+\subsection*{Adding Columns to a Table}
+After you have created a table, you can add more columns to the table by using the \lsql{ALTER TABLE} command.  For example, if we wanted to add the column "age" into our students table.  We run this command.
+\begin{lstlisting}
+cur.execute("ALTER TABLE StudentInformation ADD COLUMN age INTEGER;")
+\end{lstlisting}
 
 \subsection*{Selecting Data From Tables}
 The process of retrieving data from a table in a database is accomplished by the \lsql{SELECT} statement.
@@ -411,6 +437,12 @@ Or we can impose conditions on the selected rows.
 SELECT StudentID, Name FROM students WHERE MajorCode=1;
 \end{lstlisting}
 This query results in the following table (Table \ref{table:selectmath}) where the contents are all the students that are math majors.
+
+You can also further refine which rows you select by using the \lsql{AND} or \lsql{OR} commands.  These commands will connect expressions.  For example, to get the math and science majors. One could run the command.
+\begin{lstlisting}[language=SQL]
+SELECT StudentID, Name FROM students WHERE MajorCode=1 OR MajorCode=2;
+\end{lstlisting}
+
 \begin{table}
 \begin{tabular}{|l|l|}
 \hline
@@ -449,7 +481,7 @@ Method & Description \\
 \end{table}
 
 \begin{problem}
-From the ICD9 table you created in Problem \ref{prob:icd9tables}, how many men between the ages of 25 and 35 are there?  How many women between those same ages?  
+From the ICD9 table you created in Problem \ref{prob:icd9tables}, how many men between the ages of 25 and 35 are there?  How many women between those same ages?  Return your answers as a tuple.
 \label{prob:youngfreqcodes}
 \end{problem}
 
@@ -488,16 +520,5 @@ except sql.Error:
 \end{lstlisting}
 Note that rolling back is not needed if we are just performing queries.
 If we don't change any of the data in the database, there is no need to roll anything back.  However, even with queries, there is the potential for errors.  You must design your code to handle these errors gracefully.
-
-\subsection*{Ending the SQL Session}
-Once we are finished performing SQL statements and interacting with the database, we need to commit our changes and safely close the connection
-to the database.
-This can be done by calling methods on the database connection object.
-\begin{lstlisting}
-db.commit()     #save changes made in the transaction
-db.close()      #safely close the database
-\end{lstlisting}
-
-A database connection is automatically closed in Python when the connection object is garbage-collected.  However, it is nice to be safe and explicit in closing a database connection using the \li{close()} method.
 
 \let\undefined\lsql 
