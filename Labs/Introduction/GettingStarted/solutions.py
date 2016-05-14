@@ -44,25 +44,24 @@ def backward(my_string):
 
 # Problem 4
 def list_ops():
-    """Define a list with the entries "ant", "bear", "cat", and "dog".
+    """Define a list with the entries "bear", "ant", "dog", and "cat".
     Perform the following operations on the list:
-        - Append "elephant".
-        - Remove "ant"
+        - Append "eagle".
         - Remove the entry at index 1.
-        - Replace the entry at index 2 with "eagle".
+        - Replace the entry at index 2 with "fox".
         - Append "fox".
     Return the resulting list.
 
     Examples:
         >>> list_ops()
-        ['bear', 'dog', 'eagle', 'fox']
+        ['fox', 'eagle', 'dog', 'bear']
     """
-    my_list = ["ant", "bear", "cat", "dog"]
-    my_list.append("elephant")
-    my_list.remove("ant")
-    my_list.remove(my_list[1])
-    my_list[2] = "eagle"
-    my_list.append("fox")
+    my_list = ["bear", "ant", "dog", "cat"]
+    my_list.append("eagle")
+    my_list.pop(1)                  # or my_list.remove(my_list[1])
+    my_list[2] = "fox"
+    my_list.sort()
+    my_list = my_list[::-1]         # or my_list.reverse()
     return my_list
 
 

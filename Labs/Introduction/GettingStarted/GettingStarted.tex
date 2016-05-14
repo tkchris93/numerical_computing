@@ -453,10 +453,10 @@ The parameter \li{step} defaults to 1.
 Write two new functions, called \li{first_half()} and \li{backward()}.
 \begin{enumerate}
 \item \li{first_half()} should accept a parameter and return the first half of it, excluding the middle character if there is an odd number of characters.
-
+\\
 (Hint: the built-in function \li{len()} returns the length of the input.)
 \item The \li{backward()} function should accept a parameter and reverse the order of its characters using slicing, then return the reversed string.
-
+\\
 (Hint: The \li{step} parameter used in slicing can be negative.)
 \end{enumerate}
 Use IPython to quickly test your syntax for each function.
@@ -534,14 +534,13 @@ For example, recall that the \li{arithmetic()} function returns two values.
 
 \begin{problem} % Problem: Simple list operations.
 Write a function called \li{list_ops()}.
-Define a list with the entries \li{"ant"}, \li{"bear"}, \li{"cat"}, and \li{"dog"}, in that order.
+Define a list with the entries \li{"bear"}, \li{"ant"}, \li{"dog"}, and \li{"cat"}, in that order.
 Then perform the following operations on the list:
 \begin{enumerate}
-\item Append \li{"elephant"}.
-\item Remove \li{"ant"}.
+\item Append \li{"eagle"}.
+\item Replace the entry at index 2 with \li{"fox"}.
 \item Remove the entry at index 1.
-\item Replace the entry at index 2 with \li{"eagle"}.
-\item Append \li{"fox"}.
+\item Sort the list in reverse alphabetical order.
 \end{enumerate}
 Return the resulting list.
 \end{problem}
@@ -554,27 +553,21 @@ Initialize a set with curly braces \li{\{ \}}, separating the values by commas, 
 
 \begin{lstlisting}
 # Initialize some sets. Note that repeats are not added.
->>> library_members = {"Lytle, Josh", "Henriksen, Amelia", "Webb, Jared"}
 >>> gym_members = {"Doe, John", "Doe, John", "Smith, Jane", "Brown, Bob"}
 >>> print(gym_members)
-<<set(['Brown, Bob', 'Doe, John', 'Smith, Jane'])>>
+<<set(['Smith, Jane', 'Brown, Bob', 'Doe, John'])>>
 
-# Delete an object from a set.
->>> gym_members.discard("Doe, John");
+>>> gym_members.add("Lytle, Josh")      # Add an object to the set.
+>>> gym_members.discard("Doe, John")    # Delete an object from the set.
 >>> print(gym_members)
-<<set(['Brown, Bob', 'Smith, Jane'])>>
-
-# Add an object to a set.
->>> gym_members.add("Lytle, Josh")
->>> print(gym_members)
-<<set(['Brown, Bob', 'Lytle, Josh', 'Smith, Jane'])>>
+<<set(['Lytle, Josh', 'Smith, Jane', 'Brown, Bob'])>>
 \end{lstlisting}
 
-Like mathematical sets, Python sets have operations like union, intersection, 
-difference, and symmetric difference.
+Like mathematical sets, Python sets have operations like union and intersection.
+% difference, and symmetric difference.
+
 \begin{lstlisting}
-# Set intersection returns a new set object.
->>> gym_members.intersection(library_members)
+>>> gym_members.intersection({"Lytle, Josh", "Henriksen, Amelia" "Webb, Jared"})
 <<set(['Lytle, Josh'])>>
 \end{lstlisting}
 
@@ -666,8 +659,8 @@ calorie count unavailable
 \begin{problem} % Problem: If statements and Pig Latin.
 Write a function called \li{pig_latin()}.
 Accept a parameter \li{word}, translate it into Pig Latin, then return the translation.
-Specificaly, if \li{word} starts with a vowel, add ``hay'' to the end; if \li{word} starts with a consonant, take the first character of \li{word}, move it to the end, and add ``ay''.
-
+Specifically, if \li{word} starts with a vowel, add ``hay'' to the end; if \li{word} starts with a consonant, take the first character of \li{word}, move it to the end, and add ``ay''.
+\\
 (Hint: use the \li{in} operator to check if the first letter is a vowel.)
 \end{problem}
 
@@ -835,7 +828,7 @@ Recall the alternating harmonic series:
 Write a function called \li{alt_harmonic()}.
 Use a list comprehension to quickly compute the first $n$ terms of this series, given the parameter \li{n}.
 The sum of the first 500,000 terms of this series approximates ln(2) to five decimal places.
-
+\\
 (Hint: consider using Python's built-in \li{sum()} function.)
 \end{problem}
 
