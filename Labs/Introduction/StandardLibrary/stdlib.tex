@@ -5,7 +5,7 @@ To that end, every Python distribution includes several built-in functions for a
 In addition, Python is designed to import and reuse code written by others.
 A Python file with code that can be imported is called a \emph{module}.
 All Python distributions include a collection of modules for accomplishing a variety of tasks, collectively called the \emph{Python Standard Library}.
-In this lab we will explore some built-in functions, learn how to create, import, and use modules, and become familiar with the standard library.}
+In this lab we explore some built-in functions, learn how to create, import, and use modules, and become familiar with the standard library.}
 
 % Suggestions for improvement:
 %   - More problems.
@@ -35,19 +35,19 @@ Type:      builtin_function_or_method
 \end{lstlisting}
 
 \begin{table}[H]
-\begin{tabular}{c|l}
-Function & Returns \\
-\hline \li{abs()} & The absolute value of a real number, or the magnitude\\
+\begin{tabular}{r|l}
+Function & Returns \\ \hline
+\li{abs()} & The absolute value of a real number, or the magnitude\\
 & of a complex number.\\
-\hline \li{min()} & The smallest element of a single iterable, or the smallest\\
+\li{min()} & The smallest element of a single iterable, or the smallest\\
 & of several arguments. Strings are compared  based on\\
 & lexicographical order: numerical characters first, then\\
 & upper-case letters, then lower-case letters.\\
-\hline \li{max()} & The largest element of a single iterable, or the largest\\
+\li{max()} & The largest element of a single iterable, or the largest\\
 & of several arguments.\\
-\hline \li{len()} & The number of items of a sequence or collection.\\
-\hline \li{round()} & A float rounded to a given precision in decimal digits.\\
-\hline \li{sum()} & The sum of a sequence of numbers.\\
+\li{len()} & The number of items of a sequence or collection.\\
+\li{round()} & A float rounded to a given precision in decimal digits.\\
+\li{sum()} & The sum of a sequence of numbers.\\
 \end{tabular}
 \caption{Some common built-in functions for numerical calculations.}
 \label{table:builtin}
@@ -223,7 +223,7 @@ dictionaries & dict[1] = `a' \\
 \hline
 \end{tabular}
 \end{center}
-Print a statement of your conclusions to the terminal.
+Print a statement of your conclusions.
 % TODO: Evaluate this problem. How can we make this a little clearer?
 \end{problem}
 
@@ -317,8 +317,7 @@ else:
     print "This file was imported."
 \end{lstlisting}
 
-
-Executing the file from the terminal will execute the file line by line, including the code under the \li{if __name__ == '__main__'} clause.
+Executing the file from the terminal executes the file line by line, including the code under the \li{if __name__ == '__main__'} clause.
 
 \begin{lstlisting}
 $ python example.py
@@ -359,7 +358,7 @@ Data: [1, 2, 3, 4]
 \end{lstlisting}
 
 Note that code under the \li{if __name__ == '__main__'} clause is \emph{not} executed when a file is imported.
-We will explore the \li{__name__} attribute a little more in a future lab. % ?
+We will explore the \li{__name__} attribute a little more in a future lab. %(?)
 
 % WARNING! In Python 3, reload() is no longer a built-in function
 %   (you have to use importlib.reload() instead). Delete this section?
@@ -413,8 +412,7 @@ Out[6]: 14
 \end{lstlisting}
 \end{comment} % ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-% Problem 3: create your own module. % TODO: Something more compelling!
-\begin{problem}
+\begin{problem} % Problem: create and use a simple module.
 Create a module called \texttt{calculator.py}.
 Write a function that returns the sum of two arguments, a function that returns the product of two arguments, and a function that returns the square root of a single argument.
 When the file is either run or imported, nothing should be executed.
@@ -428,15 +426,15 @@ Using only the functions defined in the module, write a new function that calcul
 All Python distributions include a collection of modules for accomplishing a variety of common tasks, collectively called the \emph{Python standard library}.
 See Table \ref{table:stdlib}.
 
-\begin{table}[H]
+\begin{table}[H] % Some standard library modules.
 \begin{tabular}{c|l}
-Module & Description / Purpose \\
-\hline \li{csv} & Comma Separated Value (CSV) file parsing and writing.\\
-\hline \li{math} & Standard mathematical functions.\\
-\hline \li{random} & Random variable generators.\\
-\hline \li{sys} & Tools for interacting with the interpreter.\\
-\hline \li{time} & Time value generation and manipulation. \\
-\hline \li{timeit} & Measuring execution time of small code snippets.
+Module & Description / Purpose \\ \hline
+\li{csv} & Comma Separated Value (CSV) file parsing and writing.\\
+\li{math} & Standard mathematical functions.\\
+\li{random} & Random variable generators.\\
+\li{sys} & Tools for interacting with the interpreter.\\
+\li{time} & Time value generation and manipulation.\\
+\li{timeit} & Measuring execution time of small code snippets.
 \end{tabular}
 \caption{Some common standard library modules.}
 \label{table:stdlib}
@@ -501,8 +499,7 @@ $ python echo.py I am the walrus
 ['echo', 'I', 'am', 'the', 'walrus']
 \end{lstlisting}
 
-This method can be used to point a Python script to a file to be analyzed.
-It can also be used to control a script's behavior, as in the following example.
+Command line arguments can be used to control a script's behavior, as in the following example:
 
 \begin{lstlisting}
 # cipher.py
@@ -520,6 +517,7 @@ if sys.argv[1] == '1':
 elif sys.argv[1] == '2':
     print(arg.upper())
 \end{lstlisting}
+
 Now we can specify the behavior of the script with command line arguments.
 
 \begin{lstlisting}
@@ -533,6 +531,15 @@ $ python cipher.py 2 second
 SECOND
 \end{lstlisting}
 
+% TODO: discuss raw_input()
+
+\subsection*{The Random Module} % =============================================
+
+TODO !!
+
+% choice(), randint(), random(), sample(), seed(), shuffle() 
+
+\begin{comment} % Introduce the random module instead. Timing --> Complexity.
 \subsection*{The Time and Timeit Modules} % -----------------------------------
 
 The \li{time} module includes functions for dealing with time.
@@ -573,8 +580,10 @@ In IPython, \li{timeit} can be used like a built-in function any time with the \
 In [0]: %timeit for i in xrange(10000): pass 
 1000 loops, best of 3: 303 µs per loop
 \end{lstlisting}
+\end{comment}
 
-\begin{problem} % Problem 4: put it all together.
+\begin{comment} % Old Problem 4 --> Complexity perhaps
+\begin{problem} % Problem: put it all together.
 Download \texttt{matrix\_multiply.py} and \texttt{matrices.npz}.
 The Python file \texttt{matrix\_multiply.py} is a module that has three functions for multiplying two matrices together, called \li{method1()}, \li{method2()}, and \li{method3()}.
 It also has a \li{load\_matrices()} function that returns two matrices from \texttt{matrices.npz}.
@@ -583,11 +592,12 @@ Modify your solutions file so that when it is run from a Python interpreter (but
 \begin{enumerate}
 \item If no command line arguments are given, print ``No Input."
 \item If anything other than ``matrices.npz'' is given, print ``Incorrect Input."
-\item If ``matrices.npz'' is given as a command line argument, load two matrices from \texttt{matrices.npz}. Time (separately) how long each method takes to multiply the two matrices together, then print the results to the terminal.
+\item If ``matrices.npz'' is given as a command line argument, load two matrices from \texttt{matrices.npz}. Time (separately) how long each method takes to multiply the two matrices together, then print the results.
 
 (Hint: Read the code in \texttt{matrix\_multiply.py}, especially the function docstrings, to determine how to use each function.)
 \end{enumerate}
 \end{problem}
+\end{comment}
 
 \newpage
 
@@ -595,22 +605,24 @@ Modify your solutions file so that when it is run from a Python interpreter (but
 
 \subsection*{More Built-in Functions} % ---------------------------------------
 
-Experiment with the following built-in functions.
+Experiment with the following built-in functions:
 
 \begin{table}[H]
-\begin{tabular}{c|l}
-Function & Description \\
-\hline \li{all()} & Return \li{True} if \li{bool(entry)} evaluates to \li{True} for \emph{every} entry in \\&the input iterable.\\
-\hline \li{any()} & Return \li{True} if \li{bool(entry)} evaluates to \li{True} for \emph{any} entry in the\\&input iterable.\\
-\hline \li{bool()} & Evaluate a single input object as \li{True} or \li{False}.\\
-\hline \li{eval()} & Execute a string as Python code and return the output.\\
-% \hline \li{hash()} & \\
-\hline \li{raw_input()} & Prompt the user for input (as a string).\\
+\begin{tabular}{r|l}
+Function & Description \\ \hline
+\li{all()} & Return \li{True} if \li{bool(entry)} evaluates to \li{True} for \emph{every} entry in \\&the input iterable.\\
+\li{any()} & Return \li{True} if \li{bool(entry)} evaluates to \li{True} for \emph{any} entry in the\\&input iterable.\\
+\li{bool()} & Evaluate a single input object as \li{True} or \li{False}.\\
+\li{eval()} & Execute a string as Python code and return the output.\\
+% \li{hash()} & \\
+% TODO: include raw_input() in the sys module section.
+\li{raw_input()} & Prompt the user for input (as a string).\\
+\li{input()} & Prompt the user for input and evaluate it (\li{eval(raw_input())}).\\
 % TODO: change this to input() for Python 3.
-% \hline \li{iter()} & \\
-\hline \li{map()} & Apply a function to every item of the input iterable and return \\&a list of the results.\\
-\hline \li{reduce()} & Apply a function accepting two arguments cumulatively to the \\&items of the input iterable from left to right (thus reducing it to\\&a single output).
-% \hline \li{repr()} &
+% \li{iter()} & \\
+\li{map()} & Apply a function to every item of the input iterable and return \\&a list of the results.\\
+\li{reduce()} & Apply a function accepting two arguments cumulatively to the \\&items of the input iterable from left to right (thus reducing it to\\&a single output).
+% \li{repr()} &
 \end{tabular}
 \end{table}
 
@@ -636,11 +648,11 @@ The complete directory might look something like this.
         abacus.py>>
 \end{lstlisting}
 
-To import the \texttt{calculator.py} module to the \texttt{Trees} file, we use the following import command:
+To import the \texttt{calculator.py} module to \texttt{Trees.py}, use the following import command in \texttt{Trees.py}:
 
 \begin{lstlisting}
 from ..tools import calculator
 \end{lstlisting}
 
-This tells the interpreter to look up one level, then to go into the \texttt{tools} directory and look for the \texttt{calculator.py} module.
+This tells the interpreter to go up one level, enter the \texttt{tools/} directory, and then load the \texttt{calculator.py} module.
 For more details and examples on this topic, see \url{https://docs.python.org/2/tutorial/modules.html\#packages}.
