@@ -384,7 +384,7 @@ If both operands are integers, integer division is performed.
 \end{lstlisting}
 
 \begin{warn} % TODO: This warning can be deleted for Python 3.
-Using integer division unintentionally when float division is needed instead is an incredibly common programming mistake.
+Using integer division unintentionally is an incredibly common programming mistake.
 To avoid this, cast at least one operand as a float before dividing.
 \begin{lstlisting}
 >>> x, y = 7, 5
@@ -415,7 +415,7 @@ To concatenate two or more strings, use the \li{+} operator between string varia
 \begin{lstlisting}
 >>> str1 = "Hello"
 >>> str2 = 'world'
->>> my_string = str1 + " " + str2 + "!"
+>>> my_string = str1 + " " + str2 + '!'
 >>> my_string
 <<'Hello world!'>>
 \end{lstlisting}
@@ -427,10 +427,9 @@ The parameter \li{step} defaults to 1.
 
 \begin{lstlisting}
 >>> my_string = "Hello world!"
-# Indexing begins at 0 and negative numbers count backward from the end.
->>> my_string[4]
+>>> my_string[4]                # Indexing begins at 0.
 <<'o'>>
->>> my_string[-1]
+>>> my_string[-1]               # Negative indices count backward from the end.
 <<'!'>>
 
 # Slice from the 0th to the 5th character (not including the 5th character).
@@ -497,6 +496,7 @@ Consult IPython for details on each of these methods using object introspection.
 \end{lstlisting}
 
 Slicing is also very useful for replacing values in a list.
+
 \begin{lstlisting}
 >>> my_list = [10, 20, 30, 40, 50]
 >>> my_list[0] = -1
@@ -505,6 +505,7 @@ Slicing is also very useful for replacing values in a list.
 \end{lstlisting}
 
 The \li{in} operator quickly checks if a given value is in a list (or a string).
+
 \begin{lstlisting}
 >>> my_list = [1, 2, 3, 4, 5]
 >>> 2 in my_list
@@ -531,10 +532,10 @@ For example, recall that the \li{arithmetic()} function returns two values.
 (3, 10)
 \end{lstlisting}
 
-% TODO: Fix this problem! Specify input or say "Initialize the following list"
-\begin{problem} % Problem: List operations.
+\begin{problem} % Problem: Simple list operations.
 Write a function called \li{list_ops()}.
-Accept a parameter (a list) and perform the following operations on it, in order.
+Define a list with the entries \li{"ant"}, \li{"bear"}, \li{"cat"}, and \li{"dog"}, in that order.
+Then perform the following operations on the list:
 \begin{enumerate}
 \item Append \li{"elephant"}.
 \item Remove \li{"ant"}.

@@ -156,16 +156,10 @@ class _testDriver(object):
         """Test list_ops(). 5 points."""
         if not hasattr(s, "list_ops"):
             raise NotImplementedError("Problem 4 Incomplete")
-        if s.list_ops(["ant", "bear", "cat", "dog"]) is None:
+        if s.list_ops() is None:
             raise NotImplementedError("list_ops() returned nothing")
         
-        points = 2*self._eqTest(  list_ops(["ant", "bear", "cat", "dog"]),
-                                s.list_ops(["ant", "bear", "cat", "dog"]),
-                        'list_ops(["ant", "bear", "cat", "dog"]) failed')
-        points +=3*self._eqTest(list_ops(["ant", "beaver", "cobra", "dragon"]),
-                            s.list_ops(["ant", "beaver", "cobra", "dragon"]),
-                'list_ops(["ant", "beaver", "cobra", "dragon"]) failed')
-        return points
+        return 5*self._eqTest(list_ops(), s.list_ops(), "list_ops() failed")
 
     def problem5(self, s):
         """Test pig_latin(). 5 points."""

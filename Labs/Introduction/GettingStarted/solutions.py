@@ -43,18 +43,21 @@ def backward(my_string):
 
 
 # Problem 4
-def list_ops(my_list):
-    """Perform the following operations on the list 'my_list':
+def list_ops():
+    """Define a list with the entries "ant", "bear", "cat", and "dog".
+    Perform the following operations on the list:
         - Append "elephant".
         - Remove "ant"
         - Remove the entry at index 1.
         - Replace the entry at index 2 with "eagle".
         - Append "fox".
+    Return the resulting list.
 
     Examples:
-        >>> list_ops(["ant", "bear", "cat", "dog"])
+        >>> list_ops()
         ['bear', 'dog', 'eagle', 'fox']
     """
+    my_list = ["ant", "bear", "cat", "dog"]
     my_list.append("elephant")
     my_list.remove("ant")
     my_list.remove(my_list[1])
@@ -110,5 +113,3 @@ def alt_harmonic(n):
     """
     return sum([(-1)**(i+1)/float(i) for i in xrange(1,n)])
 
-
-# END OF FILE =================================================================
