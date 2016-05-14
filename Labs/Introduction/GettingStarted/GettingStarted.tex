@@ -15,9 +15,7 @@ These Python basics are an essential part of almost every problem you will solve
 
 \section*{Python} % ===========================================================
 
-% \subsection*{Installation} % ------------------------------------------------
 % TODO: Update to Python 3
-
 Python is quickly gaining momentum as a fundamental tool in scientific computing.
 It is simple, readable, and easy to learn.
 Anaconda is a free distribution service by Continuum Analytics, Inc., that includes the cross-platform Python \emph{interpreter} (the software that actually executes Python code) and many Python libraries that are commonly used for applied and computational mathematics.
@@ -162,15 +160,15 @@ IPython Notebook (also know as Jupyter) is displayed in a web browser and has ma
 The QTConsole is a console that communicates with Jupyter more fluidly than the regular IPython console.
 Spyder is a popular IDE built specifically for Python programming.
 To start IPython Notebook, QTConsole, or Spyder from the terminal, run \li{ipython notebook}, \li{ipython qtconsole}, or \li{spyder}, respectively.
-Try using each of these interfaces until you find the one you are most comfortable with (we recommend starting with plain \li{ipython} for now).
 \end{comment}
 
 \section*{Python Basics} % ====================================================
 
-\subsection*{Arithmetic} % --------------------------------------------------
+\subsection*{Arithmetic} % ----------------------------------------------------
+
 We can now dive into the particulars of Python syntax.
 To begin, Python can be used as a calculator.
-Use \li{**} for exponentiation.
+Use \li{**} for exponentiation and \li{\%} for modular division.
 
 \begin{lstlisting}
 >>> 3**2 + 2*5                      # Python obeys the order of operations.
@@ -179,6 +177,7 @@ Use \li{**} for exponentiation.
 >>> 13 % 3                          # The modulo operator % calculates the
 1                                   # remainder: 13 = (3*4) + 1. 
 \end{lstlisting}
+
 In most Python interpreters, the underscore character \li{\_} is a variable with the value of the previous command's output, like the ANS button on many calculators.
 
 \begin{lstlisting}
@@ -188,15 +187,19 @@ In most Python interpreters, the underscore character \li{\_} is a variable with
 9
 \end{lstlisting}
 
-Data comparisons act as expected.
+Data comparisons like \li{<} and \li{>} act as expected.
+The \li{==} operator checks for numerical equality and the \li{<=} and \li{>=} operators correspond to $\le$ and $\ge$, respectively.
+
+To connect multiple boolean expressions, use the operators \li{and}, \li{or}, and \li{not}.\footnote{In many other programming languages, the \li{and}, \li{or}, and \li{not} operators are written as \li{&&}, \li{||}, and \li{!}, respectively. Python's convention is much more readable and does not require parentheses.}
+
 \begin{lstlisting}
 >>> 3 > 2
 True
 >>> 4 < 4
 False
->>> 1 <= 1
+>>> 1 <= 1 or 2 > 3
 True
->>> 7 == 7
+>>> 7 == 7 and not 4 < 4
 True
 \end{lstlisting}
 
@@ -212,6 +215,7 @@ Unlike many programming languages, Python does not require a variable's data typ
 >>> y = 2 * 6                       # Initialize y with the integer 2*6 = 12.
 >>> x == y                          # Compare the two variable values.
 True
+
 >>> x, y = 2, 4                     # Give both x and y new values in one line.
 >>> x == y
 False
