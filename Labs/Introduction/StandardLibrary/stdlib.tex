@@ -539,6 +539,59 @@ TODO !!
 
 % choice(), randint(), random(), sample(), seed(), shuffle() 
 
+\begin{problem} % Problem: shut the box.
+The game \emph{shut the box} is a popular British pub game that is used to help children with arithmetic.
+
+The provided module \texttt{box.py} contains some functions that will be useful in your implementation of the game.
+
+% Sample game session
+\begin{lstlisting}
+<<$ python solutions.py
+Player name: Math TA
+
+Numbers left: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+Roll: 7
+Numbers to eliminate: 1 2 4
+
+Numbers left: [3, 5, 6, 7, 8, 9]
+Roll: 4
+Game over!
+
+Score for player Math TA: 38 points
+
+$ python solutions.py TA
+
+Numbers left: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+Roll: 5
+Numbers to eliminate: 5
+
+Numbers left: [1, 2, 3, 4, 6, 7, 8, 9]
+Roll: 5
+Numbers to eliminate: 4 1
+
+Numbers left: [2, 3, 6, 7, 8, 9]
+Roll: 9
+Numbers to eliminate: 9
+
+Numbers left: [2, 3, 6, 7, 8]
+Roll: 8
+Numbers to eliminate: 8
+
+Numbers left: [2, 3, 6, 7]
+Roll: 10
+Numbers to eliminate: 7 2 1
+Invalid input
+Numbers to eliminate: 7 3
+
+Numbers left: [2, 6]
+Roll: 8
+Numbers to eliminate: 2 6
+
+Score for player TA: 0 points
+Congratulations!! You shut the box!>>
+\end{lstlisting}
+\end{problem}
+
 \begin{comment} % Introduce the random module instead. Timing --> Complexity.
 \subsection*{The Time and Timeit Modules} % -----------------------------------
 
