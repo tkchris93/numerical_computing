@@ -5,62 +5,20 @@
 # Students write this module as part of problem 3. Do not provide to students.
 
 def add(x,y):
-    return x+y
+    return x + y
 
 def mult(x,y):
-    return x*y
-
+    return x * y
+ 
 def sqrt(x):
     return x**.5
     # or, from math import sqrt at the top.
 
-# matrix_multiply.py ==========================================================
-# This module is provided to students and used to complete problem 4.
-
-import numpy as np
-
-def load_matrices(filename):
-    """Returns two matrices if the correct filename is given."""
-    
-    files = np.load(filename)
-    return files['arr_0'], files['arr_1']
-
-
-def method1(A,B):
-    """Multiply the matrices 'A' and 'B' together using nested for loops."""
-    
-    product_matrix = np.zeros((A.shape[0], B.shape[1]))
-    for i in range(product_matrix.shape[0]):
-        for j in range(product_matrix.shape[1]):
-            for k in range(product_matrix.shape[0]):
-                product_matrix[i,j] += A[i,k]*B[k,j] 
-    
-    return product_matrix
-
-
-def method2(A,B):
-    """Multiply the matrices 'A' and 'B' together with some vectorization.
-    Use xrange() instead of range() to make things a little faster.
-    """
-    
-    product_matrix = np.zeros((A.shape[0], B.shape[1]))
-    for i in xrange(product_matrix.shape[0]):
-        for j in xrange(product_matrix.shape[1]):
-            product_matrix[i,j] = np.dot(A[i,:], B[:,j])
-    
-    return product_matrix
-
-
-def method3(A,B):
-    """Use numpy's matrix multiplication method for maximum speed."""
-    
-    return np.dot(A,B)
-
-
 # solutions.py ================================================================
 
 import sys
-import time
+from random import randint
+from box import isvalid, parse_input
 
 # Problem 1: Implement this function.
 def prob1(l):
@@ -136,7 +94,7 @@ def prob3(a,b):
     'calculator' module.
     Parameters:
         a : the length one of the sides of the triangle.
-        b : the length the other nonhypotenuse side of the triangle.
+        b : the length the other non-hypotenuse side of the triangle.
     Returns:
         The length of the triangle's hypotenuse.
     """
@@ -150,7 +108,7 @@ def prob3(a,b):
     return sqrt(a2plusb2)
 
 
-# Problem 4
+# Old Problem 4
 def prob4():
     """If no command line argument is given, print "No Input."
     If anything other than "matrices.npz is given, print "Incorrect Input."
@@ -184,6 +142,56 @@ def prob4():
         method3(A,B)
         print(time.time() - start)
 
+# Problem 4
+def shut_the_box():
+
+    # Get the player's name.
+    if len(sys.argv) != 2:
+        player = raw_input("Player name: ")
+    else:
+        player = sys.argv[1]
+
+    # Initialize the box.
+    numbers = range(1,10)
+
+    # Take a turn until either the player wins or gets a game over.
+    while len(numbers) > 0:
+        if sum(numbers) <= 6:       # Roll a single die.
+            roll = randint(1,6)
+        else:                       # Roll two dice.
+            roll = randint(1,6) + randint(1,6)
+
+        # Print the game information.
+        print "\nNumbers left:", numbers
+        print "Roll:", roll
+        if not isvalid(roll, numbers):
+            print "Game over!"
+            break
+
+        # Choose a valid integer or integers to eliminate.
+        choices = []
+        while len(choices) == 0:
+            # Parse the player's input.
+            choices = parse_input(raw_input("Numbers to eliminate: "), numbers)
+            # Make sure the player's choices actually sum up to the roll.
+            if sum(choices) == roll:
+                # Remove the player's choices from the remaining numbers.
+                for number in choices:
+                    numbers.remove(number)
+            # Report invalid input and go back to the top of the inner loop.
+            else:
+                print "Invalid input"
+                choices = []
+
+    # Report the player's final score.
+    score = sum(numbers)
+    print("\nScore for player " + player + ": " + str(score) + " points")
+    # or print("\nScore for player {}: {} points".format(player, score))
+    if score == 0:
+        print("Congratulations!! You shut the box!")
+    print ""
+
+
 if __name__ == "__main__":
-    prob4()
+    shut_the_box()
 

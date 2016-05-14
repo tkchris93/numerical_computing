@@ -1,7 +1,7 @@
 # solutions.py
 """Introductory Labs: The Standard Library. Solutions file."""
 
-import os
+from subprocess import call
 from numpy.random import randint
 from solutions import prob1, prob2, prob3
 
@@ -38,7 +38,6 @@ def _timeout(seconds):
         return wraps(func)(wrapper)
     return decorator
 
-# Test Script and Class =======================================================
 
 # Test script
 def test(student_module):
@@ -187,16 +186,20 @@ class _testDriver(object):
     def problem4(self, s):
         """Test prob4() (using another module). 15 points."""
 
-        print("Testing Problem 4")
-        print("Correct outputs:")
-        os.system("python solutions.py")
-        os.system("python solutions.py Wrong Name")
-        os.system("python solutions.py matrices.npz")
-        print("\nStudent outputs:")
-        os.system('python ' + s.__file__)
-        os.system('python ' + s.__file__ + ' "Wrong Name"')
-        os.system('python ' + s.__file__ + ' "matrices.npz"')
-        return self._grade(15, "Incorrect outputs")
+        print("\n------- Testing Problem 4: Play 'Shut the Box' twice -------")
+        call(["python", s.__file__, "TA"])
+        call(["python", s.__file__])
+        return self._grade(15, "'Shut the box' does not match specifications")
+
+        # print("Correct outputs:")
+        # os.system("python solutions.py")
+        # os.system("python solutions.py Wrong Name")
+        # os.system("python solutions.py matrices.npz")
+        # print("\nStudent outputs:")
+        # os.system('python ' + s.__file__)
+        # os.system('python ' + s.__file__ + ' "Wrong Name"')
+        # os.system('python ' + s.__file__ + ' "matrices.npz"')
+
 
 
 # Validation ==================================================================
