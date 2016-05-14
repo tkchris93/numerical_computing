@@ -4,6 +4,40 @@
 from numpy.random import randint
 from solutions import *
 
+import signal
+from functools import wraps
+
+def _timeout(seconds):
+    """Decorator for preventing a function from running for too long.
+
+    Inputs:
+        seconds (int): The number of seconds allowed.
+
+    Notes:
+        This decorator uses signal.SIGALRM, which is only available on Unix.
+    """
+    assert isinstance(seconds, int), "@timeout(sec) requires an int"
+    
+    class TimeoutError(Exception):
+        pass
+
+    def _handler(signum, frame):
+        """Handle the alarm by raising a custom exception."""
+        raise TimeoutError("Timeout after {0} seconds".format(seconds))
+
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            signal.signal(signal.SIGALRM, _handler)
+            signal.alarm(seconds)               # Set the alarm.
+            try:
+                result = func(*args, **kwargs)
+            finally:
+                signal.alarm(0)                 # Turn the alarm off.
+            return result
+        return wraps(func)(wrapper)
+    return decorator
+
+
 # Test script        
 def test(student_module):
     """Test script. Import the student's solutions file as a module.
@@ -12,8 +46,8 @@ def test(student_module):
     10 points for problem 3
      5 points for problem 4
      5 points for problem 5
-     5 points for problem 6
-    10 points for problem 8
+    10 points for problem 6
+     5 points for problem 7
     
     Parameters:
         student_module: the imported module for the student's file.
@@ -64,8 +98,8 @@ class _testDriver(object):
         test_one(self.problem3, "Problem 3", 10)    # Problem 3: 10 points.
         test_one(self.problem4, "Problem 4",  5)    # Problem 4:  5 points.
         test_one(self.problem5, "Problem 5",  5)    # Problem 5:  5 points.
-        test_one(self.problem6, "Problem 6",  5)    # Problem 6:  5 points.
-        test_one(self.problem7, "Problem 7", 10)    # Problem 7: 10 points.
+        test_one(self.problem6, "Problem 6", 10)    # Problem 6: 10 points.
+        test_one(self.problem7, "Problem 7",  5)    # Problem 7:  5 points.
 
         # Report final score.
         percentage = (100. * self.score) / total
@@ -120,6 +154,7 @@ class _testDriver(object):
 
 
     # Problems ----------------------------------------------------------------
+    @_timeout(5)
     def problem2(self, s):
         """Test sphere_volume(). 5 Points."""
         if not hasattr(s, "sphere_volume"):
@@ -133,6 +168,7 @@ class _testDriver(object):
                                             "sphere_volume(3.14) failed")
         return points
 
+    @_timeout(5)
     def problem3(self, s):
         """Test first_half() and backward(). 10 points."""
         if not hasattr(s, "first_half") or not hasattr(s, "backward"):
@@ -152,6 +188,7 @@ class _testDriver(object):
                                             "first_half('TK421') failed")
         return points
 
+    @_timeout(5)
     def problem4(self, s):
         """Test list_ops(). 5 points."""
         if not hasattr(s, "list_ops"):
@@ -161,6 +198,7 @@ class _testDriver(object):
         
         return 5*self._eqTest(list_ops(), s.list_ops(), "list_ops() failed")
 
+    @_timeout(5)
     def problem5(self, s):
         """Test pig_latin(). 5 points."""
         if not hasattr(s, "pig_latin"):
@@ -176,22 +214,24 @@ class _testDriver(object):
                                         "pig_latin('university') failed")
         return points
 
+    @_timeout(10)
     def problem6(self, s):
-        """Test int_to_string(). 5 points.""" 
-        if not hasattr(s, "int_to_string"):
+        """Test palindrome(). 5 points.""" 
+        if not hasattr(s, "palindrome"):
             raise NotImplementedError("Problem 6 Incomplete")
-        if s.int_to_string([1]) is None:
-            raise NotImplementedError("int_to_string() returned nothing")
-        
-        points = 2*self._eqTest(int_to_string([1, 2, 3]),
-                                s.int_to_string([1, 2, 3]),
-                                    "int_to_string([1, 2, 3]) failed")
-        points += 3*self._eqTest(
-                        int_to_string([24, 25, 12, 15, 16, 8, 15, 14, 5]),
-                        s.int_to_string([24, 25, 12, 15, 16, 8, 15, 14, 5]),
-            "int_to_string([24, 25, 12, 15, 16, 8, 15, 14, 5]) failed")
-        return points
+        if s.palindrome() is None:
+            raise NotImplementedError("palindrome() returned nothing")
 
+        correct, student = palindrome(), s.palindrome()
+        if correct > student:
+            self.feedback += "\npalindrome() failed: {} is too low".format(
+                                                                    student)
+        elif correct < student: 
+            self.feedback += "\npalindrome() failed: {} is too high".format(
+                                                                    student)
+        return 10 if correct == student else 0
+        
+    @_timeout(5)
     def problem7(self, s):
         """Test alt_harmonic(). 10 points."""
         if not hasattr(s, "alt_harmonic"):
@@ -199,12 +239,12 @@ class _testDriver(object):
         if s.alt_harmonic(10) is None:
             raise NotImplementedError("alt_harmonic() returned nothing")
 
-        points = 4*self._eqTest(alt_harmonic(100), s.alt_harmonic(100),
+        points = 2*self._eqTest(alt_harmonic(100), s.alt_harmonic(100),
                                             "alt_harmonic(100) failed")
-        points += 6*self._eqTest(alt_harmonic(5000), s.alt_harmonic(5000),
+        points += 3*self._eqTest(alt_harmonic(5000), s.alt_harmonic(5000),
                                             "alt_harmonic(5000) failed")
         return points
 
 if __name__ == '__main__':
-    import solutions as sol
-    score, feedback = test(sol)
+    import solutions
+    test(solutions)

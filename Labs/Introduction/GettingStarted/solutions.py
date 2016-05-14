@@ -79,31 +79,20 @@ def pig_latin(word):
         return word + "hay"
     else:
         return word[1:] + word[0] + "ay"
-        
 
-# Problem 6
-def int_to_string(my_list):
-    """Translate 'my_list', a list of numbers 1-26, to corresponding
-    lowercase letters of the alphabet. 1 -> a, 2 -> b, 3 -> c, and so on.
-    
-    Example:
-        >>> int_to_string([13, 1, 20, 8])
-        ['m', 'a', 't', 'h'] 
+# New Problem 6
+def palindrome():
+    """Find and retun the largest panindromic number made from the product
+    of two 3-digit numbers.
     """
-    # Using a list comprehension.
-    alphabet = "abcdefghijklmnopqrstuvwxyz"
-    return [alphabet[i-1] for i in my_list]
-
-    # Using a dictionary.
-    my_dictionary = {1:'a',  2:'b',  3:'c',  4:'d',  5:'e',  6:'f',  7:'g',
-                     8:'h',  9:'i', 10:'j', 11:'k', 12:'l', 13:'m', 14:'n',
-                    15:'o', 16:'p', 17:'q', 18:'r', 19:'s', 20:'t', 21:'u',
-                    22:'v', 23:'w', 24:'x', 25:'y', 26:'z'}
-    output = []
-    for number in my_list:
-        output.append(my_dictionary[number])
-    return output
-
+    winner = 0
+    for n in xrange(100,1000):
+        for m in xrange(n,1000):
+            product = n*m
+            num = str(product)
+            if num == num[::-1] and product > winner:
+                winner = product
+    return winner
 
 # Problem 7
 def alt_harmonic(n):
