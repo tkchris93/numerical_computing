@@ -97,7 +97,7 @@ def palindrome():
 # Problem 7
 def alt_harmonic(n):
     """Return the partial sum of the first n terms of the alternating
-    harmonic series. Use this function to approximae ln(2).
+    harmonic series. Use this function to approximate ln(2).
     """
     return sum([(-1)**(i+1)/float(i) for i in xrange(1,n)])
 

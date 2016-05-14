@@ -40,18 +40,14 @@ def backward(my_string):
 
 
 # Problem 4
-def list_ops(my_list):
-    """Perform the following operations on the list 'my_list':
-        - Append "elephant".
-        - Remove "ant"
+def list_ops():
+    """Define a list with the entries "bear", "ant", "dog", and "cat".
+    Perform the following operations on the list:
+        - Append "eagle".
         - Remove the entry at index 1.
-        - Replace the entry at index 2 with "eagle".
+        - Replace the entry at index 2 with "fox".
         - Append "fox".
     Return the resulting list.
-
-    Examples:
-        >>> list_ops(["ant", "bear", "cat", "dog"])
-        ['bear', 'dog', 'eagle', 'fox']
     """
     pass
 
@@ -70,13 +66,9 @@ def pig_latin(word):
 
 
 # Problem 6
-def int_to_string(my_list):
-    """Translate 'my_list', a list of numbers 1-26, to corresponding
-    lowercase letters of the alphabet. 1 -> a, 2 -> b, 3 -> c, and so on.
-    
-    Example:
-        >>> int_to_string([13, 1, 20, 8])
-        ['m', 'a', 't', 'h'] 
+def palindrome():
+    """Find and retun the largest panindromic number made from the product
+    of two 3-digit numbers.
     """
     pass
 
@@ -84,9 +76,7 @@ def int_to_string(my_list):
 # Problem 7
 def alt_harmonic(n):
     """Return the partial sum of the first n terms of the alternating
-    harmonic series. Use this function to approximae ln(2).
+    harmonic series. Use this function to approximate ln(2).
     """
     pass
 
-
-# END OF FILE =================================================================
