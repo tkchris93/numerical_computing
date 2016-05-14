@@ -15,7 +15,7 @@ These Python basics are an essential part of almost every problem you will solve
 
 \section*{Python} % ===========================================================
 
-\subsection*{Installation} % ------------------------------------------------
+% \subsection*{Installation} % ------------------------------------------------
 % TODO: Update to Python 3
 
 Python is quickly gaining momentum as a fundamental tool in scientific computing.
@@ -30,11 +30,11 @@ For more information on installing Python and various libraries, see Appendices 
 
 \subsection*{Running Python} % ------------------------------------------------
 
-% TODO: shorten this section. Instead of talking about different options for IDEs, tell them to use a plain text editor in conjunction with a Unix shell.
 Python files are saved with a \texttt{.py} extension.
-For beginners, we strongly recommend using a simple text editor for programming in Python, though many free many free IDEs (Integrated Development Environments---large applications that facilitate code development with some sophisticated tools) are also compatible with Python.
-% Some of the more popular text editors are described in Appendix \ref{pythoninstall}.
-A typical Python file looks similar to the code on the following page:
+For beginners, we strongly recommend using a simple text editor\footnote{Some of the more popular text editors are described in Appendix \ref{pythoninstall}.} for writing Python files, though many free IDEs (Integrated Development Environments---large applications that facilitate code development with some sophisticated tools) are also compatible with Python.
+For now, the simpler the coding environment, the better.
+
+A plain Python file looks similar to the code on the following page:
 
 \begin{lstlisting}
 # filename.py
@@ -42,12 +42,8 @@ A typical Python file looks similar to the code on the following page:
 The header contains basic information about the file.
 """
 
-def main():
-    """This is a docstring. It provides information about the function."""
-    print("Hello, world!")
-
 if __name__ == "__main__":
-    main()
+    pass                            # 'pass' is a temporary placeholder.
 \end{lstlisting}
 
 The \li{#} character creates a single-line \emph{comment}.
@@ -59,21 +55,19 @@ A pair of three quotes, \li{""" """} or \li{''' '''}, creates a multi-line strin
 A triple-quoted string literal at the top of the file serves as the \emph{header} for the file.
 The header typically includes the author, instructions on how to use the file, and so on.
 Executable Python code comes after the header.
-% In the above example, we have a single function called \li{main()} that prints ``Hello, world!'' to the screen.
 
 Finally, each statement under the \li{if __name__ == "__main__"} clause is executed when the file is run.
-Any ``orphan'' statements that are not placed under this clause are also executed when the file is run, but it is generally considered bad practice to leave statements outside of function definitions or under the clause.
-% However, it is good practice to write almost all code within functions, then call those functions under the \li{if __name__ == "__main__"} clause.
-
-% Finally, each statement under the if __name__ == "__main__" clause is executed when the file is run. Any “orphan” statements that are not within a function definition, but not under the if __name__ == "__main__" clause, will also be executed when the file is run.
+Any ``orphan'' statements that are not placed under this clause are also executed when the file is run, but it is generally considered bad practice to leave any statements outside of function definitions or under the clause.
 
 \begin{problem} % Problem: Run a file that prints "Hello, world!"
 Create a new Python file and save it to your file system.
 Write the file name and a brief header at the top, then add the following code:
+
 \begin{lstlisting}
 if __name__ == "__main__":
     print("Hello, world!")
 \end{lstlisting}
+
 Open a Unix shell (often called a \emph{terminal} or a \emph{command line}) and navigate to the directory where the new file is saved.
 Use the command \li{ls} to list the files in the current directory, \li{pwd} to print the working directory, and \li{cd} to change directories.
 Below, the \li{\$} character indicates that the command is being run from the shell.
@@ -89,13 +83,14 @@ $ pwd
 $ ls
 getting_started.py
 \end{lstlisting}
+
 Now that we are in the same directory as the Python file, we can execute it using the following command:
 
 \begin{lstlisting}
 $ python getting_started.py
 \end{lstlisting}
 
-If ``Hello, world!'' is displayed on the screen, you have just successfully executed your first Python program.
+If ``Hello, world!'' is displayed on the screen, you have just successfully executed your first Python program!
 \label{prob:helloWorld}
 \end{problem}
 
@@ -112,12 +107,13 @@ $ python                                # Start the Python interpreter.
 \end{lstlisting}
 
 There are, however, more useful interfaces.
-Chief among these is IPython.
+Chief among these is \emph{IPython}.
 To execute a script in IPython, use the \li{run} command.
 
 \begin{lstlisting}
 >>> quit()                              # Exit the Python interpreter.
 $ ipython                               # Start IPython.
+
 In [1]: print("This is IPython!")       # Execute some code.
 <<This is IPython!>>
 
@@ -147,15 +143,20 @@ In [2]: help(list)
 class list(object)
  |  list() -> new empty list
  |  list(iterable) -> new list initialized from iterable's items
- |  ...>>                           # Press 'q' to exit the info screen.
-\end{lstlisting}
+ |  
+ |  Methods defined here:
+ |  
+ |  __add__(...)
+ |      x.__add__(y) <==> x+y>>       # Press 'q' to exit the info screen.
+ \end{lstlisting}
 
-Use IPython side-by-side with a text editor or an IDE to test code snippets and syntax.
-Testing code in IPython before putting it into your program helps you catch errors beforehand and greatly speeds up the coding process.
-If you cannot answer a coding question using these strategies, search the internet.
-In particular, \href{http://stackoverflow.com/}{stackoverflow.com} is often a valuable resource for answering programming questions.
+Use IPython side-by-side with a text editor to test syntax and small code snippets.
+Testing code in IPython \emph{before} putting it into a program helps you catch errors beforehand and greatly speeds up the coding process.
 
-\begin{comment}
+If you cannot answer a coding question using these strategies, search the Internet.
+In particular, \href{http://stackoverflow.com/}{stackoverflow.com} is often a valuable resource for answering common programming questions.
+
+\begin{comment} % Overkill -- this will just confuse students.
 The Anaconda distribution also includes three additional interfaces: Notebook, QTConsole, and Spyder.
 IPython Notebook (also know as Jupyter) is displayed in a web browser and has many features that are particularly useful for presentations and for running separated blocks of code.
 The QTConsole is a console that communicates with Jupyter more fluidly than the regular IPython console.
