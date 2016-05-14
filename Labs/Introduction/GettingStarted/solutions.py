@@ -43,23 +43,25 @@ def backward(my_string):
 
 
 # Problem 4
-def list_ops(my_list):
-    """Perform the following operations on the list 'my_list':
-        - Append "elephant".
-        - Remove "ant"
+def list_ops():
+    """Define a list with the entries "bear", "ant", "dog", and "cat".
+    Perform the following operations on the list:
+        - Append "eagle".
         - Remove the entry at index 1.
-        - Replace the entry at index 2 with "eagle".
+        - Replace the entry at index 2 with "fox".
         - Append "fox".
+    Return the resulting list.
 
     Examples:
-        >>> list_ops(["ant", "bear", "cat", "dog"])
-        ['bear', 'dog', 'eagle', 'fox']
+        >>> list_ops()
+        ['fox', 'eagle', 'dog', 'bear']
     """
-    my_list.append("elephant")
-    my_list.remove("ant")
-    my_list.remove(my_list[1])
-    my_list[2] = "eagle"
-    my_list.append("fox")
+    my_list = ["bear", "ant", "dog", "cat"]
+    my_list.append("eagle")
+    my_list.pop(1)                  # or my_list.remove(my_list[1])
+    my_list[2] = "fox"
+    my_list.sort()
+    my_list = my_list[::-1]         # or my_list.reverse()
     return my_list
 
 
@@ -77,38 +79,25 @@ def pig_latin(word):
         return word + "hay"
     else:
         return word[1:] + word[0] + "ay"
-        
 
-# Problem 6
-def int_to_string(my_list):
-    """Translate 'my_list', a list of numbers 1-26, to corresponding
-    lowercase letters of the alphabet. 1 -> a, 2 -> b, 3 -> c, and so on.
-    
-    Example:
-        >>> int_to_string([13, 1, 20, 8])
-        ['m', 'a', 't', 'h'] 
+# New Problem 6
+def palindrome():
+    """Find and retun the largest panindromic number made from the product
+    of two 3-digit numbers.
     """
-    # Using a list comprehension.
-    alphabet = "abcdefghijklmnopqrstuvwxyz"
-    return [alphabet[i-1] for i in my_list]
-
-    # Using a dictionary.
-    my_dictionary = {1:'a',  2:'b',  3:'c',  4:'d',  5:'e',  6:'f',  7:'g',
-                     8:'h',  9:'i', 10:'j', 11:'k', 12:'l', 13:'m', 14:'n',
-                    15:'o', 16:'p', 17:'q', 18:'r', 19:'s', 20:'t', 21:'u',
-                    22:'v', 23:'w', 24:'x', 25:'y', 26:'z'}
-    output = []
-    for number in my_list:
-        output.append(my_dictionary[number])
-    return output
-
+    winner = 0
+    for n in xrange(100,1000):
+        for m in xrange(n,1000):
+            product = n*m
+            num = str(product)
+            if num == num[::-1] and product > winner:
+                winner = product
+    return winner
 
 # Problem 7
 def alt_harmonic(n):
     """Return the partial sum of the first n terms of the alternating
-    harmonic series. Use this function to approximae ln(2).
+    harmonic series. Use this function to approximate ln(2).
     """
     return sum([(-1)**(i+1)/float(i) for i in xrange(1,n)])
 
-
-# END OF FILE =================================================================
