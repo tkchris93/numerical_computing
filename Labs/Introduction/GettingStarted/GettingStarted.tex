@@ -101,8 +101,8 @@ The most basic of these is the Python interpreter.
 In this and subsequent labs, the triple brackets \li{>>>} indicate that the given code is being executed one line at a time via the Python interpreter.
 
 \begin{lstlisting}
-$ python                                # Start the Python interpreter.
->>> print("This is plain Python.")      # Execute some code.
+$ python                            # Start the Python interpreter.
+>>> print("This is plain Python.")  # Execute some code.
 <<This is plain Python.>>
 \end{lstlisting}
 
@@ -111,13 +111,13 @@ Chief among these is \emph{IPython}.
 To execute a script in IPython, use the \li{run} command.
 
 \begin{lstlisting}
->>> quit()                              # Exit the Python interpreter.
-$ ipython                               # Start IPython.
+>>> quit()                          # Exit the Python interpreter.
+$ ipython                           # Start IPython.
 
-In [1]: print("This is IPython!")       # Execute some code.
+In [1]: print("This is IPython!")   # Execute some code.
 <<This is IPython!>>
 
-In [2]: run getting_started.py          # Run a particular Python script.
+In [2]: run getting_started.py      # Run a particular Python script.
 Hello, world!
 \end{lstlisting}
 
@@ -137,18 +137,18 @@ In [1]: list.append?
 <<Docstring:    L.append(object) -- append object to end
 Type:         method_descriptor>>
 
-In [2]: help(list)
+In [2]: help()                      # Start IPython's interactive help utility.
+
+<<help>>> list                          # Get documentation on the list class.
 <<Help on class list in module __builtin__:
 
 class list(object)
  |  list() -> new empty list
  |  list(iterable) -> new list initialized from iterable's items
- |  
- |  Methods defined here:
- |  
- |  __add__(...)
- |      x.__add__(y) <==> x+y>>       # Press 'q' to exit the info screen.
- \end{lstlisting}
+ |  ...>>                             # Press 'q' to exit the info screen.
+
+<<help>>> quit                          # End the interactive help session.
+\end{lstlisting}
 
 Use IPython side-by-side with a text editor to test syntax and small code snippets.
 Testing code in IPython \emph{before} putting it into a program helps you catch errors beforehand and greatly speeds up the coding process.
@@ -167,7 +167,7 @@ Try using each of these interfaces until you find the one you are most comfortab
 
 \section*{Python Basics} % ====================================================
 
-\subsection*{Arithmetic} % ----------------------------------------------------
+\subsection*{Arithmetic} % --------------------------------------------------
 We can now dive into the particulars of Python syntax.
 To begin, Python can be used as a calculator.
 Use \li{**} for exponentiation.
@@ -255,7 +255,7 @@ That is, if it is not specified in the function call, the variable \li{c} will c
 
 \begin{lstlisting}
 >>> def printer(a, b, c=0):
-...    print(a, b, c)
+...    print a, b, c
 ...
 >>> printer(1, 2, 3)                # Specify each parameter.
 1 2 3
@@ -266,12 +266,13 @@ That is, if it is not specified in the function call, the variable \li{c} will c
 Arguments are passed to functions based on position or name, and positional arguments must be defined before named arguments.
 For example, \li{a} and \li{b} must come before \li{c} in the function definition of \li{printer()}.
 Examine the following code block demonstrating how positional and named arguments are used to call a function.
+
 \begin{lstlisting}
 # Try defining printer with a named argument before a positional argument.
 >>> def printer(c=0, a, b):
-...    print(a, b, c)
+...    print a, b, c
 ...
-SyntaxError: invalid syntax
+SyntaxError: non-default argument follows default argument
 
 # Correctly define printer with the named argument after positional arguments.
 >>> def printer(a, b, c=0):
@@ -295,7 +296,7 @@ SyntaxError: invalid syntax
 1 3 2
 \end{lstlisting}
 
-Finally, In Python, functions can return more than one value.
+Finally, Python functions can return more than one value.
 Simply separate the values by commas after the \li{return} statement.
 
 \begin{lstlisting}
@@ -345,6 +346,7 @@ Run your file to see if your answer is what you expect it to be.
 \section*{Data Types} % =======================================================
 
 \subsection*{Numerical Types} % -----------------------------------------------
+
 Python has four numerical data types: \li{int}, \li{long}, 
 \li{float}, and \li{complex}.
 Each stores a different kind of number.
