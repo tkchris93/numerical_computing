@@ -204,6 +204,7 @@ True
 \end{lstlisting}
 
 \subsection*{Variables} % -----------------------------------------------------
+
 Variables are used to temporarily store data.
 A \emph{single} equals sign assigns one or more values (on the right) to one or more variable names (on the left).
 A \emph{double} equals sign is a comparison operator, as in the previous code block.
@@ -247,7 +248,7 @@ The values \li{2} and \li{5} are the arguments that are passed when calling the 
 
 \begin{lstlisting}
 >>> def area(width, height):
-...     return width*height
+...     return width * height
 ...         
 >>> area(2, 5)
 10
@@ -269,7 +270,7 @@ That is, if it is not specified in the function call, the variable \li{c} will c
 
 Arguments are passed to functions based on position or name, and positional arguments must be defined before named arguments.
 For example, \li{a} and \li{b} must come before \li{c} in the function definition of \li{printer()}.
-Examine the following code block demonstrating how positional and named arguments are used to call a function.
+Examine the following code blocks demonstrating how positional and named arguments are used to call a function.
 
 \begin{lstlisting}
 # Try defining printer with a named argument before a positional argument.
@@ -277,30 +278,32 @@ Examine the following code block demonstrating how positional and named argument
 ...    print a, b, c
 ...
 SyntaxError: non-default argument follows default argument
+\end{lstlisting}
 
-# Correctly define printer with the named argument after positional arguments.
+\begin{lstlisting}
+# Correctly define printer() with the named argument after positional arguments.
 >>> def printer(a, b, c=0):
-...    print(a, b, c)
+...    print a, b, c
 ...
 
-# Call printer with 3 positional arguments.
+# Call printer() with 3 positional arguments.
 >>> printer(2, 4, 6)
 2 4 6
 
-# Call printer with 3 named arguments. Note the change in order.
+# Call printer() with 3 named arguments. Note the change in order.
 >>> printer(b=3, c=5, a=7)
 7 3 5
 
-# Call printer with 2 named arguments, excluding c.
+# Call printer() with 2 named arguments, excluding c.
 >>> printer(b=1, a=2)
 2 1 0
 
-# Call printer with 1 positional argument and 2 named arguments.
+# Call printer() with 1 positional argument and 2 named arguments.
 >>> printer(1, c=2, b=3)
 1 3 2
 \end{lstlisting}
 
-Finally, Python functions can return more than one value.
+Python functions can return more than one value.
 Simply separate the values by commas after the \li{return} statement.
 
 \begin{lstlisting}
@@ -314,13 +317,13 @@ Simply separate the values by commas after the \li{return} statement.
 3 10
 \end{lstlisting}
 
-\begin{info} % Difference between print and return
+\begin{info} % Note on the difference between print and return.
 The functions \li{area()} and \li{printer()} defined above have an important difference: \li{area()} ends with a \li{return} statement, but \li{printer()} lacks a \li{return} statement.
 
 The \li{return} statement instantly ends the function call and passes the return value to the function caller.
 The \li{print} statement does nothing more than display the value of a given object (or objects) in the terminal.
 % TODO: print is a function in Python 3.
-A function without a return statement implicitly returns the Python constant \li{None}, which is similar to the \li{null} special value of many other languages.
+A function without a return statement implicitly returns the Python constant \li{None}, which is similar to the special value \li{null} of many other languages.
 
 \begin{lstlisting}
 >>> x = area(2, 4)              # Calling area() doesn't print anything,
@@ -329,13 +332,12 @@ A function without a return statement implicitly returns the Python constant \li
 
 >>> print(x)                    # However, x now contains a value,
 8
-
 >>> print(y)                    # whereas y only contains 'None'.
 None
 \end{lstlisting}
-
-If you have any intention of using the results of a function, always use a \li{return} statement.
-The returned value or values can then be stored in variables for later use.
+%
+% If you have any intention of using the results of a function, always use a \li{return} statement.
+% The returned value or values can then be stored in variables for later use.
 \end{info}
 
 \begin{problem} % Problem: write a very basic function.
