@@ -169,9 +169,33 @@ def gradient_descent_totalvariation(imagename,time_steps=120):
 										(epsilon + z_x[1:-1,1:-1]**2. + z_y[1:-1,1:-1]**2.)**(3./2) )
 										)
 	
+	
+	
+	def total_variation_properly_regularized(z): # Not yet working. 
+		lmbda = .02
+		epsilon = 3e-7
+		# Approximate first and second derivatives to second order accuracy.
+		z_x = (np.roll(z,-1,axis=0) - np.roll(z,1,axis=0))/2. # (2.*delta_x)
+		z_y	 = (np.roll(z,-1,axis=1) - np.roll(z,1,axis=1))/2. # (2.*delta_y)
+		
+		z_xy = (np.roll(z_x,-1,axis=1) - np.roll(z_x,1,axis=1))/2. # (2.*delta_y)
+		z_yx = (np.roll(z_y,-1,axis=0) - np.roll(z_y,1,axis=0))/2. # (2.*delta_x)
+		
+		z_xx = (np.roll(z,-1,axis=0) - 2.*z + np.roll(z,1,axis=0))
+		z_yy = (np.roll(z,-1,axis=1) - 2.*z + np.roll(z,1,axis=1))
+		# Find approximation for the next time step, using a first order Euler step
+		z[1:-1,1:-1] -= delta_t*(	lmbda*(z[1:-1,1:-1]-IM[1:-1,1:-1])#*( (epsilon + z_x[1:-1,1:-1]**2. + z_y[1:-1,1:-1]**2.)**(3./2) )
+									  -(z_xx[1:-1,1:-1]*((z_y[1:-1,1:-1]+epsilon)**2.) + 
+										z_yy[1:-1,1:-1]*((z_x[1:-1,1:-1]+epsilon)**2.) - 
+										(z_x[1:-1,1:-1]+epsilon)*(z_y[1:-1,1:-1]+epsilon)*(z_xy[1:-1,1:-1] + z_yx[1:-1,1:-1])
+										)/ (
+										((z_x[1:-1,1:-1] + epsilon)**2. + (z_y[1:-1,1:-1] + epsilon)**2.)**(2./2) )
+								  )
+		
+		
 	def total_variation_numexpr(z):
-		lmbda = 1.
-		epsilon = 2e-7
+		lmbda = .02
+		epsilon = 1e-8
 		dt = delta_t
 		
 		# temporary arrays
@@ -191,9 +215,12 @@ def gradient_descent_totalvariation(imagename,time_steps=120):
 		
 		numerator = np.zeros(z.shape)
 		denominator = np.zeros(z.shape)
-		ne.evaluate('(z_N - 2*z + z_S)*z_y*z_y + (z_E - 2*z + z_W)*z_x*z_x - .5*z_x*z_y*(z_N + z_E - z_S - z_W)',out=numerator)
-		ne.evaluate('(epsilon + z_x**2. + z_y**2.)',out=denominator)
-		ne.evaluate('denominator**(3/2.)',out=denominator)
+		# ne.evaluate('(z_N - 2*z + z_S)*(z_y*z_y) + (z_E - 2*z + z_W)*(z_x*z_x) - .5*z_x*z_y*(z_N + z_E - z_S - z_W)',out=numerator)
+		# ne.evaluate('(epsilon + z_x**2. + z_y**2.)',out=denominator)
+		# ne.evaluate('denominator**(3/2.)',out=denominator)
+		ne.evaluate('(z_N - 2*z + z_S)*(z_y+epsilon)*(z_y+epsilon) + (z_E - 2*z + z_W)*(z_x+epsilon)*(z_x+epsilon) - .5*(z_x+epsilon)*(z_y+epsilon)*(z_N + z_E - z_S - z_W)',out=numerator)
+		ne.evaluate('( (z_x+epsilon)**2. + (z_y+epsilon)**2.)',out=denominator)
+		ne.evaluate('denominator**(2/2.)',out=denominator)
 		
 		ne.evaluate('z-dt*( lmbda*(z-new_IM) - numerator/denominator )',out=znew)
 		z[1:-1,1:-1] = znew[1:-1,1:-1]
@@ -203,8 +230,8 @@ def gradient_descent_totalvariation(imagename,time_steps=120):
 		
 		
 	def total_variation_fd1(z):
-		lmbda = 1.
-		epsilon = 2e-7
+		lmbda = .05
+		epsilon = 1e-7
 		# Approximate first and second derivatives to first order accuracy.
 		z_x = (np.roll(z,-1,axis=0) - np.roll(z,0,axis=0))
 		z_y	 = (np.roll(z,-1,axis=1) - np.roll(z,0,axis=1))
@@ -226,9 +253,11 @@ def gradient_descent_totalvariation(imagename,time_steps=120):
 	# Time step until successive iterations are close
 	iteration = 0
 	while iteration < time_steps:
-		total_variation_numexpr(u[1])
+		total_variation(u[1])
+		# total_variation_properly_regularized(u[1])
+		# total_variation_numexpr(u[1])
 		# total_variation_fd1(u[1])
-		if norm(np.abs((u[0] - u[1]))) < 1e-6:
+		if norm(np.abs((u[0] - u[1]))) < 1e-4:#1e-6:
 			break
 		print(iteration, norm(np.abs((u[0] - u[1]))) )
 		u[0] = u[1]

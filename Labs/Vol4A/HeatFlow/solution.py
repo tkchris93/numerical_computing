@@ -65,11 +65,14 @@ def heat_Crank_Nicolson(init_conditions,x_subintervals,t_subintervals,x_interval
 	data = np.concatenate((D0,D1,D1),axis=0) # This stacks up rows
 	A=spdiags(data,diags,(x_subintervals-1),(x_subintervals-1)).asformat('csr') 
 	# print K
-	# print A.todense()
+	
 	D0,D1,diags = (1.+2.*K)*np.ones((1,(x_subintervals-1))), -K*np.ones((1,(x_subintervals-1))), np.array([0,-1,1])
 	data = np.concatenate((D0,D1,D1),axis=0) # This stacks up rows
 	B=spdiags(data,diags,(x_subintervals-1),(x_subintervals-1)).asformat('csr')
 	
+	if t_subintervals ==8:
+		print "A = ", A.todense()
+		print "B = ", B.todense()
 	U = np.zeros((x_subintervals+1,t_subintervals+1))
 	U[:,0] = init_conditions 
 	for j in range(0,int(t_subintervals)+1):

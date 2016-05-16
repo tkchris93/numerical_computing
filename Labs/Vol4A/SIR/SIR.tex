@@ -74,7 +74,7 @@
 %
 %
 % \section*{The SIR Model}
-The SIR model describes the spread of an epidemic throughout a large population.
+The SIR model describes the spread of an epidemic through a large population.
 It does this by describing the movement of the population through three phases of the disease: those individuals who are \emph{susceptible}, those who are \emph{infectious}, and those who have been \emph{removed} from the disease.
 Those individuals in the removed class have either died, or have recovered from the disease and are now immune to it.
 If the outbreak occurs over a short period of time, we may reasonably assume that the total population is fixed, so that $S'(t) + I'(t) + R'(t) = 0$.
@@ -102,6 +102,15 @@ Since the derivatives sum to $0$, we have $I'(t) = - S'(t) - R'(t)$, so the  dif
 \frac{dR}{dt} &=\gamma I.
 \end{align*}
 
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{SIR1.pdf}
+\caption{Solution to Problem (\ref{prob_sir1})}
+\label{sir1}
+\end{figure}
+
+
 \begin{problem}
 Solve the IVP
 \begin{align*}
@@ -112,15 +121,10 @@ S(0) &= 1-6.25\cdot10^{-7},\\
 I(0) &= 6.25\cdot10^{-7},\\
 R(0) &=0,
 \end{align*}
-on the interval $[0,100]$. \label{prob_sir1}
+on the interval $[0,100]$, and plot your results.  See Figure \ref{sir1}. \label{prob_sir1}
 \end{problem}
 
-\begin{figure}[ht]
-\centering
-\includegraphics[width=\textwidth]{SIR1.pdf}
-\caption{Solution to Problem (\ref{prob_sir1})}
-\label{sir1}
-\end{figure}
+
 
 \begin{problem}
 Suppose that, in a city of approximately three million, five have recently entered the city carrying a certain disease.
@@ -132,6 +136,8 @@ Find the solution of the corresponding SIR equations for the next fifty days.
 
 At the peak of the infection, how many in the city will still be able to work? (Assume for simplicity that those who are in the infectious state either cannot go to work or are unproductive, etc.)
 Answer the same question if instead of three days, an average of seven days is spent in the infectious state.
+
+Hint: Find the $t$ value that maximizes $I$. Then $(S + R)*3000000$ is the number of individuals who can work at the peak of the infection. 
 \end{problem}
 
 
@@ -140,9 +146,19 @@ Suppose that, in a city of approximately three million, five have recently enter
 (Suppose they have just entered the infectious state.)
 
 Each of those individuals will make three contacts every ten days that could spread the disease, and an average of four days is spent in the infectious state.
-Find the solution of the corresponding SIR equations.
-Choose an appropriate time interval and plot your results.
+Find the solution of the corresponding SIR equations and plot your results. See Figure \ref{sir:exercise3}.
+\label{prob_sir3}
 \end{problem}
+
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{exercise3.pdf}
+\caption{Solution to Problem (\ref{prob_sir3}).}
+\label{sir:exercise3}
+\end{figure}
+
+
 
 \section*{Variations on the SIR Model}
 

@@ -3,70 +3,67 @@
 
 \objective{Demonstrate the use of finite difference schemes in image analysis.}
 
-We will now look into one of the many applications of finite difference methods.
-It is often useful in image processing to remove extra static from an image.
-This is most easily done by simply blurring the image, but this has the unfortunate consequence of also blurring the boundary lines between distinct elements of the image.
-This blurring can be done by treating the image as a rectangular domain where we are applying the diffusion equation:
-\[u_t = b \Delta u\]
-where $b$ is some diffusion constant and $\Delta$ is the Laplace operator.
-In this simple case, the diffusion equation is the same as the heat equation.
+A common task in image processing is to remove extra static from an image.
+This is most easily done by simply blurring the image, which can be accomplished by  treating the image as a rectangular domain and applying the diffusion (heat) equation:
+\[u_t = c \Delta u\]
+where $c$ is some diffusion constant and $\Delta$ is the Laplace operator.
+Unfortunately, this also blurs the boundary lines between distinct elements of the image.
+
 A more general form of the diffusion equation in two dimensions is:
 \[u_t = \nabla\cdot \left( c(x,y,t) \nabla u \right)\]
 where $c$ is a function representing the diffusion coefficient at each given point and time.
 In this case, $\nabla \cdot$ is the divergence operator and $\nabla$ is the gradient. 
-If we want to blur a picture uniformly, we can allow $c$ to be constant, but we are often interested in \textit{preserving the edges} between features of the image.
-$c$ can be used to control how much diffusion is allowed at each point, so we would like to modify it so that it minimizes diffusion across edges in the image.
-If we can limit diffusion near the boundaries between different features of the image, we will be able to allow smaller details of the image to blur away while maintaining the overall form of the image.
-This is especially useful for denoising low quality images.
-This approach was first introduced by Pietro Perona and Jitendra Malik in 1987.
+
+To blur a picture uniformly, choose $c$ to be a constant function.  
+% , but we are often interested in \textit{preserving the edges} between features of the image.
+Since $c$ controls how much diffusion is allowed at each point, it can be modified so that diffusion is minimized across edges in the image.
+In this way we attempt to limit diffusion near the boundaries between different features of the image, and allow smaller details of the image (such as static) to blur away. 
+This method for image denoising is especially useful for denoising low quality images, and was first introduced by Pietro Perona and Jitendra Malik in 1987.
 It is known as Anisotropic Diffusion or Perona-Malik Diffusion.
 
+\section*{A Finite Difference Scheme}
 Suppose we have some estimate $E$ of the rate of change at a given point in an image.
-This means that $E$ will be large at boundaries in the image and small elsewhere.
+$E$ will be largest at the boundaries in the image.
 We will then let $c(x,y,t) = g(E(x,y,t))$ where $g$ is some function such that $g(0)=1$ and $\displaystyle{\lim_{x \to \infty} g(x) = 0}$.
-The idea here is that $c$ will be small where $E$ is large, so there will be little diffusion near the boundaries of different portions of the image.
+Thus $c$ will be small where $E$ is large, so that little diffusion occurs near the boundaries of different portions of the image.
 
-One way to model the evolution of this system is to use a finite differencing scheme where, at each time step, we have an array of values at a 2D grid of points.
-Here we will let $U_{l,m}^n$ be our discretized approximation of the function $u$, $n$ be the index in time, $l$ be the index along the $x$-axis, and $m$ be the index along the $y$-axis.
+We will model this system using a finite differencing scheme with an array of values at a 2D grid of points, and iterate through time.
+Let $U_{l,m}^n$ be the discretized approximation of the function $u$, $n$ be the index in time, $l$ be the index along the $x$-axis, and $m$ be the index along the $y$-axis.
 
-We will implement this idea of limiting diffusion at edges in the following way:
-The following finite difference scheme is consistent with the Laplace Operator:
-\[\Delta u = u_{xx}+u_{yy} \approx \frac{U_{l-1,m}^n - 2 U_{l,m}^n + U_{l+1,m}^n}{(\Delta x)^2} + \frac{U_{l,m-1}^n-2 U_{l,m}^n + U_{l,m+1}^n}{(\Delta y)^2}\]
-Since we are working with images, we may say, without loss of generality, that the distance between pixels is always one, so $\Delta x = \Delta y = 1$. Rearranging the terms we have:
-\[\Delta u \approx (U_{l-1,m}^n - U_{l,m}^n) + (U_{l+1,m}^n - U_{l,m}^n) + (U_{l,m-1}^n - U_{l,m}^n) + (U_{l,m+1}^n - U_{l,m}^n)\]
-
-Again, since we are working with images and not some time based problem, we may say, without loss of generality, that $\Delta t = 1$, so we will have the following finite difference scheme:
-\[U_{l,m}^{n+1} = U_{l,m}^n + (U_{l-1,m}^n - U_{l,m}^n) + (U_{l+1,m}^n - U_{l,m}^n) + (U_{l,m-1}^n - U_{l,m}^n) + (U_{l,m+1}^n - U_{l,m}^n)\]
-We will now limit the diffusion near the edges of objects by making the following modification:
+The Laplace operator can be approximated with the finite difference scheme
+\[\Delta u = u_{xx}+u_{yy} \approx \frac{U_{l-1,m}^n - 2 U_{l,m}^n + U_{l+1,m}^n}{(\Delta x)^2} + \frac{U_{l,m-1}^n-2 U_{l,m}^n + U_{l,m+1}^n}{(\Delta y)^2}.\]
+A good metric to use with images is to let the distance between each pixel be equal to one, so $\Delta x = \Delta y = 1$. 
+Rearranging terms, we obtain
+\[\Delta u \approx (U_{l-1,m}^n - U_{l,m}^n) + (U_{l+1,m}^n - U_{l,m}^n) + (U_{l,m-1}^n - U_{l,m}^n) + (U_{l,m+1}^n - U_{l,m}^n).\]
+Again, since we are working with images and not some time based problem, we can without loss of generality let $\Delta t = 1$, so we obtain the finite difference scheme
+\[U_{l,m}^{n+1} = U_{l,m}^n + (U_{l-1,m}^n - U_{l,m}^n) + (U_{l+1,m}^n - U_{l,m}^n) + (U_{l,m-1}^n - U_{l,m}^n) + (U_{l,m+1}^n - U_{l,m}^n).\]
+We will now limit the diffusion near the edges of objects by making the modification
 \begin{align*}
-U_{l,m}^{n+1} = U_{l,m}^n + & \lambda (g(|U_{l-1,m}^n - U_{l,m}^n|)(U_{l-1,m}^n - U_{l,m}^n) \\
+U_{l,m}^{n+1} = U_{l,m}^n + & \lambda \Big(g(|U_{l-1,m}^n - U_{l,m}^n|)(U_{l-1,m}^n - U_{l,m}^n) \\
 			&+ g(|U_{l+1,m}^n - U_{l,m}^n|)(U_{l+1,m}^n - U_{l,m}^n) \\
 			&+ g(|U_{l,m-1}^n - U_{l,m}^n|)(U_{l,m-1}^n - U_{l,m}^n) \\
-			&+ g(|U_{l,m+1}^n - U_{l,m}^n|)(U_{l,m+1}^n - U_{l,m}^n))
+			&+ g(|U_{l,m+1}^n - U_{l,m}^n|)(U_{l,m+1}^n - U_{l,m}^n)\Big),
 \end{align*}
+where $\lambda \leq \frac{1}{4}$ is the stability condition. 
 
-Where $\lambda \leq \frac{1}{4}$ for stability.
+In this difference scheme, each term is affected most by nearby terms that are most similar to it, so less diffusion will happen anywhere there is a sharp difference between pixels.
+This scheme also has the useful property that it does not increase or decrease the total brightness of the image.
+Intuitively, this is because the effect of each point on its neighbors is exactly the opposite effect its neighbors have on it.
 
-In this way, we allow each term to be affected most by the terms that are already the most similar to it, so less diffusion will happen anywhere where there is a sharp difference between pixels.
-
-This particular scheme has the useful property that it does not increase or decrease the total brightness of the image.
-Intuitively, this is because the effect of each point on each of its neighbors is exactly opposite the effect its neighbors have on it.
-
-Two good examples of commonly used functions for $g$ are $g(x) = e^{-\left(\frac{x}{\sigma}\right)^2}$ and $g(x) = \frac{1}{1+\left(\frac{x}{\sigma}\right)^2}$.
-In both cases, $\sigma$ is a parameter which allows us to control how sharply we decrease diffusion across boundaries.
-Larger $\sigma$ values allow more diffusion across boundaries.
-Also note that in both cases, $g(0) = 1$ and $\displaystyle{\lim_{x\to \infty} g(x) = 0}$.
-For our examples here we use $g(x)=e^{-\left(\frac{x}{\sigma}\right)^2}$.
+Two commonly used functions for $g$ are $g(x) = e^{-\left(\frac{x}{\sigma}\right)^2}$ and $g(x) = \frac{1}{1+\left(\frac{x}{\sigma}\right)^2}$.
+The parameter $\sigma$ allows us to control how much diffusion decreases across boundaries, with larger $\sigma$ values allowing more diffusion.
+Note that $g(0) = 1$ and $\displaystyle{\lim_{x\to \infty} g(x) = 0}$ for both functions.
+In this lab we use $g(x)=e^{-\left(\frac{x}{\sigma}\right)^2}$.
 
 It is worth noting that this particular difference scheme is \textit{not} an accurate finite difference scheme for the version of the diffusion equation we discussed before, but it \textit{does} accomplish the same thing in the same way.
 As it turns out, this particular scheme is the solution to a slightly different diffusion PDE, but can still be used the same way.
 
-For all of the examples here we have read in the image using the \li{scipy.misc.imread} function, and normalized it so that the colors are represented as floating point values between 0 and 1.
+For this lab's examples we read in the image using the \li{scipy.misc.imread} function, and normalized it so that the colors are represented as floating point values between 0 and 1.
 An image can converted to black and white when it is read by including the argument \li{flatten=True}
 
-We can implement the above finite difference scheme using purely vector operations.
+Our finite difference scheme can be implemented using purely vector operations.
 First consider the case where the boundaries of the image are considered fixed.
-A simple idea would be to do the following
+A simple idea would be to do 
 \begin{lstlisting}
 import numpy as np
 from scipy.misc import imread, imsave
@@ -111,6 +108,7 @@ plt.imshow(U, cmap=cm.gray)
 plt.show()
 \end{lstlisting}
 
+\section*{Speeding up the Implementation}
 Unfortunately, with reasonably sized images, this is still slow.
 This happens for a variety of reasons.
 When evaluating such a large vector expression, many temporary arrays are allocated and deallocated at each time step.

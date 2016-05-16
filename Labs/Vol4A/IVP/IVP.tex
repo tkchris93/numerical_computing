@@ -15,9 +15,9 @@ where $f$ is a continuous function.
 A solution of \eqref{ivp:generic} is a continuously differentiable function $y(x)$ that satisfies the equation $y' = f(x,y)$ on the interval $[a,b]$ and for which $y(a) = y_0$. 
 In this lab we will focus on numerical methods for approximating $y(x)$, and sidestep the important mathematical problem of verifying that \eqref{ivp:generic} has a unique solution.
 
-There are many IVPs where it is impossible to find a closed form, analytic expression for the solution.
-For other IVPs there is a closed form expression for the solution, but it may be difficult to interpret.
-In either case, we can usually make good use of numerical methods to study the solution. 
+For many IVPs it is impossible to find a closed-form, analytic expression for the solution.
+When there is a closed-form expression for the solution, it may not be very useful.
+In both cases, numerical methods must be relied on to understand the solutions of \eqref{ivp:generic}. 
 
 As an example, consider the initial value problem
 \begin{align}
@@ -26,17 +26,17 @@ y'(x) &= \sin y(x), \\
 y(0) &= y_0.
 	\end{split}\label{ivp:example}
 \end{align}
-This has a solution $y(x)$, defined implicitly by
+The solution $y(x)$ is defined implicitly by
 \[x = \ln \left|\frac{\cos y_0 + \cot y_0}{\csc y + \cot y} \right|.\]
-Since this analytic expression is not very helpful intuitively, we turn to a combination of qualitative and numerical methods. 
-We begin by noting that since $\sin (n \pi) = 0$, this differential equation has constant solutions $y_n(x) = n \pi,$ $n \in \mathbb{N}$. 
+This analytic expression does not provide much intuition, so we turn to a combination of qualitative and numerical methods. 
+Since $\sin (n \pi) = 0$, this differential equation has constant solutions $y_n(x) = n \pi,$ $n \in \mathbb{N}$. 
 We can also use an IVP solver to numerically approximate solutions for several other initial values. 
 After plotting these solutions (see Figure \ref{ivp:int_curves}), it becomes obvious how solutions of \eqref{ivp:example} behave in general.
 
 \begin{figure}
 \centering
 \includegraphics[width=\textwidth]{example.pdf}
-\caption{Several solutions of \eqref{ivp:example}, using the Numpy's IVP solver \li{dopri5}. }
+\caption{Several solutions of \eqref{ivp:example}, using Numpy's IVP solver \li{dopri5}. }
 \label{ivp:int_curves}
 \end{figure}
 
@@ -114,15 +114,99 @@ IVP solvers with this general form are called \textit{Runge-Kutta methods}.
 % $y_{i+1} = y_i + \frac{h}{2}[ f(x_i, y_i) + f(x_{i+1}, y_i+ hf(x_i, y_i))]$
 
 There are many Runge-Kutta methods with varying orders of accuracy. 
-In practice, methods of order four or higher, such as the following, are most commonly used:
-\begin{enumerate}
-\item Apply initial conditions.
-\item $K_1 = f(x_i,y_i),$
-\item $K_2 = f(x_i + \frac{h}{2}, y_i + \frac{h}{2} K_1),$
-\item $K_3 = f(x_i + \frac{h}{2} , y_i + \frac{h}{2} K_2),$
-\item $K_4 = f(x_{i+1} , y_i + h K_3),$
-\item $y_{i+1} = y_i + \frac{h}{6}(K_1 + 2K_2 + 2K_3 + K_4)$
-\end{enumerate}
+Methods of order four or higher are most commonly used. A fourth order Runge-Kutta method iterates as follows: 
+\begin{align*}
+	\begin{split}
+K_1 &= f(x_i,y_i), \\
+K_2 &= f(x_i + \frac{h}{2}, y_i + \frac{h}{2} K_1),\\
+K_3 &= f(x_i + \frac{h}{2} , y_i + \frac{h}{2} K_2),\\
+K_4 &= f(x_{i+1} , y_i + h K_3),\\
+y_{i+1} &= y_i + \frac{h}{6}(K_1 + 2K_2 + 2K_3 + K_4).
+	\end{split}
+\end{align*}
+
+Notice that these methods are doing a type of quadrature where we are sampling the function at different points and then performing computation using the samples and some inherent weights. 
+For example, consider a differential equation 
+\[ y' = f(t).\]
+Since the function $f$ has no $y$ dependence, this is a simple integration problem, and these IVP methods become well known quadrature methods. In this case, Euler's method corresponds to the left hand sum, and backward Euler's method corresponds to the right hand sum. 
+The modified Euler and midpoint methods are second order IVP methods that correspond to the trapezoidal and midpoint rules for integration, respectively. RK4 corresponds to Simpson's rule for integration.
+
+
+\begin{comment}
+\begin{problem}
+Suppose a differential equation is given by
+\[ y' = f(t).\]
+Since the function $f$ has no $y$ dependence, this a simple integration problem. 
+Which integration approximation methods correspond to Euler's method, backward Euler's method, modified Euler's method, the Midpoint method, and the fourth order Runge-Kutta method (RK4)?
+\end{problem}
+\end{comment}
+
+
+
+\section*{Advantages of Higher-Order Methods} 
+
+Higher-order methods are usually much more efficient. One way to measure this efficiency is to determine how many times the right hand side of the initial value problem must be evaluated to provide a desired accuracy.  As an example, consider the initial value problem 
+\begin{align}
+	\begin{split}
+		y' &= y \cos(x), x \in [0,8],\\
+		y(0) &= 1. 
+	\end{split}
+	\label{ivp:efficiency_problem}
+\end{align}
+Figure \ref{ivp:efficiency_figure} illustrates the comparative efficiency of the Euler, Midpoint, and RK4 methods.  The figure also demonstrates another point: since the lower order methods require more floating point operations, floating point error limits the highest possible accuracy that can be achieved with lower order methods. 
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{Efficiency.pdf}
+\caption{Here we graph the relative error in computing the solution of \eqref{ivp:efficiency_problem} at $x = 8$, versus the number of times the right side of \eqref{ivp:efficiency_problem} must be evaluated.  }
+\label{ivp:efficiency_figure}
+\end{figure}
+
+
+
+
+Let $t^*$ be an approximation of some value $t$. The relative error of the approximation is 
+\[ \frac{|t^*-t|}{|t|}.
+\]
+Note that the relative error is simply the absolute error $|t^*-t|$ normalized by the size of $t$.  A method with order $p$ has error of the form 
+\[E(h) = C h^p. \]
+This means that the graph of $\log (E)$ versus $\log(h)$ has slope $p$.  
+The relative error of a numerical method can be approximated and graphed to verify that $p$th order convergence is occurring. For example, consider the IVP
+ \begin{align}
+ 	\begin{split}
+ y' &= y - 2x + 4,\quad 0 \leq x \leq 2, \\
+ y(0) &= 0.
+ 	\end{split} \label{ivp:prob2}
+ \end{align}
+The following code solves the initial value problem on several grids using the Euler method, approximates the relative error in computing $y(2)$ and creates a plot (see Figure \ref{ivp:relative_error}).
+
+\begin{lstlisting}
+import matplotlib.pyplot as plt
+
+a, b, ya = 0., 2., 0.
+
+def ode_f(x,y):
+	return np.array([y -2*x + 4.])
+	
+best_grid = 320					#  number of subintervals in most refined grid
+# Requires an implementation of the euler method
+best_val = euler(ode_f,ya,a,b,best_grid)[-1]  
+
+smaller_grids = [10,20,40,80]  # number of subintervals in smaller grids
+h = [2./N for N in smaller_grids]
+Euler_sol = [euler(ode_f,ya,a,b,N)[-1] for N in smaller_grids]
+Euler_error = [abs(( val - best_val)/best_val ) for val in Euler_sol]
+	
+plt.loglog(h, Euler_error, '-b', label="Euler method"	  , linewidth=2.)
+plt.show()
+
+\end{lstlisting}
+
+
+\begin{problem} Consider the IVP \eqref{ivp:prob2}.
+Use the Midpoint method and the fourth order Runge-Kutta method (RK4) to approximate the value of the solution at $x = 2$, with a step size of $h = 0.2,$ $ 0.1,$ $0.05 $, $0.025,$ and $0.0125.$ 
+Create a log-log plot of the relative error of each approximation using the \li{loglog} function in \li{matplotlib} (see Figure \ref{ivp:relative_error}).
+\end{problem}
 
 \begin{figure}[ht]
 \centering
@@ -131,32 +215,6 @@ In practice, methods of order four or higher, such as the following, are most co
 \label{ivp:relative_error}
 \end{figure}
 
-\begin{comment}
-\begin{problem}
-Suppose a differential equation is given by
-\[ y' = f(t).\]
-If we were to solve this by just integrating, which integration approximation method would correspond to Euler's method, backward Euler's method, modified Euler's method, the Midpoint method, and the fourth order Runge-Kutta method (RK4)?
-\end{problem}
-\end{comment}
-
-Notice that these methods are doing a type of quadrature where we are sampling the function at different points and then performing computation using the samples and some inherent weights.
-
-\begin{problem} Consider the IVP given by
-\begin{align*}
-	\begin{split}
-y' &= y - 2x + 4,\quad 0 \leq x \leq 2, \\
-y(0) &= 0.
-	\end{split} \label{ivp:prob2}
-\end{align*}
-Use Euler's method, the Midpoint method, and the fourth order Runge-Kutta method (RK4) to approximate the value of the solution at $x = 2$, with a step size of $h = 0.2,$ $ 0.1,$ $0.05 $, $0.025,$ and $0.0125.$ 
-Create a log-log plot of the relative error of each approximation using the \li{loglog} function in \li{matplotlib} (see Figure \ref{ivp:relative_error}).
-\end{problem}
-
-% \begin{problem}
-% Plot the solutions of
-% \[ y' + y = 2-2x\,\, 0 \leq x \leq 2, \]
-% with initial conditions $y(0) = 0, 2, 4, 6, $ and $8$. Use RK4 to compute the solutions.
-% \end{problem}
 
 \section*{Harmonic Oscillators and Resonance} 
 Harmonic oscillators show up often in classical mechanics.
@@ -208,16 +266,27 @@ We can do this by letting $z_1 = y, z_2 = y'$. Then we have \[     z'=
 
 
 \begin{problem} Use the RK4 method to solve for the simple harmonic oscillator satisfying 
-\begin{align*}
+\begin{align}
+	\begin{split}
 &{}my'' + ky = 0,\quad 0 \leq t \leq 20, \\
 &{}y(0) = 2, \quad
 y'(0) = -1,
-\end{align*}
+	\end{split}
+	\label{ivp:simple_oscillator}
+\end{align}
 for $m = 1$ and $k =1$. Note that in your implementation of RK4, the constants $K_1, K_2, K_3,$ and $K_4$ become vectors with $n$ entries, where $n$ is the number of equations in the first-order system.
 
 Plot your numerical approximation of $y(t)$.  
 Compare this with its numerical approximation when $m = 3$ and $k =1$. Consider: Why does the difference in solutions make sense physically?
 \end{problem}
+
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{simple_oscillator.pdf}
+\caption{Solutions of \eqref{ivp:simple_oscillator} for several values of $m$.}
+\label{ivp:simple_oscillator_figure}
+\end{figure}
 
 
 \section*{Damped free harmonic oscillators} 
@@ -244,7 +313,7 @@ where $R$ and $\delta$ are fixed, and $\mu = \sqrt{4km-\gamma^2}/2m.$ This syste
 \begin{problem}
 Use the RK4 method to solve for the damped free harmonic oscillator satisfying 
 \begin{align*}
-&{}y'' +\gamma y'+ y = 0, \quad 0 \leq x \leq 20,\\
+&{}y'' +\gamma y'+ y = 0, \quad 0 \leq t \leq 20,\\
 &{}y(0) = 1, \quad
 y'(0) = -1.
 \end{align*}
@@ -274,12 +343,22 @@ However, the fact that the equation predicts large oscillations suggests the spr
 Mechanical resonance has been known to cause failure of bridges, buildings, and airplanes.
 
 \begin{problem}
-Use the RK4 method to solve for the undamped forced harmonic oscillator satisfying 
-\begin{align*}
-&{}2y'' + \gamma y' + 2y = 2 \cos (\omega x), \quad 0 \leq x \leq 40,\\
+Use the RK4 method to solve for the damped and forced harmonic oscillator satisfying 
+\begin{align}
+	\begin{split}
+&{}2y'' + \gamma y' + 2y = 2 \cos (\omega t), \quad 0 \leq t \leq 40,\\
 &{}y(0) = 2, \quad
-y'(0) = -1.
-\end{align*}
+y'(0) = -1. 
+	\end{split}
+	\label{ivp:damped_forced_oscillator}
+\end{align}
 For the following values of $\gamma$ and $\omega,$ plot your numerical approximations of $y$ and find $y(40)$ accurate to four significant digits: $(\gamma, \omega) = (0.5, 1.5),$ $(0.1, 1.1),$ and $(0, 1).$
 \end{problem}
 
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\textwidth]{damped_forced_oscillator.pdf}
+\caption{Solutions of \eqref{ivp:damped_forced_oscillator} for several values of $\omega$ and $\gamma$.}
+\label{ivp:damped_forced_oscillator_figure}
+\end{figure}

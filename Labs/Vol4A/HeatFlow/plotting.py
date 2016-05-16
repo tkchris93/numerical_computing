@@ -74,7 +74,8 @@ def Exercise3():
 		plt.loglog(h,MaxError,'-k',label='Error $E(h)$')
 		plt.loglog(h,MaxError,'ko')
 		plt.loglog(np.array(h),np.array(h)**2.,'-r',label='$h^2$')
-		
+		print "MaxError =", MaxError
+		print "h = ", h
 		# plt.ylabel("",fontsize=16)
 		plt.xlabel('$h$',fontsize=16)
 		plt.legend(loc='best')
@@ -85,20 +86,29 @@ def Exercise3():
 		plt.clf()
 	
 	
-	# # This Graph is found in the lab
-	# U = []
-	# List = [20,40,80,160,320,640,1280,2560]
-	# h = [1./item for item in List[:-1]]
-	# for subintervals in List:
-	# 	x_subintervals, t_subintervals = subintervals, subintervals
-	# 	xinterval = [-12,12]
-	# 	init_conditions = np.maximum(1.-np.linspace(-12,12,x_subintervals+1)**2,0.) 
-	# 	x,u = heat_Crank_Nicolson(init_conditions, x_subintervals, t_subintervals,
-	# 								x_interval=xinterval, T=1., flag3d="off", nu=1.)
-	# 	U.append(u[:,-1])
-	# 
-	# graph(U,List,h)
+	# This Graph is found in the lab
+	U = []
+	List = [20,40,80,160,320,640]#,1280,2560]
+	h = [24./item for item in List[:-1]]
+	for subintervals in List:
+		x_subintervals, t_subintervals = subintervals, subintervals
+		xinterval = [-12,12]
+		init_conditions = np.maximum(1.-np.linspace(-12,12,x_subintervals+1)**2,0.)
+		x,u = heat_Crank_Nicolson(init_conditions, x_subintervals, t_subintervals,
+									x_interval=xinterval, T=1., flag3d="off", nu=1.)
+		U.append(u[:,-1])
+
+	graph(U,List,h)
 	
+	
+	# x_subintervals, t_subintervals = 8, 8
+	# xinterval = [-12,12]
+	# init_conditions = np.maximum(1.-np.linspace(-12,12,x_subintervals+1)**2,0.)
+	# x,u = heat_Crank_Nicolson(init_conditions, x_subintervals, t_subintervals,
+	# 							x_interval=xinterval, T=1., flag3d="off", nu=1.)
+	#
+	#
+	# print "u = ", u[-1,:]
 	# x_subintervals, t_subintervals = 400.,500. 
 	# xinterval = [-12,12]
 	# init_conditions = np.maximum(1.-np.linspace(-12,12,x_subintervals+1)**2,0.) 
@@ -125,8 +135,8 @@ def Exercise3():
 
 
 
-Exercise1()
-Exercise2()
+# Exercise1()
+# Exercise2()
 Exercise3()
 
 

@@ -22,14 +22,14 @@ def wave_1d(f,g,L,N_x,T,N_t,view):
 	U, x_grid = np.zeros((N_t+1, N_x+1)), np.linspace(0,L,N_x+1)
 	f_grid, g_grid = f(x_grid), g(x_grid)
 		
-	U[1,1:-1] = f_grid[1:-1]
-	U[0,1:-1] = ( -delta_t*g_grid[1:-1]  + U[1,1:-1] + 
-					(1./2.)*(c*delta_t/delta_x)**2.*(U[1,2:] -2.*U[1,1:-1] + U[1,:-2])
+	U[0,1:-1] = f_grid[1:-1]
+	U[1,1:-1] = ( delta_t*g_grid[1:-1]  + U[0,1:-1] + 
+					(1./2.)*lmbda**2.*(U[0,2:] -2.*U[0,1:-1] + U[0,:-2])
 					)
 	
 	for m in xrange(1,N_t): 
 		U[m+1,1:-1] = ( (2.*U[m,1:-1]-U[m-1,1:-1]) + 
-						(c*delta_t/delta_x)**2. * (U[m,2:] -2.*U[m,1:-1] + U[m,:-2]) 
+						lmbda**2. * (U[m,2:] -2.*U[m,1:-1] + U[m,:-2]) 
 						)
 	
 	# for m in xrange(1,N_t):
@@ -46,7 +46,9 @@ def wave_1d(f,g,L,N_x,T,N_t,view):
 
 a = 0
 def math_animation(Data,time_steps,view,wait):
-	X,Array,Constant = Data
+	# X,Array,Constant = Data
+	X,Array = Data
+	Constant=None
 	
 	fig = plt.figure()
 	ax = plt.axes(xlim=tuple(view[0:2]), ylim=tuple(view[2:]) )
