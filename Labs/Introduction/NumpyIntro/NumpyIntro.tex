@@ -1,50 +1,14 @@
 \lab{Introduction to NumPy}{Introduction to NumPy} 
 \label{lab:NumPy}
-\objective{Python's NumPy and SciPy packages make Python an ideal language for scientific computing. NumPy is a package for manipulating data with multi-dimensional vectors, and SciPy is a higher-level library built on NumPy. Both packages will be used extensively in almost every lab hereafter in this curriculum. In this lab we introduce basic NumPy data structures and operations as a first step to numerical computing in Python.}
+\objective{NumPy is a powerful Python package for manipulating data with multi-dimensional vectors.
+Its versatility and speed makes Python an ideal language for applied and computational mathematics.
+\\ \indent
+In this lab we introduce basic NumPy data structures and operations as a first step to numerical computing in Python.}
 
-%\footnote{SciPy is also the name of a Python coding environment that includes the NumPy and SciPy libraries, as well as IPython, matplotlib, and other tools.}
-
-% Lab Outline
-% - Arrays
-%     - How to initialize a simple custom array
-%     - **Problem 1**: Matrix Equation 1
-%     - Basic array operations +, -, *, / component-wise
-%     - **Problem 2**: Matrix Equation 2 (Cayley-Hamilton preview)
-%     - Data Types
-%         - How to initialize an array with a certain type
-%         - Changing the type of an array's elements
-%         - Warning: precision limits on data types (int16)
-%     - Special Creation routines
-%         - `zeros()`, `ones()`, `eye()`, `identity()`, `full()`, etc.
-%         - `diag()`, `tril()`, `triu()`
-%         - **Problem 3**: Matrix Equation 3
-% - Data Access
-%     - Slicing Revisited (refer to the visual guide at the end of the lab)
-%     - Warning: views vs copies (mutability, `np.copy()`)
-%     - Fancy Indexing and Masks
-%     - **Problem 4**: Use fancy indexing to make all entries of a matrix nonnegative (something harder!!)
-% - Array Manipulation
-%     - `reshape()`, `ravel()`, `transpose()`
-%     - `hstack()`, `vstack()`, `column_stack()`
-%     - Note: All 1-D arrays are flat! (`np.newaxis`)
-%     - **Problem 5**: A final matrix equation (Interior Point block matrices)
-%     - Array Broadcasting
-% - Numerical Calculations
-%     - Universal Functions
-%     - Array methods: `max()`, `min()`, `argmax()`, `argmin()`, etc.
-%     - The `axis` argument.
-%     - **Problem 6**: Make an input matrix row-stochastic.
-% - **Problem 7**: Jacobi method for Laplace's equation (hot plate)
-% - Additional Material
-%     - Random Sampling
-%     - Saving / Loading arrays
-%     - Iterating through arrays
-% - Visual Reference Guide
-%     - Data Access
-%     - Slicing
-%     - Stacking
-%     - Broadcasting (might need an illustrator's help)
-%     - The `axis` Argument (might need an illustrator's help)
+% TODO: More detailed / compelling objective.
+% TODO: Shorten the section on data types.
+% TODO: More motivation on the final problem (Laplace's equation).
+% TODO: Finish the NumPy visual guide.
 
 \section*{Arrays} % ===========================================================
 
@@ -64,7 +28,7 @@ The simplest way to explicitly create a 1-D \li{ndarray} is to define a list, th
 >>> np.array([8, 4, 6, 0, 4])
 array([8, 4, 6, 0, 4])
 \end{lstlisting}
-The alias \li{np} is standard in the Python community.
+The alias \li{np} is standard in the Python community. % Make footnote?
 
 An \li{ndarray} can have arbitrarily many dimensions.
 A 2-D array is a 1-D array of 1-D arrays, and more generally, an $n$-dimensional array is a 1-D array of $(n-1)$-dimensional arrays.
@@ -74,7 +38,7 @@ Elements are accessed using brackets and indices (like a regular list), and the 
 
 \begin{lstlisting}
 # Create a 2-D array by passing a list of lists into array().
->>> A = np.array([[1, 2, 3], [4, 5, 6]])
+>>> A = np.array( [ [1, 2, 3],[4, 5, 6] ] )
 >>> print(A)
 [[1, 2, 3],
  [4, 5, 6]]
@@ -88,7 +52,7 @@ Elements are accessed using brackets and indices (like a regular list), and the 
 array([1, 2, 3])
 \end{lstlisting}
 
-\begin{problem} % Problem 1: Matrix Multiplication
+\begin{problem} % Problem: Matrix Multiplication
 NumPy's \li{dot()} function performs matrix multiplication. % In Python 3.5, we can use the @ operator to perform matrix multiplication.
 Write a function that defines the following matrices as NumPy arrays.
 \begin{align*}
@@ -120,16 +84,16 @@ An \li{ndarray} object has several attributes, some of which are listed below.
 
 \begin{table}[H] % Important ndarray Attributes
 \centering 
-\begin{tabular}{c|l}%{10cm}}
+\begin{tabular}{c|l}
     Attribute & Description \\
     \hline \li{dtype} & The type of the elements in the array. \\
     \li{ndim} & The number of axes (dimensions) of the array. \\
     \li{shape} & A tuple of integers indicating the size in each dimension. \\
     \li{size} & The total number of elements in the array. \\
 \end{tabular}
-% \caption{A few of the attributes of NumPy arrays.}
 \label{table:ndarrayattrs}
 \end{table}
+
 \begin{lstlisting}
 >>> A = np.array([[1, 2, 3], [4, 5, 6]])
 >>> A.ndim
@@ -182,77 +146,7 @@ array([ 4, 10, 18])
 % Subtraction and division also perform element-wise operations for arrays.
 Apart from being syntactically convenient, element-wise NumPy operations also execute significantly faster than element-wise list operations.
 
-\begin{comment} % Old demonstration, overkill.
-\begin{lstlisting}
-In [1]: import numpy as np
-In [2]: from random import random
-
-# Make two lists of 10000 random entries and corresponding NumPy arrays.
-In [3]: a = [random() for i in xrange(10000)]
-In [4]: b = [random() for i in xrange(10000)]
-In [5]: A, B = np.array(a), np.array(b)
-
-In [6]: %timeit [x + y for x,y in zip(a,b)]
-100 loops, best of 3: 2.02 milisecons per loop          # .00202 seconds.
-
-In [7]: %timeit A + B
-100000 loops, best of 3: 92.9 microseconds per loop     # .0000929 seconds.
-\end{lstlisting}
-
-\begin{lstlisting}
-# For lists, + performs concatenation (not addition) and * is not defined.
->>> a = [1, 2, 3]
->>> b = [4, 5, 6]
->>> a + b
-[1, 2, 3, 4, 5, 6]
->>> a * b
-<<TypeError: cannot multiply sequence by non-int of type 'list'>>
-
-# Element-wise operations for lists are possible, but cumbersome.
->>> [x + y for x, y in zip(a, b)]
-[5, 7, 9]
->>> [x * y for x, y in zip(a, b)]
-[4, 10, 18]
-
-# With NumPy arrays, addition and multiplication are element-wise.
->>> a = np.array(a)             # Cast 'a' and 'b' as NumPy arrays.
->>> b = np.array(b)
->>> a + b
-array([5, 7, 9])
->>> a * b
-array([4, 10, 18])
-\end{lstlisting}
-
-Apart from being syntactically convenient, element-wise NumPy operations are also significantly faster than element-wise list operations.
-
-\begin{lstlisting}
->>> from time import time
->>> from random import random
-
-# Make two random lists with 10000 entries each.
->>> a = [random() for i in xrange(10000)]
->>> b = [random() for i in xrange(10000)]
-
-# Time the element-wise addition for lists.
->>> start = time()
->>> [x + y for x, y in zip(a, b))]
->>> list_time = time() - start
-
-# Cast each list as a NumPy array.
->>> A, B = np.array(a), np.array(b)
-
-# Time the element-wise addition for arrays.
->>> start = time()
->>> a + b
->>> array_time = time() - start
-
-# Report the times.
->>> print list_time, array_time
-0.0030951499939 0.000310897827148
-\end{lstlisting}
-\end{comment}
-
-\begin{problem} % Simple Matrix Equation 2 (Cayley Hamilton)
+\begin{problem} % Problem: Simple Matrix Equation 2 (Cayley Hamilton)
 Write a function that defines the following matrix as a NumPy array.
 \[
 A = \left[\begin{array}{rrr}
@@ -262,8 +156,7 @@ A = \left[\begin{array}{rrr}
 \]
 Return the matrix $-A^3 + 9A^2 - 15A$.
 In this context, $A^2 = AA$ (the matrix product).
-
-The somewhat surprising result is a demonstration of the Cayley-Hamilton theorem, which will be discussed late in the curriculum.
+The somewhat surprising result is a demonstration of the Cayley-Hamilton theorem.
 \label{prob:simple2}
 \end{problem}
 
@@ -417,34 +310,37 @@ array([[  1,   0,   0],
 
 See \url{http://docs.scipy.org/doc/numpy/reference/routines.array-creation.html} for the official documentation on NumPy's array creation routines.
 
-\begin{problem} % Simple Matrix Equation 3
+\begin{problem} % Problem: Simple Matrix Equation 3
 Write a function that defines the following matrices as NumPy arrays.
-Use the functions presented in this section instead of \li{np.array()} to construct the matrices, and change the data type of the final matrix to \li{np.int64}.
+Use the functions presented in this section instead of \li{np.array()} to construct the matrices, then calculate the matrix product $ABA$.
+Change the data type of the resulting matrix to \li{np.int64}, then return it.
 \begin{align*}
-A = \left[\begin{array}{rrrrrr}
-1 & 1 & 1 & 1 & 1 & 1\\
-0 & 1 & 1 & 1 & 1 & 1\\
-0 & 0 & 1 & 1 & 1 & 1\\
-0 & 0 & 0 & 1 & 1 & 1\\
-0 & 0 & 0 & 0 & 1 & 1\\
-0 & 0 & 0 & 0 & 0 & 1\end{array}\right]
+A = \left[\begin{array}{rrrrrrr}
+1 & 1 & 1 & 1 & 1 & 1 & 1\\
+0 & 1 & 1 & 1 & 1 & 1 & 1\\
+0 & 0 & 1 & 1 & 1 & 1 & 1\\
+0 & 0 & 0 & 1 & 1 & 1 & 1\\
+0 & 0 & 0 & 0 & 1 & 1 & 1\\
+0 & 0 & 0 & 0 & 0 & 1 & 1\\
+0 & 0 & 0 & 0 & 0 & 0 & 1\end{array}\right]
 &&
-B = \left[\begin{array}{rrrrrr}
--1 &  5 &  5 &  5 &  5 &  5\\
--1 & -1 &  5 &  5 &  5 &  5\\
--1 & -1 & -1 &  5 &  5 &  5\\
--1 & -1 & -1 & -1 &  5 &  5\\
--1 & -1 & -1 & -1 & -1 &  5\\
--1 & -1 & -1 & -1 & -1 & -1\end{array}\right]
+B = \left[\begin{array}{rrrrrrr}
+-1 &  5 &  5 &  5 &  5 &  5 &  5\\
+-1 & -1 &  5 &  5 &  5 &  5 &  5\\
+-1 & -1 & -1 &  5 &  5 &  5 &  5\\
+-1 & -1 & -1 & -1 &  5 &  5 &  5\\
+-1 & -1 & -1 & -1 & -1 &  5 &  5\\
+-1 & -1 & -1 & -1 & -1 & -1 &  5\\
+-1 & -1 & -1 & -1 & -1 & -1 & -1\end{array}\right]
 \end{align*}
 % Solution:
-% array([[ -6,  -6,   0,  12,  30,  54],
-%        [ -5, -10,  -9,  -2,  11,  30],
-%        [ -4,  -8, -12, -10,  -2,  12],
-%        [ -3,  -6,  -9, -12,  -9,   0],
-%        [ -2,  -4,  -6,  -8, -10,  -6],
-%        [ -1,  -2,  -3,  -4,  -5,  -6]], dtype=int64)
-Return the matrix product $ABA$.
+% array([[ -7,  -8,  -3,   8,  25,  48,  77],
+%        [ -6, -12, -12,  -6,   6,  24,  48],
+%        [ -5, -10, -15, -14,  -7,   6,  25],
+%        [ -4,  -8, -12, -16, -14,  -6,   8],
+%        [ -3,  -6,  -9, -12, -15, -12,  -3],
+%        [ -2,  -4,  -6,  -8, -10, -12,  -8],
+%        [ -1,  -2,  -3,  -4,  -5,  -6,  -7]])
 \label{prob:simple3}
 \end{problem}
 
@@ -548,14 +444,13 @@ array([16, 18])
 >>> y[mask] = 0
 >>> print(y)
 [10 12 14  0  0]
-
 \end{lstlisting}
 
 Note that slice operations and indexing always return a view and fancy indexing always returns a copy.
 
-\begin{problem} % Slicing / Fancy Indexing
-Write a function that accepts a single array.
-Make a copy of the array, and set all negative entries of the copy to $0$.
+\begin{problem} % Problem: Slicing / Fancy Indexing
+Write a function that accepts a single array as input.
+Make a copy of the array, then use fancy indexing to set all negative entries of the copy to $0$.
 Return the copy.
 \end{problem}
 
@@ -888,7 +783,7 @@ A more comprehensive list of array methods can be found at
 html}.
 See the visual guide at the end of the lab for more examples of the \li{axis} keyword argument.
 
-\begin{problem} % Problem 6: Row stochastic matrices.
+\begin{problem} % Problem: Row stochastic matrices.
 A matrix is called \emph{row-stochastic} if its rows each sum to $1$.\footnote{Similarly, a matrix is called \emph{column-stochastic} if its columns each sum to $1$.}
 Stochastic matrices are fundamentally important for finite discrete random processes and some machine learning algorithms.
 
@@ -896,10 +791,6 @@ Write a function than accepts a matrix (as a 2-D array).
 Divide each row of the matrix by the row sum and return the new row-stochastic matrix.
 Use array broadcasting instead of a loop, and be careful to avoid integer division.
 \end{problem}
-
-% =============================================================================
-% DONE TO HERE ================================================================
-% =============================================================================
 
 \begin{algorithm} % Laplace's equation procedure.
 \begin{algorithmic}[1]
@@ -1088,27 +979,6 @@ When absolutely necessary, use \li{np.nditer()} to create an efficient iterator 
 See \url{http://docs.scipy.org/doc/numpy/reference/arrays.nditer.html} for details.
 
 \begin{comment}
-\subsection*{Linear Algebra} % ------------------------------------------------
-Both NumPy and SciPy have a linear algebra library, but the SciPy library is larger. The SciPy linear algebra library is typically imported as follows:
-
-\begin{lstlisting}
-from scipy import linalg as la
-\end{lstlisting}
-
-The linear algebra library contains several functions to construct special 
-matrices, located in 
-\li{linalg.special_matrices}. There are also functions that will invert matrices, find determinants and norms, solve linear systems and least squares problems, and find special matrix decompositions. You can read more about the linear algebra capabilities of SciPy in the 
-documentation for the \li{linalg} module found at
-\url{http://docs.scipy.org/doc/scipy/reference/linalg.html}.
-
-Finally, the \li{scipy.linalg} library has a \li{matrix} class that is very 
-similar to a 2-D NumPy array. The matrix class can be convenient when doing matrix 
-operations. However, in such situations we still recommend using NumPy arrrays, which have many of the same features and are also compatible with all other SciPy operations.
-
-The \li{scipy.linalg} library will be essential for the remainder of the labs in this manual. We will address the details of this package at length in future labs. 
-\end{comment}
-
-\begin{comment}
 \subsection*{Polynomials} % ---------------------------------------------------
 
 The \li{np.poly1d} object represents a polynomial in NumPy.
@@ -1162,9 +1032,9 @@ Verify that your approximation is close.
 
 \newpage
 
-\section*{NumPy Visual Guide}
+\section*{NumPy Visual Guide} % ===============================================
 
-\subsection*{Data Access}
+\subsection*{Data Access} % ---------------------------------------------------
 
 The entries of a 2-D array are the rows of the matrix (as 1-D arrays).
 To access a single entry, enter the row index, a comma, and the column index.
@@ -1186,7 +1056,7 @@ A[2,1] = \left[\begin{array}{rrrrr}
 \end{array}\right]
 \end{align*}
 
-\subsection*{Slicing}
+\subsection*{Slicing} % -------------------------------------------------------
 
 A lone colon extracts an entire row or column from a 2-D array.
 The syntax \li{[a:b]} can be read as ``the $a^{th}$ entry up to (but not including) the $b^{th}$ entry.''
@@ -1223,7 +1093,7 @@ Similarly, \li{[a:]} means ``the $a^{th}$ entry to the end'' and \li{[:b]} means
 \times & \times & \times & \times & \times\end{array}\right]
 \end{align*}
 
-\subsection*{Stacking}
+\subsection*{Stacking} % ------------------------------------------------------
 
 \li{np.hstack()} stacks sequence of arrays horizontally and \li{np.vstack()} stacks a sequence of arrays vertically.
 
@@ -1301,11 +1171,11 @@ y = \left[\begin{array}{cccc}
 \end{array}\right]
 \end{align*}
 
-\subsection*{Broadcasting}
+\subsection*{Broadcasting} % --------------------------------------------------
 
 Really only need two pictures here.
 
-\subsection*{Operations along an Axis}
+\subsection*{Operations along an Axis} % --------------------------------------
 
 Similar pictures to the Broadcasting section (really only need 2)
 
@@ -1381,3 +1251,97 @@ One reason for this is that algorithms in NumPy are usually implemented in C or 
 NumPy is optimized for fast array computations.
 
 \end{comment} % Complexity Lab ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+\begin{comment} % TODO: put this into a different lab, like Complexity? vvvvvvv
+\subsection*{Linear Algebra} % ------------------------------------------------
+Both NumPy and SciPy have a linear algebra library, but the SciPy library is larger.
+The SciPy linear algebra library is typically imported as follows:
+
+\begin{lstlisting}
+from scipy import linalg as la
+\end{lstlisting}
+
+The linear algebra library contains several functions to construct special 
+matrices, located in \li{linalg.special_matrices}.
+There are also functions that will invert matrices, find determinants and norms, solve linear systems and least squares problems, and find special matrix decompositions.
+You can read more about the linear algebra capabilities of SciPy in the documentation for the \li{linalg} module found at \url{http://docs.scipy.org/doc/scipy/reference/linalg.html}.
+
+Finally, the \li{scipy.linalg} library has a \li{matrix} class that is very 
+similar to a 2-D NumPy array.
+The matrix class can be convenient when doing matrix operations.
+However, in such situations we still recommend using NumPy arrrays, which have many of the same features and are also compatible with all other SciPy operations.
+
+The \li{scipy.linalg} library will be essential for the remainder of the labs in this manual.
+We will address the details of this package at length in future labs. 
+\end{comment} % Complexity Lab? ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+\begin{comment} % Old demonstration, overkill. Useful some other time?
+\begin{lstlisting}
+In [1]: import numpy as np
+In [2]: from random import random
+
+# Make two lists of 10000 random entries and corresponding NumPy arrays.
+In [3]: a = [random() for i in xrange(10000)]
+In [4]: b = [random() for i in xrange(10000)]
+In [5]: A, B = np.array(a), np.array(b)
+
+In [6]: %timeit [x + y for x,y in zip(a,b)]
+100 loops, best of 3: 2.02 milisecons per loop          # .00202 seconds.
+
+In [7]: %timeit A + B
+100000 loops, best of 3: 92.9 microseconds per loop     # .0000929 seconds.
+\end{lstlisting}
+
+\begin{lstlisting}
+# For lists, + performs concatenation (not addition) and * is not defined.
+>>> a = [1, 2, 3]
+>>> b = [4, 5, 6]
+>>> a + b
+[1, 2, 3, 4, 5, 6]
+>>> a * b
+<<TypeError: cannot multiply sequence by non-int of type 'list'>>
+
+# Element-wise operations for lists are possible, but cumbersome.
+>>> [x + y for x, y in zip(a, b)]
+[5, 7, 9]
+>>> [x * y for x, y in zip(a, b)]
+[4, 10, 18]
+
+# With NumPy arrays, addition and multiplication are element-wise.
+>>> a = np.array(a)             # Cast 'a' and 'b' as NumPy arrays.
+>>> b = np.array(b)
+>>> a + b
+array([5, 7, 9])
+>>> a * b
+array([4, 10, 18])
+\end{lstlisting}
+
+Apart from being syntactically convenient, element-wise NumPy operations are also significantly faster than element-wise list operations.
+
+\begin{lstlisting}
+>>> from time import time
+>>> from random import random
+
+# Make two random lists with 10000 entries each.
+>>> a = [random() for i in xrange(10000)]
+>>> b = [random() for i in xrange(10000)]
+
+# Time the element-wise addition for lists.
+>>> start = time()
+>>> [x + y for x, y in zip(a, b))]
+>>> list_time = time() - start
+
+# Cast each list as a NumPy array.
+>>> A, B = np.array(a), np.array(b)
+
+# Time the element-wise addition for arrays.
+>>> start = time()
+>>> a + b
+>>> array_time = time() - start
+
+# Report the times.
+>>> print list_time, array_time
+0.0030951499939 0.000310897827148
+\end{lstlisting}
+\end{comment}
+

@@ -19,9 +19,8 @@ def prob2():
     return -np.dot(A, A2) + 9*A2 - 15*A
 
 def prob3():
-    A = np.triu(np.ones((6,6)))
-    C = np.full_like(A, 3)
-    B = np.full_like(A, 2) - np.tril(C) + np.triu(C, 1)
+    A = np.triu(np.ones((7,7)))
+    B = np.full_like(A, 5) - np.tril(np.full_like(A, 6))
     return np.dot(np.dot(A, B), A).astype(np.int64)
 
 def prob4(A):
