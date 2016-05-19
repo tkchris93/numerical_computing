@@ -6,6 +6,8 @@ Its versatility and speed makes Python an ideal language for applied and computa
 In this lab we introduce basic NumPy data structures and operations as a first step to numerical computing in Python.}
 
 % TODO: More detailed / compelling objective.
+% TODO: Shorten the section on data types.
+% TODO: More motivation on the final problem (Laplace's equation).
 % TODO: Finish the NumPy visual guide.
 
 \section*{Arrays} % ===========================================================
@@ -310,32 +312,35 @@ See \url{http://docs.scipy.org/doc/numpy/reference/routines.array-creation.html}
 
 \begin{problem} % Problem: Simple Matrix Equation 3
 Write a function that defines the following matrices as NumPy arrays.
-Use the functions presented in this section instead of \li{np.array()} to construct the matrices, and change the data type of the final matrix to \li{np.int64}.
+Use the functions presented in this section instead of \li{np.array()} to construct the matrices, then calculate the matrix product $ABA$.
+Change the data type of the resulting matrix to \li{np.int64}, then return it.
 \begin{align*}
-A = \left[\begin{array}{rrrrrr}
-1 & 1 & 1 & 1 & 1 & 1\\
-0 & 1 & 1 & 1 & 1 & 1\\
-0 & 0 & 1 & 1 & 1 & 1\\
-0 & 0 & 0 & 1 & 1 & 1\\
-0 & 0 & 0 & 0 & 1 & 1\\
-0 & 0 & 0 & 0 & 0 & 1\end{array}\right]
+A = \left[\begin{array}{rrrrrrr}
+1 & 1 & 1 & 1 & 1 & 1 & 1\\
+0 & 1 & 1 & 1 & 1 & 1 & 1\\
+0 & 0 & 1 & 1 & 1 & 1 & 1\\
+0 & 0 & 0 & 1 & 1 & 1 & 1\\
+0 & 0 & 0 & 0 & 1 & 1 & 1\\
+0 & 0 & 0 & 0 & 0 & 1 & 1\\
+0 & 0 & 0 & 0 & 0 & 0 & 1\end{array}\right]
 &&
-B = \left[\begin{array}{rrrrrr}
--1 &  5 &  5 &  5 &  5 &  5\\
--1 & -1 &  5 &  5 &  5 &  5\\
--1 & -1 & -1 &  5 &  5 &  5\\
--1 & -1 & -1 & -1 &  5 &  5\\
--1 & -1 & -1 & -1 & -1 &  5\\
--1 & -1 & -1 & -1 & -1 & -1\end{array}\right]
+B = \left[\begin{array}{rrrrrrr}
+-1 &  5 &  5 &  5 &  5 &  5 &  5\\
+-1 & -1 &  5 &  5 &  5 &  5 &  5\\
+-1 & -1 & -1 &  5 &  5 &  5 &  5\\
+-1 & -1 & -1 & -1 &  5 &  5 &  5\\
+-1 & -1 & -1 & -1 & -1 &  5 &  5\\
+-1 & -1 & -1 & -1 & -1 & -1 &  5\\
+-1 & -1 & -1 & -1 & -1 & -1 & -1\end{array}\right]
 \end{align*}
 % Solution:
-% array([[ -6,  -6,   0,  12,  30,  54],
-%        [ -5, -10,  -9,  -2,  11,  30],
-%        [ -4,  -8, -12, -10,  -2,  12],
-%        [ -3,  -6,  -9, -12,  -9,   0],
-%        [ -2,  -4,  -6,  -8, -10,  -6],
-%        [ -1,  -2,  -3,  -4,  -5,  -6]], dtype=int64)
-Return the matrix product $ABA$.
+% array([[ -7,  -8,  -3,   8,  25,  48,  77],
+%        [ -6, -12, -12,  -6,   6,  24,  48],
+%        [ -5, -10, -15, -14,  -7,   6,  25],
+%        [ -4,  -8, -12, -16, -14,  -6,   8],
+%        [ -3,  -6,  -9, -12, -15, -12,  -3],
+%        [ -2,  -4,  -6,  -8, -10, -12,  -8],
+%        [ -1,  -2,  -3,  -4,  -5,  -6,  -7]])
 \label{prob:simple3}
 \end{problem}
 
@@ -443,9 +448,9 @@ array([16, 18])
 
 Note that slice operations and indexing always return a view and fancy indexing always returns a copy.
 
-\begin{problem} % Slicing / Fancy Indexing
-Write a function that accepts a single array.
-Make a copy of the array, and set all negative entries of the copy to $0$.
+\begin{problem} % Problem: Slicing / Fancy Indexing
+Write a function that accepts a single array as input.
+Make a copy of the array, then use fancy indexing to set all negative entries of the copy to $0$.
 Return the copy.
 \end{problem}
 
@@ -787,10 +792,6 @@ Divide each row of the matrix by the row sum and return the new row-stochastic m
 Use array broadcasting instead of a loop, and be careful to avoid integer division.
 \end{problem}
 
-% =============================================================================
-% DONE TO HERE ================================================================
-% =============================================================================
-
 \begin{algorithm} % Laplace's equation procedure.
 \begin{algorithmic}[1]
 \Procedure{Jacobi}{$n$, tol}
@@ -1031,9 +1032,9 @@ Verify that your approximation is close.
 
 \newpage
 
-\section*{NumPy Visual Guide}
+\section*{NumPy Visual Guide} % ===============================================
 
-\subsection*{Data Access}
+\subsection*{Data Access} % ---------------------------------------------------
 
 The entries of a 2-D array are the rows of the matrix (as 1-D arrays).
 To access a single entry, enter the row index, a comma, and the column index.
@@ -1055,7 +1056,7 @@ A[2,1] = \left[\begin{array}{rrrrr}
 \end{array}\right]
 \end{align*}
 
-\subsection*{Slicing}
+\subsection*{Slicing} % -------------------------------------------------------
 
 A lone colon extracts an entire row or column from a 2-D array.
 The syntax \li{[a:b]} can be read as ``the $a^{th}$ entry up to (but not including) the $b^{th}$ entry.''
@@ -1092,7 +1093,7 @@ Similarly, \li{[a:]} means ``the $a^{th}$ entry to the end'' and \li{[:b]} means
 \times & \times & \times & \times & \times\end{array}\right]
 \end{align*}
 
-\subsection*{Stacking}
+\subsection*{Stacking} % ------------------------------------------------------
 
 \li{np.hstack()} stacks sequence of arrays horizontally and \li{np.vstack()} stacks a sequence of arrays vertically.
 
@@ -1170,11 +1171,11 @@ y = \left[\begin{array}{cccc}
 \end{array}\right]
 \end{align*}
 
-\subsection*{Broadcasting}
+\subsection*{Broadcasting} % --------------------------------------------------
 
 Really only need two pictures here.
 
-\subsection*{Operations along an Axis}
+\subsection*{Operations along an Axis} % --------------------------------------
 
 Similar pictures to the Broadcasting section (really only need 2)
 
@@ -1343,3 +1344,4 @@ Apart from being syntactically convenient, element-wise NumPy operations are als
 0.0030951499939 0.000310897827148
 \end{lstlisting}
 \end{comment}
+
