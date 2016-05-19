@@ -208,14 +208,24 @@ Using Equation \ref{eq:jacobi}, implement the Jacobi Method. Avoid using
 \li{la.inv}. Your function should accept a matrix \li{A}, a vector \li{b}, and
 an optional parameter \li{tol} with a default value of \li{1e-8}. Additionally,
 accept an optional parameter \li{maxiters} to help you catch nonconvergent
-systems. Set \li{maxiters} $200$ as default. Your function should return the
+systems. Set \li{maxiters} to $100$ as default. Your function should return the
 solution vector \li{x} as well as an array of all the approximations of \li{x}
-at each iteration. Stop iteration when \li{maxiters} is reached or
-$||\mathbf{x}^{(k)} - \mathbf{x}^{(k+1)}|| < $ \li{tol}.
+at each iteration. Stop iterating when \li{maxiters} is reached or
+$||\mathbf{x}^{(k)} - \mathbf{x}^{(k+1)}||_{\infty} < $ \li{tol}. In Python, you
+can calculate $||x||_{\infty}$ in two ways.
+\begin{lstlisting}
+>>> la.norm(x, ord=np.inf)
+<<or>>
+>>> np.max(np.abs(x))
+\end{lstlisting}
+For more information about the $\infty$-norm see Chapter ?? of Volume 1.
 
 If \li{maxiters} is hit, return the current solution. If your
-system is non-convergent, you will find that the solutions have increasingly
-large entries. Test your function on the $3 \times 3$ linear system above.
+system is non-convergent, you will find that your approximations have increasingly
+large entries. Test your function on the $3 \times 3$ linear system above. Then
+test your function on a random $3 \times 3$ matrix. Chances are the random matrix
+you generate will not converge, i.e. \li{maxiters} will be hit.
+We will discuss why in the next section.
 
 \end{problem}
 
@@ -323,7 +333,7 @@ continue this same process until convergence is attained.
 Implement the Gauss-Seidel Method using Equation \ref{eq:gauss_seidel}. Your
 function should accept a matrix \li{A}, a vector \li{b}, an optional parameter
 \li{tol} that defaults to \li{1e-8} and an optional parameter \li{maxiters} that
-defaults to $200$. Your function should return the solution vector \li{x} as
+defaults to $100$. Your function should return the solution vector \li{x} as
 well as an array of all the approximations of \li{x} at each iteration.
 \end{problem}
 
@@ -454,9 +464,12 @@ methods that have been optimized for sparse matrices. We will use the
 \begin{problem}
 To be able to use the Gauss-Seidel method on sparse matrices, you must translate
 the code you wrote in \ref{prob:gauss_seidel} from \li{numpy} to \li{scipy.sparse}.
-The algorithm is the same, but there are some functions that are named differently between these two packages.
+The algorithm is the same, but there are some functions that are named differently
+between these two packages.
 
-Write a new function that accepts a sparse matrix \li{A}, a NumPy array \li{b}, an optional parameter \li{tol} that defauls to \li{1e-8}, and an optional parameter \li{maxiters} that defaults to 200. Your function should return the solution
+Write a new function that accepts a sparse matrix \li{A}, a NumPy array \li{b},
+an optional parameter \li{tol} that defauls to \li{1e-8}, and an optional parameter
+\li{maxiters} that defaults to 100. Your function should return the solution
 vector \li{x} as well as an array of all the approximations of \li{x} at each
 iteration. Be sure to use different types of sparse matrices to optimize
 performance.
