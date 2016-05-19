@@ -232,17 +232,16 @@ dominant.
 
 Although this seems like a strong requirement, most real-world linear systems
 are represented by strictly diagonally dominant matrices.
-We will discuss some of these applications later in this lab.
+We will discuss a class of problems that satisfy this condition at the end of
+this lab.
 
 \begin{problem}
-    TODO create plot of b - Ax called %fig:jacobi_convergence
-    TODO provide them with a linear system as a .npz file to test it on.
-To visualize the converence of the Jacobi method, plot the error at each
-approximation. This can be computed by calculating $||A\mathbf{x}^{(k)} - \mathbf{b}||$ for each
-approximation $x^{(k)}$. Your plot should be similar to the figure below. TODO
-add labels to plot and put the code in plots.py.
+To visualize the speed of convergence of the Jacobi method, plot the error at each
+iteration. The error can be computed by calculating $||A\mathbf{x}^{(k)} - \mathbf{b}||$
+for each approximation, $x^{(k)}$. Your plot should be similar to the figure below.
+To plot with a logrithmic scale on the yaxis, run \li{plt.semilogy()}.
 
-\begin{figure}[H]
+\begin{figure}[H] \label{fig:jacobi_convergence}
 \includegraphics[width=.7\textwidth]{jacobi_convergence.pdf}
 \label{fig:jacobi_convergence}
 \end{figure}
@@ -275,7 +274,7 @@ x^{(1)}_3 & = & \frac{1}{3} ( -1 - x^{(1)}_2)       & = & \frac{1}{3} (-1 - \fra
 \end{matrix}.
 $$
 
-This process of using what we have calculated right away is called
+This process of using what we have calculated immediately is called
 \emph{forward substitution}. Using forward substitution causes the algorithm to
 converge much faster.
 
@@ -345,19 +344,36 @@ Volume 1 of the textbook.
 \begin{problem}
 As we have described up to this point in the lab, we can take advantage of the
 sparsity of a linear system by using iterative methods like Jacobi and Gauss-Seidel.
-To show how much faster these methods are, load the matrix saved in \li{whateveritscalled.npy}
-by executing the following command:
+For this problem, compare the runtimes between your \li{gauss_seidel()} function and
+\li{la.solve()}. Use the following code to generate a strictly diagonal dominant
+matrix:
 \begin{lstlisting}
->>> import numpy as np
->>> A = np.load("whateveritscalled.npy")
+def diag_dom(n, vals=[-4,4], num_entries=None):
+    """Generate a strictly diagonally dominant nxn matrix.
+
+    Inputs:
+        n (int) - dimension.
+        vals (list) - range of values for off-diagonal entries.
+        num_entries (int) - number of nonzero values.
+
+    Returns:
+        A (array) - nxn strictly diagonally dominant matrix.
+    """
+    if num_entries is None:
+        num_entries = int(n**1.5) - n
+    A = np.zeros((n,n))
+    for _ in xrange(num_entries):
+        i = np.random.randint(0,n)
+        j = np.random.randint(0,n)
+        A[i,j] = np.random.randint(vals[0],vals[-1])
+    for i in xrange(n):
+        A[i,i] = np.sum(np.abs(A[i,:])) + 1
+    return A
 \end{lstlisting}
-The matrix saved in this file is $5000 \times 5000$ and strictly diagonally dominant matrix, so the Gauss-Seidel method
-is guaranteed to converge. Compare the runtime of your \li{gauss_seidel()} function
-and the \li{la.solve()} function.
 What difference do you see between these two functions? Explain why there is such a big difference.
 \end{problem}
 
-\subsection*{Sparse Matrices}
+\section*{Sparse Matrices}
 As mentioned in the introduction, there are some systems that have tens of
 thousands of parameters. Storing such matrices in memory can become difficult.
 For example, when dealing with a system that is $100000 \times 100000$, it
