@@ -2,11 +2,228 @@
 \newcommand\ve{\varepsilon}
 \objective{This section teaches the fundamentals of Dynamic Programming using value function iteration.}
 
-Often it is of interest to optimize decision making in some sequential process.  For example, an oil company may need to decide
-how much oil to excavate and sell each month as prices change, a person entering retirement may need to decide how much of their
-savings to spend each year, or a model of economic growth may require a decision about how much to invest in capital versus how
-much to spend each year.  In this lab we will formulate a general dynamic optimization problem.  We will explore techniques for
-solving such a problem with both finite and infinite time horizons.
+%Often it is of interest to optimize decision making in some sequential process.  For example, an oil company may need to decide
+%how much oil to excavate and sell each month as prices change, a person entering retirement may need to decide how much of their
+%savings to spend each year, or a model of economic growth may require a decision about how much to invest in capital versus how
+%much to spend each year.  In this lab we will formulate a general dynamic optimization problem.  We will explore techniques for
+%solving such a problem with both finite and infinite time horizons.
+
+Previously we have optimizated a single decision or question.
+In this lab we will optimize a sequence of decisions.
+The techniques to solve these problems are called dynamic optimization.
+
+Dynamic optimization provides different answers than optimization techniques we have studied previously.
+For example, an oil company might want to know how much oil to excavate in one day in order to maximize profit.
+If we only consider today, then the answer is to excavate and sell as much as possible.
+If each day is considered in isolation, then the strategy to optimize profit is to maximize excavation in order to maximize profits.
+However, in reality oil prices change from day to day and as supply increases or decreases, and so maximizing excavation may in fact lead to less profit.
+On the other hand, if the oil company considers how production on one day will affect subsequent decisions, they may be able to maximize their profits.
+In this lab we will explore techniques for solving such a problem.
+
+\section*{The Cake Eating Problem}
+
+Rather than maximizing oil profits, we will focus on solving a general problem that can be applied in many areas called the cake eating problem.
+Given a cake of a certain size, how do we eat it to maximize our enjoyment (in other words, our utility) over time?
+Some people may prefer to eat all of their cake at once, and not save any for later.
+Others may prefer to only eat a little bit at a time.
+These preferences will be expressed precisely using a utility function.
+Our task is to find an optimal strategy given an increasing utility function, $u$.
+Precisely, given a cake of size $W_0$ and some amount of consumption $c_0 \in [0, W_0]$, the utility gained is given by
+\[
+u(c_0).
+\]
+
+If we want to maximize utility over one time period, we will consume the entire cake.  How do we maximize utility over several days?
+
+\subsection*{Discount Factors}
+
+A person or firm will typically have a preference for saving or consuming.
+For example, a dollar today can be invested and yield interest, whereas a dollar received next year will not include the accrued interest.
+In this lab, cake now will yield more utility than cake in the future.
+We can model this by multiplying future utility by a discount factor $\beta \in (0,1)$.
+For example, if we were to consume $c_0$ cake at time $0$ and $c_1$ cake at time $1$, then the total utility gained will be
+\[
+u(c_0) + \beta u(c_1).
+\]
+
+\subsection*{The Optimization Problem}
+
+If we are to consume a cake of size $W_0$ over $T$ time periods, then we can represent our consumption at each step as a vector
+\[
+(c_0, c_1, ... , c_T)
+\]
+where
+\[
+\sum_{i=1}^T c_i = W_0.
+\]
+
+We will call such a vector a policy.  Thus, our optimization problem is to
+
+\begin{align*}
+\mbox{maximize }  & \sum_{t=0}^T \beta^t u(c_t) \\
+\mbox{subject to } & \sum_{t=0}^T c_t = 1, c_t \geq 0.
+\end{align*}
+
+\begin{problem}
+
+It might seem obvious what sort of policy will yield the most utility, but the truth may surprise you.
+See Figure \ref{fig:diff_pols} for some examples.
+Write a function called \li{graph_policy} will accepts
+\begin{itemize}
+\item a policy,
+\item a utility function, and
+\item a discount factor;
+\end{itemize}
+and returns the total utility gained with the policy input.
+Also display a plot of the total utility gained over time.
+Ensure that the policy that the user passes in sums to 1.
+Otherwise, raise an \li{InputError}.
+
+%\begin{figure}
+%\begin{subfigure}{.5\textwidth}
+%    \includegraphics[width=\textwidth]{fixed_time.pdf}
+%\end{subfigure}
+%\begin{subfigure}{.5\textwidth}
+%    \includegraphics[width=\textwidth]{fixed_w.pdf}
+%\end{subfigure}
+%\caption{Slices of the finite horizon value function for fixed values of $t$ and $W$, respectively.}
+%\label{fig:valueslices}
+%\end{figure}
+\end{problem}
+\begin{figure}
+\includegraphics[width=\textwidth]{diff_policies.pdf}
+\caption{Plots for various policies with a square root utility function.  Policy 1 eats all the cake in the first step while policy 2 eats all the cake in the last step.  Their difference in utility demonstrate the effect of the discount factor on waiting to eat.  Policy 3 eats the same amount of cake at each step, while policy 4 starts eating a lot of cake but eats less and less as time goes on and the cake runs out.}
+\label{fig:diff_pols}
+\end{figure}
+
+\section*{The Value Function}
+
+We have posed the cake eating problem as an optimization problem, but we do not have a good way to solve it yet.
+To that end, we introduce the value function.
+The value function  $V(a,b,W)$ is the maximal value of
+
+\begin{align*}
+\mbox{maximize } & \sum_{t=a}^b \beta^tu(c_t) \\
+\mbox{subject to } & \sum_{t=a}^b c_t = W, c_t \geq 0
+\end{align*}
+
+for $t = a, a+1, ... b$.
+In other words, it gives the utility gained from following an optimal policy from time $a$ to time $b$.  
+%The Value function gives how much utility that a policy from time $a$ to $b$ yields given a cake of size $W$.
+So if we start with a cake of size $W_0$ and have half the cake left at time $t$, then $V(t, T, \frac{W_0}{2})$ gives how much utility we will gain by proceeding optimally from $t$.
+
+Thus, if we know what the optimal policy in the future is, we can figure out the optimal policy for the present, since
+
+\[
+V(t, T, W_{t}) = \max_{W_{t+1}} u(W_{t} - W_{t+1}) + \beta V(t+1, T, W_{t+1}).
+\]
+Recall that we know what the utility function $u$ is, as well as $\beta$.
+Also, note that our consumption at time $t$ is given by the amount of cake at the beginning of time $t$ minus the amount of cake at the beginning of time $t+1$, or $W_t - W_{t+1}$.
+
+In other words, if we know how to maximize utility in the future, we only need to maximize utility in the now in order to maintain optimality.
+So if we know what $V(t+1, T, W_{t+1})$ yields for all possible $W_{t+1}$, then we choose the best $W_{t+1}$ to figure out what the value function yields in the present.
+Thus, if we can evaluate the value function, we can also determine the optimal policy.
+
+\subsection*{Solving the Optimization Problem}
+
+\begin{problem}
+
+In this problem we will write a helper function that will help us choose the optimal policy.
+Write a method that accepts an integer $N$ representing the number of pieces we want in a discretized cake and a utility function.
+Create a vector whose entries correspond to possible amounts of cake given the discretization.
+For example, if we wanted to consider a cake split into 4 pieces, the vector should be
+\[
+w = (0, 0.25, 0.5, 0.75, 1.0)
+\]
+Return a matrix that whose $ij^{th}$ entry is the amount of utility gained by starting with $i$ cake pieces and ending with $j$ pieces.
+In other words, the $ij^{th}$ entry should be $u(w_i - w_j)$.
+Let the default utility function be the square root function.
+Set impossible situations to 0 (i.e., eating more than you have).
+We call this matrix the consumption matrix.
+
+\end{problem}
+
+How can we find the value function if we do not know the optimal policy?
+So far in our problem, we do not know how to start eating in order to maximize utility.
+However, we know that we do not want to have any cake left over when time runs out.
+Thus, the amount of utility we gain from having $W_{T-1}$ cake is given by $u(W_{T-1})$, and so we know $V(T-1, T, W_{T-1})$ for any choice of $W_{T-1}$.
+For example, if we had a cake split into 4 pieces and wanted to eat it in $T=4$ time intervals, we could express what we know about the value function from time $T$ to $T+1$ as
+
+\[
+\begin{bmatrix}
+* & * & * & * & u(1) & 0 \\
+* & * & * & * & u(0.75) & 0 \\
+* & * & * & * & u(0.5) & 0 \\
+* & * & * & * & u(0.25) & 0 \\
+* & * & * & * & :w
+u(0) & 0 \\
+\end{bmatrix}
+\]
+
+where the $ij^{th}$ entry gives the value of having $w_j$ cake at time $j$ and $*$ represents unknown values.  
+This is called the value function matrix, and note that it is dimension $N \times T+2$, since we want columns for $t = 0$ and $t = T+1$.
+The last column is there to show that after time $4$, there is no value in having any cake.
+
+\begin{problem}
+Write a function that accepts 
+\begin{itemize}
+\item $T$ (the number of time steps),
+\item $N$ (the number of pieces into which we split our cake), 
+\item a discount factor $\beta$, and
+\item a utility function;
+\end{itemize}
+and returns the value function matrix with the last two columns filled in.
+Let the default utility function be the square root function.
+\end{problem}
+
+As we mentioned in the previous section, if we know what the value function evaluates to in the future, we can evaluate the value function in the present.
+If we are at time $t$, and we know what the value function evaluates to at time $t+1$ (given by the appropriate column of the value function matrix we have built), then we can calculate
+\[
+V_t(W_t) = u(W_{t} - W_{t+1}) + \beta V_{t+1}(W_{t+1})
+\]
+for all possible values of $W_t$ and $W_{t+1}$.
+This will give an $N \times N$ matrix giving the value all possible values of starting with a cake of size $W_t$ and finishing with size $W_{t+1}$.
+We call this matrix the current value matrix.
+%If we choose the maximal value of each row, then we know the optimal amount of cake to end up with a the end of time $t$, and thus how much cake to eat.
+The largest entry of each row then is the optimal value that the value function can attain at this step, given that we start with the amount of cake that corresponds to the row.
+Thus, the maximal values of each row becomes the column of the value function matrix at time $t$ and if we know one column of the value matrix, we may iterate backwards to fill the rest of it in.
+Note that we can start this process with just the column of zeros that we know occupies the last column of the value function matrix.
+
+\begin{problem}
+Modify the solution to the previous problem to determine the entire value function matrix.
+Initialize the matrix as zeros, and starting from the next to last column 
+\begin{itemize}
+\item calculate the current value matrix,
+\item find the largest value in each row, and
+\item fill in the column with these values.
+\end{itemize}
+\end{problem}
+
+Now that the value function matrix is filled in we could say that the optimization problem is solved in some sense.
+However, it is not immediately apparent how to make decisions given the value function matrix only.
+What we really want is the optimal policy.
+It turns out that we already calculated it in the previous problem - we just didn't keep track of it.
+Recall that we calculated a current value matrix for each column of the value matrix, and that the $ij^{th}$ entry of that matrix was the value of starting with $i$ pieces of cake and finishing with $j$ pieces of cake.
+Thus, the policy for starting a time step with $i$ pieces of cake is $w_i - w_j$ (the vector $w = (w_1, ..., w_N)$ is the equal partition of the cake), where $j$ is the index of w that corresponds to the maximum value of row $i$ in the current value matrix.
+We can use this information to fill out an $N \times T+1$ policy matrix at the same time that we fill out the value matrix (T+1 because we inlcude $t=0$).
+The $ij^{th}$ entry of the policy matrix tells us how much cake to eat if we start with $w_i$ cake at time $j$. 
+
+\begin{problem}
+Modify the solution to the previous problem to determine the policy matrix.
+Initialize the matrix as zeros and fill it in starting from the last column at the same time that you determining the value function matrix.
+\end{problem}
+
+\begin{problem}
+The $ij^{th}$ entry of the policy matrix tells us how much cake to eat at time $j$ if we start with $i$ pieces.
+Use this information to find the optimal policy for starting with a cake of size 1 split into $N$ pieces, and then plot the policy.
+\end{problem}
+
+\begin{comment}
+%
+% This is the old version of the lab.  I am keeping it in for now.
+% If we wish to expand this lab then this material may help write
+% more sections, i.e. infinite horizon porblems.
+%
 
 \section*{The Sequential Problem, Finite Horizon}
 Suppose there are time periods $t=0,1,\ldots, T$ and at each time period we take an action $c_t$. Furthermore, at the beginning
@@ -704,3 +921,4 @@ $\mu=4\sigma$, $\rho = 1/2$, $\sigma=1/2$, and
 Your \li{e_params} parameter will therefore be a tuple of values containing (in order)
 $K$, $\mu$, $\rho$, $\sigma$, and $baseSigma$.
 \end{problem}
+\end{comment}
