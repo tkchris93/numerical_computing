@@ -10,14 +10,14 @@ is ubiquitous in statistics.
 However, the integrand does not have a symbolic antiderivative.
 This means we must use numerical methods to evaluate this integral. The standard technique for numerically evaluating multivariable integrals is \emph{Monte Carlo Integration}. In the next lab, we will approximate this integral using a modified version of Monte Carlo Integration. In this lab, we address the basics of Monte Carlo Integration.
 
-Monte Carlo integration is radically different from 1-dimensional techniques like Simpson's rule. Whereas Simpson's rule is purely computational, Monte Carlo integration relies on probability to calculate the integral.
+Monte Carlo integration is radically different from techniques like Simpson's rule. Whereas Simpson's rule is purely computational and deterministic, Monte Carlo integration uses randomly chosen points  in the domain to calculate the integral.
 Although it converges slowly, Monte Carlo integration is frequently used to evaluate multivariable integrals because the higher-dimensional analogs of methods like Simpson's rule are inefficient. 
 
 \section*{A Motivating Example}
 Suppose we want to numerically compute the area of a circle of radius 1.
 From analytic methods, we know the answer is $\pi$.
-Empirically, we can estimate this quantity by randomly choosing points in a $2 \times 2$ square.
-The percent of points that land in the inscribed circle, times the area of the square, should approximately equal the area of the circle (see Figure \ref{fig:MCCircle}).
+Empirically, we can estimate the area by randomly choosing points in a $2 \times 2$ square.
+The percentage of points that land in the inscribed circle, times the area of the square, should approximately equal the area of the circle (see Figure \ref{fig:MCCircle}).
 
 \begin{figure}
 \includegraphics[width=.7\textwidth]{MC.png}
@@ -34,25 +34,26 @@ We rescale and shift these points to be uniformly distributed in $[-1,1]\times[-
 \begin{lstlisting}
 >>> points = points*2-1
 \end{lstlisting}
-Next we compute the number of points in the unit circle.
-The function \li{np.hypot(a, b)} returns the norm of the vector $(a, b)$ where $a$ and $b$ are the $x$- and $y$-components, respectively.
+Next we determine the number of points in the unit circle.
+We compute the Euclidean distance from the origin for each point, then count the points that are within a distance of 1 from the origin.
+%The function \li{np.hypot(a, b)} returns the norm of the vector $(a, b)$ where $a$ and $b$ are the $x$- and $y$-components, respectively.
 \begin{lstlisting}
->>> # Create a mask of points in the circle
->>> circleMask = np.hypot(points[0,:], points[1,:]) <= 1
->>> # Count how many there are
->>> numInCircle = np.count_nonzero(circleMask)
+>>> # Compute the distance from the origin for each point
+>>> pointsDistances = np.linalg.norm(points,axis=0)
+>>> # Count how many are less than 1
+>>> numInCircle = np.count_nonzero(pointsDistances < 1)
 \end{lstlisting}
-Finally, we approximate the area.
+The fraction of points inside the circle is \li{numInCircle} divided by \li{numPoints}. By multiplying this fraction by the square's area, we can estimate the area of the circle. 
 \begin{lstlisting}
->>> # Area is approximately (area of the square)*(num points in circle)/(total num points)
->>> 4.*numInCircle/numPoints
+>>> circleArea = 4.*(numInCircle/numPoints)
+>>> circleArea
 3.024
 \end{lstlisting}
 This differs from $\pi$ by about 0.117.
 
 \begin{problem}
 \label{prob:sphere}
-Write a function that estimates the volume of the unit sphere. Your function should have a keyword argument \li{numPoints} that defaults to $10^5$. Your function should draw \li{numPoints} points uniformly from $[-1,1]\times[-1,1]\times[-1,1]$ to make your estimate. Your answer should be approximately 4.189.
+Write a function that estimates the volume of the unit sphere. Your function should have a keyword argument \li{numPoints} that defaults to $10^5$. Your function should draw \li{numPoints} points uniformly from $[-1,1]\times[-1,1]\times[-1,1]$ to make your estimate. The true volume is $\frac{4}{3}\pi \approx 4.189$.
 \end{problem}
 
 We analyze the error of the Monte Carlo method by repeating this experiment for many values of \li{numPoints} and plotting the errors.
