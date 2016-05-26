@@ -30,7 +30,7 @@ This relationship and its inverse must be modeled with at least two tables.
 The general approach is to use a unique ID.
 Note that a relationship that appears one to one may actually be a one to many relationship.
 Many people will, therefore, use the same unique ID approach on one to one relationships too in the case it turns out to be a one to many relationship.
-An example of a one to many relationship would between an department and its employees.
+An example of a one to many relationship would be between an department and its employees.
 The department would receive a unique ID and then each employee in that department would be tagged with that ID.
 
 \subsection*{Many to Many}
@@ -158,6 +158,8 @@ An inner join can be depicted as an intersection of two or more tables.
 \label{fig:inner_join}
 \end{figure}
 When performing an inner join on tables, the result will only be those records that match across all tables.
+For example, this join will select all the students' names along with their major as long as the students.majorcode matches the majors.id.
+If the students.majorcode is missing or null, then they won't be selected.
 \begin{lstlisting}[language=SQL]
 SELECT students.name, majors.name FROM students JOIN majors ON students.majorcode=majors.id;
 \end{lstlisting}
@@ -237,10 +239,13 @@ Essentially a Cartesian product of tables.
 Care must be taken when using cross join because of the size of the joined table.
 A cross join should only be used on small tables.
 It matches each relation in one table with every other possible combination of relations in the joined tables.
+For example, if you were to run a cross join on the above join.  You would get every student matched with every major.
+This doesn't really make much sense but can be useful for other applications.
+Use with caution.
 
 \section*{Advanced Selections}
 Aggregate functions are useful for summarizing the data in a column.
-The functions are
+The functions can be found in \ref{table:aggregations}.
 \begin{table}
 \begin{tabular}{|l|l|}
 \hline
@@ -253,8 +258,8 @@ AVG() & Retrieve the average numeric value of the column \\
 COUNT() & Retrieve the total number of matching records in a column \\
 \hline
 \end{tabular}
-\label{table:aggregations}
 \caption{SQL aggregation functions}
+\label{table:aggregations}
 \end{table}
 
 We can count the number of students by executing the following SQL statement.
@@ -272,7 +277,7 @@ SELECT name FROM students ORDER BY name DESC;
 
 Another useful SQL keyword is the \lsql{GROUP BY} keyword.
 It is used along with an aggregating function to group the result set by columns.
-\begin{lstlisting}
+\begin{lstlisting}[language=SQL]
 SELECT grade, COUNT(studentid) FROM grades GROUP BY grade;
 \end{lstlisting}
 The result set is given in table \ref{table:group_by_grade}.
@@ -329,7 +334,7 @@ Since \lsql{COUNT} is an aggregating function, the following is required.
 SELECT grade FROM grades GROUP BY grade HAVING COUNT(*)=1;
 \end{lstlisting}
 This SQL query returns all the grades that occur only once in the table.
-A simple why to remember the difference is \emph{\lsql{WHERE} operates on individual records and \lsql{HAVING} operates on groups of records}.
+A simple way to remember the difference is \emph{\lsql{WHERE} operates on individual records and \lsql{HAVING} operates on groups of records}.
 
 \begin{problem}
 Select all the students who have received grades (non-null grades) in more than two classes.  How many grades did he receive?
@@ -341,6 +346,8 @@ A case expression allows you to temporarily modify records from a select operati
 There are two forms of the case expression; simple and searched.
 The simple form of the expression is a match and replace on a specified column.
 A simple case expression is demonstrated below.
+This code will return the name of the student along with their majorcode.
+But instead of integers, the names of the majors will be returned.
 \begin{lstlisting}[language=SQL]
 SELECT name, 
 CASE majorcode 
@@ -370,7 +377,7 @@ FROM students;
 \begin{problem}
 Find the overall GPA of all the students in the school.
 Use a regular 4.0 scale (A=4.0, B=3.0, C=2.0, D=1.0).
-Any pluses or minuses are dropped so an A- becomes and A.
+Any pluses or minuses are dropped so an A- becomes an A.
 
 Your result set should be one column and one row with average of all GPAs of all the students taking classes.  
 Your solution should return a single floating point number.
