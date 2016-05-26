@@ -11,6 +11,39 @@ from matplotlib import pyplot as plt
 from matplotlib import cm
 from mpl_toolkits.mplot3d import Axes3D
 
+def diff_policies():
+
+    def graph_policy(policies, utility_function=np.sqrt, beta=0.9):
+        # First, create a state space that is the same length as the policy.
+        states = np.linspace(0,1,len(policies[0]))
+
+        # Now calculate the utility accumulated at each step of the policy.
+        fig = plt.figure()
+        fig.set_size_inches(8,8)
+        plt.title('Utility Gained From Various Policies')
+        for i, policy in enumerate(policies):
+
+            total_utility = np.zeros(len(policy))
+            total_utility[0] = utility_function(policy[0])
+
+            for j, consumption_amount in enumerate(policy[1:]):
+                total_utility[j+1] = total_utility[j] + beta**(j+1)*utility_function(policy[j+1])
+
+            l, = plt.plot(np.arange(len(policy)), total_utility, label='Policy ' + str(i+1) 
+                          + ', Utility = ' + str(total_utility[-1])[:3])
+
+            print("Total Utility: \t" + str(total_utility[-1]))
+        plt.legend(loc='upper left')
+        plt.savefig('./diff_policies.pdf')
+    
+    policy1 = np.array([1.0, 0, 0, 0, 0])
+    policy2 = np.array([0, 0, 0, 0, 1.0])
+    policy3 = np.array([0.2, 0.2, 0.2, 0.2, 0.2])
+    policy4 = np.array([0.4, 0.3, 0.2, 0.1, 0])
+
+    policies = [policy1, policy2, policy3, policy4]
+    graph_policy(policies)
+    
 
 def eatCake(beta, N, Wmax=1., T=None, finite=True, plot=False):
     """
