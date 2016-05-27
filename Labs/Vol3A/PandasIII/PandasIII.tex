@@ -1,0 +1,82 @@
+\lab{Pandas III: Pivot Tables}{Pandas III: Pivot Tables}
+\objective{Learn about Pivot tables.}
+\label{lab:pandas3}
+
+\section*{Introduction}
+Pandas originated as a wrapper for numpy that was developed by AQR Capital Management, a large investment management company. They used pandas to speed their analysis of financial data. It has since evolved to handle numerous use-cases. Core among its abilities is the power to ``pivot'', or change the main axis of analysis, and then apply functions to that new view. There are two central ways to accomplish this: GroupBy & PivotTables.
+
+\section*{The Titanic Dataset}
+We first take a look at how we can use pandas to identify broad trends in the data. We will first look at a simple yet interesting dataset: the Titanic dataset. This dataset contains information (gender, age, class, place of embark, etc.) on passengers from the ill-fated voyage of the Titanic.
+
+\begin{lstlisting}
+>>> import numpy as np
+>>> import pandas as pd
+>>> titanic = pd.read_csv('titanic.csv')
+\end{lstlisting}
+
+Let's visualize some of the columns and first couple of rows of our dataset to see what information we can start grouping by to see relations. With this dataset's format, we can just call .head() to visualize the first 5 rows of the table to see what columns are present.
+
+Using the function \li{head()}, we can examine the first few rows of a DataFrame so as to view the columns present.
+
+\begin{lstlisting}
+>>> titanic.head()
+\end{lstlisting}
+
+%\begin{figure}
+%    \centering
+%    \includegraphics[width=.75\textwidth]{heading.pdf}
+%\end{figure}
+
+\subsection*{GroupBy()}
+Just as it sounds, groupby() takes a DataFrame, and creates groups. The groupby() function does not return anything itself that is helpful to examine. You have to apply some kind of function to the DataFrame object that is returned, but then the function is extremely helpful.
+
+Let's say we want to look at the survival rate of women versus men. How likely was it for a person to survive on the Titanic if they were male as compared to female? We do this with groupby as follows:
+
+\begin{lstlisting}
+>>> # Survival rate by gender
+>>> titanic.groupby('sex')[['survived']].mean()
+\end{lstlisting}
+
+%\begin{figure}
+%    \centering
+%    \includegraphics[width=.75\textwidth]{gend_surv.pdf}
+%\end{figure}
+
+Here, we chose `sex' as the attribute we want to distinguish the survival rates between. The column `survived' in the titanic dataset contains either a 1 if the passenger survived, or a 0 if they died. Therefore, the survival rate can be found by taking the mean of the entries of the resulting pandas dataframe.
+
+From the table, as we would probably expect, women were more likely to survive than men. But was this true for all different classes on the ship? For example, were women sailing in 1st class more likely to survive than women in 3rd class? In other words, did your class for the voyage have a direct correlation with your survival rate?
+
+We use groupby to help us in the following way:
+
+We pass a list of arguments `sex' and `class', and specify that we want to look at the `survived' values for these different categories. We must then call the aggregate function to organize our data into rows and columns with the value of 'mean' for the intersection of each category. The function unstack() then puts the dataframe into a nice visual format for us.
+
+\begin{lstlisting}
+>>> # Survival rate by gender and class. Note how complicated the line is
+>>> titanic.groupby(['sex', 'class'])[['survived']].aggregate('mean').unstack()
+\end{lstlisting}
+
+%\begin{figure}
+%    \centering
+%    \includegraphics[width=.75\textwidth]{gend_class.pdf}
+%\end{figure}
+
+Note how long of a function call this previous groupby statement was. Because this functionality is used so often, pandas was built to include a much more quick and efficient way to make these types of tables - pivot tables!
+
+\section*{Pivot Tables}
+With a given pandas dataframe, we can visualize all of these tables easily with the function \li{pivot_table()}. To accomplish basically the same task as before of comparing the survival rates for both genders and each class, we can call:
+
+\begin{lstlisting}
+>>> # We can do the same thing, with less code in df.pivot_table()
+>>> titanic.pivot_table('survived', index='sex', columns='class')
+\end{lstlisting}
+
+%\begin{figure}
+%    \centering
+%    \includegraphics[width=.75\textwidth]{piv_gend_class.pdf}
+%\end{figure}
+
+Here ``value'' is the category (or column in the original datset) we want to compare, ``index'' will be the category for the row of our pivot table, and ``columns'' is the category to organize as the columns for our pivot table.
+
+Let's say we want to further break down the survival rates to compare how different ages fared in the voyage, according to their gender and class. We could be asking ourselves the question, ``What about the children? Were male children really that likely to die as compared to female children?''. As you will see with pivot tables, as we see these simple breakdowns of the data, more questions can, and should arise. You should consistently ask yourself questions about the relevance of the numbers you see in the pivot tables you create. So let's look at how age was a factor in survival.
+
+Noting that in the original dataset, the `age' column has an integer value for the age of each passenger, if we were to just add `age' as an argument for index, then the table would create a new row for EACH age present. This wouldn't be a very useful or simple table to visualize, so we desire to partition the ages into 3 categories. We use the function \li{cut()} to do this.
