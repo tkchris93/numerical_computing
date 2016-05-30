@@ -1,3 +1,8 @@
+import numpy as np
+from scipy import linalg as la
+from solutions import jacobi_method
+import matplotlib.pyplot as plt
+
 A = np.array([[2,0,-1],[-1,3,2],[0,1,3]])
 b = np.array([3,3,-1])
 
