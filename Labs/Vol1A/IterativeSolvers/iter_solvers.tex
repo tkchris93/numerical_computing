@@ -110,7 +110,7 @@ $$
 
 To find $\mathbf{x}^{(k)}$, we repeat the same process of solving for each
 $x^{(k)}_i$ until convergence is reached. For this particular problem,
-convergence is reached in 29 iterations.
+convergence to 8 decimal places is reached in 29 iterations.
 
 \begin{center}
 \begin{tabular}{ c|c c c  }
@@ -209,7 +209,7 @@ Using Equation \ref{eq:jacobi}, implement the Jacobi Method. Avoid using
 an optional parameter \li{tol} with a default value of \li{1e-8}. Additionally,
 accept an optional parameter \li{maxiters} to help you catch nonconvergent
 systems. Set \li{maxiters} to $100$ as default. Your function should return the
-solution vector \li{x} as well as an array of all the approximations of \li{x}
+solution vector \li{x} as well as a list of all the approximations of \li{x}
 at each iteration. Stop iterating when \li{maxiters} is reached or
 $||\mathbf{x}^{(k)} - \mathbf{x}^{(k+1)}||_{\infty} < $ \li{tol}. In Python, you
 can calculate $||x||_{\infty}$ in two ways.
@@ -220,13 +220,20 @@ can calculate $||x||_{\infty}$ in two ways.
 \end{lstlisting}
 For more information about the $\infty$-norm see Chapter ?? of Volume 1.
 
-If \li{maxiters} is hit, return the current solution. If your
+If \li{maxiters} is hit, return the current solution. Your function should flexible enought
+to be able to handle systems of any size. If your
 system is non-convergent, you will find that your approximations have increasingly
 large entries. Test your function on the $3 \times 3$ linear system above. Then
 test your function on a random $3 \times 3$ matrix. Chances are the random matrix
 you generate will not converge, i.e. \li{maxiters} will be hit.
 We will discuss why in the next section.
 
+\begin{info}
+Remember that NumPy arrays are mutable. Therefore, to check convergence, you
+will need to have two copies of the array you are testing,
+i.e. a ``before" version and an ``after" version. Review Lab 2 for more
+information.
+\end{info}
 \end{problem}
 
 \subsection*{Convergence of the Jacobi Method}
@@ -247,9 +254,11 @@ this lab.
 
 \begin{problem}
 To visualize the speed of convergence of the Jacobi method, plot the error at each
-iteration. The error can be computed by calculating $||A\mathbf{x}^{(k)} - \mathbf{b}||$
+iteration. Use the list of approximations that you returned in Problem \ref{prob:jacobi}
+to calculate the errors. The error can be computed by calculating
+$||A\mathbf{x}^{(k)} - \mathbf{b}||$
 for each approximation, $x^{(k)}$. Your plot should be similar to the figure below.
-To plot with a logrithmic scale on the yaxis, run \li{plt.semilogy()}.
+To plot with a logrithmic scale on the $y$-axis, run \li{plt.semilogy()}.
 
 \begin{figure}[H] \label{fig:jacobi_convergence}
 \includegraphics[width=.7\textwidth]{jacobi_convergence.pdf}
@@ -334,7 +343,8 @@ Implement the Gauss-Seidel Method using Equation \ref{eq:gauss_seidel}. Your
 function should accept a matrix \li{A}, a vector \li{b}, an optional parameter
 \li{tol} that defaults to \li{1e-8} and an optional parameter \li{maxiters} that
 defaults to $100$. Your function should return the solution vector \li{x} as
-well as an array of all the approximations of \li{x} at each iteration.
+well as a list of all the approximations of \li{x} at each iteration. HINT: It is
+easiest to implement this algorithm if you update the approximation vector, $x^{(k)}$, in-place.
 \end{problem}
 
 \subsection*{Convergence of Gauss-Seidel}
@@ -355,8 +365,8 @@ Volume 1 of the textbook.
 As we have described up to this point in the lab, we can take advantage of the
 sparsity of a linear system by using iterative methods like Jacobi and Gauss-Seidel.
 For this problem, compare the runtimes between your \li{gauss_seidel()} function and
-\li{la.solve()}. Use the following code to generate a strictly diagonal dominant
-matrix:
+\li{la.solve()} for a strictly diagonally dominant system of 5000 parameters. Use the following
+code to generate a strictly diagonal dominant matrix:
 \begin{lstlisting}
 def diag_dom(n, vals=[-4,4], num_entries=None):
     """Generate a strictly diagonally dominant nxn matrix.
@@ -364,7 +374,9 @@ def diag_dom(n, vals=[-4,4], num_entries=None):
     Inputs:
         n (int) - dimension.
         vals (list) - range of values for off-diagonal entries.
-        num_entries (int) - number of nonzero values.
+        num_entries (int) - number of nonzero values. If None, num_entries
+                    defaults to n^(1.5) - n. This provides a good amount of
+                    nonzero values while still being very sparse.
 
     Returns:
         A (array) - nxn strictly diagonally dominant matrix.
@@ -375,7 +387,7 @@ def diag_dom(n, vals=[-4,4], num_entries=None):
     for _ in xrange(num_entries):
         i = np.random.randint(0,n)
         j = np.random.randint(0,n)
-        A[i,j] = np.random.randint(vals[0],vals[-1])
+        A[i,j] = np.random.randint(vals[0],vals[1])
     for i in xrange(n):
         A[i,i] = np.sum(np.abs(A[i,:])) + 1
     return A
@@ -398,25 +410,118 @@ problem of storage. A \li{sparse} matrix only stores the nonzero values and the 
 of these values. For sufficiently sparse matrices, storing the matrix as a
 \li{sparse} matrix may take merely megabytes rather than gigabytes.
 
-There are different kinds of matrices in the \li{sparse} module. Each has their
-strengths and weaknesses. In Table \ref{table:sparse_matrices}, we briefly
-address the uses of these matrices. We direct the interested reader to the
-online documentation for more in-depth information. \url{http://docs.scipy.org/doc/scipy/reference/sparse.html}
-
+\subsection*{Types of Sparse Matrices}
+There are different kinds of matrices in the \li{sparse} module. If performance
+is an issue, it is necessary to be familiar with the strengths and weaknesses of each type.
+In Table \ref{table:sparse_matrices}, we briefly summarize the uses of these matrices.
 \begin{center}
-    \begin{tabular} {c | l }
+    \begin{tabular} {c | l } \label{table:sparse_matrices}
                   & \multicolumn{1}{c}{Intended Uses} \\
         \hline
         \li{coo\_matrix} & Create a matrix using arrays of \\
                          & coordinates and values. Also fast \\
                          & sparse matrix type conversion. \\
-        \li{csc\_matrix} & Perform column-based matrix operations. \\
-        \li{csr\_matrix} & Perform row-based matrix operations.  \\
+        \li{csc\_matrix} & Perform column-based matrix operations and slicing. \\
+        \li{csr\_matrix} & Perform row-based matrix operations and slicing.  \\
         \li{dia\_matrix} & Create a matrix with diagonal structure.  \\
         \li{dok\_matrix} & Access individual elements of the matrix.  \\
-        \li{lil\_matrix} & Create a matrix one entry at a time.  \\
         \end{tabular}
 \end{center}
+
+\subsection*{coo\_matrix}
+A \li{coo_matrix} is in COOrdinate format. All nonzero values are stored as a
+location (or coordinate) and value. Use this type of sparse matrix for creating
+a sparse matrix if you know the location of all the nonzero values. Once a matrix
+in this format has been created, it also supports very fast conversion between
+the other sparse matrix types.
+
+\begin{lstlisting}
+# Initialize the matrix using a coo_matrix.
+>>> rows = np.array([0,1,2,3,0,2])
+>>> cols = np.array([0,1,2,3,1,0])
+>>> values = np.array([3,5,4,1,2,1])
+>>> A = spar.coo_matrix((values, (rows,cols)), shape=(4,4))
+
+To visualize how the values are stored,
+>>> print A
+    (0, 0)	3
+    (1, 1)	5
+    (2, 2)	4
+    (3, 3)	1
+    (0, 1)	2
+    (2, 0)	1
+
+# To visualize the matrix, use .todense(). Keep in mind doing
+#   operations on this dense matrix forfeits all sparse-related
+#   optimizations.
+>>> print A.todense()
+matrix([[3, 2, 0, 0],
+        [0, 5, 0, 0],
+        [1, 0, 4, 0],
+        [0, 0, 0, 1]])
+
+\end{lstlisting}
+
+\subsection*{csr\_matrix and csc\_matrix}
+For the vast majority of matrix computation you can perform with sparse matrices, the
+\li{csr_matrix} and \li{csc_matrix} will be your best option. They stand for
+Compressed Sparse Row matrix and Compressed Sparse Column matrix, respectively.
+
+When choosing which format to use, we must determine what direction the matrix
+will be traversed, whether it is row-wise or column-wise. For example, in matrix-vector
+multiplication, the matrix is traversed row-wise, therefore we should choose the
+\li{csr_matrix}.
+
+\begin{lstlisting}
+>>> Acsr = A.tocsr()
+>>> x = np.array([1,0,-1,2])
+>>> b = Acsr.dot(x)
+array([3,0,-3,2])
+\end{lstlisting}
+
+For matrix-matrix multiplication, the left matrix is traversed row-wise and the
+right matrix is traversed column-wise. Therefore, we should make a \li{csr_matrix}
+copy and a \li{csc_matrix} copy.
+
+\begin{lstlisting}
+>>> Acsr = A.tocsr()
+>>> Acsc = A.tocsc()
+>>> Asquared = Acsr.dot(Acsc)
+\end{lstlisting}
+
+If you need to access rows or columns of these matrices, you can perform array
+slicing with syntax identical to array slicing for NumPy arrays. Row slicing is
+faster with a \li{csr_matrix} and column slicing is faster with a \li{csc_matrix}.
+
+\begin{lstlisting}
+>>> Acsr[0,:].todense()
+matrix([[3, 2, 0, 0]])
+
+>>> Acsc[:,2].todense()
+matrix([[0],
+        [0],
+        [4],
+        [0]])
+\end{lstlisting}
+
+It is worth noting that row-based operations on a \li{csc_matrix} is very slow,
+and similarly, column-based operations on a \li{csr_matrix} is very slow. Therefore,
+for the sake of performance, it is worth taking extra care to ensure the optimal
+matrix is being used.
+
+\subsection*{dok\_matrix}
+The \li{dok_matrix} format stands for Dictionary Of Keys matrix. This type of matrix
+is optimal for accessing single elements. It is not very fast for any other operation.
+
+\begin{lstlisting}
+>>> Adok = A.todok()
+>>> print Adok[2,0]
+1
+>>> print Adok[1,1]
+5
+\end{lstlisting}
+
+\begin{comment}
 
 The following is a quick example of how the different types of sparse matrices
 can be used to optimize performance.
@@ -443,6 +548,19 @@ matrix([[3, 2, 0, 0],
 >>> b = Acsr.dot(x)
 array([3,0,-3,2])
 
+# access rows of a csr_matrix. The syntax for slicing a csr_matrix
+#  (and csc_matrix) is identical to slicing NumPy arrays. For row slicing,
+#  use a csr_matrix. For column slicing, use a csc_matrix.
+>>> Acsr[0,:].todense()
+matrix([[3, 2, 0, 0]])
+
+>>> Acsc = A.tocsc()
+>>> Acsc[:,2].todense()
+matrix([[0],
+        [0],
+        [4],
+        [0]])
+
 # access individual elements of the matrix after converting to a dok_matrix.
 >>> Adok = A.todok()
 >>> print Adok[2,0]
@@ -451,28 +569,68 @@ array([3,0,-3,2])
 5
 \end{lstlisting}
 
+\end{comment}
+
+\subsection*{In Summary}
 Since the \li{coo_matrix} type allows for fast sparse matrix type conversion, it
-is usually worth the time and memory to convert to the sparse matrix type that corresponds with the operations you are performing.
+is usually worth the time and memory to convert to the sparse matrix type that
+corresponds with the operations you are performing. If you would like more
+information regarding the intended uses for each type of sparse matrix, see
+\url{http://docs.scipy.org/doc/scipy/reference/sparse.html}.
 
 Many of the same methods you are used to using with NumPy arrays have similar
 functions in the \li{scipy.sparse} module. These methods take advantage of the
 sparse structure of the matrices and are, therefore, usually significantly faster.
+To learn which methods are available, see
+\url{http://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.html#scipy.sparse.csr_matrix}
 Note that there is also a \li{scipy.sparse.linalg} module that has linear algebra
 methods that have been optimized for sparse matrices. We will use the
-\li{scipy.sparse} module more in future labs.
+\li{scipy.sparse} and \li{scipy.sparse.linalg} modules more in future labs.
 
 \begin{problem}
 To be able to use the Gauss-Seidel method on sparse matrices, you must translate
-the code you wrote in \ref{prob:gauss_seidel} from \li{numpy} to \li{scipy.sparse}.
+the code you wrote in Problem \ref{prob:gauss_seidel} from \li{numpy} to \li{scipy.sparse}.
 The algorithm is the same, but there are some functions that are named differently
 between these two packages.
 
 Write a new function that accepts a sparse matrix \li{A}, a NumPy array \li{b},
 an optional parameter \li{tol} that defauls to \li{1e-8}, and an optional parameter
 \li{maxiters} that defaults to 100. Your function should return the solution
-vector \li{x} as well as an array of all the approximations of \li{x} at each
+vector \li{x} as well as a list of all the approximations of \li{x} at each
 iteration. Be sure to use different types of sparse matrices to optimize
 performance.
+
+To test your function, you can create a strictly diagonally dominant matrix with
+the following code. In this code, also note how different types of sparse matrices
+have been used to optimize performance.
+\begin{lstlisting}
+def spar_diag_dom(n, num_entries=None):
+    """Generate a strictly diagonally dominant sparse nxn matrix.
+
+    Inputs:
+        n (int) - dimension
+        num_entries (int) - number of nonzero values. If None, num_entries
+                    defaults to n^(1.5) - n. This provides a good amount of
+                    nonzero values while still being very sparse.
+
+    Returns:
+        A (spar.coo_matrix) - strictly diagonally dominantn sparse nxn matrix.
+    """
+    if num_entries is None:
+        num_entries = int(n**1.5) - n
+
+    rows = np.random.random_integers(0,n-1,num_entries)
+    cols = np.random.random_integers(0,n-1,num_entries)
+    values = np.random.random_integers(-4,4,num_entries)
+    A = spar.coo_matrix((values, (rows,cols)), shape=(n, n))
+
+    A = A.todok()
+    Acsr = A.tocsr()
+    for i in xrange(n):
+        A[i,i] = np.abs(Acsr[i,:]).sum() + 1
+    return A.tocsr()
+\end{lstlisting}
+
 \end{problem}
 
 \section*{Application: (whatever the problem is)}
