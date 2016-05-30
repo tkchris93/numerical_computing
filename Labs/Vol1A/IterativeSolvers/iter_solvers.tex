@@ -375,8 +375,7 @@ def diag_dom(n, vals=[-4,4], num_entries=None):
         n (int) - dimension.
         vals (list) - range of values for off-diagonal entries.
         num_entries (int) - number of nonzero values. If None, num_entries
-                    defaults to n^(1.5) - n. This provides a good amount of
-                    nonzero values while still being very sparse.
+                    defaults to n^(1.5) - n. 
 
     Returns:
         A (array) - nxn strictly diagonally dominant matrix.
@@ -610,8 +609,7 @@ def spar_diag_dom(n, num_entries=None):
     Inputs:
         n (int) - dimension
         num_entries (int) - number of nonzero values. If None, num_entries
-                    defaults to n^(1.5) - n. This provides a good amount of
-                    nonzero values while still being very sparse.
+                    defaults to n^(1.5) - n.
 
     Returns:
         A (spar.coo_matrix) - strictly diagonally dominantn sparse nxn matrix.
