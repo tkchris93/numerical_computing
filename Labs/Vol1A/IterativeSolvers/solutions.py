@@ -59,6 +59,17 @@ def spar_diag_dom(n, num_entries=None):
 
 # Problem 1
 def jacobi_method(A,b,maxiters=100,tol=1e-8):
+    """Returns the solution to the system Ax = b using the Jacobi Method.
+
+    Inputs:
+        A (array) - 2D NumPy array
+        b (array) - 1D NumPy array
+        maxiters (int, optional) - maximum iterations for algorithm to perform.
+        tol (float) - tolerance for convergence
+    Returns:
+        x (array) - solution to system Ax = b.
+        x_approx (list) - list of approximations at each iteration.
+    """
     n = A.shape[0]
     x0 = np.zeros(n)
     x = np.zeros(n)
@@ -75,7 +86,15 @@ def jacobi_method(A,b,maxiters=100,tol=1e-8):
 
 # Problem 2
 def plot_convergence(A, b, maxiters=100, tol=1e-8):
-    x, x_approx = jacobi_method(A,b)
+    """Plot the rate of convergence for solving the system Ax = b.
+
+    Inputs:
+        A (array) - 2D NumPy array
+        b (array) - 1D NumPy array
+        maxiters (int, optional) - maximum iterations for algorithm to perform.
+        tol (float) - tolerance for convergence
+    """
+    x, x_approx = jacobi_method(A,b,maxiters,tol)
 
     x_approx = np.array(x_approx)
     dom = np.arange(x_approx.shape[0])
@@ -91,6 +110,17 @@ def plot_convergence(A, b, maxiters=100, tol=1e-8):
 
 # Problem 3
 def gauss_seidel(A,b,maxiters=100,tol=1e-8):
+    """Returns the solution to the system Ax = b using the Gauss-Seidel Method.
+
+    Inputs:
+        A (array) - 2D NumPy array
+        b (array) - 1D NumPy array
+        maxiters (int, optional) - maximum iterations for algorithm to perform.
+        tol (float) - tolerance for convergence
+    Returns:
+        x (array) - solution to system Ax = b.
+        x_approx (list) - list of approximations at each iteration.
+    """
     n = A.shape[0]
     x0 = np.zeros(n)
     x = np.zeros(n)
@@ -111,6 +141,10 @@ def gauss_seidel(A,b,maxiters=100,tol=1e-8):
 
 # Problem 4
 def compare_times():
+    """For a 5000 parameter system, compare the runtimes of the Gauss-Seidel
+    method and la.solve. Print an explanation of why Gauss-Seidel is so much
+    faster.
+    """
     A = diag_dom(5000)
     b = np.random.rand(5000)
     before = time.time()
@@ -128,6 +162,18 @@ def compare_times():
 
 # Problem 5
 def sparse_gauss_seidel(A,b,maxiters=100,tol=1e-8):
+    """Returns the solution to the system Ax = b using the Gauss-Seidel method.
+
+    Inputs:
+        A (array) - 2D scipy.sparse matrix
+        b (array) - 1D NumPy array
+        maxiters (int, optional) - maximum iterations for algorithm to perform.
+        tol (float) - tolerance for convergence
+    Returns:
+        x (array) - solution to system Ax = b.
+        x_approx (list) - list of approximations at each iteration.
+    """
+
     if type(A) != spar.coo_matrix:
         A = spar.coo_matrix(A)
     Acsr = A.tocsr()
@@ -153,6 +199,17 @@ def sparse_gauss_seidel(A,b,maxiters=100,tol=1e-8):
 
 # Problem 7 (Optional)
 def sparse_sor(A,b,omega,maxiters=100, tol=1e-8):
+    """Returns the solution to the system Ax = b using Successive Over-Relaxation.
+
+    Inputs:
+        A (array) - 2D scipy.sparse matrix
+        b (array) - 1D NumPy array
+        maxiters (int, optional) - maximum iterations for algorithm to perform.
+        tol (float) - tolerance for convergence
+    Returns:
+        x (array) - solution to system Ax = b.
+        x_approx (list) - list of approximations at each iteration.
+    """
     if type(A) != spar.coo_matrix:
         A = spar.coo_matrix(A)
     Acsr = A.tocsr()
