@@ -1,4 +1,4 @@
-\lab{Intro to pandas I}{Intro to pandas I}
+\lab{Pandas I: Introduction to Pandas}{Pandas I: Introduction to Pandas}
 \objective{Become acquainted with the data structures and tools that pandas offers for data analysis.}
 \label{lab:pandas1}
 
@@ -305,8 +305,10 @@ Plotting is often a much more effective way to view and gain understanding of a 
 viewing the raw numbers. Fortunately, pandas interfaces well with matplotlib, allowing relatively
 painless data visualization.
 
-We start by plotting a \li{Series}. Doing so is easy, as the \li{Series} object is equipped with its own plot
+Most of the functionality of plotting using pandas will be discussed in Lab \ref{lab:pandas2}.  In this lab, we will simply show how to plot a \li{Series}. Doing so is easy, as the \li{Series} object is equipped with its own plot
 function.
+%Change this example to use the titanic data, which will be cleaned up.
+
 Let's start with visualizing a simple random walk. By way of background, a \emph{random walk} is a
 stochastic process used to model a non-deterministic path through some space. It is a useful construct in
 many fields and can be used to explain things like the motion of a molecule as it travels through a liquid to modeling the fluctuations
@@ -357,46 +359,6 @@ Your results should be comparable to those in Figure \ref{pandas:biasedRandomWal
 \includegraphics[width=.7 \textwidth]{biasedRandomWalk.pdf}
 \caption{Biased random walk of length 100 (above) and 10000 (below).}
 \label{pandas:biasedRandomWalk}
-\end{figure}
-
-Using \li{DataFrames}, one can also plot one column against another.
-
-\begin{lstlisting}
->>> xvals = pd.Series(np.sqrt(np.arange(1000)))
->>> yvals = pd.Series(np.random.randn(1000).cumsum())
->>> df = pd.DataFrame({'xvals': xvals, 'yvals': yvals})
->>> df.plot(x='xvals', y='yvals') # specify x and y values
->>> plt.show()
->>> plt.close()
-\end{lstlisting}
-
-The result is displayed in Figure \ref{pandas:dfPlot}.
-
-\begin{figure}
-\centering
-\includegraphics[width=.7 \textwidth]{dfPlot.pdf}
-\caption{ Graph generated when one coordinate is taken from the xvals column and the other from the yvals column.}
-\label{pandas:dfPlot}
-\end{figure}
-
-A variety of other types of plots are possible. One of the more useful plots when trying to estimate or
-visualize the distribution of data is a histogram. The code listed below demonstrates how to generate
-a histogram for each column in a \li{DataFrame}, with the result shown in Figure \ref{fig:PandasHistogram}.
-
-\begin{lstlisting}
->>> col1 = pd.Series(np.random.randn(1000))         #normal distribution
->>> col2 = pd.Series(np.random.gamma(5, size=1000)) #gamma distribution
->>> df = pd.DataFrame({'normal': col1, 'gamma': col2})
->>> df.hist()
->>> plt.show()
->>> plt.close()
-\end{lstlisting}
-
-\begin{figure}
-\centering
-\includegraphics[width=.7 \textwidth]{histogram.pdf}
-\caption{Histogram of two columns of a \li{DataFrame.}}
-\label{fig:PandasHistogram}
 \end{figure}
 
 \subsection*{SQL Operations in pandas}
