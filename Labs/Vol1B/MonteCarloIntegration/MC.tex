@@ -56,22 +56,6 @@ This differs from $\pi$ by about 0.117.
 Write a function that estimates the volume of the unit sphere. Your function should have a keyword argument \li{numPoints} that defaults to $10^5$. Your function should draw \li{numPoints} points uniformly from $[-1,1]\times[-1,1]\times[-1,1]$ to make your estimate. The true volume is $\frac{4}{3}\pi \approx 4.189$.
 \end{problem}
 
-We analyze the error of the Monte Carlo method by repeating this experiment for many values of \li{numPoints} and plotting the errors.
-The result is the blue line in Figure \ref{fig:mc_error}.
-The error appears to be proportional to $1/\sqrt{N}$ where $N=$ \li{numPoints} (the green line in Figure \ref{fig:mc_error}).
-This means that to divide the error by 10, we must sample \emph{100 times} more points.
-
-\begin{figure}
-\includegraphics[width=.7\textwidth]{mc_error.pdf}
-\caption{The Monte Carlo integration method was used to compute the area of a circle of radius 1. 
-The blue line plots the average error in 100 runs of the Monte Carlo method on $N$ sample points, where $N$ appears on the horizontal axis.
-The green line is a plot of $1/\sqrt{N}$. }
-\label{fig:mc_error}
-\end{figure}
-
-This is a slow convergence rate, but it is independent of the number of dimensions of the problem. 
-This dimension independence is what makes the Monte Carlo method useful for multivariable integrals.
-
 \section*{Monte Carlo Integration}
 
 You can calculate the area of the unit circle with the following integration problem:
@@ -238,6 +222,26 @@ Compare the errors of your estimates to the result you got from the SciPy packag
 \end{enumerate}
 \end{problem}
 \end{comment}
+
+
+
+\section*{Convergence}
+
+We analyze the error of the Monte Carlo method by repeating this experiment for many values of \li{numPoints} and plotting the errors.
+The result is the blue line in Figure \ref{fig:mc_error}.
+The error appears to be proportional to $1/\sqrt{N}$ where $N=$ \li{numPoints} (the green line in Figure \ref{fig:mc_error}).
+This means that to divide the error by 10, we must sample \emph{100 times} more points.
+
+\begin{figure}
+\includegraphics[width=.7\textwidth]{mc_error.pdf}
+\caption{The Monte Carlo integration method was used to compute the area of a circle of radius 1. 
+The blue line plots the average error in 100 runs of the Monte Carlo method on $N$ sample points, where $N$ appears on the horizontal axis.
+The green line is a plot of $1/\sqrt{N}$. }
+\label{fig:mc_error}
+\end{figure}
+
+This is a slow convergence rate, but it is independent of the number of dimensions of the problem. 
+This dimension independence is what makes the Monte Carlo method useful for multivariable integrals.
 
 \section*{A Caution}
 You can run into trouble if you try to use Monte Carlo integration on an integral that does not converge.
