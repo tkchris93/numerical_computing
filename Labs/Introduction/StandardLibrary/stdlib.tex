@@ -229,7 +229,7 @@ Print a statement of your conclusions.
 
 \section*{Modules} % ==========================================================
 
-In general, a Python \emph{module} is a file containing Python code that is meant to be used in some other setting, and not necessarily run directly.\footnote{A Python file that is not meant to be imported is often called a \emph{script}.}
+A Python \emph{module} is a file containing Python code that is meant to be used in some other setting, and not necessarily run directly.\footnote{Python files that are not meant to be imported are often called \emph{scripts}.}
 The \li{import} statement loads code from a specified Python file.
 That is, importing a module containing some functions, classes, or other objects makes those functions, classes, or objects available for use.
 
@@ -251,8 +251,10 @@ if __name__ == "__main__":
     pass                            # 'pass' is a temporary placeholder.
 \end{lstlisting}
 
+\begin{info}
 The modules imported in this example are some of the most important modules for this curriculum.
 The NumPy, SciPy, and MatPlotLib modules will be presented in detail in subsequent labs.
+\end{info}
 
 \subsection*{Importing Syntax} % ----------------------------------------------
 
@@ -297,37 +299,35 @@ In each case, the far right word of the import statement is the name that is add
 
 \subsection*{Running and Importing} % -----------------------------------------
 
-Consider the following simple Python module, saved as \texttt{example.py}.
+Consider the following simple Python module, saved as \texttt{example1.py}.
 
 % TODO: put parentheses on the print statements for Python 3.
 \begin{lstlisting}
-# example.py
-
 data = range(4)
 
 def display():
     print "Data:", data
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print "This file was executed from the terminal or an interpreter."
     display()
 else:
     print "This file was imported."
 \end{lstlisting}
 
-Executing the file from the terminal executes the file line by line, including the code under the \li{if __name__ == '__main__'} clause.
+Executing the file from the terminal executes the file line by line, including the code under the \li{if __name__ == "__main__"} clause.
 
 \begin{lstlisting}
-$ python example.py
+$ python example1.py
 <<Data: [1, 2, 3, 4]
 This file was executed from the terminal or an interpreter.>>
 \end{lstlisting}
 
-Executing the file with IPython's \li{run} command executes each line and also adds the module's names to the current namespace.
+Executing the file with IPython's \li{run} command executes each line of the file and also adds the module's names to the current namespace.
 This is the quickest way to test individual functions via IPython.
 
 \begin{lstlisting}
-In [1]: run example.py
+In [1]: run example1.py              # or just 'run example1'.
 <<Data: [1, 2, 3, 4]
 This file was executed from the terminal or an interpreter.>>
 
@@ -336,7 +336,7 @@ Data: [1, 2, 3, 4]
 \end{lstlisting}
 
 Importing the file also executes each line, but only adds the indicated alias to the namespace.
-Also, code under the \li{if __name__ == '__main__'} clause is \emph{not} executed when a file is imported.
+Also, code under the \li{if __name__ == "__main__"} clause is \emph{not} executed when a file is imported.
 
 \begin{lstlisting}
 In [1]: import example as ex
@@ -449,7 +449,7 @@ Create a module called \texttt{calculator.py}.
 Write a function that returns the sum of two arguments, a function that returns the product of two arguments, and a function that returns the square root of a single argument.
 When the file is either run or imported, nothing should be executed.
 
-In your solutions file, import your new calculator module.
+In your main solutions file, import your new calculator module.
 Using only the functions defined in the module, write a new function that calculates the length of the hypotenuse of a right triangle given the lengths of the other two sides.
 \end{problem}
 
@@ -457,6 +457,10 @@ Using only the functions defined in the module, write a new function that calcul
 
 All Python distributions include a collection of modules for accomplishing a variety of common tasks, collectively called the \emph{Python standard library}.
 See Table \ref{table:stdlib}.
+
+Using IPython's object introspection, we can learn about how to use the various modules and functions in the standard library very quickly.
+Use \li{?} or \li{help()} for information on the module or one of its names.
+To see the entire module's namespace, use the \li{tab} key.
 
 \begin{table}[H] % Some standard library modules.
 \begin{tabular}{c|l}
@@ -471,10 +475,6 @@ Module & Description / Purpose \\ \hline
 \caption{Some common standard library modules.}
 \label{table:stdlib}
 \end{table}
-
-Using IPython's object introspection, we can learn about how to use the various modules and functions in the standard library very quickly.
-Use \li{?} or \li{help()} for information on the module or one of its names.
-To see the entire module's namespace, use the \li{tab} key.
 
 \begin{lstlisting}
 In [1]: import math
@@ -531,6 +531,7 @@ $ python echo.py I am the walrus
 ['echo', 'I', 'am', 'the', 'walrus']
 \end{lstlisting}
 
+% TODO: keep but simplify this example.
 Command line arguments can be used to control a script's behavior, as in the following example:
 
 \begin{lstlisting}
