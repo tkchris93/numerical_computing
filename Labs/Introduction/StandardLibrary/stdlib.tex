@@ -230,8 +230,8 @@ Print a statement of your conclusions.
 \section*{Modules} % ==========================================================
 
 In general, a Python \emph{module} is a file containing Python code that is meant to be used in some other setting, and not necessarily run directly.\footnote{A Python file that is not meant to be imported is often called a \emph{script}.}
-The \li{import} statement loads the code from a specified Python file.
-That is, when a module containing some functions, classes, or other objects is imported, those functions, classes, and objects are made available for use.
+The \li{import} statement loads code from a specified Python file.
+That is, importing a module containing some functions, classes, or other objects makes those functions, classes, or objects available for use.
 
 All import statements should occur at the top of the file, below the header but before any other code.
 Thus we expand our example of typical Python file from the previous lab to the following:
@@ -247,15 +247,11 @@ import numpy as np
 from scipy import linalg as la
 import matplotlib.pyplot as plt
 
-def main():
-    """This is a docstring. It provides information about the function."""
-    print("Hello, world!")
-
 if __name__ == "__main__":
-    main()
+    pass                            # 'pass' is a temporary placeholder.
 \end{lstlisting}
 
-The modules imported in this example are some of the most important modules used in Python for scientific computing.
+The modules imported in this example are some of the most important modules for this curriculum.
 The NumPy, SciPy, and MatPlotLib modules will be presented in detail in subsequent labs.
 
 \subsection*{Importing Syntax} % ----------------------------------------------
@@ -305,7 +301,9 @@ Consider the following simple Python module, saved as \texttt{example.py}.
 
 % TODO: put parentheses on the print statements for Python 3.
 \begin{lstlisting}
-data = [1, 2, 3, 4]
+# example.py
+
+data = range(4)
 
 def display():
     print "Data:", data
@@ -326,6 +324,7 @@ This file was executed from the terminal or an interpreter.>>
 \end{lstlisting}
 
 Executing the file with IPython's \li{run} command executes each line and also adds the module's names to the current namespace.
+This is the quickest way to test individual functions via IPython.
 
 \begin{lstlisting}
 In [1]: run example.py
@@ -337,10 +336,10 @@ Data: [1, 2, 3, 4]
 \end{lstlisting}
 
 Importing the file also executes each line, but only adds the indicated alias to the namespace.
-% When creating modules, beware of stray code that might be executed unintentionally when a file is imported.
+Also, code under the \li{if __name__ == '__main__'} clause is \emph{not} executed when a file is imported.
 
 \begin{lstlisting}
-In [1]: import example
+In [1]: import example as ex
 <<This file was imported.>>
 
 # The module's names are not direcly available...
@@ -352,65 +351,98 @@ NameError                                 Traceback (most recent call last)
 
 NameError: name 'display' is not defined>>
 
-# ...unless accessed via the module name.
-In [3]: example.display()
+# ...unless accessed via the module's alias.
+In [3]: ex.display()
 Data: [1, 2, 3, 4]
 \end{lstlisting}
 
-Note that code under the \li{if __name__ == '__main__'} clause is \emph{not} executed when a file is imported.
-We will explore the \li{__name__} attribute a little more in a future lab. %(?)
-
 % WARNING! In Python 3, reload() is no longer a built-in function
-%   (you have to use importlib.reload() instead). Delete this section?
-\begin{comment} % vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-\subsection*{Reloading and Testing} % -----------------------------------------
+%   (you have to use importlib.reload() instead).
 
-In IPython, importing provides a quick way to test code.
-However, if a module has been imported and the source code then changes (you test your code, discover and error, then fix it), the \li{reload()} function must be used to access the changes.
-Using the \li{import} command again will \textbf{not} change the module.
+\begin{warn} % Use run in IPython instead of import.
+If a module has been imported in IPython and the source code then changes, using \li{import} again will \textbf{not} refresh the name in the IPython namespace.
+Instead, use \li{run} to correctly refresh the namespace.
+Consider this example where we test the function \li{sum_of_squares()}, saved in the file \texttt{example2.py}.
 
-Consider this example where we test a file containing a single function.
 \begin{lstlisting}
 # example2.py
+
 def sum_of_squares(x):
-    """Return the sum of the squares of all integers less than or equal to x."""
-    return sum([i**2 for i in range(x)])
+    """Return the sum of the squares of all positive integers
+    less than or equal to x.
+    """
+    return sum([i**2 for i in range(1,x)])
 \end{lstlisting}
 
-In IPython, import the file and test the \li{sum_of_squares} function.
-\begin{lstlisting}
-In [1]: import example2 as test
+In IPython, run the file and test \li{sum_of_squares()}.
 
-In [2]: test.sum_of_squares(3)
+\begin{lstlisting}
+# Run the file, adding the function sum_of_squares() to the namespace.
+In [1]: run example2
+
+In [2]: sum_of_squares(3)
+Out[2]: 5                           # Should be 14!
+\end{lstlisting}
+
+Since $1^2 + 2^2 + 3^2 = 14$, not $5$, something has gone wrong.
+We modify the source file to correct the mistake, then run the file again in IPython:
+
+\begin{lstlisting}
+# example2.py
+
+def sum_of_squares(x):
+    """Return the sum of the squares of all positive integers
+    less than or equal to x.
+    """
+    return sum([i**2 for i in range(1,x+1)])    # Include the final term.
+\end{lstlisting}
+
+\begin{lstlisting}
+# Run the file again to refresh the namespace.
+In [3]: run example2
+
+# Now sum_of_squares() is updated to the new, corrected version.
+In [4]: sum_of_squares(3)
+Out[4]: 14                          # It works!
+\end{lstlisting}
+
+Remember that running the file will also execute any freestanding code snippets, as well as any code under the \li{if __name__ == "__main__"} clause.
+
+\begin{comment} % Alternate version showing how importing twice fails.
+In IPython, import the file and test \li{sum_of_squares()}.
+
+\begin{lstlisting}
+In [1]: import example2
+
+In [2]: example2.sum_of_squares(3)
 Out[2]: 5
 \end{lstlisting}
 
 Since $1^2 + 2^2 + 3^2 = 14$, not $5$, something has gone wrong.
-We modify the file to correct the mistake:
+We modify the source file to correct the mistake:
 
 \begin{lstlisting}
 # example2.py
+
 def sum_of_squares(x):
-    """Return the sum of the squares of all integers less than or equal to x."""
-    return sum([i**2 for i in range(1,x+1)])    # Be sure to include x.
+    """Return the sum of the squares of all positive integers
+    less than or equal to x.
+    """
+    return sum([i**2 for i in range(1,x+1)])    # Include the final term.
 \end{lstlisting}
+
+Back in IPython, import the module again and see if the function acts differently.
 
 \begin{lstlisting}
 # Using import again doesn't change the loaded module, even though
 # the source file was modified.
-In [3]: import test
+In [3]: import example2
 
-In [4]: test.sum_of_squares(3)
+In [4]: example2.sum_of_squares(3)
 Out[4]: 5
-
-# Using reload, however, updates the loaded module with the changes.
-In [5]: reload(test)
-Out[5]: <<<module 'example2' from 'example2.py'>>>
-
-In [6]: test.sum_of_squares(3)
-Out[6]: 14
 \end{lstlisting}
-\end{comment} % ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+\end{comment}
+\end{warn}
 
 \begin{problem} % Problem: create and use a simple module.
 Create a module called \texttt{calculator.py}.
