@@ -1,5 +1,5 @@
 # solutions.py
-"""Volume 2 Lab 13: Optimization Packages I (scipy.optimize) solutions file."""
+"""Volume 2: Optimization Packages I (scipy.optimize) solutions file."""
 
 import scipy.optimize as opt
 import numpy as np
