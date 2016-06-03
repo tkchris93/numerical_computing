@@ -110,6 +110,7 @@ def prob3(a,b):
 
 # Problem 4
 def shut_the_box():
+    """Play a single game of shut the box."""
 
     # Get the player's name.
     if len(sys.argv) != 2:
@@ -155,7 +156,7 @@ def shut_the_box():
     # or print("\nScore for player {}: {} points".format(player, score))
     if score == 0:
         print("Congratulations!! You shut the box!")
-    print ""
+    print("")
 
 
 if __name__ == "__main__":

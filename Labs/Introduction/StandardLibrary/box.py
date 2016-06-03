@@ -1,5 +1,5 @@
 # box.py
-"""Introductory Labs: The Standard Library. Auxiliary file."""
+"""Introductory Labs: The Standard Library. Auxiliary file (do not modify)."""
 
 from itertools import combinations
 
@@ -8,18 +8,19 @@ def isvalid(roll, remaining):
     exists a combination of the entries of 'remaining' that sum up to 'roll'.
 
     Parameters:
-        roll (int): The value of a dice roll.
-        remaining (list): the list of the numbers that still need to be
+        roll (int): The value of a dice roll, between 2 and 12 (inclusive).
+        remaining (list): The list of the numbers that still need to be
             removed before the box can be shut.
     
     Returns:
         True if the roll is valid.
         False if the roll is invalid.
     """
+    if roll not in range(2, 13):
+        return False
     for i in xrange(1, len(remaining)+1):
-        for combo in combinations(remaining, i):
-            if sum(combo) == roll:
-                return True
+        if any([sum(combo) == roll for combo in combinations(remaining, i)]):
+            return True
     return False
 
 
@@ -28,9 +29,9 @@ def parse_input(player_input, remaining):
     Then check that each of those integers is an entry in the other list.
 
     Parameters:
-        player_input (str): a string of integers, separated by spaces.
+        player_input (str): A string of integers, separated by spaces.
             The player's choices for which numbers to remove.
-        remaining (list): the list of the numbers that still need to be
+        remaining (list): The list of the numbers that still need to be
             removed before the box can be shut.
     
     Returns:
