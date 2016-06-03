@@ -45,6 +45,7 @@ Small changes to the input of an ill-conditioned function produce large changes 
 In applications, it is important to know if a function is ill-conditioned because there is usually some error in the parameters passed to the function.
 
 \subsection*{Example: the Wilkinson Polynomial}
+
 Let $f:\mathbb{C}^{n+1} \rightarrow \mathbb{C}^n$ be the function that sends $(a_1, \ldots, a_{m+1})$ to the roots of $a_1x^n+a_2x^{n-1}+\ldots+a_nx+a_{n+1}$.
 In other words, this function describes the problem of finding the roots of a polynomial.
 Unfortunately, root finding is extremely ill-conditioned.
@@ -149,7 +150,6 @@ This figure replicates Figure 12.1 on p. 93 of \emph{Numerical Linear Algebra} b
 
 \end{problem}
 
-
 %Notes on Problem 1:
 % - Make something to copy-paste with the polynomial coefficients
 % - You MUST copy paste the exact coefficients!!! Multiplying out the polynomial is not stable!!!
@@ -158,6 +158,7 @@ This figure replicates Figure 12.1 on p. 93 of \emph{Numerical Linear Algebra} b
 % In introductory discussion, compute the condition number of the problem. Explain why we use the infinity norm.
 
 \subsection*{Example: Calculating Eigenvalues}
+
 Let $f:\mathbb{C}^{n^2} \rightarrow \mathbb{C}^n$ be the function that sends an $n \times n$ matrix to its $n$ eigenvalues.
 This problem is well-conditioned for symmetric matrices, but can be extremely ill-conditioned for non-symmetric matrices.
 
@@ -245,6 +246,7 @@ What can you conclude about the condition number of the eigenvalue problem at a 
 %\end{example}
 
 \section*{Stability of an Algorithm}
+
 The stability of an algorithm is measured by the error in its output. 
 Suppose we have some algorithm to compute $f: \mathbb{R}^m \rightarrow \mathbb{R}^n$.
 Let $\tilde f(\x)$ represent the value computed by the algorithm at $\x$.
@@ -256,6 +258,7 @@ An algorithm is \emph{stable} if this relative forward error is small.
 
 As an example, let us examine the stability of NumPy's root finding algorithm that we used to investigate the Wilkinson polynomial.
 We know the exact roots of $w(x)$, and we can also compute these roots using NumPy's \li{np.roots()} function.
+
 \begin{lstlisting}
 >>> roots = np.arange(1,21)
 >>> w_coeffs = np.array([1, -210, 20615, -1256850, 53327946, -1672280820,
@@ -268,7 +271,9 @@ We know the exact roots of $w(x)$, and we can also compute these roots using Num
                     -8752948036761600000, 2432902008176640000])
 >>> computed_roots = np.roots(np.poly1d(w_coeffs))
 \end{lstlisting}
+
 We sort the roots to ensure they are in the same order, then compute the absolute and relative forward error.
+
 \begin{lstlisting}
 >>> roots = np.sort(roots)
 >>> computed_roots = np.sort(computed_roots)
@@ -344,8 +349,6 @@ $50$ & $0.0192377544343$ \\
 \end{center}
 
 \end{problem}
-
-
 
 %\begin{table}
 %\centering
