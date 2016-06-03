@@ -2,7 +2,7 @@
 """Introductory Labs: The Standard Library. Solutions file."""
 
 # calculator.py ===============================================================
-# Students write this module as part of problem 3. Do not provide to students.
+# Students write this module as part of problem 3.
 
 def add(x,y):
     return x + y
@@ -12,7 +12,7 @@ def mult(x,y):
  
 def sqrt(x):
     return x**.5
-    # or, from math import sqrt at the top.
+    # or 'from math import sqrt' at the top.
 
 # solutions.py ================================================================
 
@@ -108,40 +108,6 @@ def prob3(a,b):
     return sqrt(a2plusb2)
 
 
-# Old Problem 4
-def prob4():
-    """If no command line argument is given, print "No Input."
-    If anything other than "matrices.npz is given, print "Incorrect Input."
-    If "matrices.npz" is given as a command line argument, use functions
-    from the provided 'matrix_multiply' module to load two matrices, then
-    time how long each method takes to multiply the two matrices together.
-    Print your results to the terminal.
-    """
-    # Students should use matrix_multiply.method() instead of method()
-    # m = matrix_multiply     # or "import matrix_multiply as m" at the top
-    if len(sys.argv) == 1:
-        print("No Input.")
-    elif sys.argv[1] != "matrices.npz":
-        print("Incorrect Input.")
-    else:   # If the correct filename is given,
-        # load the matrices
-        A,B = load_matrices(sys.argv[1])
-        
-        # time method1()
-        start = time.time()
-        method1(A,B)
-        print(time.time() - start)
-        
-        # time method2()
-        start = time.time()
-        method2(A,B)
-        print(time.time() - start)
-        
-        # time method3()
-        start = time.time()
-        method3(A,B)
-        print(time.time() - start)
-
 # Problem 4
 def shut_the_box():
 
@@ -195,3 +161,37 @@ def shut_the_box():
 if __name__ == "__main__":
     shut_the_box()
 
+
+# Old Problem 4 (delete or move to a different lab)
+def prob4():
+    """If no command line argument is given, print "No Input."
+    If anything other than "matrices.npz is given, print "Incorrect Input."
+    If "matrices.npz" is given as a command line argument, use functions
+    from the provided 'matrix_multiply' module to load two matrices, then
+    time how long each method takes to multiply the two matrices together.
+    Print your results to the terminal.
+    """
+    # Students should use matrix_multiply.method() instead of method()
+    # m = matrix_multiply     # or "import matrix_multiply as m" at the top
+    if len(sys.argv) == 1:
+        print("No Input.")
+    elif sys.argv[1] != "matrices.npz":
+        print("Incorrect Input.")
+    else:   # If the correct filename is given,
+        # load the matrices
+        A,B = load_matrices(sys.argv[1])
+        
+        # time method1()
+        start = time.time()
+        method1(A,B)
+        print(time.time() - start)
+        
+        # time method2()
+        start = time.time()
+        method2(A,B)
+        print(time.time() - start)
+        
+        # time method3()
+        start = time.time()
+        method3(A,B)
+        print(time.time() - start)
