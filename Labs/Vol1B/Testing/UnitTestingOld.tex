@@ -1,40 +1,3 @@
-\documentclass[nociteref]{../../SIAM-GH-book}
-
-\usepackage{hyperref}
-\usepackage{import}
-\usepackage{amsmath, amsfonts, amscd, amssymb}
-\usepackage{epsfig}
-\usepackage{graphicx}
-\usepackage{url}
-\usepackage{mathrsfs}
-\usepackage{makeidx}
-\usepackage{multicol}
-\usepackage{algorithmicx}
-\usepackage[plain]{algorithm}
-\usepackage[noend]{algpseudocode}
-\usepackage{color}
-\usepackage{verbatim}
-\usepackage{listings}
-\usepackage{float}
-\usepackage{paralist}
-\usepackage{caption}
-\usepackage{subcaption}
-\usepackage{textcomp}
-\usepackage[framemethod=tikz]{mdframed}
-\usepackage[style=alphabetic,refsection=chapter,backref=true]{biblatex}
-\usepackage{relsize}
-\usepackage{mathtools}
-
-\input{../../command}
-
-\makeindex
-
-\begin{document}
-
-
-\mainmatter
-
-
 \lab{Unit Testing In Python}{Unit Testing In Python}
 
 \objective{Convey the importance of unit testing in code, especially in the corporate world. Unit testing in python is easy, valuable and powerful. Any software development position will appreciate a developer who is able to accurately test their code.}
@@ -79,7 +42,7 @@ with this test function:
 Now this is all good and pretty, we are able to write tests for a function, by asserting that they give us a particular output based on some fixed input.
 But what makes unit testing in python so useful isn't this, it is running the following in your current directory (from the terminal):
 \begin{lstlisting}[language=bash]
-  $ py.test
+$ py.test
 \end{lstlisting}
 
 \begin{info}
