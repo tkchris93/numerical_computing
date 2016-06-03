@@ -1,62 +1,12 @@
-# testDriver.py
-"""Outline for Foundations of Applied Mathematics lab test drivers.
+# solutions.py
+"""Introductory Labs: The Standard Library. Solutions file."""
 
-Test driver files should be named testDriver.py and should be placed in the
-same folder as the lab that it corresponds to. The testDriver.py file should
-have dependencies on the corresponding solutions.py file so that student
-submissions are tested directly against the solutions when possible.
-
-test() function and _testDriver class -----------------------------------------
-
-The _testDriver class is designed to be flexible. The test_all() routine will
-grade each problem and collect feedback, but each problem can be graded
-individually via the different problemX() methods. This allows the instructor
-to grade from IPython, or to automate grading using Git, Google Drive, or
-another file system manager.
-
-The test() function creates an instance of the _testDriver class, grades every
-problem, and returns the score feedback. Use this function to automate the
-grading process.
-
-Customize the docstrings of the test() function and the _testDriver class to
-give specific instructions about how the lab is to be graded.
-
-Tags --------------------------------------------------------------------------
-
-The @_autoclose tag makes it easy to grade a problem that produces a plot.
-It should only be on a problem-grading function that uses _testDriver._grade()
-or some other pausing command (like raw_input()) so that the plot is not closed
-immediately after it is created.
-
-The @_timeout tag prevents a function from running for longer than a
-specificied number of seconds. Be careful not to use this wrapper in
-conjunction with _testDriver._grade() or another pausing command that waits
-for the grader's response. NOTE: this decorator will only work on Unix.
-
-Testing -----------------------------------------------------------------------
-
-To test the test driver, make sure that the solutions file passes with full
-points. The if __name__ == '__main__' clause imports the solutions file and
-grades it.
-"""
-
-# Wrappers ====================================================================
+from subprocess import call
+from numpy.random import randint
+from solutions import prob1, prob2, prob3
 
 import signal
 from functools import wraps
-from matplotlib import pyplot as plt
-
-def _autoclose(func):
-    """Decorator for closing figures automatically."""
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        try:
-            plt.ion()
-            return func(*args, **kwargs)
-        finally:
-            plt.close('all')
-            plt.ioff()
-    return wrapper
 
 def _timeout(seconds):
     """Decorator for preventing a function from running for too long.
@@ -88,22 +38,21 @@ def _timeout(seconds):
         return wraps(func)(wrapper)
     return decorator
 
-# Test Script and Class =======================================================
 
-# from solutions import [functions / classes that are needed for testing]
-
+# Test script
 def test(student_module):
-    """Grade a student's entire solutions file.
+    """Test script. Import the student's solutions file as a module.
     
-    X points for problem 1
-    X points for problem 2
-    ...
+    5  points for problem 1
+    5  points for problem 2
+    5  points for problem 3
+    15 points for problem 4
     
     Inputs:
         student_module: the imported module for the student's file.
     
     Returns:
-        score (int): the student's score, out of TOTAL.
+        score (int): the student's score, out of 30.
         feedback (str): a printout of test results for the student.
     """
     tester = _testDriver()
@@ -125,7 +74,7 @@ class _testDriver(object):
         self.feedback = ""
 
     # Main routine -----------------------------------------------------------
-    def test_all(self, student_module, total=100):
+    def test_all(self, student_module, total=30):
         """Grade the provided module on each problem and compile feedback."""
         # Reset feedback and score.
         self.feedback = ""
@@ -142,8 +91,10 @@ class _testDriver(object):
                 self.feedback += "\n{}: {}".format(self._errType(e), e)
 
         # Grade each problem.
-        test_one(self.problem1, "Problem 1", 0)   # Problem 1: X points.
-        test_one(self.problem2, "Problem 2", 0)   # Problem 2: X points.
+        test_one(self.problem1, "Problem 1",  5)   # Problem 1:  5 points.
+        test_one(self.problem2, "Problem 2",  5)   # Problem 2:  5 points.
+        test_one(self.problem3, "Problem 3",  5)   # Problem 3:  5 points.
+        test_one(self.problem4, "Problem 4", 15)   # Problem 4: 15 points.
 
         # Report final score.
         percentage = (100. * self.score) / total
@@ -177,18 +128,6 @@ class _testDriver(object):
             self.feedback += "\n\tStudent response: {}".format(student)
             return 0
 
-    def _strTest(self, correct, student, message):
-        """Test to see if 'correct' and 'student' have the same string
-        representation. Report the given 'message' if they are not.
-        """
-        if str(correct) == str(student):
-            return 1
-        else:
-            self.feedback += "\n{}".format(message)
-            self.feedback += "\n\tCorrect response: {}".format(correct)
-            self.feedback += "\n\tStudent response: {}".format(student)
-            return 0
-
     def _grade(self, points, message=None):
         """Manually grade a problem worth 'points'. Return the score.
         If full points are not earned, get feedback on the problem.
@@ -210,17 +149,57 @@ class _testDriver(object):
         return credit
 
     # Problems ----------------------------------------------------------------
+    @_timeout(5)
     def problem1(self, s):
-        """Test Problem 1. X points."""
-        points = 0
-        # Test problem 1 here.
+        """Test prob1() (built-in functions). 5 points."""
+
+        l = list(randint(-50,50,10))
+        correct, student = prob1(l), s.prob1(l)
+        if student is None:
+            raise NotImplementedError("Problem 1 Incomplete")
+
+        points  = 1*self._eqTest(correct[0], student[0], "Incorrect maximum")
+        points += 2*self._eqTest(correct[1], student[1], "Incorrect minimum")
+        points += 2*self._eqTest(correct[2], student[2], "Incorrect average")
+
         return points
 
     def problem2(self, s):
-        """Test Problem 2. X points."""
-        points = 0
-        # Test problem 2 here.
+        """Test prob2() (mutable vs. immutable objects). 5 points."""
+
+        print("\nCorrect output:");   prob2()
+        print("\nStudent output:"); s.prob2()
+        return self._grade(5, "Incorrect response(s)"
+                     "\n(Hint: 3 are immutable and 2 are mutable)")
+
+    @_timeout(5)
+    def problem3(self, s):
+        """Test prob3() (make and use the calculator module). 5 points."""
+
+        points  = 2*self._eqTest(prob3(5,12), s.prob3(5,12),
+                                "Incorrect hypotenuse length")
+        a, b = randint(1,50,2)
+        points += 3*self._eqTest(prob3(a,b), s.prob3(a,b),
+                                "Incorrect hypotenuse length")
         return points
+
+    def problem4(self, s):
+        """Test prob4() (using another module). 15 points."""
+
+        print("\n------- Testing Problem 4: Play 'Shut the Box' twice -------")
+        call(["python", s.__file__, "TA"])
+        call(["python", s.__file__])
+        return self._grade(15, "'Shut the box' does not match specifications")
+
+        # print("Correct outputs:")
+        # os.system("python solutions.py")
+        # os.system("python solutions.py Wrong Name")
+        # os.system("python solutions.py matrices.npz")
+        # print("\nStudent outputs:")
+        # os.system('python ' + s.__file__)
+        # os.system('python ' + s.__file__ + ' "Wrong Name"')
+        # os.system('python ' + s.__file__ + ' "matrices.npz"')
+
 
 
 # Validation ==================================================================
@@ -228,4 +207,3 @@ if __name__ == '__main__':
     """Validate the test driver by testing the solutions file."""
     import solutions
     test(solutions)
-
