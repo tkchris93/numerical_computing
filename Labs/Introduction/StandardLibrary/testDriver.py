@@ -74,7 +74,7 @@ class _testDriver(object):
         self.feedback = ""
 
     # Main routine -----------------------------------------------------------
-    def test_all(self, student_module, total=30):
+    def test_all(self, student_module, total=40):
         """Grade the provided module on each problem and compile feedback."""
         # Reset feedback and score.
         self.feedback = ""
@@ -92,8 +92,8 @@ class _testDriver(object):
 
         # Grade each problem.
         test_one(self.problem1, "Problem 1",  5)   # Problem 1:  5 points.
-        test_one(self.problem2, "Problem 2",  5)   # Problem 2:  5 points.
-        test_one(self.problem3, "Problem 3",  5)   # Problem 3:  5 points.
+        test_one(self.problem2, "Problem 2", 10)   # Problem 2: 10 points.
+        test_one(self.problem3, "Problem 3", 10)   # Problem 3: 10 points.
         test_one(self.problem4, "Problem 4", 15)   # Problem 4: 15 points.
 
         # Report final score.
@@ -169,17 +169,17 @@ class _testDriver(object):
 
         print("\nCorrect output:");   prob2()
         print("\nStudent output:"); s.prob2()
-        return self._grade(5, "Incorrect response(s)"
+        return self._grade(10, "Incorrect response(s)"
                      "\n(Hint: 3 are immutable and 2 are mutable)")
 
     @_timeout(5)
     def problem3(self, s):
         """Test prob3() (make and use the calculator module). 5 points."""
 
-        points  = 2*self._eqTest(prob3(5,12), s.prob3(5,12),
+        points  = 5*self._eqTest(prob3(5,12), s.prob3(5,12),
                                 "Incorrect hypotenuse length")
         a, b = randint(1,50,2)
-        points += 3*self._eqTest(prob3(a,b), s.prob3(a,b),
+        points += 5*self._eqTest(prob3(a,b), s.prob3(a,b),
                                 "Incorrect hypotenuse length")
         return points
 
@@ -190,16 +190,6 @@ class _testDriver(object):
         call(["python", s.__file__, "TA"])
         call(["python", s.__file__])
         return self._grade(15, "'Shut the box' does not match specifications")
-
-        # print("Correct outputs:")
-        # os.system("python solutions.py")
-        # os.system("python solutions.py Wrong Name")
-        # os.system("python solutions.py matrices.npz")
-        # print("\nStudent outputs:")
-        # os.system('python ' + s.__file__)
-        # os.system('python ' + s.__file__ + ' "Wrong Name"')
-        # os.system('python ' + s.__file__ + ' "matrices.npz"')
-
 
 
 # Validation ==================================================================
