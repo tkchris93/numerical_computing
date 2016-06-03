@@ -4,6 +4,7 @@
 import scipy.optimize as opt
 import numpy as np
 from matplotlib import pyplot as plt
+from mpl_toolkits.mplot3d import axes3d
 
 
 # Problem 1: use scipy.optimize.minimize() with different methods and compare.
@@ -16,9 +17,9 @@ def prob1():
         BFGS
     Use x0 = np.array([4., -2.5]) for the initial guess for each test.
     
-    For each method, print whether it converged, and if so, print how many iterations it took
+    For each method, print whether it converged, and if so, print how many iterations it took.
     """
-    # Set up the initial guess, jacobian, and hessian.
+    # Set up the initial guess.
     x0 = np.array([4.0,-2.5])
 
     # Test each method.
@@ -32,7 +33,7 @@ def prob1():
         print "Method:", method
         print "Converged: ", info[method]['success']
         if info[method]['success']:
-        	print "Number of Iterations", info[method]['nit'], '\n'
+            print "Number of Iterations", info[method]['nit'], '\n'
 
 
 # Problem 2: learn and use scipy.optimize.basinhopping()
@@ -41,32 +42,51 @@ def prob2():
     online or via IPython. Use it to find the global minimum of the multmin()
     function given in the lab, with initial point x0 = np.array([-2, -2]) and
     the Nelder-Mead algorithm. Try it first with stepsize=0.5, then with
-    stepsize=0.2.
+    stepsize=0.2. Then compare these results with minimize() function used in
+    Problem 1, again with the Nelder-Mead method.
 
-    Return the minimum value of the function with stepsize=0.2.
-    Print a statement answering the following question:
-        Why doesn't scipy.optimize.basinhopping() find the minimum the second
-        time (with stepsize=0.2)?
+    Plot the multimin function and minima found above using the code provided.
+    Print a statement explaining why scipy.optimize.basinhopping() fails to 
+    find the global minimum with stepsize=0.2.
     """
     # Define the function to be optimized and the initial condition.
     def multimin(x):
         r = np.sqrt((x[0]+1)**2 + x[1]**2)
         return r**2 *(1+ np.sin(4*r)**2)
-    x0 = np.array([-2, -2])
-    
-    info = {}
-    info[.5] = opt.basinhopping(multimin, x0, stepsize=0.5,
-                                minimizer_kwargs={'method':'nelder-mead'})
-    info[.2] = opt.basinhopping(multimin, x0, stepsize=0.2,
-                                minimizer_kwargs={'method':'nelder-mead'})
+    x0 = np.array([-2, -1.9])
+    small_step = .2
+    large_step = .5
+
+    # Optimize using variations on Nelder-Mead
+    local = opt.minimize(multimin, x0, method='Nelder-Mead')
+    small = opt.basinhopping(multimin, x0, stepsize=small_step,
+                            minimizer_kwargs={'method':'nelder-mead'})
+    large = opt.basinhopping(multimin, x0, stepsize=large_step,
+                            minimizer_kwargs={'method':'nelder-mead'})
 
     # Print the results.
-    for step in info:
-        print("Stepsize:\t{}\nMinimum:\t{}\n".format(step, info[step].fun))
+    print("Stepsize:\t{}\nMinimum:\t{}\nX-Values:\t{}\n".format("None", local['fun'], local['x']))
+    print("Stepsize:\t{}\nMinimum:\t{}\nX-Values:\t{}\n".format(small_step, small['fun'], small['x']))
+    print("Stepsize:\t{}\nMinimum:\t{}\nX-Values:\t{}\n".format(large_step, large['fun'], large['x']))
+
+    # Plot the multimin graph
+    xdomain = np.linspace(-3.5,1.5,70)
+    ydomain = np.linspace(-2.5,2.5,60)
+    X,Y = np.meshgrid(xdomain,ydomain)
+    Z = multimin((X,Y))
+    fig = plt.figure()
+    ax1 = fig.add_subplot(111, projection='3d')
+    ax1.plot_wireframe(X, Y, Z, linewidth=.5, color='c')
+    ax1.scatter(x0[0], x0[1], multimin(x0), c='b')
+
+    # Plot the results.
+    ax1.scatter(local.x[0], local.x[1], local.fun, s=30, c='k')
+    ax1.scatter(small.x[0], small.x[1], small.fun, s=30, c='r')
+    ax1.scatter(large.x[0], large.x[1], large.fun, s=30, c='g')
+    plt.show()
 
     # Answer the problem question and return the minimum value.
     print("0.2 is too small a stepsize to escape the basin of a local min.")
-    return info[.2].fun
 
 
 # Problem 3: learn and use scipy.optimize.root()
