@@ -12,52 +12,27 @@ def prob1():
     minimum of the Rosenbrock function (scipy.optimize.rosen) using the
     following methods:
         Nelder-Mead
-        Powell
         CG
         BFGS
-        Newton-CG (test with and without the hessian)
-        L-BFGS-B
-        TNC
-        COBYLA
-        SLSQP
     Use x0 = np.array([4., -2.5]) for the initial guess for each test.
     
-    Print a statement answering the following questions:
-        Which algorithm(s) take(s) the least number of iterations?
-        Which algorithm(s) fail to find the (correct) minimum?
+    For each method, print whether it converged, and if so, print how many iterations it took
     """
     # Set up the initial guess, jacobian, and hessian.
     x0 = np.array([4.0,-2.5])
-    jacobian = opt.rosen_der
-    hessian = opt.rosen_hess
 
     # Test each method.
     info = {}
-    info["Nelder-Mead"] = opt.minimize(opt.rosen, x0, method='Nelder-Mead',
-                                                        options={'xtol':1e-8})
-    info["Powell"] = opt.minimize(opt.rosen, x0, method='Powell',
-                                                        options={'xtol':1e-8})
+    info["Nelder-Mead"] = opt.minimize(opt.rosen, x0, method='Nelder-Mead')
     info["CG"] = opt.minimize(opt.rosen, x0, method='CG')
     info["BFGS"] = opt.minimize(opt.rosen, x0, method='BFGS')
-    info["Newton-CG w/out Hessian"] = opt.minimize(opt.rosen, x0, jac=jacobian,
-                                method='Newton-CG', options={'xtol':1e-8})
-    info["Newton-CG, w/ Hessian"] = opt.minimize(opt.rosen, x0, jac=jacobian,
-                    hess=hessian, method='Newton-CG',options={'xtol':1e-8})
-    info["L-BFGS-B"] = opt.minimize(opt.rosen, x0, method='L-BFGS-B',
-                                                        options={'xtol':1e-8})
-    info["TNC"] = opt.minimize(opt.rosen, x0, method='TNC', 
-                                                        options={'xtol':1e-8})
-    info["COBYLA"] = opt.minimize(opt.rosen, x0, method='COBYLA')
-    info["SLSQP"] = opt.minimize(opt.rosen, x0, method='SLSQP')
 
     # Report the info.
-    print("\n\t\tOptimization Tests")
     for method in info:
-        print("Method: {}\n{}\n\n".format(method, info[method]))
-    
-    # Answer the problem questions.
-    print("The Powell algorithm takes the least number of iterations (19).")
-    print("COBYLA fails to find the correct minimum.")
+        print "Method:", method
+        print "Converged: ", info[method]['success']
+        if info[method]['success']:
+        	print "Number of Iterations", info[method]['nit'], '\n'
 
 
 # Problem 2: learn and use scipy.optimize.basinhopping()
@@ -159,3 +134,4 @@ def prob4():
 # END OF SOLUTIONS ========================================================== #
 
 
+print prob2()
