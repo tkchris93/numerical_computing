@@ -1,6 +1,6 @@
 \lab{Unit Testing In Python}{Unit Testing In Python}
 
-\objective{Convey the importance of unit testing in code, especially in the corporate world. Unit testing in python is easy, valulable, and powerful. Any project manager will appreciate a developer who is able to accurately test their code.}
+\objective{Convey the importance of unit testing in code, especially in the corporate world. Unit testing in python is easy, valuable, and powerful. Any project manager will appreciate a developer who is able to accurately test their code.}
 
 In school, coding projects are usually done by a single student in isolation.  However, when you write code in the real world, you often need to think about how other developers would react to your code, particularly developers working alongside you.
 When working on projects with hundreds of thousand lines of code, it is nigh on impossible to understand how the individual functions work together to form your product.
@@ -156,7 +156,7 @@ Run "py.test --cov" in the directory which has the two files "solutions.py" and 
 
 Now write some of your own tests for the addition function and the Fibonacci function. Be sure to give each function its own test. (This is more of a convention than mandate,
 but it's good practice and will allow you to track down bugs quickly in the future.) Be sure that your tests cover every statement of your code in those two functions.
-(The number of statments missed should go from 100 to 94 TODO double check this)
+(The number of statements missed should go from 100 to 94 TODO double check this)
 \end{problem}
 
 \section*{pytest as a module}
@@ -204,8 +204,8 @@ For exceptions, be sure to check both the typename and the message, that way you
 \end{problem}
 
 Pytest also offers an option to make "pytest fixtures". These are wildly useful for mocking data or preventing constant code duplication.
-Mocking data is useful when you don't want certain test to be dependent on the working of completely seperate code.
-For example if we had a feature which was dependent upon a user service working correctly, rather than having my tests make a call to the user service I may write a fixture which simply gives exsisting mock data that I expect for my feature.
+Mocking data is useful when you don't want certain test to be dependent on the working of completely separate code.
+For example if we had a feature which was dependent upon a user service working correctly, rather than having my tests make a call to the user service I may write a fixture which simply gives existing mock data that I expect for my feature.
 As far as preventing code duplication a fixture may also be utilized to create a class object which we can then call within our function.
 
 \begin{lstlisting}
@@ -269,21 +269,21 @@ Given the previous class, you could reduce code setup for your tests by using a 
 \begin{problem}
 Finish writing unit test for the complex numbers class. Be sure to utilize fixtures in order to reduce on the length of your code.
 Also, remember, it would be useful (and good practice) to write a different test function for each method in the ComplexNumberClass.
-(The number of statments missed should go from \_\_ to \_\_ TODO: this)
+(The number of statements missed should go from \_\_ to \_\_ TODO: this)
 \end{problem}
 
 \begin{problem}
 Write unit tests for the \li{LinkedListNode} and \li{LinkedList} classes provided in solutions.py. It is not necessary, but it will help you to get total line coverage if every function has its own test.
 If you have trouble finding everything, consider commenting out sections of code in solutions.py and seeing if the number of statements missed goes down.
 If it does, then you know that part of what you deleted is un-tested.
-(At the end of this the number of missed statments should be 0.)
+(At the end of this the number of missed statements should be 0.)
 \end{problem}
 
 \section*{Test Driven Development}
 
 Kent Beck, the creator of \href{https://en.wikipedia.org/wiki/Extreme_programming}{extreme programming}, claims to have re-discovered  Test Driven Development (TDD). He said,
-"The original description of TDD was in an ancient book about programming. It said you take the input tape, manually type in the output tape you expect, then program until the actual output tape matches the expected output."
-TDD incentivizes simple design, elegant code, and gives quantifiable checkpoints in the development proccess.
+``The original description of TDD was in an ancient book about programming. It said you take the input tape, manually type in the output tape you expect, then program until the actual output tape matches the expected output.''
+TDD incentivizes simple design, elegant code, and gives quantifiable checkpoints in the development process.
 The idea is simple enough:
 \begin{tikzpicture}
 \matrix [column sep=40mm, row sep=5mm] {
@@ -294,13 +294,14 @@ The idea is simple enough:
 \draw[->, thick] (id) -- (ts);
 \draw[->, thick] (ts) -- (im);
 \end{tikzpicture}\\
-The idea must be a bit more concrete then "I want to add a chat room to my website." The general idea of how the chat room will look in code (like a history module, a data base, and a sketch of required functions, etc.) is required.
+The idea must be a bit more concrete then ``I want to add a chat room to my website.'' The general idea of how the chat room will look in code (like a history module, a data base, and a sketch of required functions, etc.) is required.
 Next that idea is transformed into tests because the inputs and outputs of required functionality are understood.
 Following the example of the chat room, you could write a unit test that checks what a given API returns when a user has broadcasted some message.
 The implementation is simply adding, changing and editing code until all the required tests pass.
 
 \begin{problem}
-Use TDD to create a module which takes the string representation of a polynomial (of one arbitary variable) and plots it. For example it should take in:
+Use TDD to create a module which takes the string representation of a polynomial (of one arbitrary variable) and plots it.
+For example, it should take in:
 "$5x^4 + 4x^3 + 3x^2+ 2x + 1$" and plot it
 Equivlently "$5y^4 + 4y^3 + 3y^2+ 2y + 1$" (you may throw an excpetion if two variables are given).
 (If you wanna get really "Wolfram Alpha-y", allow "$5y4 + 4y3 + 3y2+ 2y + 1$ as valid input.)  TODO: clean this up, add a graph, more guidelines as to how to implement TDD
