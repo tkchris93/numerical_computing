@@ -5,9 +5,9 @@ Labs/Introduction/PlottingIntro/fancymesh.png
 Labs/Orphans/FiniteElement/tridiag.c
 Labs/Orphans/MultivariateDerivatives/Rosenbrock.pdf
 Labs/Orphans/RiemannSphere/mobius2.png
-Labs/Vol1B/Complex1/arctan_riemann_surface.pdf
-Labs/Vol1B/Complex1/poly_color_plot_imag.pdf
-Labs/Vol1B/Complex1/poly_color_plot_real.pdf
+Labs/Vol1B/Complex1-Plots/arctan_riemann_surface.pdf
+Labs/Vol1B/Complex1-Plots/poly_color_plot_imag.pdf
+Labs/Vol1B/Complex1-Plots/poly_color_plot_real.pdf
 Labs/Vol1B/Differentiation/Rosenbrock.pdf
 Labs/Vol1B/GMRES/LeastSquares.pdf
 Labs/Vol2B/scipyoptimize/ManyMinima.pdf
