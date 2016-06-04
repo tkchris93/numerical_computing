@@ -37,4 +37,4 @@ def find_big_files(fatal=True):
             
 
 if __name__ == "__main__":
-    find_big_files()
+    find_big_files(fatal=False)
