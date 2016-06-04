@@ -26,21 +26,21 @@ def mc_circle():
     plt.savefig("MC_Circle.pdf")
     plt.clf()
 
-def prob1(numPoints=10000):
+def prob1(N=10000):
     """Return an estimate of the volume of the unit sphere using Monte
     Carlo Integration.
 
     Input:
-        numPoints (int, optional) - The number of points to sample. Defaults
+        N (int, optional) - The number of points to sample. Defaults
             to 10000.
     
     """
-    points = np.random.rand(3, numPoints)
+    points = np.random.rand(3, N)
     points = points*2 - 1
     radiusMask = la.norm(points,axis=0)
     radiusMask[radiusMask>1] = 0
     numInSphere = np.count_nonzero(radiusMask)
-    return 8.*numInSphere/numPoints
+    return 8.*numInSphere/N
 
 def mc_error_plot(numIters=50):
     actual = 4.1887902047863905
