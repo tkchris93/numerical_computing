@@ -72,7 +72,7 @@ def prob3(filename = 'logregression.txt'):
     x[:,0] = np.ones_like(data[:,0])
     x[:,1:] = data[:,1:]
     y = data[:,0]
-    
+
     guess = np.ones(4)
     b = opt.fmin_cg(objective, guess)
     
@@ -82,14 +82,17 @@ def prob3(filename = 'logregression.txt'):
     [-0.41307717, 0.92181585, 0.21007539, -0.55791808]
     '''
     
-def test():
+if __name__ == '__main__':
     n = 10
     A = np.random.random((n,n))
     Q = A.T.dot(A)
     b = np.random.random(n)
     x0 = np.random.random(n)
     x = conjugateGradient(b, x0, Q)
+    # np.set_printoptions(suppress=True)
     if not np.allclose(x, la.solve(Q,b)):
         raise ValueError("Problem 1 Failed")
     print prob2()
     print prob3()
+    np.set_printoptions()
+    # test()

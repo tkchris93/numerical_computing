@@ -34,26 +34,49 @@ def startingPoint(A, b, c):
 
     return x, lam, mu
 
-# SMALL linear program generator. See below for the more general version.
-def randomLP2(m):
-    """Generate a 'square' linear program min c^T x s.t. Ax = b, x>=0.
-    First generate m feasible constraints, then add slack variables.
+def randomLP(m,n):
+    """Generate a linear program min c^T x s.t. Ax = b, x>=0.
+    First generate m feasible constraints, then add
+    slack variables to convert it into the above form.
     Inputs:
-        m -- positive integer: the number of desired constraints
-             and the dimension of space in which to optimize.
+        m -- positive integer >= n, number of desired constraints
+        n -- dimension of space in which to optimize
     Outputs:
-        A -- array of shape (m,n).
-        b -- array of shape (m,).
-        c -- array of shape (n,).
-        x -- the solution to the LP.
+        A -- array of shape (m,n+m)
+        b -- array of shape (m,)
+        c -- array of shape (n+m,), with m trailing 0s
+        v -- the solution to the LP
     """
-    n = m
+    # generate random constraints (each row corresponds to the normal
+    # vector defining a linear constraint)
     A = np.random.random((m,n))*20 - 10
+
+    # adjust so that the normal vector of each constraint lies in the upper
+    # half-space. this ensures that the constraints permit a feasible region
     A[A[:,-1]<0] *= -1
-    x = np.random.random(n)*10
-    b = A.dot(x)
-    c = A.sum(axis=0)/float(n)
-    return A, b, -c, x
+
+    # adjust so that the solution to the program is a prescribed point v in
+    # the first quadrant.
+    v = np.random.random(n)*10
+    #k = np.random.randint(n,m+1)
+    k = n
+    b = np.zeros(m)
+    b[:k] = A[:k,:].dot(v)
+    b[k:] = A[k:,:].dot(v) + np.random.random(m-k)*10
+
+    # now create the appropriate c vector, a weighted sum of the first k
+    # constraints
+    c = np.zeros(n+m)
+    c[:n] = A[:k,:].sum(axis=0)/k
+
+    # at this point, we should have a program max c^T x s.t. Ax <= b, x >= 0
+    # we need to convert it to standard equality form by adding slack variables
+    A = np.hstack((A, np.eye(m)))
+
+    # we now have the program min -c^T x s.t. Ax = b, x>=0.
+    # the optimal solution has x[:n] = v
+    return A, b, -c, v
+
 
 # Problems 1-4 ================================================================
 def interiorPoint(A, b, c, niter=20, tol=1e-16, verbose=False):
@@ -74,7 +97,7 @@ def interiorPoint(A, b, c, niter=20, tol=1e-16, verbose=False):
     m,n = A.shape
     def F(x_, l_, m_):
         """The almost-linear function that accounts for the KKT conditions."""
-        return np.hstack((np.dot(A.T, l_) + m_ - c, np.dot(A, x_) - b, m_*x_))
+        return np.hstack((np.dot(A.T, l_)+m_-c, np.dot(A, x_)-b, m_*x_))
 
     DF = np.zeros((2*n+m, 2*n+m))
     DF[:n,n:-n] = A.T
@@ -90,7 +113,7 @@ def interiorPoint(A, b, c, niter=20, tol=1e-16, verbose=False):
     sigma = .1
 
     i = 0
-    nu = 1.
+    nu = 1 + tol
     while i < niter and nu >= tol:
         i += 1
 
@@ -104,22 +127,20 @@ def interiorPoint(A, b, c, niter=20, tol=1e-16, verbose=False):
         direct = la.lu_solve(lu_piv, nu_vec - F(x,lam,mu))
 
         # Problem 4: Step Length
-        trix, trilam, trimu = direct[:n], direct[n:-n], direct[-n:]
-        mask = trimu < 0
-        if np.any(mask):
-            alpha = min(1, -(mu/trimu)[mask].min())
-        else:
-            alpha = 1
-        mask = trix < 0
-        if np.any(mask):
-            delta = min(1, -(x/trix)[mask].min())
-        else:
-            delta = 1
+        dx, dlam, dmu = direct[:n], direct[n:-n], direct[-n:]
+
+        mask = dmu < 0
+        amin = np.min(-mu[mask]/dmu[mask])
+        alpha = min(1, .95*min(1, amin)) if np.any(mask) else .95
+
+        mask = dx < 0
+        dmin = np.min(-x[mask]/dx[mask]).min()
+        delta = min(1, .95*min(1, dmin)) if np.any(mask) else .95
 
         # Problem 5: Finish it up.
-        x += delta*trix
-        lam += alpha*trilam
-        mu += alpha*trimu
+        x += delta*dx
+        lam += alpha*dlam
+        mu += alpha*dmu
 
         if verbose:
             print("Iteration {:0>2} nu = {}".format(i, nu))
@@ -129,37 +150,42 @@ def interiorPoint(A, b, c, niter=20, tol=1e-16, verbose=False):
         print("Maximum iterations reached")
     return x, c.dot(x)
 
-
-def test_interiorPoint(m=7, n=5, verbose=True):
+# Tests =======================================================================
+def single_test(m=7, n=5, verbose=True):
+    """Test interiorPoint() a single time."""
     A, b, c, x = randomLP(m, n)
     point, value = interiorPoint(A, b, c, verbose=verbose)
-    if not np.allclose(x, point[:n]):
-
-        # Test with CVXOPT to make sure it broke
-        from cvxopt import matrix, solvers
-        solvers.options['show_progress'] = False
-        A, b, c = matrix(A), matrix(b), matrix(c)
-        G = matrix(-np.eye(m+n))
-        h = matrix(np.zeros(m+n))
-        sol = solvers.lp(c, G, h, A, b)
-        ans = np.array(sol["x"]).flatten()
-        val = sol["primal objective"]
-        if not np.allclose(point, ans):
-            # print "FAILED\nOurs:\n{}\n{}\n".format(value, point)
-            # print "CVXOPT:\n{}\n{}\n".format(val, ans)
-            return 1
+    if not np.allclose(x,point[:n]):
+        return 1
     return 0
 
-def big_test(trials=1000):
+def single_other_test():
+    m = np.random.randint(2,10)
+    n = m
+    A = np.random.random((m,n))*20 - 10
+    A[A[:,-1]<0] *= -1
+    x = np.random.random(n)*10
+    b = A.dot(x)
+    c = -A.sum(axis=0)/float(n)
+
+    point, value = interiorPoint(A, b, c, verbose=True)
+    if not np.allclose(x,point):
+        return 1
+    return 0
+
+
+def huge_test(trials=100):
+    """Test interior point in high dimensions 'trials' times."""
+    from sys import stdout
     failed = 0
     for i in xrange(trials):
-        failed += test_interiorPoint(verbose=False)
+        print "\rIteration {} of {}".format(i+1, trials),
+        stdout.flush()
+        n = np.random.randint(low=100, high=200)
+        m = np.random.randint(low=n, high=300)
+        failed += test_interiorPoint(m, n, verbose=False)
+        print "({} failures)".format(failed),
     print "{}/{} failed".format(failed, trials)
-
-def lame_test():
-    A, b, c, x = randomLP2(np.random.randint(2,10))
-    point, value = interiorPoint(A, b, c, verbose=False)
-    return np.allclose(x, point)
 
 
 # Problem 5 ===================================================================
@@ -312,49 +338,4 @@ def old_interiorPoint(A, b, c, niter=20, verbose=False, starting_point=None, pts
         return pts
     else:
         return x, (c*x).sum()
-
-
-def randomLP(m,n):
-    '''
-    Generate a linear program min c^T x s.t. Ax = b, x>=0.
-    First generate m feasible constraints, then add
-    slack variables to convert it into the above form.
-    Inputs:
-        m -- positive integer >= n, number of desired constraints
-        n -- dimension of space in which to optimize
-    Outputs:
-        A -- array of shape (m,n+m)
-        b -- array of shape (m,)
-        c -- array of shape (n+m,), with m trailing 0s
-        v -- the solution to the LP
-    '''
-    # generate random constraints (each row corresponds to the normal vector defining
-    # a linear constraint)
-    A = np.random.random((m,n))*20 - 10
-
-    # adjust so that the normal vector of each constraint lies in the upper half-space.
-    # this ensures that the constraints permit a feasible region
-    A[A[:,-1]<0] *= -1
-
-    # adjust so that the solution to the program is a prescribed point v in the first
-    # quadrant.
-    v = np.random.random(n)*10
-    #k = np.random.randint(n,m+1)
-    k = n
-    b = np.zeros(m)
-    b[:k] = A[:k,:].dot(v)
-    b[k:] = A[k:,:].dot(v) + np.random.random(m-k)*10
-
-    # now create the appropriate c vector, a weighted sum of the first k constraints
-    c = np.zeros(n+m)
-    c[:n] = A[:k,:].sum(axis=0)/k
-
-    # at this point, we should have a program max c^T x s.t. Ax <= b, x >= 0
-    # we need to convert it to standard equality form by adding slack variables
-    A = np.hstack((A, np.eye(m)))
-
-    # we now have the program min -c^T x s.t. Ax = b, x>=0.
-    # the optimal solution has x[:n] = v
-
-    return A, b, -c, v
 
