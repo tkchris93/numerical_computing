@@ -17,7 +17,8 @@ def prob1():
         BFGS
     Use x0 = np.array([4., -2.5]) for the initial guess for each test.
     
-    For each method, print whether it converged, and if so, print how many iterations it took.
+    For each method, print whether it converged, and if so, print how many 
+        iterations it took.
     """
     # Set up the initial guess.
     x0 = np.array([4.0,-2.5])
@@ -30,10 +31,10 @@ def prob1():
 
     # Report the info.
     for method in info:
-        print "Method:", method
-        print "Converged: ", info[method]['success']
+        print("Method:\t{}\nConverged:\t{} "
+                                    .format(method, info[method]['success']))
         if info[method]['success']:
-            print "Number of Iterations", info[method]['nit'], '\n'
+            print "Number of Iterations:", info[method]['nit'], '\n'
 
 
 # Problem 2: learn and use scipy.optimize.basinhopping()
@@ -42,12 +43,16 @@ def prob2():
     online or via IPython. Use it to find the global minimum of the multmin()
     function given in the lab, with initial point x0 = np.array([-2, -2]) and
     the Nelder-Mead algorithm. Try it first with stepsize=0.5, then with
-    stepsize=0.2. Then compare these results with minimize() function used in
-    Problem 1, again with the Nelder-Mead method.
+    stepsize=0.2. Then try opimizing the multimin() function using the 
+    minimize() function from Problem 1 with the Nelder-Mead method and same 
+    initial point x0 = np.array([-2, -2]).
 
     Plot the multimin function and minima found above using the code provided.
-    Print a statement explaining why scipy.optimize.basinhopping() fails to 
-    find the global minimum with stepsize=0.2.
+    Print statements answering the following questions:
+        Which algorithms fail to find the global minimum?
+        Why do these algorithms fail?
+
+    Finally, return the global minimum.
     """
     # Define the function to be optimized and the initial condition.
     def multimin(x):
@@ -57,7 +62,8 @@ def prob2():
     small_step = .2
     large_step = .5
 
-    # Optimize using variations on Nelder-Mead
+    # Optimize using variations on Nelder-Mead.  NOTE: Here, each has been stored 
+    # seperately for ease of plotting differently colored minimums.
     local = opt.minimize(multimin, x0, method='Nelder-Mead')
     small = opt.basinhopping(multimin, x0, stepsize=small_step,
                             minimizer_kwargs={'method':'nelder-mead'})
@@ -65,11 +71,14 @@ def prob2():
                             minimizer_kwargs={'method':'nelder-mead'})
 
     # Print the results.
-    print("Stepsize:\t{}\nMinimum:\t{}\nX-Values:\t{}\n".format("None", local['fun'], local['x']))
-    print("Stepsize:\t{}\nMinimum:\t{}\nX-Values:\t{}\n".format(small_step, small['fun'], small['x']))
-    print("Stepsize:\t{}\nMinimum:\t{}\nX-Values:\t{}\n".format(large_step, large['fun'], large['x']))
+    print("Stepsize:\t{}\nMinimum:\t{}\nX-Values:\t{}\n".format("None",
+                                                     local['fun'], local['x']))
+    print("Stepsize:\t{}\nMinimum:\t{}\nX-Values:\t{}\n".format(small_step, 
+                                                     small['fun'], small['x']))
+    print("Stepsize:\t{}\nMinimum:\t{}\nX-Values:\t{}\n".format(large_step, 
+                                                     large['fun'], large['x']))
 
-    # Plot the multimin graph
+    # Plot the multimin graph.
     xdomain = np.linspace(-3.5,1.5,70)
     ydomain = np.linspace(-2.5,2.5,60)
     X,Y = np.meshgrid(xdomain,ydomain)
@@ -79,14 +88,18 @@ def prob2():
     ax1.plot_wireframe(X, Y, Z, linewidth=.5, color='c')
     ax1.scatter(x0[0], x0[1], multimin(x0), c='b')
 
-    # Plot the results.
+    # Plot the results of the algorithms.
     ax1.scatter(local.x[0], local.x[1], local.fun, s=30, c='k')
     ax1.scatter(small.x[0], small.x[1], small.fun, s=30, c='r')
     ax1.scatter(large.x[0], large.x[1], large.fun, s=30, c='g')
     plt.show()
 
-    # Answer the problem question and return the minimum value.
-    print("0.2 is too small a stepsize to escape the basin of a local min.")
+    # Answer the problem questions.
+    print("minimize() fails because it gets trapped in a basin.")
+    print("0.2 fails because it is too small a stepsize to escape a basin.")
+
+    # Return the correct global minimum.
+    return large['fun']
 
 
 # Problem 3: learn and use scipy.optimize.root()
