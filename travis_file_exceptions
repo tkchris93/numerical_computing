@@ -2,6 +2,7 @@ Labs/Introduction/NumpyIntro/jacobi_small.pdf
 Labs/Introduction/PlottingIntro/3dplot.pdf
 Labs/Introduction/PlottingIntro/GrandCanyon.png
 Labs/Introduction/PlottingIntro/fancymesh.png
+Labs/MachineLearning/Metropolis/samples.pdf
 Labs/Orphans/FiniteElement/tridiag.c
 Labs/Orphans/MultivariateDerivatives/Rosenbrock.pdf
 Labs/Orphans/RiemannSphere/mobius2.png
@@ -14,5 +15,4 @@ Labs/Vol2B/scipyoptimize/ManyMinima.pdf
 Labs/Vol2B/scipyoptimize/Rosenbrock.pdf
 Labs/Vol3A/PandasII/plotting_demos.ipynb
 Labs/Vol3A/PandasIII/industry_return_data.csv
-Labs/Vol3B/Metropolis/samples.pdf
 Labs/Vol4A/AnisotropicDiffusion/baloons_resized_noisy.png
