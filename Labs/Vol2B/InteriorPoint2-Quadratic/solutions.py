@@ -241,7 +241,7 @@ def laplacian(n):
     return spdiags(data, diags, n**2, n**2).toarray()
 
 # Problem 2
-def prob2(n=15):
+def circus(n=15):
     """Solve the circus tent problem for grid size length 'n'."""
     # Create the tent pole configuration.
     L = np.zeros((n,n))
@@ -263,8 +263,7 @@ def prob2(n=15):
     mu = np.ones(n**2)
 
     # Solve and plot the solutions.
-    # z = qInteriorPoint_old(H, c, A, L, (x,y,mu), verbose=True)[0].reshape((n,n))
-    z = qInteriorPoint(H, c, A, L, (x,y,mu), verbose=True)[0].reshape((n,n))
+    z = qInteriorPoint(H, c, A, L, (x,y,mu))[0].reshape((n,n))
 
     domain = np.arange(n)
     X, Y = np.meshgrid(domain, domain)
@@ -277,28 +276,25 @@ def prob2(n=15):
     # but qInteriorPoint() does not work :(
 
     # Solve and plot with CVXOPT.
-    A1 = matrix(-A)
-    H1 = matrix(H)
-    c1 = matrix(c)
-    L1 = matrix(-L)
-    z1 = np.array(solvers.qp(H1,c1,G=A1,h=L1)['x']).reshape((n,n))
+    # A1 = matrix(-A)
+    # H1 = matrix(H)
+    # c1 = matrix(c)
+    # L1 = matrix(-L)
+    # z1 = np.array(solvers.qp(H1,c1,G=A1,h=L1)['x']).reshape((n,n))
 
-    fig = plt.figure()
-    ax1 = fig.add_subplot(111, projection='3d')
-    ax1.plot_surface(X, Y, z1,  rstride=1, cstride=1, color='r')
-    plt.show()
+    # fig = plt.figure()
+    # ax1 = fig.add_subplot(111, projection='3d')
+    # ax1.plot_surface(X, Y, z1,  rstride=1, cstride=1, color='r')
+    # plt.show()
 
-if __name__ == '__main__':
-    prob2()
-
-def portfolio():
+def portfolio(filename="portfolio.txt"):
     # Markowitz portfolio optimization
     data = np.loadtxt('portfolio.txt')[:,1:]
     n = data.shape[1]
     mu = 1.13
     
     # calculate covariance matrix
-    Q = np.cov(data .T)
+    Q = np.cov(data.T)
     
     # calculate returns
     R = data.mean(axis=0)
@@ -311,13 +307,13 @@ def portfolio():
     A = matrix(A)
     
     # calculate optimal portfolio with short selling.
-    sol1 = solvers.qp(P,q,A=A,b=b)
+    sol1 = solvers.qp(P, q, A=A, b=b)
     x1 = np.array(sol1['x']).flatten()
     
     # calculate optimal portfolio without short selling.
     G = matrix(-np.eye(n))
     h = matrix(np.zeros(n))
-    sol2 = solvers.qp(P,q,G, h,A, b)
+    sol2 = solvers.qp(P, q, G, h, A, b)
     x2 = np.array(sol2['x']).flatten()
     
     return x1, x2
