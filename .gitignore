@@ -45,10 +45,11 @@ Thumbs.db
 *.sav
 
 ################
-# Binary files #
+# Binary files, EXCEPT .pdf and .png (preferred picture files). #
 ################
-*.pdf
-*.png
+Vol[1234].pdf
+ExtraLabs.pdf
+onelab.pdf
 *.eps
 *.tif
 *.gif
