@@ -5,12 +5,14 @@
 The Optimize package in Scipy has several functions for minimizing, root finding, and curve fitting. Here we will cover the usage of many of these functions.
 You can learn about all of the functions at \url{http://docs.scipy.org/doc/scipy/reference/optimize.html}.
 
+\section*{Local Minimization}
+
 First we will test out a few of the minimization algorithms on the Rosenbrock Function, which is defined as
 \[
 f(x,y) = (1-x)^2 + 100(y-x^2)^2.
 \]
 The Rosenbrock function is commonly used when evaluating the performance of an optimization algorithm.
-Reasons for this include the fact that its minimizer is found in a curved valley, and so minimizing the function is non-trivial.
+Reasons for this include the fact that its minimizer \li{x = np.array([1., 1.])} is found in  curved valley, and so minimizing the function is non-trivial.
 See Figure \ref{opt:rosenbrock}.
 The Rosenbrock function is included in the optimize package (as \li{rosen}), as well as its gradient (\li{rosen_der}) and its hessian (\li{rosen_hess}).
 
@@ -28,34 +30,53 @@ For some algorithms, you will additionally need to pass in the jacobian or hessi
 You may recognize some of these algorithms, and several of them will be discussed in greater detail later. For this lab, you do not need to understand how they work, just
 how to use them.
 
-\begin{problem}
-Import the \li{scipy.optimize} module as \li{opt}. Now use the \li{opt.minimize} function to find the minimum of the Rosenbrock function.
-Test Nelder-Mead, Powell, CG, BFGS, Newton-CG, Anneal, L-BFGS-B, TNC, COBYLA, SLSQP.
-
-The Newton-CG method takes in the jacobian and can take in the hessian. Test it with and without the hessian.
-Part of the output of \li{opt.minimize} is the number of iterations each algorithm took (sometimes outputted as \li{nit}).
-Start with the initial guess \li{x_0 = np.array([4., -2.5])}.
-Which algorithm(s) take(s) the least number of iterations?
-Which of the algorithms fail to find the (correct) minimum of the Rosenbrock?
-For your solution, print the answers to these two questions.
-
-As an example, we'll minimize the Rosenbrock with the Nelder-Mead method.
+% Here give an example (Change so not Nelder-Mead) and expalin how to read the output
+As an example, we'll minimize the Rosenbrock with the Newton-CG method. This method often performs better by including the optional hessian as an argument, which we will do here.
 \begin{lstlisting}
 >>> import numpy as np
 >>> from scipy import optimize as opt
 >>> x0 = np.array([4., -2.5])
->>> opt.minimize(opt.rosen, x0, method='nelder-mead', options={'xtol': 1e-8})
-  status: 0
-    nfev: 184
- success: True
-     fun: 2.4359782685672914e-18
-       x: array([ 1.,  1.])
+>>> opt.minimize(opt.rosen, x0, method='Newton-CG', hess=opt.rosen_hess, 
+													jac=opt.rosen_der)
+     fun: 1.1496545381999877e-15
+     jac: array([  1.12295570e-05,  -5.63744647e-06])
  message: 'Optimization terminated successfully.'
-     nit: 96
+    nfev: 45
+    nhev: 34
+     nit: 34
+    njev: 78
+  status: 0
+ success: True
+       x: array([ 0.99999997,  0.99999993])
 \end{lstlisting}
-The printed output gives you information on the performance of the algorithm. In particular, the line \li{x: array([ 1.,  1.])} gives the obtained minimizer, and the final
-line \li{nit: 96} gives the number of iterations.
+As the online documentation indicates, \li{opt.minimize()} returns an object of type \li{opt.optimize.OptimizeResult}. 
+
+The printed output gives you information on the performance of the algorithm. 
+The most relevant output for this lab include 
+
+\li{fun: 1.1496545381999877e-15}, the obtained minimum; 
+
+\li{nit: 96}, the number of iterations the algorithm took to complete; 
+
+\li{success: True}, whether the algorithm converged or not; 
+
+\li{x: array([ 0.99999997,  0.99999993])}, the obtained minimizer.
+
+Each of these outputs can be accessed either by indexing \li{OptimizeResult} object like a dictionary (\li{result['nit']}), or as attributes of a class (\li{result.nit}).  We recommend access by indexing, as this is consistent with other optimization packages in Python.
+
+The online documenation for \li{scipy.optimize.minimize} includes other optional parameters available to users, for example, to set a tolerance of convergence. While these are not required for this lab, they should be explored as needed for specific applications.
+
+\begin{problem}
+Use the \li{opt.minimize} function to find the minimum of the Rosenbrock function.
+Test Nelder-Mead, CG, and BFGS, starting each with the initial guess \li{x_0 = np.array([4., -2.5])}.
+For each method, print whether it converged, and if so, print how many iterations it took.
+
+Note that the hessian argument is not needed for these paticular methods. 
 \end{problem}
+
+Each of these three algorithms will be explored in great detail later in Volume 2: Nelder-Mead is a variation of the Simplex algorithm, CG is a variant of the Conjugate Gradient algorithm, and BFGS is a quasi-Newton method developed by Broyden, Fletcher, Goldfarb, and Shanno.
+
+\section*{Global Minimization via Basin Hopping}
 
 In the realm of optimization, convex functions are the most well-behaved, as any local minimum is a global minimum.
 However, in practice one must frequently deal with non-convex functions, and sometimes we need pick the global minimum out of many local minima.
@@ -77,22 +98,28 @@ Essentially, this is a wavy crater offset from the origin by 1 along the $x$ axi
 \end{figure}
 The presence of many local minima proves to be a difficulty for the minimization algorithms.
 
-For example, if we use the \li{opt.fmin} function (which employs the Nelder-Mead method), the algorithm fails to find the global minimum, and instead comes to rest on a local minimum.
+For example, if we try using the Nelder-Mead method as previously, with an initial point of \li{x0 = np.array([-2, -2])}, the algorithm fails to find the global minimum, and instead comes to rest on a local minimum.
 \begin{lstlisting}
 >>> def multimin(x):
 >>>     r = np.sqrt((x[0]+1)**2 + x[1]**2)
 >>>     return r**2 *(1+ np.sin(4*r)**2)
 >>>
 >>> x0 = np.array([-2, -2])
->>> res = opt.fmin(multimin, x0, xtol=1e-8, disp=True)
-Optimization terminated successfully.
-         Current function value: 5.488169
-         Iterations: 56
-         Function evaluations: 132
->>> print res
-[-2.03513929 -2.08611595]
->>> print multimin(res)
-5.48816865696
+>>> res = opt.minimize(multimin, x0, method='Nelder-Mead')
+ final_simplex: (array([[-2.11758025, -2.04313668], [-2.11748198, -2.04319043],
+       [-2.11751491, -2.04317242]]), array([ 5.48816866,  
+       												5.48816866,  5.48816866]))
+           fun: 5.488168656962328
+       message: 'Optimization terminated successfully.'
+          nfev: 84
+           nit: 44
+        status: 0
+       success: True
+             x: array([-2.11758025, -2.04313668])
+>>> print res['x']
+[-2.11758025, -2.04313668]
+>>> print res['fun']
+5.488168656962328
 >>> print multimin([-1,0])
 0.0
 \end{lstlisting}
@@ -109,15 +136,34 @@ or basin belonging to the current local minimum.
 It then searches for the minimum from this new starting point, and if it finds a better minimizer, it repeats the hopping process from this new minimizer.
 
 \emph{Only Scipy Version 0.12+ has \li{opt.basinhopping}. In earlier versions, such as 0.11, you won't find it.}
-%I've seen a real cool animation of this -feasible to do in python?
+
 \begin{problem}
+Explore the documentation for the \li{opt.basinhopping} function online or via IPython, 
+and use it to find the global minimum of our \li{multimin} function with \li{x0 = np.array([-2, -2])}.
+Call it using the same \li{Nelder-Mead} algorithm with \li{opt.basinhopping(multimin, x0, stepsize=0.5, minimizer_kwargs=\{'method':'nelder-mead'\})}.
+Try it first with \li{stepsize=0.5} and then with \li{stepsize=0.2}. 
 
-Look at the documentation for the \li{opt.basinhopping} function online and use it to find the global minimum of our \li{multimin} function with \li{x0 = np.array([-2, -2])}.
-Use the same \li{Nelder-Mead} algorithm with the same \li{xtol}. Call it with \li{opt.basinhopping(multimin, x0, stepsize=0.5, minimizer_kwargs=\{'method':'nelder-mead'\})}.
-Try it first with \li{stepsize=0.5} and then with \li{stepsize=0.2}. Why doesn't it find the minimum the second time? Print your answer to this question, and
-return the minimum value the of the function with \li{stepsize=0.2}.
+Plot the multimin function using the following code:
+\begin{lstlisting}
+>>> xdomain = np.linspace(-3.5,1.5,70)
+>>> ydomain = np.linspace(-2.5,2.5,60)
+>>> X,Y = np.meshgrid(xdomain,ydomain)
+>>> Z = multimin((X,Y))
+>>> fig = plt.figure()
+>>> ax1 = fig.add_subplot(111, projection='3d')
+>>> ax1.plot_wireframe(X, Y, Z, linewidth=.5, color='c')
+\end{lstlisting}
 
+Plot the initial point and minima by adapting the following line:
+\begin{lstlisting}
+>>> ax1.scatter(x_value, y_value, z_value)     
+\end{lstlisting}
+
+Why doesn't the alogrithm find the global minimum with \li{stepsize=0.2}?
+Print your answer to this question, and return the true global minimum.
 \end{problem}
+
+\section*{Root Finding}
 
 The \li{optimize} package also has functions useful in root-finding.
 The next example, taken from the online documentation, solves the following nonlinear system of equations using \li{opt.root}.
@@ -170,6 +216,9 @@ Return the values of $x,y,z$ as an array.
 
 As with \li{opt.minimize}, \li{opt.root} has more than one algorithm for root finding.
 Here we have used the \li{hybr} method. There are also several algorithms for scalar root finding. See the online documentation for more.
+
+\section*{Curve Fitting}
+
 %we still have curve fitting
 %least squares programming -- but it seems that it's already been done in Volume One
 
