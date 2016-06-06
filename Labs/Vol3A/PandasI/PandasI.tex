@@ -425,11 +425,11 @@ the column on which to join, along with the type (left, right, inner, outer).
 >>> # SELECT * FROM studentInfo INNER JOIN mathInfo ON studentInfo.ID = mathInfo.ID
 >>> pd.merge(studentInfo, mathInfo, on='ID') # INNER JOIN is the default
    Age Class  ID    Name Sex  Grade Math_Major
-0   20    Sp   0    Mylan   M    4.0          y
+0   20    Sp   0   Mylan   M    4.0          y
 1   21    Se   1   Regan   F    3.0          n
-2   22    Se   3   Jess   F    4.0          n
-3   20     J   5  Remi   F    3.5          y
-4   20     J   6   Matt   M    3.0          n
+2   22    Se   3    Jess   F    4.0          n
+3   20     J   5    Remi   F    3.5          y
+4   20     J   6    Matt   M    3.0          n
 [5 rows x 7 columns]
 
 >>> # SELECT GPA, Grade FROM otherInfo FULL OUTER JOIN mathInfo ON otherInfo.ID = mathInfo.ID
