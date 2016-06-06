@@ -6,6 +6,9 @@ from matplotlib import pyplot as plt
 s1 = pd.Series(-3, index=range(2, 11, 2))
 s2 = pd.Series({'Bill':31, 'Sarah':28, 'Jane':34, 'Joe':26})
 
+# Titanic readin problem
+data = pd.read_csv('titanic.csv')
+
 # Random Walk Problem
 # five random walks of length 100 plotted together
 N = 100
