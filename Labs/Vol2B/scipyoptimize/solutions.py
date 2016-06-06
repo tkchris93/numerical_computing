@@ -43,11 +43,9 @@ def prob2():
     online or via IPython. Use it to find the global minimum of the multmin()
     function given in the lab, with initial point x0 = np.array([-2, -2]) and
     the Nelder-Mead algorithm. Try it first with stepsize=0.5, then with
-    stepsize=0.2. Then try opimizing the multimin() function using the 
-    minimize() function from Problem 1 with the Nelder-Mead method and same 
-    initial point x0 = np.array([-2, -2]).
+    stepsize=0.2. 
 
-    Plot the multimin function and minima found above using the code provided.
+    Plot the multimin function and minima found using the code provided.
     Print statements answering the following questions:
         Which algorithms fail to find the global minimum?
         Why do these algorithms fail?
@@ -64,21 +62,18 @@ def prob2():
 
     # Optimize using variations on Nelder-Mead.  NOTE: Here, each has been stored 
     # seperately for ease of plotting differently colored minimums.
-    local = opt.minimize(multimin, x0, method='Nelder-Mead')
     small = opt.basinhopping(multimin, x0, stepsize=small_step,
                             minimizer_kwargs={'method':'nelder-mead'})
     large = opt.basinhopping(multimin, x0, stepsize=large_step,
                             minimizer_kwargs={'method':'nelder-mead'})
 
     # Print the results.
-    print("Stepsize:\t{}\nMinimum:\t{}\nX-Values:\t{}\n".format("None",
-                                                     local['fun'], local['x']))
     print("Stepsize:\t{}\nMinimum:\t{}\nX-Values:\t{}\n".format(small_step, 
                                                      small['fun'], small['x']))
     print("Stepsize:\t{}\nMinimum:\t{}\nX-Values:\t{}\n".format(large_step, 
                                                      large['fun'], large['x']))
 
-    # Plot the multimin graph.
+    # Plot the multimin graph. Here, the points are colored differently for emphasis.
     xdomain = np.linspace(-3.5,1.5,70)
     ydomain = np.linspace(-2.5,2.5,60)
     X,Y = np.meshgrid(xdomain,ydomain)
@@ -86,12 +81,11 @@ def prob2():
     fig = plt.figure()
     ax1 = fig.add_subplot(111, projection='3d')
     ax1.plot_wireframe(X, Y, Z, linewidth=.5, color='c')
-    ax1.scatter(x0[0], x0[1], multimin(x0), c='b')
+    ax1.scatter(x0[0], x0[1], multimin(x0), c='b')               # Initial pt: blue
 
     # Plot the results of the algorithms.
-    ax1.scatter(local.x[0], local.x[1], local.fun, s=30, c='k')
-    ax1.scatter(small.x[0], small.x[1], small.fun, s=30, c='r')
-    ax1.scatter(large.x[0], large.x[1], large.fun, s=30, c='g')
+    ax1.scatter(small.x[0], small.x[1], small.fun, s=30, c='r')  # Small step: red
+    ax1.scatter(large.x[0], large.x[1], large.fun, s=30, c='g')  # Large step: green
     plt.show()
 
     # Answer the problem questions.
