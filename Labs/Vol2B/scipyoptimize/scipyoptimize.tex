@@ -253,13 +253,13 @@ See Figure \ref{opt:curve_fit} for a plot of the data and the fitted curve.
 
 \begin{problem}
 Use the \li{opt.curve_fit} function to fit a curve to data obtained from numerical simulations of convection.
-The data are in the file \li{convection.npy}. The first column is $R$, the Raleigh number, and the second column is $\nu$.
+The data are in the file \li{convection.npy}. The first column is $R$, the Rayleigh number, and the second column is $\nu$, the Nusselt number.
 The relevant convection equation is:
 \[
 \nu = cR^\beta,
 \]
-where $\nu$ is nu, $R$ is the Raleigh number, $c$ is some constant, and $\beta$ is another constant. 
-Use \li{opt.curve_fit()} to find a fit to the data using $c$, and $\beta$ as the fitting parameters.
+where $c$ and $\beta$ are some constants. 
+Use \li{opt.curve_fit()} to find a fit to the data using $c$ and $\beta$ as the fitting parameters.
 Just so that you know that you are getting realistic values, $c$ should be on the order of $10^{-2}$, and $\beta$ on the order of $10^{0}$.
 Return your values for $c$, and $\beta$ in a NumPy array of length 2.
 
