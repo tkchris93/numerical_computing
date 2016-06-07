@@ -20,7 +20,7 @@ curve = nu(data[initial:,0], popt[0], popt[1])
 plt.loglog(data[:,0], data[:,1], '.k', label='Data')
 plt.loglog(data[initial:,0], curve, 'b', label='Curve', linewidth=2)
 plt.legend(loc="lower right")
-plt.show()
+# plt.show()
 
 # Save the plot.
 plt.savefig("ConvectionFit.pdf")
