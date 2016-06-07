@@ -63,7 +63,6 @@ def mc_error_plot(numIters=50):
     plt.xlim([0,max(N)])
     plt.xlabel(r'$N$')
     plt.ylabel('Relative error')
-    plt.title('Sphere volume error vs. number of points used')
     plt.legend()
     
     plt.savefig("MC_error_2.pdf")
