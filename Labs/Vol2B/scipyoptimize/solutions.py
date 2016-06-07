@@ -128,7 +128,7 @@ def prob3():
 def prob4():
     """Use the scipy.optimize.curve_fit() function to fit a curve to
     the data found in `convection.npy`. The first column of this file is R, 
-    the Railiegh number, and the second column is Nu. 
+    the Rayleigh number, and the second column is Nu, the Nusselt number. 
 
     The fitting parameters should be c and beta, as given in the convection
     equations.
@@ -140,12 +140,12 @@ def prob4():
     initial = 6
 
     # Define the function to optimize.
-    def nu(R, c, beta):
+    def nusselt(R, c, beta):
         return c*R**beta
 
     # Use curve_fit and the data to get the parameters.
-    popt, pcov = opt.curve_fit(nu, data[initial:,0], data[initial:,1])
-    curve = nu(data[initial:,0], popt[0], popt[1])
+    popt, pcov = opt.curve_fit(nusselt, data[initial:,0], data[initial:,1])
+    curve = nusselt(data[initial:,0], popt[0], popt[1])
 
     # Plot the data and the curve.
     plt.loglog(data[:,0], data[:,1], '.k', label='Data')
@@ -157,6 +157,3 @@ def prob4():
     return popt
 
 # END OF SOLUTIONS ========================================================== #
-
-
-print prob4()
