@@ -150,8 +150,6 @@ def prob4():
     # Plot the data and the curve.
     plt.loglog(data[:,0], data[:,1], '.k', label='Data')
     plt.loglog(data[initial:,0], curve, 'b', label='Curve', linewidth=2)
-    plt.xlim(0, 1e8)
-    plt.ylim(0, 4000)
     plt.legend(loc="lower right")
     plt.show()
 

@@ -252,32 +252,24 @@ See Figure \ref{opt:curve_fit} for a plot of the data and the fitted curve.
 \end{figure}
 
 \begin{problem}
-Use the \li{opt.curve_fit} function to fit a heating curve to data obtained from a temperature sensitive diode embedded in a cylindrical aluminum block.
-The data are in the file \li{heating.txt}. The first column is time and the second column is temperature in the Kelvin scale.
-The temperature in the block was measured as it warmed from 290K up to 370K using a heating coil wound around the block attached to a
-copper rod which sat in a cooling bath of liquid nitrogen.
-Newton's law of cooling has the following form:
+Use the \li{opt.curve_fit} function to fit a curve to data obtained from numerical simulations of convection.
+The data are in the file \li{convection.npy}. The first column is $R$, the Raleigh number, and the second column is $\nu$.
+The relevant convection equation is:
 \[
-T = T_{\infty} + \frac{P}{\gamma}+Ke^{-\frac{\gamma t}{C}},
-\]\
-where $T$ is the temperature (in Kelvin), $t$ is the time, $P$ is the power used to warm it (which here was 59.43 watts),
-$T_{\infty}$ is the ambient temperature (290K), $\gamma$ is a coefficient of heat transfer through the copper rod,
-$C$ is the total heat capacity of the block, and $K$ is a constant coefficient that depends on the initial conditions.
-Use \li{opt.curve_fit()} to find a fit to the data using $\gamma$, $C$, and $K$ as the fitting parameters.
-Just so that you know that you are getting realistic values, $\gamma$ should be on the order of $10^{-1}$, $C$ on the order of $10^{2}$, and $K$ should be negative on the order of $10^{2}$.
-Return your values for $\gamma$, $C$, and $K$ in a NumPy array of length 3.
+\nu = cR^\beta,
+\]
+where $\nu$ is nu, $R$ is the Raleigh number, $c$ is some constant, and $\beta$ is another constant. 
+Use \li{opt.curve_fit()} to find a fit to the data using $c$, and $\beta$ as the fitting parameters.
+Just so that you know that you are getting realistic values, $c$ should be on the order of $10^{-2}$, and $\beta$ on the order of $10^{0}$.
+Return your values for $c$, and $\beta$ in a NumPy array of length 2.
 
-See Figure \ref{opt:HeatingFit} for a plot of the data along with a fitted curve.
-
-\begin{comment}
-From the heat capacity you obtained in the fit you can calculate the specific heat capacity of the aluminum block by dividing the heat capacity by the mass of the block (about 300g). Is it close to the experimentally measured specific heat capacity of aluminum of 0.900 J/g K? From $\gamma$ you can also calculate the thermal conductivity of the copper rod using the formula $k=\gamma L/A$ where $L$ and $A$ are the length ($25.6mm$) and the cross-sectional area ($71.24mm^{3}$) of the rod. How does it compare to the experimentally measured thermal conductivity of $401 W/(m \dot K)$? Look at the covariance you got from the fit. Is the error due to the fit, noise in the data, or an error in the excremental setup?
-\end{comment}
+See Figure \ref{opt:ConvectionFit} for a plot of the data along with a fitted curve.
 \end{problem}
 
 \begin{figure}
-\includegraphics[width=\textwidth]{HeatingFit.pdf}
-\caption{The black line is actually the data from \li{heating.txt} plotted as a scatter plot. It appears as a line because the data is very dense. The blue line is a fitted curve.}
-\label{opt:HeatingFit}
+\includegraphics[width=\textwidth]{ConvectionFit.pdf}
+\caption{The black points are the data from \li{convection.npy} plotted as a scatter plot. The blue line is a fitted curve.}
+\label{opt:ConvectionFit}
 \end{figure}
 
 The \li{scipy.optimize} package has many other useful functions, and is a good first resource when confronting a numerical optimization problem. See the online documentation for further details.
