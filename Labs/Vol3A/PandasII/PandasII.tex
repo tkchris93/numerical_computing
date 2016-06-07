@@ -1,15 +1,15 @@
 \lab{Pandas II: Plotting with Pandas}{Pandas II: Plotting with Pandas}
-\objective{Pandas has many built-in plotting methods that wrap around matplotlib. Since Pandas provides tools for organizing and correlating large sets of data, it is important to be able to visualize these relationships. This lab consists of two parts: learning to plot with Pandas, and using those techniques to visualize data in informative ways.}
+\objective{Pandas has many built-in plotting methods that wrap around matplotlib. Since pandas provides tools for organizing and correlating large sets of data, it is important to be able to visualize these relationships. First, we will go over different types of plots offered by pandas, and then some techniques we can use to visualize data in useful ways.}
 \label{lab:pandas2}
 
 \section*{Plotting Data Frames}
 
 Recall from Lab \ref{lab:pandas1} that in Pandas, a \emph{DataFrame} is an ordered collection of \emph{Series}.
 A series is similar to a dictionary, with values assigned to various labels, or indices. Each series becomes a column in the data frame, with each row corresponding to an index.
-When several series are combined into a single data frame, it becomes very easy to compare and visualize data.
+When several series are combined into a single data frame, it becomes very easy to compare and visualize data.  Each entry has an associated index and column.
 
 Data frames have several methods for easy plotting.
-Most are simple wrappers around matplotlib commands, but some produce styles of plots that we have not previously seen.
+Most are simple wrappers around matplotlib commands, but some produce styles of plots that we have not previously seen.  In this lab, we will go over seven different types of plots offered by pandas.
 
 For these examples, we will use the data found in the file \li{crime\_data.txt}.
 
@@ -20,10 +20,11 @@ For these examples, we will use the data found in the file \li{crime\_data.txt}.
 
 \subsection*{Line Plots}
 
-Using matplotlib, we can plot the data in a single pandas \li{Series} against the data frame index (the years, in this case).
+In Lab \ref{lab:pandas1}, we showed how to plot a \li{Series} against its index (the years, in this case) using matplotlib.
 With a few extra lines we modify the $x$-axis label and limits and create a legend.
 
 \begin{lstlisting}
+>>> from matplotlib import pyplot as plt
 >>> plt.plot(crime["Population"], label="Population")
 >>> plt.xlabel("Year")
 >>> plt.xlim(min(crime.index), max(crime.index))
@@ -31,7 +32,7 @@ With a few extra lines we modify the $x$-axis label and limits and create a lege
 >>> plt.show()
 \end{lstlisting}
 
-Equivalently, we can produce the exact same plot with a single line using the DataFrame method \li{plot()}.
+Equivalently, we can produce the exact same plot with a single line using the \li{DataFrame} method \li{plot()}.
 Specify the $y$ values as a keyword argument.
 The $x$ values default to the index of the Series.
 See Figure \ref{fig:intro}.
@@ -65,7 +66,7 @@ With \li{DataFrame.plot()}, specify the $x$ values as a keyword argument:
 \end{lstlisting}
 
 Both procedures produce the same line plot, but the data frame method automatically sets the limits and labels of each axis and includes a legend.
-See Figure \ref{fig:intro2}.
+See Figure \ref{fig:compare}.
 
 \begin{figure}[H] % Matplotlib vs. Pandas
     \centering
@@ -77,7 +78,7 @@ See Figure \ref{fig:intro2}.
     \includegraphics[width=\textwidth]{dfBurglary.pdf}
     \end{minipage}
     \caption{On the left, the result of \li{plt.plot()}. On the right, the result of \li{DataFrame.plot()}}
-    \label{fig:intro2}
+    \label{fig:compare}
 \end{figure}
 
 Standard matplotlib keyword arguments can be passed in as usual to \li{DataFrame.plot()}.
@@ -92,10 +93,9 @@ This includes the ability to produce subplots quickly, modify the linestyle, and
 
 By default, the data frame's \li{plot()} function creates a line plot.
 We can create other types of plots easily by specifying the keyword \li{kind}.
-For example, bar plots are particularly useful for comparing several categories of data over time, or whenever there is a sense of progression in the index.
-Bar plots tend to give a little more detail than line plots, though line plots are the better choice when there are many data points.
-As an example, we compare three different types of crime over the last 5 years contained in the crime data set.
-% Like histograms, bar plots can be stacked.
+Bar plots are particularly useful for comparing several categories of data over time, or whenever there is a sense of progression in the index.
+Line plots are better suited to show a more continuous index (such as each year in a century), whereas bar plots are better for a discrete index (a few distinct years).
+Consider, for example, three different types of crime over the last five years. The argument \li{stacked} defaults to \li{False} (and \li{legend} to \li{True}).  Stacking the bars can help to show the combined totals each year.  Both types are shown below:
 
 \begin{lstlisting}
 # Each call to plot() makes a separate figure automatically.
@@ -118,6 +118,7 @@ As an example, we compare three different types of crime over the last 5 years c
 \end{figure}
 
 \begin{problem}
+\label{prob:one}
 The \li{pydataset} module\footnote{Run \li{pip install pydataset} if needed} contains numerous data sets stored as Pandas data frames.
 \begin{lstlisting}
 from pydataset import data
@@ -175,8 +176,7 @@ We can also mke the histogram horizontal by seting the keyword  \li{orientation}
 
 \subsection*{Box Plots}
 
-Sometimes it is helpful to visualize a distribution of values using the box-and-whisker plot which is commonly taught in elementary school, which
-displays the median, first and third quartiles, and outliers.
+Sometimes it is helpful to visualize a distribution of values using the box-and-whisker plot which displays the median, first and third quartiles, and outliers.
 Like the previous examples, select the columns to examine and plot them with \li{plot()}.
 To switch the orientation, use \li{vert=False}.
 
@@ -204,19 +204,10 @@ Write a short description of each data set based on the docstrings of the data a
 \end{problem}
 
 \subsection*{Scatter Plots}
-%Probably use the movie data here, compare with online images that are very similar to show the sophisication of the package.  I still think the movie data would be cool although they never got the cleaned up data to us.  Something similar wouldn't be too hard with the movie data
 
-Scatter plots are one of the most commonly used type of plot and have a simple implementation in pandas. Unlike other plotting commands, \li{scatter} needs both an \li{x} and a \li{y} column as arguments.
+Scatter plots are commonly used in a myriad of areas and have a simple implementation in pandas. Unlike other plotting commands, \li{scatter} needs both an \li{x} and a \li{y} column as arguments.
 
-
-\begin{lstlisting}
->>> mammal_speed = data("Mammals")
->>> mammal_speed.plot(kind="scatter", x="weight", y="speed"))
->>> plt.show()
-\end{lstlisting}
-
-
-The package includes many more scatter plot features which can be used to make the plots easier to understand.  For example, we can change the size of the point based on another column.  Consider the pydataset \li{HairEyeColor}, which contains the hair and eye color of various individuals. A scatter plot of hair color vs eye color is relatively useless unless we can see the frequencies with which each combination occurs.  Including the keyword argument \li{s} allows us to control the size of each point.  This can be set to a fixed value or the value in another column.  In the example below, the size of each point is set to the frequency with which each observation occurs.  
+The scatter plot option includes many features which can be used to make the plots easier to understand.  For example, we can change the size of the point based on another column.  Consider the pydataset \li{HairEyeColor}, which contains the hair and eye color of various individuals. A scatter plot of hair color vs eye color is relatively useless unless we can see the frequencies with which each combination occurs.  Including the keyword argument \li{s} allows us to control the size of each point.  This can be set to a fixed value or the value in another column.  In the example below, the size of each point is set to the frequency with which each observation occurs.  
 
 \begin{lstlisting}
 >>> hec = data("HairEyeColor")
@@ -249,30 +240,23 @@ Following is an example using pydataset's \li{sat.act} plotting the SAT Quantita
 >>> plt.show()
 \end{lstlisting}
 
-Note the scatter plot in Figure 4. While we can see the structure of the data, it is not easy to differentiate the densities of the areas with many data points. Compare this now to the hexbin plot in Figure 5.  The two plots are clearly similar, but with the hexbin plot we have the added dimension of density.   
+Note the scatter plot in Figure \ref{fig:comp}. While we can see the structure of the data, it is not easy to differentiate the densities of the areas with many data points. Compare this now to the hexbin plot in the same figure.  The two plots are clearly similar, but with the hexbin plot we have the added dimension of density.   
 \begin{figure}[H] 
     \centering
-    \includegraphics[width=.75\textwidth]{scatter.png}
-    \caption{Scatter Plot}
+    \includegraphics[width=.49\textwidth]{scatter.png}
+    \includegraphics[width=.49\textwidth]{hexbin2.png}
+    \caption{Comparing a scatter plot of SAT and ACT scores with a hexbin plot.}
+    \label{fig:comp}
 \end{figure}
 
-A key factor in creating an informative hexbin is choosing an appropriate \li{gridsize} parameter. This determines how large or small the bins will be. A large gridsize will give many small bins and a small gridsize gives a few large bins. Figure 6 shows the effect of changing the gridsize from 20 to 10.
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=.75\textwidth]{hexbin2.png}
-    \caption{Hexbin Plot With Gridsize 20}
-\end{figure}
-
-
+A key factor in creating an informative hexbin is choosing an appropriate \li{gridsize} parameter. This determines how large or small the bins will be. A large gridsize will give many small bins and a small gridsize gives a few large bins. Figure \ref{fig:hex} shows the effect of changing the gridsize from 20 to 10.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=.75\textwidth]{hexbin.png}
     \caption{Hexbin Plot With Gridsize 10}
+    \label{fig:hex}
 \end{figure}
-
-
-
 
 
 \subsection*{Lag Plot}
@@ -291,18 +275,14 @@ A key factor in creating an informative hexbin is choosing an appropriate \li{gr
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=.75\textwidth]{randomdata.png}
-    \caption{Lag Plot of Random Data}
+    \includegraphics[width=.49\textwidth]{randomdata.png}
+    \includegraphics[width=.49\textwidth]{structureddata.png}
+    \caption{Lag plot of random data (left) compared to a lag plot of a sine wave (right).}
 \end{figure}
 
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=.75\textwidth]{structureddata.png}
-    \caption{Lag Plot of Sine Wave}
-\end{figure}
 
 \begin{problem}
+Make this problem more specific.
 Choose a dataset provided in the \li{pydataset} and produce scatter and hexbin plots demonstrating some characteristic of the data. A list of datasets in the \li{pydataset} module can be produced using the \li{data()} command.
 \end{problem}
 
@@ -310,37 +290,37 @@ For more types of plots available in Pandas and further examples, see \url{http:
 
 \section*{Data Visualization}
 
-Visualization is much more than a set of pretty pictures scattered throughout a paper for the sole purpose of providing candy-colored filler.
+Visualization is much more than a set of pretty pictures scattered throughout a paper for the sole purpose of providing contrast to the text.
 When properly implemented, data visualization is a powerful tool for analysis and communication. 
-In this section we discuss the process of making deliberate, effective, and efficient design decisions.
+When writing a paper or report, the author must make many decisions about how to use graphics effectively to convey useful information to the reader.  Here we will go over a simple process for making deliberate, effective, and efficient design decisions.
 
 \subsection*{Catching all of the Details}
 
-Consider the figure entitled ``Plot 1''. 
+Consider the plot in Figure \ref{fig:nolabels}. 
 What does it depict?
 We can tell from a simple glance that it is a scatter plot of positively correlated data of some kind, with \li{temp}--likely temperature--on the $x$ axis and \li{cons} on the $y$ axis. 
-However, the picture is not really communicating anything about the dataset. We have not specified the units for the $x$ or the $y$ axis, we have no idea what \li{cons} is, and we don't even know where the data came from in the first place. 
+However, the picture is not really communicating anything about the dataset. We have not specified the units for the $x$ or the $y$ axis, we have no idea what \li{cons} is, there is no title, and we don't even know where the data came from in the first place. 
 
 \begin{figure}[H] 
     \centering
     \includegraphics[width=.75\textwidth]{Nolabels.png}
-    \caption{Plot 1}
-    \label{fig:aplot}
+    \caption{Non-specific data.}
+    \label{fig:nolabels}
 \end{figure}
 
 \subsubsection*{Labels, Legends, and Titles}
 In a homework or lab setting, we sometimes (mistakenly) think that it is acceptable to leave off appropriate labels, legends, titles, and sourcing.
-In a published report or presentation, this kind of carelessness is confusing at best and (when the source is not included) plagiaristic at worst.
-Here, we offer a brief overview of the pandas code that will allow us to add these vital elements.
+In a published report or presentation, this kind of carelessness is confusing at best and, when the source is not included, even plagiaristic.
+Clearly, we need to explain our data in a useful manner that includes all of the vital information.
 
-Consider again ``Plot 1''. 
+Consider again Figure \ref{fig:nolabels}. 
 This figure comes from the \li{Icecream} dataset within the \li{pydataset} package, which we store here in a dataframe and then plot:
 \begin{lstlisting}
 >>> icecream = data("Icecream")
 >>> icecream.plot(kind="scatter", x="temp", y="cons")
 \end{lstlisting}
 
-We have at this point reproduced the rather substandard plot in Figure 9.
+We have at this point reproduced the rather substandard plot in Figure \ref{fig:nolabels}.
 Using \li{data('Icecream', show\_doc=True)} we find the following information:
 \begin{enumerate}
     \item The dataset details ice cream consumption via four-weekly observations from March 1951 to July 1953 in the United States.
@@ -350,10 +330,10 @@ Using \li{data('Icecream', show\_doc=True)} we find the following information:
 \end{enumerate}
 
 We add these important details using the following code.
-As we have seen in previous examples, Pandas automatically generates legends when appropriate.
-However, although Pandas also automatically labels the $x$ and $y$ axes, our data frame column titles may be insufficient.
+As we have seen in previous examples, pandas automatically generates legends when appropriate.
+However, although pandas also automatically labels the $x$ and $y$ axes, our data frame column titles may be insufficient.
 Appropriate titles for the $x$ and $y$ axes must also list appropriate units. 
-For example, the $y$ axis should specify that the consumption is \emph{per head} with unit \emph{pints}, in place of the ambigious label \li{cons}.
+For example, the $y$ axis should specify that the consumption is in units of \emph{pints per head}, in place of the ambigious label \li{cons}.
 \begin{lstlisting}
 >>> icecream = data("Icecream")
 # Set title via the title keyword argument
@@ -372,17 +352,17 @@ To arbitrarily add the necessary text to the figure, we may use either \li{plt.a
 Both of these methods are imperfect, however, and can normally be just as easily replaced by a caption attached to the figure in your presentation or document setting. 
 We again reiterate how important it is that you source any data you use. Failing to do so is plagiarism.
 
-Finally, we have a clear and demonstrative graphic:
+Finally, we have a clear and demonstrative graphic in Figure \ref{fig:labels}.
 
 \begin{figure}[H] 
     \centering
     \includegraphics[width=.75\textwidth]{Icecream.png}
     \caption{Source:  Hildreth, C. and J. Lu (1960) \_Demand relations with autocorrelated disturbances\_, Technical Bulletin No 2765, Michigan State University.}
-    \label{fig:aplot}
+    \label{fig:labels}
 \end{figure}
 
 \begin{problem}
-Return to the plots you generated in problem one (datasets \li{nottem}, \li{VADeaths}, and \li{Arbuthnot}).
+Return to the plots you generated in problem \ref{prob:one} (datasets \li{nottem}, \li{VADeaths}, and \li{Arbuthnot}).
 Reproduce and modify these plots to include:
 \begin{itemize}
 \item A clear title, with relevant information for the period or region the data was collected in.
@@ -390,34 +370,17 @@ Reproduce and modify these plots to include:
 \item A legend (for comparison data).
 \item The source. You may include the source information in your plot or print it after the plot at your discretion.
 \end{itemize}
-Note that in this and all subsequent problems, points will be taken off if any of these items are partially or fully missing from your graphs.
+Note that in this problem, as well as for plots in subsequent labs, points will be taken off if any of these items are partially or fully missing from your graphs.
 \end{problem}
-
-\begin{comment}
-\subsubsection*{Colors and Scaling}
-This discussion will draw heavily from discussions on visualization from recent conferences such as SciPy and Vis.
-A lot of research and effort has been put into color choice.
-We will also briefly discuss choosing an appropriate scale for the graph.
-\end{comment}
 
 
 \subsection*{Choosing the Right Plot}
-Now that we know how to add the appropriate details for remaining plots, we return to the fundamental question of data visualization--which plot is the right plot for your data? 
+Now that we know how to add the appropriate details for remaining plots, we return to the fundamental question of data visualization: Which plot should you use for your data? 
 In previous sections, we have already discussed the various strengths and weaknesses of available pandas plotting techniques.
-At this point, we know how to visualize data using bar charts and histograms or scatter plots and hexbins. 
+At this point, we know how to visualize data using line graphs, bar charts, histograms, box plots, scatter plots, hexbins, and lag plots. 
+
 However, perfectly plot-ready data sets--organized by a simple continuum or a convenient discrete set--are few and far between.
-In the real world, it is rare to find a dataframe that is already ready to become a meaningful visual.
+In the real world, it is rare to find data that is perfectly ready to become a meaningful visual, even if it is already a \li{DataFrame}.
+As such, deciding how to organize and group your data is one of the most important parts of ``choosing the right plot''.
 
-As such, deciding how to organize and group the data within your dataframe is one of the most important parts of ``choosing the right plot''.
-
-\begin{comment}
-Discuss the importance of choosing the right plot for your data, and analyzing what you want to communicate.
-This section will probably use 1-3 datasets from PyDataset describing diseases.
-Since these datasets are easy to download and use, that will be a good way to compare how different datasets match certain plots better, and then similarly divide certain aspects of the data into different plots.
-
-One example here will be the PyDataset's AIDS dataset.
-In addition to its categories of infection and induction periods, we can compare adult cases to children using a bar chart, or simply focus on one of these two using a scatter plot.
-There are many different ways to describe the data, here we will discuss how what we want to display effects the plot we choose.
-\end{comment}
-
-Fix the end here.
+In Lab \ref{lab:pandas3} we will go over how to group data in meaningful ways.  You should then be better able to choose the right type of plot for your data. 

@@ -74,7 +74,8 @@ plt.savefig("box2.pdf")
 plt.clf(); plt.close()
 plt.show()
 
-############# Middle section ############
+
+# Hair and Eye color scatter plot
 hec = data("HairEyeColor")
 X = np.unique(hec["Hair"], return_inverse=True)
 Y = np.unique(hec["Eye"], return_inverse=True)
