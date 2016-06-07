@@ -29,11 +29,9 @@ This lab manual is designed to accompany the textbook \emph{Foundations of Appli
 \copyright{This work is licensed under the Creative Commons Attribution 3.0 United States
 License.  You may copy, distribute, and display this copyrighted work only if you give
 credit to Dr.~J.~Humpherys. All derivative works must include an attribution to Dr.~J.~Humpherys as the owner of this work as well as the web address to
-\\\centerline{\url{https://github.com/byuimpact/numerical_computing}}\\ as the original source of
-this
-work.\\To view a copy of the Creative Commons Attribution 3.0 License,
-visit\\\centerline{\url{http://creativecommons.org/licenses/by/3.0/us/}} or send a letter to
-Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 94105, USA.}
+\\\centerline{\url{https://github.com/Foundations-of-Applied-Mathematics/Labs}}\\as the original source of this work.
+\\To view a copy of the Creative Commons Attribution 3.0 License, visit
+\\\centerline{\url{http://creativecommons.org/licenses/by/3.0/us/}} or send a letter to Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 94105, USA.}
 
 \vfill
 \centering\includegraphics[height=1.2cm]{by}
@@ -43,15 +41,11 @@ Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 94105
 \setcounter{tocdepth}{1}
 \tableofcontents
 
-\mainmatter
+\mainmatter % LABS ============================================================
 
-% LABS ========================================================================
-
-% THIS NEEDS TO BE REVISED TO MATCH THE CURRENT OUTLINE.
+% TODO: MATCH THE CURRENT OUTLINE.
 
 \part{Labs}
-
-% Volume 3 A
 \subimport{./Labs/Vol3A/UnixShell1/}{shell1.tex}
 \subimport{./Labs/Vol3A/UnixShell2/}{shell2.tex}
 \subimport{./Labs/Vol3A/RegexBasic/}{RegexBasic}
@@ -60,26 +54,30 @@ Creative Commons, 171 Second Street, Suite 300, San Francisco, California, 94105
 \subimport{./Labs/Vol3A/PandasI/}{PandasI}
 \subimport{./Labs/Vol3A/PandasII/}{PandasII}
 \subimport{./Labs/Vol3A/PandasIII/}{PandasIII}
-\subimport{./Labs/Vol3A/WebTechnology/}{WebTechnology}
-% Web Tech 2
-\subimport{./Labs/Vol3A/MongoDB/}{MongoDB}
-\subimport{./Labs/Vol3A/Scrapy/}{scraping}
-% Web Scraping 2
+% Bokeh
 
-% Volume 3 B
+\subimport{./Labs/Vol3B/WebTech1-Serialization/}{WebTech1}
+\subimport{./Labs/Vol3B/WebTech2-InternetProtocol/}{WebTech2}
+% Beautiful Soup 1 and 2
 \subimport{./Labs/Vol3B/PandasIV/}{pandasIV}
-\subimport{./Labs/Vol3B/KalmanFilter/}{kalman}
-\subimport{./Labs/Vol3B/ARMA_Models/}{TimeSeries}
-\subimport{./Labs/Vol3B/NaiveBayes/}{naivebayes}
-\subimport{./Labs/Vol3B/HMM/}{hmm}
-\subimport{./Labs/Vol3B/GMM/}{gmm}
-\subimport{./Labs/Vol3B/LDA/}{lda}
-\subimport{./Labs/Vol3B/Metropolis/}{metropolis}
-\subimport{./Labs/Vol3B/PCA_LSI/}{PCA_LSI}
-% Clustering
-\subimport{./Labs/Vol3B/LogisticRegression/}{LogReg}
-\subimport{./Labs/Vol3B/TitanicSurvival/}{randomforest}
-\subimport{./Labs/Vol3B/StateMachines/}{StateMachines}
+\subimport{./Labs/Vol3B/MongoDB/}{MongoDB}
+% MPI
+% Hadoop
+% Spark
 
+\part{Machine Learning Algorithms}
+\subimport{./Labs/MachineLearning/KalmanFilter/}{KalmanFilter}
+\subimport{./Labs/MachineLearning/ARMA/}{ARMA}
+\subimport{./Labs/MachineLearning/HMM/}{HMM}
+\subimport{./Labs/MachineLearning/GMM/}{GMM}
+\subimport{./Labs/MachineLearning/CDHMM/}{CDHMM}
+\subimport{./Labs/MachineLearning/LDA/}{LDA}
+\subimport{./Labs/MachineLearning/Metropolis/}{Metropolis}
+\subimport{./Labs/MachineLearning/PCA-LSI/}{PCA-LSI}
+\subimport{./Labs/MachineLearning/NaiveBayes/}{NaiveBayes}
+\subimport{./Labs/MachineLearning/LogisticRegression/}{LogisticRegression}
+\subimport{./Labs/MachineLearning/CART/}{CART}
+\subimport{./Labs/MachineLearning/RandomForest/}{RandomForest}
+\subimport{./Labs/MachineLearning/KNN-SVM/}{KNN-SVM}
 
 \end{document}

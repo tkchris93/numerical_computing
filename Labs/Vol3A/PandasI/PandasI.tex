@@ -4,9 +4,8 @@
 
 In volumes 1 and 2, we solved data problems primarily using NumPy and SciPy.
 While extremely flexible and useful tools, these libraries lack some of the high-level 
-data-analytic abstractions present in other popular data packages like R and Stata.
-We now turn our attention to \emph{pandas}, a Python library that is more specifically built
-for data analysis.
+data-analytic abstractions present in other popular data packages.
+In particular, \emph{pandas} is a Python library that is more specifically built for data analysis.  In this lab, we will give an overview of some of the functions which will prove very useful in this regard.
 
 \section*{Data Structures in pandas}
 Just as NumPy is built on the \li{ndarray} data structure suited for efficient scientific
@@ -14,13 +13,11 @@ and numerical computation, pandas is centered around a handful of core data stru
 custom built for data analysis. These data structures include the \li{Series}, \li{DataFrame},
 and \li{Panel}, which correspond roughly to one, two, and three-dimensional arrays.
 We will explore the first two data structures in some detail.
-The interested reader can learn more about the \li{Panel} data structure (the least-used one in pandas) in the online documentation.
+The interested reader can learn more about the \li{Panel} data structure (the least-used one in pandas) in the online documentation; we will not delve into this data structure here.
 
 \subsection*{Series}
-The \li{Series} is a one-dimensional array with labeled entries. The values of the array may be
-any data type, including integers, strings, or general Python objects. Further, the array
-need not be homogeneous. That is, it can hold values of different data types. Together,
-the array values are referred to as the \emph{data} of the \li{Series}.
+The \li{Series} is a one-dimensional array with labeled entries. The values contained may be any data type, including integers, strings, or general Python objects. Further, unlike NumPy arrays, pandas \li{Series} need not be homogeneous. That is, they can hold values of different data types. Together,
+the values are referred to as the \emph{data} of the \li{Series}.
 The labels must consist of hashable types, and are most commonly integers or strings.
 Together, the labels are referred to as the \emph{index} of the \li{Series}.
 Thus, a \li{Series} consists of data and an index. The most basic way to initialize such an object
@@ -79,7 +76,7 @@ We can create a \li{Series} having constant values in the following manner:
 dtype: int64
 \end{lstlisting}
 
-It is also possible to use a Python dictionary when creating a \li{Series}:
+It is also possible to use a Python dictionary to create a \li{Series}:
 \begin{lstlisting}
 >>> d = {'e1': 93, 'e2': 95, 'e3': 87, 'e4': 82, 'e5': 94}
 >>> s4 = pd.Series(d)
@@ -111,8 +108,8 @@ as a tabular structure with labeled rows and columns. The row labels are collect
 index, and the column labels are collectively called the columns. An individual column in a
 \li{DataFrame} object is a \li{Series}.
 
-There are many ways to initialize a \li{DataFrame}. In the following, we build a \li{DataFrame} out of a
-dictionary of \li{Series}.
+There are many ways to initialize a \li{DataFrame}. In the following code, we build a \li{DataFrame} out of a
+dictionary of \li{Series}:
 \begin{lstlisting}
 >>> x = pd.Series(np.random.randn(4), ['a', 'b', 'c', 'd'])
 >>> y = pd.Series(np.random.randn(5), ['a', 'b', 'd', 'e', 'f'])
@@ -180,8 +177,7 @@ tenth   math      -0.924962
 dtype: float64
 \end{lstlisting}
 
-Multi-indexing is visually convenient, but not strictly necessary for most applications.
-The interested reader is invited to explore the documentation to learn more.
+Multi-indexing is visually convenient, and will be explored further in Lab \ref{lab:pandas3}, where we will discuss pandas pivot tables.
 
 \section*{Data I/O}
 Being able to import and export data is a fundamental skill in data science. Unfortunately, with the
@@ -219,7 +215,7 @@ When you need to save your data, pandas allows you to write to several different
 A typical example is the \li{to_csv} function method attached to \li{Series} and \li{DataFrame} objects,
 which writes the data to a CSV file.
 Keyword arguments allow you to specify the separator character, omit writing the columns names or index,
-and other options. The code below demonstrates its typical usage:
+and specify many other options. The code below demonstrates its typical usage:
 \begin{lstlisting}
 >>> df.to_csv("my_df.csv")
 \end{lstlisting}
@@ -227,8 +223,7 @@ and other options. The code below demonstrates its typical usage:
 \section*{Viewing and Accessing Data}
 
 Once we have our data ready to go in pandas, how can we interact with it?
-In this section we will explore some elementary access, plotting, and querying techniques that enable us to maneuver through
-and gain insight into our data.
+In this section we will explore some elementary accessing and querying techniques that enable us to maneuver through and gain insight into our data.
 
 \subsection*{Basic Data Access}
 Some of the basic slicing paradigms in NumPy carry over to pandas. 
@@ -258,7 +253,7 @@ b  0.402484 -0.955039
 More generally, we can select subsets of the data using the \li{.iloc} and \li{.loc} methods.
 The \li{.loc} method selects rows and columns based on their labels, while the \li{.iloc} method
 selects them based on their integer position.
-Accessing \li{Series} and \li{DataFrame} objects using these indexing operations is more efficient than using bracket indexing because the bracket indexing has to check many cases before it can determine how to slice the data structure.
+Accessing \li{Series} and \li{DataFrame} objects using these indexing operations is more efficient than using bracket indexing, because the bracket indexing has to check many cases before it can determine how to slice the data structure.
 By using \li{loc}/\li{iloc} explicitly, you bypass the extra checks.
 \begin{lstlisting}
 >>> # select rows a and c, column II
@@ -368,10 +363,10 @@ explore how pandas accomplishes some of the same tasks as SQL. The SQL-like func
 one of its biggest advantages, since it can eliminate the need to switch between programming languages
 for different tasks. Within pandas we can handle both the querying \emph{and} data analysis.
 
-For the following examples, we will use this data:
+For the following examples, we will use the following data:
 \begin{lstlisting}
 >>> #build toy data for SQL operations
->>> name = ['Bill', 'Alice', 'Joe', 'Jenny', 'Ted', 'Taylor', 'Tracy', 'Morgan', 'Liz']
+>>> name = ['Mylan', 'Regan', 'Justin', 'Jess', 'Jason', 'Remi', 'Matt', 'Alexander', 'JeanMarie']
 >>> sex = ['M', 'F', 'M', 'F', 'M', 'F', 'M', 'M', 'F']
 >>> age = [20, 21, 18, 22, 19, 20, 20, 19, 20]
 >>> rank = ['Sp', 'Se', 'Fr', 'Se', 'Sp', 'J', 'J', 'J', 'Se']
@@ -430,11 +425,11 @@ the column on which to join, along with the type (left, right, inner, outer).
 >>> # SELECT * FROM studentInfo INNER JOIN mathInfo ON studentInfo.ID = mathInfo.ID
 >>> pd.merge(studentInfo, mathInfo, on='ID') # INNER JOIN is the default
    Age Class  ID    Name Sex  Grade Math_Major
-0   20    Sp   0    Bill   M    4.0          y
-1   21    Se   1   Alice   F    3.0          n
-2   22    Se   3   Jenny   F    4.0          n
-3   20     J   5  Taylor   F    3.5          y
-4   20     J   6   Tracy   M    3.0          n
+0   20    Sp   0   Mylan   M    4.0          y
+1   21    Se   1   Regan   F    3.0          n
+2   22    Se   3    Jess   F    4.0          n
+3   20     J   5    Remi   F    3.5          y
+4   20     J   6    Matt   M    3.0          n
 [5 rows x 7 columns]
 
 >>> # SELECT GPA, Grade FROM otherInfo FULL OUTER JOIN mathInfo ON otherInfo.ID = mathInfo.ID
@@ -478,15 +473,15 @@ The \li{join} method makes this operation convenient.
 >>> #now join studentInfo with sibInfo
 >>> studentInfo.join(sibInfo)
    Age Class  ID    Name Sex  Siblings
-0   20    Sp   0    Bill   M         0
-1   21    Se   1   Alice   F         1
-2   18    Fr   2     Joe   M         0
-3   22    Se   3   Jenny   F         5
-4   19    Sp   4     Ted   M         2
-5   20     J   5  Taylor   F         9
-6   20     J   6   Tracy   M       NaN
-7   19     J   7  Morgan   M       NaN
-8   20    Se   8     Liz   F       NaN
+0   20    Sp   0    Mylan   M         0
+1   21    Se   1   Regan   F         1
+2   18    Fr   2     Justin   M         0
+3   22    Se   3   Jess   F         5
+4   19    Sp   4     Jason   M         2
+5   20     J   5  Remi   F         9
+6   20     J   6   Matt   M       NaN
+7   19     J   7  Alexander   M       NaN
+8   20    Se   8     JeanMarie   F       NaN
 [9 rows x 6 columns]
 \end{lstlisting}
 The default is a left join, but this can be altered.
@@ -498,11 +493,11 @@ parameters (for the left and right DataFrames, respectively).
 >>> #join studentInfo and mathInfo on indexes
 >>> studentInfo.join(mathInfo, lsuffix='_left', rsuffix='_right', how='inner')
    Age Class  ID_left   Name Sex  Grade  ID_right Math_Major
-0   20    Sp        0   Bill   M    4.0         0          y
-1   21    Se        1  Alice   F    3.0         1          n
-2   18    Fr        2    Joe   M    3.5         5          y
-3   22    Se        3  Jenny   F    3.0         6          n
-4   19    Sp        4    Ted   M    4.0         3          n
+0   20    Sp        0   Mylan   M    4.0         0          y
+1   21    Se        1  Regan   F    3.0         1          n
+2   18    Fr        2    Justin   M    3.5         5          y
+3   22    Se        3  Jess   F    3.0         6          n
+4   19    Sp        4    Jason   M    4.0         3          n
 [5 rows x 8 columns]
 \end{lstlisting}
 

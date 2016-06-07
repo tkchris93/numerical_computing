@@ -1,44 +1,5 @@
-# testDriver.py
-"""Outline for Foundations of Applied Mathematics lab test drivers.
-
-Test driver files should be named testDriver.py and should be placed in the
-same folder as the lab that it corresponds to. The testDriver.py file should
-have dependencies on the corresponding solutions.py file so that student
-submissions are tested directly against the solutions when possible.
-
-test() function and _testDriver class -----------------------------------------
-
-The _testDriver class is designed to be flexible. The test_all() routine will
-grade each problem and collect feedback, but each problem can be graded
-individually via the different problemX() methods. This allows the instructor
-to grade from IPython, or to automate grading using Git, Google Drive, or
-another file system manager.
-
-The test() function creates an instance of the _testDriver class, grades every
-problem, and returns the score feedback. Use this function to automate the
-grading process.
-
-Customize the docstrings of the test() function and the _testDriver class to
-give specific instructions about how the lab is to be graded.
-
-Tags --------------------------------------------------------------------------
-
-The @_autoclose tag makes it easy to grade a problem that produces a plot.
-It should only be on a problem-grading function that uses _testDriver._grade()
-or some other pausing command (like raw_input()) so that the plot is not closed
-immediately after it is created.
-
-The @_timeout tag prevents a function from running for longer than a
-specificied number of seconds. Be careful not to use this wrapper in
-conjunction with _testDriver._grade() or another pausing command that waits
-for the grader's response. NOTE: this decorator will only work on Unix.
-
-Testing -----------------------------------------------------------------------
-
-To test the test driver, make sure that the solutions file passes with full
-points. The if __name__ == '__main__' clause imports the solutions file and
-grades it.
-"""
+# solutions.py
+"""Volume II: Interior Point II (Quadratic Optimization). Test Driver."""
 
 # Wrappers ====================================================================
 
@@ -90,20 +51,21 @@ def _timeout(seconds):
 
 # Test Script and Class =======================================================
 
-# from solutions import [functions / classes that are needed for testing]
+import numpy as np
+from real_solutions import portfolio
 
 def test(student_module):
     """Grade a student's entire solutions file.
     
-    X points for problem 1
-    X points for problem 2
-    ...
+    20 points for problems 1-2
+    10 points for problem 3
+    10 points for problem 4
     
     Inputs:
         student_module: the imported module for the student's file.
     
     Returns:
-        score (int): the student's score, out of TOTAL.
+        score (int): the student's score, out of 40.
         feedback (str): a printout of test results for the student.
     """
     tester = _testDriver()
@@ -125,16 +87,17 @@ class _testDriver(object):
         self.feedback = ""
 
     # Main routine -----------------------------------------------------------
-    def test_all(self, student_module, total=100):
+    def test_all(self, student_module, total=40):
         """Grade the provided module on each problem and compile feedback."""
         # Reset feedback and score.
         self.feedback = ""
         self.score = 0
 
-        def test_one(problem, label, value):
+        def test_one(problem, number, value):
             """Test a single problem, checking for errors."""
             try:
-                self.feedback += "\n\n{} ({} points):".format(label, value)
+                self.feedback += "\n\nProblem {} ({} points):".format(
+                                                                number, value)
                 points = problem(student_module)
                 self.score += points
                 self.feedback += "\nScore += {}".format(points)
@@ -142,8 +105,9 @@ class _testDriver(object):
                 self.feedback += "\n{}: {}".format(self._errType(e), e)
 
         # Grade each problem.
-        test_one(self.problem1, "Problem 1", 0)   # Problem 1: X points.
-        test_one(self.problem2, "Problem 2", 0)   # Problem 2: X points.
+        test_one(self.problem2, 2, 20)   # Problems 1-2: 20 points.
+        test_one(self.problem3, 3, 10)   # Problem 3: 10 points.
+        test_one(self.problem4, 4, 10)   # Problem 4: 10 points.
 
         # Report final score.
         percentage = (100. * self.score) / total
@@ -168,20 +132,9 @@ class _testDriver(object):
         """Test to see if 'correct' and 'student' are equal.
         Report the given 'message' if they are not.
         """
-        # if np.allclose(correct, student):
-        if correct == student:
-            return 1
-        else:
-            self.feedback += "\n{}".format(message)
-            self.feedback += "\n\tCorrect response: {}".format(correct)
-            self.feedback += "\n\tStudent response: {}".format(student)
-            return 0
-
-    def _strTest(self, correct, student, message):
-        """Test to see if 'correct' and 'student' have the same string
-        representation. Report the given 'message' if they are not.
-        """
-        if str(correct) == str(student):
+        if not isinstance(student, np.ndarray):
+            raise TypeError("Failed to return a NumPy array")
+        if np.allclose(correct, student):
             return 1
         else:
             self.feedback += "\n{}".format(message)
@@ -210,16 +163,48 @@ class _testDriver(object):
         return credit
 
     # Problems ----------------------------------------------------------------
-    def problem1(self, s):
-        """Test Problem 1. X points."""
-        points = 0
-        # Test problem 1 here.
-        return points
-
+    @_timeout(5)
     def problem2(self, s):
-        """Test Problem 2. X points."""
-        points = 0
-        # Test problem 2 here.
+        """Test qInteriorPoint(). 20 points."""
+
+        Q = np.array([[1,-1.],[-1,2]])
+        c = np.array([-2,-6.])
+        A = np.array([[-1, -1], [1, -2.], [-2, -1], [1, 0], [0,1]])
+        b = np.array([-2, -2, -3., 0, 0])
+        x0 = np.array([.5, .5])
+        y0 = np.ones(5)
+        m0 = np.ones(5)
+        point, value = s.qInteriorPoint(Q=Q, c=c, A=A, b=b, guess=(x0,y0,m0))
+        return 20 * self._eqTest(np.array([2/3., 4/3.]), point,
+                            "qInteriorPoint() failed for the QP in Problem 2")
+
+    @_autoclose
+    def problem3(self, s):
+        """Test the circus tent problem. 10 points."""
+        s.circus(n=15)
+        return self._grade(10, "Incorrect circus tent graph with n=15")
+
+    @_timeout(5)
+    def problem4(self, s):
+        """Test the portfolio optimization problem. 10 points."""
+        
+        try:
+            s1, s2 = s.portfolio(filename="portfolio.txt")
+            s1, s2 = np.ravel(s1), np.ravel(s2)
+        except ValueError as e:
+            if str(e) == "too many values to unpack":
+                raise ValueError("Failed to return two NumPy arrays")
+            else: raise
+        except TypeError as e:
+            if "is not iterable" in str(e):
+                raise TypeError("Failed to return two NumPy arrays")
+            else: raise
+        c1, c2 = portfolio(filename="portfolio.txt")
+
+        points  = 5 * self._eqTest(c1, s1,
+                              "Incorrect percentages (with short selling)")
+        points += 5 * self._eqTest(c2, s2,
+                              "Incorrect percentages (with short selling)")
         return points
 
 
@@ -227,5 +212,5 @@ class _testDriver(object):
 if __name__ == '__main__':
     """Validate the test driver by testing the solutions file."""
     import solutions
-    test(solutions)
+    test(real_solutions)
 

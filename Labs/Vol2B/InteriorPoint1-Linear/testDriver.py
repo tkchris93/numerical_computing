@@ -1,48 +1,10 @@
 # testDriver.py
-"""Outline for Foundations of Applied Mathematics lab test drivers.
-
-Test driver files should be named testDriver.py and should be placed in the
-same folder as the lab that it corresponds to. The testDriver.py file should
-have dependencies on the corresponding solutions.py file so that student
-submissions are tested directly against the solutions when possible.
-
-test() function and _testDriver class -----------------------------------------
-
-The _testDriver class is designed to be flexible. The test_all() routine will
-grade each problem and collect feedback, but each problem can be graded
-individually via the different problemX() methods. This allows the instructor
-to grade from IPython, or to automate grading using Git, Google Drive, or
-another file system manager.
-
-The test() function creates an instance of the _testDriver class, grades every
-problem, and returns the score feedback. Use this function to automate the
-grading process.
-
-Customize the docstrings of the test() function and the _testDriver class to
-give specific instructions about how the lab is to be graded.
-
-Tags --------------------------------------------------------------------------
-
-The @_autoclose tag makes it easy to grade a problem that produces a plot.
-It should only be on a problem-grading function that uses _testDriver._grade()
-or some other pausing command (like raw_input()) so that the plot is not closed
-immediately after it is created.
-
-The @_timeout tag prevents a function from running for longer than a
-specificied number of seconds. Be careful not to use this wrapper in
-conjunction with _testDriver._grade() or another pausing command that waits
-for the grader's response. NOTE: this decorator will only work on Unix.
-
-Testing -----------------------------------------------------------------------
-
-To test the test driver, make sure that the solutions file passes with full
-points. The if __name__ == '__main__' clause imports the solutions file and
-grades it.
-"""
+"""Volume II: Interior Point 1. Test Driver."""
 
 # Wrappers ====================================================================
 
 import signal
+import numpy as np
 from functools import wraps
 from matplotlib import pyplot as plt
 
@@ -90,14 +52,13 @@ def _timeout(seconds):
 
 # Test Script and Class =======================================================
 
-# from solutions import [functions / classes that are needed for testing]
+from real_solutions import randomLP
 
 def test(student_module):
     """Grade a student's entire solutions file.
     
-    X points for problem 1
-    X points for problem 2
-    ...
+    30 points for problems 1-4
+    10 points for problem 5
     
     Inputs:
         student_module: the imported module for the student's file.
@@ -125,16 +86,17 @@ class _testDriver(object):
         self.feedback = ""
 
     # Main routine -----------------------------------------------------------
-    def test_all(self, student_module, total=100):
+    def test_all(self, student_module, total=40):
         """Grade the provided module on each problem and compile feedback."""
         # Reset feedback and score.
         self.feedback = ""
         self.score = 0
 
-        def test_one(problem, label, value):
+        def test_one(problem, number, value):
             """Test a single problem, checking for errors."""
             try:
-                self.feedback += "\n\n{} ({} points):".format(label, value)
+                self.feedback += "\n\n{} ({} points):".format(
+                                                                number, value)
                 points = problem(student_module)
                 self.score += points
                 self.feedback += "\nScore += {}".format(points)
@@ -142,8 +104,9 @@ class _testDriver(object):
                 self.feedback += "\n{}: {}".format(self._errType(e), e)
 
         # Grade each problem.
-        test_one(self.problem1, "Problem 1", 0)   # Problem 1: X points.
-        test_one(self.problem2, "Problem 2", 0)   # Problem 2: X points.
+        test_one(self.problem4, "Problems 1-4", 30) # Problems 1-4: 30 points.
+        test_one(self.bonus, "Extra Credit", 8)     # Extra Credit: 8 points.
+        test_one(self.problem5, "Problem 5", 10)    # Problem 5: 10 points.
 
         # Report final score.
         percentage = (100. * self.score) / total
@@ -163,31 +126,6 @@ class _testDriver(object):
     def _errType(error):
         """Get just the name of the exception 'error' in string format."""
         return str(type(error).__name__)
-
-    def _eqTest(self, correct, student, message):
-        """Test to see if 'correct' and 'student' are equal.
-        Report the given 'message' if they are not.
-        """
-        # if np.allclose(correct, student):
-        if correct == student:
-            return 1
-        else:
-            self.feedback += "\n{}".format(message)
-            self.feedback += "\n\tCorrect response: {}".format(correct)
-            self.feedback += "\n\tStudent response: {}".format(student)
-            return 0
-
-    def _strTest(self, correct, student, message):
-        """Test to see if 'correct' and 'student' have the same string
-        representation. Report the given 'message' if they are not.
-        """
-        if str(correct) == str(student):
-            return 1
-        else:
-            self.feedback += "\n{}".format(message)
-            self.feedback += "\n\tCorrect response: {}".format(correct)
-            self.feedback += "\n\tStudent response: {}".format(student)
-            return 0
 
     def _grade(self, points, message=None):
         """Manually grade a problem worth 'points'. Return the score.
@@ -210,22 +148,48 @@ class _testDriver(object):
         return credit
 
     # Problems ----------------------------------------------------------------
-    def problem1(self, s):
-        """Test Problem 1. X points."""
+    @_timeout(5)
+    def problem4(self, s):
+        """Test interiorPoint(). 30 points."""
         points = 0
-        # Test problem 1 here.
-        return points
+        for _ in xrange(300):
+            m = np.random.randint(3,10)
+            A, b, c, x = s.randomLP(m)
+            try:
+                point, value = s.interiorPoint(A=A, b=b, c=c)
+                if np.allclose(x, point):
+                    points += 1
+            except ValueError as e:
+                print e
+                print m
 
-    def problem2(self, s):
-        """Test Problem 2. X points."""
+        self.feedback += "\nPassed {}/300 tests".format(points)
+        return points // 10
+
+    @_timeout(5)
+    def bonus(self, s):
+        """Test interiorPoint() on non-square systems. 8 points (20 percent)"""
         points = 0
-        # Test problem 2 here.
-        return points
+        for _ in xrange(80):
+            n = np.random.randint(2,20)
+            m = np.random.randint(n,30)
+            A, b, c, x = s.randomLP2(m,n)
+            point, value = s.interiorPoint(A=A, b=b, c=c)
+            if np.allclose(x, point[:n]):
+                points += 1
+        self.feedback += "\nPassed {}/80 tests".format(points)
+        return points // 10
+
+    @_autoclose
+    def problem5(self, s):
+        """Test leastAbsoluteDeviations(). 10 points."""
+        s.leastAbsoluteDeviations()
+        return self._grade(10)
 
 
 # Validation ==================================================================
 if __name__ == '__main__':
     """Validate the test driver by testing the solutions file."""
     import solutions
-    test(solutions)
+    test(real_solutions)
 
