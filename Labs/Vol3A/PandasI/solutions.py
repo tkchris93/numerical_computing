@@ -65,8 +65,6 @@ avg = crimeDF.mean(axis=0)[['Total', 'Burglary']]
 crimeDF[(crimeDF['Total']<avg['Total']) & (crimeDF['Burglary']>avg['Burglary'])].index
 # plot murders as function of population
 crimeDF.plot(x='Population', y='Murder')
-# make histogram of Robbery and Burglary, plot side-by-side
-crimeDF.hist(column=['Robbery', 'Burglary'])
 # select Population, Violent, and Robbery columns for years in the 80s, save to csv file.
 crimeDF.loc[1980:1989,['Population', 'Violent', 'Robbery']].to_csv("crime_subset.txt")
 

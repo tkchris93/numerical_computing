@@ -14,7 +14,7 @@ Arbuthnot_data = data('Arbuthnot')
 
 #data('nottem', show_doc=True)
 print 'Nottem:'
-print 'This data set contains the average air temperatures at Nottingham Castle for 20 years.'
+print 'This data set contains the monthly average air temperatures at Nottingham Castle for 20 years.'
 print 'Since this data set consists of a single series, a line plot is best.'
 nottem_data.plot(y='nottem',legend=False)
 plt.show()
@@ -34,11 +34,11 @@ print 'This data set contains information on male and female birth ratios in Lon
 as well as deaths from plague and total mortality over the same time period.'
 print 'We plot each category against the year. Since there are a large number of years, a bar plot \
 becomes unwieldy, so we simply use line plots. Related categories are plotted on the same chart.'
-Arbuthnot_data.iloc[:][['Males','Females']].plot()
+Arbuthnot_data[['Males','Females']].plot()
 plt.show()
 Arbuthnot_data.plot(x='Year',y='Ratio')
 Arbuthnot_data.plot(x='Year',y='Total')
-Arbuthnot_data.iloc[:][['Plague','Mortality']].plot()
+Arbuthnot_data[['Plague','Mortality']].plot()
 plt.show()
 
 # Problem 2
