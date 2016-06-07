@@ -22,8 +22,8 @@ The Rosenbrock function is included in the optimize package (as \li{rosen}), as 
 \label{opt:rosenbrock}
 \end{figure}
 
-We will use the \li{minimize} function and test each of its algorithms (specified by the keyword argument ``method" -- see the documentation page for \li{minimize}).
-Note that there are also several functions such as \li{fmin} and \li{fmin_powell}. These are equivalent to using the \li{minimize} function with the specified method.
+We will use the \li{minimize()} function and test each of its algorithms (specified by the keyword argument ``method" -- see the documentation page for \li{minimize()}).
+Note that there are also several functions such as \li{fmin} and \li{fmin_powell}. These are equivalent to using the \li{minimize()} function with the specified method.
 
 For each algorithm, you need to pass in a callable function object for the Rosenbrock function, as well as a NumPy array giving the initial guess.
 For some algorithms, you will additionally need to pass in the jacobian or hessian.
@@ -64,10 +64,10 @@ The most relevant output for this lab include
 
 Each of these outputs can be accessed either by indexing \li{OptimizeResult} object like a dictionary (\li{result['nit']}), or as attributes of a class (\li{result.nit}).  We recommend access by indexing, as this is consistent with other optimization packages in Python.
 
-The online documenation for \li{scipy.optimize.minimize} includes other optional parameters available to users, for example, to set a tolerance of convergence. While these are not required for this lab, they should be explored as needed for specific applications.
+The online documenation for \li{scipy.optimize.minimize()} includes other optional parameters available to users, for example, to set a tolerance of convergence. While these are not required for this lab, they should be explored as needed for specific applications.
 
 \begin{problem}
-Use the \li{opt.minimize} function to find the minimum of the Rosenbrock function.
+Use the \li{opt.minimize()} function to find the minimum of the Rosenbrock function.
 Test Nelder-Mead, CG, and BFGS, starting each with the initial guess \li{x_0 = np.array([4., -2.5])}.
 For each method, print whether it converged, and if so, print how many iterations it took.
 
@@ -124,13 +124,13 @@ For example, if we try using the Nelder-Mead method as previously, with an initi
 0.0
 \end{lstlisting}
 
-However, SciPy does have some tools to help us with these problems. Specifically, we can use the \li{opt.basinhopping} function.
+However, SciPy does have some tools to help us with these problems. Specifically, we can use the \li{opt.basinhopping()} function.
 Conceptually, most of the minimizing algorithms use the derivative of the function to search in a downhill direction for potential minimizers.
 Often they overshoot the minimum and later backtrack. You can think of it as a ball rolling down a hill into a valley.
 At first, the momentum of the ball carries it across the valley floor and partially up the other wall, only to roll back into the valley.
 Slowly the ball loses momentum as it repeatedly overshoots and backtracks. Eventually the ball comes to rest at the bottom of a valley -- hopefully the lowest valley.
 However, if there are many valleys (or local minima), the ball can get stuck in one that's not the lowest.
-The \li{opt.basinhopping} function uses the same minimizing algorithms (in fact, you can tell it whatever minimizing algorithm you can pass to \li{opt.minimize}).
+The \li{opt.basinhopping()} function uses the same minimizing algorithms (in fact, you can tell it whatever minimizing algorithm you can pass to \li{opt.minimize()}).
 However, once it settles on a minimum, it hops to a new point in the domain (depending on how we set the ``hopping" distance) that hopefully lies outside of the valley
 or basin belonging to the current local minimum.
 It then searches for the minimum from this new starting point, and if it finds a better minimizer, it repeats the hopping process from this new minimizer.
@@ -138,8 +138,8 @@ It then searches for the minimum from this new starting point, and if it finds a
 \emph{Only Scipy Version 0.12+ has \li{opt.basinhopping}. In earlier versions, such as 0.11, you won't find it.}
 
 \begin{problem}
-Explore the documentation for the \li{opt.basinhopping} function online or via IPython, 
-and use it to find the global minimum of our \li{multimin} function with \li{x0 = np.array([-2, -2])}.
+Explore the documentation for the \li{opt.basinhopping()} function online or via IPython, 
+and use it to find the global minimum of our \li{multimin()} function with \li{x0 = np.array([-2, -2])}.
 Call it using the same \li{Nelder-Mead} algorithm with \li{opt.basinhopping(multimin, x0, stepsize=0.5, minimizer_kwargs=\{'method':'nelder-mead'\})}.
 Try it first with \li{stepsize=0.5} and then with \li{stepsize=0.2}. 
 
@@ -214,7 +214,7 @@ Return the values of $x,y,z$ as an array.
 
 
 
-As with \li{opt.minimize}, \li{opt.root} has more than one algorithm for root finding.
+As with \li{opt.minimize()}, \li{opt.root()} has more than one algorithm for root finding.
 Here we have used the \li{hybr} method. There are also several algorithms for scalar root finding. See the online documentation for more.
 
 \section*{Curve Fitting}
@@ -222,7 +222,7 @@ Here we have used the \li{hybr} method. There are also several algorithms for sc
 %we still have curve fitting
 %least squares programming -- but it seems that it's already been done in Volume One
 
-SciPy also has methods for curve fitting wrapped by the \li{opt.curve_fit} function.
+SciPy also has methods for curve fitting wrapped by the \li{opt.curve_fit()} function.
 Just pass it data and a function to be fit. The function should take in the independent variable as its first argument and
 values for the fitting parameters as subsequent arguments.
 Examine the following example from the online documentation.
@@ -252,34 +252,24 @@ See Figure \ref{opt:curve_fit} for a plot of the data and the fitted curve.
 \end{figure}
 
 \begin{problem}
-Use the \li{opt.curve_fit} function to fit a heating curve to data obtained from a temperature sensitive diode embedded in a cylindrical aluminum block.
-The data are in the file \li{heating.txt}. The first column is time and the second column is temperature in the Kelvin scale.
-The temperature in the block was measured as it warmed from 290K up to 370K using a heating coil wound around the block attached to a
-copper rod which sat in a cooling bath of liquid nitrogen.
-Newton's law of cooling has the following form:
+Use the \li{opt.curve_fit} function to fit a curve to data obtained from numerical simulations of convection.
+The data are in the file \li{convection.npy}. The first column is $R$, the Rayleigh number, and the second column is $\nu$, the Nusselt number.
+The relevant convection equation is:
 \[
-T = T_{\infty} + \frac{P}{\gamma}+Ke^{-\frac{\gamma t}{C}},
-\]\
-where $T$ is the temperature (in Kelvin), $t$ is the time, $P$ is the power used to warm it (which here was 59.43 watts),
-$T_{\infty}$ is the ambient temperature (290K), $\gamma$ is a coefficient of heat transfer through the copper rod,
-$C$ is the total heat capacity of the block, and $K$ is a constant coefficient that depends on the initial conditions.
-Use \li{opt.curve_fit} to find a fit to the data using $\gamma$, $C$, and $K$ as the fitting parameters.
-Just so that you know that you are getting realistic values, $\gamma$ should be on the order of $10^{-1}$, $C$ on the order of $10^{2}$, and $K$ should be negative on the order of $10^{2}$.
-Return your values for $\gamma$, $C$, and $K$ in a NumPy array of length 3.
+\nu = cR^\beta,
+\]
+where $c$ and $\beta$ are some constants. 
+Use \li{opt.curve_fit()} to find a fit to the data using $c$ and $\beta$ as the fitting parameters.
+Just so that you know that you are getting realistic values, $c$ should be on the order of $10^{-2}$, and $\beta$ on the order of $10^{0}$.
+Return your values for $c$, and $\beta$ in a NumPy array of length 2.
 
-See Figure \ref{opt:HeatingFit} for a plot of the data along with a fitted curve.
-
-\begin{comment}
-From the heat capacity you obtained in the fit you can calculate the specific heat capacity of the aluminum block by dividing the heat capacity by the mass of the block (about 300g). Is it close to the experimentally measured specific heat capacity of aluminum of 0.900 J/g K? From $\gamma$ you can also calculate the thermal conductivity of the copper rod using the formula $k=\gamma L/A$ where $L$ and $A$ are the length ($25.6mm$) and the cross-sectional area ($71.24mm^{3}$) of the rod. How does it compare to the experimentally measured thermal conductivity of $401 W/(m \dot K)$? Look at the covariance you got from the fit. Is the error due to the fit, noise in the data, or an error in the excremental setup?
-\end{comment}
+See Figure \ref{opt:ConvectionFit} for a plot of the data along with a fitted curve.
 \end{problem}
 
 \begin{figure}
-\includegraphics[width=\textwidth]{HeatingFit.pdf}
-\caption{The black line is actually the data from \li{heating.txt} plotted as a scatter plot. It appears as a line because the data is very dense. The blue line is a fitted curve.}
-\label{opt:HeatingFit}
+\includegraphics[width=\textwidth]{ConvectionFit.pdf}
+\caption{The black points are the data from \li{convection.npy} plotted as a scatter plot. The blue line is a fitted curve.}
+\label{opt:ConvectionFit}
 \end{figure}
 
 The \li{scipy.optimize} package has many other useful functions, and is a good first resource when confronting a numerical optimization problem. See the online documentation for further details.
-
-
