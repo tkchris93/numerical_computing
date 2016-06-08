@@ -7,14 +7,12 @@ A Python file with code that can be imported is called a \emph{module}.
 All Python distributions include a collection of modules for accomplishing a variety of tasks, collectively called the \emph{Python Standard Library}.
 In this lab we explore some built-in functions, learn how to create, import, and use modules, and become familiar with the standard library.}
 
-% Suggestions for improvement:
-%   - More problems.
 
 \section*{Built-in Functions} % ===============================================
 
 Every Python installation comes with several built-in functions that may be used at any time.
 IPython's object introspection feature makes it easy to learn about these functions.
-Start IPython from the terminal and use \li{?} to bring up technical details on each function.
+Start IPython from the command line and use \li{?} to bring up technical details on each function.
 
 \begin{lstlisting}
 In [1]: min?
@@ -97,7 +95,7 @@ Can you implement this function in a single line?
 
 \subsection*{Names} % ---------------------------------------------------------
 All Python objects reside somewhere in computer memory.
-These objects may be primitive data, data structures, functions, or any other sort of Python object.
+These objects may be numbers, data structures, functions, or any other sort of Python object.
 A \emph{name} (or variable) is a reference to a Python object.
 A \emph{namespace} is a dictionary that maps names to Python objects.
 
@@ -116,7 +114,7 @@ A \emph{namespace} is a dictionary that maps names to Python objects.
 \end{lstlisting}
 
 A single equals sign assigns a name to an object.
-If a name is assigned to another name, that new name refers to the same object that the original name refers to (or a copy of it).
+If a name is assigned to another name, that new name refers to the same object that the original name refers to (or a copy of it---see the next section).
 
 \begin{lstlisting}
 >>> students = ["John", "Paul", "George", "Ringo"]
@@ -160,33 +158,36 @@ A \emph{mutable} object's value may be changed, so assigning a new name to it do
 Therefore, if two names refer to the same mutable object, any changes to the object will be reflected in both names.
 
 \begin{warn} % Extensive Mutability Warning.
-Mutability can be very useful in some settings, but it can also cause hard-to-find problems when a copy should have been to be made.
-For example, suppose we have a dictionary mapping items to their base prices, and we want make a new dictionary that accounts for a small sales tax.
+Making a copy of a mutable object is possible, but doing so incorrectly can cause subtle problems.
+For example, suppose we have a dictionary mapping items to their base prices, and we want make a similar dictionary that accounts for a small sales tax.
 
 \begin{lstlisting}
->>> original = {"pencil": 1, "pen": 2, "paper": 3, "computer": 2000}
->>> tax_prices = original                   # Make a "copy" for processing.
->>> for item in tax_prices:
-...     price = tax_prices[item]            # Get the original price.
-...     tax_prices[item] += .07 * price     # Add on a 7% tax.
+>>> holy = {"moly": 1.99, "hand_grenade": 3, "grail": 1975.41}
+>>> tax_prices = holy               # Try to make a copy for processing.
+>>> for item, price in tax_prices.items():
+...     # Add a 7 percent tax, rounded to the nearest cent.
+...     tax_prices[item] = round(1.07 * price, 2)
 ...
 # Now the base prices have been updated to the total price.
 >>> print(tax_prices)
-<<{'pencil': 1.07, 'pen': 2.14, 'paper': 3.21, 'computer': 2140.0}>>
+<<{'moly': 2.13, 'hand_grenade': 3.21, 'grail': 2113.69}>>
 
-# However, dictionaries are mutable, so 'prices' and 'original' actually
+# However, dictionaries are mutable, so 'holy' and 'tax_prices' actually
 # refer to the same object. The original base prices have now been lost.
->>> print(original)
-<<{'pencil': 1.07, 'pen': 2.14, 'paper': 3.21, 'computer': 2140.0}>>
+>>> print(holy)
+<<{'moly': 2.13, 'hand_grenade': 3.21, 'grail': 2113.69}>>
 \end{lstlisting}
 
-To avoid this problem, create a copy of an object.
+To avoid this problem, explicitly create a copy of the object by casting it as a new structure.
 Changes made to the copy will not change the original object.
-In this case, we replace the $2^{nd}$ line of the above code with the following:
+In the above code, we replace the second line with the following:
+
 \begin{lstlisting}
 >>> tax_prices = dict(original)
 \end{lstlisting}
+
 Then, after running the same procedure, the two dictionaries will be different.
+
 \end{warn}
 
 \begin{problem} % Problem 2: determine which Python types are immutable.
@@ -231,7 +232,7 @@ Print a statement of your conclusions.
 
 A Python \emph{module} is a file containing Python code that is meant to be used in some other setting, and not necessarily run directly.\footnote{Python files that are not meant to be imported are often called \emph{scripts}.}
 The \li{import} statement loads code from a specified Python file.
-That is, importing a module containing some functions, classes, or other objects makes those functions, classes, or objects available for use.
+Importing a module containing some functions, classes, or other objects makes those functions, classes, or objects available for use.
 
 All import statements should occur at the top of the file, below the header but before any other code.
 Thus we expand our example of typical Python file from the previous lab to the following:
@@ -309,18 +310,18 @@ def display():
     print "Data:", data
 
 if __name__ == "__main__":
-    print "This file was executed from the terminal or an interpreter."
     display()
+    print "This file was executed from the command line or an interpreter."
 else:
     print "This file was imported."
 \end{lstlisting}
 
-Executing the file from the terminal executes the file line by line, including the code under the \li{if __name__ == "__main__"} clause.
+Executing the file from the command line executes the file line by line, including the code under the \li{if __name__ == "__main__"} clause.
 
 \begin{lstlisting}
 $ python example1.py
 <<Data: [1, 2, 3, 4]
-This file was executed from the terminal or an interpreter.>>
+This file was executed from the command line or an interpreter.>>
 \end{lstlisting}
 
 Executing the file with IPython's \li{run} command executes each line of the file and also adds the module's names to the current namespace.
@@ -329,7 +330,7 @@ This is the quickest way to test individual functions via IPython.
 \begin{lstlisting}
 In [1]: run example1.py              # or 'run example1'.
 <<Data: [1, 2, 3, 4]
-This file was executed from the terminal or an interpreter.>>
+This file was executed from the command line or an interpreter.>>
 
 In [2]: display()
 Data: [1, 2, 3, 4]
@@ -415,52 +416,8 @@ In [4]: sum_of_squares(3)
 Out[4]: 14                          # It works!
 \end{lstlisting}
 
-Remember that running the file will also execute any freestanding code snippets, as well as any code under the \li{if __name__ == "__main__"} clause.
-
-\begin{comment} % Alternate version showing how importing twice fails.
-In IPython, import the file and test \li{sum_of_squares()}.
-
-\begin{lstlisting}
-In [1]: import example2
-
-In [2]: example2.sum_of_squares(3)
-Out[2]: 5
-\end{lstlisting}
-
-Since $1^2 + 2^2 + 3^2 = 14$, not $5$, something has gone wrong.
-We modify the source file to correct the mistake:
-
-\begin{lstlisting}
-# example2.py
-
-def sum_of_squares(x):
-    """Return the sum of the squares of all positive integers
-    less than or equal to x.
-    """
-    return sum([i**2 for i in range(1,x+1)])    # Include the final term.
-\end{lstlisting}
-
-Back in IPython, import the module again and see if the function acts differently.
-
-\begin{lstlisting}
-# Using import again doesn't change the loaded module, even though
-# the source file was modified.
-In [3]: import example2
-
-In [4]: example2.sum_of_squares(3)
-Out[4]: 5
-\end{lstlisting}
-\end{comment}
+Remember that running or importing a file executes any freestanding code snippets, but any code under an \li{if __name__ == "__main__"} clause will \emph{only} be executed when the file is run (not when it is imported).
 \end{warn}
-
-% \begin{problem} % Problem: create and use a simple module.
-% Create a module called \texttt{calculator.py}.
-% Write a function that returns the sum of two arguments, a function that returns the product of two arguments, and a function that returns the square root of a single argument.
-% When the file is either run or imported, nothing should be executed.
-
-% In your main solutions file, import your new calculator module.
-% Using only the functions defined in the module, write a new function that calculates the length of the hypotenuse of a right triangle given the lengths of the other two sides.
-% \end{problem}
 
 \newpage
 \section*{Python Standard Library} % ==========================================
@@ -479,6 +436,8 @@ Module & Description / Purpose \\ \hline
 \li{timeit} & Measuring execution time of small code snippets.
 \end{tabular}
 \end{table}
+
+% TODO: shorten this section?
 
 Using IPython's object introspection, we can learn about how to use the various modules and functions in the standard library very quickly.
 Use \li{?} or \li{help()} for information on the module or one of its names.
@@ -579,13 +538,13 @@ In [1]: x = raw_input("Enter a value for x: ")
 <<Enter a value for x:>> <r<20>r>             # Type '20' and press 'enter.'
 
 In [2]: x
-Out[2]: <<'27'>>                        # Note that x contains a string.
+Out[2]: <<'20'>>                        # Note that x contains a string.
 
 In [3]: y = int(raw_input("Enter an integer for y: "))
 <<Enter an integer for y:>> <r<16>r>          # Type '16' and press 'enter.'
 
 In [4]: y
-Out[4]: 27                          # Note that y contains an integer.
+Out[4]: 16                          # Note that y contains an integer.
 \end{lstlisting}
 
 \subsection*{The Random Module} % =============================================
