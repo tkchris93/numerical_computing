@@ -6,7 +6,7 @@ Its versatility and speed makes Python an ideal language for applied and computa
 In this lab we introduce basic NumPy data structures and operations as a first step to numerical computing in Python.}
 
 % TODO: More detailed / compelling objective.
-% TODO: Shorten the section on data types.
+% TODO: Shorten the section on data types (?)
 % TODO: More motivation on the final problem (Laplace's equation).
 % TODO: Finish the NumPy visual guide.
 
@@ -1177,7 +1177,37 @@ Really only need two pictures here.
 
 \subsection*{Operations along an Axis} % --------------------------------------
 
-Similar pictures to the Broadcasting section (really only need 2)
+% Similar pictures to the Broadcasting section (really only need 2)
+
+\begin{align*}
+A = \left[\begin{array}{cccc}
+1 & 2 & 3 & 4\\
+1 & 2 & 3 & 4\\
+1 & 2 & 3 & 4\\
+1 & 2 & 3 & 4
+\end{array}\right]
+\end{align*}
+
+
+\begin{align*}
+\text{\li{np.<<sum>>(A, axis=0)}} &= %np.array([sum(A[:,i] for i in xrange(A.shape[1]))])}} =
+\left[\begin{array}{cccc}
+\tikzmarkin{col1}1 & \tikzmarkin{col2}2 & \tikzmarkin{col3}3 & \tikzmarkin{col4}4\\
+1 & 2 & 3 & 4\\
+1 & 2 & 3 & 4\\
+1\tikzmarkend{col1} & 2\tikzmarkend{col2} & 3\tikzmarkend{col3} & 4\tikzmarkend{col4}
+\end{array}\right]
+= \left[\begin{array}{cccc} 4 & 8 & 12 & 16 \end{array}\right]
+\\ \\
+\text{\li{np.<<sum>>(A, axis=1)}} &= %np.array([sum(A[i,:] for i in xrange(A.shape[0]))])}} =
+\left[\begin{array}{cccc}
+\tikzmarkin{rowA}1 & 2 & 3 & 4\tikzmarkend{rowA}\\
+\tikzmarkin{rowB}1 & 2 & 3 & 4\tikzmarkend{rowB}\\
+\tikzmarkin{rowC}1 & 2 & 3 & 4\tikzmarkend{rowC}\\
+\tikzmarkin{rowD}1 & 2 & 3 & 4\tikzmarkend{rowD}\\
+\end{array}\right]
+= \left[\begin{array}{cccc} 10 & 10 & 10 & 10 \end{array}\right]
+\end{align*}
 
 % =============================================================================
 % =============================================================================
@@ -1275,7 +1305,7 @@ The \li{scipy.linalg} library will be essential for the remainder of the labs in
 We will address the details of this package at length in future labs. 
 \end{comment} % Complexity Lab? ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-\begin{comment} % Old demonstration, overkill. Useful some other time?
+\begin{comment} % Old demonstration, overkill.
 \begin{lstlisting}
 In [1]: import numpy as np
 In [2]: from random import random
