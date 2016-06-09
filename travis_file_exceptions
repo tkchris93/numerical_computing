@@ -3,7 +3,6 @@ Labs/Introduction/PlottingIntro/3dplot.pdf
 Labs/Introduction/PlottingIntro/GrandCanyon.png
 Labs/Introduction/PlottingIntro/fancymesh.png
 Labs/MachineLearning/Metropolis/samples.pdf
-Labs/Orphans/FiniteElement/tridiag.c
 Labs/Orphans/MultivariateDerivatives/Rosenbrock.pdf
 Labs/Orphans/RiemannSphere/mobius2.png
 Labs/Vol1B/Complex1-Plots/arctan_riemann_surface.pdf
@@ -16,3 +15,4 @@ Labs/Vol2B/scipyoptimize/Rosenbrock.pdf
 Labs/Vol3A/PandasII/plotting_demos.ipynb
 Labs/Vol3A/PandasIII/industry_return_data.csv
 Labs/Vol4A/AnisotropicDiffusion/baloons_resized_noisy.png
+Labs/Vol4B/FiniteElement/tridiag.c
