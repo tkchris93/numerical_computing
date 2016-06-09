@@ -1,30 +1,33 @@
 \lab{Markov Chains}{Markov Chains}
 \label{lab:Markov}
-\objective{A \emph{Markov chain} is a finite collection of states with specified probabilities for transitioning from one state to another.
-They are characterized by the fact that the future behavior of the system depends only on its current state. Markov chains have far ranging applications; in this lab, we create a Markov chain for generating random English sentences.}
+\objective{
+A \emph{Markov chain} is a finite collection of states with specified probabilities for transitioning from one state to another.
+They are characterized by the fact that the future behavior of the system depends only on its current state.
+Markov chains have far ranging applications; in this lab, we create a Markov chain for generating random English sentences.}
 
 % TODO: recommend changing column_sum = 1 to row_sum = 1 (transpose all transition matrices, ij^th entry --> probability of going from from state i to state j (instead of the other way around). Makes implementing everything easier.)
 
-% TODO: Change this section header.
-\section*{Definition and Implementation} % ====================================
+\section*{State Space Models} % ===============================================
 
 Many systems can be described by a finite number of states.
 % A Markov chain is a collection of states, together with the probabilities of moving from one state to another.
 For example, a board game where players move around the board based on die rolls can be modeled by a Markov chain.
 Each space represents a state, and a player is said to be in a state if their piece is currently on the corresponding space.
-In this case, the probability of moving from one space to another only depends on the players current location.
-Where the player was on a previous turn does not affect their current turn.
+In this case, the probability of moving from one space to another only depends on the players current location: where the player was on a previous turn does not affect their current turn.
 
 Finite Markov chains have an associated transition matrix that stores all the information about the chain.
 The $(ij)^{th}$ entry of the matrix gives the probability of moving from state $j$ to state $i$.
 Thus the columns of the transition matrix must sum to 1. %\footnote{This type of transition matrix is called \emph{column-stochastic}. Row stochastic matrices are also often used ti model Markov chains.}
 % TODO: Note about column-stochastic v row-stochastic transition matrices.
 
-Consider a very simple weather model, where the probability of being hot or cold depends on the weather of the previous day.
-If the probability that tomorrow is hot given that today is hot is 0.7, and the probability that tomorrow is cold given that today is cold is 0.4, then by assigning hot to the $0^{th}$ column and cold to the $1^{st}$ column, the Markov chain has the following transition matrix:
+Consider a very simple weather model where the probability of being hot or cold depends on the weather of the previous day.
+If the probability that tomorrow is hot given that today is hot is 0.7, and the probability that tomorrow is cold given that today is cold is 0.4, then by assigning hot to the $0^{th}$ row and column, and cold to the $1^{st}$ row and column, this Markov chain has the following transition matrix:
+
 \[W = \left[\begin{array}{cc}
 0.7 & 0.6 \\
 0.3 & 0.4 \end{array} \right]\] 
+
+% TODO: insert a PICTURE of a this Markov chain!
 
 If it is hot today, we examine the $0^{th}$ column of $W$.
 There is a $70\%$ chance that tomorrow will be hot ($0^{th}$ row), and a $30\%$ chance that tomorrow will be cold ($1^{st}$ row).
@@ -33,22 +36,22 @@ Conversely, if it is cold today, there is a $60\%$ chance that tomorrow will be 
 \begin{problem} % Problem: stochasticity. 
 Transition matrices for Markov chains are efficiently stored as NumPy arrays.
 Write a function that accepts a dimension $n$ and returns the transition matrix for a random Markov chain with $n$ states.
+\\
+(Hint: use array broadcasting to avoid looping.)
 \end{problem}
 
-\section*{Simulating State Transitions} % =====================================
+\subsection*{Simulating State Transitions} % ----------------------------------
 
-% We may simulate moving from state to state by sampling from a uniform distribution.
 In a general finite Markov chain, if we are in state $j$ then the $j^{th}$ column of the transition matrix gives the probabilities of moving to any other state $i$.
 By definition, these probabilities sum to $1$.
 Thus, the entries of each column partition the interval $[0, 1]$, and we can choose the next state to move to by generating a random number between $0$ and $1$.
-% To simulate moving from state to state, then, we sample from a uniform distribution and choose the corresponding row. 
 
 Consider again the weather model example from the previous section.
 Suppose that today is hot, and that we want to simulate tomorrow's weather.
 The column that corresponds to ``hot'' in the transition matrix is $(0.7, 0.3)^T$.
 If we generate a random number and it is smaller than $0.3$, then our simulation indicates that tomorrow will be cold.
-Conversely, if the random number is betwen $0.3$ and $1$, then the simulation says that tomorrow will be hot.
-In Python, the programming logic is as follows:
+Conversely, if the random number is between $0.3$ and $1$, then the simulation says that tomorrow will be hot.
+The following code implements this idea.
 
 \begin{lstlisting}
 import numpy as np
@@ -66,7 +69,7 @@ def forecast():
 		return 0
 \end{lstlisting}
 
-\begin{problem} % Problem: Forcasting over several days.
+\begin{problem} % Problem: Forecasting over several days.
 Modify \li{forecast()} so that it accepts a parameter \li{num\_days} and runs a simulation of the weather for the number of days given.
 Return a list containing the day-by-day weather predictions (0 for hot, 1 for cold).
 Assume the first day is hot, but do not include the data from the first day in the list of predictions.
@@ -80,7 +83,7 @@ However, small Markov chains are typically not very useful in applications.
 
 The \li{forecast()} function makes one random draw from a \emph{uniform} distribution to simulate a state change.
 For larger Markov chains, we draw from a \emph{multinomial} distribution.
-A multinomial distribution is a mulitvariate generalization of the binomial distribution.
+A multinomial distribution is a multivariate generalization of the binomial distribution.
 A single draw from a binomial distribution with parameter $p$ indicates successes or failure of a single experiment with probability $p$ of success.
 The classic example is a coin flip, where the $p$ is the probability that the coin lands heads side up.
 A single draw from a multinomial distribution with parameters $\left[p_1, p_2, ..., p_n \right]$ indicates which of $n$ outcomes occurs.
@@ -122,7 +125,7 @@ Print a report of your findings.
 % TODO: is it okay to make this reference?
 One of the original applications of Markov chains was to study natural languages.\footnote{See \url{http://langvillea.people.cofc.edu/MCapps7.pdf} for some details}
 In the early $20^{th}$ century, Markov used his chains to model how Russian switched from vowels to consonants.
-By midcentury, they had been used to try and model English.
+By mid-century, they had been used to try and model English.
 It turns out that Markov chains are, by themselves, insufficient to model very good English.
 However, they can approach a fairly good model of bad English, with sometimes amusing results.
 
@@ -130,7 +133,7 @@ A Markov chain model of English has each word as a state.
 By nature, a Markov chain is only concerned with its current state.
 Thus, a Markov chain is unaware of context or even previous words in a sentence.
 For example, a Markov chain's current state may be the word ``continuous.''
-Then the chain would say that the next word in the sentence is more likey to be ``function'' rather than ``racoon.''
+Then the chain would say that the next word in the sentence is more likely to be ``function'' rather than ``raccoon.''
 However, without the context of the rest of the sentence, even two likely words stringed together may result in gibberish.
 
 To build a Markov chain to simulate English, we need to determine the transition probabilities between words.
@@ -149,7 +152,7 @@ We will call the source collection of works in the next problems the \emph{train
 	% 1. Write a summary of the procedure and give an example.
 	% 2. Consolidate the next three problems into two parts: constructing the
 	% 	chain, and transitioning through the chain.
-	% 3. Formulate the solution as a class. This makes it reuseable.
+	% 3. Formulate the solution as a class. This makes it reusable.
 
 % Outline of procedure (algorithm format?)
 % \begin{enumerate}
