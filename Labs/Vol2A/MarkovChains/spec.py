@@ -62,7 +62,7 @@ class SentenceGenerator(object):
 
     Example:
         >>> yoda = SentenceGenerator("Yoda.txt")
-        >>> print yoda.babble()
+        >>> print(yoda.babble())
         The dark side of loss is a path as one with you.
     """
 

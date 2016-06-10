@@ -34,7 +34,7 @@ def forecast(days):
     transition_matrix = np.array([[.7, .6], [.3, .4]])
     current_state = 0
     record = []
-    for day in xrange(num_days):
+    for day in xrange(days):
         random_number = np.random.random()
         if random_number < transition_matrix[1, current_state]:
             current_state = 1
@@ -163,7 +163,6 @@ class SentenceGenerator(object):
             if state != stop:
                 output += self.states[state]
         return output 
-
 
 if __name__ == '__main__':
     analyze_simulation()

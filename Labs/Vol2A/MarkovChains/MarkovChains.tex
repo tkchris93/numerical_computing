@@ -5,7 +5,9 @@ A \emph{Markov chain} is a finite collection of states with specified probabilit
 They are characterized by the fact that the future behavior of the system depends only on its current state.
 Markov chains have far ranging applications; in this lab, we create a Markov chain for generating random English sentences.}
 
-% TODO: recommend changing column_sum = 1 to row_sum = 1 (transpose all transition matrices, ij^th entry --> probability of going from from state i to state j (instead of the other way around). Makes implementing everything easier.)
+% TODO: Changing column_sum = 1 to row_sum = 1 (transpose all transition matrices, ij^th entry --> probability of going from from state i to state j (instead of the other way around). Makes implementing everything easier.)
+
+% TODO: Update test driver, solutions+spec on class implementation.
 
 \section*{State Space Models} % ===============================================
 
@@ -129,7 +131,6 @@ By mid-century, they had been used as an attempt to model English.
 It turns out that Markov chains are, by themselves, insufficient to model very good English.
 However, they can approach a fairly good model of bad English, with sometimes amusing results.
 
-% A Markov chain model of English has each word as a state.
 By nature, a Markov chain is only concerned with its current state.
 Thus a Markov chain simulating transitions between English words is completely unaware of context or even of previous words in a sentence.
 For example, a Markov chain's current state may be the word ``continuous.''
@@ -211,13 +212,7 @@ Finally, to avoid a column of zeros, we place a one in the bottom right hand cor
 
 The entire procedure of creating the transition matrix for the Markov chain with words from a file as states, with some hints for implementation, is summarized below in Algorithm \ref{alg:MarkovSentencesTransitionMatrix}.
 
-% TODO:
-	% 1. Write a summary of the procedure and give an example.
-	% 2. Consolidate the next three problems into two parts: constructing the
-	% 	chain, and transitioning through the chain.
-	% 3. Formulate the solution as a class. This makes it reusable.
-
-\newpage
+\newpage % Might be unnecessary in later editions.
 
 \begin{algorithm} % Read a file and convert it into a Markov chain.
 \begin{algorithmic}[1]
@@ -247,6 +242,8 @@ Read the file and build a transition matrix from its sentences.
 You may assume that the file has one complete sentence on each line.
 \label{problem:MarkovClassPt1}
 \end{problem}
+
+% TODO: Put a picture of the actual Markov chain here and discuss a little.
 
 \begin{problem} % Problem: Create random sentences
 Add a method to the \li{SentenceGenerator} class called \li{babble()}.
