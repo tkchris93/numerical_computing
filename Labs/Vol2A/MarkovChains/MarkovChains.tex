@@ -70,10 +70,10 @@ def forecast():
 \end{lstlisting}
 
 \begin{problem} % Problem: Forecasting over several days.
-Modify \li{forecast()} so that it accepts a parameter \li{num\_days} and runs a simulation of the weather for the number of days given.
+Modify \li{forecast()} so that it accepts a parameter \li{days} and runs a simulation of the weather for the number of days given.
 Return a list containing the day-by-day weather predictions (0 for hot, 1 for cold).
 Assume the first day is hot, but do not include the data from the first day in the list of predictions.
-The resulting list should therefore have \li{num\_days} entries.
+The resulting list should therefore have \li{days} entries.
 \end{problem}
 
 For Markov chains with very few states, the approach in \li{forecast()} is practical and the implementation is fairly simple.
@@ -108,7 +108,7 @@ Let the following be the transition chain for a Markov chain modeling weather wi
   0 & 0.1 & 0.2 & 0.2\end{array} \right]\]
 with hot, mild, cold, and freezing corresponding to columns (and rows) 0, 1, 2, and 3, respectively.
 
-Write a new function that accepts a parameter \li{num\_days} and runs the same kind of simulation as \li{forecast}, but that uses the new four-state transition matrix.
+Write a new function that accepts a parameter \li{days} and runs the same kind of simulation as \li{forecast()}, but that uses the new four-state transition matrix.
 This time, assume the first day is mild.
 Return a list containing the day-to-day results (0 for hot, 1 for mild, 2 for cold, and 3 for freezing).
 \label{problem:transition}
@@ -261,10 +261,11 @@ For example, your \li{SentenceGenerator} class should be able to create random s
 >>> for i in xrange(5):
 ... 	print(yoda.babble())
 ...
-<<Fear leads to eat as well.
-For eight hundred years old to enter the dark side of Congress there is.
+<<
 Impossible to my size, do not!
-A domain of greed, that misread could have we.
+For eight hundred years old to enter the dark side of Congress there is.
+But beware of the Wookiees, I have.
+Fear leads to eat as well.
 But agree on this, we must, and find your weapon!>>
 \end{lstlisting}
 \end{problem}

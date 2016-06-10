@@ -1,18 +1,15 @@
 # solutions.py
-"""Volume II Lab 8: Markov Chains
-Solutions file. Written by Shane McQuarrie, even though
-it should have been written by Jared Webb. All well.
-"""
+"""Volume II: Markov Chains. Solutions file."""
 
 import numpy as np
-from scipy.sparse import lil_matrix
-from os import system
+# from scipy.sparse import lil_matrix
+# from sklearn.preprocessing import normalize
 
 
-# Problem 1: implement this function.
+# Problem 1
 def random_markov(n):
-    """Create a transition matrix for a random Markov chain with n states.
-    This should be stored as an nxn numpy array. The columns sum to 1.
+    """Create and return a transition matrix for a random Markov chain with
+    'n' states. This should be stored as an nxn NumPy array.
     """
     transition_matrix = np.empty((n,n))
     for j in range(n):
@@ -22,19 +19,17 @@ def random_markov(n):
     return transition_matrix
 
 
-# Problem 2: modify this function.
-def forecast(num_days):
-    """Run a simulation for the weather over 'num_days' days, with
-    'hot' as the starting state. Return a list containing the day-by-day
+# Problem 2
+def forecast(days):
+    """Run a simulation for the weather over the specified number of days,
+    with 'hot' as the starting state. Return a list containing the day-by-day
     results, not including the starting day.
 
-    Example:
+    Examples:
         >>> forecast(3)
         [1, 1, 0]
-
-        # Or, if you prefer,
         >>> forecast(5)
-        ['cold', 'hot', 'hot', 'cold', 'cold']
+        [0, 0, 0, 1, 0]
     """
     transition_matrix = np.array([[.7, .6], [.3, .4]])
     current_state = 0
@@ -51,10 +46,23 @@ def forecast(num_days):
 # Roughly 33.3% of the entries should be ones.
 
 
-# Problem 3: implement this function.
-def four_state_forecast(days=1):
-    transition = np.array(
-        [[.5, .3, .1, 0],[.3, .3, .3, .3],[.2, .3, .4, .5],[0, .1, .2, .1]])
+# Problem 3
+def four_state_forecast(days):
+    """Run a simulation for the weather over the specified number of days,
+    with 'mild' as the starting state, using the four-state Markov chain.
+    Return a list containing the day-by-day results, not including the
+    starting day.
+
+    Examples:
+        >>> four_state_forecast(3)
+        [0, 1, 3]
+        >>> four_state_forecast(5)
+        [2, 1, 2, 1, 1]
+    """
+    transition = np.array([ [.5, .3, .1, 0.],
+                            [.3, .3, .3, .3],
+                            [.2, .3, .4, .5],
+                            [0., .1, .2, .1]    ])
     current_state = 0
     record = []
     for day in xrange(days):
@@ -68,10 +76,14 @@ def four_state_forecast(days=1):
 # Roughly 12.1% of the entries should be threes.
 
 
-# Problem 4: implement this function.
+# Problem 4
 def analyze_simulation():
-    """Analyze the results of the previous two problems."""
-    hot1, cold1, hot2, mild, cold2, freezing  = [], [], [], [], [], []
+    """Investigate and interpret the results of the simulations in the previous
+    two problems. Specifically, find the average percentage of days that are
+    hot, mild, cold, and freezing in each simulation. Does the starting day
+    alter the results? Print a report of your findings (return nothing).
+    """
+    hot1, cold1, hot2, mild, cold2, frozen  = [], [], [], [], [], []
     for i in xrange(10):
         f2 = forecast(10000)
         f4 = four_state_forecast(10000)
@@ -80,95 +92,81 @@ def analyze_simulation():
         hot2.append(f4.count(0))
         mild.append(f4.count(1))
         cold2.append(f4.count(2))
-        freezing.append(f4.count(3))
-    print("2-state forecast Hot days:\t%f%%"%(np.mean(hot1)/100.))
-    print("2-state forecast Cold days:\t%f%%"%(np.mean(cold1)/100.))
-    print("4-state forecast Hot days:\t%f%%"%(np.mean(hot2)/100.))
-    print("4-state forecast Mild days:\t%f%%"%(np.mean(mild)/100.))
-    print("4-state forecast Cold days:\t%f%%"%(np.mean(cold2)/100.))
-    print("4-state forecast Freezing days:\t%f%%"%(np.mean(freezing)/100.))
+        frozen.append(f4.count(3))
+    print("2-state forecast Hot days:\t{}%".format(np.mean(hot1)/100.))
+    print("2-state forecast Cold days:\t{}%".format(np.mean(cold1)/100.))
+    print("4-state forecast Hot days:\t{}%".format(np.mean(hot2)/100.))
+    print("4-state forecast Mild days:\t{}%".format(np.mean(mild)/100.))
+    print("4-state forecast Cold days:\t{}%".format(np.mean(cold2)/100.))
+    print("4-state forecast Freezing days:\t{}%".format(np.mean(frozen)/100.))
 
 
-def problem5(filename):
-    """Read in from a file, convert to ints, read out to a file."""
+class SentenceGenerator(object):
+    """Note: This implementation is ROW STOCHASTIC!!!
 
-    word_list = ['$tart']
-    with open(filename, 'r') as f:
-        contents = f.readlines()
-    outfile = open("int_file.txt", 'w')
-    for line in contents:
-        sentence = line.split()
-        for word in sentence:
-            if word not in word_list:
-                word_list.append(word)
-            outfile.write(str(word_list.index(word)) + " ")
-        outfile.write('\n')
-    word_list.append('en&')
-    return word_list
-
-
-def problem6(int_file, num_states, sparse=False):
-
-    # Initialize the transition matrix.
-    if sparse:
-        markov = lil_matrix((num_states, num_states))
-    else:
-        markov = np.zeros((num_states, num_states))
-
-    # Read in the data and process it.
-    with open(int_file, 'r') as f:
-        contents = f.readlines()
-    data = []
-    for line in contents:
-        data.append(line.split())
-
-    # Build the matrix.
-    for i in xrange(len(data)-1):
-        line = data[i]
-        markov[int(line[0]), 0] += 1
-        for j in xrange(len(line)-1):
-            markov[int(line[j+1]), int(line[j])] += 1
-        markov[num_states-1, int(line[-1])] += 1
-
-    # Divide by nonzero column sums.
-    for j in xrange(num_states):
-        s = markov[:,j].sum()
-        if s != 0:
-            markov[:,j] /= s
-    return markov
-
-def sentences(infile, outfile, num_sentences=1):
-    """Generate random sentences using the word list generated in
-    Problem 5 and the transition matrix generated in Problem 6.
-    Write the results to the specified outfile.
-
-    Parameters:
-        infile (str): The path to a filen containing a training set.
-        outfile (str): The file to write the random sentences to.
-        num_sentences (int): The number of random sentences to write.
-
-    Returns:
-        None
+    Example:
+        >>> yoda = SentenceGenerator("Yoda.txt")
+        >>> print yoda.babble()
+        The dark side of loss is a path as one with you.
     """
 
-    # Get output from previous problems.
-    word_list = problem5(infile)
-    transition = problem6('int_file.txt', len(word_list), False)
+    def __init__(self, filename=None):
+        if filename is not None:
+            self._read(filename)
 
-    # Transition through the Markov chain.
-    stop = transition.shape[1] - 1
-    output = ""
-    for i in xrange(num_sentences):
-        current_state = 0
-        while current_state != stop:
-            current_state = np.argmax(
-                np.random.multinomial(1, transition[:,current_state]))
-            if current_state != stop:
-                output += word_list[current_state] + " "
-            else:
-                output += "\n"
+    def _read(self, filename, sparse=False): # TODO: take sparse out? Optional?
+        self.filename = filename
+        self.states = ["$tart"]
+        
+        # Initialize an empty transition matrix.
+        with open(self.filename, 'r') as source:
+            self.num_states = len(set(source.read().split())) + 2
+        # if sparse:
+            # self.chain = lil_matrix((self.num_states, self.num_states))
+        # else:
+        self.chain = np.zeros((self.num_states, self.num_states))
 
-    # Write the results to the specified output file.
-    with open(outfile, 'w') as f:
-        f.write(output)
-    system("rm int_file.txt")
+        # Process the data. This assumes one sentence per line in the file.
+        with open(self.filename, 'r') as source:
+            for line in source:
+                sentence = line.split()
+                
+                for word in sentence:
+                    if word not in self.states:
+                        self.states.append(word)
+                index = [self.states.index(word) for word in sentence]
+                
+                self.chain[0, index[0]] += 1                # &tart -> first
+                for i in xrange(len(index)-1):
+                    self.chain[index[i], index[i+1]] += 1   # middle -> next
+                self.chain[index[-1], -1] += 1              # last -> en&
+        
+        self.chain[-1, -1] = 1
+
+        # Make each row sum to 1.
+        # if sparse:
+            # self.chain = normalize(self.chain, norm="l1", axis=1)
+        # else:
+        self.chain /= self.chain.sum(axis=1)[:,np.newaxis]
+
+    def babble(self):
+        stop = self.num_states - 1
+        output = ""
+        state = 0
+        while state != stop:
+            if state != 0:
+                output += " "
+            # Transition to a new state.
+            state = np.argmax(np.random.multinomial(1, self.chain[state]))
+            # TODO: transitions don't quite work yet with sparse matrices.
+            # Record the corresponding word.
+            if state != stop:
+                output += self.states[state]
+        return output 
+
+
+if __name__ == '__main__':
+    analyze_simulation()
+    yoda = SentenceGenerator("Yoda.txt")
+    for i in xrange(5):
+        print yoda.babble()
