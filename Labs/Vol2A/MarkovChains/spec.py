@@ -33,7 +33,7 @@ def forecast():
 # Problem 3
 def four_state_forecast(days):
     """Run a simulation for the weather over the specified number of days,
-    with 'mild' as the starting state, using the four-state Markov chain.
+    with mild as the starting state, using the four-state Markov chain.
     Return a list containing the day-by-day results, not including the
     starting day.
 
@@ -58,15 +58,22 @@ def analyze_simulation():
 
 # Problems 5 and 6
 class SentenceGenerator(object):
-    """Note: This implementation is ROW STOCHASTIC!!!
+    """Markov chain creator for simulating bad English.
+
+    Attributes:
+        (what attributes do you need to keep track of?)
 
     Example:
         >>> yoda = SentenceGenerator("Yoda.txt")
-        >>> print(yoda.babble())
+        >>> print yoda.babble()
         The dark side of loss is a path as one with you.
     """
 
     def __init__(self, filename):
+        """Read the specified file and build a transition matrix from its
+        contents. You may assume that the file has one complete sentence
+        written on each line.
+        """
         raise NotImplementedError("Problem 5 Incomplete")
 
     def babble(self):

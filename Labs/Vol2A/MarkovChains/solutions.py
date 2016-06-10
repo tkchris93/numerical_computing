@@ -22,7 +22,7 @@ def random_markov(n):
 # Problem 2
 def forecast(days):
     """Run a simulation for the weather over the specified number of days,
-    with 'hot' as the starting state. Return a list containing the day-by-day
+    with hot as the starting state. Return a list containing the day-by-day
     results, not including the starting day.
 
     Examples:
@@ -49,7 +49,7 @@ def forecast(days):
 # Problem 3
 def four_state_forecast(days):
     """Run a simulation for the weather over the specified number of days,
-    with 'mild' as the starting state, using the four-state Markov chain.
+    with mild as the starting state, using the four-state Markov chain.
     Return a list containing the day-by-day results, not including the
     starting day.
 
@@ -102,28 +102,34 @@ def analyze_simulation():
 
 
 class SentenceGenerator(object):
-    """Note: This implementation is ROW STOCHASTIC!!!
+    """Markov chain creator for simulating bad English.
+
+    Attributes:
+        (what attributes do you need to keep track of?)
 
     Example:
         >>> yoda = SentenceGenerator("Yoda.txt")
         >>> print yoda.babble()
         The dark side of loss is a path as one with you.
+
+    Note: This implementation is ROW STOCHASTIC!!!
     """
 
     def __init__(self, filename=None):
         if filename is not None:
             self._read(filename)
 
-    def _read(self, filename, sparse=False): # TODO: take sparse out? Optional?
+    def _read(self, filename):
+        """Read the specified file and build a transition matrix from its
+        contents. You may assume that the file has one complete sentence
+        written on each line.
+        """
         self.filename = filename
         self.states = ["$tart"]
         
         # Initialize an empty transition matrix.
         with open(self.filename, 'r') as source:
             self.num_states = len(set(source.read().split())) + 2
-        # if sparse:
-            # self.chain = lil_matrix((self.num_states, self.num_states))
-        # else:
         self.chain = np.zeros((self.num_states, self.num_states))
 
         # Process the data. This assumes one sentence per line in the file.
@@ -139,33 +145,36 @@ class SentenceGenerator(object):
                 self.chain[0, index[0]] += 1                # &tart -> first
                 for i in xrange(len(index)-1):
                     self.chain[index[i], index[i+1]] += 1   # middle -> next
-                self.chain[index[-1], -1] += 1              # last -> en&
+                self.chain[index[-1], -1] += 1              # last -> $top
         
         self.chain[-1, -1] = 1
+        self.states.append("$top")
 
         # Make each row sum to 1.
-        # if sparse:
-            # self.chain = normalize(self.chain, norm="l1", axis=1)
-        # else:
         self.chain /= self.chain.sum(axis=1)[:,np.newaxis]
 
     def babble(self):
+        """Begin at the start sate and use the strategy from
+        four_state_forecast() to transition through the Markov chain.
+        Keep track of the path through the chain and the corresponding words.
+        When the stop state is reached, stop transitioning and terminate the
+        sentence. Return the resulting sentence as a single string.
+        """
         stop = self.num_states - 1
-        output = ""
+        path = []
         state = 0
-        while state != stop:
-            if state != 0:
-                output += " "
-            # Transition to a new state.
+        
+        # Begin at the start state and end at the stop state.
+        while state != stop:        # Transition to a new state...
             state = np.argmax(np.random.multinomial(1, self.chain[state]))
-            # TODO: transitions don't quite work yet with sparse matrices.
-            # Record the corresponding word.
-            if state != stop:
-                output += self.states[state]
-        return output 
+            if state != stop:       # ...and record the corresponding word.
+                path.append(self.states[state])
+        
+        return " ".join(path)
+
 
 if __name__ == '__main__':
-    analyze_simulation()
+    # analyze_simulation()
     yoda = SentenceGenerator("Yoda.txt")
     for i in xrange(5):
         print yoda.babble()

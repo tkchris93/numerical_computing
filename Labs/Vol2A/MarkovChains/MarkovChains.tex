@@ -238,8 +238,8 @@ The entire procedure of creating the transition matrix for the Markov chain with
 \begin{problem} % Problem: Class that makes a Markov chain from a file.
 Write a class called \li{SentenceGenerator}.
 The constructor should accept a filename (for the training set).
-Read the file and build a transition matrix from its sentences.
-You may assume that the file has one complete sentence on each line.
+Read the file and build a transition matrix from its contents.
+You may assume that the file has one complete sentence written on each line.
 \label{problem:MarkovClassPt1}
 \end{problem}
 
@@ -249,7 +249,7 @@ You may assume that the file has one complete sentence on each line.
 Add a method to the \li{SentenceGenerator} class called \li{babble()}.
 Begin at the start state and use the strategy from Problem \ref{problem:transition} to transition through the object's Markov chain.
 Keep track of the path through the chain and the corresponding path of words.
-When the end state is reached, stop transitioning and terminate the sentence.
+When the stop state is reached, stop transitioning and terminate the sentence.
 Return the resulting sentence as a single string.
 
 For example, your \li{SentenceGenerator} class should be able to create random sentences that sound somewhat like Yoda speaking.
