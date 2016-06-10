@@ -48,7 +48,7 @@ Thus, the entries of each column partition the interval $[0, 1]$, and we can cho
 
 Consider again the weather model example from the previous section.
 Suppose that today is hot, and that we want to simulate tomorrow's weather.
-The column that corresponds to ``hot'' in the transition matrix is $(0.7, 0.3)^T$.
+The column that corresponds to ``hot'' in the transition matrix is $[0.7, 0.3]^T$.
 If we generate a random number and it is smaller than $0.3$, then our simulation indicates that tomorrow will be cold.
 Conversely, if the random number is between $0.3$ and $1$, then the simulation says that tomorrow will be hot.
 The following code implements this idea.
@@ -86,7 +86,7 @@ For larger Markov chains, we draw from a \emph{multinomial} distribution.
 A multinomial distribution is a multivariate generalization of the binomial distribution.
 A single draw from a binomial distribution with parameter $p$ indicates successes or failure of a single experiment with probability $p$ of success.
 The classic example is a coin flip, where the $p$ is the probability that the coin lands heads side up.
-A single draw from a multinomial distribution with parameters $\left[p_1, p_2, ..., p_n \right]$ indicates which of $n$ outcomes occurs.
+A single draw from a multinomial distribution with parameters $\left(p_1, p_2, ..., p_n \right)$ indicates which of $n$ outcomes occurs.
 In this case the classic example is a dice roll, with $6$ possible outcomes instead of the $2$ in a coin toss.
 
 \begin{lstlisting}
@@ -123,36 +123,109 @@ Print a report of your findings.
 
 \section*{Using Markov Chains to Simulate English} % ==========================
 % TODO: is it okay to make this reference?
-One of the original applications of Markov chains was to study natural languages.\footnote{See \url{http://langvillea.people.cofc.edu/MCapps7.pdf} for some details}
+One of the original applications of Markov chains was to study natural languages.\footnote{In computer science, a \emph{natural language} is a spoken language, like English or Russian. See \url{http://langvillea.people.cofc.edu/MCapps7.pdf} for some details on the early applications of Markov chains, including the study of natural languages.}
 In the early $20^{th}$ century, Markov used his chains to model how Russian switched from vowels to consonants.
-By mid-century, they had been used to try and model English.
+By mid-century, they had been used as an attempt to model English.
 It turns out that Markov chains are, by themselves, insufficient to model very good English.
 However, they can approach a fairly good model of bad English, with sometimes amusing results.
 
-A Markov chain model of English has each word as a state.
+% A Markov chain model of English has each word as a state.
 By nature, a Markov chain is only concerned with its current state.
-Thus, a Markov chain is unaware of context or even previous words in a sentence.
+Thus a Markov chain simulating transitions between English words is completely unaware of context or even of previous words in a sentence.
 For example, a Markov chain's current state may be the word ``continuous.''
 Then the chain would say that the next word in the sentence is more likely to be ``function'' rather than ``raccoon.''
 However, without the context of the rest of the sentence, even two likely words stringed together may result in gibberish.
 
-To build a Markov chain to simulate English, we need to determine the transition probabilities between words.
-One way to do this would be to assign every word in English a number.
-Say there are $N$ of them, and create an $N\times N$ matrix of zeros.
-Then, read every written work in English and when word $b$ follows word $a$, we add 1 to the $(b,a)^{th}$ entry of the matrix.
-Once we have done this for every word of every written work, we normalize the columns and have a transition matrix that we may simulate from.
-
-The main problem with this approach is the sheer enormity of the task at hand.
-We will restrict ourselves to a subproblem of modeling the English of a specific file.
-Thus, the transition probabilities of our Markov chains will reflect the sort of English that the source authors speak.
-For example, the transition matrix built from the Complete Works of William Shakespeare will differ greatly from, say, a collection of academic journals.
+We restrict ourselves to a subproblem of modeling the English of a specific file.
+The transition probabilities of the resulting Markov chain will reflect the sort of English that the source authors speak.
+Thus the Markov chain built from \emph{The Complete Works of William Shakespeare} will differ greatly from, say, the Markov chain built from a collection of academic journals.
 We will call the source collection of works in the next problems the \emph{training set}.
+
+\subsection*{Making the Chain} % ----------------------------------------------
+
+In the weather models of the previous section, we chose a fixed number of states to simulate.
+However, in English, sentences are of varying length.
+To capture this feature in a Markov model, we include a \emph{start state} and an \emph{end state} in the model in addition to the words of the training set.
+The start state should only transition to words that appear at the beginning of a sentence in the training set, and only words that appear at the end a sentence in the training set should transition to the end state.
+Thus if a training set has $N$ unique words, the transition matrix will be $(N+2) \times (N+2)$.
+
+After determining the states in the Markov chain, we need to determine the transition probabilities between the states.
+As with the weather models, each state must be assigned a row and column in the transition matrix.
+Then, while iterating through the sentences of the training set, we fill in the entries of the transition matrix.
+When word $b$ follows word $a$, we add one to the $(b,a)^{th}$ entry of the matrix.
+Once we have done this for every adjacent pair of words in the training set, we normalize the columns so that they each sum to one.
+
+Consider the following small training set as an example.
+
+\begin{lstlisting}
+<<I am Sam Sam I am.
+Do you like green eggs and ham?
+I do not like them, Sam I am.
+I do not like green eggs and ham.>>
+\end{lstlisting}
+
+If we include punctuation (so ``ham?'' and ``ham.'' are counted as distinct words) and do not alter the capitalization (so ``Do'' and ``do'' are also different), there are 15 unique words in this training set:
+\begin{align*}
+\text{``I'', ``am'', ``Sam'', ``am.'', ``Do'', ``you'', ``like'', ``green'',}
+\\
+\text{``eggs'', ``and'', ``ham?'', ``do'', ``not'', ``them,'', and ``ham.''.}
+\end{align*}
+
+With start and stop states, the transition matrix should therefore be $17 \times 17$.
+The start state should transition to the words ``I'' and ``Do'', and the words ``am.'', ``ham?'', and ``ham?'' should transition to the end state.
+Letting ``{\color[rgb]{.3,.6,.1}\$tart}'' represent the start state and ``{\color{red}\$top}'' represent the stop state, we first count the number of times that each state transitions to another state:
+
+\begin{align*}
+\begin{blockarray}{cccccccc}
+& \text{\textcolor[rgb]{.3,.6,.1}{\$tart}} & \text{I} & \text{am} & \text{Sam} & & \text{ham.} & \text{\textcolor[rgb]{1,0,0}{\$top}} \\
+\begin{block}{c(ccccccc)} % TODO: turn these into hard brackets?
+\text{\textcolor[rgb]{.3,.6,.1}{\$tart}} 	& 0 & 0 & 0 & 0 & \ldots & 0 & 0\\
+\text{I} 		& 3 & 0 & 0 & 2 & \ldots & 0 & 0\\
+\text{am} 		& 0 & 1 & 0 & 0 & \ldots & 0 & 0\\
+\text{Sam} 		& 0 & 0 & 1 & 1 & \ldots & 0 & 0\\
+& \vdots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots\\
+\text{ham.} 	& 0 & 0 & 0 & 0 & \ldots & 0 & 0\\
+\text{\textcolor[rgb]{1,0,0}{\$top}} 		& 0 & 0 & 0 & 0 & \ldots & 1 & 1\\
+\end{block}\end{blockarray}
+\end{align*}
+Now we divide each column by the column sum so that each column sums to one.
+
+\begin{align*}
+\begin{blockarray}{cccccccc}
+& \text{\textcolor[rgb]{.3,.6,.1}{\$tart}} & \text{I} & \text{am} & \text{Sam} & & \text{ham.} & \text{\textcolor[rgb]{1,0,0}{\$top}} \\
+\begin{block}{c(ccccccc)} % TODO: turn these into hard brackets?
+\text{\textcolor[rgb]{.3,.6,.1}{\$tart}} & 0 & 0 & 0 & 0 & \ldots & 0 & 0\\
+\text{I} 		& 3/4 & 0 & 0 & 2/3 & \ldots & 0 & 0\\
+\text{am} 		& 0 & 1/5 & 0 & 0 & \ldots & 0 & 0\\
+\text{Sam} 		& 0 & 0 & 1 & 1/3 & \ldots & 0 & 0\\
+& \vdots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots\\
+\text{ham.} 	& 0 & 0 & 0 & 0 & \ldots & 0 & 0\\
+\text{\textcolor[rgb]{1,0,0}{\$top}} 	& 0 & 0 & 0 & 0 & \ldots & 1 & 1\\
+\end{block}\end{blockarray}
+\end{align*}
+
+The $3/4$ correctly indicates that 3 out of 4 times, the sentences in the training set start with the word ``I''.
+Similarly, the $2/3$ and $1/3$ tell us that ``Sam'' is followed by ``I'' twice and by ``Sam'' once in the training set.
+Note that ``am'' (without a period) always transitions to ``Sam'' and that ``ham.'' (with a period) always transitions the stop state.
 
 % TODO:
 	% 1. Write a summary of the procedure and give an example.
 	% 2. Consolidate the next three problems into two parts: constructing the
 	% 	chain, and transitioning through the chain.
 	% 3. Formulate the solution as a class. This makes it reusable.
+
+% \begin{problem} % Problem: Text file to file of ints.
+% Write a class called \li{SentenceGenerator}.
+% The constructor should accept a filename (the training set).
+% Read the file and build a transition matrix from its the sentences.
+% You may assume that the file has one complete sentence on each line.
+
+% Each unique word in the file will correspond to a single number, and each of these numbers will correspond to a row and column in the transition matrix (to be built in the next problem).
+
+% Parse the file, assigning a unique natural number to each unique word.
+% % As you parse, write the corresponding sequence of numbers to a new file, maintaining the line break structure.
+% \label{problem:MarkovClassPt1}
+% \end{problem}
 
 % Outline of procedure (algorithm format?)
 % \begin{enumerate}

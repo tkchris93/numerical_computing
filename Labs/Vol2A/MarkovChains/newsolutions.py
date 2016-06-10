@@ -112,7 +112,7 @@ class SentenceGenerator(object):
         # else:
         self.chain = np.zeros((self.num_states, self.num_states))
 
-        # Process the data.
+        # Process the data. This assumes one sentence per line in the file.
         with open(self.filename, 'r') as source:
             for line in source:
                 sentence = line.split()
@@ -142,7 +142,7 @@ class SentenceGenerator(object):
         while state != stop:
             if state != 0:
                 output += " "
-            # Tranisition to a new state.
+            # Transition to a new state.
             state = np.argmax(np.random.multinomial(1, self.chain[state]))
             # TODO: transitions don't quite work yet with sparse matrices.
             # Record the corresponding word.
