@@ -207,6 +207,9 @@ Now we divide each column by the column sum so that each column sums to one.
 The $3/4$ correctly indicates that 3 out of 4 times, the sentences in the training set start with the word ``I''.
 Similarly, the $2/3$ and $1/3$ tell us that ``Sam'' is followed by ``I'' twice and by ``Sam'' once in the training set.
 Note that ``am'' (without a period) always transitions to ``Sam'' and that ``ham.'' (with a period) always transitions the stop state.
+Finally, to avoid a column of zeros, we place a one in the bottom right hand corner of the matrix (the end state always transitions to itself).
+
+The entire procedure of creating the transition matrix for the Markov chain with words from a file as states, with some hints for implementation, is summarized below in Algorithm \ref{alg:MarkovSentencesTransitionMatrix}.
 
 % TODO:
 	% 1. Write a summary of the procedure and give an example.
@@ -214,138 +217,69 @@ Note that ``am'' (without a period) always transitions to ``Sam'' and that ``ham
 	% 	chain, and transitioning through the chain.
 	% 3. Formulate the solution as a class. This makes it reusable.
 
-% \begin{problem} % Problem: Text file to file of ints.
-% Write a class called \li{SentenceGenerator}.
-% The constructor should accept a filename (the training set).
-% Read the file and build a transition matrix from its the sentences.
-% You may assume that the file has one complete sentence on each line.
+\newpage
 
-% Each unique word in the file will correspond to a single number, and each of these numbers will correspond to a row and column in the transition matrix (to be built in the next problem).
+\begin{algorithm} % Read a file and convert it into a Markov chain.
+\begin{algorithmic}[1]
+\Procedure{MakeTransitionMatrix}{}
+\State Count the number of unique words in the training set.
+\State Initialize a square array of zeros of the appropriate size to be the transition matrix (remember to account for the start and stop states).
+\State Initialize a list of states, beginning with ``\$tart''.
+\For {each sentence in the training set}
+    \State Split the sentence into a list of words.
+    \State Add each \emph{new} word to the list of states.
+    \State Add 1 to the entry of the transition matrix corresponding to the start state transitioning to the first word of the sentence.
+   	\State For each consecutive pair $(a, b)$ of words in the list of words, add 1 to the entry of the transition matrix corresponding to moving from state $a$ to state $b$.
+	\item Add 1 to the entry of the transition matrix corresponding to the last word of the sentence transitioning to the stop state.
+\EndFor
+\State Make sure the stop state transitions to itself.
+\State Normalize each column by dividing by the column sums (hint: array broadcasting).
+\EndProcedure
+\end{algorithmic}
+\caption{Convert a training set of sentences into a Markov chain.}
+\label{alg:MarkovSentencesTransitionMatrix}
+\end{algorithm}
 
-% Parse the file, assigning a unique natural number to each unique word.
-% % As you parse, write the corresponding sequence of numbers to a new file, maintaining the line break structure.
-% \label{problem:MarkovClassPt1}
-% \end{problem}
-
-% Outline of procedure (algorithm format?)
-% \begin{enumerate}
-% \item Read a source file and convert it into a Markov chain:
-% 	\begin{enumerate}
-% 	\item Count the number of unique words in the file.
-% 	\item Initialize a square array of zeros of the appropriate size to be the transition matrix (remember to account for beginning and end states).
-% 	\item Initialize a list of states, beginning with ``\$tart.''
-% 	\item Process each line of the data file:
-% 		\begin{enumerate}
-% 		\item Convert the sentence to a list of words.
-% 		\item Add each \emph{new} word to the list of states.
-% 		\item Convert the list of words to a list of integers, where each integer is the index of the word in the list of states. (hint: list comprehension)
-% 		\item Add 1 to the entry of the transition matrix corresponding to ``\$tart'' $\rightarrow$ first word.
-% 		\item For each consecutive pair $(i, j)$ of integers in the list of integers, add 1 to the entry of the transition matrix corresponding to moving from state $i$ to state $j$.
-% 		\item Add 1 to the entry of the transition matrix corresponding to last word $\rightarrow$ ``en\&.''
-% 		\end{enumerate}
-% 	\item Make sure the ``en\&'' state transitions to itself.
-% 	\item Normalize each column by dividing by the column sums (hint: array broadcasting)
-% 	\end{enumerate}
-% \item Transition through the chain to generate a random sentence.
-% \end{enumerate}
-
-\begin{problem} % Problem: Text file to file of ints.
-First we must convert a file of English words to numbers.
-Each unique word in the file will correspond to a single number, and each of these numbers will correspond to a row and column in the transition matrix (to be built in the next problem).
-
-Write a function that accepts the path to a file containing a training set of English sentences, with one sentence per line.
-Parse the file, assigning a unique natural number to each unique word.
-As you parse, write the corresponding sequence of numbers to a new file, maintaining the line break structure.
-
-We provide an example below.
-On the left is the training set of sentences, and on the right is the corresponding file of numbers.
-Note that once a word is assigned a number, the same number is used to represent the word throughout the rest of the file, thus preserving the 1-1 relationship of words to numbers.
-
-\begin{lstlisting}
-<<Love is patient Love is kind 						1 2 3 1 2 4 
-It does not envy It does not boast 					5 6 7 8 5 6 7 9 
-It is not proud It is not rude 						5 2 7 10 5 2 7 11 
-It is not self-seeking It is not easily angered  	5 2 7 5 2 7 12 13 14 
-It keeps no record of wrongs						5 15 16 17 18 19 
-Love does not delight in evil						1 6 7 20 21 22 
-but rejoices with the truth 						23 24 25 26 27 
-It always protects always trusts 					5 28 29 28 30 
-always hopes always perseveres 						28 31 28 32
-Love never fails 									1 33 34>>
-\end{lstlisting}
-
-Here the word ``Love'' is assigned the number 1, ``is'' is assigned 2, and ``kind'' is assigned 4 (since it is the $4^{th}$ unique word in the file).
-
-Also keep track of each word-number pair with a some basic data structure.
-This could be an ordered list of words, a word-number dictionary, a set of tuples, or any other simple structure (which will be fastest?).
-Return this data structure.
-
-\begin{comment}
-Also return a list that matches the index of the list to the word assigned that number, prepending and appending unique values for the start and stop states.
-The list generated by the above example could be:
-\begin{lstlisting}
-<<[$tart, Love, is, patient, kind, It, does, not, ..., never, fails, en&]>>
-\end{lstlisting}
-
-Examine each line, one at a time.
-Check each word in the line to see if it has been assigned a number yet.
-If it hasn't, then assign the word a number and write the number into a new file.
-If a number has been assigned already, write it to the new file.
-The line break structure should be maintained.
-\end{comment}
-\label{problem:str_to_int}
+\begin{problem} % Problem: Class that makes a Markov chain from a file.
+Write a class called \li{SentenceGenerator}.
+The constructor should accept a filename (for the training set).
+Read the file and build a transition matrix from its sentences.
+You may assume that the file has one complete sentence on each line.
+\label{problem:MarkovClassPt1}
 \end{problem}
 
-\subsection*{Starting and Stopping States} % ----------------------------------
-
-Now that we have converted our English text into numbers, we can build the transition matrix for the Markov chain.
-We will scan the file we created in the previous problem and use it to create the matrix.
-
-In the previous weather model we chose a fixed number of states to simulate.
-However, in English, sentences are of varying length.
-One way to simulate this is to create a start state and an end state.
-To generate a new sentence, we begin in the given start state.
-The start state may transition to any of the words that are at the beginning of the sentences in the training set.
-Words that are at the end of the sentences in the training set will have a probability of moving to the end state.
-Once the chain has moved to the end state, we terminate the sentence.
-
-\begin{problem} % Problem: Generate the Markov chain's transition matrix.
-Write a function that accepts the path to the file created in the previous problem and the number of unique words in the training.
-Initialize a square zero matrix of zeros whose dimension is the number of unique words in the text, plus 2 (to include the start and stop state).
-Then, read each line of the file and for each pair of subsequent numbers add one to the corresponding entry of the matrix.
-
-For instance, if we scanned the line 2 6 3 7 9, then we would add one to the $(6,2)$, $(3,6)$, $(7,3)$, and $(9,7)$ entries of the matrix.
-In addition, the start state must transition to the first word in of the line and the last word of the line must transition to the end state.
-Then we would also increment the $(2,0)$ and $(N,9)$ entries, where $N$ is the index of the last column in the matrix.
-Finally, to avoid a column of all zeros, we say that the end state transitions to itself with probability 1.
-Thus we increment the $(N,N)$ entry as well.
-
-Once the entire file has been read, divide each column by its column sum.
-Then each column will sum to one, with the $ij^{th}$ entry corresponding to the probability of moving from word $j$ to word $i$.
-\label{problem:chainmaker}
-\end{problem}
-
-\begin{problem} % Problem: Random Sentences
-Write a function that accepts a file name to read data in from (the training set), a file name to write data out to, and an optional integer argument \li{num\_sentences}.
-Use Problem \ref{problem:str_to_int} to write the file of numbers that corresponds to the training set, and to get the data structure describing the one-to-one relationship between the words and the numbers.
-Then use Problem \ref{problem:chainmaker} to generate the corresponding transition matrix.
-
-Begin at the start state and use the strategy from Problem \ref{problem:transition} to transition through the Markov chain.
+\begin{problem} % Problem: Create random sentences
+Add a method to the \li{SentenceGenerator} class called \li{babble()}.
+Begin at the start state and use the strategy from Problem \ref{problem:transition} to transition through the object's Markov chain.
 Keep track of the path through the chain and the corresponding path of words.
 When the end state is reached, stop transitioning and terminate the sentence.
-Write the resulting sentence to the outfile, followed by a newline character.
-Write as many sentences to the file as is specified by \li{num\_sentences}.
+Return the resulting sentence as a single string.
+
+For example, your \li{SentenceGenerator} class should be able to create random sentences that sound somewhat like Yoda speaking.
+\begin{lstlisting}
+>>> yoda = SentenceGenerator("Yoda.txt")
+>>> for i in xrange(5):
+... 	print(yoda.babble())
+...
+<<Fear leads to eat as well.
+For eight hundred years old to enter the dark side of Congress there is.
+Impossible to my size, do not!
+A domain of greed, that misread could have we.
+But agree on this, we must, and find your weapon!>>
+\end{lstlisting}
 \end{problem}
 
 \section*{Additional Material} % ==============================================
 
-The approach in the previous problems begins to fail as the training set grows larger.
-For example, a single Shakespearean play may not be large enough to cause memory problems, but the Complete Works of William Shakespeare certainly will.
+\subsection*{Large Training Sets} % -------------------------------------------
 
-To accommodate larger data sets, consider use a sparse matrix for the transition matrix in instead of a regular NumPy array (use the \li{lil_matrix} from the \li{scipy.sparse} library). % Why lil_matrix?
+The approach in the previous problems begins to fail as the training set grows larger.
+For example, a single Shakespearean play may not be large enough to cause memory problems, but \emph{The Complete Works of William Shakespeare} certainly will.
+
+To accommodate larger data sets, consider use a sparse matrix for the transition matrix in instead of a regular NumPy array. %(use the \li{lil_matrix} from the \li{scipy.sparse} library). % Why lil_matrix?
 Ensure that the process still works on small training sets, then proceed to larger training sets.
 How are the resulting sentences different if a very large training set is used instead of a small training set?
 
-% \subsection*{Natural Language Tools}
+% \subsection*{Natural Language Processing Tools} % -----------------------------
 
-% A brief overview of the \li{nltk} package.
+% TODO: A brief overview of the \li{nltk} package.

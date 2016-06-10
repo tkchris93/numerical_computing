@@ -152,7 +152,7 @@ class SentenceGenerator(object):
 
 
 if __name__ == '__main__':
-    analyze_simulation()
+    # analyze_simulation()
     yoda = SentenceGenerator("Yoda.txt")
-    for i in xrange(5):
+    for i in xrange(25):
         print yoda.babble()
