@@ -8,11 +8,11 @@ else                                # Delete the specified git branch.
     echo -e "\nAttempting to delete branch $1...\n"
     git checkout develop
     git pull upstream develop
+    git push origin develop
     git checkout $1
     git merge develop
     git checkout develop
     git branch -d $1
     git push origin :$1
-    git push origin develop
-    echo "\nDone\n"
+    echo -e "\nDone\n"
 fi
