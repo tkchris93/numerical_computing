@@ -1,43 +1,38 @@
 \lab{Markov Chains}{Markov Chains}
 \label{lab:Markov}
 \objective{
-A \emph{Markov chain} is a collection of states with specified probabilities for transitioning from one state to another.
+A \emph{Markov chain} is a finite collection of states with specified probabilities for transitioning from one state to another.
 They are characterized by the fact that the future behavior of the system depends only on its current state.
-Markov chains have far ranging applications. In this lab, we learn to construct and interact with Markov chains and apply a Markov chain to natural language processing.}
+Markov chains have far ranging applications; in this lab, we create a Markov chain for generating random English sentences.}
+
+% TODO: Changing column_sum = 1 to row_sum = 1 (transpose all transition matrices, ij^th entry --> probability of going from from state i to state j (instead of the other way around). Makes implementing everything easier.)
+
+% TODO: Update test driver, solutions+spec on class implementation.
 
 \section*{State Space Models} % ===============================================
 
 Many systems can be described by a finite number of states.
+% A Markov chain is a collection of states, together with the probabilities of moving from one state to another.
 For example, a board game where players move around the board based on die rolls can be modeled by a Markov chain.
 Each space represents a state, and a player is said to be in a state if their piece is currently on the corresponding space.
 In this case, the probability of moving from one space to another only depends on the players current location: where the player was on a previous turn does not affect their current turn.
 
-% A Markov chain is a collection of states, together with the probabilities of moving from one state to another.
-Finite Markov chains have an associated \emph{transition matrix} that stores the information about the transitions between the states in the chain.
-The $(ij)^{th}$ entry of the matrix gives the probability of moving from state $i$ to state $j$.
-Thus the rows of the transition matrix must sum to 1.
-
-\begin{info} % Row / column stochasticity
-A transition matrix where the rows sum to 1 is called \emph{row stochastic} (or \emph{right stochastic}).
-The transpose of a row stochastic matrix is \emph{column stochastic} (or \emph{left stochastic}): each column of a column stochastic matrix sums to 1 and the $(i,j)^{th}$ entry of the matrix gives the probability of moving from state $j$ to state $i$.
-Both representations are common. In this lab, our examples are row stochastic.
-\end{info}
+Finite Markov chains have an associated transition matrix that stores all the information about the chain.
+The $(ij)^{th}$ entry of the matrix gives the probability of moving from state $j$ to state $i$.
+Thus the columns of the transition matrix must sum to 1. %\footnote{This type of transition matrix is called \emph{column-stochastic}. Row stochastic matrices are also often used ti model Markov chains.}
+% TODO: Note about column-stochastic v row-stochastic transition matrices.
 
 Consider a very simple weather model where the probability of being hot or cold depends on the weather of the previous day.
 If the probability that tomorrow is hot given that today is hot is 0.7, and the probability that tomorrow is cold given that today is cold is 0.4, then by assigning hot to the $0^{th}$ row and column, and cold to the $1^{st}$ row and column, this Markov chain has the following transition matrix:
-\begin{align*}
-\begin{blockarray}{ccc}
-& \text{\textcolor{red}{hot tomorrow}} & \text{\textcolor{blue}{cold tomorrow}} \\
-\begin{block}{c(cc)}
-\text{\textcolor{red}{hot today}}   & 0.7 & 0.3 \\
-\text{\textcolor{blue}{cold today}} & 0.6 & 0.4 \\
-\end{block}\end{blockarray}
-\end{align*}
+
+\[W = \left[\begin{array}{cc}
+0.7 & 0.6 \\
+0.3 & 0.4 \end{array} \right]\] 
 
 % TODO: insert a PICTURE of a this Markov chain!
 
-If it is hot today, we examine the $0^{th}$ row of the matrix.
-There is a $70\%$ chance that tomorrow will be hot ($0^{th}$ column), and a $30\%$ chance that tomorrow will be cold ($1^{st}$ column).
+If it is hot today, we examine the $0^{th}$ column of $W$.
+There is a $70\%$ chance that tomorrow will be hot ($0^{th}$ row), and a $30\%$ chance that tomorrow will be cold ($1^{st}$ row).
 Conversely, if it is cold today, there is a $60\%$ chance that tomorrow will be hot, and a $40\%$ chance that tomorrow will be cold.
 
 \begin{problem} % Problem: stochasticity. 
@@ -49,13 +44,13 @@ Write a function that accepts a dimension $n$ and returns the transition matrix 
 
 \subsection*{Simulating State Transitions} % ----------------------------------
 
-In a general finite Markov chain, if we are in state $i$ then the $i^{th}$ row of the transition matrix gives the probabilities of moving to any other state $j$.
+In a general finite Markov chain, if we are in state $j$ then the $j^{th}$ column of the transition matrix gives the probabilities of moving to any other state $i$.
 By definition, these probabilities sum to $1$.
 Thus, the entries of each column partition the interval $[0, 1]$, and we can choose the next state to move to by generating a random number between $0$ and $1$.
 
 Consider again the weather model example from the previous section.
 Suppose that today is hot, and that we want to simulate tomorrow's weather.
-The row that corresponds to ``hot''in the transition matrix is $[0.7, 0.3]^T$.
+The column that corresponds to ``hot'' in the transition matrix is $[0.7, 0.3]^T$.
 If we generate a random number and it is smaller than $0.3$, then our simulation indicates that tomorrow will be cold.
 Conversely, if the random number is between $0.3$ and $1$, then the simulation says that tomorrow will be hot.
 The following code implements this idea.
@@ -66,9 +61,9 @@ import numpy as np
 def forecast():
 	"""Forecast tomorrow's weather given that today is hot."""
 
-	transition_matrix = np.array([[0.7, 0.3], [0.6, 0.4]])
+	transition_matrix = np.array([[0.7, 0.6], [0.3, 0.4]])
 	# Sample from the standard uniform distribution to choose a new state.
-	if np.random.random() < transition_matrix[0, 1]:
+	if np.random.random() < transition_matrix[1,0]:
 		print "Cold"
 		return 1
 	else:
@@ -108,18 +103,14 @@ array([0, 0, 0, 1, 0, 0])                       # The roll resulted in a 4.
 \begin{problem} % Problem: 4 states instead of 2. Multinomial transitioning.
 Let the following be the transition chain for a Markov chain modeling weather with four states: hot, mild, cold, and freezing.
 
-\begin{align*}
-\begin{blockarray}{ccccc}
-& \text{\textcolor{red}{hot}} & \text{\textcolor[rgb]{0,.6,0}{mild}} & \text{\textcolor{blue}{cold}} & \text{\textcolor{cyan}{freezing}} \\
-\begin{block}{c(cccc)}
-\text{\textcolor{red}{hot}}                 & 0.5 & 0.3 & 0.2 & 0 \\
-\text{\textcolor[rgb]{0,.6,0}{mild}}       & 0.3 & 0.3 & 0.3 & 0.1 \\
-\text{\textcolor{blue}{cold}}               & 0.1 & 0.3 & 0.4 & 0.2 \\
-\text{\textcolor{cyan}{freezing}}           & 0 & 0.3 & 0.5 & 0.2 \\
-\end{block}\end{blockarray}
-\end{align*}
+\[ W^\prime = \left[\begin{array}{cccc}
+0.5 & 0.3 & 0.1 & 0\\
+0.3 & 0.3 & 0.3 & 0.3\\
+0.2 & 0.3 & 0.4 & 0.5\\
+  0 & 0.1 & 0.2 & 0.2\end{array} \right]\]
+with hot, mild, cold, and freezing corresponding to columns (and rows) 0, 1, 2, and 3, respectively.
 
-Write a new function that accepts a parameter \li{days} and runs the same kind of simulation as \li{forecast()}, but that uses this new four-state transition matrix.
+Write a new function that accepts a parameter \li{days} and runs the same kind of simulation as \li{forecast()}, but that uses the new four-state transition matrix.
 This time, assume the first day is mild.
 Return a list containing the day-to-day results (0 for hot, 1 for mild, 2 for cold, and 3 for freezing).
 \label{problem:transition}
@@ -162,8 +153,8 @@ Thus if a training set has $N$ unique words, the transition matrix will be $(N+2
 After determining the states in the Markov chain, we need to determine the transition probabilities between the states.
 As with the weather models, each state must be assigned a row and column in the transition matrix.
 Then, while iterating through the sentences of the training set, we fill in the entries of the transition matrix.
-When word $i$ is followed by word $j$, we add 1 to the $(i,j)^{th}$ entry of the matrix.
-Once we have done this for every adjacent pair of words in the training set, we normalize the columns so that they each sum to 1.
+When word $b$ follows word $a$, we add one to the $(b,a)^{th}$ entry of the matrix.
+Once we have done this for every adjacent pair of words in the training set, we normalize the columns so that they each sum to one.
 
 Consider the following small training set as an example.
 
@@ -183,43 +174,45 @@ If we include punctuation (so ``ham?'' and ``ham.'' are counted as distinct word
 
 With start and stop states, the transition matrix should therefore be $17 \times 17$.
 The start state should transition to the words ``I'' and ``Do'', and the words ``am.'', ``ham?'', and ``ham?'' should transition to the end state.
-Letting ``{\color[rgb]{0,.6,0}\$tart}'' represent the start state and ``{\color{red}\$top}'' represent the stop state, we first count the number of times that each state transitions to another state:
+Letting ``{\color[rgb]{.3,.6,.1}\$tart}'' represent the start state and ``{\color{red}\$top}'' represent the stop state, we first count the number of times that each state transitions to another state:
 
 \begin{align*}
 \begin{blockarray}{cccccccc}
-& \text{\textcolor[rgb]{0,.6,0}{\$tart}} & \text{I} & \text{am} & \text{Sam} & & \text{ham.} & \text{\textcolor{red}{\$top}} \\
-\begin{block}{c(ccccccc)}
-\text{\textcolor[rgb]{0,.6,0}{\$tart}} 	& 0 & 3 & 0 & 0 & \ldots & 0 & 0\\
-\text{I} 		& 0 & 0 & 1 & 0 & \ldots & 0 & 0\\
-\text{am} 		& 0 & 0 & 0 & 1 & \ldots & 0 & 0\\
-\text{Sam} 		& 0 & 2 & 0 & 1 & \ldots & 0 & 0\\
+& \text{\textcolor[rgb]{.3,.6,.1}{\$tart}} & \text{I} & \text{am} & \text{Sam} & & \text{ham.} & \text{\textcolor[rgb]{1,0,0}{\$top}} \\
+\begin{block}{c(ccccccc)} % TODO: turn these into hard brackets?
+\text{\textcolor[rgb]{.3,.6,.1}{\$tart}} 	& 0 & 0 & 0 & 0 & \ldots & 0 & 0\\
+\text{I} 		& 3 & 0 & 0 & 2 & \ldots & 0 & 0\\
+\text{am} 		& 0 & 1 & 0 & 0 & \ldots & 0 & 0\\
+\text{Sam} 		& 0 & 0 & 1 & 1 & \ldots & 0 & 0\\
 & \vdots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots\\
-\text{ham.} 	& 0 & 0 & 0 & 0 & \ldots & 0 & 1\\
-\text{\textcolor{red}{\$top}} 		& 0 & 0 & 0 & 0 & \ldots & 0 & 1\\
+\text{ham.} 	& 0 & 0 & 0 & 0 & \ldots & 0 & 0\\
+\text{\textcolor[rgb]{1,0,0}{\$top}} 		& 0 & 0 & 0 & 0 & \ldots & 1 & 1\\
 \end{block}\end{blockarray}
 \end{align*}
-Now we divide each column by the column sum so that each column sums to 1.
+Now we divide each column by the column sum so that each column sums to one.
 
 \begin{align*}
 \begin{blockarray}{cccccccc}
-& \text{\textcolor[rgb]{0,.6,0}{\$tart}} & \text{I} & \text{am} & \text{Sam} & & \text{ham.} & \text{\textcolor{red}{\$top}} \\
-\begin{block}{c(ccccccc)}
-\text{\textcolor[rgb]{0,.6,0}{\$tart}} & 0 & 3/4 & 0 & 0 & \ldots & 0 & 0\\
-\text{I}        & 0 & 0 & 1/5 & 0 & \ldots & 0 & 0\\
-\text{am}       & 0 & 0 & 0 & 1 & \ldots & 0 & 0\\
-\text{Sam}      & 0 & 2/3 & 0 & 1/3 & \ldots & 0 & 0\\
+& \text{\textcolor[rgb]{.3,.6,.1}{\$tart}} & \text{I} & \text{am} & \text{Sam} & & \text{ham.} & \text{\textcolor[rgb]{1,0,0}{\$top}} \\
+\begin{block}{c(ccccccc)} % TODO: turn these into hard brackets?
+\text{\textcolor[rgb]{.3,.6,.1}{\$tart}} & 0 & 0 & 0 & 0 & \ldots & 0 & 0\\
+\text{I} 		& 3/4 & 0 & 0 & 2/3 & \ldots & 0 & 0\\
+\text{am} 		& 0 & 1/5 & 0 & 0 & \ldots & 0 & 0\\
+\text{Sam} 		& 0 & 0 & 1 & 1/3 & \ldots & 0 & 0\\
 & \vdots & \vdots & \vdots & \vdots & \ddots & \vdots & \vdots\\
-\text{ham.}     & 0 & 0 & 0 & 0 & \ldots & 0 & 1\\
-\text{\textcolor{red}{\$top}}        & 0 & 0 & 0 & 0 & \ldots & 0 & 1\\
+\text{ham.} 	& 0 & 0 & 0 & 0 & \ldots & 0 & 0\\
+\text{\textcolor[rgb]{1,0,0}{\$top}} 	& 0 & 0 & 0 & 0 & \ldots & 1 & 1\\
 \end{block}\end{blockarray}
 \end{align*}
 
 The $3/4$ correctly indicates that 3 out of 4 times, the sentences in the training set start with the word ``I''.
 Similarly, the $2/3$ and $1/3$ tell us that ``Sam'' is followed by ``I'' twice and by ``Sam'' once in the training set.
 Note that ``am'' (without a period) always transitions to ``Sam'' and that ``ham.'' (with a period) always transitions the stop state.
-Finally, to avoid a row of zeros, we place a 1 in the bottom right hand corner of the matrix (the end state always transitions to itself).
+Finally, to avoid a column of zeros, we place a one in the bottom right hand corner of the matrix (the end state always transitions to itself).
 
 The entire procedure of creating the transition matrix for the Markov chain with words from a file as states, with some hints for implementation, is summarized below in Algorithm \ref{alg:MarkovSentencesTransitionMatrix}.
+
+\newpage % Might be unnecessary in later editions.
 
 \begin{algorithm} % Read a file and convert it into a Markov chain.
 \begin{algorithmic}[1]
@@ -231,7 +224,7 @@ The entire procedure of creating the transition matrix for the Markov chain with
     \State Split the sentence into a list of words.
     \State Add each \emph{new} word to the list of states.
     \State Add 1 to the entry of the transition matrix corresponding to the start state transitioning to the first word of the sentence.
-   	\State For each consecutive pair $(i, j)$ of words in the list of words, add 1 to the entry of the transition matrix corresponding to moving from state $i$ to state $j$.
+   	\State For each consecutive pair $(a, b)$ of words in the list of words, add 1 to the entry of the transition matrix corresponding to moving from state $a$ to state $b$.
 	\item Add 1 to the entry of the transition matrix corresponding to the last word of the sentence transitioning to the stop state.
 \EndFor
 \State Make sure the stop state transitions to itself.
