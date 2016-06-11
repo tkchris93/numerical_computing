@@ -11,11 +11,8 @@ def random_markov(n):
     """Create and return a transition matrix for a random Markov chain with
     'n' states. This should be stored as an nxn NumPy array.
     """
-    transition_matrix = np.empty((n,n))
-    for j in range(n):
-        column = np.random.random(n)
-        column /= column.sum()
-        transition_matrix[:,j] = column
+    transition_matrix = np.random.random((n,n))
+    transition_matrix /= transition_matrix.sum(axis=1)[:,np.newaxis]
     return transition_matrix
 
 
@@ -31,15 +28,14 @@ def forecast(days):
         >>> forecast(5)
         [0, 0, 0, 1, 0]
     """
-    transition_matrix = np.array([[.7, .6], [.3, .4]])
+    transition_matrix = np.array([[.7, .3], [.6, .4]])
     current_state = 0
     record = []
     for day in xrange(days):
-        random_number = np.random.random()
-        if random_number < transition_matrix[1, current_state]:
-            current_state = 1
+        if np.random.random() < transition_matrix[current_state, 1]:
+            current_state = 1       # Transition to cold.
         else:
-            current_state = 0
+            current_state = 0       # Transition to hot.
         record.append(current_state)
     return record
 # Roughly 66.7% of the entries should be zeros.
@@ -59,15 +55,16 @@ def four_state_forecast(days):
         >>> four_state_forecast(5)
         [2, 1, 2, 1, 1]
     """
-    transition = np.array([ [.5, .3, .1, 0.],
-                            [.3, .3, .3, .3],
-                            [.2, .3, .4, .5],
-                            [0., .1, .2, .1]    ])
+    transition = np.array([ [.5, .3, .2, 0.],
+                            [.3, .3, .3, .1],
+                            [.1, .3, .4, .2],
+                            [0., .3, .5, .2]    ])
+
     current_state = 0
     record = []
     for day in xrange(days):
         current_state = np.argmax(
-                    np.random.multinomial(1, transition[:,current_state]))
+                    np.random.multinomial(1, transition[current_state]))
         record.append(current_state)
     return record
 # Roughly 24.6% of the entries should be zeros.
@@ -111,8 +108,6 @@ class SentenceGenerator(object):
         >>> yoda = SentenceGenerator("Yoda.txt")
         >>> print yoda.babble()
         The dark side of loss is a path as one with you.
-
-    Note: This implementation is ROW STOCHASTIC!!!
     """
 
     def __init__(self, filename=None):
@@ -174,7 +169,7 @@ class SentenceGenerator(object):
 
 
 if __name__ == '__main__':
-    # analyze_simulation()
+    analyze_simulation()
     yoda = SentenceGenerator("Yoda.txt")
     for i in xrange(5):
         print yoda.babble()

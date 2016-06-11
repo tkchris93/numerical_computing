@@ -20,9 +20,9 @@ def random_markov(n):
 def forecast():
     """Forecast tomorrow's weather given that today is hot."""
     
-    transition_matrix = np.array([[.7, .6], [.3, .4]])
+    transition_matrix = np.array([[.7, .3], [.6, .4]])
     # Sample from the standard uniform distribution to choose a new state.
-    if np.random.random() < transition_matrix[1, 0]:
+    if np.random.random() < transition_matrix[0, 1]:
         print("Cold")
         return 1
     else:
