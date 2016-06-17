@@ -74,4 +74,4 @@ birthdeathrates_data[['birth','death']].plot(kind='box')
 
 # Problem 3 is very open ended and easy enough to produce.
 
-# Problem 5 is similar to the example given in the lab.
+# Problem 4 should include the necessary information for the first problem.
