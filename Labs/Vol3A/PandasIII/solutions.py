@@ -1,9 +1,8 @@
-from pydataset import data
+import pandas as pd
 
-#msleep = data("msleep")
-#vore_cons = msleep.groupby(["vore", "conservation"])
-#tab = msleep.pivot_table('sleep_total', index=['conservation','bodywt'], columns='vore')
-#print tab
+titanic = pd.read_csv("titanic.csv")
+print titanic.head()
 
-titanic = data("titanic")
-print titanic
+tab = titanic.pivot_table('Survived', index='Sex', columns='Pclass',aggfunc='count')
+print tab
+

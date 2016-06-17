@@ -64,15 +64,15 @@ Using \li{groupby()}, we can select the parts we want. As the name implies, \li{
 \begin{lstlisting}
 >>> vore = msleep.groupby("vore")
 \end{lstlisting}
-You can also group the data by multiple columns, for example, both the \li{vore} and \li{conservation} classifications.
+You can also group the data by multiple columns, for example, both the \li{vore} and \li{order} classifications.
 To group and view this data, simply use:
 \begin{lstlisting}
->>> vore_cons = msleep.groupby(["vore", "conservation"])
+>>> vorder = msleep.groupby(["vore", "order"])
 
-# View groups within vore_cons
->>> vore_cons.describe()
+# View groups within vorder
+>>> vorder.describe()
 \end{lstlisting}
-This listing is much too long to view here, but you should be able to see that it first sorts all rows into the appropriate \li{vore} category, and then into the appropriate \li{conservation} category.  It gives the count of rows in each section, along with the mean, standard deviation, and other potentially useful statistics.
+This listing is much too long to view here, but you should be able to see that it first sorts all rows into the appropriate \li{vore} category, and then into the appropriate \li{order} category.  It gives the count of rows in each section, along with the mean, standard deviation, and other potentially useful statistics.
 
 Pandas \li{groupby} objects are not lists of new \li{DataFrames} associated with groupings.
 They are better thought of as a dictionary or generator-like object which can be \emph{used} to produce the necessary groups.
@@ -167,55 +167,13 @@ Both hexbins reveal a linearity between diamond weight and diamond price, with D
 \li{Groupby} is a very useful method to order data.  However, it is not the perfect tool for every method.  As we saw when sorting data by multiple columns, we can end up with a useful grouping, but too much information to display.  If we want to see information in table format, we can make use Pivot Tables.
 
 \section*{Pivot Tables}
-With a given pandas \li{DataFrame}, we can visualize data easily with the function \li{pivot_table()}. Before, we ordered the mammilian sleep data by \li{vore} and \li{class}.  We can very simply get the mean hours of sleep for each grouping using a Pivot Table, as follows:
+With a given pandas \li{DataFrame}, we can visualize data easily with the function \li{pivot_table()}. The Titanic dataset (\li{titanic.csv}) is especially apt for this.  It includes many columns, but we will use only those entitled "Survived", "Pclass", "Sex", "Age", and "Fare" here.  Once this has been loaded in, we can make Pivot Tables to view trends in the data.
 
 \begin{lstlisting}
->>> msleep = data("msleep")
->>> msleep.pivot_table('sleep_total', index='conservation', columns='vore')
-vore           carni      herbi  insecti     omni
-conservation                                     
-cd             2.700   1.900000      NaN      NaN
-domesticated  11.300   6.300000      NaN   9.1000
-en            15.800   9.100000    18.10      NaN
-lc            13.920  10.110000    14.05  11.7875
-nt            10.400  13.833333      NaN      NaN
-vu             7.825   5.733333      NaN      NaN
+>>> titanic.pivot_table('Survived', index='Sex', columns='Pclass')
 \end{lstlisting}
 
-Here ``sleep\_total'' is the category (or column in the original datset) we want to compare, ``index'' will be the category for the row of our pivot table, and ``columns'' is the category to organize as the columns for our pivot table.  The values listed default to the mean of the values in each grouping.  Note that many are NaNs.  We can see why by looking at the number of animals in each grouping.  To change the default from ``mean'' to ``count'', we simply add the keyword argument \li{aggfunc='count'}.
-
-\begin{lstlisting}
->>> msleep.pivot_table('sleep_total', index='conservation', columns='vore', aggfunc='count')
-vore          carni  herbi  insecti  omni
-conservation                             
-cd                1      1      NaN   NaN
-domesticated      2      7      NaN     1
-en                1      2        1   NaN
-lc                5     10        2     8
-nt                1      3      NaN   NaN
-vu                4      3      NaN   NaN
-\end{lstlisting}
-
-en = endangered
-vu = vulnerable
-nt = near threatened
-cd = conservation dependent
-lc = least concern
-
-If we want to view another column of the \li{DataFrame} in the Pivot Table, we can use a multi-indexed Pivot Table.  For example, going back to the mean sleep values, we can add in the mean bodyweight for each category as follows: bodywt
-
-\begin{lstlisting}
->>> msleep.pivot_table('sleep_total', index=['conservation','bodywt'], columns='vore')
-
-\end{lstlisting}
-
-
-
-
-
-
-
-
+Here ``value'' is the category (or column in the original datset) we want to compare, ``index'' will be the category for the row of our pivot table, and ``columns'' is the category to organize as the columns for our pivot table.
 
 Let's say we want to further break down the survival rates to compare how different ages fared in the voyage, according to their gender and class. We could be asking ourselves the question, ``What about the children? Were male children really that likely to die as compared to female children?''. As you will see with pivot tables, as we see these simple breakdowns of the data, more questions can, and should arise. You should consistently ask yourself questions about the relevance of the numbers you see in the pivot tables you create. So let's look at how age was a factor in survival.
 
