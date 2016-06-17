@@ -202,9 +202,12 @@ nt = near threatened
 cd = conservation dependent
 lc = least concern
 
-However, we can do something else to see all of the information at once.  We can use a multi-indexed Pivot Table:
+If we want to view another column of the \li{DataFrame} in the Pivot Table, we can use a multi-indexed Pivot Table.  For example, going back to the mean sleep values, we can add in the mean bodyweight for each category as follows: bodywt
 
+\begin{lstlisting}
+>>> msleep.pivot_table('sleep_total', index=['conservation','bodywt'], columns='vore')
 
+\end{lstlisting}
 
 
 
