@@ -5,7 +5,7 @@ import scipy.optimize as opt
 import numpy as np
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import axes3d
-
+from blackbox_function import blackbox
 
 # Problem 1: use scipy.optimize.minimize() with different methods and compare.
 def prob1():
@@ -36,9 +36,52 @@ def prob1():
         if info[method]['success']:
             print "Number of Iterations:", info[method]['nit'], '\n'
 
-
-# Problem 2: learn and use scipy.optimize.basinhopping()
+# Problem 2: Minizize an unknown "blackbox" function.
 def prob2():
+    """Minimize the function blackbox() in the blackbox_function module, 
+        selecting the appropriate method of scipy.optimize.minimize() for this
+        problem.  Do not pass your method a derivative. You may need to test 
+        several methods and determine which is most appropriate.
+
+        The blackbox() function returns the length of a piecewise-linear curve
+        between two fixed points: the origin, and the point (100,80). 
+        It accepts a one-dimensional ndarray} of length m of y-values, where m
+        is the number of points of the piecewise curve excluding endpoints.
+        These points are spaced evenly along the x-axis, so only the y-values 
+        of each point are passed into blackbox().
+
+        Once you have selected a method, select an initial point with the 
+        provided code.
+
+        Then plot your initial curve and minimizing curve together on the same
+        plot, including endpoints. Note that this will require padding your 
+        array of internal y-values with the y-values of the endpoints, so 
+        that you plot a total of 20 points for each curve.
+    """
+    # Set up the initial values
+    y_initial = 160*np.random.random_sample(18)
+    x = np.linspace(0,100,20)
+
+    # Plot the pre-graph
+    yplot = np.hstack((0,y_initial,80))
+    plt.plot(x,yplot, color='r')
+    plt.scatter(x, yplot, color='r')
+
+    # Minimize the blackbox() function using method="Powell".
+    # NOTE: Students may try to minimize using method="Nelder-Mead",
+    # as this also does not use a derivative. However, this does not return
+    # the optimal solution.
+    result = opt.minimize(blackbox, y_initial, tol=1e-4, method='Powell', 
+                                        options={'maxiter':1e5, 'maxfev':1e5})
+    if not result['success']:
+        raise RuntimeError("didn't converge")
+    ypost = np.hstack((0,result['x'],80))
+    plt.plot(x, ypost)
+    plt.scatter(x, ypost)
+    plt.show()
+
+# Problem 3: learn and use scipy.optimize.basinhopping()
+def prob3():
     """Explore the documentation on the function scipy.optimize.basinhopping()
     online or via IPython. Use it to find the global minimum of the multmin()
     function given in the lab, with initial point x0 = np.array([-2, -2]) and
@@ -96,8 +139,8 @@ def prob2():
     return large['fun']
 
 
-# Problem 3: learn and use scipy.optimize.root()
-def prob3():
+# Problem 4: learn and use scipy.optimize.root()
+def prob4():
     """Find the roots of the system
     [       -x + y + z     ]   [0]
     [  1 + x^3 - y^2 + z^3 ] = [0]
@@ -124,8 +167,8 @@ def prob3():
     return sol.x
 
 
-# Problem 4: learn and use scipy.optimize.curve_fit().
-def prob4():
+# Problem 5: learn and use scipy.optimize.curve_fit().
+def prob5():
     """Use the scipy.optimize.curve_fit() function to fit a curve to
     the data found in `convection.npy`. The first column of this file is R, 
     the Rayleigh number, and the second column is Nu, the Nusselt number. 
@@ -157,3 +200,5 @@ def prob4():
     return popt
 
 # END OF SOLUTIONS ========================================================== #
+
+prob2()

@@ -1,12 +1,13 @@
 # blackbox_function.py
-"""Blackbox function for use in Volume 2: Optimization Packages I (scipy.optimize)."""
+"""Blackbox function for use in 
+                    Volume 2: Optimization Packages I (scipy.optimize)."""
 
 import numpy as np
 from scipy import linalg as la
 
 def blackbox(y_free):
     """
-    Finds the length of a curve approximated piece-wise by a sequence of points.
+    Finds the length of a curve approximated piece-wise by a set of points.
     Accepts:
         y_free (1xn ndarray): the non-endpoint y-values of the curve.
 
