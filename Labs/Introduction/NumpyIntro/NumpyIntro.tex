@@ -7,7 +7,7 @@ In this lab we introduce basic NumPy data structures and operations as a first s
 
 % TODO: More detailed / compelling objective.
 % TODO: Shorten the section on data types (?)
-% TODO: More motivation on the final problem (Laplace's equation).
+% TODO: Remove Laplace's equation problem.
 % TODO: Finish the NumPy visual guide.
 
 \section*{Arrays} % ===========================================================
@@ -792,93 +792,6 @@ Divide each row of the matrix by the row sum and return the new row-stochastic m
 Use array broadcasting instead of a loop, and be careful to avoid integer division.
 \end{problem}
 
-\begin{algorithm} % Laplace's equation procedure.
-\begin{algorithmic}[1]
-\Procedure{Jacobi}{$n$, tol}
-\State $U \gets$ an $n\times n$ array of zeros.
-\State Set the boundaries of $U$.
-\State $U^\prime \gets$ a copy of $U$.
-\State diff $\gets$ tol
-\While {diff $\ge$ tol}
-    \State Set all interior points of $U^\prime$ equal to the average of their neighbors.
-    \State diff $\gets$ the maximum of the absolute value of $U - U^\prime$.
-    \State Interior of $U \gets$ interior of $U^\prime $.
-\EndWhile
-\State \pseudoli{return} $U$
-\EndProcedure
-\end{algorithmic}
-\caption{The Jacobi method for solving Laplace's equation.}
-\label{alg:jacobi}
-\end{algorithm}
-
-\begin{problem}
-Laplace's equation is used to model steady-state heat flow on a square plate.
-The plate can be approximated by a matrix, where each entry of the matrix represents the average temperature over a small square portion of the plate.
-Suppose the plate starts at $0^\circ$ Celsius everywhere except on the east and west boundaries, which are held at a constant temperature of $100^\circ$.
-In addition, the north and south boundaries are held constant at $0^\circ$.
-
-\[
-U = \left[\begin{array}{ccccc}
-\textcolor[rgb]{0.,0.,1.}0 & \textcolor[rgb]{0.,0.,1.}0 & \textcolor[rgb]{0.,0.,1.}\cdots & \textcolor[rgb]{0.,0.,1.}0 & \textcolor[rgb]{0.,0.,1.}0\\
-\textcolor[rgb]{1.,0.,0.}{100} & 0 & \cdots & 0 & \textcolor[rgb]{1.,0.,0.}{100}\\
-\textcolor[rgb]{1.,0.,0.}\vdots & \vdots & \ddots & \vdots & \textcolor[rgb]{1.,0.,0.}\vdots \\
-\textcolor[rgb]{1.,0.,0.}{100} & 0 & \cdots & 0 & \textcolor[rgb]{1.,0.,0.}{100}\\
-\textcolor[rgb]{0.,0.,1.}0 & \textcolor[rgb]{0.,0.,1.}0 & \textcolor[rgb]{0.,0.,1.}\cdots & \textcolor[rgb]{0.,0.,1.}0 & \textcolor[rgb]{0.,0.,1.}0\\
-
-\end{array}\right]
-\]
-
-The non-boundary, interior portion of the matrix (with black text) can be accessed with the slice \li{U[1:-1,1:-1]}.
-To find the steady state of the hot plate, set each entry of the interior of $U$ equal to the average of its 4 immediate neighbors (the entries above, below, and to the left and right).
-This step should take only \emph{one line} and should be based entirely on array slicing.
-
-Continue updating the interior entries of $U$ until they stop changing significantly.
-The entire procedure is summarized in Algorithm \ref{alg:jacobi}.
-
-(Hint: The slice \li{U[:-2,1:-1]} references the upper neighbors of the interior points of $U$ and \li{U[1:-1,2:]} references the right neighbors. How can you reference the lower and left neighbors?)
-
-Use the following code to visualize your results.
-% from mpl_toolkits.mplot3d import Axes 3D
-
-%     x, y = np.linspace(0, 1, n), np.linspace(0, 1, n)
-%     X, Y = np.meshgrid(x, y)
-%     fig = plt.figure()
-%     ax = fig.gca(projection='3d')
-%     ax.plot_surface(X, Y, U, rstride=5)
-%     plt.show()
-
-\begin{lstlisting}
-from matplotlib import pyplot as plt
-
-def jacobi(n=100, tol=1e-8):
-    
-    # Perform the algorithm, storing the result in the array 'U'.
-
-    # Visualize the results.
-    plt.imshow(U)
-    plt.show()
-\end{lstlisting}
-
-This Jacobi iteration is a \emph{finite difference method}, and is similar to many of the methods that we will use to find numerical solutions to differential equations in Volume IV.
-\end{problem}
-
-\begin{figure}[H]
-\centering
-\begin{subfigure}{.5\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{jacobi_small.pdf}
-    \caption{$10\times 10$ approximation.}
-\end{subfigure}%
-\begin{subfigure}{.5\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{jacobi_big.pdf}
-    \caption{$100\times 100$ approximation.}
-\end{subfigure}
-\caption{Hot plates in steady state with different resolutions.}
-\end{figure}
-
-% The module used for visualizing these results, \li{matplotlib}, will be the subject one of our next labs.
-
 \newpage % ====================================================================
 
 \section*{Additional Material} % ==============================================
@@ -985,24 +898,34 @@ The \li{np.poly1d} object represents a polynomial in NumPy.
 The constructor is called with the coefficients of the desired polynomial. 
 
 \begin{lstlisting}
->>> poly_array = np.poly1d([3, 5, 1, 2, 0, 1])
->>> print poly_array
+>>> poly = np.poly1d([3, 5, 1, 2, 0, 1])
+>>> print(poly)
    5     4     3     2
 3 x + 5 x + 1 x + 2 x + 1
 \end{lstlisting}
 
-The object \li{poly_array} represents the polynomial $3x^5+5x^4+x^3+2x^2+1$.
+The object \li{poly} represents the polynomial $3x^5+5x^4+x^3+2x^2+1$.
 NumPy provides many functions to operate on \li{poly1d} objects (see \url{http://docs.scipy.org/doc/numpy/reference/routines.polynomials.polynomial.html}).
 
-Here is an example using the \li{poly1d} class. Recall that
+Recall that
 \[
 e^x = \sum_{n=0}^{\infty} \frac{x^n}{n!}.
 \]
 The following function evaluates the $n^{th}$ partial sum of this series at the value $a$.
 
-\lstinputlisting[style=fromfile]{exp.py}
+\begin{lstlisting}
+>>> from scipy.misc import factorial
+>>> def exp(a, n = 25):
+...     """Construct an array in reverse order from n to 0."""
+...     integers = np.arange(n, -1, -1)
+...     # Use broadcasting to compute coefficients
+...     coefficients = 1. / factorial(integers)
+...     poly = np.poly1d(coefficients) # make polynomial object
+...     return poly(a)
+...
+\end{lstlisting}
 
-The last two lines can be condensed by using the following command.
+The last two lines can be condensed by using the following command:
 
 \begin{lstlisting}
 np.polyval(p, a)
@@ -1240,6 +1163,7 @@ def matrix_multiply(A, B):
 
 Write a function that times matrix multiplication with the above function, and compare it with numpy.dot().
 A random matrix $1000\times 1000$ as a list of lists can be created with
+
 \begin{lstlisting}
 a = [[random() for j in xrange(1000)] for i in xrange(1000)]
 \end{lstlisting}
@@ -1375,3 +1299,90 @@ Apart from being syntactically convenient, element-wise NumPy operations are als
 \end{lstlisting}
 \end{comment}
 
+\begin{comment} % Move to Iterative Methods vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+\begin{algorithm} % Laplace's equation procedure.
+\begin{algorithmic}[1]
+\Procedure{Jacobi}{$n$, tol}
+\State $U \gets$ an $n\times n$ array of zeros.
+\State Set the boundaries of $U$.
+\State $U^\prime \gets$ a copy of $U$.
+\State diff $\gets$ tol
+\While {diff $\ge$ tol}
+    \State Set all interior points of $U^\prime$ equal to the average of their neighbors.
+    \State diff $\gets$ the maximum of the absolute value of $U - U^\prime$.
+    \State Interior of $U \gets$ interior of $U^\prime $.
+\EndWhile
+\State \pseudoli{return} $U$
+\EndProcedure
+\end{algorithmic}
+\caption{The Jacobi method for solving Laplace's equation.}
+\label{alg:jacobi}
+\end{algorithm}
+
+\begin{problem}
+Laplace's equation is used to model steady-state heat flow on a square plate.
+The plate can be approximated by a matrix, where each entry of the matrix represents the average temperature over a small square portion of the plate.
+Suppose the plate starts at $0^\circ$ Celsius everywhere except on the east and west boundaries, which are held at a constant temperature of $100^\circ$.
+In addition, the north and south boundaries are held constant at $0^\circ$.
+
+\[
+U = \left[\begin{array}{ccccc}
+\textcolor[rgb]{0.,0.,1.}0 & \textcolor[rgb]{0.,0.,1.}0 & \textcolor[rgb]{0.,0.,1.}\cdots & \textcolor[rgb]{0.,0.,1.}0 & \textcolor[rgb]{0.,0.,1.}0\\
+\textcolor[rgb]{1.,0.,0.}{100} & 0 & \cdots & 0 & \textcolor[rgb]{1.,0.,0.}{100}\\
+\textcolor[rgb]{1.,0.,0.}\vdots & \vdots & \ddots & \vdots & \textcolor[rgb]{1.,0.,0.}\vdots \\
+\textcolor[rgb]{1.,0.,0.}{100} & 0 & \cdots & 0 & \textcolor[rgb]{1.,0.,0.}{100}\\
+\textcolor[rgb]{0.,0.,1.}0 & \textcolor[rgb]{0.,0.,1.}0 & \textcolor[rgb]{0.,0.,1.}\cdots & \textcolor[rgb]{0.,0.,1.}0 & \textcolor[rgb]{0.,0.,1.}0\\
+
+\end{array}\right]
+\]
+
+The non-boundary, interior portion of the matrix (with black text) can be accessed with the slice \li{U[1:-1,1:-1]}.
+To find the steady state of the hot plate, set each entry of the interior of $U$ equal to the average of its 4 immediate neighbors (the entries above, below, and to the left and right).
+This step should take only \emph{one line} and should be based entirely on array slicing.
+
+Continue updating the interior entries of $U$ until they stop changing significantly.
+The entire procedure is summarized in Algorithm \ref{alg:jacobi}.
+
+(Hint: The slice \li{U[:-2,1:-1]} references the upper neighbors of the interior points of $U$ and \li{U[1:-1,2:]} references the right neighbors. How can you reference the lower and left neighbors?)
+
+Use the following code to visualize your results.
+%% This does 3D visualization, but it's easier as a heat map.
+% from mpl_toolkits.mplot3d import Axes 3D
+
+%     x, y = np.linspace(0, 1, n), np.linspace(0, 1, n)
+%     X, Y = np.meshgrid(x, y)
+%     fig = plt.figure()
+%     ax = fig.gca(projection='3d')
+%     ax.plot_surface(X, Y, U, rstride=5)
+%     plt.show()
+
+\begin{lstlisting}
+from matplotlib import pyplot as plt
+
+def jacobi(n=100, tol=1e-8):
+    
+    # Perform the algorithm, storing the result in the array 'U'.
+
+    # Visualize the results.
+    plt.imshow(U)
+    plt.show()
+\end{lstlisting}
+
+This Jacobi iteration is a \emph{finite difference method}, and is similar to many of the methods that we will use to find numerical solutions to differential equations in Volume IV.
+\end{problem}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{jacobi_small.pdf}
+    \caption{$10\times 10$ approximation.}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{jacobi_big.pdf}
+    \caption{$100\times 100$ approximation.}
+\end{subfigure}
+\caption{Hot plates in steady state with different resolutions.}
+\end{figure}
+\end{comment} % Move to Iterative Methods ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
