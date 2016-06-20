@@ -25,10 +25,11 @@ The simplest way to explicitly create a 1-D \li{ndarray} is to define a list, th
 \begin{lstlisting}
 >>> import numpy as np
 # Create a 1-D array by passing a list into NumPy's array() function.
->>> np.array([8, 4, 6, 0, 4])
-array([8, 4, 6, 0, 4])
+>>> np.array([8, 4, 6, 0, 2])
+array([8, 4, 6, 0, 2])
 \end{lstlisting}
-The alias \li{np} is standard in the Python community. % Make footnote?
+%
+The alias ``\li{np}'' is standard in the Python community. % Make footnote?
 
 An \li{ndarray} can have arbitrarily many dimensions.
 A 2-D array is a 1-D array of 1-D arrays, and more generally, an $n$-dimensional array is a 1-D array of $(n-1)$-dimensional arrays.
@@ -97,15 +98,16 @@ For lists, \li{+} concatenates two lists and \li{*} replicates a list by a scala
 [1, 2, 3, 1, 2, 3, 1, 2, 3, 1, 2, 3]
 \end{lstlisting}
 
-These operations are component-wise for NumPy arrays, so that arrays behave the same way that vectors and matrices behave mathematically.
+In contrast, these operations are component-wise for NumPy arrays.
+Thus arrays behave the same way that vectors and matrices behave mathematically.
 
 \begin{lstlisting}
 >>> x = np.array([1, 2, 3])
 >>> y = np.array([4, 5, 6])
 
 # Addition or multiplication by a scalar acts on each element of the array.
->>> x + 2
-array([3, 4, 5])
+>>> x + 10
+array([11, 12, 13])
 >>> x * 4
 array([ 4,  8, 12])
 
@@ -118,8 +120,23 @@ array([5, 7, 9])
 array([ 4, 10, 18])
 \end{lstlisting}
 
-Subtraction and division are also component-wise operations for NumPy arrays.
-Apart from being syntactically convenient, NumPy arithmetic operations also execute significantly faster than component-wise list operations.
+% Subtraction and division are also component-wise operations for NumPy arrays.
+% Apart from being syntactically convenient, arithmetic operations on NumPy arrays also execute significantly faster than component-wise list operations.
+
+\begin{comment} % Probably unnecessary.
+\begin{warn} % Don't mix up * and np.dot().
+Matrix multiplication is executed via \li{np.dot()} and scalar (component-wise) multiplication is executed via the \li{*} operator.
+The equation below is an example of scalar multiplication, which uses \li{*}.
+\begin{align*}
+2 \left[\begin{array}{rrr}
+1 & 2 & 3\\
+4 & 5 & 6 \end{array}\right]
+= \left[\begin{array}{rrr}
+2 & 4 & 6\\
+8 & 10 & 12 \end{array}\right]
+\end{align*}
+\end{warn}
+\end{comment}
 
 \begin{problem} % Problem: Simple Matrix Equation 2 (Cayley Hamilton)
 Write a function that defines the following matrix as a NumPy array.
@@ -130,8 +147,9 @@ A = \left[\begin{array}{rrr}
 -5 & 3 & 1 \end{array}\right]
 \]
 Return the matrix $-A^3 + 9A^2 - 15A$.
+
 In this context, $A^2 = AA$ (the matrix product).
-The somewhat surprising result is a simple demonstration of the Cayley-Hamilton theorem.
+The somewhat surprising result is a demonstration of the Cayley-Hamilton theorem.
 \label{prob:simple2}
 \end{problem}
 
@@ -147,11 +165,10 @@ An \li{ndarray} object has several attributes, some of which are listed below.
     \li{shape} & A tuple of integers indicating the size in each dimension. \\
     \li{size} & The total number of elements in the array. \\
 \end{tabular}
-\label{table:ndarrayattrs}
 \end{table}
 
 \begin{lstlisting}
->>> A = np.array([[1, 2, 3], [4, 5, 6]])
+>>> A = np.array([[1, 2, 3],[4, 5, 6]])
 >>> A.ndim
 2
 >>> A.shape
@@ -163,6 +180,7 @@ An \li{ndarray} object has several attributes, some of which are listed below.
 Note that the \li{ndim} is the number of entries in \li{shape}, and the
 the \li{size} of the array is the product of the entries of \li{shape}.
 
+\begin{comment} % This is being severely shortened.
 \subsection*{Data Types} % ----------------------------------------------------
 
 Unlike native Python data structures, \textbf{all elements of a NumPy array must have the same data type}.
@@ -226,11 +244,11 @@ Casting a number outside of this range as an 8-bit integer can cause some unexpe
 -56
 \end{lstlisting}
 \end{warn}
+\end{comment}
 
 \subsection*{Array Creation Routines} % ---------------------------------------
 
 In addition to casting other structures as arrays via \li{np.array()}, NumPy provides efficient ways to create certain commonly-used arrays.
-Each of these functions accepts the keyword argument \li{dtype} to specify the data type.
 
 \begin{table}[H]
 \centering
@@ -240,7 +258,7 @@ Function & Returns \\
 % \li{empty()} & A new array of given shape and type, without initializing entries. \\
 % \li{empty_like()} & A new array with the same shape and type as a given array. \\
 \li{eye()} & A 2-D array with ones on the diagonal and zeros elsewhere. \\
-\li{identity()} & The square identity array. \\
+% \li{identity()} & The square identity array. \\
 \li{ones()} & A new array of given shape and type, filled with ones. \\
 \li{ones_like()} & An array of ones with the same shape and type as a given array. \\
 \li{zeros()} & A new array of given shape and type, filled with zeros. \\
@@ -250,6 +268,9 @@ Function & Returns \\
 \end{tabular}
 \label{table:numpycreate1}
 \end{table}
+
+Each of these functions accepts the keyword argument \li{dtype} to specify the data type.
+Common types include \li{np.bool_}, \li{np.int64}, \li{np.float64}, and \li{np.complex128}.
 
 \begin{lstlisting}
 # A 1-D array of 5 zeros.
@@ -268,10 +289,30 @@ array([[1, 1, 1, 1, 1],
  [ 0.  1.]]
 
 # An array of 3s the same size as 'I'.
->>> np.full_like(I, 3)              # Equivalent to np.full(I.shape, 3)
+>>> np.full_like(I, 3)              # Equivalent to np.full(I.shape, 3).
 array([[ 3.,  3.],
        [ 3.,  3.]])
 \end{lstlisting}
+
+All elements of a NumPy array must be of the same data type.
+To change an existing array's data type, use the array's \li{astype()} method.
+
+\begin{lstlisting}
+# A list of integers becomes an array of integers.
+>>> x = np.array([0, 1, 2, 3, 4])
+>>> print(x)
+[0 1 2 3 4]
+>>> x.dtype
+<<dtype('int64')>>
+
+# Change the data type to one of NumPy's float types.
+>>> x = x.astype(np.float64)
+>>> print(x)
+[ 0.  1.  2.  3.  4.]
+>>> x.dtype
+<<dtype('float64')>>
+\end{lstlisting}
+
 
 Once we have an array, we might want to extract its diagonal or get the upper or lower portion of the array.
 The following functions are very helpful for this.
