@@ -1,0 +1,148 @@
+\lab{Linear Transformations}{Linear Transformations}
+% \objective{Apply affine transformations to a set of vectors in $\mathbb{R}^2$ and solve linear systems.}
+% \objective{Introduce the temporal and spatial complexity and explore SciPy's methods for working with sparse matrices.}
+
+\section*{Numerical Linear Operations} % ======================================
+
+\subsection*{Timing Code} % ---------------------------------------------------
+
+\subsection*{Matrix-Vector Multiplication} % ----------------------------------
+
+\subsection*{Matrix-Matrix Multiplication} % ----------------------------------
+
+\subsection*{Why NumPy} % -----------------------------------------------------
+
+% The coefficient for list of lists is way bigger than it is with NumPy arrays.
+
+\begin{lstlisting}
+In [1]: import numpy as np
+In [2]: from random import random
+
+# Make two lists of 10000 random entries and corresponding NumPy arrays.
+In [3]: a = [random() for i in xrange(10000)]
+In [4]: b = [random() for i in xrange(10000)]
+In [5]: A, B = np.array(a), np.array(b)
+
+In [6]: %timeit [x + y for x,y in zip(a,b)]
+100 loops, best of 3: 2.02 milisecons per loop          # .00202 seconds.
+
+In [7]: %timeit A + B
+100000 loops, best of 3: 92.9 microseconds per loop     # .0000929 seconds.
+\end{lstlisting}
+
+Apart from being syntactically convenient, element-wise NumPy operations are also significantly faster than element-wise list operations.
+
+\begin{lstlisting}
+>>> from time import time
+>>> from random import random
+
+# Make two random lists with 10000 entries each.
+>>> a = [random() for i in xrange(10000)]
+>>> b = [random() for i in xrange(10000)]
+
+# Time the element-wise addition for lists.
+>>> start = time()
+>>> [x + y for x, y in zip(a, b))]
+>>> list_time = time() - start
+
+# Cast each list as a NumPy array.
+>>> A, B = np.array(a), np.array(b)
+
+# Time the element-wise addition for arrays.
+>>> start = time()
+>>> a + b
+>>> array_time = time() - start
+
+# Report the times.
+>>> print list_time, array_time
+0.0030951499939 0.000310897827148
+\end{lstlisting}
+
+\begin{problem} % Time matrix multiplication.
+For a $m\times n$ matrix $A$ with entries $a_{ij}$ and an $n\times l$ matrix $B$ with entries $b_{ij}$, the matrix product $C = AB$ is defined entrywise by the formula:
+\[c_{ij} = \sum_{k=1}^N a_{ik}b_{kj}\]
+
+The following function performs matrix multiplication using nested lists without using NumPy.
+
+\begin{lstlisting}
+def matrix_multiply(A, B):
+    """Calculate the matrix product AB.
+    Each parameter is a list of lists.
+    """
+    # Get the dimensions of the matrices and initialize the new 'matrix'.
+    m, n, l = len(A), len(B), len(B[0])
+    result = []
+
+    # Calculate each entry of the new matrix.
+    for i in range(m):
+        for j in range(l):
+            result.append(sum([A[i][k] * B[k][j] for k in xrange(n)]))
+    return result
+\end{lstlisting}
+
+Write a function that times matrix multiplication with the above function, and compare it with numpy.dot().
+A random matrix $1000\times 1000$ as a list of lists can be created with
+
+\begin{lstlisting}
+a = [[random() for j in xrange(1000)] for i in xrange(1000)]
+\end{lstlisting}
+
+\end{problem}
+
+Iterating through this triple \li{for} loop is very expensive.
+NumPy also uses loops, but it uses C loops instead of Python loops.
+Compare the difference between the pure Python and the NumPy ways:
+
+\begin{lstlisting}
+def arr_mult(A,B):
+    # return [[ sum([A[i][k] * B[k][j] for k in xrange(len(B))   ]) 
+    #                                  for j in xrange(len(B[0])) ]
+    #                                  for i in xrange(len(A))    ]
+    matrix = []
+    # Iterate over the rows of A.
+    for i in range(len(A)):
+        # Create a new row to insert into the product.
+        row = []
+        # Iterate over the columns of B.
+        for j in range(len(B[0])):
+            # Initialize an empty total.
+            total = 0
+            # Multiply the elements of the row of A with 
+            # the column of B and sum the products.
+            for k in range(len(B)):
+                total += A[i][k] * B[k][j]
+            # Insert the value into the new row of the product. 
+            row.append(total)
+        # Insert the new row into the product.
+        matrix.append(row)
+    return matrix
+\end{lstlisting}
+
+Table \ref{table:square_times} documents how long\footnote{You can replicate this experiment yourself. In IPython, you can find the execution time of a line of code by prefacing it with \li{\%timeit}.
+If you aren't using IPython, you will need
+to use the timeit function documented here: \url{https://docs.python.org/2/library/timeit.html}.}
+one computer took to square a $k \times k$ matrix in both Python (using the function \li{arr_mult}) and NumPy (using the method you found in Problem \ref{prob:simple1}) for various values of $k$.
+As you can see, NumPy is much faster.
+One reason for this is that algorithms in NumPy are usually implemented in C or in Fortran.
+
+\begin{table}
+ \begin{tabular}{|c|l|l|} \hline Data Structure & $k\times k$ & Time (s) \\ \hline
+ Python List    & $10\times10$  & 0.0002758503 \\
+ \cline{2-3}    & $100\times100$    & 0.1336028576 \\
+ \cline{2-3}    & $1000\times1000$ & 200.4009799957 \\
+ %& $1\times1$      & 0.0000181198 \\
+\hline \hline
+ NumPy Array    & $10\times10$  & 0.0000109673 \\
+ \cline{2-3}    & $100\times100$    & 0.0009210110 \\
+ \cline{2-3}    & $1000\times1000$ & 2.1682999134 \\
+ %& $1\times1$      & 0.0000298023 \\
+ \hline \end{tabular}
+ \caption{Time for one computer to square a $k \times k$ matrix in Python and NumPy.}
+\label{table:square_times}
+\end{table}
+%
+NumPy is optimized for fast array computations.
+
+% Note about Caching.
+
+\section*{Linear Transformations} % ===========================================

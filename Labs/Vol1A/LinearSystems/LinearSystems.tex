@@ -1,0 +1,28 @@
+\lab{Linear Transformations}{Linear Transformations}
+% \objective{Apply affine transformations to a set of vectors in $\mathbb{R}^2$ and solve linear systems.}
+% \objective{Introduce the temporal and spatial complexity and explore SciPy's methods for working with sparse matrices.}
+
+\section*{SciPy} % ============================================================
+
+SciPy is . . .
+
+\subsection*{Linear Algebra} % ------------------------------------------------
+Both NumPy and SciPy have a linear algebra library, but the SciPy library is larger.
+The SciPy linear algebra library is typically imported as follows:
+
+\begin{lstlisting}
+from scipy import linalg as la
+\end{lstlisting}
+
+The linear algebra library contains several functions to construct special
+matrices, located in \li{linalg.special_matrices}.
+There are also functions that will invert matrices, find determinants and norms, solve linear systems and least squares problems, and find special matrix decompositions.
+You can read more about the linear algebra capabilities of SciPy in the documentation for the \li{linalg} module found at \url{http://docs.scipy.org/doc/scipy/reference/linalg.html}.
+
+Finally, the \li{scipy.linalg} library has a \li{matrix} class that is very
+similar to a 2-D NumPy array.
+The matrix class can be convenient when doing matrix operations.
+However, in such situations we still recommend using NumPy arrrays, which have many of the same features and are also compatible with all other SciPy operations.
+
+The \li{scipy.linalg} library will be essential for the remainder of the labs in this manual.
+We will address the details of this package at length in future labs.
