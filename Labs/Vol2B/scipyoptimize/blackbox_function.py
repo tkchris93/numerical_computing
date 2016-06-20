@@ -1,6 +1,5 @@
 # blackbox_function.py
-"""Blackbox function for use in 
-                    Volume 2: Optimization Packages I (scipy.optimize)."""
+"""Volume 2: Optimization Packages I (scipy.optimize). Auxiliary File."""
 
 import numpy as np
 from scipy import linalg as la
@@ -14,9 +13,9 @@ def blackbox(y_free):
     Returns:
         total_length (float): the length of the approximated curve.
     """
-    # Initialize local constants
+    # Initialize local constants.
     m = len(y_free) + 2 # Number points: free variables, origin, and endpoint.
-    (a, b) = (100, 80)  # Coordinates of endpoint.
+    a, b = 40, 30       # Coordinates of endpoint.
 
     # Generate the evenly-spaced x-values of the curve.
     x = np.linspace(0,a,m)
@@ -28,5 +27,4 @@ def blackbox(y_free):
     partial_norms = []
     for i,item in enumerate(y[:-1]):
         partial_norms.append(la.norm(np.array([x[i+1]-x[i],y[i+1] - item])))
-    total_length = np.sum(partial_norms)
-    return total_length
+    return np.sum(partial_norms)

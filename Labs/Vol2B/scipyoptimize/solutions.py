@@ -44,7 +44,7 @@ def prob2():
         several methods and determine which is most appropriate.
 
         The blackbox() function returns the length of a piecewise-linear curve
-        between two fixed points: the origin, and the point (100,80). 
+        between two fixed points: the origin, and the point (40,30). 
         It accepts a one-dimensional ndarray} of length m of y-values, where m
         is the number of points of the piecewise curve excluding endpoints.
         These points are spaced evenly along the x-axis, so only the y-values 
@@ -59,25 +59,23 @@ def prob2():
         that you plot a total of 20 points for each curve.
     """
     # Set up the initial values
-    y_initial = 160*np.random.random_sample(18)
-    x = np.linspace(0,100,20)
+    y_initial = 30*np.random.random_sample(18)
+    x = np.linspace(0,40,20)
 
     # Plot the pre-graph
-    yplot = np.hstack((0,y_initial,80))
-    plt.plot(x,yplot, color='r')
-    plt.scatter(x, yplot, color='r')
+    yplot = np.hstack((0,y_initial,30))
+    plt.plot(x, yplot, '.-r', markersize=10)
 
     # Minimize the blackbox() function using method="Powell".
     # NOTE: Students may try to minimize using method="Nelder-Mead",
     # as this also does not use a derivative. However, this does not return
     # the optimal solution.
-    result = opt.minimize(blackbox, y_initial, tol=1e-4, method='Powell', 
-                                        options={'maxiter':1e5, 'maxfev':1e5})
+    result = opt.minimize(blackbox, y_initial, tol=1e-4, method='BFGS') 
+                                    # options={'maxiter':1e5, 'maxfev':1e5})
     if not result['success']:
         raise RuntimeError("didn't converge")
-    ypost = np.hstack((0,result['x'],80))
-    plt.plot(x, ypost)
-    plt.scatter(x, ypost)
+    ypost = np.hstack((0,result['x'],30))
+    plt.plot(x, ypost, '.-b', markersize=10)
     plt.show()
 
 # Problem 3: learn and use scipy.optimize.basinhopping()
@@ -199,6 +197,6 @@ def prob5():
     # Return the parameter values.
     return popt
 
-# END OF SOLUTIONS ========================================================== #
 
-prob2()
+if __name__ == '__main__':
+    prob2()

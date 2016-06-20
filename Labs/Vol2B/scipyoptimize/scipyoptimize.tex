@@ -10,7 +10,7 @@ To assist with this, the \li{scipy.optimize} package has several functions for m
 
 You can learn about all of the functions at \url{http://docs.scipy.org/doc/scipy/reference/optimize.html}.
 
-\section*{Local Minimization}
+\section*{Local Minimization} % ===============================================
 
 First we will test out a few of the minimization algorithms on the Rosenbrock function, which is defined as
 \[
@@ -72,7 +72,7 @@ We recommend access by indexing, as this is consistent with other optimization p
 The online documenation for \li{scipy.optimize.minimize()} includes other optional parameters available to users, for example, to set a tolerance of convergence. 
 While these are not required for this lab, they should be explored as needed for specific applications.
 
-\begin{problem}
+\begin{problem} % Minimize the Rosenbrock function.
 Use the \li{opt.minimize()} function to find the minimum of the Rosenbrock function.
 Test Nelder-Mead, CG, and BFGS, starting each with the initial guess \li{x_0 = np.array([4., -2.5])}.
 For each method, print whether it converged, and if so, print how many iterations it took.
@@ -91,28 +91,26 @@ Perhaps expert engineers have designed extremely robust and complicated software
 Briefly said, you simply don't want to understand it; nobody wants to understand it. 
 Fortunately, one can still optimize effectively in such situations by wisely selecting a correct algorithm.
 
-\begin{problem}
+\begin{problem} % Minimize a 'blackbox' function. TODO: rename blackbox().
 Minimize the function \li{blackbox()} in the \li{blackbox_function} module, selecting the appropriate method of \li{scipy.optimize.minimize()} for this problem.  
 Do not pass your method a derivative. 
 You may need to test several methods and determine which is most appropriate.
 
-The function \li{blackbox()} returns the length of a piecewise-linear curve between two fixed points: the origin, and the point \li{(100,80)}. 
+The function \li{blackbox()} returns the length of a piecewise-linear curve between two fixed points: the origin, and the point \li{(40,30)}.
 This function accepts a one-dimensional \li{ndarray} of length \li{m} of y-values, where \li{m} is the number of points of the piecewise curve excluding endpoints.
 These points are spaced evenly along the x-axis, so only the y-values of each point are passed into \li{blackbox()}.
 
 Once you have selected a method, select an initial point with the following code:
 
 \begin{lstlisting}
-y_initial = 160*np.random.random_sample(18)
+y_initial = 30*np.random.random_sample(18)
 \end{lstlisting}
 
 Then plot your initial curve and minimizing curve together on the same plot, including endpoints.
 Note that this will require padding your array of internal y-values with the y-values of the endpoints, so that you plot a total of 20 points for each curve.
 \end{problem}
 
-
-
-\section*{Global Minimization via Basin Hopping}
+\section*{Global Minimization via Basin Hopping} % ============================
 
 In the realm of optimization, convex functions are the most well-behaved, as any local minimum is a global minimum.
 However, in practice one must frequently deal with non-convex functions, and sometimes we need pick the global minimum out of many local minima.
@@ -176,7 +174,7 @@ It then searches for the minimum from this new starting point, and if it finds a
 
 \emph{Only Scipy Version 0.12+ has \li{opt.basinhopping}. In earlier versions, such as 0.11, you won't find it.}
 
-\begin{problem}
+\begin{problem} % Basinhopping
 Explore the documentation for the \li{opt.basinhopping()} function online or via IPython, and use it to find the global minimum of our \li{multimin()} function with \li{x0 = np.array([-2, -2])}.
 Call it using the same \li{Nelder-Mead} algorithm with \li{opt.basinhopping(multimin, x0, stepsize=0.5, minimizer_kwargs=\{'method':'nelder-mead'\})}.
 Try it first with \li{stepsize=0.5} and then with \li{stepsize=0.2}. 
@@ -201,7 +199,7 @@ Why doesn't the alogrithm find the global minimum with \li{stepsize=0.2}?
 Print your answer to this question, and return the true global minimum.
 \end{problem}
 
-\section*{Root Finding}
+\section*{Root Finding} % =====================================================
 
 The \li{optimize} package also has functions useful in root-finding.
 The next example, taken from the online documentation, solves the following nonlinear system of equations using \li{opt.root}.
@@ -250,13 +248,11 @@ Find the roots of the system
 Return the values of $x,y,z$ as an array.
 \end{problem}
 
-
-
 As with \li{opt.minimize()}, \li{opt.root()} has more than one algorithm for root finding.
 Here we have used the \li{hybr} method. 
 There are also several algorithms for scalar root finding. See the online documentation for more.
 
-\section*{Curve Fitting}
+\section*{Curve Fitting} % ====================================================
 
 %we still have curve fitting
 %least squares programming -- but it seems that it's already been done in Volume One
@@ -290,8 +286,8 @@ See Figure \ref{opt:curve_fit} for a plot of the data and the fitted curve.
 \label{opt:curve_fit}
 \end{figure}
 
-\begin{problem}
-Use the \li{opt.curve_fit} function to fit a curve to data obtained from numerical simulations of convection.
+\begin{problem} % Convection curve fitting.
+Use \li{opt.curve_fit()} to fit a curve to data obtained from numerical simulations of convection.
 The data are in the file \li{convection.npy}. 
 The first column is $R$, the Rayleigh number, and the second column is $\nu$, the Nusselt number.
 The relevant convection equation is:
