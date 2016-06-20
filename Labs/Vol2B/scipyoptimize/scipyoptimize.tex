@@ -27,9 +27,7 @@ The Rosenbrock function is included in the optimize package (as \li{rosen}), as 
 \label{opt:rosenbrock}
 \end{figure}
 
-We will use the \li{minimize()} function and test each of its algorithms (specified by the keyword argument ``method" -- see the documentation page for \li{minimize()}).
-Note that there are also several functions such as \li{fmin} and \li{fmin_powell}. These are equivalent to using the \li{minimize()} function with the specified method.
-
+We will use the \li{minimize()} function and test some of its algorithms (specified by the keyword argument ``method" -- see the documentation page for \li{minimize()}).
 For each algorithm, you need to pass in a callable function object for the Rosenbrock function, as well as a NumPy array giving the initial guess.
 For some algorithms, you will additionally need to pass in the jacobian or hessian.
 You may recognize some of these algorithms, and several of them will be discussed in greater detail later. For this lab, you do not need to understand how they work, just
@@ -83,6 +81,9 @@ Note that the hessian argument is not needed for these paticular methods.
 \end{problem}
 
 Each of these three algorithms will be explored in great detail later in Volume 2: Nelder-Mead is a variation of the Simplex algorithm, CG is a variant of the Conjugate Gradient algorithm, and BFGS is a quasi-Newton method developed by Broyden, Fletcher, Goldfarb, and Shanno.
+
+The \li{minimize()} function can use various algorithms, each of which is best for certain problems.  
+Which algorithm one uses depends on the specific nature of one's problem. 
 
 It is also important to note that in many optimization applications, very little is known about the function to optimize. 
 For example, one may be asked in the airline industry to analyze and optimize certain properties involving a segment of airplane wing. 
