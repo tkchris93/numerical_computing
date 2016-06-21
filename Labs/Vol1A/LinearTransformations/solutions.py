@@ -4,9 +4,11 @@
 import time
 import timeit
 import numpy as np
+from random import random
 from matplotlib import pyplot as plt
 
 # Helper Functions ============================================================
+
 def matrix_multiplication(A, B):
     """Compute the matrix product AB, where each input is a list of lists."""
     if type(B[0]) is list:          # matrix-matrix multiplication.
@@ -42,9 +44,102 @@ def plotOldNew(old, new):
 
 # Examples ====================================================================
 
+def time_addition():
+    domain = 2**np.arange(24)
+    times = []
+    for n in domain:
+        x, y = [random() for i in xrange(n)], [random() for i in xrange(n)]
+        start = time.time()
+        [a + b for a, b in zip(x,y)]
+        times.append(time.time() - start)
 
+    plt.plot(domain, times, lw=2)
+    plt.show()
 
 # Solutions ===================================================================
+
+def prob1(N=8):
+    
+    domain = 2**np.arange(1,N)
+    vec, mat = [], []
+    
+    for n in domain:
+        A = [[random() for j in xrange(n)] for i in xrange(n)]
+        B = [[random() for j in xrange(n)] for i in xrange(n)]
+        x = [random() for i in xrange(n)]
+
+        start = time.time()
+        [sum([A[i][k] * x[k] for k in range(n)]) for i in range(n)]
+        vec.append(time.time() - start)
+
+        start = time.time()
+        [[sum([A[i][k] * B[k][j] for k in range(n)])
+                                 for j in range(n)]
+                                 for i in range(n)]
+        mat.append(time.time() - start)        
+
+    plt.subplot(121)
+    plt.plot(domain, vec, '.-b', lw=2)
+    plt.ylabel("Seconds")
+
+    plt.subplot(122)
+    plt.plot(domain, mat, '.-g', lw=2)
+
+    plt.show()
+
+
+def prob2(N=8):
+
+    domain = 2**np.arange(1,N)
+    vec, mat, npvec, npmat = [], [], [], []
+
+    for n in domain:
+        A = [[random() for j in xrange(n)] for i in xrange(n)]
+        B = [[random() for j in xrange(n)] for i in xrange(n)]
+        x = [random() for i in xrange(n)]
+
+        # Time list of lists operations.
+        start = time.time()
+        [sum([A[i][k] * x[k] for k in range(n)]) for i in range(n)]
+        vec.append(time.time() - start)
+
+        start = time.time()
+        [[sum([A[i][k] * B[k][j] for k in range(n)])
+                                 for j in range(n)]
+                                 for i in range(n)]
+        mat.append(time.time() - start)
+
+        # Time NumPy operations.
+        A, B, x = np.array(A), np.array(B), np.array(x)
+        start = time.time()
+        A.dot(x)
+        npvec.append(time.time() - start)
+
+        start = time.time()
+        A.dot(B)
+        npmat.append(time.time() - start)
+
+    plt.subplot(121)
+    plt.plot(domain, vec, '.-', lw=2, label="Matrix-Vector with Lists")
+    plt.plot(domain, mat, '.-', lw=2, label="Matrix-Matrix with Lists")
+    plt.plot(domain, npvec, '.-', lw=2, label="Matrix-Vector with NumPy")
+    plt.plot(domain, npmat, '.-', lw=2, label="Matrix-Matrix with NumPy")
+    plt.xlabel("n"); plt.ylabel("Seconds")
+    plt.legend(loc="upper left")
+
+    plt.subplot(122)
+    plt.loglog(domain, vec, '.-', lw=2, basex=2, basey=2,
+                                            label="Matrix-Vector with Lists")
+    plt.loglog(domain, mat, '.-', lw=2, basex=2, basey=2,
+                                            label="Matrix-Matrix with Lists")
+    plt.loglog(domain, npvec, '.-', lw=2, basex=2, basey=2,
+                                            label="Matrix-Vector with NumPy")
+    plt.loglog(domain, npmat, '.-', lw=2, basex=2, basey=2,
+                                            label="Matrix-Matrix with NumPy")
+    plt.xlabel("n")
+    plt.legend(loc="upper left")
+    plt.show()
+
 
 def dilate(A, x_factor, y_factor):
     """Scale the points in A by x_factor in the x direction and y_factor in
@@ -115,4 +210,8 @@ def rotatingParticle(time, omega, direction, speed):
     plt.plot(posP1_x, posP1_y)
     plt.gca().set_aspect('equal')
     plt.show()
+
+if __name__ == '__main__':
+    prob1(10)
+    prob2(10)
 

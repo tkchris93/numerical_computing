@@ -2,8 +2,62 @@ import matplotlib
 matplotlib.rcParams = matplotlib.rc_params_from_file('../../../matplotlibrc')
 
 from matplotlib import pyplot as plt
-import solutions
+from random import random
+from time import time
 import numpy as np
+import solutions
+
+def matrix_multiplication_figures(N=10):
+    
+    domain = 2**np.arange(N)
+    vec, mat = [], []
+    
+    for n in domain:
+        A = [[random() for j in xrange(n)] for i in xrange(n)]
+        B = [[random() for j in xrange(n)] for i in xrange(n)]
+        x = [random() for i in xrange(n)]
+
+        start = time()
+        [sum([A[i][k] * x[k] for k in range(n)]) for i in range(n)]
+        vec.append(time() - start)
+
+        start = time()
+        [[sum([A[i][k] * B[k][j] for k in range(n)])
+                                 for j in range(n)]
+                                 for i in range(n)]
+        mat.append(time() - start)        
+
+    # First Figure: Matrix-Vector and Matrix-Matrix by themselves in subplots.
+    plt.subplot(121)
+    plt.plot(domain, vec, '.-b', lw=2)
+    plt.xlabel("n"); plt.ylabel("Seconds")
+    plt.title("Matrix-Vector Multiplication")
+
+    plt.subplot(122)
+    plt.plot(domain, mat, '.-g', lw=2)
+    plt.xlabel("n")
+    plt.title("Matrix-Matrix Multiplication")
+
+    plt.savefig("matrixmultiplication1.pdf", format="pdf")
+    plt.clf()
+    plt.close("all")
+
+    # Second Figure: Matrix-Vector and Matrix-Matrix overlaid w/ diff scales.
+    plt.subplot(121)
+    plt.plot(domain, vec, '.-b', lw=2, label="Matrix-Vector")
+    plt.plot(domain, mat, '.-g', lw=2, label="Matrix-Matrix")
+    plt.xlabel("n"); plt.ylabel("Seconds")
+    plt.legend(loc="upper left")
+
+    plt.subplot(122)
+    plt.loglog(domain, vec, '.-b', basex=2,basey=2,lw=2, label="Matrix-Vector")
+    plt.loglog(domain, mat, '.-g', basex=2,basey=2,lw=2, label="Matrix-Matrix")
+    plt.xlabel("n")
+    plt.legend(loc="upper left")
+    
+    plt.savefig("matrixmultiplication2.pdf", format="pdf")
+    plt.clf()
+    plt.close("all")
 
 horse = np.load("horse.npy")[:,::10]
 
@@ -90,9 +144,10 @@ def trajectory():
 
 
 if __name__ == "__main__":
-    stretch()
-    rotate()
-    shear()
-    reflect()
-    translate()
-    combo()
+    matrix_multiplication_figures(10)
+    # stretch()
+    # rotate()
+    # shear()
+    # reflect()
+    # translate()
+    # combo()
