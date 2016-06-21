@@ -16,7 +16,7 @@ def blackbox(y_free):
     """
     # Initialize local constants
     m = len(y_free) + 2 # Number points: free variables, origin, and endpoint.
-    (a, b) = (100, 80)  # Coordinates of endpoint.
+    (a, b) = (40,30)  # Coordinates of endpoint.
 
     # Generate the evenly-spaced x-values of the curve.
     x = np.linspace(0,a,m)
