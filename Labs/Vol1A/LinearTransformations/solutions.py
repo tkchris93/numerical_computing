@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 
 # Helper Functions ============================================================
 
-def matrix_multiplication(A, B):
+def matrix_multiplication(A, B): # ?
     """Compute the matrix product AB, where each input is a list of lists."""
     if type(B[0]) is list:          # matrix-matrix multiplication.
         m, n, l = len(A), len(B), len(B[0])

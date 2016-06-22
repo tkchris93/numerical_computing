@@ -1,66 +1,170 @@
 \lab{Linear Transformations}{Linear Transformations}
+\objective{One of the most important questions in scientific computing is ``How long will a computer take to execute this algorithm?'' In this lab we explore why NumPy is a good option for performing numerical linear algebra.
+Linear transformations are the most basic and essential operations in vector space theory; we visually explore how linear transformations alter points in $\mathbb{R}^2$.
+}
 % \objective{Apply affine transformations to a set of vectors in $\mathbb{R}^2$.}
 % \objective{Introduce the temporal and spatial complexity and explore SciPy's methods for working with sparse matrices.}
 
-\section*{Numerical Linear Operations} % ======================================
+\section*{Matrix Operations} % ================================================
 
 \subsection*{Timing Code} % ---------------------------------------------------
 
-The \li{time} module includes functions that access for dealing with time.
-This is useful for precisely measuring how long it takes for code to run.
-The \li{time()} function in the \li{time} module measures the number of seconds from a fixed starting point, the ``Epoch.''
-For most machines, this starting point will be January 1, 1970.
+The \li{time} module in the standard library include functions for dealing with time.
+The module's \li{time()} function measures the number of seconds from a fixed starting point, called ``the Epoch'' (January 1, 1970 for Unix machines).
 
 \begin{lstlisting}
 >>> import time
-
 >>> time.time()
-1436832057.321525
+1466609325.819298
 \end{lstlisting}
 
-In order to measure how long it takes to execute some Python code, record the time just before and just after the code in question.
-Subtracting the first measurement from the second gives the amount of time in seconds that have passed.
+The \li{time()} function\footnote{The \li{clock()} function is similar to \li{time()}, but it records more precision on Windows machines.} is useful for measuring how long it takes for code to run: record the time just before and just after the code in question, then subtract the first measurement from the second to get the number of seconds that have passed.
 
 \begin{lstlisting}
-# Time how long it takes to go through 10000 iterations using 'range'.
->>> def time_for_loop():
+>>> def time_for_loop(iters):
+...     """Time how long it takes to go through 'iters' iterations of nothing."""
 ...     start = time.time()         # Clock the starting time.
-...     for i in range(10000):      # Perform the operation.
+...     for _ in range(int(iters)):
 ...         pass
 ...     end = time.time()           # Clock the ending time.
 ...     return end - start          # Report the difference.
+...
+>>> time_for_loop(1e5)              # 1e5 = 100000.
+0.007936954498291016
+>>> time_for_loop(1e7)              # 1e7 = 10000000.
+0.8008430004119873
 \end{lstlisting}
 
-The standard library also has a module called \li{timeit}.
-This library is built specifically to time Python code and has more sophisticated tools than the \li{time} module.
-In IPython, \li{timeit} can be used like a built-in function any time with the \li{\%timeit} command.
+The standard library's \li{timeit} module is built specifically to time code and has more sophisticated tools than the \li{time} module.
+The \li{timeit()} function accepts a function handle (the name of a function) and the number of times to run it.
 
 \begin{lstlisting}
-# Time how long it takes to go through 10000 iterations using 'xrange'.
-In [0]: %timeit for i in xrange(10000): pass 
-1000 loops, best of 3: 303 µs per loop
+>>> def for_loop():
+...     """Go though 1e7 iterations of nothing."""
+...     for _ in range(int(1e7)):
+...         pass
+...
+>>> timeit.timeit(for_loop, number=5) / 5.
+0.7928117752075196
 \end{lstlisting}
 
-\begin{comment} % Old problem. Can this be rehashed somehow?
-\begin{problem}
-Download \texttt{matrix\_multiply.py} and \texttt{matrices.npz}.
-The Python file \texttt{matrix\_multiply.py} is a module that has three functions for multiplying two matrices together, called \li{method1()}, \li{method2()}, and \li{method3()}.
-It also has a \li{load\_matrices()} function that returns two matrices from \texttt{matrices.npz}.
+In IPython, \li{timeit.timeit()} can be used like a built-in function with \li{\%timeit}.
 
-Modify your solutions file so that when it is run from a Python interpreter (but not when it is imported), the following is executed:
-\begin{enumerate}
-\item If no command line arguments are given, print ``No Input."
-\item If anything other than ``matrices.npz'' is given, print ``Incorrect Input."
-\item If ``matrices.npz'' is given as a command line argument, load two matrices from \texttt{matrices.npz}. Time (separately) how long each method takes to multiply the two matrices together, then print the results.
+\begin{lstlisting}
+# Time how long it takes to go through 1e7 iterations of nothing.
+In [24]: %timeit for i in range(int(1e7)): pass
+1 loop, best of 3: 768 ms per loop
+\end{lstlisting}
 
-(Hint: Read the code in \texttt{matrix\_multiply.py}, especially the function docstrings, to determine how to use each function.)
-\end{enumerate}
+\subsection*{Timing Algorithms} % ---------------------------------------------
+
+Most algorithms have at least one input that dictates the size of the problem to be solved.
+For example, the following functions take in a single integer $n$ and produce a random vector of length $n$ as a list and random $n\times n$ matrix as a list of lists:
+
+\begin{lstlisting}
+from random import random
+
+def random_vector(n):
+    """Generate a random vector of length n as a list."""
+    return [random() for i in xrange(n)]
+
+def random_matrix(n):
+    """Generate a random nxn matrix as a list of lists."""
+    return [[random() for j in xrange(n)] for i in xrange(n)]
+\end{lstlisting}
+
+As $n$ increases, how does the time it takes to execute these functions increase?
+To capture the real scale of what's going on, we time \li{random_matrix()} with inputs that are a multiple of 2 ($n = 2,\ 4,\ 8,\ \ldots$).
+The result is displayed below.
+
+\begin{lstlisting}
+>>> from matplotlib import pyplot as plt
+
+>>> domain = 2**np.arange(1,12)
+>>> times = []
+>>> for n in domain:
+...     start = time.time()
+...     random_matrix(n)
+...     times.append(time.time() - start)
+...
+>>> plt.plot(domain, times, 'g', linewidth=2)
+>>> plt.xlabel("n")
+>>> plt.ylabel("Seconds")
+>>> plt.title("random_matrix() times")
+>>> plt.show()
+\end{lstlisting}
+
+% Figure here.
+
+\begin{problem} % Time Matrix Multiplication.
+Let $A$ be an $m \times n$ matrix with entries $a_{ij}$, $\x$ be an $n \times 1$ vector with entries $x_k$, and $B$ be an $n \times p$ matrix with entries $b_{ij}$.
+%
+\begin{align*}
+A = \left[\begin{array}{cccc}
+a_{11} & a_{12} & \cdots & a_{1n} \\
+a_{21} & a_{22} & \cdots & a_{2n} \\
+\vdots & \vdots & \ddots & \vdots \\
+a_{m1} & a_{m2} & \cdots & a_{mn}
+\end{array}\right]
+&&
+\x = \left[\begin{array}{c}
+x_1 \\ x_2 \\ \vdots \\ x_n
+\end{array}\right]
+&&
+B = \left[\begin{array}{cccc}
+b_{11} & b_{12} & \cdots & b_{1p} \\
+b_{21} & b_{22} & \cdots & b_{2p} \\
+\vdots & \vdots & \ddots & \vdots \\
+b_{n1} & b_{n2} & \cdots & b_{np}
+\end{array}\right]
+\end{align*}
+
+The matrix-vector product $A\x = \y$ is a new $m \times 1$ vector and the matrix-matrix product $AB = C$ is a new $m \times p$ matrix.
+The entries $y_i$ of $\y$ and $c_{ij}$ of $C$ are determined by the following formulas:
+%
+\begin{align*}
+y_i = \sum_{k=1}^n a_{ik}x_k%,\qquad i = 1,\ 2,\ \ldots,\ m.
+&&
+c_{ij} = \sum_{k=1}^n a_{ik}b_{kj}%,\quad i = 1,\, 2,\, \ldots,\ m, \quad j = 1,\, 2\, \ldots,\ l.
+\end{align*}
+
+By representing vectors as lists and matrices as a lists of lists (where each inner list is a row of the matrix), we can implement matrix-vector and matrix-matrix multiplication from scratch without using NumPy.
+
+\begin{lstlisting}
+def matrix_vector_multiplication(A, x):
+    """Compute the matrix-vector product Ax (as a list).
+    
+    Inputs:
+        A (list of lists): an mxn matrix.
+        x (list): an nx1 vector.
+    """
+    m, n = len(A), len(x)
+    return [sum([A[i][k] * B[k] for k in range(n)]) for i in range(m)]
+
+def matrix_matrix_multiplication(A, B):
+    """Compute the matrix-matrix product AB (as a list of lists).
+    
+    Inputs:
+        A (list of lists): an mxn matrix.
+        B (list of lists): an nxp matrix.
+    """
+    m, n, p = len(A), len(B), len(B[0])
+    return [[sum([A[i][k] * B[k][j] for k in range(n)])
+                                    for j in range(p) ]
+                                    for i in range(m) ]
+\end{lstlisting}
+
+Time each of these functions with increasingly-sized inputs.
+Generate the inputs with \li{random_vector()} and \li{random_matrix()} (so each input will be $n \times n$ or $n \times 1$).
+Report your findings in a single figure with two subplots: one with matrix-vector times, and one with matrix-matrix times.
+
+% Put a figure here.
+
 \end{problem}
-\end{comment}
 
-\subsection*{Matrix-Vector Multiplication} % ----------------------------------
 
-\subsection*{Matrix-Matrix Multiplication} % ----------------------------------
+
+\subsection*{Scaling Plots} % -------------------------------------------------
 
 \subsection*{Why NumPy} % -----------------------------------------------------
 
@@ -76,7 +180,7 @@ In [4]: b = [random() for i in xrange(10000)]
 In [5]: A, B = np.array(a), np.array(b)
 
 In [6]: %timeit [x + y for x,y in zip(a,b)]
-100 loops, best of 3: 2.02 milisecons per loop          # .00202 seconds.
+100 loops, best of 3: 2.02 miliseconds per loop         # .00202 seconds.
 
 In [7]: %timeit A + B
 100000 loops, best of 3: 92.9 microseconds per loop     # .0000929 seconds.
@@ -110,17 +214,32 @@ Apart from being syntactically convenient, element-wise NumPy operations are als
 0.0030951499939 0.000310897827148
 \end{lstlisting}
 
+\begin{comment} % Old problem. Can this be rehashed somehow?
+\begin{problem}
+Download \texttt{matrix\_multiply.py} and \texttt{matrices.npz}.
+The Python file \texttt{matrix\_multiply.py} is a module that has three functions for multiplying two matrices together, called \li{method1()}, \li{method2()}, and \li{method3()}.
+It also has a \li{load\_matrices()} function that returns two matrices from \texttt{matrices.npz}.
+
+Modify your solutions file so that when it is run from a Python interpreter (but not when it is imported), the following is executed:
+\begin{enumerate}
+\item If no command line arguments are given, print ``No Input."
+\item If anything other than ``matrices.npz'' is given, print ``Incorrect Input."
+\item If ``matrices.npz'' is given as a command line argument, load two matrices from \texttt{matrices.npz}. Time (separately) how long each method takes to multiply the two matrices together, then print the results.
+
+(Hint: Read the code in \texttt{matrix\_multiply.py}, especially the function docstrings, to determine how to use each function.)
+\end{enumerate}
+\end{problem}
+\end{comment}
+
 \begin{problem} % Time matrix multiplication.
-For a $m\times n$ matrix $A$ with entries $a_{ij}$ and an $n\times l$ matrix $B$ with entries $b_{ij}$, the matrix product $C = AB$ is defined entrywise by the formula:
+For a $m\times n$ matrix $A$ with entries $a_{ij}$ and an $n\times l$ matrix $B$ with entries $b_{ij}$, the matrix product $C = AB$ is defined entry-wise by the formula:
 \[c_{ij} = \sum_{k=1}^N a_{ik}b_{kj}\]
 
 The following function performs matrix multiplication using nested lists without using NumPy.
 
 \begin{lstlisting}
 def matrix_multiply(A, B):
-    """Calculate the matrix product AB.
-    Each parameter is a list of lists.
-    """
+    """Calculate the matrix product AB. Each parameter is a list of lists."""
     # Get the dimensions of the matrices and initialize the new 'matrix'.
     m, n, l = len(A), len(B), len(B[0])
     result = []
@@ -132,7 +251,7 @@ def matrix_multiply(A, B):
     return result
 \end{lstlisting}
 
-Write a function that times matrix multiplication with the above function, and compare it with numpy.dot().
+Write a function that times matrix multiplication with the above function, and compare it with \li{np.dot()}.
 A random matrix $1000\times 1000$ as a list of lists can be created with
 
 \begin{lstlisting}
@@ -141,7 +260,7 @@ a = [[random() for j in xrange(1000)] for i in xrange(1000)]
 
 \end{problem}
 
-Iterating through this triple \li{for} loop is very expensive.
+Iterating through this triple for loop is very expensive.
 NumPy also uses loops, but it uses C loops instead of Python loops.
 Compare the difference between the pure Python and the NumPy ways:
 
