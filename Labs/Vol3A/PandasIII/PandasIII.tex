@@ -1,5 +1,5 @@
-\lab{Pandas III: Pivot Tables}{Pandas III: Pivot Tables}
-\objective{Learn about Pivot tables.}
+\lab{Pandas III: Grouping and Presenting Data}{Pandas III: Grouping and Presenting Data}
+\objective{Learn about Pivot tables, groupby, etc.}
 \label{lab:pandas3}
 
 MAJOR REVISIONS IN PROGRESS!!!!!!!!!!!!!!
@@ -164,10 +164,10 @@ Both hexbins reveal a linearity between diamond weight and diamond price, with D
 
 \end{problem}
 
-\li{Groupby} is a very useful method to order data.  However, it is not the perfect tool for every method.  As we saw when sorting data by multiple columns, we can end up with a useful grouping, but too much information to display.  If we want to see information in table format, we can make use Pivot Tables.
+\li{Groupby} is a very useful method to order data.  However, it is not the perfect tool for every situation.  As we saw when sorting data by multiple columns, we can end up with a useful grouping, but too much information to display.  If we want to see information in table format, we can make use Pivot Tables.
 
 \section*{Pivot Tables}
-With a given pandas \li{DataFrame}, we can visualize data easily with the function \li{pivot_table()}. The Titanic dataset (\li{titanic.csv}) is especially apt for this.  It includes many columns, but we will use only those entitled "Survived", "Pclass", "Sex", "Age", and "Fare" here.  Once this has been loaded in, we can make Pivot Tables to view trends in the data.
+With a given pandas \li{DataFrame}, we can visualize data easily with the function \li{pivot_table()}. The Titanic dataset (\li{titanic.csv}) is especially apt for this.  It includes many columns, but we will use only those entitled``Survived", ``Pclass", ``Sex", ``Age", and ``Fare" here.  Once this has been loaded in, we can make Pivot Tables to view trends in the data.
 
 \begin{lstlisting}
 >>> titanic.pivot_table('Survived', index='Sex', columns='Pclass')
