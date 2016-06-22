@@ -167,49 +167,59 @@ Both hexbins reveal a linearity between diamond weight and diamond price, with D
 \li{Groupby} is a very useful method to order data.  However, it is not the perfect tool for every situation.  As we saw when sorting data by multiple columns, we can end up with a useful grouping, but too much information to display.  If we want to see information in table format, we can make use Pivot Tables.
 
 \section*{Pivot Tables}
-With a given pandas \li{DataFrame}, we can visualize data easily with the function \li{pivot_table()}. The Titanic dataset (\li{titanic.csv}) is especially apt for this.  It includes many columns, but we will use only those entitled``Survived", ``Pclass", ``Sex", ``Age", and ``Fare" here.  Once this has been loaded in, we can make Pivot Tables to view trends in the data.
+With a given pandas \li{DataFrame}, we can visualize data easily with the method \li{pivot_table()}. The Titanic dataset (\li{titanic.csv}) is especially apt for this.  It includes many columns, but we will use only \li{Survived}, \li{Pclass}, \li{Sex}, \li{Age}, and \li{Fare} here.  You will need to load in this dataset for upcoming problems, using principles taught in Lab \ref{lab:pandas1}. Note that many of the ages are missing values.  For our purposes, simply fill these missing values with the average age.  Then drop any rows that are missing data. Once we have a usable dataset, we can make Pivot Tables to view trends in the data.
 
 \begin{lstlisting}
 >>> titanic.pivot_table('Survived', index='Sex', columns='Pclass')
+Pclass         1         2         3
+Sex                                 
+female  0.962406  0.893204  0.473684
+male    0.350993  0.145570  0.169540
 \end{lstlisting}
 
-Here ``value'' is the category (or column in the original datset) we want to compare, ``index'' will be the category for the row of our pivot table, and ``columns'' is the category to organize as the columns for our pivot table.
+This simple command makes a table with rows \li{Sex} and columns \li{Pclass}, and averages the result of the column \li{Survived}, thereby giving the percentage of survivors in each grouping.  Note that this is similar to \li{groupby}: it sorts all entries into their gender and class, and the ``function" it performs is getting the percentage of survivors.
 
-Let's say we want to further break down the survival rates to compare how different ages fared in the voyage, according to their gender and class. We could be asking ourselves the question, ``What about the children? Were male children really that likely to die as compared to female children?''. As you will see with pivot tables, as we see these simple breakdowns of the data, more questions can, and should arise. You should consistently ask yourself questions about the relevance of the numbers you see in the pivot tables you create. So let's look at how age was a factor in survival.
+Add in multi-indexing.
 
-Noting that in the original dataset, the `age' column has an integer value for the age of each passenger, if we were to just add `age' as an argument for index, then the table would create a new row for EACH age present. This wouldn't be a very useful or simple table to visualize, so we desire to partition the ages into 3 categories. We use the function \li{cut()} to do this.
+This is interesting, and we can clearly see how much more likely females were to survive than males.  But how does age factor into survival rates? Were male children really that likely to die as compared to female children?.
+
+Noting that in the original dataset, the column \li{Age} has a floating point value for the age of each passenger. If we were to just add `age' as an argument for index, then the table would create a new row for \emph{each} age present. This wouldn't be a very useful or simple table to visualize, so we desire to partition the ages into 3 categories. We use the function \li{cut()} to do this.
 
 \begin{lstlisting}
 >>> # Partition each of the passengers into 3 categories based on their age
->>> age = pd.cut(titanic['age'], [0,12,18,80])
+>>> age = pd.cut(titanic['Age'], [0,12,18,80])
 \end{lstlisting}
 
-Now with this other partition of the column age, we can add this dimension to our pivot table, passing it along with `sex' in a list to the parameter index.
+Now with this other partition of the column age, we can add this dimension to our pivot table, passing it along with \li{Sex} in a list to the parameter index.
 
 \begin{lstlisting}
 >>> # Add a third dimension, age, to our pivot table
->>> titanic.pivot_table('survived', index =['sex', age], columns='class')
+>>> titanic.pivot_table('Survived', index =['Sex', age], columns='Pclass')
+Pclass                  1         2         3
+Sex    Age                                   
+female (0, 12]   0.000000  1.000000  0.466667
+       (12, 18]  1.000000  0.875000  0.607143
+       (18, 80]  0.966667  0.878049  0.436170
+male   (0, 12]   1.000000  1.000000  0.342857
+       (12, 18]  0.500000  0.000000  0.081081
+       (18, 80]  0.328671  0.087591  0.159420
 \end{lstlisting}
 
-Add table
-%\begin{figure}
-%    \centering
-%    \includegraphics[width=.75\textwidth]{piv_gend_class_age.pdf}
-%\end{figure}
-
-What do we notice? First of all, male children (ages 0 to 12) in 1st and 2nd class were very likely to survive, whereas those in 3rd class did not. However, look at the female children in first class. 0 percent of them survived? This might seem a little odd, but if we looked at our data set again to see how many passengers fell into this category of female, 1st class, and age 0 to 12, we would find only 1 passenger. Therefore, the statistic that 0\% of female children in first class died is misleading. We can visualize this by specifying the parameter aggfunc=`count'.
+What do we notice? First of all, male children (ages 0 to 12) in the 1st and 2nd class were very likely to survive, whereas those in 3rd class were much less likely to. However, look at the female children in first class. It says that zero percent survived. This might seem a little odd, but if we looked at our data set again to see how many passengers fell into this category of female, 1st class, and age 0 to 12, we would find only one passenger. Therefore, the statistic that 0\% of female children in first class lived is misleading. We can see the number of people in each category by simply specifying the parameter aggfunc=`count'.
 
 \begin{lstlisting}
->>> titanic.pivot_table('survived', columns='sex', index=['class',age], aggfunc='count')
+>>> titanic.pivot_table('Survived', index=['Sex',age], columns='Pclass', aggfunc='count')
+Pclass             1    2    3
+Sex    Age                    
+female (0, 12]     1   13   30
+       (12, 18]   12    8   28
+       (18, 80]  120   82   94
+male   (0, 12]     4   11   35
+       (12, 18]    4   10   37
+       (18, 80]  143  137  276
 \end{lstlisting}
 
-Add table
-%\begin{figure}
-%    \centering
-%    \includegraphics[width=.75\textwidth]{piv_gca_count.pdf}
-%\end{figure}
-
-The parameter aggfunc defaults to `mean', which is why we have seen the mean survival rate for each of the different categories. By specifying aggfunc to be `count', we get how many passengers of each category are present in the table. In this case, specifying the value is `survived' is redundant.
+The parameter aggfunc defaults to `mean', which is why we have seen the mean survival rate for each of the different categories. By specifying aggfunc to be `count', we get how many passengers of each category are present in the table. In this case, specifying the value is `survived' is redundant. We get the same table if we put in \li{Fare} in place of li{Survived}.
 
 This brings up another point about these datasets. We note for this dataset, we have roughly 800 passengers' data. This is not that large of a data set relatively, and we aren't guaranteed significant sample sizes for each possible partitioning of the the data columns. This is important to keep in mind with any dataset, and you should always ask questions about the numbers you see in pivot tables before making any conclusions.
 
