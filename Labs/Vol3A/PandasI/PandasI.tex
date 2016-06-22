@@ -395,6 +395,7 @@ Math_Major    5 non-null object
 dtypes: float64(1), int64(1), object(1)
 \end{lstlisting}
 
+The method \li{isin()} is a useful way to find certain values in a \li{DataFrame}.  It compares the input (a list, dictionary, or \li{DataFrame}) to the \li{DataFrame} and returns a boolean \li{DataFrame} showing whether or not the values match. You can then use this boolean array to select appropriate locations.
 Now let's look at the pandas equivalent of some SQL SELECT statements.
 \begin{lstlisting}
 >>> # SELECT ID, Age FROM studentInfo
@@ -403,8 +404,8 @@ Now let's look at the pandas equivalent of some SQL SELECT statements.
 >>> # SELECT ID, GPA FROM otherInfo WHERE Financial_Aid = 'y'
 >>> otherInfo[otherInfo['Financial_Aid']=='y'][['ID', 'GPA']]
 
->>> # SELECT Math_Major, COUNT(*) FROM mathInfo GROUP BY Math_Major
->>> print mathInfo.groupby('Math_Major').size()
+>>> # SELECT Name FROM studentInfo WHERE Class = 'J' OR Class = 'Sp'
+>>>  studentInfo[studentInfo['Class'].isin(['J','Sp'])]['Name']
 \end{lstlisting}
 
 \begin{problem}
