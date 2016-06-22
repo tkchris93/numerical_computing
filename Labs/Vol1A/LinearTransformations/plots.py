@@ -1,11 +1,50 @@
 import matplotlib
 matplotlib.rcParams = matplotlib.rc_params_from_file('../../../matplotlibrc')
+del matplotlib
 
 from matplotlib import pyplot as plt
+from scipy.optimize import curve_fit
 from random import random
 from time import time
 import numpy as np
 import solutions
+
+# Complexity Pictures =========================================================
+
+def random_vector(n):
+    """Generate a random vector of length n as a list."""
+    return [random() for i in xrange(n)]
+
+def random_matrix(n):
+    """Generate a random nxn matrix as a list of lists."""
+    return [[random() for j in xrange(n)] for i in xrange(n)]
+
+def timing_demo(N=13):
+
+    domain = 2**np.arange(1,N)
+    times = []
+    for n in domain:
+        start = time()
+        random_matrix(n)
+        times.append(time() - start)
+    
+    plt.plot(domain, times, 'g.-', linewidth=2, markersize=15)
+    plt.xlabel("n", fontsize=14)
+    plt.ylabel("Seconds", fontsize=14)
+    plt.savefig("time_random_matrix1.pdf", format="pdf")
+
+    # Plot the dotted blue line over the green line.
+    def f(x, a):
+        return a*x**2
+    a = curve_fit(f, domain, times)[0][0]
+
+    refinement = np.linspace(1, 2**(N-1), 200)
+    plt.plot(refinement, f(refinement, a), 'b--', lw=5)
+    plt.ylabel("Seconds", fontsize=14, color="white")
+
+    plt.savefig("time_random_matrix2.pdf", format="pdf")
+    plt.clf()
+    plt.close("all")
 
 def matrix_multiplication_figures(N=10):
     
@@ -13,9 +52,9 @@ def matrix_multiplication_figures(N=10):
     vec, mat = [], []
     
     for n in domain:
-        A = [[random() for j in xrange(n)] for i in xrange(n)]
-        B = [[random() for j in xrange(n)] for i in xrange(n)]
-        x = [random() for i in xrange(n)]
+        A = random_matrix(n)
+        x = random_vector(n)
+        B = random_matrix(n)
 
         start = time()
         [sum([A[i][k] * x[k] for k in range(n)]) for i in range(n)]
@@ -58,6 +97,8 @@ def matrix_multiplication_figures(N=10):
     plt.savefig("matrixmultiplication2.pdf", format="pdf")
     plt.clf()
     plt.close("all")
+
+# Horse Pictures ==============================================================
 
 horse = np.load("horse.npy")[:,::10]
 
@@ -144,7 +185,8 @@ def trajectory():
 
 
 if __name__ == "__main__":
-    matrix_multiplication_figures(10)
+    timing_demo()
+    # matrix_multiplication_figures(10)
     # stretch()
     # rotate()
     # shear()

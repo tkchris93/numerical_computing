@@ -48,11 +48,11 @@ The \li{timeit()} function accepts a function handle (the name of a function) an
 0.7928117752075196
 \end{lstlisting}
 
-In IPython, \li{timeit.timeit()} can be used like a built-in function with \li{\%timeit}.
+In IPython, \li{\%timeit} uses \li{timeit.timeit()} to quickly time a single line of code.
 
 \begin{lstlisting}
 # Time how long it takes to go through 1e7 iterations of nothing.
-In [24]: %timeit for i in range(int(1e7)): pass
+In [1]: %timeit for_loop()
 1 loop, best of 3: 768 ms per loop
 \end{lstlisting}
 
@@ -73,28 +73,46 @@ def random_matrix(n):
     return [[random() for j in xrange(n)] for i in xrange(n)]
 \end{lstlisting}
 
-As $n$ increases, how does the time it takes to execute these functions increase?
-To capture the real scale of what's going on, we time \li{random_matrix()} with inputs that are a multiple of 2 ($n = 2,\ 4,\ 8,\ \ldots$).
-The result is displayed below.
+Executing \li{random_vector(n)} calls \li{random()} $n$ times, so doubling $n$ should about double the amount of time \li{random_vector(n)} takes to execute.
+By contrast, executing \li{random_matrix(n)} calls \li{random()} $n^2$ times ($n$ times per row with $n$ rows).
+Therefore doubling $n$ will likely more than double the amount of time \li{random_matrix(n)} takes to execute, especially if $n$ is large.
+
+To visualize this phenomenon, we time \li{random_matrix()} for $n = 2^1,\ 2^2,\ \ldots,\ 2^{12}$ and plot $n$ against the execution time.
+The result is displayed below on the left.% in Figure \ref{fig:matrix_time_result1}.
 
 \begin{lstlisting}
 >>> from matplotlib import pyplot as plt
-
->>> domain = 2**np.arange(1,12)
+>>> domain = 2**np.arange(1,13)
 >>> times = []
 >>> for n in domain:
 ...     start = time.time()
 ...     random_matrix(n)
 ...     times.append(time.time() - start)
 ...
->>> plt.plot(domain, times, 'g', linewidth=2)
+>>> plt.plot(domain, times, 'g.-', linewidth=2, markersize=15)
 >>> plt.xlabel("n")
 >>> plt.ylabel("Seconds")
->>> plt.title("random_matrix() times")
 >>> plt.show()
 \end{lstlisting}
 
-% Figure here.
+\begin{figure}[H] % Generated with timing_demo() in plots.py.
+\captionsetup[subfigure]{justification=centering}
+\centering
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{time_random_matrix1.pdf}
+    % \label{fig:matrix_time_result1}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{time_random_matrix2.pdf}
+\end{subfigure}
+\end{figure}
+
+The figure on the left shows that the execution time for \li{random_matrix(n)} increases quadratically in $n$.
+In fact, the blue dotted line in the figure on the right is the parabola $y = an^2$, which fits nicely over the timed observations. Here $a$ is a small constant, but it is much less significant than the exponent on the $n$---we can leave it off altogether and write \li{random_matrix(n)} $\sim n^2$.%\footnote{In precise mathematical terms, we might write \li{random_matrix(n)} $\in O(n^2)$. See Volume II for more details on Big-O notation.}
+
+% TODO: More explanation here? Reference to Vol II?
 
 \begin{problem} % Time Matrix Multiplication.
 Let $A$ be an $m \times n$ matrix with entries $a_{ij}$, $\x$ be an $n \times 1$ vector with entries $x_k$, and $B$ be an $n \times p$ matrix with entries $b_{ij}$.
@@ -128,40 +146,36 @@ y_i = \sum_{k=1}^n a_{ik}x_k%,\qquad i = 1,\ 2,\ \ldots,\ m.
 c_{ij} = \sum_{k=1}^n a_{ik}b_{kj}%,\quad i = 1,\, 2,\, \ldots,\ m, \quad j = 1,\, 2\, \ldots,\ l.
 \end{align*}
 
-By representing vectors as lists and matrices as a lists of lists (where each inner list is a row of the matrix), we can implement matrix-vector and matrix-matrix multiplication from scratch without using NumPy.
+% By representing vectors as lists and matrices as a lists of lists (where each inner list is a row of the matrix), we can 
+Below, we implement these multiplication formulas without using NumPy.
 
 \begin{lstlisting}
 def matrix_vector_multiplication(A, x):
-    """Compute the matrix-vector product Ax (as a list).
-    
-    Inputs:
-        A (list of lists): an mxn matrix.
-        x (list): an nx1 vector.
-    """
+    """Compute the matrix-vector product Ax (as a list)."""
     m, n = len(A), len(x)
     return [sum([A[i][k] * B[k] for k in range(n)]) for i in range(m)]
 
 def matrix_matrix_multiplication(A, B):
-    """Compute the matrix-matrix product AB (as a list of lists).
-    
-    Inputs:
-        A (list of lists): an mxn matrix.
-        B (list of lists): an nxp matrix.
-    """
+    """Compute the matrix-matrix product AB (as a list of lists)."""
     m, n, p = len(A), len(B), len(B[0])
     return [[sum([A[i][k] * B[k][j] for k in range(n)])
                                     for j in range(p) ]
                                     for i in range(m) ]
 \end{lstlisting}
 
-Time each of these functions with increasingly-sized inputs.
-Generate the inputs with \li{random_vector()} and \li{random_matrix()} (so each input will be $n \times n$ or $n \times 1$).
-Report your findings in a single figure with two subplots: one with matrix-vector times, and one with matrix-matrix times.
+Use \li{time.time()}, \li{timeit.timeit()}, or \li{\%timeit} to time each of these functions with increasingly large inputs.
+Choose a domain for $n$ that accurately describes the growth without taking too long.
+Generate the inputs $A$, $\x$, and $B$ with \li{random_matrix()} and \li{random_vector()} (so each input will be $n \times n$ or $n \times 1$).
+Only time the multiplication functions, not the generating functions.
 
-% Put a figure here.
+Report your findings in a single figure with two subplots: one with matrix-vector times, and one with matrix-matrix times.
+Your plot should resemble the following figure.
+
+\begin{figure}[H]
+    \includegraphics[width=.7\textwidth]{matrixmultiplication1.pdf}
+\end{figure}
 
 \end{problem}
-
 
 
 \subsection*{Scaling Plots} % -------------------------------------------------
