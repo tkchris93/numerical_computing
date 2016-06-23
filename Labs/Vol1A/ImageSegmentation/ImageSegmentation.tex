@@ -362,18 +362,21 @@ In this lab, you will learn one way to segment images using graph theory.
 The algorithm we will present comes from a paper by Jianbo Shi and Jitendra Malik in 2000 (\cite{Shi2000}).
 They present the following steps to segment an image.
 \begin{enumerate}
-\item \textbf{Represent the image as a weighted graph of pixels.} 
+	\item \textbf{Represent the image as a weighted graph of pixels.} 
 An image is made up of individual pixels, each having a brightness and a location.
 (Here, \emph{brightness} is equivalent the grayscale value of the pixel.)
 To define a graph representing this image, we let each pixel be a vertex.
-We say that two pixels are connected in the graph if they are close together, i.e. within some distance $r$ of each other, in the image.
-The weight of the edges between two pixels is determined by their distance apart and their similarity in brightness, so that two adjacent pixels that are the same brightness will be connected by a very strong edge.
-\item \textbf{Calculate the Laplacian.} We calculate the adjacency and degree matrices of the graph representing the image, and use these to obtain the Laplacian.
-\item \textbf{Choose the best cut.} The graph we have created is connected, but not all edges have the same weight.
+%We say that two pixels are connected in the graph if they are close together, i.e. within some distance $r$ of each other, in the image.
+The weight of the edges between two pixels is determined by their distance apart and their similarity in brightness.
+We define the graph so that two similar pixels (i.e. with similar brightness and location) will be connected by a strong edge.
+	\item \textbf{Calculate the Laplacian.} 
+We calculate the adjacency and degree matrices of the graph representing the image, and use these to obtain the Laplacian.
+	\item \textbf{Choose the best cut.} 
+The graph we have created is connected, but not all edges have the same weight.
 Dissimilar pixels will be connected by edges that have a low weight.
 We can split the graph into two connected components by ``cutting" it along the low-weight edges.
 These components are the image segments we are looking for.
-(We can also cut' an image multiple times to segment an image into more than two pieces.)
+(We can also cut an image multiple times to segment it into more than two pieces.)
 As we will see later, Shi and Malik's algorithm uses spectral information (eigenvectors) of the Laplacian to determine the best edges to cut.
 \end{enumerate}
 
@@ -392,10 +395,35 @@ We can ``cut'' an image multiple times to segment an image into more than two pi
 \end{comment}
 
 
-\subsection*{Defining the Adjacency Matrix}
+\subsection*{Defining the Graph and Adjacency Matrix}
+
+%New
+We now define the graph that represents an image. In our $M \times N$ image, the associated graph will have $M \times N$ nodes, one representing each pixel. We let $w_{ij}$ be the weight of the edge connecting pixels $i$ and $j$, and define
+
+ \begin{equation}
+ \label{eq:adjacency}
+w_{ij} = \begin{cases} \exp(-\frac{|I(i) - I(j)|}{\sigma_I^2}-\frac{d(i,j)}{\sigma_d^2}) & \mbox{ for $d(i,j) < r$} \\ 0 & \mbox{ otherwise,} \end{cases}
+\end{equation}
+where
+\begin{itemize}
+	\item$d(i,j)$ is the Euclidean distance between pixel $i$ and pixel $j$
+	\item $|I(i) - I(j)|$ is the difference in brightness of pixels $i$ and $j$
+	\item $r$, $\sigma_I$ and $\sigma_d$ are constants that we choose
+\end{itemize}
+
+With this definition, pixels that are farther apart that $r$ will never be connected. 
+Pixels within $r$ will be strongly connected if they are a similar brightness ($|I(i) - I(j)|$ is small) and close together ($d(i,j)$ is small).
+Highly contrasting pixels ($|I(i) - I(j)|$ is large) will be weakly connected. 
+This gives us a graph with the properties we intuitively want.
+
+The adjacency matrix $W$ is $(M \times N) \times (M \times N)$ and has $w_{ij}$ as its $ij$th entry. 
+$W$ will be sparse as long as $r$ is small. 
+Figure \ref{fig:adjacency} shows what the adjacency matrix looks like for a $4x4$ image when $r=1.2$.
+
+\begin{comment}
 Now let us define the adjacency matrix of the graph associated to an image. 
 Since an $M \times N$ image has $M \times N$ pixels, the adjacency matrix will be $(M \times N) \times (M \times N)$.
-After choosing a radius $r$ and some constants $\sigma_I$ and $\sigma_d$, we define the adjacency matrix to be $W = (w_{ij})$, where
+After choosing a radius $r$ and some scaling factors $\sigma_I$ and $\sigma_d$, we define the adjacency matrix to be $W = (w_{ij})$, where
 
 \begin{equation}
 \label{eq:adjacency}
@@ -407,7 +435,9 @@ where
 	\item $|I(i) - I(j)|$ is the difference in brightness of pixels $i$ and $j$.
 \end{itemize}
 
-Notice that $W$ will be sparse as long as $r$ is small. Figure \ref{fig:adjacency} shows what the adjacency matrix looks like for a $4x4$ image when $r=1.2$.
+$W$ will be sparse as long as $r$ is small. 
+Figure \ref{fig:adjacency} shows what the adjacency matrix looks like for a $4x4$ image when $r=1.2$.
+\end{comment}
 
 \begin{figure}
 \begin{tikzpicture}[dot/.style={circle,fill=black,minimum 
@@ -493,9 +523,11 @@ Notice that $W$ will be sparse as long as $r$ is small. Figure \ref{fig:adjacenc
 
 
 \subsection*{Computing the Adjacency Matrix}
-In this section, we will write a function that accepts an image and constants \li{radius}, \li{sigma_I}, and \li{sigma_d}. The function will return the adjacency matrix defined in (\ref{eq:adjacency}) and the diagonal of the corresponding degree matrix. 
+In this section, we will write a function that accepts an image, and computes the adjacency and degree matrices of the corresponding graph.
+The function will also accept constants \li{radius}, \li{sigma_I}, and \li{sigma_d} to use in \ref{eq:adjacency}. 
+The function will return the adjacency matrix defined in (\ref{eq:adjacency}) and the diagonal of the corresponding degree matrix. 
 
-First, load a grayscale image and flatten it into a 1-D array of pixel values. To help handle color images, the helper function \li{getImage} is given. The input \li{filename} should be the filename of the image that you want to segment. The return value will be a 2-D array representing a grayscale image. Flatten this array using \li{img.flatten}.
+First, we load a grayscale image and flatten it into a 1-D array of pixel values. To help handle color images, the helper function \li{getImage} is given. The input \li{filename} should be the filename of the image that you want to segment. The return value will be a 2-D array representing a grayscale image. Flatten this array using \li{img.flatten}.
 \begin{lstlisting}
 >>> A = np.array([[1,2],[3,4]])
 >>> A.flatten()                
@@ -519,18 +551,18 @@ Later, our function will iterate through the rows of the adjacency matrix, initi
 \end{lstlisting}
 \end{comment}
 
-Next, we initialize empty adjacency and degree matrices. As can be seen in Figure \ref{fig:adjacency}, the adjacency matrix will be sparse, so we initialize it as a sparse matrix \li{W}. The sparse matrix type \li{lil_matrix} is optimized for building a matrix one entry at a time, which is what we will do. On the other hand, we only need to compute the diagonal of the degree matrix, so we initialize this diagonal as a regular 1-dimensional NumPy array \li{D}.
+Next, we initialize empty adjacency and degree matrices. As can be seen in Figure \ref{fig:adjacency}, the adjacency matrix will be sparse, so we initialize it as a sparse matrix \li{W}. The sparse matrix type \li{lil_matrix} is optimized for building a matrix one entry at a time, which is what we will do. On the other hand, we only need to store the diagonal of the degree matrix, so we initialize this diagonal as a regular 1-dimensional NumPy array \li{D}.
 
 We now fill in $W$ according to our definition in Equation \ref{eq:adjacency}.
 Each pixel in the image corresponds to one row in $W$.
 For each pixel:
 \begin{itemize}
-\item Find its neighbors (the pixels in the image which are within distance $r$)
-\item Using \ref{eq:adjacency}, calculate the weight connecting the pixel and each of its neighbors
+\item Find its neighbors (the pixels in the image which are within distance $r$ of it)
+\item Use \ref{eq:adjacency} to calculate the weights connecting the pixel to each of its neighbors
 \item Fill in these weights in $W$, leaving the rest of the values in the row as zeros.
 \end{itemize}
-Iterating through each pixel in the image, we initialize the corresponding row of the adjacency matrix according to our definition in 
-The sum of the entries of this row will be the corresponding entry in \li{D}. 
+%Iterating through each pixel in the image, we initialize the corresponding row of the adjacency matrix according to our definition in 
+The sum of the entries of a row in $W$ will be the corresponding entry in \li{D}. 
 
 The function \li{getNeighbors} returns two flat arrays: \li{indices} and \li{distances} (code is provided in the spec file). The array \li{indices} contains the indices of those pixels within \li{radius} of the input \li{pixel}. The array \li{distances} contains the corresponding distances of those pixels from the input \li{pixel} (all entries of \li{distances} will be at most \li{radius}). According to (\ref{eq:adjacency}), the array \li{indices} contains exactly the indices of the nonzero entries of the current row of \li{W}.  See Figure \ref{fig:adjacency} for an example. \footnote{Note that \li{W} will be a symmetric matrix. We could possibly speed up this function a lot by taking advantage of this fact.}
 
