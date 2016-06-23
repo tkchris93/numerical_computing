@@ -14,7 +14,6 @@ from time import time
 import numpy as np
 import solutions
 
-
 def _save(filename):
     """Decorator for saving, clearing, and closing figures automatically."""
     try:
@@ -218,8 +217,8 @@ def horse_drawings():
         stdout.flush()
         func()
         print("done.")
-    for f in [original_horse, dilated_horse, rotated_horse, sheared_horse,
-              reflected_horse, translated_horse, combo_horse]:
+    for f in [original_horse, dilated_horse, rotated_horse,
+              sheared_horse, reflected_horse, translated_horse,]:
         execute(f)
 
 # =============================================================================
