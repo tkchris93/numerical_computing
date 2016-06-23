@@ -7,6 +7,8 @@ import numpy as np
 from random import random
 from matplotlib import pyplot as plt
 
+from sys import stdout
+
 def random_vector(n):
     """Generate a random vector of length n as a list."""
     return [random() for i in xrange(n)]
@@ -49,13 +51,13 @@ def prob1(N=8):
         x = random_vector(n)
         B = random_matrix(n)
 
-        start = time()
+        start = time.time()
         matrix_vector_product(A, x)
-        vector_times.append(time() - start)
+        vector_times.append(time.time() - start)
 
-        start = time()
+        start = time.time()
         matrix_matrix_product(A, B)
-        matrix_times.append(time() - start)
+        matrix_times.append(time.time() - start)
 
     plt.subplot(121)
     plt.plot(domain, vector_times, 'b.-', lw=2, ms=15)
@@ -71,67 +73,60 @@ def prob1(N=8):
 
 
 def prob2(N=8):
+    """
+    """
 
     domain = 2**np.arange(1,N+1)
     vector_times, matrix_times = [], []
+    npvect_times, npmatr_times = [], []
 
     for n in domain:
         A = random_matrix(n)
         x = random_vector(n)
         B = random_matrix(n)
 
-        start = time()
+        # Time list-list operations.
+        start = time.time()
         matrix_vector_product(A, x)
-        vec.append(time() - start)
+        vector_times.append(time.time() - start)
 
-        start = time()
+        start = time.time()
         matrix_matrix_product(A, B)
-        mat.append(time() - start)
+        matrix_times.append(time.time() - start)
 
-    # First Figure: Matrix-Vector and Matrix-Matrix by themselves in subplots.
-    plt.subplot(121)
-    plt.plot(domain, vector_times, 'b.-', lw=2, ms=15)
-    plt.xlabel("n"); plt.ylabel("Seconds")
-    plt.title("Matrix-Vector Multiplication")
+        # Time NumPy operations.
+        A, B, x = np.array(A), np.array(B), np.array(x)
+        start = time.time()
+        A.dot(x)
+        npvect_times.append(time.time() - start)
 
-    plt.subplot(122)
-    plt.plot(domain, matrix_times, 'g.-', lw=2, ms=15)
-    plt.xlabel("n")
-    plt.title("Matrix-Matrix Multiplication")
-
-    plt.show()
-
-    # Time NumPy operations.
-    A, B, x = np.array(A), np.array(B), np.array(x)
-    start = time.time()
-    A.dot(x)
-    npvec.append(time.time() - start)
-
-    start = time.time()
-    A.dot(B)
-    npmat.append(time.time() - start)
+        start = time.time()
+        A.dot(B)
+        npmatr_times.append(time.time() - start)
 
     plt.subplot(121)
-    plt.plot(domain, vector_times, '.-', lw=2, label="Matrix-Vector with Lists")
-    plt.plot(domain, matrix_times, '.-', lw=2, label="Matrix-Matrix with Lists")
-    plt.plot(domain, npvector_times, '.-', lw=2, label="Matrix-Vector with NumPy")
-    plt.plot(domain, npmatrix_times, '.-', lw=2, label="Matrix-Matrix with NumPy")
-    plt.xlabel("n"); plt.ylabel("Seconds")
+    plt.plot(domain, vector_times, '.-', lw=2, ms=15,
+                                            label="Matrix-Vector with Lists")
+    plt.plot(domain, matrix_times, '.-', lw=2, ms=15,
+                                            label="Matrix-Matrix with Lists")
+    plt.plot(domain, npvect_times, '.-', lw=2, ms=15,
+                                            label="Matrix-Vector with NumPy")
+    plt.plot(domain, npmatr_times, '.-', lw=2, ms=15,
+                                            label="Matrix-Matrix with NumPy")
+    plt.xlabel("n", fontsize=14); plt.ylabel("Seconds", fontsize=14)
     plt.legend(loc="upper left")
 
     plt.subplot(122)
-    plt.loglog(domain, vector_times, '.-', lw=2, basex=2, basey=2,
+    plt.loglog(domain, vector_times, '.-', lw=2, ms=15, basex=2, basey=2,
                                             label="Matrix-Vector with Lists")
-    plt.loglog(domain, matrix_times, '.-', lw=2, basex=2, basey=2,
+    plt.loglog(domain, matrix_times, '.-', lw=2, ms=15, basex=2, basey=2,
                                             label="Matrix-Matrix with Lists")
-    plt.loglog(domain, npvector_times, '.-', lw=2, basex=2, basey=2,
+    plt.loglog(domain, npvect_times, '.-', lw=2, ms=15, basex=2, basey=2,
                                             label="Matrix-Vector with NumPy")
-    plt.loglog(domain, npmatrix_times, '.-', lw=2, basex=2, basey=2,
+    plt.loglog(domain, npmatr_times, '.-', lw=2, ms=15, basex=2, basey=2,
                                             label="Matrix-Matrix with NumPy")
     plt.xlabel("n")
-    plt.legend(loc="upper left")
     plt.show()
-
 
 # Horsefeathers ===============================================================
 
@@ -229,6 +224,7 @@ def rotatingParticle(time, omega, direction, speed):
     plt.show()
 
 if __name__ == '__main__':
-    prob1(10)
-    prob2(10)
+    # prob1(8)
+    # prob2(8)
+    caching()
 

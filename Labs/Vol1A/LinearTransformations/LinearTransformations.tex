@@ -36,24 +36,21 @@ The \li{time()} function\footnote{The \li{clock()} function is similar to \li{ti
 \end{lstlisting}
 
 The standard library's \li{timeit} module is built specifically to time code and has more sophisticated tools than the \li{time} module.
-The \li{timeit()} function accepts a function handle (the name of a function) and the number of times to run it.
+The \li{timeit()} function accepts a function handle (the name of the function to run) and the number of times to run it.
+Additionally, in IPython the quick command \li{\%timeit} uses \li{timeit.timeit()} to quickly time a single line of code.
 
 \begin{lstlisting}
->>> def for_loop():
-...     """Go though 1e7 iterations of nothing."""
-...     for _ in range(int(1e7)):
-...         pass
-...
->>> timeit.timeit(for_loop, number=5) / 5.
-0.7928117752075196
-\end{lstlisting}
+In [1]: import timeit
+In [2]: def for_loop():
+   ...:     """Go through 1e7 iterations of nothing."""
+   ...:     for _ in range(int(1e7)):
+   ...:         pass
 
-In IPython, \li{\%timeit} uses \li{timeit.timeit()} to quickly time a single line of code.
+In [3]: timeit.timeit(for_loop, number=5) / 5.
+Out[3]: 0.8081045627593995
 
-\begin{lstlisting}
-# Time how long it takes to go through 1e7 iterations of nothing.
-In [1]: %timeit for_loop()
-1 loop, best of 3: 768 ms per loop
+In [4]: %timeit for_loop()
+1 loop, best of 3: 801 ms per loop
 \end{lstlisting}
 
 \subsection*{Timing an Algorithm} % -------------------------------------------
@@ -177,7 +174,7 @@ Your figure should resemble the following plots.
     \centering
     \includegraphics[width=\linewidth]{matrixVectorMultiplication.pdf}
 \end{subfigure}%
-\begin{subfigure}{.489\textwidth}
+\begin{subfigure}{.474\textwidth}
     \centering
     \includegraphics[width=\linewidth]{matrixMatrixMultiplication.pdf}
 \end{subfigure}
@@ -188,9 +185,8 @@ Your figure should resemble the following plots.
 
 \subsection*{Logarithmic Plots} % ---------------------------------------------
 
-The plots from Problem \ref{prob:matrix-multiplication-timing} look similar, but the actual execution times are very different.
-For instance, with $n=512$ \li{matrix_matrix_product()} takes about 650 times longer than \li{matrix_vector_product()}.
-To adequately compare the two, we need to scale the way we view the results.
+The two plots from Problem \ref{prob:matrix-multiplication-timing} look similar, but the actual execution times differ greatly.
+To adequately compare the two, we need to view the results differently.
 
 A \emph{logarithmic plot} uses a logarithmic scale---with values that increase exponentially, such as $10^1,\ 10^2,\ 10^3,\ \ldots$---on one or both of its axes.
 The three kinds of log plots are listed below.
@@ -239,7 +235,7 @@ The following code produces Figure \ref{fig:loglogdemo}.
 \end{figure}
 
 Since the slope of the line for \li{matrix_matrix_product()} is noticeably greater than the slope of the \li{matrix_vector_product()} line, we conclude that matrix-matrix multiplication is an order of magnitude faster than matrix-matrix multiplication.
-In fact, matrix-matrix multiplication is $\sim n^3$, while matrix-vector multiplication is only $\sim n^2$.
+In fact, matrix-matrix multiplication (which uses 3 \li{for} loops) is $\sim n^3$, while matrix-vector multiplication (which only has 2 loops) is only $\sim n^2$.
 
 \begin{problem} % Why NumPy ROCKS.
 NumPy is optimized for fast computations.
@@ -252,7 +248,8 @@ Repeat the experiment of Problem \ref{prob:matrix-multiplication-timing}, timing
 \item matrix-matrix multiplication with \li{np.dot()}.
 \end{itemize}
 
-Create a single figure with two subplots: one with all four sets of execution times on a regular linear scale, and one with all four sets of execution times on a log-log scale, as in Figure \ref{fig:loglogdemo}.
+Create a single figure with two subplots: one with all four sets of execution times on a regular linear scale, and one with all four sets of execution times on a log-log scale.
+Compare your results to Figure \ref{fig:loglogdemo}.
 \end{problem}
 
 Apart from being syntactically convenient, element-wise NumPy operations are also significantly faster than element-wise list operations.
@@ -260,21 +257,36 @@ The coefficient for list of lists is way bigger than it is with NumPy arrays.
 Iterating through loops is very expensive.
 NumPy also uses loops, but it uses C loops instead of Python loops.
 
-\begin{info}
-Note about Caching.
+\begin{info} % Note about Caching.
+The execution times for matrix multiplication with NumPy increase somewhat erratically.
+NumPy operations are optimized for computer hardware.
+Below, we plot execution times for vector-vector multiplication with NumPy.
+The spikes in the plot indicate the times that the array no longer fits in the current level of memory
+%
+\begin{figure}[H]
+\includegraphics[width=.5\textwidth]{cachingDemo.pdf}
+\end{figure}
 \end{info}
 
 \section*{Linear Transformations} % ===========================================
 
-% Definition of a Linear Transformation.
+A \emph{linear transformation} is a mapping on a vector space that preserves addition and scalar multiplication.
+More precisely, for an arbitrary vector space $V$, the mapping $L:V\rightarrow V$ is a linear transformation if and only if it satisfies the following conditions:
+%
+\begin{itemize}
+\item $T(\x + \y) = T\x + T\y$ for any two vectors $\x,\ \y \in V$
+\item $T(\alpha\x) = \alpha T\x$ for any vector $\x \in V$ and any scalar $\alpha \in \mathbb{F}$.
+\end{itemize}
+
+In $\mathbb{R}^n$, every linear transformation $L$ can be represented by an $n \times n$ matrix $A$.
+To apply $L$ to a vector $\x \in \mathbb{R}^n$, left multiply by the matrix representation.
+
 
 \subsection*{Dilations}
 A \emph{dilation} of the vector space rescales the vectors.
 Graphically, a dilation stretches or compresses the space.
 A linear transformation is a dilation if and only if its matrix representation is diagonal, so in particular all Type II elementary matrices are dilations.
-The matrix $\begin{pmatrix}
-1.5 & 0\\
-0 & 1.5 \end{pmatrix}$ corresponds to the dilation in Figure \ref{fig:dilation}.
+The matrix $\begin{pmatrix}1.25 & 0\\0 & .25 \end{pmatrix}$ corresponds to the dilation below.
 
 \begin{figure}[H] % Generated with dilated_horse() in plots.py.
 \captionsetup[subfigure]{justification=centering}
@@ -287,32 +299,12 @@ The matrix $\begin{pmatrix}
     \centering
     \includegraphics[width=\linewidth]{DilationHorse.pdf}
 \end{subfigure}
-\label{fig:dilation}
 \end{figure}
 
-\begin{problem}\label{prob:dilation}
+\begin{problem}
 Write a function that accepts an array of points and an array giving the stretching factors in each direction.
 Your function should return the dilated points.
-Hint: To check your work, plot the original points and their images under the transformation using the function \li{plotOldNew()} defined below.
-\begin{lstlisting}
-import numpy as np
-from matplotlib import pyplot as plt
-
-def plotOldNew(old, new):
-    '''Inputs:
-    new -- a (2,n) numpy array containing x-coordinates on the
-            first row and y-coordinates on the second row.
-    old -- a (2,n) numpy array containing x-coordinates on the first
-            row and y-coordinates on the second row.
-    '''
-
-    plt.subplot(2, 1, 1)
-    plt.scatter(old[0], old[1])
-    plt.axis('equal')
-    plt.subplot(2, 1, 2)
-    plt.scatter(new[0], new[1])
-    plt.show()
-\end{lstlisting}
+\label{prob:dilation}
 \end{problem}
 
 \subsection*{Rotations} % -----------------------------------------------------
@@ -322,7 +314,7 @@ A rotation of $\theta$ radians counterclockwise corresponds to the matrix $\begi
 \cos(\theta) & -\sin(\theta) \\
 \sin(\theta) & \cos(\theta)
 \end{pmatrix}.$
-When $\theta = \pi/3$ we get the rotation matrix illustrated in Figure \ref{fig:rotate}.
+Rotating with $\theta = \pi/3$ produces the figure shown below.
 
 \begin{figure}[H] % Generated with rotated_horse() in plots.py.
 \captionsetup[subfigure]{justification=centering}
@@ -335,32 +327,15 @@ When $\theta = \pi/3$ we get the rotation matrix illustrated in Figure \ref{fig:
     \centering
     \includegraphics[width=\linewidth]{RotationHorse.pdf}
 \end{subfigure}
-\caption{An example of a rotation.
-The image on the left was rotated by $\pi/3$, producing the image on the right.}
 \label{fig:rotate}
 \end{figure}
 
 \begin{problem}
- Write a function that accepts an array of points and the angle of rotation (in radians).
- Your function should return the rotated points.
- Hint: To check your work, plot the original points and their images under the transformation using the function \li{plotOldNew()} defined in Problem \ref{prob:dilation}.
+Write a function that accepts an array of points and the angle of rotation (in radians).
+Your function should return the rotated points.
 \end{problem}
 
 \subsection*{Shears} % --------------------------------------------------------
-
-\begin{figure}[H] % Generated with dilated_horse() in plots.py.
-\captionsetup[subfigure]{justification=centering}
-\centering
-\begin{subfigure}{.5\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{originalHorse.pdf}
-\end{subfigure}%
-\begin{subfigure}{.5\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{ShearHorse.pdf}
-\end{subfigure}
-\label{fig:shear}
-\end{figure}
 
 A third type of linear transformation is a \emph{shear}, which ``slants'' a set of vectors.
 The corresponding matrix is a Type III elementary matrix.
@@ -373,22 +348,14 @@ A horizontal shear has the form $\begin{pmatrix}
 c & 1
 \end{pmatrix}
 $.
-Notice that horizontal skews fix the $y$-coordinate of a vector while vertical skews fix the $x$-coordinate.
-The horizontal shear in Figure \ref{fig:shear} corresponds to the matrix $\begin{pmatrix}
-1 & 1.02 \\
+Horizontal skews fix the $y$-coordinate of a vector while vertical skews fix the $x$-coordinate.
+The horizontal shear shown below corresponds to the matrix $\begin{pmatrix}
+1 & .2 \\
 0 & 1
 \end{pmatrix}
 $.
 
-\begin{problem}
-Write a function that accepts an array of points, a floating point argument that indicates the shearing amount, and an integer argument that indicates the direction of the shear (0 for horizontal, 1 for vertical).
-Your function should return the sheared points.
-Hint: To check your work, plot the original points and their images under the transformation using the function \li{plotOldNew()} defined in Problem \ref{prob:dilation}.
-\end{problem}
-
-\subsection*{Reflections}% ----------------------------------------------------
-
-\begin{figure}[H] % Generated with reflected_horse() in plots.py.
+\begin{figure}[H] % Generated with dilated_horse() in plots.py.
 \captionsetup[subfigure]{justification=centering}
 \centering
 \begin{subfigure}{.5\textwidth}
@@ -397,12 +364,17 @@ Hint: To check your work, plot the original points and their images under the tr
 \end{subfigure}%
 \begin{subfigure}{.5\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{ReflectionHorse.pdf}
+    \includegraphics[width=\linewidth]{ShearHorse.pdf}
 \end{subfigure}
-\caption{An example of a reflection.
-The top image was reflected about the line $y = (1/\sqrt{3})x$, producing the bottom image.}
-\label{fig:reflect}
 \end{figure}
+
+
+\begin{problem}
+Write a function that accepts an array of points, a floating point argument that indicates the shearing amount, and an integer argument that indicates the direction of the shear (0 for horizontal, 1 for vertical).
+Your function should return the sheared points.
+\end{problem}
+
+\subsection*{Reflections}% ----------------------------------------------------
 
 A fourth type of linear transformation is reflections about a line, also called \emph{Householder transformations}.
 Reflecting about a line spanned by $(l_1, l_2)$ corresponds to the matrix
@@ -424,10 +396,23 @@ As another example, the reflection in Figure \ref{fig:reflection} about the line
 2\sqrt{3} & -2
 \end{pmatrix}$.
 
+\begin{figure}[H] % Generated with reflected_horse() in plots.py.
+\captionsetup[subfigure]{justification=centering}
+\centering
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{originalHorse.pdf}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{ReflectionHorse.pdf}
+\end{subfigure}
+\label{fig:reflect}
+\end{figure}
+
 \begin{problem}
 Write a function that accepts an array of points and a 1-D array describing the axis of reflection (in the notation above, this argument is $(l_1, l_2)$.
 Your function should return the reflected points.
-Hint: To check your work, plot the original points and their images under the transformation using the function \li{plotOldNew()} defined in Problem \ref{prob:dilation}.
 \end{problem}
 
 \subsection*{Composition of linear transformations}
@@ -437,8 +422,14 @@ For example, if $S$ is a matrix representing a shear and $R$ is a matrix represe
 In fact, any linear transformation of $\mathbb{R}^2$ is a composition of the transformations discussed in this lab.
 This is because reflections, dilations, and shears provide us with all the elementary matrices, and every matrix is a product of elementary matrices.
 
+% ComboHorse might not be necessary!!
+
 \section*{Affine transformations}
 \subsection*{Translations}
+
+A translation is a map $T: \mathbb{R}^2 \rightarrow \mathbb{R}^2$ defined by $T(\mathbf{x}) = \mathbf{x}+\mathbf{b}$ where $\mathbf{b} \in \mathbb{R}^2$.
+For example, if $\mathbf{b} = (2, 0)\trp$, then applying $T$ to an image will shift it right by 2.
+This translation is illustrated below.
 
 \begin{figure}[H] % Generated with translated_horse() in plots.py.
 \captionsetup[subfigure]{justification=centering}
@@ -451,18 +442,10 @@ This is because reflections, dilations, and shears provide us with all the eleme
     \centering
     \includegraphics[width=\linewidth]{TranslationHorse.pdf}
 \end{subfigure}
-\caption{An example of a translation.
-The image on the left was translated by the vector $(0, 2)\trp$ to produce the image on the right.}
-\label{fig:translation}
 \end{figure}
 
-A translation is a map $T: \mathbb{R}^2 \rightarrow \mathbb{R}^2$ defined by $T(\mathbf{x}) = \mathbf{x}+\mathbf{b}$ where $\mathbf{b} \in \mathbb{R}^2$.
-For example, if $\mathbf{b} = (2, 0)\trp$, then applying $T$ to an image will shift it right by 2.
-This translation is illustrated in Figure \ref{fig:translation}.
-
-
-Translations are usually NOT linear maps.
-Therefore, they cannot be represented as matrix multiplication.
+Translations are usually \textbf{not} linear maps.
+Therefore, they cannot be represented with matrix multiplication.
 
 \begin{problem}
 Write a function that accepts an array of points and an array indicating how much to shift them in each direction.

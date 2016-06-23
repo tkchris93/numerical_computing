@@ -68,7 +68,7 @@ def _timeout(seconds):
         This decorator uses signal.SIGALRM, which is only available on Unix.
     """
     assert isinstance(seconds, int), "@timeout(sec) requires an int"
-    
+
     class TimeoutError(Exception):
         pass
 
@@ -77,6 +77,7 @@ def _timeout(seconds):
         raise TimeoutError("Timeout after {0} seconds".format(seconds))
 
     def decorator(func):
+        @wraps(func)
         def wrapper(*args, **kwargs):
             signal.signal(signal.SIGALRM, _handler)
             signal.alarm(seconds)               # Set the alarm.
@@ -94,14 +95,14 @@ def _timeout(seconds):
 
 def test(student_module):
     """Grade a student's entire solutions file.
-    
+
     X points for problem 1
     X points for problem 2
     ...
-    
+
     Inputs:
         student_module: the imported module for the student's file.
-    
+
     Returns:
         score (int): the student's score, out of TOTAL.
         feedback (str): a printout of test results for the student.
