@@ -1,12 +1,13 @@
 # plots.py
 """Volume I: Linear Transformations. Plotting file."""
+from __future__ import print_function
 import matplotlib
 matplotlib.rcParams = matplotlib.rc_params_from_file('../../../matplotlibrc')
-del matplotlib
 
 from matplotlib import pyplot as plt
 from scipy.optimize import curve_fit
 from random import random
+from sys import stdout
 from time import time
 import numpy as np
 import solutions
@@ -14,8 +15,7 @@ import solutions
 # Complexity Pictures =========================================================
 
 def timing_demo(N=12):
-    """Generates the two figures used just before Problem 1.
-    """
+    """Generate the two figures used just before Problem 1."""
 
     domain = 2**np.arange(1,N+1)
     times = []
@@ -43,6 +43,7 @@ def timing_demo(N=12):
     plt.close("all")
 
 def prob1_solution(N=9):
+    """Generate the two figures used at the end of Problem 1."""
 
     domain = 2**np.arange(1,N+1)
     vector_times, matrix_times = [], []
@@ -53,11 +54,11 @@ def prob1_solution(N=9):
         B = solutions.random_matrix(n)
 
         start = time()
-        solutions.matrix_vector_multiplication(A, x)
+        solutions.matrix_vector_product(A, x)
         vector_times.append(time() - start)
 
         start = time()
-        solutions.matrix_matrix_multiplication(A, B)
+        solutions.matrix_matrix_product(A, B)
         matrix_times.append(time() - start)
 
     # Matrix-Vector Multiplication.
@@ -78,44 +79,83 @@ def prob1_solution(N=9):
     plt.clf()
     plt.close("all")
 
-def loglog_demo(N=9):
+    return domain, vector_times, matrix_times
 
-    domain = 2**np.arange(1, N+1)
-    vec, mat = [], []
+def loglog_demo(domain, vector_times, matrix_times):
+    """Generate the two figures between Problem 1 and Problem 2."""
 
-    for n in domain:
-        A = solutions.random_matrix(n)
-        x = solutions.random_vector(n)
-        B = solutions.random_matrix(n)
-
-        start = time()
-        solutions.matrix_vector_multiplication(A, x)
-        vec.append(time() - start)
-
-        start = time()
-        solutions.matrix_matrix_multiplication(A, B)
-        mat.append(time() - start)
-
-    # Second Figure: Matrix-Vector and Matrix-Matrix overlaid w/ diff scales.
-    plt.subplot(121)
-    plt.plot(domain, vec, '.-b', lw=2, label="Matrix-Vector")
-    plt.plot(domain, mat, '.-g', lw=2, label="Matrix-Matrix")
-    plt.xlabel("n"); plt.ylabel("Seconds")
+    plt.plot(domain, vector_times, 'b.-', lw=2, ms=15, label="Matrix-Vector")
+    plt.plot(domain, matrix_times, 'g.-', lw=2, ms=15, label="Matrix-Matrix")
     plt.legend(loc="upper left")
-
-    plt.subplot(122)
-    plt.loglog(domain, vec, '.-b', basex=2,basey=2,lw=2, label="Matrix-Vector")
-    plt.loglog(domain, mat, '.-g', basex=2,basey=2,lw=2, label="Matrix-Matrix")
-    plt.xlabel("n")
-    plt.legend(loc="upper left")
-
-    plt.savefig("matrixmultiplication2.pdf", format="pdf")
+    plt.savefig("loglogDemoBad.pdf", format="pdf")
     plt.clf()
     plt.close("all")
 
+    plt.loglog(domain, vector_times, 'b.-', basex=2, basey=2, lw=2, ms=15)
+    plt.loglog(domain, matrix_times, 'g.-', basex=2, basey=2, lw=2, ms=15)
+    plt.savefig("loglogDemoGood.pdf", format="pdf")
+    plt.clf()
+    plt.close("all")
+
+def timing_drawings():
+    print("timing_demo()...", end=''); stdout.flush()
+    timing_demo(12)
+    print("done.\nprob1_solution()...", end=''); stdout.flush()
+    a, b, c = prob1_solution(9)
+    print("done.\nloglog_demo()...", end=''); stdout.flush()
+    loglog_demo(a, b, c)
+    print("done.")
+
 # Horse Pictures ==============================================================
 
-horse = np.load("horse.npy")[:,::10]
+horse = np.load("horse.npy")[:,::5]
+
+def save_horse(data, title):
+    plt.clf()
+    plt.plot(data[0], data[1], 'k,')
+    plt.title(title, fontsize=14)
+    plt.axis([-1,1,-1,1])
+    plt.gca().set_aspect("equal")
+    plt.savefig("{}Horse.pdf".format(title), format="pdf")
+    plt.clf()
+    plt.close("all")
+
+def original_horse():
+    save_horse(horse, "Original")
+
+def dilated_horse():
+    dilation = np.dot([[.5,0],[0,1.5]], horse)
+    save_horse(dilation, "Dilation")
+
+def rotated_horse():
+    theta = np.pi/3.
+    rotation = np.dot([[np.cos(theta),-np.sin(theta)],
+                       [np.sin(theta),np.cos(theta)]], horse)
+    save_horse(rotation, "Rotation")
+
+def sheared_horse():
+    shear = np.dot([[1, .2],[.2, 1]], horse)
+    save_horse(shear, "Shear")
+
+def reflected_horse():
+    l1, l2 = 0, 1
+    reflection = np.dot(np.array([[l1**2 - l2**2, 2*l1*l2],
+                            [2*l1*l2, l2**2 - l1**2]])/(l1**2 + l2**2), horse)
+    save_horse(reflection, "Reflection")
+
+def translated_horse():
+    translation = horse + np.vstack([.25, .25])
+    save_horse(translation, "Translation")
+
+def combo_horse():      # TODO
+    p = solutions.shear(horse, -1.02, .5)
+    p = solutions.translate(p, np.array([-2, .5]))
+    p = solutions.reflect(p, np.array([-2, .5]))
+
+    fig = plotOldNew(horse, p, "General Affine")
+    fig.savefig("combo.pdf")
+    plt.close(fig.number)
+
 
 def plotOldNew(old, new, label):
     """Plot an original image and a modified version side by side.
@@ -158,32 +198,6 @@ def plotOldNew(old, new, label):
     ax2.set_xlabel(label, fontsize=14)
     return fig
 
-def stretch():
-    fig = plotOldNew(horse, solutions.dilate(horse, 1.5, 1.5), "Dilation")
-    fig.savefig("stretch.pdf")
-    plt.close(fig.number)
-
-def rotate():
-    fig = plotOldNew(horse, solutions.rotate(horse, np.pi/3.), "Rotation")
-    fig.savefig("rotate.pdf", format="pdf")
-    plt.close(fig.number)
-
-def shear():
-    fig = plotOldNew(horse, solutions.shear(horse, 0, 1), "Shear")
-    fig.savefig("shear.pdf")
-    plt.close(fig.number)
-
-def reflect():
-    fig = plotOldNew(horse, solutions.reflect(horse, [np.sqrt(3), 1]),
-                                                                "Reflection")
-    fig.savefig("reflect.pdf")
-    plt.close(fig.number)
-
-def translate():
-    fig = plotOldNew(horse, solutions.translate(horse, (0, 2)), "Translation")
-    fig.savefig("translate.pdf")
-    plt.close(fig.number)
-
 def combo():
     p = solutions.shear(horse, -1.02, .5)
     p = solutions.translate(p, np.array([-2, .5]))
@@ -198,20 +212,28 @@ def trajectory():
     plt.savefig('soln3.pdf')
     plt.clf()
 
-def draw_all():
-    print("timing_demo()..."),
-    timing_demo(12)
-    print("done.\nprob1_solution()..."),
-    prob1_solution(9)
-    print("done.\nloglog_demo()..."),
-    # loglog_demo()
-    # stretch()
-    # rotate()
-    # shear()
-    # reflect()
-    # translate()
+def horse_drawings():
+    print("original_horse()...", end=''),; stdout.flush()
+    original_horse()
+    print("done.\ndilated_horse()...", end=''),; stdout.flush()
+    dilated_horse()
+    print("done.\nrotated_horse()...", end=''),; stdout.flush()
+    rotated_horse()
+    print("done.\nsheared_horse()...", end=''),; stdout.flush()
+    sheared_horse()
+    print("done.\nreflected_horse()...", end=''),; stdout.flush()
+    reflected_horse()
+    print("done.\ntranslated_horse()...", end=''),; stdout.flush()
+    translated_horse()
+    print("done.\n", end=''),; stdout.flush()
     # combo()
 
+# =============================================================================
+
+def draw_all():
+    timing_drawings()
+    horse_drawings()
 
 if __name__ == "__main__":
-    draw_all()
+    # draw_all()
+    horse_drawings()

@@ -15,12 +15,12 @@ def random_matrix(n):
     """Generate a random nxn matrix as a list of lists."""
     return [[random() for j in xrange(n)] for i in xrange(n)]
 
-def matrix_vector_multiplication(A, x):
+def matrix_vector_product(A, x):
     """Compute the matrix-vector product Ax (as a list)."""
     m, n = len(A), len(x)
     return [sum([A[i][k] * x[k] for k in range(n)]) for i in range(m)]
 
-def matrix_matrix_multiplication(A, B):
+def matrix_matrix_product(A, B):
     """Compute the matrix-matrix product AB (as a list of lists)."""
     m, n, p = len(A), len(B), len(B[0])
     return [[sum([A[i][k] * B[k][j] for k in range(n)])
@@ -31,7 +31,7 @@ def matrix_matrix_multiplication(A, B):
 
 def prob1(N=8):
     """Use time.time(), timeit.timeit(), or %timeit to time
-    matrix_vector_multiplication(n) and matrix-matrix_multiplication(n) with
+    matrix_vector_product(n) and matrix-matrix-mult(n) with
     increasingly large inputs. Generate the inputs A, x, and B with
     random_matrix() and random_vector()} (so each input will be nxn or nx1).
     Only time the multiplication functions, not the generating functions.
@@ -42,7 +42,7 @@ def prob1(N=8):
     that lead to execution times of more than 1 minute.
     """
     domain = 2**np.arange(1,N+1)
-    vec, mat = [], []
+    vector_times, matrix_times = [], []
 
     for n in domain:
         A = random_matrix(n)
@@ -50,22 +50,21 @@ def prob1(N=8):
         B = random_matrix(n)
 
         start = time()
-        matrix_vector_multiplication(A, x)
-        vec.append(time() - start)
+        matrix_vector_product(A, x)
+        vector_times.append(time() - start)
 
         start = time()
-        matrix_matrix_multiplication(A, B)
-        mat.append(time() - start)
+        matrix_matrix_product(A, B)
+        matrix_times.append(time() - start)
 
-    # First Figure: Matrix-Vector and Matrix-Matrix by themselves in subplots.
     plt.subplot(121)
-    plt.plot(domain, vec, 'b.-', lw=2, ms=15)
-    plt.xlabel("n"); plt.ylabel("Seconds")
+    plt.plot(domain, vector_times, 'b.-', lw=2, ms=15)
+    plt.xlabel("n", fontsize=14); plt.ylabel("Seconds", fontsize=14)
     plt.title("Matrix-Vector Multiplication")
 
     plt.subplot(122)
-    plt.plot(domain, mat, 'g.-', lw=2, ms=15)
-    plt.xlabel("n")
+    plt.plot(domain, matrix_times, 'g.-', lw=2, ms=15)
+    plt.xlabel("n", fontsize=14)
     plt.title("Matrix-Matrix Multiplication")
 
     plt.show()
@@ -73,51 +72,61 @@ def prob1(N=8):
 
 def prob2(N=8):
 
-    domain = 2**np.arange(1,N)
-    vec, mat, npvec, npmat = [], [], [], []
+    domain = 2**np.arange(1,N+1)
+    vector_times, matrix_times = [], []
 
     for n in domain:
-        A = [[random() for j in xrange(n)] for i in xrange(n)]
-        B = [[random() for j in xrange(n)] for i in xrange(n)]
-        x = [random() for i in xrange(n)]
+        A = random_matrix(n)
+        x = random_vector(n)
+        B = random_matrix(n)
 
-        # Time list of lists operations.
-        start = time.time()
-        [sum([A[i][k] * x[k] for k in range(n)]) for i in range(n)]
-        vec.append(time.time() - start)
+        start = time()
+        matrix_vector_product(A, x)
+        vec.append(time() - start)
 
-        start = time.time()
-        [[sum([A[i][k] * B[k][j] for k in range(n)])
-                                 for j in range(n)]
-                                 for i in range(n)]
-        mat.append(time.time() - start)
+        start = time()
+        matrix_matrix_product(A, B)
+        mat.append(time() - start)
 
-        # Time NumPy operations.
-        A, B, x = np.array(A), np.array(B), np.array(x)
-        start = time.time()
-        A.dot(x)
-        npvec.append(time.time() - start)
+    # First Figure: Matrix-Vector and Matrix-Matrix by themselves in subplots.
+    plt.subplot(121)
+    plt.plot(domain, vector_times, 'b.-', lw=2, ms=15)
+    plt.xlabel("n"); plt.ylabel("Seconds")
+    plt.title("Matrix-Vector Multiplication")
 
-        start = time.time()
-        A.dot(B)
-        npmat.append(time.time() - start)
+    plt.subplot(122)
+    plt.plot(domain, matrix_times, 'g.-', lw=2, ms=15)
+    plt.xlabel("n")
+    plt.title("Matrix-Matrix Multiplication")
+
+    plt.show()
+
+    # Time NumPy operations.
+    A, B, x = np.array(A), np.array(B), np.array(x)
+    start = time.time()
+    A.dot(x)
+    npvec.append(time.time() - start)
+
+    start = time.time()
+    A.dot(B)
+    npmat.append(time.time() - start)
 
     plt.subplot(121)
-    plt.plot(domain, vec, '.-', lw=2, label="Matrix-Vector with Lists")
-    plt.plot(domain, mat, '.-', lw=2, label="Matrix-Matrix with Lists")
-    plt.plot(domain, npvec, '.-', lw=2, label="Matrix-Vector with NumPy")
-    plt.plot(domain, npmat, '.-', lw=2, label="Matrix-Matrix with NumPy")
+    plt.plot(domain, vector_times, '.-', lw=2, label="Matrix-Vector with Lists")
+    plt.plot(domain, matrix_times, '.-', lw=2, label="Matrix-Matrix with Lists")
+    plt.plot(domain, npvector_times, '.-', lw=2, label="Matrix-Vector with NumPy")
+    plt.plot(domain, npmatrix_times, '.-', lw=2, label="Matrix-Matrix with NumPy")
     plt.xlabel("n"); plt.ylabel("Seconds")
     plt.legend(loc="upper left")
 
     plt.subplot(122)
-    plt.loglog(domain, vec, '.-', lw=2, basex=2, basey=2,
+    plt.loglog(domain, vector_times, '.-', lw=2, basex=2, basey=2,
                                             label="Matrix-Vector with Lists")
-    plt.loglog(domain, mat, '.-', lw=2, basex=2, basey=2,
+    plt.loglog(domain, matrix_times, '.-', lw=2, basex=2, basey=2,
                                             label="Matrix-Matrix with Lists")
-    plt.loglog(domain, npvec, '.-', lw=2, basex=2, basey=2,
+    plt.loglog(domain, npvector_times, '.-', lw=2, basex=2, basey=2,
                                             label="Matrix-Vector with NumPy")
-    plt.loglog(domain, npmat, '.-', lw=2, basex=2, basey=2,
+    plt.loglog(domain, npmatrix_times, '.-', lw=2, basex=2, basey=2,
                                             label="Matrix-Matrix with NumPy")
     plt.xlabel("n")
     plt.legend(loc="upper left")
