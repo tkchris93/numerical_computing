@@ -270,8 +270,8 @@ The spikes in the plot indicate the times that the array no longer fits in the c
 
 \section*{Linear Transformations} % ===========================================
 
-A \emph{linear transformation} is a mapping on a vector space that preserves addition and scalar multiplication.
-More precisely, for an arbitrary vector space $V$, the mapping $L:V\rightarrow V$ is a linear transformation if and only if it satisfies the following conditions:
+A \emph{linear transformation} is a mapping between vector space that preserves addition and scalar multiplication.
+More precisely, for arbitrary vector spaces $V$ and $W$, the mapping $L:V\rightarrow W$ is a linear transformation if and only if it satisfies the following conditions:
 %
 \begin{itemize}
 \item $T(\x + \y) = T\x + T\y$ for any two vectors $\x,\ \y \in V$
@@ -281,6 +281,29 @@ More precisely, for an arbitrary vector space $V$, the mapping $L:V\rightarrow V
 In $\mathbb{R}^n$, every linear transformation $L$ can be represented by an $n \times n$ matrix $A$.
 To apply $L$ to a vector $\x \in \mathbb{R}^n$, left multiply by the matrix representation.
 
+Linear transformations can be interpreted geometrically.
+
+The array stored in \texttt{horse.txt} has two rows: one for $x$-coordinates, and one for $y$-coordinates.
+
+\begin{align*}
+\left[\begin{array}{cccc}
+x_1 & x_2 & \ldots & x_m \\
+y_1 & y_2 & \ldots & y_m \\
+\end{array}\right]
+\end{align*}
+
+\begin{lstlisting}
+# Load the array from the npy file.
+>>> import numpy as np
+>>> data = np.load("horse.npy")
+
+# Plot the horse with black pixels.
+>>> plt.plot(data[0], data[1], 'k,')
+
+# Set the window limits to [-1, 1]x[-1, 1] and make the window square.
+>>> plt.axis([-1,1,-1,1])
+>>> plt.gca().set_aspect("equal")
+\end{lstlisting}
 
 \subsection*{Dilations}
 A \emph{dilation} of the vector space rescales the vectors.
