@@ -9,7 +9,7 @@ There many protocols in the suite are divided into four abstraction layers:
 \item Application: Software that utilizes transport protocols to move information between computers.
 This layer includes protocols important for email, file transfers, and browsing the web.
 \item Transport: Protocols that define basic high level communication between two computers.
-The two most common protocols in this layer are TCP and UDP. 
+The two most common protocols in this layer are TCP and UDP.
 TCP is by far the most widely used due to its reliability.
 UDP, however, trades reliability for low latency.
 \item Internet: Protocols that handle routing and movement of data on a network.
@@ -25,7 +25,7 @@ Specifically, TCP creates network \textit{sockets}. These sockets send and recei
 
 
 \subsection*{Creating the Server}
-First, create a new socket object. 
+First, create a new socket object.
 The socket object will be able to listen for and accept incoming connections from other sockets.
 
 
@@ -41,7 +41,7 @@ A port is analogous to a mailbox on the computer.
 There are 65535 available ports.
 Of those, about 250 are commonly used.
 Certain ports are have pre-defined uses. For example:
-\begin{itemize}  
+\begin{itemize}
         \item 0 to 1023: Special reserved ports
         \item  80, 443: Commonly used for web traffic
         \item 25, 110, 143, 465: Commonly used for email servers
@@ -56,7 +56,7 @@ s.bind((address, 33498)) #bind to an arbitrary port number
 s.listen(1)
 \end{lstlisting}
 
-Next we tell the socket what do with incoming connections. 
+Next we tell the socket what do with incoming connections.
 Once a connection is made, the \li{accept} method returns the connection, which is itself a socket object.
 The connection object receives data in blocks, so we specify a block size in bits.
 Data is received in string form.
@@ -90,9 +90,9 @@ client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 We specify the address of the server, and the port (this needs to be the same port on which the server is listening). We then connect to the server.
 
 \begin{lstlisting}
-ip = '127.0.0.1' 
+ip = '127.0.0.1'
 port = 33498
-client.connect((ip, port)) 
+client.connect((ip, port))
 \end{lstlisting}
 
 Once connected, the client can send and receive data.
@@ -104,7 +104,7 @@ msg = "Trololololo, lolololololo, ahahahaha."
 client.send(msg)
 
 print "Waiting for the server to echo back the data..."
-data = client.recv(size) 
+data = client.recv(size)
 print "Server echoed back:", data
 
 client.close()
@@ -115,7 +115,7 @@ To see the client and server communicate, open a terminal and run the server. Th
 \begin {table}
 \begin{tabular}{| l | p{8cm}|}
 	\hline
-	Command & Description\\ 
+	Command & Description\\
 	\hline
 	\li{bind((address, port)) }&  Binds to a port and an address.\\
 	\li{listen} & Starts listening for requests.\\
@@ -125,7 +125,7 @@ To see the client and server communicate, open a terminal and run the server. Th
 	\li{close} & Closes the socket.\\
 	\li{gethostname} & Returns the host name of the machine.\\
 	\li{getsockname} & Returns the socket's own address.\\
-	
+
 	\hline
 \end {tabular}
 \caption{Table of Socket Commands}
@@ -138,7 +138,7 @@ Also write a file called \li{simple_client.py}. In this file, create a client so
 \end{problem}
 
 \begin{problem}
-Write a file called \li{rps_server.py}, which plays rock-paper-scissors with a client. The server should accept a connection, and while the connection is open, cycle through the following loop: 
+Write a file called \li{rps_server.py}, which plays rock-paper-scissors with a client. The server should accept a connection, and while the connection is open, cycle through the following loop:
 \begin {itemize}
 	\item{Receive a move ("rock","paper", or "scissors").}
 	\item{Generate a random move of its own. Print both moves.}
@@ -181,7 +181,7 @@ GET requests are typically used to request information from a server.
 POST requests are sent to the server with the intent of modifying the state of the server.  We can send additional information with both GET and POST requests.
 
 Every HTTP request consists of two parts: a header and a body.
-The headers contain important information about the request such as the type of request, encoding, among other things.  
+The headers contain important information about the request such as the type of request, encoding, among other things.
 We can add custom headers to any request to provide additional information.
 The body of the request contains the requested data.
 The body of a request may or may not be empty.
@@ -203,7 +203,7 @@ print data      # long string
 \end{lstlisting}
 We start by creating a connection to specific host.
 Then we make a request.  In this case, we use GET request.
-The host we are connected to will respond and we retrieve the response. 
+The host we are connected to will respond and we retrieve the response.
 We will need to check the status of the response to know if our request was processed successfully.
 A status code of $200$ means that everything went alright.
 We can now attempt to read the data of the response.
