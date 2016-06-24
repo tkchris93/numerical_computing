@@ -68,12 +68,13 @@ def four_state_forecast(days):
         record.append(current_state)
     return record
 # Roughly 24.6% of the entries should be zeros.
-# Roughly 30.1% of the entries should be ones.
-# Roughly 33.2% of the entries should be twos.
+# Roughly 30.0% of the entries should be ones.
+# Roughly 33.3% of the entries should be twos.
 # Roughly 12.1% of the entries should be threes.
 
 
 # Problem 4
+# TODO: Turn this problem into an explanation of steady states.
 def analyze_simulation():
     """Investigate and interpret the results of the simulations in the previous
     two problems. Specifically, find the average percentage of days that are
@@ -121,8 +122,8 @@ class SentenceGenerator(object):
         """
         self.filename = filename
         self.states = ["$tart"]
-        
-        # Initialize an empty transition matrix.
+
+        # Initialize an empty transition matrix of the appropriate size.
         with open(self.filename, 'r') as source:
             self.num_states = len(set(source.read().split())) + 2
         self.chain = np.zeros((self.num_states, self.num_states))
@@ -131,18 +132,18 @@ class SentenceGenerator(object):
         with open(self.filename, 'r') as source:
             for line in source:
                 sentence = line.split()
-                
+
                 for word in sentence:
                     if word not in self.states:
                         self.states.append(word)
-                index = [self.states.index(word) for word in sentence]
-                
-                self.chain[0, index[0]] += 1                # &tart -> first
+                indices = [self.states.index(word) for word in sentence]
+
+                self.chain[0, indices[0]] += 1                 # &tart -> first
                 for i in xrange(len(index)-1):
-                    self.chain[index[i], index[i+1]] += 1   # middle -> next
-                self.chain[index[-1], -1] += 1              # last -> $top
-        
-        self.chain[-1, -1] = 1
+                    self.chain[indices[i], indices[i+1]] += 1  # middle -> next
+                self.chain[indices[-1], -1] += 1               # last -> $top
+
+        self.chain[-1, -1] = 1.
         self.states.append("$top")
 
         # Make each row sum to 1.
@@ -158,13 +159,13 @@ class SentenceGenerator(object):
         stop = self.num_states - 1
         path = []
         state = 0
-        
+
         # Begin at the start state and end at the stop state.
         while state != stop:        # Transition to a new state...
             state = np.argmax(np.random.multinomial(1, self.chain[state]))
             if state != stop:       # ...and record the corresponding word.
                 path.append(self.states[state])
-        
+
         return " ".join(path)
 
 

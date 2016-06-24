@@ -70,7 +70,8 @@ Each of these outputs can be accessed either by indexing \li{OptimizeResult} obj
 We recommend access by indexing, as this is consistent with other optimization packages in Python.
 
 The online documenation for \li{scipy.optimize.minimize()} includes other optional parameters available to users, for example, to set a tolerance of convergence. 
-While these are not required for this lab, they should be explored as needed for specific applications.
+In some methods, the derivative may be optional, while it may be necessary in others. 
+While we do not cover all possible parameters in this lab, they should be explored as needed for specific applications.
 
 \begin{problem} % Minimize the Rosenbrock function.
 Use the \li{opt.minimize()} function to find the minimum of the Rosenbrock function.
@@ -170,7 +171,7 @@ However, if there are many valleys (or local minima), the ball can get stuck in 
 The \li{opt.basinhopping()} function uses the same minimizing algorithms (in fact, you can tell it whatever minimizing algorithm you can pass to \li{opt.minimize()}).
 However, once it settles on a minimum, it hops to a new point in the domain (depending on how we set the ``hopping" distance) that hopefully lies outside of the valley
 or basin belonging to the current local minimum.
-It then searches for the minimum from this new starting point, and if it finds a better minimizer, it repeats the hopping process from this new minimizer.
+It then searches for the minimum from this new starting point, and if it finds a better minimizer, it repeats the hopping process from this new minimizer. 
 
 \emph{Only Scipy Version 0.12+ has \li{opt.basinhopping}. In earlier versions, such as 0.11, you won't find it.}
 
@@ -282,7 +283,7 @@ See Figure \ref{opt:curve_fit} for a plot of the data and the fitted curve.
 
 \begin{figure}
 \includegraphics[width=\textwidth]{curve_fit.pdf}
-\caption{Perturbed data graphed with the curve using the fitted parameters: $a=2.72$,  $b=1.31$, and $c=0.45$.}
+\caption{Example of perturbed data graphed with the resulting curve using the fitted parameters: $a=2.72$,  $b=1.31$, and $c=0.45$.}
 \label{opt:curve_fit}
 \end{figure}
 
@@ -295,11 +296,12 @@ The relevant convection equation is:
 \nu = cR^\beta,
 \]
 where $c$ and $\beta$ are some constants. 
-Use \li{opt.curve_fit()} to find a fit to the data using $c$ and $\beta$ as the fitting parameters.
+Use \li{opt.curve_fit()} to find a fit to the data using $c$ and $\beta$ as the fitting parameters. 
+See Figure \ref{opt:ConvectionFit} for a plot of the data along with a fitted curve.
+Though it may be difficult to see in the figure, the first six points skew the data, and do not help us determine the appropriate long-term values of $c$ and $\beta$. Thus, do not use the first six points when fitting a curve to the data.
+
 Just so that you know that you are getting realistic values, $c$ should be on the order of $10^{-2}$, and $\beta$ on the order of $10^{0}$.
 Return your values for $c$, and $\beta$ in a NumPy array of length 2.
-
-See Figure \ref{opt:ConvectionFit} for a plot of the data along with a fitted curve.
 \end{problem}
 
 \begin{figure}

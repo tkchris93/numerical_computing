@@ -110,7 +110,7 @@ A \emph{namespace} is a dictionary that maps names to Python objects.
 # The name for this function is 'add_numbers'.
 >>> def add_numbers(a, b):
 ...     return a + b
-... 
+...
 \end{lstlisting}
 
 A single equals sign assigns a name to an object.
@@ -144,7 +144,7 @@ NameError: name 'num' is not defined>>
 Many programming languages distinguish between \emph{variables} and \emph{pointers}.
 A pointer holds a memory location where an object is stored.
 % Pointer arithmetic and manipulation is delicate, occasionally very useful, but often cumbersome.
-% 
+%
 Python names are essentially pointers. %but pointer operations are done automatically,
 Objects in memory that have no names pointing to them are automatically deleted (this is called \emph{garbage collection}).
 % Understanding how Python handles memory access via names is important for implementing reference-based data structures, such as linked lists and trees.
@@ -324,7 +324,7 @@ This file was executed from the command line or an interpreter.>>
 \end{lstlisting}
 
 Executing the file with IPython's \li{run} command executes each line of the file and also adds the module's names to the current namespace.
-This is the quickest way to test individual functions via IPython.
+\emph{This is the quickest way to test individual functions via IPython}.
 
 \begin{lstlisting}
 In [1]: run example1.py              # or 'run example1'.
@@ -455,16 +455,16 @@ mathematical functions defined by the C standard.>>
 
 # Type the module name, a period, then press tab to see the module's namespace.
 In [3]: math.   # Press 'tab'.
-<<math.acos       math.atanh      math.e          math.factorial  
-math.hypot      math.log10      math.sin        math.acosh      
-math.ceil       math.erf        math.floor      math.isinf      
-math.log1p      math.sinh       math.asin       math.copysign   
-math.erfc       math.fmod       math.isnan      math.modf       
-math.sqrt       math.asinh      math.cos        math.exp        
-math.frexp      math.ldexp      math.pi         math.tan        
-math.atan       math.cosh       math.expm1      math.fsum       
-math.lgamma     math.pow        math.tanh       math.atan2      
-math.degrees    math.fabs       math.gamma      math.log        
+<<math.acos       math.atanh      math.e          math.factorial
+math.hypot      math.log10      math.sin        math.acosh
+math.ceil       math.erf        math.floor      math.isinf
+math.log1p      math.sinh       math.asin       math.copysign
+math.erfc       math.fmod       math.isnan      math.modf
+math.sqrt       math.asinh      math.cos        math.exp
+math.frexp      math.ldexp      math.pi         math.tan
+math.atan       math.cosh       math.expm1      math.fsum
+math.lgamma     math.pow        math.tanh       math.atan2
+math.degrees    math.fabs       math.gamma      math.log
 math.radians    math.trunc>>
 
 In [4]: math.sqrt?
@@ -505,7 +505,7 @@ Command line arguments can be used to control a script's behavior, as in the fol
 import sys
 
 if len(sys.argv) != 2:
-    print("An extra command line argument is required")
+    print("One extra command line argument is required")
 else:
     print(sys.argv[1].upper())
 \end{lstlisting}
@@ -608,7 +608,7 @@ Your game should match the following specifications:
 \item Keep track of the remaining numbers.
 \item Use the \li{random} module to simulate rolling two six-sided dice.
 If the sum of the remaining numbers is 6 or less, role only one die.
-\item Print the remaining numbers and the sum of the dice roll at each turn. 
+\item Print the remaining numbers and the sum of the dice roll at each turn.
 \item If the game is not over, prompt the user for numbers to eliminate after each dice roll.
 The input should be one or more of the remaining integers, separated by spaces.
 If the user's input is invalid, prompt them for input again before rolling the dice again.
@@ -695,6 +695,8 @@ Game over!
 
 <<Score for player TA: 22 points>>
 \end{lstlisting}
+
+\label{prob:shut-the-box}
 \end{problem}
 
 \newpage
@@ -712,44 +714,148 @@ Function & Description \\ \hline
 \li{any()} & Return \li{True} if \li{bool(entry)} evaluates to \li{True} for \emph{any} entry in the\\&input iterable.\\
 \li{bool()} & Evaluate a single input object as \li{True} or \li{False}.\\
 \li{eval()} & Execute a string as Python code and return the output.\\
-% \li{hash()} & \\
 % TODO: delete this one (input()) for Python 3.
 \li{input()} & Prompt the user for input and evaluate it (\li{eval(raw_input())}).\\
-% \li{iter()} & \\
 \li{map()} & Apply a function to every item of the input iterable and return \\&a list of the results.\\
 \li{reduce()} & Apply a function accepting two arguments cumulatively to the \\&items of the input iterable from left to right (thus reducing it to\\&a single output).
-% \li{repr()} &
 \end{tabular}
 \end{table}
 
+The \li{all()} and \li{any()} functions are particularly useful for creating readable code when used in conjunction conditionals or list comprehensions.
+
+\begin{lstlisting}
+>>> from random import randint
+# Get 5 random numbers between 1 and 10, inclusive
+>>> numbers = [randint(1,10) for _ in xrange(5)]
+
+# If all of the numbers are less than 8, print the list.
+>>> if all([num < 8 for num in numbers]):
+...     print(numbers)
+...
+[1, 5, 7, 3, 4]
+
+# If none of the numbers are even, print the list.
+>>> if not any([num % 2 == 0 for num in numbers]):
+...     print(numbers)
+...
+\end{lstlisting}
+
+\subsection*{Two-Player Shut the Box} % ---------------------------------------
+
+% \emph{``A game that you can play with your girlfriend is much more fun than a game that you can only play alone.''}
+% \begin{flushright}\emph{---Emily Evans}\end{flushright}
+% %
+Consider modifying your Shut the Box program so that it pits two players against each other (one player tries to shut the box while the other tries to keep it open).
+The first player plays a regular round as described in Problem \ref{prob:shut-the-box}.
+If they fail to shut the box, the second player begins a round, but his or her initial list of numbers to eliminate contains all of the numbers that the first player had eliminated.
+If the second player loses, the first player gets another round to try to shut the box with the numbers that the second player had eliminated.
+Play continues until one of the players eliminates their entire list.
+
 \subsection*{Python Packages} % -----------------------------------------------
 
-Suppose that we have a handmade module like \texttt{calculator.py} that we would like to use, but which is saved in a different directory than our current file.
-In order to use the module, we must make the directory where it is located into a Python \emph{package}.
-To do this, create a file named \texttt{\_\_init\_\_.py} in the same directory as the module to be imported.
-To import the module, we specify the path to the module relative to the current file.
+Large projects often have code spread throughout several folders and files.
+In order to get related files in different folders to communicate properly, we must make the associated directories into Python \emph{packages}.
+This is a common procedure when creating smart phone applications and other programs that have graphical user interfaces (GUIs).
 
-As an example, suppose we are currently working on a Python file called \texttt{Trees.py} in a folder called \texttt{structures}.
-The \texttt{structures} folder is contained within the \texttt{projects} folder, which also contains a \texttt{tools} folder where the \texttt{calculator.py} module is stored.
-The complete directory might look something like this.
+A package must contain a file called \texttt{\_\_init\_\_.py}.
+This file is always executed first whenever the package is used.
+If the package or sub-package has a main routine, it should be placed in a file called \texttt{\_\_main\_\_.py}, though this file is technically nonessential.
+Running the package will execute \texttt{\_\_init\_\_.py} and \texttt{\_\_main\_\_.py}, but importing the package will only execute \texttt{\_\_init\_\_.py}.
+
+Suppose we are working on a project with the following file directories.
 
 \begin{lstlisting}
-<<projects/
-    structures/
-        LinkedLists.py
-        Trees.py
-    tools/
+<<ssb/
         __init__.py
-        calculator.py
-        abacus.py>>
+        __main__.py
+        characters/
+                __init__.py
+                link.py
+                mario.py
+        gui/
+                __init__.py
+                character_select.py
+                main_menu.py
+                stage_select.py
+        play/
+                __init__.py
+                damage.py
+                sounds.py
+        spoileralert/
+                __init__.py
+                __main__.py
+                jigglypuff.py>>
 \end{lstlisting}
 
-To import the \texttt{calculator.py} module to \texttt{Trees.py}, use the following import command in \texttt{Trees.py}:
+Use the regular syntax to import a module that is in the current folder.
+Use the syntax \li{from <package.module> import <names>} to load a module within a subpackage,
+Once a name has been loaded into \texttt{ssb/\_\_init\_\_.py}, other files can load the same name with \li{from . import <name>}.
+Thus the files \texttt{ssb/\_\_init\_\_.py} and \texttt{ssb/\_\_main\_\_.py} might be as follows:
 
 \begin{lstlisting}
-from ..tools import calculator
+print("ssb/__init__.py")
+
+# Load some packages.
+import characters, play
+# Import the start() function from the main_menu module in the gui subpackage.
+from gui.main_menu import start
 \end{lstlisting}
 
-This tells the interpreter to go up one level, enter the \texttt{tools/} directory, and then load the \texttt{calculator.py} module.
-For more details and examples on this topic, see \url{https://docs.python.org/2/tutorial/modules.html\#packages}.
+\begin{lstlisting}
+print("ssb/__main__.py")
 
+# Load a name that was already imported in ssb/__init__.py
+from . import start
+print("Starting game...")
+start()
+\end{lstlisting}
+
+To access code in a file in the directory one level above the current directory, use the syntax \li{from .. imort <name>} or \li{from ..<module> import <name>} (no space after the two periods).
+This tells the interpreter to go up one level, enter the specified subpackage or module, and import the name.
+This is called an \emph{explicit relative import} and cannot be done in files that are executed directly.
+
+For instance, \texttt{ssb/gui/\_\_init\_\_.py} might need to access \texttt{ssb/play/sounds.py}.
+
+\begin{lstlisting}
+print("ssb/gui/__init__.py")
+
+from ..play import sounds           # Import a module from the play subpackage.
+print("Initializing GUI...")
+\end{lstlisting}
+
+To run a package, run python from the shell with the flag \li{-m} (for ``module-name'') and exclude the extension \texttt{.py}.
+
+\begin{lstlisting}[language=bash]
+$ python -m ssb
+ssb/__init__.py
+ssb/gui/__init__.py
+Initializing GUI...
+ssb/__main__.py
+Starting game...
+\end{lstlisting}
+
+Separate directories by a period to run a subpackage.
+Remember that running a package executes the \texttt{\_\_main\_\_.py} files in addition to the \texttt{\_\_init\_\_.py} files.
+
+\begin{lstlisting}
+print("ssb/spoileralert/__init__.py")
+\end{lstlisting}
+
+\begin{lstlisting}
+print("ssb/spoileralert/__main__.py")
+
+print("Challenger Approaching!")
+import jigglypuff
+\end{lstlisting}
+
+\begin{lstlisting}[language=bash]
+$ python -m ssb.spoileralert
+ssb/__init__.py
+ssb/gui/__init__.py
+Initializing GUI...
+ssb/spoileralert/__init__.py
+ssb/spoileralert/__main__.py
+Challenger Approaching!
+\end{lstlisting}
+
+See \url{https://docs.python.org/2/tutorial/modules.html\#packages} for more details and examples on this topic.
