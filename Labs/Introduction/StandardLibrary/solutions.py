@@ -9,7 +9,7 @@ def add(x,y):
 
 def mult(x,y):
     return x * y
- 
+
 def sqrt(x):
     return x**.5
     # or 'from math import sqrt' at the top.
@@ -90,7 +90,7 @@ def prob2():
 # Problem 3: Write a 'calculator' module and use it to implement this function.
 def prob3(a,b):
     """Calculate and return the length of the hypotenuse of a right triangle.
-    Do not use any methods other than those that are imported from the
+    Do not use any methods other than those that are imported from your
     'calculator' module.
     Parameters:
         a : the length one of the sides of the triangle.
@@ -108,7 +108,7 @@ def prob3(a,b):
     return sqrt(a2plusb2)
 
 
-# Problem 4
+# Problem 4: Implement shut the box.
 def shut_the_box():
     """Play a single game of shut the box."""
 
@@ -162,37 +162,3 @@ def shut_the_box():
 if __name__ == "__main__":
     shut_the_box()
 
-
-# Old Problem 4 (delete or move to a different lab)
-def prob4():
-    """If no command line argument is given, print "No Input."
-    If anything other than "matrices.npz is given, print "Incorrect Input."
-    If "matrices.npz" is given as a command line argument, use functions
-    from the provided 'matrix_multiply' module to load two matrices, then
-    time how long each method takes to multiply the two matrices together.
-    Print your results to the terminal.
-    """
-    # Students should use matrix_multiply.method() instead of method()
-    # m = matrix_multiply     # or "import matrix_multiply as m" at the top
-    if len(sys.argv) == 1:
-        print("No Input.")
-    elif sys.argv[1] != "matrices.npz":
-        print("Incorrect Input.")
-    else:   # If the correct filename is given,
-        # load the matrices
-        A,B = load_matrices(sys.argv[1])
-        
-        # time method1()
-        start = time.time()
-        method1(A,B)
-        print(time.time() - start)
-        
-        # time method2()
-        start = time.time()
-        method2(A,B)
-        print(time.time() - start)
-        
-        # time method3()
-        start = time.time()
-        method3(A,B)
-        print(time.time() - start)

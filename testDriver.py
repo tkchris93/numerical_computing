@@ -126,7 +126,7 @@ class _testDriver(object):
         self.feedback = ""
 
     # Main routine ------------------------------------------------------------
-    def test_all(self, student_module, total=100):
+    def test_all(self, student_module, total=40):
         """Grade the provided module on each problem and compile feedback."""
         # Reset feedback and score.
         self.feedback = ""

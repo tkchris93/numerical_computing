@@ -7,7 +7,6 @@ A Python file with code that can be imported is called a \emph{module}.
 All Python distributions include a collection of modules for accomplishing a variety of tasks, collectively called the \emph{Python Standard Library}.
 In this lab we explore some built-in functions, learn how to create, import, and use modules, and become familiar with the standard library.}
 
-
 \section*{Built-in Functions} % ===============================================
 
 Every Python installation comes with several built-in functions that may be used at any time.
@@ -721,7 +720,7 @@ Function & Description \\ \hline
 \end{tabular}
 \end{table}
 
-The \li{all()} and \li{any()} functions are particularly useful for creating readable code when used in conjunction conditionals or list comprehensions.
+The \li{all()} and \li{any()} functions are particularly useful for creating readable code when used in conjunction with conditionals or list comprehensions.
 
 \begin{lstlisting}
 >>> from random import randint
@@ -732,10 +731,10 @@ The \li{all()} and \li{any()} functions are particularly useful for creating rea
 >>> if all([num < 8 for num in numbers]):
 ...     print(numbers)
 ...
-[1, 5, 7, 3, 4]
+[1, 5, 6, 3, 3]
 
-# If none of the numbers are even, print the list.
->>> if not any([num % 2 == 0 for num in numbers]):
+# If none of the numbers are divisible by 3, print the list.
+>>> if not any([num % 3 == 0 for num in numbers]):
 ...     print(numbers)
 ...
 \end{lstlisting}
@@ -745,22 +744,23 @@ The \li{all()} and \li{any()} functions are particularly useful for creating rea
 % \emph{``A game that you can play with your girlfriend is much more fun than a game that you can only play alone.''}
 % \begin{flushright}\emph{---Emily Evans}\end{flushright}
 % %
-Consider modifying your Shut the Box program so that it pits two players against each other (one player tries to shut the box while the other tries to keep it open).
+Consider modifying your shut the box program so that it pits two players against each other (one player tries to shut the box while the other tries to keep it open).
 The first player plays a regular round as described in Problem \ref{prob:shut-the-box}.
-If they fail to shut the box, the second player begins a round, but his or her initial list of numbers to eliminate contains all of the numbers that the first player had eliminated.
+Suppose he or she eliminates every number but 2, 3, and 6.
+The second player then begins a round with the numbers 1, 4, 5, 7, 8, and 9, the numbers that the first player had eliminated.
 If the second player loses, the first player gets another round to try to shut the box with the numbers that the second player had eliminated.
 Play continues until one of the players eliminates their entire list.
 
 \subsection*{Python Packages} % -----------------------------------------------
 
-Large projects often have code spread throughout several folders and files.
+Large programming projects often have code spread throughout several folders and files.
 In order to get related files in different folders to communicate properly, we must make the associated directories into Python \emph{packages}.
 This is a common procedure when creating smart phone applications and other programs that have graphical user interfaces (GUIs).
 
-A package must contain a file called \texttt{\_\_init\_\_.py}.
+A package is simply a folder that contains a file called \texttt{\_\_init\_\_.py}.
 This file is always executed first whenever the package is used.
-If the package or sub-package has a main routine, it should be placed in a file called \texttt{\_\_main\_\_.py}, though this file is technically nonessential.
-Running the package will execute \texttt{\_\_init\_\_.py} and \texttt{\_\_main\_\_.py}, but importing the package will only execute \texttt{\_\_init\_\_.py}.
+A package must also have a file called \texttt{\_\_main\_\_.py} to be executable.
+Executing the package will run \texttt{\_\_init\_\_.py} and then \texttt{\_\_main\_\_.py}, but importing the package will only run \texttt{\_\_init\_\_.py}.
 
 Suppose we are working on a project with the following file directories.
 
@@ -781,23 +781,22 @@ Suppose we are working on a project with the following file directories.
                 __init__.py
                 damage.py
                 sounds.py
-        spoileralert/
+        spoilers/
                 __init__.py
                 __main__.py
                 jigglypuff.py>>
 \end{lstlisting}
 
-Use the regular syntax to import a module that is in the current folder.
-Use the syntax \li{from <package.module> import <names>} to load a module within a subpackage,
-Once a name has been loaded into \texttt{ssb/\_\_init\_\_.py}, other files can load the same name with \li{from . import <name>}.
+Use the regular syntax to import a module or subpackage that is in the current package, and use \li{from <subpackage.module> import <<<object>>>} to load a module within a subpackage.
+Once a name has been loaded into a package's \texttt{\_\_init\_\_.py}, other files in the same package can load the same name with \li{from . import <<<object>>>}.
 Thus the files \texttt{ssb/\_\_init\_\_.py} and \texttt{ssb/\_\_main\_\_.py} might be as follows:
 
 \begin{lstlisting}
 print("ssb/__init__.py")
 
-# Load some packages.
-import characters, play
-# Import the start() function from the main_menu module in the gui subpackage.
+# Load a subpackage.
+import characters
+# Import the start() function from the main_menu module in the gui/ subpackage.
 from gui.main_menu import start
 \end{lstlisting}
 
@@ -806,56 +805,71 @@ print("ssb/__main__.py")
 
 # Load a name that was already imported in ssb/__init__.py
 from . import start
-print("Starting game...")
+print("\tStarting game...")
 start()
 \end{lstlisting}
 
-To access code in a file in the directory one level above the current directory, use the syntax \li{from .. imort <name>} or \li{from ..<module> import <name>} (no space after the two periods).
-This tells the interpreter to go up one level, enter the specified subpackage or module, and import the name.
-This is called an \emph{explicit relative import} and cannot be done in files that are executed directly.
+To access code in the directory one level above the current directory, use the syntax \li{from .. import <<<object>>>}
+This tells the interpreter to go up one level and import the object from there.
+This is called an \emph{explicit relative import} and cannot be done in files that are executed directly (like \texttt{\_\_main\_\_.py}).
 
-For instance, \texttt{ssb/gui/\_\_init\_\_.py} might need to access \texttt{ssb/play/sounds.py}.
+For instance, \texttt{ssb/gui/\_\_init\_\_.py} might need to access \texttt{ssb/} subpackages.
 
 \begin{lstlisting}
 print("ssb/gui/__init__.py")
 
-from ..play import sounds           # Import a module from the play subpackage.
-print("Initializing GUI...")
+from .. import characters           # Import a subpackage from the ssb/ package.
+from ..play import sounds           # Import a module from the play/ subpackage.
+print("\tInitializing GUI...")
 \end{lstlisting}
 
-To run a package, run python from the shell with the flag \li{-m} (for ``module-name'') and exclude the extension \texttt{.py}.
+To execute a package, run Python from the shell with the flag \li{-m} (for ``module-name'') and exclude the extension \texttt{.py}.
+Suppose each file prints out its own name.
 
 \begin{lstlisting}[language=bash]
 $ python -m ssb
-ssb/__init__.py
+ssb/__init__.py                     # First run ssb/__init__.py.
+ssb/characters/__init__.py
 ssb/gui/__init__.py
-Initializing GUI...
-ssb/__main__.py
-Starting game...
+ssb/play/__init__.py
+ssb/play/sounds.py
+    Initializing GUI...
+ssb/gui/main_menu.py
+ssb/__main__.py                     # Then run ssb/__main__.py.
+    Starting game...
 \end{lstlisting}
 
 Separate directories by a period to run a subpackage.
-Remember that running a package executes the \texttt{\_\_main\_\_.py} files in addition to the \texttt{\_\_init\_\_.py} files.
 
 \begin{lstlisting}
-print("ssb/spoileralert/__init__.py")
-\end{lstlisting}
+print("ssb/spoilers/__main__.py")
 
-\begin{lstlisting}
-print("ssb/spoileralert/__main__.py")
-
-print("Challenger Approaching!")
+print("\tChallenger Approaching!")
 import jigglypuff
 \end{lstlisting}
 
 \begin{lstlisting}[language=bash]
+# Run spoilers/ as a subpackage.
 $ python -m ssb.spoileralert
-ssb/__init__.py
+ssb/__init__.py                     # First run ssb/__init__.py.
+ssb/characters/__init__.py
 ssb/gui/__init__.py
-Initializing GUI...
-ssb/spoileralert/__init__.py
-ssb/spoileralert/__main__.py
-Challenger Approaching!
+ssb/play/__init__.py
+ssb/play/sounds.py
+    Initializing GUI...
+ssb/gui/main_menu.py
+ssb/spoilers/__init__.py            # Second run ssb/spoilers/__init__.py.
+ssb/spoilers/__main__.py            # Finally run ssb/spoilers/__main__.py.
+    Challenger Approaching!
+ssb/spoilers/jigglypuff.py
+
+# Change directories to ssb/ to run spoilers/ without running ssb/.
+$ cd ssb
+$ python -m spoilers
+ssb/spoilers/__init__.py            # First run ssb/spoilers/__init__.py.
+ssb/spoilers/__main__.py            # Then run ssb/spoilers/__main__.py.
+    Challenger Approaching!
+ssb/spoilers/jigglypuff.py
 \end{lstlisting}
 
 See \url{https://docs.python.org/2/tutorial/modules.html\#packages} for more details and examples on this topic.
