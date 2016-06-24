@@ -77,6 +77,7 @@ def _timeout(seconds):
         raise TimeoutError("Timeout after {0} seconds".format(seconds))
 
     def decorator(func):
+        @wraps(func)
         def wrapper(*args, **kwargs):
             signal.signal(signal.SIGALRM, _handler)
             signal.alarm(seconds)               # Set the alarm.

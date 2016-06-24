@@ -1,0 +1,342 @@
+\lab{Linear Transformations}{Linear Transformations}
+% \objective{Apply affine transformations to a set of vectors in $\mathbb{R}^2$ and solve linear systems.}
+% \objective{Introduce the temporal and spatial complexity and explore SciPy's methods for working with sparse matrices.}
+
+\section*{SciPy} % ============================================================
+
+SciPy is . . .
+
+\subsection*{Linear Algebra} % ------------------------------------------------
+
+Both NumPy and SciPy have a linear algebra library, but the SciPy library is larger.
+The SciPy linear algebra library is typically imported as follows:
+
+\begin{lstlisting}
+from scipy import linalg as la
+\end{lstlisting}
+
+The linear algebra library contains several functions to construct special
+matrices, located in \li{linalg.special_matrices}.
+There are also functions that will invert matrices, find determinants and norms, solve linear systems and least squares problems, and find special matrix decompositions.
+You can read more about the linear algebra capabilities of SciPy in the documentation for the \li{linalg} module found at \url{http://docs.scipy.org/doc/scipy/reference/linalg.html}.
+
+Finally, the \li{scipy.linalg} library has a \li{matrix} class that is very
+similar to a 2-D NumPy array.
+The matrix class can be convenient when doing matrix operations.
+However, in such situations we still recommend using NumPy arrrays, which have many of the same features and are also compatible with all other SciPy operations.
+
+The \li{scipy.linalg} library will be essential for the remainder of the labs in this manual.
+We will address the details of this package at length in future labs.
+
+\section*{Linear systems} % ===================================================
+
+This section describes efficient algorithms for solving systems of linear equations.
+
+\subsection*{Programming Elementry Row Operations} % --------------------------
+
+When you perform a row operation on a matrix, you are really left-multiplying by some elementary matrix. 
+However, matrix multiplication is not the most efficient way to implement row operations. It is much faster to perform row operations by modifying the array in place, and only changing those entries that are affected by the operation. 
+The following code implements the three elementary row operations by modifying the array in place.
+
+\lstinputlisting[style=fromfile]{row_opers.py}
+
+\subsection*{Programming Row Reduction} % -------------------------------------
+
+When you solve a linear system by reducing the matrix with row operations, it is most efficient to reduce only to row echelon form (REF)
+\footnote{We do not require leading coefficients to be 1 in the REF.} 
+and then use back substitution. 
+Here is some code that reduces a matrix to REF.
+
+\begin{lstlisting}
+>>> A = np.array([[4., 5., 6., 3.],[2., 4., 6., 4.],[7., 8., 0., 5.]])
+array([[ 4.,  5.,  6.,  3.],
+       [ 2.,  4.,  6.,  4.],
+       [ 7.,  8.,  0.,  5.]])
+>>> A[1] -= (A[1,0]/A[0,0]) * A[0]
+>>> A[2] -= (A[2,0]/A[0,0]) * A[0]
+>>> A[2,1:] -= (A[2,1]/A[1,1]) * A[1,1:]
+>>> A
+array([[ 4. ,  5. ,  6. ,  3. ],
+       [ 0. ,  1.5,  3. ,  2.5],
+       [ 0. ,  0. , -9. ,  1. ]])
+\end{lstlisting}
+
+The third row operation modified only a part of the third row because we knew that the first value would still be 0. 
+Modifying only those entries of the array that are affected by a row operation will save a lot of time when you are row reducing a large matrix.
+
+Beware that round-off error in row reduction can cause serious problems.
+Suppose we wish to row reduce a matrix $A$ as follows.
+
+\begin{lstlisting}
+>>> A = np.array([[4., 5., 6., 3.],[2., 2.5, 6., 4.],[7., 8., 0., 5.]])
+array([[ 4.,  5.,  6.,  3.],
+       [ 2.,  2.5,  6.,  4.],
+       [ 7.,  8.,  0.,  5.]])
+>>> A[1] -= (A[1,0]/A[0,0]) * A[0]
+>>> A[2] -= (A[2,0]/A[0,0]) * A[0]
+\end{lstlisting}
+
+If we work this out by hand, at this point we have
+
+\begin{equation}\label{equ:correct_ans}
+A = \begin{pmatrix}
+4&5&6&3 \\
+0&0&3&2.5 \\
+0&-7.5&-10.5&-.25
+\end{pmatrix}.
+\end{equation}
+
+If we swap the second and third rows, then the matrix is in row echelon form. 
+However, suppose that due to round-off error, the machine instead computes
+
+\[
+A = \begin{pmatrix}
+4&5&6&3 \\
+0&10^{-15}&3&2.5 \\
+0&-7.5&-10.5&-.25
+\end{pmatrix}.
+\]
+
+The algorithm would then attempt to pivot on the \li{A[1,1]} entry as follows.
+
+\begin{lstlisting}
+>>> A[2,1:] -= (A[2,1]/A[1,1]) * A[1,1:]
+>>> A
+array([[ 4. ,  5.0e+00 , 6.00e+00 ,  3.000e-00 ],
+       [ 0. ,  1.0e-14 , 3.00e+00 ,  2.500e-00 ],
+       [ 0. ,  0.0e+00 , 2.25e+14 ,  1.875e+14 ]])
+\end{lstlisting}
+
+The round-off error in the \li{A[1,1]} entry has affected the third row, and the matrix is now much different than the correct answer in (\ref{equ:correct_ans}). 
+In larger matrices, round-off error can propagate through many steps in a calculation, resulting in garbage output.
+
+Some of NumPy's matrix algorithms use row reduction. 
+NumPy's methods use several clever tricks to minimize the impact of round-off errors. 
+However, these methods may still give you garbage output due to round-off error, especially if the matrix is \emph{ill-conditioned}. 
+You should always be aware of this possibility.
+
+\begin{problem}
+\label{prob:REF}
+Write a function which reduces a square matrix to REF. 
+You may make the following assumptions:
+\begin{enumerate}
+\item The matrix is invertible.
+\item During your row reduction, a zero will never appear on the main diagonal.
+\item All round-off errors may be ignored.
+\end{enumerate}
+During a row operation, do not modify any entries that you know will be zero before and after the operation.
+\end{problem}
+
+\subsection*{The LU Decomposition} % ------------------------------------------
+
+The LU decomposition of a square matrix $A$ is a factorization $A=LU$ where $U$ is an upper triangular and $L$ is a lower triangular matrix. 
+In fact, $U$ is the REF of $A$ and $L$ is a product of Type III elementary matrices whose inverses reduce $A$ to $U$. 
+Thus, the LU decomposition is a way of storing the REF and ``how we got there.''
+
+The LU factorization of $A$ exists only when $A$ can be reduced to REF using only Type III elementary matrices (no row swaps). 
+However, we can always permute the rows of $A$ to obtain a matrix that has an LU decomposition. 
+If $P$ encodes the row swaps, then a decomposition $PA = LU$ always exists. 
+
+If $A$ has an LU decomposition (not requiring row swaps), then we can find it as follows. 
+Reduce $A$ to REF with $k$ row operations, corresponding to matrices $E_1, \ldots, E_k$. 
+Then $U = E_k \ldots E_2E_1A,$ where $U$ is the REF of $A$. 
+Because there were no row swaps, each $E_i$ is a lower triangular Type III matrix. Then $E_i^{-1}$ is also lower triangular. 
+Thus, $L=(E_k \ldots E_2E_1)^{-1}$ is lower triangular, and $LU=A.$
+
+Because $L=(E_k \ldots E_2E_1)^{-1} = IE_1^{-1}E_2^{-1}\ldots E_k^{-1}$, we can compute $L$ by right-multiplying the identity by the matrices we used to reduce $U$. 
+In fact, in this special situation, each right-multiplication will change only one entry of $L$. 
+We have the following algorithm for the LU decomposition, assuming it exists.
+
+%
+%\begin{itemize}
+%\item Make a copy, $U$, of $A$.
+%\item Make an identity matrix $L$ that is the same shape as $A$.
+%\item Iterate through the entries below the diagonal of $U$.
+%
+%Now for each entry below the main diagonal of $U$ do the following:
+%   \begin{itemize}
+%   \item Set the corresponding entry of $L$ to the quotient of the current entry of $U$ and the entry of the main diagonal of $U$ located above the current entry.
+%   \item Perform the type 3 row operation to set the current entry of $U$ to 0.
+%       Do not modify any entries known to be 0.
+%   \end{itemize}
+%\item Return $L$ and $U$
+%\end{itemize}
+
+\begin{algorithm}
+\begin{algorithmic}[1]
+\Procedure{LU Decomposition}{$A$}
+\State Store the dimensions $(m, n)$ of $A$ 
+\State Initialize the $U$ matrix as a copy of $A$
+\State Initialize the $L$ matrix as the $n\times n$ identity matrix
+\State Then create your matrices as follows:
+\For{$j=0 \ldots n-1$}
+    \For{$i=j+1 \ldots m-1$}
+    %\State $L[i,j] \gets U[i, j]/U[j, j]
+    \State Set each element of $L$ to the corresponding element of $U$ divided by $U[j,j]$
+    %\State $U[i,j:] \gets U[i,j:] - L[i,j]U[j, j:]$
+    \State Set $U[i,j:]$ to itself minus $L[i,j] \times U[j,j:]$
+    \EndFor
+\EndFor
+\State \pseudoli{return} $L, U$
+\EndProcedure
+\end{algorithmic}
+\caption{The algorithm for the LU decomposition of a matrix $A$. This algorithm returns lower triangular $L$ and upper triangular $U$ such that $A = LU$.}
+\label{Alg:gram_schmidt}
+\end{algorithm}
+
+\begin{problem}
+\label{prob:LU_copy}
+Write a function that finds the LU decomposition of a square matrix. 
+You may assume that the matrix has an LU decomposition.
+\end{problem}
+
+The LU decomposition can be performed in-place by storing $U$ on and above the main diagonal of the array and storing $L$ below it.
+The main diagonal of $L$ does not need to be stored since all its entries are ones.
+
+\begin{problem}
+Modify your solution to Problem \ref{prob:LU_copy} so that the function computes the LU decomposition in place.
+\end{problem}
+
+\subsection*{Applications of the LU decomposition} % --------------------------
+
+The LU decomposition is a more efficient way to solve linear systems than row reduction, and it can also be used to quickly compute inverses and determinants. 
+SciPy implements these methods in the \li{linalg} module, specifically in the functions \li{linalg.lu_factor}, \li{linalg.solve}, \li{linalg.inv}, and \li{linalg.det}.
+
+Let us see how to use the LU decomposition to solve matrix equations. 
+Suppose that after row swaps, $A$ has the decomposition $PA = LU$. 
+Then $Ax=b$ is equivalent to $LUx=Pb$. 
+We can solve this system by first solving $Ly = Pb$ and then $Ux = y$. 
+Since $L$ and $U$ are triangular, these systems can be solved with backward and forward substitution, which is faster than row reduction. 
+Thus, we can perform row reduction once to compute the $LU$ factorization of $A$, and then we can use substitution to solve $Ax=b$ for many different values of $b$. 
+This technique is significantly faster than storing $A^{-1}$ and then computing $A^{-1}b$ (see Problem \ref{prob:solve}).
+
+\begin{problem}\label{prob:solve}
+In this problem you will solve the system $Ax = b$ for fixed $A$ and many different values of $b$. 
+You will do this in two ways. 
+For a random $1000 \times 1000$ array $A$ and a random $1000 \times 500$ array $B$ do the following.
+\begin{enumerate}
+\item Time \li{la.lu_factor(A)}.
+\item Time \li{la.inv(A)}.
+\item Store the output of \li{la.lu_factor()}. Time \li{la.lu_solve()} on this stored output and $B$.
+\item Store the inverse of $A$. Time how long it takes to multiply $A^{-1}$ by $B$.
+\item What can you conclude about the more efficient way to solve linear systems?
+\end{enumerate}
+\end{problem}
+
+Our technique for solving linear equations can also be used to invert matrices. 
+We can compute $A^{-1}$ by solving $LUx_i = P_i$ for every $P_i$ that is a column of $P$. 
+Then $A^{-1}$ is the matrix with columns $x_1, x_2, \ldots, x_n$. 
+
+Finally, the LU decomposition also gives us an efficient way to compute determinants. 
+If $PA=LU$, then $\det(A) = [\det(P)]^{-1}\det(L)\det(U)$. 
+But the determinant of a triangular matrix is the product of its diagonal entries, and every diagonal entry of $L$ is 1. 
+Also, $\det(P)$ is the number of row swaps we applied to $A$ to put it in the appropriate form. 
+So if $U$ has diagonal entries $u_{ii}$ for $i=1, \ldots, n$, then
+
+\[
+\det(A) = (-1)^S\left(\displaystyle\prod_{i=1}^nu_{ii}\right),
+\]
+
+where $S$ is the number of row-swaps.
+
+%\begin{problem}
+%\label{prob:lusolve}
+%Write a function that takes the LU decomposition computed by the second function you made in Problem \ref{prob:LU} and another array representing the right hand side of a linear system and modifies the second array in place so that it represents the solution to the linear system.
+%No changes to the array storing the LU decomposition are necessary.
+%\end{problem}
+%
+
+\begin{problem}
+\label{prob:det}
+Write a function that finds the determinant of a matrix using \li{la.lu_factor()} and the algorithm described above. 
+Read the documentation to learn about the output of \li{la.lu_factor()}.
+Hint: If the $i^{th}$ entry of the output \li{piv} does not equal $i$, this means that a row swap occurred.
+\end{problem}
+
+\subsection*{The Cholesky Decomposition} % ------------------------------------
+The Cholesky decomposition requires half the calculations and memory of the LU decomposition. 
+Furthermore, it is \emph{numerically stable}, which means that round-off errors do not propagate throughout the computation. 
+Because of its efficiency and numerical stability, the Cholesky decomposition is used to solve least squares, optimization, and state estimation problems.
+
+However, the Cholesky decomposition is only applicable to Hermitian positive definite matrices. 
+A matrix $A$ is positive definite if  $\mathbf{z}\trp A\mathbf{z} > 0$ for all $\mathbf{z} \neq 0$. 
+Furthermore, $A$ is Hermitian if $A = A^*$ where $A^* = \overline{A\trp }$, so a real Hermitian matrix is just a symmetric matrix. 
+The Cholesky decomposition is the matrix equivalent to taking the square root of a positive real number.
+
+The Cholesky decomposition of a $A$ is a lower-triangular matrix $L$ such that
+
+\begin{equation*}
+ A = LL^*.
+\end{equation*}
+
+The entries of $L$ are calculated as follows.
+
+\begin{align*}
+&L_{i,j} = \frac{1}{L_{j,j}}\left(A_{i,j} -\sum_{k=1}^{j-1}{L_{i,k}L_{j,k}}\right) \mbox{ for $i>j$} \\ \\
+&L_{i,i} = \sqrt{A_{i,i} - \sum_{k=1}^{i-1}{L_{i,k}L_{i,k}}}.
+\end{align*}
+
+Notice that the entries of $L$ are defined recursively, with dependencies as diagrammed in Figure \ref{fig:cholesky}. 
+Thus, an implementation of the Cholesky decomposition must compute the entries of $L$ in the correct order.
+
+\begin{figure}
+\begin{tikzpicture}[red dot/.style={draw, circle, fill=red, red},
+    norm/.style={draw=none}, xscale=1.5, yscale=1.5]
+
+\begin{scope}[shift={(4,0)}]
+\draw [-,ultra thick](-.2,0)--(-.2,2.5);
+\draw [-,ultra thick](2.7,0)--(2.7,2.5);
+\draw [-,ultra thick](-.2,0)--(0,0);
+\draw [-,ultra thick](-.2,2.5)--(0,2.5);
+\draw [-,ultra thick](2.7,2.5)--(2.5,2.5);
+\draw [-,ultra thick](2.7,0)--(2.5,0);
+
+\node[norm,black](bk1)at(.25,2.25){\LARGE \textbullet};
+\node[norm,black](bk2)at(.75,1.75){\LARGE \textbullet};
+\node[norm,black!25!](b1)at(1.25,1.25){\LARGE \textbullet};
+\node[norm,black](bk3)at(1.75,.75){\LARGE \textbullet};
+\node[norm, black](bk4)at(2.25,.25){\LARGE \textbullet};
+\node[norm, black!25!](b2)at(.25,1.25){\LARGE \textbullet};
+\node[norm,black!25!](b3)at(.75,1.25){\LARGE \textbullet};
+\node[norm,black!25!](b4)at(.25,.25){\LARGE \textbullet};
+\node[norm,black!25!](b3)at(.75,.25){\LARGE \textbullet};
+\node[norm, shadecolor](r1)at(1.25,.25){\Huge \textbullet};
+
+\end{scope}
+
+\begin{scope}
+\draw [-,ultra thick](-.2,0)--(-.2,2.5);
+\draw [-,ultra thick](2.7,0)--(2.7,2.5);
+\draw [-,ultra thick](-.2,0)--(0,0);
+\draw [-,ultra thick](-.2,2.5)--(0,2.5);
+\draw [-,ultra thick](2.7,2.5)--(2.5,2.5);
+\draw [-,ultra thick](2.7,0)--(2.5,0);
+
+
+\node[norm, shadecolor](r1)at(1.75,.75){\Huge \textbullet};
+\node[norm,black](bk1)at(.25,2.25){\LARGE \textbullet};
+\node[norm,black](bk2)at(1.25,1.25){\LARGE \textbullet};
+\node[norm,black](bk3)at(.75,1.75){\LARGE \textbullet};
+\node[norm,black](bk4)at(2.25,.25){\LARGE \textbullet};
+\node[norm,black!25!](bk1)at(.25,.75){\LARGE \textbullet};
+\node[norm,black!25!](bk1)at(.75,.75){\LARGE \textbullet};
+\node[norm, black!25!](bk1)at(1.25,.75){\LARGE \textbullet};
+\end{scope}
+\end{tikzpicture}
+\label{fig:cholesky}
+\caption{The entries of $L$ in the Cholesky decomposition are defined recursively, as illustrated in this picture. 
+To calculate the green entry, you need to know each of the light gray entries.}
+\end{figure}
+
+
+\begin{problem}
+Write a function that finds the Cholesky decomposition of a Hermitian positive definite matrix.
+Hint: To generate symmetric positive definite matrices on which to test your function, recall that for any matrix $A$, the matrix $A\trp A$ is symmetric and positive definite.
+\end{problem}
+
+The \li{linalg} module of SciPy includes an optimized Cholesky decomposition. 
+As with the LU decomposition, SciPy has the methods \li{la.cho_factor} and \li{la.cho_solve}.
+
+\begin{problem}
+Repeat problem \ref{prob:solve}, this time using the methods \li{la.cho_factor} and \li{la.cho_solve}.
+\end{problem}
