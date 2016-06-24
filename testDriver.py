@@ -68,7 +68,7 @@ def _timeout(seconds):
         This decorator uses signal.SIGALRM, which is only available on Unix.
     """
     assert isinstance(seconds, int), "@timeout(sec) requires an int"
-    
+
     class TimeoutError(Exception):
         pass
 
@@ -94,14 +94,14 @@ def _timeout(seconds):
 
 def test(student_module):
     """Grade a student's entire solutions file.
-    
+
     X points for problem 1
     X points for problem 2
     ...
-    
+
     Inputs:
         student_module: the imported module for the student's file.
-    
+
     Returns:
         score (int): the student's score, out of TOTAL.
         feedback (str): a printout of test results for the student.
@@ -125,7 +125,7 @@ class _testDriver(object):
         self.feedback = ""
 
     # Main routine ------------------------------------------------------------
-    def test_all(self, student_module, total=100):
+    def test_all(self, student_module, total=40):
         """Grade the provided module on each problem and compile feedback."""
         # Reset feedback and score.
         self.feedback = ""
