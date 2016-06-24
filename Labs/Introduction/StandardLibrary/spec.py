@@ -26,26 +26,17 @@ def prob2():
 # Problem 3: Create a 'calculator' module and implement this function.
 def prob3(a,b):
     """Calculate and return the length of the hypotenuse of a right triangle.
-    Do not use any methods other than those that are imported from the
+    Do not use any methods other than those that are imported from your
     'calculator' module.
-    
+
     Parameters:
         a (float): the length one of the sides of the triangle.
         b (float): the length the other nonhypotenuse side of the triangle.
-    
+
     Returns:
         The length of the triangle's hypotenuse.
     """
     pass
 
 
-# Problem 4
-def prob4():
-    """If no command line argument is given, print "No Input."
-    If anything other than "matrices.npz is given, print "Incorrect Input."
-    If "matrices.npz" is given as a command line argument, use functions
-    from the provided 'matrix_multiply' module to load two matrices, then
-    time how long each method takes to multiply the two matrices together.
-    Print your results to the terminal.
-    """
-    pass
+# Problem 4: Implement shut the box.

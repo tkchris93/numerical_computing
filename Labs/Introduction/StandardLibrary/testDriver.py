@@ -1,5 +1,5 @@
-# solutions.py
-"""Introductory Labs: The Standard Library. Solutions file."""
+# testDriver.py
+"""Introductory Labs: The Standard Library. Test Driver."""
 
 from subprocess import call
 from numpy.random import randint
@@ -18,7 +18,7 @@ def _timeout(seconds):
         This decorator uses signal.SIGALRM, which is only available on Unix.
     """
     assert isinstance(seconds, int), "@timeout(sec) requires an int"
-    
+
     class TimeoutError(Exception):
         pass
 
@@ -42,17 +42,17 @@ def _timeout(seconds):
 # Test script
 def test(student_module):
     """Test script. Import the student's solutions file as a module.
-    
+
     5  points for problem 1
-    5  points for problem 2
-    5  points for problem 3
+    10  points for problem 2
+    10  points for problem 3
     15 points for problem 4
-    
+
     Inputs:
         student_module: the imported module for the student's file.
-    
+
     Returns:
-        score (int): the student's score, out of 30.
+        score (int): the student's score, out of 40.
         feedback (str): a printout of test results for the student.
     """
     tester = _testDriver()
@@ -165,7 +165,7 @@ class _testDriver(object):
         return points
 
     def problem2(self, s):
-        """Test prob2() (mutable vs. immutable objects). 5 points."""
+        """Test prob2() (mutable vs. immutable objects). 10 points."""
 
         print("\nCorrect output:");   prob2()
         print("\nStudent output:"); s.prob2()
@@ -174,7 +174,7 @@ class _testDriver(object):
 
     @_timeout(5)
     def problem3(self, s):
-        """Test prob3() (make and use the calculator module). 5 points."""
+        """Test prob3() (make and use the calculator module). 10 points."""
 
         points  = 5*self._eqTest(prob3(5,12), s.prob3(5,12),
                                 "Incorrect hypotenuse length")
