@@ -34,13 +34,18 @@ If the probability that tomorrow is hot given that today is hot is 0.7, and the 
 \end{block}\end{blockarray}
 \end{align*}
 
-% TODO: insert a PICTURE of a this Markov chain!
-
 If it is hot today, we examine the $0^{th}$ row of the matrix.
 There is a $70\%$ chance that tomorrow will be hot ($0^{th}$ column), and a $30\%$ chance that tomorrow will be cold ($1^{st}$ column).
 Conversely, if it is cold today, there is a $60\%$ chance that tomorrow will be hot, and a $40\%$ chance that tomorrow will be cold.
 
-\begin{problem} % Problem: stochasticity. 
+% TODO: insert a PICTURE of a this Markov chain!
+% Finite Markov chains can be visualized as graphs where the nodes are the states and the connections are represented by the transition probabilities.
+% The weather Markov chain can be visualized as follows.
+% \begin{figure}[H]
+% \includegraphics{width=\linewidth}[WEATHERCHAIN]
+% \end{figure}
+
+\begin{problem} % Problem: stochasticity.
 Transition matrices for Markov chains are efficiently stored as NumPy arrays.
 Write a function that accepts a dimension $n$ and returns the transition matrix for a random Markov chain with $n$ states.
 \\
@@ -51,7 +56,7 @@ Write a function that accepts a dimension $n$ and returns the transition matrix 
 
 In a general finite Markov chain, if we are in state $i$ then the $i^{th}$ row of the transition matrix gives the probabilities of moving to any other state $j$.
 By definition, these probabilities sum to $1$.
-Thus, the entries of each column partition the interval $[0, 1]$, and we can choose the next state to move to by generating a random number between $0$ and $1$.
+Thus, the entries of each row partition the interval $[0, 1]$, and we can choose the next state to move to by generating a random number between $0$ and $1$.
 
 Consider again the weather model example from the previous section.
 Suppose that today is hot, and that we want to simulate tomorrow's weather.
@@ -101,7 +106,7 @@ In this case the classic example is a dice roll, with $6$ possible outcomes inst
 >>> probabilities = np.array([1./6, 1./6, 1./6, 1./6, 1./6, 1./6])
 
 # Make a single random draw (roll the die once).
->>> np.random.multinomial(1, probabilities)         
+>>> np.random.multinomial(1, probabilities)
 array([0, 0, 0, 1, 0, 0])                       # The roll resulted in a 4.
 \end{lstlisting}
 
@@ -155,15 +160,15 @@ We will call the source collection of works in the next problems the \emph{train
 
 In the weather models of the previous section, we chose a fixed number of states to simulate.
 However, in English, sentences are of varying length.
-To capture this feature in a Markov model, we include a \emph{start state} and an \emph{end state} in the model in addition to the words of the training set.
-The start state should only transition to words that appear at the beginning of a sentence in the training set, and only words that appear at the end a sentence in the training set should transition to the end state.
+To capture this feature in a Markov model, we include a \emph{start state} and an \emph{stop state} in the model in addition to the words of the training set.
+The start state should only transition to words that appear at the beginning of a sentence in the training set, and only words that appear at the end a sentence in the training set should transition to the stop state.
 Thus if a training set has $N$ unique words, the transition matrix will be $(N+2) \times (N+2)$.
 
 After determining the states in the Markov chain, we need to determine the transition probabilities between the states.
 As with the weather models, each state must be assigned a row and column in the transition matrix.
 Then, while iterating through the sentences of the training set, we fill in the entries of the transition matrix.
 When word $i$ is followed by word $j$, we add 1 to the $(i,j)^{th}$ entry of the matrix.
-Once we have done this for every adjacent pair of words in the training set, we normalize the columns so that they each sum to 1.
+Once we have done this for every adjacent pair of words in the training set, we normalize the rows so that they each sum to 1.
 
 Consider the following small training set as an example.
 
@@ -182,7 +187,7 @@ If we include punctuation (so ``ham?'' and ``ham.'' are counted as distinct word
 \end{align*}
 
 With start and stop states, the transition matrix should therefore be $17 \times 17$.
-The start state should transition to the words ``I'' and ``Do'', and the words ``am.'', ``ham?'', and ``ham?'' should transition to the end state.
+The start state should transition to the words ``I'' and ``Do'', and the words ``am.'', ``ham?'', and ``ham?'' should transition to the stop state.
 Letting ``{\color[rgb]{0,.6,0}\$tart}'' represent the start state and ``{\color{red}\$top}'' represent the stop state, we first count the number of times that each state transitions to another state:
 
 \begin{align*}
@@ -198,7 +203,7 @@ Letting ``{\color[rgb]{0,.6,0}\$tart}'' represent the start state and ``{\color{
 \text{\textcolor{red}{\$top}} 		& 0 & 0 & 0 & 0 & \ldots & 0 & 1\\
 \end{block}\end{blockarray}
 \end{align*}
-Now we divide each column by the column sum so that each column sums to 1.
+Now we divide each row by the row sum so that each row sums to 1.
 
 \begin{align*}
 \begin{blockarray}{cccccccc}
@@ -217,7 +222,7 @@ Now we divide each column by the column sum so that each column sums to 1.
 The $3/4$ correctly indicates that 3 out of 4 times, the sentences in the training set start with the word ``I''.
 Similarly, the $2/3$ and $1/3$ tell us that ``Sam'' is followed by ``I'' twice and by ``Sam'' once in the training set.
 Note that ``am'' (without a period) always transitions to ``Sam'' and that ``ham.'' (with a period) always transitions the stop state.
-Finally, to avoid a row of zeros, we place a 1 in the bottom right hand corner of the matrix (the end state always transitions to itself).
+Finally, to avoid a row of zeros, we place a 1 in the bottom right hand corner of the matrix (the stop state always transitions to itself).
 
 The entire procedure of creating the transition matrix for the Markov chain with words from a file as states, with some hints for implementation, is summarized below in Algorithm \ref{alg:MarkovSentencesTransitionMatrix}.
 
