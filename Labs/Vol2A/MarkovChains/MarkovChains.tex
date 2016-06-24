@@ -230,17 +230,21 @@ The entire procedure of creating the transition matrix for the Markov chain with
 \begin{algorithmic}[1]
 \Procedure{MakeTransitionMatrix}{}
 \State Count the number of unique words in the training set.
-\State Initialize a square array of zeros of the appropriate size to be the transition matrix (remember to account for the start and stop states).
-\State Initialize a list of states, beginning with ``\$tart''.
+\State Initialize a square array of zeros of the appropriate size to be the transition \par\quad matrix (remember to account for the start and stop states).
+\State Initialize a list of states, beginning with \li{"\$tart"}.
 \For {each sentence in the training set}
     \State Split the sentence into a list of words.
-    \State Add each \emph{new} word to the list of states.
-    \State Add 1 to the entry of the transition matrix corresponding to the start state transitioning to the first word of the sentence.
-   	\State For each consecutive pair $(i, j)$ of words in the list of words, add 1 to the entry of the transition matrix corresponding to moving from state $i$ to state $j$.
-	\item Add 1 to the entry of the transition matrix corresponding to the last word of the sentence transitioning to the stop state.
+    \State Add each \emph{new} word in the sentence to the list of states.
+    \State Add 1 to the entry of the transition matrix corresponding to
+    \par\qquad\enspace transitioning from the start state to the first word of the sentence.
+    \For {each consecutive pair $(i, j)$ of words in the list of words}
+        \State Add 1 to the entry of the transition matrix corresponding to \par\qquad\qquad transitioning from state $i$ to state $j$.
+    \EndFor
+    \State Add 1 to the entry of the transition matrix corresponding
+    \par\qquad\enspace transitioning from the last word of the sentence to the stop state.
 \EndFor
 \State Make sure the stop state transitions to itself.
-\State Normalize each column by dividing by the column sums (hint: array broadcasting).
+\State Normalize each row by dividing by the row sums (Hint: array broadcasting).
 \EndProcedure
 \end{algorithmic}
 \caption{Convert a training set of sentences into a Markov chain.}
