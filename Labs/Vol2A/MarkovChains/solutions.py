@@ -68,12 +68,13 @@ def four_state_forecast(days):
         record.append(current_state)
     return record
 # Roughly 24.6% of the entries should be zeros.
-# Roughly 30.1% of the entries should be ones.
-# Roughly 33.2% of the entries should be twos.
+# Roughly 30.0% of the entries should be ones.
+# Roughly 33.3% of the entries should be twos.
 # Roughly 12.1% of the entries should be threes.
 
 
 # Problem 4
+# TODO: Turn this problem into an explanation of steady states.
 def analyze_simulation():
     """Investigate and interpret the results of the simulations in the previous
     two problems. Specifically, find the average percentage of days that are

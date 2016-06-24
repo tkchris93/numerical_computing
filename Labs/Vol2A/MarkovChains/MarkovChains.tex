@@ -19,12 +19,13 @@ Thus the rows of the transition matrix must sum to 1.
 
 \begin{info} % Row / column stochasticity
 A transition matrix where the rows sum to 1 is called \emph{row stochastic} (or \emph{right stochastic}).
-The transpose of a row stochastic matrix is \emph{column stochastic} (or \emph{left stochastic}): each column of a column stochastic matrix sums to 1 and the $(i,j)^{th}$ entry of the matrix gives the probability of moving from state $j$ to state $i$.
-Both representations are common. In this lab, our examples are row stochastic.
+The columns of a \emph{column stochastic} (or \emph{left stochastic}) transition matrix each sum to 1 and the $(i,j)^{th}$ entry of the matrix gives the probability of moving from state $j$ to state $i$.
+Both representations are common, but in this lab we exclusively use row stochastic transition matrices for consistency.
 \end{info}
 
 Consider a very simple weather model where the probability of being hot or cold depends on the weather of the previous day.
 If the probability that tomorrow is hot given that today is hot is 0.7, and the probability that tomorrow is cold given that today is cold is 0.4, then by assigning hot to the $0^{th}$ row and column, and cold to the $1^{st}$ row and column, this Markov chain has the following transition matrix:
+%
 \begin{align*}
 \begin{blockarray}{ccc}
 & \text{\textcolor{red}{hot tomorrow}} & \text{\textcolor{blue}{cold tomorrow}} \\
@@ -35,16 +36,18 @@ If the probability that tomorrow is hot given that today is hot is 0.7, and the 
 \end{align*}
 
 If it is hot today, we examine the $0^{th}$ row of the matrix.
-There is a $70\%$ chance that tomorrow will be hot ($0^{th}$ column), and a $30\%$ chance that tomorrow will be cold ($1^{st}$ column).
-Conversely, if it is cold today, there is a $60\%$ chance that tomorrow will be hot, and a $40\%$ chance that tomorrow will be cold.
+There is a $70\%$ chance that tomorrow will be hot ($0^{th}$ column) and a $30\%$ chance that tomorrow will be cold ($1^{st}$ column).
+Conversely, if it is cold today, there is a $60\%$ chance that tomorrow will be hot and a $40\%$ chance that tomorrow will be cold.
 
-% TODO: insert a PICTURE of a this Markov chain!
-% Finite Markov chains can be visualized as graphs where the nodes are the states and the connections are represented by the transition probabilities.
-% The weather Markov chain can be visualized as follows.
-% \begin{figure}[H]
-% \includegraphics{width=\linewidth}[WEATHERCHAIN]
-% \end{figure}
-
+Markov chains can be represented by a \emph{state diagram}, a type of directed graph.
+The nodes in the graph are the states, and the edges indicate the state transition probabilities.
+The Markov chain described above has the following state diagram.
+%
+% TODO: Turn this into a tikzpicture.
+\begin{figure}[H]
+    \includegraphics[width=.5\linewidth]{WeatherChain.pdf}
+\end{figure}
+%
 \begin{problem} % Problem: stochasticity.
 Transition matrices for Markov chains are efficiently stored as NumPy arrays.
 Write a function that accepts a dimension $n$ and returns the transition matrix for a random Markov chain with $n$ states.
@@ -54,31 +57,28 @@ Write a function that accepts a dimension $n$ and returns the transition matrix 
 
 \subsection*{Simulating State Transitions} % ----------------------------------
 
-In a general finite Markov chain, if we are in state $i$ then the $i^{th}$ row of the transition matrix gives the probabilities of moving to any other state $j$.
-By definition, these probabilities sum to $1$.
-Thus, the entries of each row partition the interval $[0, 1]$, and we can choose the next state to move to by generating a random number between $0$ and $1$.
+% In a general finite Markov chain, if we are in state $i$ then the $i^{th}$ row of the transition matrix gives the probabilities of moving to any other state $j$.
+% By definition, these probabilities sum to $1$.
+Since the rows of a transition matrix sum to $1$, the entries of each row partition the interval $[0, 1]$.
+We can thus choose the next state to move to by generating a random number between $0$ and $1$.
 
-Consider again the weather model example from the previous section.
-Suppose that today is hot, and that we want to simulate tomorrow's weather.
-The row that corresponds to ``hot''in the transition matrix is $[0.7, 0.3]^T$.
-If we generate a random number and it is smaller than $0.3$, then our simulation indicates that tomorrow will be cold.
+Consider again the simple weather model and suppose that today is hot.
+The row that corresponds to ``hot''in the transition matrix is $[0.7, 0.3]$.
+If we generate a random number and it is smaller than $0.3$, then the simulation indicates that tomorrow will be cold.
 Conversely, if the random number is between $0.3$ and $1$, then the simulation says that tomorrow will be hot.
-The following code implements this idea.
+% The following code implements this idea.
 
 \begin{lstlisting}
 import numpy as np
 
 def forecast():
 	"""Forecast tomorrow's weather given that today is hot."""
-
 	transition_matrix = np.array([[0.7, 0.3], [0.6, 0.4]])
 	# Sample from the standard uniform distribution to choose a new state.
 	if np.random.random() < transition_matrix[0, 1]:
-		print "Cold"
-		return 1
+		return 1              # Tomorrow will be cold.
 	else:
-		print "Hot"
-		return 0
+		return 0              # Tomorrow will be hot.
 \end{lstlisting}
 
 \begin{problem} % Problem: Forecasting over several days.
@@ -88,8 +88,8 @@ Assume the first day is hot, but do not include the data from the first day in t
 The resulting list should therefore have \li{days} entries.
 \end{problem}
 
-For Markov chains with very few states, the approach in \li{forecast()} is practical and the implementation is fairly simple.
-However, small Markov chains are typically not very useful in applications.
+% For Markov chains with very few states, the approach in \li{forecast()} is practical and the implementation is fairly simple.
+% However, small Markov chains are typically not very useful in applications.
 
 \subsection*{Larger Chains} % -------------------------------------------------
 
