@@ -126,6 +126,8 @@ Return a list containing the day-to-day results (0 for hot, 1 for mild, 2 for co
 \label{prob:makov-state-transition}
 \end{problem}
 
+% TODO: instead of crappy empirical analysis, teach briefly about steady states and raising the transition matrix to a large power.
+
 \begin{problem} % Problem: Analysis of results.
 Write a function that investigates and interprets the results of the simulations in the previous two problems.
 Specifically, find the average percentage of days that are hot, mild, cold, and freezing in each simulation.
@@ -267,8 +269,6 @@ Read the file and build a transition matrix from its contents.
 You may assume that the file has one complete sentence written on each line.
 \label{problem:markov-random-sentences-init}
 \end{problem}
-
-% TODO: Put a picture of the actual Markov chain here and discuss a little.
 
 \begin{problem} % Problem: Create random sentences
 Add a method to the \li{SentenceGenerator} class called \li{babble()}.
