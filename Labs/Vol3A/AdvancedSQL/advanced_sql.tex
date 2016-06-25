@@ -140,7 +140,7 @@ Whether to normalize your database depends on your specific needs.
 Usually, though, the decision to denormalize a database is a last-resort attempt to improve performance.
 \end{info}
 
-\section*{Joining tables}
+\section*{Joining Tables}
 We can use SQL to join two or more tables together for a query.
 This is a very powerful tool.
 SQLite supports three types of standard table joins.
@@ -199,7 +199,7 @@ An illustration of a left outer join is given in figure \ref{fig:left_outer}.
 \label{fig:left_outer}
 \end{figure}
 
-A Pythonesque loop that illustrates performs a left outer join is
+A Pythonesque loop that illustrates how to perform a left outer join is
 \begin{lstlisting}
 for row_s in students:
     for row_m in majors:
@@ -386,14 +386,23 @@ Use the \lsql{ROUND()} function in SQL to round your result to the nearest hundr
 \label{prob:studentGPA}
 \end{problem}
 
-\begin{problem}
+\subsection*{Like Command}
 The SQL keyword, \lsql{LIKE}, allows us to match patterns in a column.
 For example,
 \begin{lstlisting}[language=SQL]
 SELECT name, studentid FROM students WHERE studentid LIKE '\%4';
 \end{lstlisting}
 will return all the students that have a student ID that ends with the digit 4.
+Use `\textbackslash\%' before the `4' to signify that there can be any number of characters before the `4.'
+If you only want one character, you can use an underscore.
+For example, if you were to search a database of words in the english dictionary and you entered the following command:
+\begin{lstlisting}[language=SQL]
+SELECT word FROM englishDictionary WHERE word LIKE 'i_';
+\end{lstlisting}
+You would get words like `is,' `it,' or `in.'
 
+
+\begin{problem}
 Write a SQL statement that will find all students with a last name that begins with the letter `C' and return their names and majors.  Your returned records should be
 \begin{table}[H]
 \begin{tabular}{|l|l|}
