@@ -234,7 +234,7 @@ The following code produces Figure \ref{fig:loglogdemo}.
 \label{fig:loglogdemo}
 \end{figure}
 
-In the log-log plot, the slope of the \li{matrix_matrix_product()} line is noticeably greater than the slope of the \li{matrix_vector_product()} line.
+In the log-log plot, the slope of the \li{matrix_matrix_product()} line is about $3$ and the slope of the \li{matrix_vector_product()} line is about $2$.
 This reflects the fact that matrix-matrix multiplication (which uses 3 \li{for} loops) is $\sim n^3$, while matrix-vector multiplication (which only has 2 loops) is only $\sim n^2$.
 
 \begin{problem} % Why NumPy ROCKS.
@@ -253,22 +253,24 @@ Compare your results to Figure \ref{fig:loglogdemo}.
 \label{prob:numpy-is-awesome}
 \end{problem}
 
-The results of Problem \ref{prob:numpy-is-awesome} show that matrix multiplication operations are significantly faster in NumPy than in plain Python.
-Matrix-matrix multiplication grows cubically regardless of the implementation, but with lists of lists the times grows at a rate of $an^3$ while with NumPy the times grow at a rate of $bn^3$ where $a$ is much bigger than $b$.
-% Since the exponent on the $n$ is the same in both cases, the disparity between the coefficients makes a significant impact.
+% TODO: Reword this note. What figure should be included?
 
 \begin{info} % Note about Caching.
+Problem \ref{prob:numpy-is-awesome} shows that \textbf{matrix  operations are significantly faster in NumPy than in plain Python}.
+Matrix-matrix multiplication grows cubically regardless of the implementation; however, with lists the times grows at a rate of $an^3$ while with NumPy the times grow at a rate of $bn^3$, where $a$ is much larger than $b$.
+% Since the exponent on the $n$ is the same in both cases, the disparity between the coefficients makes a significant impact.
 % Iterating through loops is very expensive.
 % NumPy also uses loops, but it uses C loops instead of Python loops.
-The execution times for matrix multiplication with NumPy seem to increase somewhat inconsistently.
+
+% However, the execution times for matrix multiplication with NumPy seem to increase somewhat inconsistently.
 % The fastest levels of computer memory can only handle so much information before it has to turn over to the next level of computer memory that is harder and slower to access.
-NumPy operations are optimized for computer hardware.
-Below, we plot execution times for vector-vector multiplication with NumPy.
-The spikes in the plot indicate the times that the array no longer fits in the current level of memory
+% NumPy operations are optimized for computer hardware.
+% Below, we plot execution times for vector-vector addition with NumPy.
+% The spikes in the plot indicate the times that the array no longer fits in the current level of memory
 %
-\begin{figure}[H]
-\includegraphics[width=.5\textwidth]{cachingDemo.pdf}
-\end{figure}
+% \begin{figure}[H]
+% \includegraphics[width=.5\textwidth]{cachingDemo.pdf}
+% \end{figure}
 \end{info}
 
 \section*{Linear Transformations} % ===========================================
@@ -278,111 +280,66 @@ The spikes in the plot indicate the times that the array no longer fits in the c
 A \emph{linear transformation} is a mapping between vector spaces that preserves addition and scalar multiplication.
 More precisely, for arbitrary vector spaces $V$ and $W$, the mapping $L:V\rightarrow W$ is a linear transformation if and only if it satisfies the following conditions:
 %
-\begin{itemize}
+\begin{enumerate}
 \item $L(\x + \y) = L\x + L\y$ for any two vectors $\x,\ \y \in V$
 \item $L(\alpha\x) = \alpha L\x$ for any vector $\x \in V$ and any scalar $\alpha \in \mathbb{F}$.
-\end{itemize}
+\end{enumerate}
 
-% TODO: Does V or W have to be finite-dimensional, or both? Look in 540 book.
-Every linear transformation $L$ from an $m$-dimensional vector space to an $n$-dimensional vector space can be represented by an $m\times n$ matrix $A$.
-To apply $L$ to a vector $\x$, left multiply by the matrix representation.
+Every linear transformation $L$ from an $m$-dimensional vector space to an $n$-dimensional vector space can be represented by an $m\times n$ matrix $A$, called the \emph{transformation matrix} of $L$.
+To apply $L$ to a vector $\x$, left multiply by its transformation matrix.
+This results in a new vector $\x^\prime$, where each component is some linear combination of the elements of $\x$.
+For linear transformations from $\mathbb{R}^2$ to $\mathbb{R}^2$, this process has the following form.
 % So if $L\x \mapsto \y$, then we calculate $A\x = \y$.
+%
+\begin{align*}
+A\x =
+\left[\begin{array}{cc}
+a & b \\
+c & d \\
+\end{array}\right]
+\left[\begin{array}{c}
+x\\y
+\end{array}\right]
+=
+\left[\begin{array}{cc}
+ax + by \\cx + dy
+\end{array}\right]
+=
+\left[\begin{array}{cc}
+x^\prime \\y^\prime
+\end{array}\right]
+= \x^\prime
+\end{align*}
 
 Linear transformations can be interpreted geometrically.
-
-The array stored in \texttt{horse.txt} has two rows: one for $x$-coordinates, and one for $y$-coordinates.
-
+To demonstrate this, we examine a set of points that collectively form a picture of a horse, stored in the file \texttt{horse.npy} (\texttt{.npy} files contain a single NumPy array).
+The coordinate pairs are organized by column, so the array has two rows: one for $x$-coordinates, and one for $y$-coordinates.
+%
 \begin{align*}
 \left[\begin{array}{cccc}
-x_1 & x_2 & \ldots & x_m \\
-y_1 & y_2 & \ldots & y_m \\
+x_1 & x_2 & x_3 & \ldots \\
+y_1 & y_2 & y_3 & \ldots \\
 \end{array}\right]
 \end{align*}
+
+Use \li{np.load()}
+% \footnote{See \url{http://docs.scipy.org/doc/numpy/reference/routines.io.html} for info on saving and loading arrays.}
+to extract the array from the \texttt{.npy} file, then plot the points as individual pixels.
+See Figure \ref{fig:linearly-transformed-horses} for the result.
 
 \begin{lstlisting}
 # Load the array from the .npy file.
 >>> import numpy as np
 >>> data = np.load("horse.npy")
 
-# Plot the horse with black pixels.
+# Plot the x row against the y row with black pixels.
 >>> plt.plot(data[0], data[1], 'k,')
 
 # Set the window limits to [-1, 1] by [-1, 1] and make the window square.
 >>> plt.axis([-1,1,-1,1])
 >>> plt.gca().set_aspect("equal")
+>>> plt.show()
 \end{lstlisting}
-
-There are several types of linear transformations.
-We define each and give examples in $\mathbb{R}^2$.
-
-\begin{itemize}
-
-\item \textbf{Stretch}: %$L(x,y) \mapsto (ax,by)$.
-Stretches or compresses the vector along each axis.
-The matrix representation is diagonal:
-%
-\begin{align*}
-\left[\begin{array}{rr}
-a & 0  \\
-0 & b
-\end{array}\right].
-\end{align*}
-%
-If $a=b$, the transformation is called a \emph{dilation}.
-The stretch in Figure \ref{fig:linearly-transformed-horses} uses $a = 1/2$ and $b = 6/5$ to compress the $x$-axis and stretch the $y$-axis.
-
-\item \textbf{Shear}: %$L(x,y) \mapsto (x + ay, y)$ or $L(x,y) \mapsto (x, bx + y)$.
-Slants the vector by a scalar factor horizontally or vertically.
-There are two matrix representations:
-% The corresponding matrix is a Type III elementary matrix.
-%
-\begin{align*}
-\text{horizontal shear:\ }
-\left[\begin{array}{cc}
-1 & a\\
-0 & 1
-\end{array}\right]
-&&
-\text{vertical shear:\ }
-\left[\begin{array}{cc}
-1 & 0\\
-b & 1
-\end{array}\right].
-\end{align*}
-%
-Horizontal shears skew the $x$-coordinate of the vector while vertical shears skew the $y$-coordinate.
-Figure \ref{fig:linearly-transformed-horses} has a horizontal shear with $a=1/2$.
-
-
-\item \textbf{Reflection}: Reflects the vector about a line that passes through the origin.
-% Also sometimes called a \emph{Householder transformation}.
-The reflection about the line spanned by the vector $\left[a, b\right]^T$ has the matrix representation
-%
-\begin{align*}
-\frac{1}{a^2 + b^2}
-\left[\begin{array}{cc}
-a^2 - b^2 & 2ab \\
-2ab       & b^2 - a^2
-\end{array}\right].
-\end{align*}
-%
-The reflection in Figure \ref{fig:linearly-transformed-horses} reflects the image about the $y$-axis ($a=0$, $b=1$).
-
-\item \textbf{Rotation}: %$L(x,y) \mapsto (x\cos\theta-y\sin\theta,\ x\sin\theta + y\cos\theta)$.
-Rotates the vector around the origin.
-A counterclockwise rotation of $\theta$ radians has the following matrix representation:
-%
-\begin{align*}
-\left[\begin{array}{rr}
-\cos\theta & -\sin\theta\\
-\sin\theta &  \cos\theta
-\end{array}\right].
-\end{align*}
-%
-A negative value of $\theta$ performs a clockwise rotation.
-Choosing $\theta = \pi/2$ produces the rotation in Figure \ref{fig:linearly-transformed-horses}.
-
-\end{itemize}
 
 \begin{figure}[h] % Generated with horse_drawings() in plots.py.
 \captionsetup[subfigure]{justification=centering}
@@ -416,14 +373,86 @@ Choosing $\theta = \pi/2$ produces the rotation in Figure \ref{fig:linearly-tran
     \centering
     \includegraphics[width=\linewidth]{CompositionHorse.pdf} % ComboHorse?
 \end{subfigure}
-\caption{The pixel image of \texttt{horse.npy} with various linear transformations.}
+\caption{The points stored in \texttt{horse.npy} under various linear transformations.}
 \label{fig:linearly-transformed-horses}
 \end{figure}
 
-\begin{problem} % Linear transformations.
+\subsection*{Types of Linear Transformations} % -------------------------------
+
+Linear transformations from $\mathbb{R}^2$ to $\mathbb{R}^2$ can be classified in a few ways.
+
+\begin{itemize}
+
+\item \textbf{Stretch}: %$L(x,y) \mapsto (ax,by)$.
+Stretches or compresses the vector along each axis.
+The transformation matrix is diagonal:
+%
+\begin{align*}
+\left[\begin{array}{rr}
+a & 0  \\
+0 & b
+\end{array}\right].
+\end{align*}
+%
+If $a=b$, the transformation is called a \emph{dilation}.
+The stretch in Figure \ref{fig:linearly-transformed-horses} uses $a = 1/2$ and $b = 6/5$ to compress the $x$-axis and stretch the $y$-axis.
+
+\item \textbf{Shear}: %$L(x,y) \mapsto (x + ay, y)$ or $L(x,y) \mapsto (x, bx + y)$.
+Slants the vector by a scalar factor horizontally or vertically.
+There are two matrix representations:
+% The corresponding matrix is a Type III elementary matrix.
+%
+\begin{align*}
+\text{horizontal shear:\ }
+\left[\begin{array}{cc}
+1 & a\\
+0 & 1
+\end{array}\right]
+&&
+\text{vertical shear:\ }
+\left[\begin{array}{cc}
+1 & 0\\
+b & 1
+\end{array}\right].
+\end{align*}
+%
+Horizontal shears skew the $x$-coordinate of the vector while vertical shears skew the $y$-coordinate.
+Figure \ref{fig:linearly-transformed-horses} has a horizontal shear with $a=1/2$.
+
+\item \textbf{Reflection}: Reflects the vector about a line that passes through the origin.
+% Also sometimes called a \emph{Householder transformation}.
+The reflection about the line spanned by the vector $\left[a, b\right]^T$ has the matrix representation
+%
+\begin{align*}
+\frac{1}{a^2 + b^2}
+\left[\begin{array}{cc}
+a^2 - b^2 & 2ab \\
+2ab       & b^2 - a^2
+\end{array}\right].
+\end{align*}
+%
+The reflection in Figure \ref{fig:linearly-transformed-horses} reflects the image about the $y$-axis ($a=0$, $b=1$).
+
+\item \textbf{Rotation}: %$L(x,y) \mapsto (x\cos\theta-y\sin\theta,\ x\sin\theta + y\cos\theta)$.
+Rotates the vector around the origin.
+A counterclockwise rotation of $\theta$ radians has the following transformation matrix:
+%
+\begin{align*}
+\left[\begin{array}{rr}
+\cos\theta & -\sin\theta\\
+\sin\theta &  \cos\theta
+\end{array}\right].
+\end{align*}
+%
+A negative value of $\theta$ performs a clockwise rotation.
+Choosing $\theta = \pi/2$ produces the rotation in Figure \ref{fig:linearly-transformed-horses}.
+
+\end{itemize}
+
+\begin{problem} % Implement linear transformations.
 Write a function for each of the linear transformations listed above.
 Each function should accept an array to transform and the scalars that define the transformation ($a$ and $b$ for stretch, shear, and reflection, and $\theta$ for rotation).
-Construct the matrix representation and left multiply to the input the array.
+Construct the transformation matrix and left multiply to the input the array.
 Return the transformed array.
 
 To test your functions, consider writing a separate function that plots an array, transforms it, and plots the result for a side-by-side comparison.
@@ -436,7 +465,7 @@ Reflections and rotations are two ways to implement the QR Decomposition, an imp
 \subsection*{Compositions of Linear Transformations} % ------------------------
 
 Let $V$, $W$, and $Z$ be $m$-dimensional, $n$-dimensional, and $p$-dimensional vector spaces, respectively.
-If $L:V\rightarrow W$ and $K:W\rightarrow Z$ are linear transformations with matrix representations $A$ and $B$, respectively, then the \emph{composition} $KL:V\rightarrow Z$ is also a linear transformation, and the matrix representation is the matrix product $AB$.
+If $L:V\rightarrow W$ and $K:W\rightarrow Z$ are linear transformations with transformation matrices $A$ and $B$, respectively, then the \emph{composition} $KL:V\rightarrow Z$ is also a linear transformation, and its transformation matrix is the matrix product $AB$.
 For example, if $S$ is a matrix representing a shear and $R$ is a matrix representing a rotation, then $RS$ represents a shear followed by a rotation.
 
 In fact, any linear transformation $L:\mathbb{R}^2 \rightarrow\mathbb{R}^2$ is a composition of the transformations discussed above.

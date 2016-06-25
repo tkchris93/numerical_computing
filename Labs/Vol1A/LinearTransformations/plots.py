@@ -131,7 +131,7 @@ def caching_demo():
     for size in sizes:
         A, B = np.random.random((2, size))
         def func():
-            np.dot(A,B)
+            A + B
         times.append(timeit(func, number=50) / 50.)
 
     plt.loglog(sizes[1:], times[1:], basex=2, basey=2, lw=2, ms=15)
@@ -151,10 +151,13 @@ horse = np.load("horse.npy")[:,::10]
 
 # TODO: Get rid of tick marks.
 
-def save_horse(data, title):
+def save_horse(data, title, top=True):
     plt.clf()
     plt.plot(data[0], data[1], 'k,')
-    plt.title(title, fontsize=24)
+    if top:
+        plt.title(title, fontsize=24)
+    else:
+        plt.xlabel(title, fontsize=24)
     plt.tick_params(
         axis='both',       # changes apply to both axes
         which='both',      # both major and minor ticks are affected
@@ -186,7 +189,7 @@ def reflected_horse(data=horse, save=True):
     reflection = np.dot(np.array([[l1**2 - l2**2, 2*l1*l2],
                             [2*l1*l2, l2**2 - l1**2]])/(l1**2 + l2**2), data)
     if save:
-        save_horse(reflection, "Reflection")
+        save_horse(reflection, "Reflection", top=False)
     return reflection
 
 def rotated_horse(data=horse, save=True):
@@ -194,7 +197,7 @@ def rotated_horse(data=horse, save=True):
     rotation = np.dot([[np.cos(theta),-np.sin(theta)],
                        [np.sin(theta),np.cos(theta)]], data)
     if save:
-        save_horse(rotation, "Rotation")
+        save_horse(rotation, "Rotation", top=False)
     return rotation
 
 def combo_horse(data=horse):
@@ -202,7 +205,7 @@ def combo_horse(data=horse):
     data = sheared_horse(data, save=False)
     data = reflected_horse(data, save=False)
     data = rotated_horse(data, save=False)
-    save_horse(data, "Composition")
+    save_horse(data, "Composition", top=False)
 
 def translated_horse():
     translation = horse + np.vstack([.75, .5])
@@ -226,7 +229,7 @@ def trajectory():
     plt.gca().set_aspect('equal')
 
 @_save("SolarSystem.pdf")
-def earth_moon_orbits(T=2*np.pi, omega_e=1, omega_m=13, N=400):
+def solar_system(T=2*np.pi, omega_e=1, omega_m=13, N=400):
     time = np.linspace(0, T, N)
     earth, moon = [np.array([10,0])], [np.array([11,0])]
 
@@ -254,7 +257,7 @@ def horse_drawings():
         stdout.flush()
         func()
         print("done.")
-    earth_moon_orbits()
+    solar_system()
 
 # =============================================================================
 
@@ -263,4 +266,4 @@ def draw_all():
     horse_drawings()
 
 if __name__ == "__main__":
-    draw_all()
+    horse_drawings()
