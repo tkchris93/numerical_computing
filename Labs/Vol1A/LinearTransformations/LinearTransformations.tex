@@ -238,7 +238,6 @@ Since the slope of the line for \li{matrix_matrix_product()} is noticeably great
 In fact, matrix-matrix multiplication (which uses 3 \li{for} loops) is $\sim n^3$, while matrix-vector multiplication (which only has 2 loops) is only $\sim n^2$.
 
 \begin{problem} % Why NumPy ROCKS.
-NumPy is optimized for fast computations.
 Repeat the experiment of Problem \ref{prob:matrix-multiplication-timing}, timing the following operations:
 %
 \begin{itemize}
@@ -252,13 +251,13 @@ Create a single figure with two subplots: one with all four sets of execution ti
 Compare your results to Figure \ref{fig:loglogdemo}.
 \end{problem}
 
-Apart from being syntactically convenient, element-wise NumPy operations are also significantly faster than element-wise list operations.
-The coefficient for list of lists is way bigger than it is with NumPy arrays.
-Iterating through loops is very expensive.
-NumPy also uses loops, but it uses C loops instead of Python loops.
+NumPy operations are significantly faster than element-wise list operations.
+Matrix-matrix multiplication is $\sim n^3$, but with lists of lists the times grows at a rate of $an^3$ while with NumPy the times grow at a rate of $bn^3$ where $a$ is much bigger than $b$.
 
 \begin{info} % Note about Caching.
-The execution times for matrix multiplication with NumPy increase somewhat erratically.
+% Iterating through loops is very expensive.
+% NumPy also uses loops, but it uses C loops instead of Python loops.
+The execution times for matrix multiplication with NumPy seem to increase somewhat inconsistently.
 NumPy operations are optimized for computer hardware.
 Below, we plot execution times for vector-vector multiplication with NumPy.
 The spikes in the plot indicate the times that the array no longer fits in the current level of memory
@@ -270,16 +269,20 @@ The spikes in the plot indicate the times that the array no longer fits in the c
 
 \section*{Linear Transformations} % ===========================================
 
-A \emph{linear transformation} is a mapping between vector space that preserves addition and scalar multiplication.
+% TODO: does Volume 1 use L or T for linear transformations?
+
+A \emph{linear transformation} is a mapping between vector spaces that preserves addition and scalar multiplication.
 More precisely, for arbitrary vector spaces $V$ and $W$, the mapping $L:V\rightarrow W$ is a linear transformation if and only if it satisfies the following conditions:
 %
 \begin{itemize}
-\item $T(\x + \y) = T\x + T\y$ for any two vectors $\x,\ \y \in V$
-\item $T(\alpha\x) = \alpha T\x$ for any vector $\x \in V$ and any scalar $\alpha \in \mathbb{F}$.
+\item $L(\x + \y) = L\x + L\y$ for any two vectors $\x,\ \y \in V$
+\item $L(\alpha\x) = \alpha L\x$ for any vector $\x \in V$ and any scalar $\alpha \in \mathbb{F}$.
 \end{itemize}
 
-In $\mathbb{R}^n$, every linear transformation $L$ can be represented by an $n \times n$ matrix $A$.
-To apply $L$ to a vector $\x \in \mathbb{R}^n$, left multiply by the matrix representation.
+% TODO: Does V or W have to be finite-dimensional, or both? Look in 540 book.
+Every linear transformation $L$ from an $m$-dimensional vector space to an $n$-dimensional vector space can be represented by an $m\times n$ matrix $A$.
+To apply $L$ to a vector $\x$, left multiply by the matrix representation.
+% So if $L\x \mapsto \y$, then we calculate $A\x = \y$.
 
 Linear transformations can be interpreted geometrically.
 
@@ -293,7 +296,7 @@ y_1 & y_2 & \ldots & y_m \\
 \end{align*}
 
 \begin{lstlisting}
-# Load the array from the npy file.
+# Load the array from the .npy file.
 >>> import numpy as np
 >>> data = np.load("horse.npy")
 
@@ -305,91 +308,144 @@ y_1 & y_2 & \ldots & y_m \\
 >>> plt.gca().set_aspect("equal")
 \end{lstlisting}
 
-\subsection*{Dilations}
-A \emph{dilation} of the vector space rescales the vectors.
-Graphically, a dilation stretches or compresses the space.
-A linear transformation is a dilation if and only if its matrix representation is diagonal, so in particular all Type II elementary matrices are dilations.
-The matrix $\begin{pmatrix}1.25 & 0\\0 & .25 \end{pmatrix}$ corresponds to the dilation below.
+There are several types of linear transformations.
+We define each and give examples in $\mathbb{R}^2$.
 
-\begin{figure}[H] % Generated with dilated_horse() in plots.py.
+\begin{itemize}
+
+\item \textbf{Stretch}: %$L(x,y) \mapsto (ax,by)$.
+Stretches or compresses the vector along each axis.
+The matrix representation is diagonal:
+%
+\begin{align*}
+\left[\begin{array}{rr}
+a & 0  \\
+0 & b
+\end{array}\right].
+\end{align*}
+%
+If $a=b$, the transformation is called a \emph{dilation}.
+The stretch in Figure \ref{fig:linearly-transformed-horses} uses $a = 1/2$ and $b = 6/5$ to compress the $x$-axis and stretch the $y$-axis.
+
+\item \textbf{Shear}: %$L(x,y) \mapsto (x + ay, y)$ or $L(x,y) \mapsto (x, bx + y)$.
+Slants the vector by a scalar factor horizontally or vertically.
+There are two matrix representations:
+% The corresponding matrix is a Type III elementary matrix.
+%
+\begin{align*}
+\text{horizontal shear:\ }
+\left[\begin{array}{cc}
+1 & a\\
+0 & 1
+\end{array}\right]
+&&
+\text{vertical shear:\ }
+\left[\begin{array}{cc}
+1 & 0\\
+b & 1
+\end{array}\right].
+\end{align*}
+%
+Horizontal shears skew the $x$-coordinate of the vector while vertical shears skew the $y$-coordinate.
+Figure \ref{fig:linearly-transformed-horses} has a horizontal shear with $a=1/2$.
+
+\item \textbf{Rotation}: %$L(x,y) \mapsto (x\cos\theta-y\sin\theta,\ x\sin\theta + y\cos\theta)$.
+Rotates the vector around the origin.
+A counterclockwise rotation of $\theta$ radians has the following matrix representation:
+%
+\begin{align*}
+\left[\begin{array}{rr}
+\cos\theta & -\sin\theta\\
+\sin\theta &  \cos\theta
+\end{array}\right].
+\end{align*}
+%
+A negative value of $\theta$ performs a clockwise rotation.
+Choosing $\theta = \pi/3$ produces the rotation in Figure \ref{fig:linearly-transformed-horses}.
+
+% TODO: rotations first or reflections? (Which is used in QR?)
+
+\item \textbf{Reflection}: Reflects the vector about a line that passes through the origin.
+% Also sometimes called a \emph{Householder transformation}.
+The reflection about the line spanned by the vector $\left[a, b\right]^T$ has the matrix representation
+%
+\begin{align*}
+\frac{1}{a^2 + b^2}
+\left[\begin{array}{cc}
+a^2 - b^2 & 2ab \\
+2ab       & b^2 - a^2
+\end{array}\right].
+\end{align*}
+%
+The reflection in Figure \ref{fig:linearly-transformed-horses} reflects the image about the $y$-axis ($a=0$, $b=1$).
+
+\end{itemize}
+
+\begin{figure}[h] % Generated with horse_drawings() in plots.py.
 \captionsetup[subfigure]{justification=centering}
 \centering
-\begin{subfigure}{.5\textwidth}
+\begin{subfigure}{.32\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{originalHorse.pdf}
-\end{subfigure}%
-\begin{subfigure}{.5\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{DilationHorse.pdf}
+    \includegraphics[width=\linewidth]{OriginalHorse.pdf}
 \end{subfigure}
-\end{figure}
-
-\begin{problem}
-Write a function that accepts an array of points and an array giving the stretching factors in each direction.
-Your function should return the dilated points.
-\label{prob:dilation}
-\end{problem}
-
-\subsection*{Rotations} % -----------------------------------------------------
-
-A second type of linear transformation is to rotate vectors around the origin.
-A rotation of $\theta$ radians counterclockwise corresponds to the matrix $\begin{pmatrix}
-\cos(\theta) & -\sin(\theta) \\
-\sin(\theta) & \cos(\theta)
-\end{pmatrix}.$
-Rotating with $\theta = \pi/3$ produces the figure shown below.
-
-\begin{figure}[H] % Generated with rotated_horse() in plots.py.
-\captionsetup[subfigure]{justification=centering}
-\centering
-\begin{subfigure}{.5\textwidth}
+%
+\begin{subfigure}{.32\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{originalHorse.pdf}
-\end{subfigure}%
-\begin{subfigure}{.5\textwidth}
+    \includegraphics[width=\linewidth]{StretchHorse.pdf}
+\end{subfigure}
+%
+\begin{subfigure}{.32\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{ShearHorse.pdf}
+\end{subfigure}
+\\
+\begin{subfigure}{.32\textwidth}
     \centering
     \includegraphics[width=\linewidth]{RotationHorse.pdf}
 \end{subfigure}
-\label{fig:rotate}
+%
+\begin{subfigure}{.32\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{ReflectionHorse.pdf}
+\end{subfigure}
+%
+\begin{subfigure}{.32\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{CompositionHorse.pdf} % ComboHorse?
+\end{subfigure}
+\caption{The pixel image of \texttt{horse.npy} with various linear transformations.}
+\label{fig:linearly-transformed-horses}
 \end{figure}
+
+\begin{problem} % Linear transformations.
+Write functions for each of the linear transformations listed above.
+Each function should accept an array to transform and the scalars that define the transformation ($a$ and $b$ for stretches, shears, and reflections, and $\theta$ for rotations).
+Construct the matrix representation and left multiply to the input the array.
+Return the transformed array.
+
+To test your functions, write a separate function that plots an array, transforms it, and plots the result for a side-by-side comparison.
+\end{problem}
+
+\subsection*{Compositions of Linear Transformations} % ------------------------
+
+Recall that composition of linear transformations corresponds to matrix multiplication.
+For example, if $S$ is a matrix representing a shear and $R$ is a matrix representing a rotation, then $RS$ represents a shear followed by a rotation.
+
+In fact, any linear transformation of $\mathbb{R}^2$ is a composition of the transformations discussed in this lab.
+This is because reflections, dilations, and shears provide us with all the elementary matrices, and every matrix is a product of elementary matrices.
+
+
+\begin{comment}
+\begin{problem}
+Write a function that accepts an array of points and an array giving the stretching factors in each direction.
+Your function should return the dilated points.
+\end{problem}
+
 
 \begin{problem}
 Write a function that accepts an array of points and the angle of rotation (in radians).
 Your function should return the rotated points.
 \end{problem}
-
-\subsection*{Shears} % --------------------------------------------------------
-
-A third type of linear transformation is a \emph{shear}, which ``slants'' a set of vectors.
-The corresponding matrix is a Type III elementary matrix.
-A horizontal shear has the form $\begin{pmatrix}
-1 & c \\
-0 & 1
-\end{pmatrix}$ and a vertical skew has the form $
- \begin{pmatrix}
-1 & 0 \\
-c & 1
-\end{pmatrix}
-$.
-Horizontal skews fix the $y$-coordinate of a vector while vertical skews fix the $x$-coordinate.
-The horizontal shear shown below corresponds to the matrix $\begin{pmatrix}
-1 & .2 \\
-0 & 1
-\end{pmatrix}
-$.
-
-\begin{figure}[H] % Generated with dilated_horse() in plots.py.
-\captionsetup[subfigure]{justification=centering}
-\centering
-\begin{subfigure}{.5\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{originalHorse.pdf}
-\end{subfigure}%
-\begin{subfigure}{.5\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{ShearHorse.pdf}
-\end{subfigure}
-\end{figure}
 
 
 \begin{problem}
@@ -397,58 +453,13 @@ Write a function that accepts an array of points, a floating point argument that
 Your function should return the sheared points.
 \end{problem}
 
-\subsection*{Reflections}% ----------------------------------------------------
-
-A fourth type of linear transformation is reflections about a line, also called \emph{Householder transformations}.
-Reflecting about a line spanned by $(l_1, l_2)$ corresponds to the matrix
-\[
-\frac{1}{l_1^2 + l_2^2}
-\begin{pmatrix}
-l_1^2 - l_2^2 & 2l_1l_2 \\
-2l_1l_2 & l_2^2 - l_1^2
-\end{pmatrix}.
-\]
-
-For example, the line $y=x$ is spanned by $(1, 1)$.
-In this case the corresponding matrix $\begin{pmatrix}
-0 & 1\\
-1 & 0
-\end{pmatrix}$ is a Type I elementary matrix, in fact the only one of size $2 \times 2$.
-As another example, the reflection in Figure \ref{fig:reflection} about the line $y = (1/\sqrt{3})x$ corresponds to the matrix $\frac{1}{4}\begin{pmatrix}
-2 & 2\sqrt{3}\\
-2\sqrt{3} & -2
-\end{pmatrix}$.
-
-\begin{figure}[H] % Generated with reflected_horse() in plots.py.
-\captionsetup[subfigure]{justification=centering}
-\centering
-\begin{subfigure}{.5\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{originalHorse.pdf}
-\end{subfigure}%
-\begin{subfigure}{.5\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{ReflectionHorse.pdf}
-\end{subfigure}
-\label{fig:reflect}
-\end{figure}
-
 \begin{problem}
 Write a function that accepts an array of points and a 1-D array describing the axis of reflection (in the notation above, this argument is $(l_1, l_2)$.
 Your function should return the reflected points.
 \end{problem}
-
-\subsection*{Composition of linear transformations}
-Recall that composition of linear transformations corresponds to matrix multiplication.
-For example, if $S$ is a matrix representing a shear and $R$ is a matrix representing a rotation, then $RS$ represents a shear followed by a rotation.
-
-In fact, any linear transformation of $\mathbb{R}^2$ is a composition of the transformations discussed in this lab.
-This is because reflections, dilations, and shears provide us with all the elementary matrices, and every matrix is a product of elementary matrices.
-
-% ComboHorse might not be necessary!!
+\end{comment}
 
 \section*{Affine transformations}
-\subsection*{Translations}
 
 A translation is a map $T: \mathbb{R}^2 \rightarrow \mathbb{R}^2$ defined by $T(\mathbf{x}) = \mathbf{x}+\mathbf{b}$ where $\mathbf{b} \in \mathbb{R}^2$.
 For example, if $\mathbf{b} = (2, 0)\trp$, then applying $T$ to an image will shift it right by 2.
@@ -459,7 +470,7 @@ This translation is illustrated below.
 \centering
 \begin{subfigure}{.5\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{originalHorse.pdf}
+    \includegraphics[width=\linewidth]{OriginalHorse.pdf}
 \end{subfigure}%
 \begin{subfigure}{.5\textwidth}
     \centering

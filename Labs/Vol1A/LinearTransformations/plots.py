@@ -146,12 +146,19 @@ def timing_drawings():
 
 # Horse Pictures ==============================================================
 
-horse = np.load("horse.npy")[:,::5]
+horse = np.load("horse.npy")[:,::10]
+
+# TODO: Get rid of tick marks.
 
 def save_horse(data, title):
     plt.clf()
     plt.plot(data[0], data[1], 'k,')
-    plt.title(title, fontsize=18)
+    plt.title(title, fontsize=24)
+    plt.tick_params(
+        axis='both',       # changes apply to both axes
+        which='both',      # both major and minor ticks are affected
+        bottom='off', top='off', left='off', right='off',
+        labelbottom='off', labelleft='off')
     plt.axis([-1,1,-1,1])
     plt.gca().set_aspect("equal")
     plt.savefig("{}Horse.pdf".format(title), format="pdf")
@@ -161,37 +168,44 @@ def save_horse(data, title):
 def original_horse():
     save_horse(horse, "Original")
 
-def dilated_horse():
-    dilation = np.dot([[1.25,0],[0,.25]], horse)
-    save_horse(dilation, "Dilation")
+def stretched_horse(data=horse, save=True):
+    dilation = np.dot([[.5,0],[0,1.2]], data)
+    if save:
+        save_horse(dilation, "Stretch")
+    return dilation
 
-def rotated_horse():
+def sheared_horse(data=horse, save=True):
+    shear = np.dot([[1, .5],[0, 1]], data)
+    if save:
+        save_horse(shear, "Shear")
+    return shear
+
+def rotated_horse(data=horse, save=True):
     theta = np.pi/3.
     rotation = np.dot([[np.cos(theta),-np.sin(theta)],
-                       [np.sin(theta),np.cos(theta)]], horse)
-    save_horse(rotation, "Rotation")
+                       [np.sin(theta),np.cos(theta)]], data)
+    if save:
+        save_horse(rotation, "Rotation")
+    return rotation
 
-def sheared_horse():
-    shear = np.dot([[1, .2],[0, 1]], horse)
-    save_horse(shear, "Shear")
-
-def reflected_horse():
+def reflected_horse(data=horse, save=True):
     l1, l2 = 0, 1
     reflection = np.dot(np.array([[l1**2 - l2**2, 2*l1*l2],
-                            [2*l1*l2, l2**2 - l1**2]])/(l1**2 + l2**2), horse)
-    save_horse(reflection, "Reflection")
+                            [2*l1*l2, l2**2 - l1**2]])/(l1**2 + l2**2), data)
+    if save:
+        save_horse(reflection, "Reflection")
+    return reflection
+
+def combo_horse(data=horse):
+    data = stretched_horse(data, save=False)
+    data = sheared_horse(data, save=False)
+    data = rotated_horse(data, save=False)
+    data = reflected_horse(data, save=False)
+    save_horse(data, "Composition")
 
 def translated_horse():
-    translation = horse + np.vstack([.25, .25])
+    translation = horse + np.vstack([.5, .5])
     save_horse(translation, "Translation")
-
-def combo_horse():
-    shear = np.dot([[1, -1.02],[.5, 1]], horse)
-    trans = shear + np.vstack([.25, -.25])
-    l1, l2 = -2, .5
-    refle = np.dot(np.array([[l1**2 - l2**2, 2*l1*l2],
-                            [2*l1*l2, l2**2 - l1**2]])/(l1**2 + l2**2), trans)
-    save_horse(refle, "Combo")
 
 @_save("trajectory.pdf")
 def trajectory():
@@ -212,14 +226,12 @@ def trajectory():
 
 
 def horse_drawings():
-    def execute(func):
+    for func in [original_horse, stretched_horse, rotated_horse, sheared_horse,
+                 reflected_horse, combo_horse, translated_horse,]:
         print("{:.<20}".format(func.__name__+'()'), end='')
         stdout.flush()
         func()
         print("done.")
-    for f in [original_horse, dilated_horse, rotated_horse,
-              sheared_horse, reflected_horse, translated_horse,]:
-        execute(f)
 
 # =============================================================================
 
@@ -228,4 +240,4 @@ def draw_all():
     horse_drawings()
 
 if __name__ == "__main__":
-    draw_all()
+    horse_drawings()
