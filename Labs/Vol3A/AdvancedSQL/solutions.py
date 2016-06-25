@@ -22,9 +22,9 @@ def studentmajors():
     cur = con.cursor()
     
     try:
-        cur.execute("""select majors.name, count(students.name) 
-            from students left outer join majors on students.majorcode=majors.id 
-            group by students.majorcode order by majors.name asc;""")
+        cur.execute("""SELECT majors.name, COUNT(students.name) 
+            FROM students LEFT OUTER JOIN majors ON students.majorcode=majors.id 
+            GROUP BY students.majorcode ORDER BY majors.name ASC;""")
         results = cur.fetchall()
         cur.close()
         return results
@@ -38,15 +38,15 @@ def studentGPA():
     cur = con.cursor()
     
     try:
-        cur.execute("""select round(avg(
-                        case when grade in ('A+', 'A', 'A-') then 4.0
-                            when grade in ('B+', 'B', 'B-') then 3.0
-                            when grade in ('C+', 'C', 'C-') then 2.0
-                            when grade in ('D+', 'D', 'D-') then 1.0
-                            else 0.0
-                        end), 2) as grade
-                    from students join grades on students.studentid=grades.studentid 
-                    where grade is not null;""")
+        cur.execute("""SELECT ROUND(AVG(
+                        CASE WHEN grade IN ('A+', 'A', 'A-') THEN 4.0
+                            WHEN grade IN ('B+', 'B', 'B-') THEN 3.0
+                            WHEN grade IN ('C+', 'C', 'C-') THEN 2.0
+                            WHEN grade IN ('D+', 'D', 'D-') THEN 1.0
+                            ELSE 0.0
+                        END), 2) AS grade
+                    FROM students JOIN grades ON students.studentid=grades.studentid 
+                    WHERE grade IS NOT NULL;""")
         result = cur.fetchall()
         cur.close()
         return result
@@ -76,9 +76,9 @@ def manygrades():
     cur = con.cursor()
     
     try:
-        cur.execute("""select name, count(*) 
-                    from students join grades on students.studentid=grades.studentid 
-                    where grade is not null group by name having count(*)>2;""")
+        cur.execute("""SELECT name, COUNT(*) 
+                    FROM students JOIN grades ON students.studentid=grades.studentid 
+                    WHERE grade IS NOT NULL GROUP BY name HAVING COUNT(*)>2;""")
         results = cur.fetchall()
         cur.close()
         return results
