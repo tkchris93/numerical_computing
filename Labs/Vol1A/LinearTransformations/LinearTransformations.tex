@@ -234,10 +234,11 @@ The following code produces Figure \ref{fig:loglogdemo}.
 \label{fig:loglogdemo}
 \end{figure}
 
-Since the slope of the line for \li{matrix_matrix_product()} is noticeably greater than the slope of the \li{matrix_vector_product()} line, we conclude that matrix-matrix multiplication is an order of magnitude faster than matrix-matrix multiplication.
-In fact, matrix-matrix multiplication (which uses 3 \li{for} loops) is $\sim n^3$, while matrix-vector multiplication (which only has 2 loops) is only $\sim n^2$.
+In the log-log plot, the slope of the \li{matrix_matrix_product()} line is noticeably greater than the slope of the \li{matrix_vector_product()} line.
+This reflects the fact that matrix-matrix multiplication (which uses 3 \li{for} loops) is $\sim n^3$, while matrix-vector multiplication (which only has 2 loops) is only $\sim n^2$.
 
 \begin{problem} % Why NumPy ROCKS.
+NumPy is built specifically for fast numerical computations.
 Repeat the experiment of Problem \ref{prob:matrix-multiplication-timing}, timing the following operations:
 %
 \begin{itemize}
@@ -249,15 +250,18 @@ Repeat the experiment of Problem \ref{prob:matrix-multiplication-timing}, timing
 
 Create a single figure with two subplots: one with all four sets of execution times on a regular linear scale, and one with all four sets of execution times on a log-log scale.
 Compare your results to Figure \ref{fig:loglogdemo}.
+\label{prob:numpy-is-awesome}
 \end{problem}
 
-NumPy operations are significantly faster than element-wise list operations.
-Matrix-matrix multiplication is $\sim n^3$, but with lists of lists the times grows at a rate of $an^3$ while with NumPy the times grow at a rate of $bn^3$ where $a$ is much bigger than $b$.
+The results of Problem \ref{prob:numpy-is-awesome} show that matrix multiplication operations are significantly faster in NumPy than in plain Python.
+Matrix-matrix multiplication grows cubically regardless of the implementation, but with lists of lists the times grows at a rate of $an^3$ while with NumPy the times grow at a rate of $bn^3$ where $a$ is much bigger than $b$.
+% Since the exponent on the $n$ is the same in both cases, the disparity between the coefficients makes a significant impact.
 
 \begin{info} % Note about Caching.
 % Iterating through loops is very expensive.
 % NumPy also uses loops, but it uses C loops instead of Python loops.
 The execution times for matrix multiplication with NumPy seem to increase somewhat inconsistently.
+% The fastest levels of computer memory can only handle so much information before it has to turn over to the next level of computer memory that is harder and slower to access.
 NumPy operations are optimized for computer hardware.
 Below, we plot execution times for vector-vector multiplication with NumPy.
 The spikes in the plot indicate the times that the array no longer fits in the current level of memory
@@ -303,7 +307,7 @@ y_1 & y_2 & \ldots & y_m \\
 # Plot the horse with black pixels.
 >>> plt.plot(data[0], data[1], 'k,')
 
-# Set the window limits to [-1, 1]x[-1, 1] and make the window square.
+# Set the window limits to [-1, 1] by [-1, 1] and make the window square.
 >>> plt.axis([-1,1,-1,1])
 >>> plt.gca().set_aspect("equal")
 \end{lstlisting}
@@ -349,21 +353,6 @@ b & 1
 Horizontal shears skew the $x$-coordinate of the vector while vertical shears skew the $y$-coordinate.
 Figure \ref{fig:linearly-transformed-horses} has a horizontal shear with $a=1/2$.
 
-\item \textbf{Rotation}: %$L(x,y) \mapsto (x\cos\theta-y\sin\theta,\ x\sin\theta + y\cos\theta)$.
-Rotates the vector around the origin.
-A counterclockwise rotation of $\theta$ radians has the following matrix representation:
-%
-\begin{align*}
-\left[\begin{array}{rr}
-\cos\theta & -\sin\theta\\
-\sin\theta &  \cos\theta
-\end{array}\right].
-\end{align*}
-%
-A negative value of $\theta$ performs a clockwise rotation.
-Choosing $\theta = \pi/3$ produces the rotation in Figure \ref{fig:linearly-transformed-horses}.
-
-% TODO: rotations first or reflections? (Which is used in QR?)
 
 \item \textbf{Reflection}: Reflects the vector about a line that passes through the origin.
 % Also sometimes called a \emph{Householder transformation}.
@@ -378,6 +367,20 @@ a^2 - b^2 & 2ab \\
 \end{align*}
 %
 The reflection in Figure \ref{fig:linearly-transformed-horses} reflects the image about the $y$-axis ($a=0$, $b=1$).
+
+\item \textbf{Rotation}: %$L(x,y) \mapsto (x\cos\theta-y\sin\theta,\ x\sin\theta + y\cos\theta)$.
+Rotates the vector around the origin.
+A counterclockwise rotation of $\theta$ radians has the following matrix representation:
+%
+\begin{align*}
+\left[\begin{array}{rr}
+\cos\theta & -\sin\theta\\
+\sin\theta &  \cos\theta
+\end{array}\right].
+\end{align*}
+%
+A negative value of $\theta$ performs a clockwise rotation.
+Choosing $\theta = \pi/2$ produces the rotation in Figure \ref{fig:linearly-transformed-horses}.
 
 \end{itemize}
 
@@ -401,12 +404,12 @@ The reflection in Figure \ref{fig:linearly-transformed-horses} reflects the imag
 \\
 \begin{subfigure}{.32\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{RotationHorse.pdf}
+    \includegraphics[width=\linewidth]{ReflectionHorse.pdf}
 \end{subfigure}
 %
 \begin{subfigure}{.32\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{ReflectionHorse.pdf}
+    \includegraphics[width=\linewidth]{RotationHorse.pdf}
 \end{subfigure}
 %
 \begin{subfigure}{.32\textwidth}
@@ -418,61 +421,48 @@ The reflection in Figure \ref{fig:linearly-transformed-horses} reflects the imag
 \end{figure}
 
 \begin{problem} % Linear transformations.
-Write functions for each of the linear transformations listed above.
-Each function should accept an array to transform and the scalars that define the transformation ($a$ and $b$ for stretches, shears, and reflections, and $\theta$ for rotations).
+Write a function for each of the linear transformations listed above.
+Each function should accept an array to transform and the scalars that define the transformation ($a$ and $b$ for stretch, shear, and reflection, and $\theta$ for rotation).
 Construct the matrix representation and left multiply to the input the array.
 Return the transformed array.
 
-To test your functions, write a separate function that plots an array, transforms it, and plots the result for a side-by-side comparison.
+To test your functions, consider writing a separate function that plots an array, transforms it, and plots the result for a side-by-side comparison.
 \end{problem}
+
+\begin{info} % Look ahead to the QR decomposition.
+Reflections and rotations are two ways to implement the QR Decomposition, an important matrix factorization which we will implement in a future lab. % In the next lab.
+\end{info}
 
 \subsection*{Compositions of Linear Transformations} % ------------------------
 
-Recall that composition of linear transformations corresponds to matrix multiplication.
+Let $V$, $W$, and $Z$ be $m$-dimensional, $n$-dimensional, and $p$-dimensional vector spaces, respectively.
+If $L:V\rightarrow W$ and $K:W\rightarrow Z$ are linear transformations with matrix representations $A$ and $B$, respectively, then the \emph{composition} $KL:V\rightarrow Z$ is also a linear transformation, and the matrix representation is the matrix product $AB$.
 For example, if $S$ is a matrix representing a shear and $R$ is a matrix representing a rotation, then $RS$ represents a shear followed by a rotation.
 
-In fact, any linear transformation of $\mathbb{R}^2$ is a composition of the transformations discussed in this lab.
-This is because reflections, dilations, and shears provide us with all the elementary matrices, and every matrix is a product of elementary matrices.
+In fact, any linear transformation $L:\mathbb{R}^2 \rightarrow\mathbb{R}^2$ is a composition of the transformations discussed above.
+Figure \ref{fig:linearly-transformed-horses} displays the composition of all four previous transformations, applied in order (stretch, shear, reflection, then rotation).
+% This is because reflections, dilations, and shears provide us with all the elementary matrices, and every matrix is a product of elementary matrices.
 
-
-\begin{comment}
-\begin{problem}
-Write a function that accepts an array of points and an array giving the stretching factors in each direction.
-Your function should return the dilated points.
-\end{problem}
-
-
-\begin{problem}
-Write a function that accepts an array of points and the angle of rotation (in radians).
-Your function should return the rotated points.
-\end{problem}
-
-
-\begin{problem}
-Write a function that accepts an array of points, a floating point argument that indicates the shearing amount, and an integer argument that indicates the direction of the shear (0 for horizontal, 1 for vertical).
-Your function should return the sheared points.
-\end{problem}
-
-\begin{problem}
-Write a function that accepts an array of points and a 1-D array describing the axis of reflection (in the notation above, this argument is $(l_1, l_2)$.
-Your function should return the reflected points.
-\end{problem}
-\end{comment}
-
-\section*{Affine transformations}
+\section*{Affine Transformations} % ===========================================
 
 A translation is a map $T: \mathbb{R}^2 \rightarrow \mathbb{R}^2$ defined by $T(\mathbf{x}) = \mathbf{x}+\mathbf{b}$ where $\mathbf{b} \in \mathbb{R}^2$.
 For example, if $\mathbf{b} = (2, 0)\trp$, then applying $T$ to an image will shift it right by 2.
 This translation is illustrated below.
 
+Translations, together, with linear transformations, make up the broader class of transformations called ``affine transformations."
+These are transformations of the form $T: \mathbb{R}^2 \to \mathbb{R}^2$, $T(X) = AX + b$ where $A$ is an $n\times n$ matrix and $b \in \mathbb{R}^n$.
+Affine transformations include all compositions of scalings, rotations, dilations, reflections, and translations.
+For example, if $S$ represents a shear and $R$ a rotation, and if $\mathbf{b}$ is a vector in $\mathbb{R}^2$, then $T(\mathbf{x}) = RS\mathbf{x} + \mathbf{b}$ first shears $\mathbf{x}$, then rotates it, and finally translates it by $\mathbf{b}$.
+
+
 \begin{figure}[H] % Generated with translated_horse() in plots.py.
 \captionsetup[subfigure]{justification=centering}
 \centering
-\begin{subfigure}{.5\textwidth}
+\begin{subfigure}{.32\textwidth}
     \centering
     \includegraphics[width=\linewidth]{OriginalHorse.pdf}
 \end{subfigure}%
-\begin{subfigure}{.5\textwidth}
+\begin{subfigure}{.32\textwidth}
     \centering
     \includegraphics[width=\linewidth]{TranslationHorse.pdf}
 \end{subfigure}
@@ -482,19 +472,35 @@ Translations are usually \textbf{not} linear maps.
 Therefore, they cannot be represented with matrix multiplication.
 
 \begin{problem}
-Write a function that accepts an array of points and an array indicating how much to shift them in each direction.
-The function should return the translated points.
-Hint: You can construct a $2 \times 1$ array using the syntax \li{np.array([[a], [b]])}.
-This may be more convenient for broadcasting.
-Another hint: To check your work, plot the original points and their images under the transformation using the function \li{plotOldNew()} defined in Problem \ref{prob:dilation}.
+The moon orbits the earth and the earth orbits the sun.
+Assuming circular orbits, we can compute the trajectories of the earth and moon using only linear and affine transformations.
+
+Suppose an orientation where both the earth and moon travel counterclockwise, with the sun at the origin.
+Let $p_e(t)$ and $p_m(t)$ be the positions of the earth and the moon at time $t$, and let $\omega_e$ and $\omega_m$ be each celestial body's angular momentum (how fast they are orbiting).
+We compute the positions as follows:
+
+\begin{enumerate}
+\item Compute the position of the earth at time $t$, $p_e(t)$, by rotating the initial vector $p_e(0)$ counterclockwise about the origin by $t\omega_e$ radians.
+\item Compute the position of the moon \emph{relative to the earth} at time $t$ by rotating the vector $p_m(0) - p_e(0)$ counterclockwise about the origin by $t\omega_m$ radians.
+\item Translate the resulting vector from the previous step by the location of the earth at time $t$, $p_e(t)$.
+\end{enumerate}
+
+Write a function that accepts a final time $T$ and the angular momenta $\omega_e$ and $\omega_m$.
+Assuming initial positions $p_e(0) = (10,0)$ and $p_m(0) = (11,0)$, plot $p_e(t)$ and $p_m(t)$ over the time interval $t \in [0, T]$.
+\\
+% (Hints: Time will \textbf{not} be one of the axes of the final plot. Create two $(2 \times N)$ arrays, one for the earth and one for the moon, with the same structure as the horse picture---$x$ coordinates on the first row and $y$ coordinates on the second.)
+
+The moon rotates around the earth approximately 13 times every year.
+With $T = 2\pi$, $\omega_e = 1$, and $\omega_m = 13$, your plot should resemble the following figure.
+%
+\begin{figure}[H]
+    \includegraphics[width=.7\textwidth]{SolarSystem.pdf}
+\end{figure}
+
+\label{prob:solar-system-trajectories}
 \end{problem}
 
-\subsection*{Affine transformations}
-Translations, together, with linear transformations, make up the broader class of transformations called ``affine transformations."
-These are transformations of the form $T: \mathbb{R}^2 \to \mathbb{R}^2$, $T(X) = AX + b$ where $A$ is an $n\times n$ matrix and $b \in \mathbb{R}^n$.
-Affine transformations include all compositions of scalings, rotations, dilations, reflections, and translations.
-For example, if $S$ represents a shear and $R$ a rotation, and if $\mathbf{b}$ is a vector in $\mathbb{R}^2$, then $T(\mathbf{x}) = RS\mathbf{x} + \mathbf{b}$ first shears $\mathbf{x}$, then rotates it, and finally translates it by $\mathbf{b}$.
-
+\begin{comment}
 \begin{problem}
 Imagine a particle $p_1$ rotating around a second particle $p_2$ which is moving through $\mathbb{R}^2$ in a straight line.
 Suppose $p_2$ begins at the origin and $p_1$ begins at $(1, 0)$.
@@ -515,10 +521,17 @@ The location of $p_1$ at time $t$ can be computed as follows:
 \end{itemize}
 \end{enumerate}
 \item Plot the trajectory of $p_1$ on the time interval $(0, 10)$ assuming $\omega=\pi$, $v=(1, 1)$, and $s=3$.
-Your graph should look something like Figure \ref{fig:trajectory}.
+
+Your graph should resemble the following figure.
 \begin{figure}[H]
-\includegraphics[width=\textwidth]{trajectory.pdf}
-\caption{Solution to Problem \ref{prob:trajectory}.}
-\label{fig:trajectory}
+    \includegraphics[width=\textwidth]{trajectory.pdf}
 \end{figure}
 \end{problem}
+\end{comment}
+
+\newpage
+
+\section*{Additional Material} % ==============================================
+
+
+

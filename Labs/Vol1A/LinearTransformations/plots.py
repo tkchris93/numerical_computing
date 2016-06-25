@@ -138,6 +138,7 @@ def caching_demo():
     plt.ylabel("Seconds")
     plt.xlabel("n")
 
+
 def timing_drawings():
     timing_demo(12)
     a, b, c = prob1_solution(8)
@@ -180,14 +181,6 @@ def sheared_horse(data=horse, save=True):
         save_horse(shear, "Shear")
     return shear
 
-def rotated_horse(data=horse, save=True):
-    theta = np.pi/3.
-    rotation = np.dot([[np.cos(theta),-np.sin(theta)],
-                       [np.sin(theta),np.cos(theta)]], data)
-    if save:
-        save_horse(rotation, "Rotation")
-    return rotation
-
 def reflected_horse(data=horse, save=True):
     l1, l2 = 0, 1
     reflection = np.dot(np.array([[l1**2 - l2**2, 2*l1*l2],
@@ -196,15 +189,23 @@ def reflected_horse(data=horse, save=True):
         save_horse(reflection, "Reflection")
     return reflection
 
+def rotated_horse(data=horse, save=True):
+    theta = np.pi/2.
+    rotation = np.dot([[np.cos(theta),-np.sin(theta)],
+                       [np.sin(theta),np.cos(theta)]], data)
+    if save:
+        save_horse(rotation, "Rotation")
+    return rotation
+
 def combo_horse(data=horse):
     data = stretched_horse(data, save=False)
     data = sheared_horse(data, save=False)
-    data = rotated_horse(data, save=False)
     data = reflected_horse(data, save=False)
+    data = rotated_horse(data, save=False)
     save_horse(data, "Composition")
 
 def translated_horse():
-    translation = horse + np.vstack([.5, .5])
+    translation = horse + np.vstack([.75, .5])
     save_horse(translation, "Translation")
 
 @_save("trajectory.pdf")
@@ -224,14 +225,36 @@ def trajectory():
     plt.plot(posP1_x, posP1_y)
     plt.gca().set_aspect('equal')
 
+@_save("SolarSystem.pdf")
+def earth_moon_orbits(T=2*np.pi, omega_e=1, omega_m=13, N=400):
+    time = np.linspace(0, T, N)
+    earth, moon = [np.array([10,0])], [np.array([11,0])]
+
+    def rotation(theta):
+        return np.array([[np.cos(theta),-np.sin(theta)],
+                         [np.sin(theta),np.cos(theta)]])
+
+    for t in time[1:]:
+        earth.append(rotation(t*omega_e).dot(earth[0]))
+        moon.append(rotation(t*omega_m).dot([1, 0]) + earth[-1])
+
+    earth = np.transpose(earth)
+    moon = np.transpose(moon)
+
+    plt.plot(earth[0], earth[1], label="Earth", lw=2)
+    plt.plot(moon[0], moon[1], label="Moon", lw=2)
+    plt.gca().set_aspect("equal")
+    plt.legend(loc="upper left")
+
 
 def horse_drawings():
-    for func in [original_horse, stretched_horse, rotated_horse, sheared_horse,
-                 reflected_horse, combo_horse, translated_horse,]:
+    for func in [original_horse, stretched_horse, sheared_horse, rotated_horse,
+                 reflected_horse, combo_horse, translated_horse]:
         print("{:.<20}".format(func.__name__+'()'), end='')
         stdout.flush()
         func()
         print("done.")
+    earth_moon_orbits()
 
 # =============================================================================
 
@@ -240,4 +263,4 @@ def draw_all():
     horse_drawings()
 
 if __name__ == "__main__":
-    horse_drawings()
+    draw_all()
