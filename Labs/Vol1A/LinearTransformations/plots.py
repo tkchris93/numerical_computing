@@ -267,4 +267,4 @@ def draw_all():
     horse_drawings()
 
 if __name__ == "__main__":
-    horse_drawings()
+    draw_all()

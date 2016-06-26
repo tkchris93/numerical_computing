@@ -16,12 +16,12 @@ def random_matrix(n):
     return [[random() for j in xrange(n)] for i in xrange(n)]
 
 def matrix_vector_product(A, x):
-    """Compute the matrix-vector product Ax (as a list)."""
+    """Compute the matrix-vector product Ax as a list."""
     m, n = len(A), len(x)
     return [sum([A[i][k] * x[k] for k in range(n)]) for i in range(m)]
 
 def matrix_matrix_product(A, B):
-    """Compute the matrix-matrix product AB (as a list of lists)."""
+    """Compute the matrix-matrix product AB as a list of lists."""
     m, n, p = len(A), len(B), len(B[0])
     return [[sum([A[i][k] * B[k][j] for k in range(n)])
                                     for j in range(p) ]
@@ -31,9 +31,9 @@ def matrix_matrix_product(A, B):
 
 def prob1(N=8):
     """Use time.time(), timeit.timeit(), or %timeit to time
-    matrix_vector_product(n) and matrix-matrix-mult(n) with
-    increasingly large inputs. Generate the inputs A, x, and B with
-    random_matrix() and random_vector()} (so each input will be nxn or nx1).
+    matrix_vector_product() and matrix-matrix-mult() with increasingly large
+    inputs. Generate the inputs A, x, and B with random_matrix() and
+    random_vector() (so each input will be nxn or nx1).
     Only time the multiplication functions, not the generating functions.
 
     Report your findings in a single figure with two subplots: one with matrix-

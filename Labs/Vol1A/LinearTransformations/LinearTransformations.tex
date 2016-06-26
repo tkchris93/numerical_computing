@@ -147,12 +147,12 @@ Below, we implement these multiplication formulas without using NumPy.
 
 \begin{lstlisting}
 def matrix_vector_product(A, x):
-    """Compute the matrix-vector product Ax (as a list)."""
+    """Compute the matrix-vector product Ax as a list."""
     m, n = len(A), len(x)
     return [sum([A[i][k] * x[k] for k in range(n)]) for i in range(m)]
 
 def matrix_matrix_product(A, B):
-    """Compute the matrix-matrix product AB (as a list of lists)."""
+    """Compute the matrix-matrix product AB as a list of lists."""
     m, n, p = len(A), len(B), len(B[0])
     return [[sum([A[i][k] * B[k][j] for k in range(n)])
                                     for j in range(p) ]
@@ -564,6 +564,8 @@ The plot in Problem \ref{prob:solar-system-trajectories} fails to fully convey t
 The following function creates a simple Matplotlib animation for the earth and moon trajectories.
 
 \begin{lstlisting}
+from matplotlib import animation
+
 def solar_system_animation(earth, moon):
     """Animate the moon orbiting the earth and the earth orbiting the sun.
 
