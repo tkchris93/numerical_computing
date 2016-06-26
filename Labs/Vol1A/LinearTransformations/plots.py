@@ -229,7 +229,7 @@ def trajectory():
     plt.gca().set_aspect('equal')
 
 @_save("SolarSystem.pdf")
-def solar_system(T=2*np.pi, omega_e=1, omega_m=13, N=400):
+def solar_system(T=3*np.pi/2, omega_e=1, omega_m=13, N=400):
     time = np.linspace(0, T, N)
     earth, moon = [np.array([10,0])], [np.array([11,0])]
 
@@ -246,6 +246,7 @@ def solar_system(T=2*np.pi, omega_e=1, omega_m=13, N=400):
 
     plt.plot(earth[0], earth[1], label="Earth", lw=2)
     plt.plot(moon[0], moon[1], label="Moon", lw=2)
+    plt.xlabel("x"); plt.ylabel("y")
     plt.gca().set_aspect("equal")
     plt.legend(loc="upper left")
 

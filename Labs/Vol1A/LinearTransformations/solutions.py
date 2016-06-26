@@ -71,7 +71,11 @@ def prob1(N=8):
 
 
 def prob2(N=8):
-    """
+    """Time matrix_vector_product(), matrix_matrix_product(), and np.dot().
+
+    Report your findings in a single figure with two subplots: one with all
+    four sets of execution times on a regular linear scale, and one with all
+    four sets of exections times on a log-log scale.
     """
 
     domain = 2**np.arange(1,N+1)
@@ -174,6 +178,16 @@ def shear(A, a, b):
     """
     return np.dot([[1, a],[b, 1]], A)
 
+def reflection(A, a, b):
+    """Reflect the points in 'A' about the origin by 'theta' radians.
+
+    Inputs:
+        A ((2,n) ndarray): Array containing points in R2 stored as columns.
+        theta (float): The rotation angle in radians.
+    """
+    return np.dot([[a**2 - b**2, 2*a*b],
+                   [2*a*b, b**2 - a**2]], A)/(a**2 + b**2)
+
 def rotation(A, theta):
     """Rotate the points in 'A' about the origin by 'theta' radians.
 
@@ -184,41 +198,20 @@ def rotation(A, theta):
     return np.dot([[np.cos(theta),-np.sin(theta)],
                    [np.sin(theta),np.cos(theta)]], A)
 
-def reflection(A, a, b):
-    """reflect the points in 'A' about the origin by 'theta' radians.
-
-    Inputs:
-        A ((2,n) ndarray): Array containing points in R2 stored as columns.
-        theta (float): The rotation angle in radians.
-    """
-    return np.dot([[a**2 - b**2, 2*a*b],
-                   [2*a*b, b**2 - a**2]], A)/(a**2 + b**2)
 
 # Problem 4
-def translate(A, a, b):
-    """Translate the points in A by the vector b.
-
-    Inputs:
-        A (array) - Array of size (2,n) containing points in R2 stored as columns.
-        b (2-tuple (b1,b2)) - Translate points by b1 in the x direction and by b2
-            in the y direction.
-    """
-    return A + np.vstack(b)
-
-
-# Problem 5
-def solar_system(T, omega_e, omega_m, N=400):
+def solar_system(T, omega_e, omega_m):
     """Plot the trajectories of the earth and moon over the time interval [0,T]
-    using 'N' time steps.
+    assuming the initial position of the earth is (10,0) and the initial
+    position of the moon is (11,0).
 
     Parameters:
         T (int): The final time.
         omega_e (float): The earth's angular velocity.
         omega_m (float): The moon's angular velocity.
-        N (int): The number of time steps to use. Defaults to 400.
     """
 
-    time = np.linspace(0, T, N)
+    time = np.linspace(0, T, 400)
     earth, moon = [np.array([10,0])], [np.array([11,0])]
 
     def rotation(theta):
@@ -250,7 +243,7 @@ def solar_system_animation(earth, moon):
             first row and y coordinates on the second row.
     """
 
-    animation_fig = plt.figure(1)                   # Make a new figure.
+    animation_fig = plt.figure()                    # Make a new figure.
     plt.axis([-15,15,-15,15])                       # Set the window limits.
     plt.gca().set_aspect("equal")                   # Make the window square.
 
@@ -303,5 +296,5 @@ def rotatingParticle(time, omega, direction, speed):
         posP1_y.append(posP1[1])
 
     plt.plot(posP1_x, posP1_y)
-    plt.gca().set_aspect('equal')
+    plt.gca().set_aspect("equal")
     plt.show()
