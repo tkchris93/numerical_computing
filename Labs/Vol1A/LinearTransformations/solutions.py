@@ -5,9 +5,7 @@ import time
 import timeit
 import numpy as np
 from random import random
-from matplotlib import pyplot as plt
-
-from sys import stdout
+from matplotlib import pyplot as plt, animation
 
 def random_vector(n):
     """Generate a random vector of length n as a list."""
@@ -18,12 +16,12 @@ def random_matrix(n):
     return [[random() for j in xrange(n)] for i in xrange(n)]
 
 def matrix_vector_product(A, x):
-    """Compute the matrix-vector product Ax (as a list)."""
+    """Compute the matrix-vector product Ax as a list."""
     m, n = len(A), len(x)
     return [sum([A[i][k] * x[k] for k in range(n)]) for i in range(m)]
 
 def matrix_matrix_product(A, B):
-    """Compute the matrix-matrix product AB (as a list of lists)."""
+    """Compute the matrix-matrix product AB as a list of lists."""
     m, n, p = len(A), len(B), len(B[0])
     return [[sum([A[i][k] * B[k][j] for k in range(n)])
                                     for j in range(p) ]
@@ -33,9 +31,9 @@ def matrix_matrix_product(A, B):
 
 def prob1(N=8):
     """Use time.time(), timeit.timeit(), or %timeit to time
-    matrix_vector_product(n) and matrix-matrix-mult(n) with
-    increasingly large inputs. Generate the inputs A, x, and B with
-    random_matrix() and random_vector()} (so each input will be nxn or nx1).
+    matrix_vector_product() and matrix-matrix-mult() with increasingly large
+    inputs. Generate the inputs A, x, and B with random_matrix() and
+    random_vector() (so each input will be nxn or nx1).
     Only time the multiplication functions, not the generating functions.
 
     Report your findings in a single figure with two subplots: one with matrix-
@@ -73,7 +71,11 @@ def prob1(N=8):
 
 
 def prob2(N=8):
-    """
+    """Time matrix_vector_product(), matrix_matrix_product(), and np.dot().
+
+    Report your findings in a single figure with two subplots: one with all
+    four sets of execution times on a regular linear scale, and one with all
+    four sets of exections times on a log-log scale.
     """
 
     domain = 2**np.arange(1,N+1)
@@ -134,69 +136,143 @@ def plotOldNew(old, new):
     """Display a plot of points before and after a transform.
 
     Inputs:
-        original (array) - Array of size (2,n) containing points in R2 as columns.
-        new (array) - Array of size (2,n) containing points in R2 as columns.
+        old ((2,n) ndarray): Array containing points in R2 stored as columns.
+        new ((2,n) ndarray): Array containing points in R2 stored as columns.
     """
-    window = [-5,5,-5,5]
+    window = [-1,1,-1,1]
 
-    plt.subplot(121)
-    plt.title('Before')
-    plt.plot(old[0], old[1], ',k')
+    plt.subplot(211)
+    plt.title("Before")
+    plt.plot(old[0], old[1], 'k,')
     plt.axis(window)
     plt.gca().set_aspect("equal")
 
-    plt.subplot(221)
-    plt.title('After')
-    plt.plot(new[0], new[1], ',k')
+    plt.subplot(212)
+    plt.title("After")
+    plt.plot(new[0], new[1], 'k,')
     plt.axis(window)
     plt.gca().set_aspect("equal")
+
     plt.show()
 
-
-def dilate(A, x_factor, y_factor):
-    """Scale the points in A by x_factor in the x direction and y_factor in
-    the y direction.
-
-    Inputs:
-        A (array) - Array of size (2,n) containing points in R2 stored as columns.
-        x_factor (float) - scaling factor in the x direction.
-        y_factor (float) - scaling factor in the y direction.
-    """
-    T = np.array([[x_factor,0],[0,y_factor]])
-    return T.dot(A)
-
-def translate(A, b):
-    """Translate the points in A by the vector b.
+# Problem 3
+def stretch(A, a, b):
+    """Scale the points in 'A' by 'a' in the x direction and 'b' in the
+    y direction.
 
     Inputs:
-        A (array) - Array of size (2,n) containing points in R2 stored as columns.
-        b (2-tuple (b1,b2)) - Translate points by b1 in the x direction and by b2
-            in the y direction.
+        A ((2,n) ndarray): Array containing points in R2 stored as columns.
+        a (float): scaling factor in the x direction.
+        b (float): scaling factor in the y direction.
     """
-    return A + np.vstack(b)
-
-# Problem 2
-def rotate(A, theta):
-    """Rotate the points in A about the origin by theta radians.
-
-    Inputs:
-        A (array) - Array of size (2,n) containing points in R2 stored as columns.
-        theta (float) - number of radians to rotate points in A.
-    """
-    T = np.array([[np.cos(theta),-np.sin(theta)],
-                  [np.sin(theta),np.cos(theta)]])
-    return T.dot(A)
+    return np.dot([[a, 0],[0, b]], A)
 
 def shear(A, a, b):
-    return np.array([[1, a],[b, 1]]).dot(A)
+    """Slant the points in 'A' by 'a' in the x direction and 'b' in the
+    y direction.
 
-def reflect(A, L):
-    l1, l2 = L
-    T = np.array([[l1**2 - l2**2, 2*l1*l2],
-                  [2*l1*l2, l2**2 - l1**2]])/(l1**2 + l2**2)
-    return T.dot(A)
+    Inputs:
+        A ((2,n) ndarray): Array containing points in R2 stored as columns.
+        a (float): scaling factor in the x direction.
+        b (float): scaling factor in the y direction.
+    """
+    return np.dot([[1, a],[b, 1]], A)
+
+def reflection(A, a, b):
+    """Reflect the points in 'A' about the origin by 'theta' radians.
+
+    Inputs:
+        A ((2,n) ndarray): Array containing points in R2 stored as columns.
+        theta (float): The rotation angle in radians.
+    """
+    return np.dot([[a**2 - b**2, 2*a*b],
+                   [2*a*b, b**2 - a**2]], A)/(a**2 + b**2)
+
+def rotation(A, theta):
+    """Rotate the points in 'A' about the origin by 'theta' radians.
+
+    Inputs:
+        A ((2,n) ndarray): Array containing points in R2 stored as columns.
+        theta (float): The rotation angle in radians.
+    """
+    return np.dot([[np.cos(theta),-np.sin(theta)],
+                   [np.sin(theta),np.cos(theta)]], A)
+
 
 # Problem 4
+def solar_system(T, omega_e, omega_m):
+    """Plot the trajectories of the earth and moon over the time interval [0,T]
+    assuming the initial position of the earth is (10,0) and the initial
+    position of the moon is (11,0).
+
+    Parameters:
+        T (int): The final time.
+        omega_e (float): The earth's angular velocity.
+        omega_m (float): The moon's angular velocity.
+    """
+
+    time = np.linspace(0, T, 400)
+    earth, moon = [np.array([10,0])], [np.array([11,0])]
+
+    def rotation(theta):
+        return np.array([[np.cos(theta),-np.sin(theta)],
+                         [np.sin(theta),np.cos(theta)]])
+
+    for t in time[1:]:
+        earth.append(rotation(t*omega_e).dot(earth[0]))
+        moon.append(rotation(t*omega_m).dot([1, 0]) + earth[-1])
+
+    earth = np.transpose(earth)
+    moon = np.transpose(moon)
+
+    plt.plot(earth[0], earth[1], label="Earth")
+    plt.plot(moon[0], moon[1], label="Moon")
+    plt.gca().set_aspect("equal")
+    plt.legend(loc="upper left")
+    plt.show()
+
+    return earth, moon
+
+def solar_system_animation(earth, moon):
+    """Animate the earth orbiting the sun and the moon orbiting the earth.
+
+    Inputs:
+        earth ((2,N) ndarray): The earth's postion with x-coordinates on the
+            first row and y coordinates on the second row.
+        moon ((2,N) ndarray): The moon's postion with x-coordinates on the
+            first row and y coordinates on the second row.
+    """
+
+    animation_fig = plt.figure()                    # Make a new figure.
+    plt.axis([-15,15,-15,15])                       # Set the window limits.
+    plt.gca().set_aspect("equal")                   # Make the window square.
+
+    earth_dot,  = plt.plot([],[], 'bo', ms=10)      # Blue dot for the earth.
+    earth_path, = plt.plot([],[], 'b-')             # Blue line for the earth.
+    moon_dot,   = plt.plot([],[], 'go', ms=5)       # Green dot for the moon.
+    moon_path,  = plt.plot([],[], 'g-')             # Green line for the moon.
+    plt.plot([0],[0],'y*',ms=30)                    # Yellow star for the sun.
+
+    def animate(index):
+        """Update the four earth and moon plots."""
+        earth_dot.set_data(earth[0,index], earth[1,index])
+        earth_path.set_data(earth[0,:index], earth[1,:index])
+        moon_dot.set_data(moon[0,index], moon[1,index])
+        moon_path.set_data(moon[0,:index], moon[1,:index])
+        return earth_dot, earth_path, moon_dot, moon_path
+
+    a = animation.FuncAnimation(animation_fig, animate,
+                                frames=earth.shape[1], interval=25)
+    plt.show()
+
+if __name__ == '__main__':
+    # prob1(8)
+    # prob2(8)
+    a, b = solar_system(2*np.pi, 1, 13)
+    solar_system_animation(a, b)
+    pass
+
+# Old Problem 5
 def rotatingParticle(time, omega, direction, speed):
     """Display a plot of the path of a particle P1 that is rotating
     around another particle P2.
@@ -220,11 +296,5 @@ def rotatingParticle(time, omega, direction, speed):
         posP1_y.append(posP1[1])
 
     plt.plot(posP1_x, posP1_y)
-    plt.gca().set_aspect('equal')
+    plt.gca().set_aspect("equal")
     plt.show()
-
-if __name__ == '__main__':
-    # prob1(8)
-    # prob2(8)
-    caching()
-
