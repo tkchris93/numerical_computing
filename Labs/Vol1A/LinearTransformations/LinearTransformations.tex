@@ -456,6 +456,7 @@ Construct the transformation matrix and left multiply it with the input array.
 Return the transformed array.
 
 To test your functions, consider writing a separate function that plots two arrays (the original and the transformed) for a side-by-side comparison.
+\label{prob:implement-linear-transformations}
 \end{problem}
 
 \begin{info} % Look ahead to the QR decomposition.
@@ -558,6 +559,22 @@ Your graph should resemble the following figure.
 
 \section*{Additional Material} % ==============================================
 
+\subsection*{Image Transformation as a Class} % -------------------------------
+
+Consider organizing the functions from Problem \ref{prob:implement-linear-transformations} into a class.
+The constructor might accept an array or the name of a file containing an array.
+This structure would makes it easy to do several linear or affine transformations in sequence.
+
+\begin{lstlisting}
+>>> horse = ImageTransformer("horse.npy")
+>>> horse.stretch(.5, 1.2)
+>>> horse.shear(.5, 0)
+>>> horse.relect(0, 1)
+>>> horse.rotate(np.pi/2.)
+>>> horse.translate(.75, .5)
+>>> horse.display()
+\end{lstlisting}
+
 \subsection*{Animating Parametrizations} % ------------------------------------
 
 The plot in Problem \ref{prob:solar-system-trajectories} fails to fully convey the system's evolution over time because time itself is not part of the plot.
@@ -568,14 +585,12 @@ from matplotlib import animation
 
 def solar_system_animation(earth, moon):
     """Animate the moon orbiting the earth and the earth orbiting the sun.
-
     Inputs:
         earth ((2,N) ndarray): The earth's postion with x-coordinates on the
             first row and y coordinates on the second row.
         moon ((2,N) ndarray): The moon's postion with x-coordinates on the
             first row and y coordinates on the second row.
     """
-
     animation_fig = plt.figure()                    # Make a new figure.
     plt.axis([-15,15,-15,15])                       # Set the window limits.
     plt.gca().set_aspect("equal")                   # Make the window square.
@@ -584,7 +599,7 @@ def solar_system_animation(earth, moon):
     earth_path, = plt.plot([],[], 'b-')             # Blue line for the earth.
     moon_dot,   = plt.plot([],[], 'go', ms=5)       # Green dot for the moon.
     moon_path,  = plt.plot([],[], 'g-')             # Green line for the moon.
-    plt.plot([0],[0],'y*',ms=30)                    # Yellow star for the sun.
+    plt.plot([0],[0],'y*', ms=30)                   # Yellow star for the sun.
 
     def animate(index):
         """Update the four earth and moon plots."""

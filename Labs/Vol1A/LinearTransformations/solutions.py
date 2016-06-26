@@ -178,7 +178,7 @@ def shear(A, a, b):
     """
     return np.dot([[1, a],[b, 1]], A)
 
-def reflection(A, a, b):
+def reflect(A, a, b):
     """Reflect the points in 'A' about the origin by 'theta' radians.
 
     Inputs:
@@ -188,7 +188,7 @@ def reflection(A, a, b):
     return np.dot([[a**2 - b**2, 2*a*b],
                    [2*a*b, b**2 - a**2]], A)/(a**2 + b**2)
 
-def rotation(A, theta):
+def rotate(A, theta):
     """Rotate the points in 'A' about the origin by 'theta' radians.
 
     Inputs:
@@ -214,13 +214,9 @@ def solar_system(T, omega_e, omega_m):
     time = np.linspace(0, T, 400)
     earth, moon = [np.array([10,0])], [np.array([11,0])]
 
-    def rotation(theta):
-        return np.array([[np.cos(theta),-np.sin(theta)],
-                         [np.sin(theta),np.cos(theta)]])
-
     for t in time[1:]:
-        earth.append(rotation(t*omega_e).dot(earth[0]))
-        moon.append(rotation(t*omega_m).dot([1, 0]) + earth[-1])
+        earth.append(rotate(earth[0], t*omega_e))
+        moon.append(rotate([1,0], t*omega_m) + earth[-1])
 
     earth = np.transpose(earth)
     moon = np.transpose(moon)
@@ -265,12 +261,8 @@ def solar_system_animation(earth, moon):
                                 frames=earth.shape[1], interval=25)
     plt.show()
 
-if __name__ == '__main__':
-    # prob1(8)
-    # prob2(8)
-    a, b = solar_system(2*np.pi, 1, 13)
-    solar_system_animation(a, b)
-    pass
+
+
 
 # Old Problem 5
 def rotatingParticle(time, omega, direction, speed):
