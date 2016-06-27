@@ -1,4 +1,4 @@
-\lab{Image Compression (SVD)}{SVD}
+\lab{The Singular Value Decomposition and Image Compression}{SVD}
 
 \objective{Learn how to compute the compact SVD and explore the SVD as a method of image compression.}
 \label{lab:SVD}
@@ -35,60 +35,48 @@ Since Schmidt's work, further devolpments have confirmed the importance of the S
 \subsection*{Computing the SVD}
 
 
-The Singular Value Decomposition separates a $m \times n$ matrix $A$ into two unitary matrices and a diagonal matrix.
-This takes the form of 
+The Singular Value Decomposition factors an $m \times n$ matrix $A$ into the form
 \begin{equation*}
 A = U \Sigma V^H
 \end{equation*}
 where $U$ and $V$ are square and unitary of sizes $m$ and $n$ respectively, and $\Sigma$ is diagonal and of size $m \times n$.
-The values of $\Sigma$ are the \emph{singular values} of $A$, and are the square root of the eigenvalues of $A^HA$.
+The values along the diagonal of $\Sigma$ are called the \emph{singular values} of $A$. 
+These are also the square roots of the eigenvalues of $A^HA$.
 % if $A$ is square, are equal to the absolute value of the eigenvalues of $A$.
-Commonly the singular values are listed in decreasing order. Thus we get
+Commonly the singular values are listed in decreasing order. Thus we have
 
 \begin{equation*}
 \Sigma = \mbox{diag}(\sigma_1,\sigma_2,\ldots,\sigma_n)
 \end{equation*}
 where $\sigma_1 \geq \sigma_2 \geq \ldots \geq \sigma_n \geq 0$ are the singular values of $A$.
 
-The \emph{compact SVD} is where the $r$ column vectors of $U$ and the $r$ row vectors of $V$ are calculated, cooresponding to the $r$ nonzero singular values.
-We lose the decomposition of the nullspace of $A$, but can still regain the full matrix $A$.
-It takes the form $A= U_1 \Sigma_1 V_1^H$ where $U_1$ is $m\times r$, $\Sigma_1$ is $r\times r$ and diagonal, and $V_1^H$ is $r\times n$.
+If A is of rank $r$, then A has exactly $r$ nonzero singular values.
+The first $r$ columns of U span the range of A, and the last $n -r$ columns span the null space of $A^H$.
+Likewise, the first $r$ columns of V span the range of $A^H$ and the last $m - r$ span the null space of $A$.
 
-The \emph{truncated SVD} is similar to the compact SVD, but instead of taking all the nonzero singular values, we only take the $k$ largest.
+Here we will focus on computing the SVD. 
+Refer to the book (TODO: ref textbook) for a more in-depth definition and proof that the SVD exists for every matrix.
+
+
+First, we define two modifications of the regular SVD.
+In the \emph{compact SVD}, we only keep the $r$ nonzero singular values.
+Only $r$ column vectors of $U$ and $r$ row vectors of $V^H$, corresponding to the $r$ singular values, are calculated.
+The compact SVD takes the form $A= U_r \Sigma_r V_r^H$ where $U_r$ is $m\times r$, $\Sigma_r$ is $r\times r$ and diagonal, and $V_r^H$ is $r\times n$.
+Although we drop the decompositions of the nullspaces, by calculating $U_1 \Sigma_1 V_1^H$ we can still recover the full matrix $A$.
+
+The \emph{truncated SVD} is similar to the compact SVD, but instead of keeping all the nonzero singular values, we only keep the $k$ largest.
 While this saves space, it means that we cannot recover the whole matrix.
-Instead we have an approximation that shares the largest $k$ singular values.
-We end up with $\widehat A = U_k\Sigma_k V_k^H$ where $\widehat A$ is an approximation of $A$, $U_k$ is $m\times k$, $\Sigma$ is $k \times k$ and diagonal, and $V_k^H$ is $k \times n$.
+Instead we end up with $\widehat A = U_k\Sigma_k V_k^H$ where $\widehat A$ is an rank-$k$ approximation of $A$, $U_k$ is $m\times k$, $\Sigma$ is $k \times k$ and diagonal, and $V_k^H$ is $k \times n$.
 
-The only difference in computing the compact SVD verses the truncated SVD is the number of singular values we keep.
-If we keep all the nonzero singular values, it is the compact SVD.
-If we only keep some of the nonzero singular values, then it is the truncated SVD.
-
-To compute the compact or truncated SVD:
-
+The components of the compact or truncated SVD can be calculated as follows:
 \begin{itemize}
-\item The singular values of $A$ are the square root of the eigenvalues of $A^HA$ and are sorted in descending order. These are the diagonal of $\Sigma$. For the compact SVD, keep all nonzero singular values. For the truncated SVD, keep the first $k$.
-\item The columns of $V$ are the eigenvectors of $A^HA$, where the $i$th column matches the $i$th singular value.
+\item The singular values of $A$, which form the diagonal of $\Sigma$, are the square roots of the eigenvalues of $A^HA$. 
+These are sorted in descending order. 
+For the compact SVD, keep all of the nonzero singular values. 
+For the truncated SVD, keep only the largest $k$.
+\item The columns of $V$ are the eigenvectors of $A^HA$, where the $i$th column $V_i$ matches the $i$th singular value.
 \item The columns of $U$ are $U_i = \frac{1}{\sigma_i} AV_i$.
 \end{itemize}
-
-\begin{comment}
-To calculate the SVD:
-\begin{itemize}
-
-\item Find $A^HA$
-
-\item Find the eigenvalues and eigenvectors of $A^HA$.
-
-\item Sort the eigenvalues in decreasing order.
-
-\item The $i^{th}$ column of $V$, $V_i$, is the eigenvector corresponding to the $i^{th}$ eigenvalue.
-
-\item Find the singular values by taking the square root of the eigenvalues.
-
-\item The $i^{th}$ column of $U$ is $U_i = \frac{1}{\sigma_i} AV_i$.
-
-\end{itemize}
-\end{comment}
 
 \begin{comment}
 \begin{algorithm}
@@ -113,27 +101,30 @@ To calculate the SVD:
 \end{comment}
 
 \begin{problem}
-Write a function \li{truncated_svd} that accepts a matrix A and an optional integer \li{k = None}. If $k$ is \li{None}, calculate the compact SVD. If $k$ is an integer, calculate the truncated SVD.
+Write a function \li{truncated_svd} that accepts a matrix $A$ and an optional integer \li{k = None}. 
+If \li{k} is \li{None}, calculate the compact SVD. If \li{k} is an integer, calculate the truncated SVD.
+(Note: if there are fewer than \li{k} nonzero singular values, the truncated SVD will come out the same as the compact SVD.)
 Since the only difference between these two processes is the number of singular values we keep, we only need to write one function.
 
 \begin{enumerate}
 \item Find the eigenvalues and eigenvectors of $A^H A$.
-\item Find the singular values of $A$.
-\item Sort the singular values and only keep the greatest $k$.
+\item Find the singular values of $A$. Keep only the greatest \li{k}, and discard any that are equal to zero.
 \item Calculate $V$.
 \item Calculate $U$.
 \end{enumerate}
 
-Check your function by calculating the compact SVD and seeing if $U_1\Sigma_1 V_1^H = A$ using \li{np.allclose()}.
+Return U, the diagonal of $\Sigma$, and V.
+Check your function by calculating the compact SVD and seeing if $U\Sigma V^H = A$ using \li{np.allclose()}.
 
-Hint: While calculating the SVD, you will need to sort the eigenvalues while keeping track of their associated eigenvectors. 
-To accomplish this, use \li{np.argsort} to generate a mask that can be used to order the eigenvalues. The same mask can be used to order the columns of a matrix. 
-Also, an efficient and concise way to keep the nonzero eigenvalues is to use fancy indexing. 
-See the NumPy and SciPy lab for more information on \li{np.argsort} and fancy indexing. 
-
+Hint: When calculating the SVD, you will need to sort the eigenvalues while keeping track of their associated eigenvectors. 
+Consider the function \li{np.argsort} for keeping the eigenvalues and eigenvectors in the same order while sorting.
+%Look for places to use fancy indexing when sorting and selecting the singular values.
 \label{prob:calc_svd}
 \end{problem}
 
+\begin{comment}
+%Commented out because finding the rest of the SVD isn't important to this lab.
+%They can reference the book for this information.
 If $A$ is full rank and square, it has $n$ nonzero singular values and this process gives us the full SVD.
 If $A$ is not full rank or not square, we can compute the first $r$ columns of $U$ and $V$, where $r$ is the number of nonzero singular values, in this way.
 To find the rest of the SVD, we can use Gram-Schmidt orthonormalization.
@@ -144,15 +135,42 @@ We find the remaining columns of $V$ by using Gram-Schmidt orthonormalization to
 Similarly, if $r<m$ then we only have $r$ columns of $U$ so we use Gram-Schmidt orthonormalization to finish the basis for $m$-space.
 The compact SVD does not have this problem because $U_1$ and $V_1$ only have $r$ columns, the remaining columns are the decomposition of the null space of the matrix, and are not included.
 In this lab we calculate the compact SVD for simplicity.
+\end{comment}
 
+\begin{info}
+In practice, calculating $A^HA$ in order to find its eigenvalues is unstable.
+We use this method here because it is mathematically the simplest.
+Industrial SVD solvers, however, use different methods that avoid computing $A^HA$.
+\end{info}
 
 \subsection*{Visualizing the SVD}
-
 Recall that a matrix is one way to express a linear transformation.
-A $m\times n$ matrix sends points from $\mathbb{R}^n$ to $\mathbb{R}^m$.
-These transformations are a mix of rotations and rescalings.
-The SVD decomposes these transformations into their individual parts.
-$V^H$ is a rotation, $\Sigma$ a rescaling along the principal axes, and $U$ is another rotation.
+An $m\times n$ matrix defines a linear transformation that sends points from $\mathbb{R}^n$ to $\mathbb{R}^m$.
+
+Intuitively, the SVD can be thought of as breaking a linear transformation into more basic steps.
+The SVD decomposes a given matrix into two rotations and a scaling.
+$V^H$ represents a rotation, $\Sigma$ represents a rescaling along the principal axes, and $U$ represents another rotation.
+
+
+\begin{problem}
+In this problem we will use the SVD to visualize the action of the matrix
+\begin{equation}
+A =  \begin{pmatrix}3 & 1\\1 & 3\end{pmatrix}
+\end{equation}
+on points in $\mathbb{R}^2$.
+Given a set of points $S$ in $\mathbb{R}^2$, we can calculate the transformation $AS$ in steps by using the SVD $A = U\Sigma V^H$.
+
+Show the steps of the transformation of $S$ in four separate subplots.
+Plot $S$ first to show the untransformed points.
+To visualize the steps of the transformation, plot the points $V^HS$, then $\Sigma V^HS$, and finally $U\Sigma V^HS$.
+Your solution should look like Figure \ref{fig:sol1}
+
+Use the set of points $S$ stored in the \li{circle.npz} dataset.
+This dataset contains a set of points on the unit circle and a set of unit vectors. 
+You can access the circle by loading the \li{"circle"} file. 
+You can access the unit vectors by loading the \li{"unit_vectors"} file. 
+These points are stored as a numpy array of points in $\mathbb{R}^2$ with the first row being all the x-coordinates and the second row being all the y-coordinates.
+\end{problem}
 
 
 \begin{figure}
@@ -183,19 +201,6 @@ $V^H$ is a rotation, $\Sigma$ a rescaling along the principal axes, and $U$ is a
 \caption{Each step in transforming the unit circle and two unit vectors using the matrix $A$.}
 \label{fig:sol1}
 \end{figure}
-
-\begin{problem}
-If $S$ are the points on the unit circle, $U\Sigma V^HS$ is equivalent to $AS$ where $U\Sigma V^H$ is the SVD of $A$. Using either your SVD from problem \ref{prob:calc_svd} or from scipy.linalg.svd, plot each part of the transformation of the matrix
-\begin{equation}
-A =  \begin{pmatrix}3 & 1\\1 & 3\end{pmatrix}.
-\end{equation}
-
-Your solution should show $S$, $V^HS$, $\Sigma V^HS$, and $U\Sigma V^HS$.
-Since $A$ is square and full rank, the compact SVD is equal to the full SVD.
-Your solution should look like Figure \ref{fig:sol1}
-
-The \li{circle.npz} dataset contains a set of points on the unit circle and a set of unit vectors. You can access the circle by loading the \li{"circle"} file. You can access the unit vectors by loading the \li{"unit_vectors"} file. These points are stored as a numpy array of points in $\mathbb{R}^2$ with the first row being all the x-coordinates and the second row being all the y-coordinates.
-\end{problem}
 
 
 \subsection*{Image Data Compression}
