@@ -10,31 +10,42 @@ When you perform a row operation on a matrix, you are really left-multiplying by
 However, matrix multiplication is not the most efficient way to implement row operations. It is much faster to perform row operations by modifying the array in place, and only changing those entries that are affected by the operation.
 The following code implements the three elementary row operations by modifying the array in place.
 
-\lstinputlisting[style=fromfile]{row_opers.py}
+\begin{lstlisting}
+def type_I(A, i, j):
+    """Swap the i-th and j-th rows of A."""
+    A[i], A[j] = np.copy(A[j]), np.copy(A[i])
+
+def type_II(A, i, alpha):
+    """Multiply the i-th row of A by a constant."""
+    A[i] *= alpha
+
+def type_III(A, i, j, alpha):
+    """Add a constant multiple of the j-th row of A to the i-th row."""
+    A[i] += alpha * A[j]
+\end{lstlisting}
 
 \subsection*{Programming Row Reduction} % -------------------------------------
 
-When you solve a linear system by reducing the matrix with row operations, it is most efficient to reduce only to row echelon form (REF)
-\footnote{We do not require leading coefficients to be 1 in the REF.}
-and then use back substitution.
-Here is some code that reduces a matrix to REF.
+Reduce a system to row echelon form (REF)\footnote{We do not require leading coefficients to be 1 in the REF.}, then use back system to the system by row reduction.
 
 \begin{lstlisting}
 >>> A = np.array([[4., 5., 6., 3.],[2., 4., 6., 4.],[7., 8., 0., 5.]])
+>>> A
 array([[ 4.,  5.,  6.,  3.],
        [ 2.,  4.,  6.,  4.],
        [ 7.,  8.,  0.,  5.]])
->>> A[1] -= (A[1,0]/A[0,0]) * A[0]
->>> A[2] -= (A[2,0]/A[0,0]) * A[0]
->>> A[2,1:] -= (A[2,1]/A[1,1]) * A[1,1:]
+>>> type_III(A, 1, 0, A[1,0]/A[0,0])
+>>> type_III(A, 2, 0, A[2,0]/A[0,0])
+>>> type_III(A, 2, 1, A[2,1]/A[1,1])
+
 >>> A
 array([[ 4. ,  5. ,  6. ,  3. ],
        [ 0. ,  1.5,  3. ,  2.5],
        [ 0. ,  0. , -9. ,  1. ]])
 \end{lstlisting}
 
-The third row operation modified only a part of the third row because we knew that the first value would still be 0.
-Modifying only those entries of the array that are affected by a row operation will save a lot of time when you are row reducing a large matrix.
+The third row operation really only modifies a part of the third row because the first values in each affected row are each 0.
+Modifying only those entries of the array that are affected by a row operation will save a lot of time when row reducing a large matrix.
 
 Beware that round-off error in row reduction can cause serious problems.
 Suppose we wish to row reduce a matrix $A$ as follows.
@@ -50,24 +61,25 @@ array([[ 4.,  5.,  6.,  3.],
 
 If we work this out by hand, at this point we have
 
-\begin{equation}\label{equ:correct_ans}
-A = \begin{pmatrix}
-4&5&6&3 \\
-0&0&3&2.5 \\
-0&-7.5&-10.5&-.25
-\end{pmatrix}.
-\end{equation}
+\begin{align}
+A = \left[\begin{array}{cccc}
+4 &    5 &     6 &    3 \\
+0 &    0 &     3 &  2.5 \\
+0 & -7.5 & -10.5 & -.25
+\end{array}\right].
+\label{equ:row-reduction-no-errors}
+\end{align}
 
 If we swap the second and third rows, then the matrix is in row echelon form.
 However, suppose that due to round-off error, the machine instead computes
 
-\[
-A = \begin{pmatrix}
-4&5&6&3 \\
-0&10^{-15}&3&2.5 \\
-0&-7.5&-10.5&-.25
-\end{pmatrix}.
-\]
+\begin{align*}
+A = \left[\begin{array}{cccc}
+4 & 5        &     6 &    3 \\
+0 & 10^{-15} &     3 &  2.5 \\
+0 & -7.5     & -10.5 & -.25
+\end{array}\right].
+\end{align*}
 
 The algorithm would then attempt to pivot on the \li{A[1,1]} entry as follows.
 
@@ -79,7 +91,7 @@ array([[ 4. ,  5.0e+00 , 6.00e+00 ,  3.000e-00 ],
        [ 0. ,  0.0e+00 , 2.25e+14 ,  1.875e+14 ]])
 \end{lstlisting}
 
-The round-off error in the \li{A[1,1]} entry has affected the third row, and the matrix is now much different than the correct answer in (\ref{equ:correct_ans}).
+The round-off error in the \li{A[1,1]} entry has affected the third row, and the matrix is now much different than the correct answer in (\ref{equ:row-reduction-no-errors}).
 In larger matrices, round-off error can propagate through many steps in a calculation, resulting in garbage output.
 
 Some of NumPy's matrix algorithms use row reduction.
@@ -250,19 +262,6 @@ However, in such situations we still recommend using NumPy arrrays, which have m
 
 The \li{scipy.linalg} library will be essential for the remainder of the labs in this manual.
 
-\section*{Sparse Matrices} % ==================================================
-
-A \emph{sparse} matrix is a matrix that has relatively few nonzero elements.
-Sparse matrices arise frequently in both theoretical and real-world applications.
-We can take advantage of the sparse structure of these matrices to use less memory and to decrease computation time.
-
-For example, diagonal matrices are sparse.
-Storing an $n \times n$ diagonal matrix in the naive way means storing $n^2$ values in memory.
-For most applications, it makes more sense to store the diagonal entries in a 1-dimensional array of $n$ values.
-In addition to using less storage space, this allows for much faster matrix operations.
-Using the standard algorithm to multiply a matrix by a diagonal matrix involves $n^3$ steps, but most of these are multiplying by or adding zero.
-A smarter algorithm that knows all off-diagonal entries are zero can accomplish the same task much faster.
-
 \subsection*{Spatial Complexity} % --------------------------------------------
 
 Analogous to temporal complexity, the spatial complexity of an algorithm is a function that describes how the algorithm's memory use increases as input sizes to the algorithm increase. For example, if your algorithm needs to store an $n \times n$ matrix, its memory use will increase at least as fast as $n^2$. Spatial complexity is important because  the spatial complexity of an algorithm can affect its speed in several ways. The most important way is that when the memory usage exceeds the amount of available RAM, the machine must use either the hard disk or some other slower method of storage.
@@ -319,7 +318,7 @@ Note that we rescaled the inputs to the functions so that your lines would begin
 
 \section*{Sparse Matrices} % ==================================================
 
-A matrix with relatively few nonzero elements is called a \emph{sparse} matrix.
+A matrix with relatively few nonzero elements is called \emph{sparse}.
 Sparse matrices arise frequently in both theoretical and real-world applications.
 We can take advantage of the sparse structure of these matrices to use less memory and decrease computation time.
 
