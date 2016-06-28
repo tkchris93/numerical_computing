@@ -118,8 +118,12 @@ def lowest_rank_approx(A,e):
     Ahat - the lowest rank approximation of A with error less than e.
     """
     U,s,Vt = la.svd(A, full_matrices=False)
+    if e<=s[-1]:
+        print "Warning: Matrix cannot be approximated below this error bound"
+        return A
     k = np.where(s<e)[0][0]
-    return svd_approx(A,k)
+    Ahat = U[:,:k].dot(S).dot(Vt[:k,:])
+    return Ahat
     
 # Problem 5
 def compress_image(filename,k):
