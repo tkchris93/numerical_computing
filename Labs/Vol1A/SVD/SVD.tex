@@ -1,17 +1,25 @@
-\lab{The Singular Value Decomposition and Image Compression}{SVD}
+\lab{The SVD and Image Compression}{SVD}
 
-\objective{Learn how to compute the compact SVD and explore the SVD as a method of image compression.}
+\objective{Learn how to compute the compact SVD. Explore the SVD as a method of matrix approximation, and use it to perform image compression.}
 \label{lab:SVD}
 % TODO
 % - write a more compelling objective.
 % - add references to the textbook and determine what is actually needed here. The explanation in the textbook is way better.
 %
 
+
+The \emph{Singular Value Decomposition} or \emph{SVD} is a matrix decomposition that is widely used in both theoretical and applied mathematics. 
+Originally discovered by theoretical mathematicians, it is the canonical way to decompose a matrix.
+Its practical use became apparent later on when Erhard Schmidt showed how the SVD could be a computational tool for providing low-rank approximations.
+Modern developments continue to confirm the importance of the SVD in both computational and theoretical applications.
+
+\begin{comment}
 The theoretical use of the \emph{Singular Value Decomposition} or \emph{SVD} has long been appreciated.
 In fact, the idea of a canonical way of decomposing a matrix was so alluring that the SVD was independently discovered by at least four people through use of both  integral equations and systems of linear equations.
 
 However, it wasn't until Erhard Schmidt showed how the SVD could be a computational tool for providing low-rank approximations that the practical applications became apparent.
-Since Schmidt's work, further devolpments have confirmed the importance of the SVD in both computational and theoretical applications.
+Since Schmidt's work, further developments have confirmed the importance of the SVD in both computational and theoretical applications.
+\end{comment}
 
 \begin{comment}
 
@@ -35,7 +43,7 @@ Since Schmidt's work, further devolpments have confirmed the importance of the S
 \subsection*{Computing the SVD}
 
 
-The Singular Value Decomposition factors an $m \times n$ matrix $A$ into the form
+The Singular Value Decomposition decomposes an $m \times n$ matrix $A$ into the form
 \begin{equation*}
 A = U \Sigma V^H
 \end{equation*}
@@ -54,9 +62,8 @@ If A is of rank $r$, then A has exactly $r$ nonzero singular values.
 The first $r$ columns of U span the range of A, and the last $n -r$ columns span the null space of $A^H$.
 Likewise, the first $r$ columns of V span the range of $A^H$ and the last $m - r$ span the null space of $A$.
 
+For a more in-depth definition and proof that the SVD exists for every matrix, refer to the book (TODO: ref textbook) .
 Here we will focus on computing the SVD. 
-Refer to the book (TODO: ref textbook) for a more in-depth definition and proof that the SVD exists for every matrix.
-
 
 First, we define two modifications of the regular SVD.
 In the \emph{compact SVD}, we only keep the $r$ nonzero singular values.
@@ -231,7 +238,7 @@ Larger singular values correspond to columns of $U$ and $V$ that contain more in
 When approximating a matrix at a lower rank, the truncated SVD is guaranteed to give the closest approximation possible.
 In mathematical terms, given a matrix $A$ and its SVD approximation $\widehat A_k = U_k\Sigma_k V_k^H$, the matrix $\widehat A_k$ is the \emph{best rank-$k$ approximation} to $A$ (with respect to the induced 2-norm and Frobenius norm). TODO: ref textbook.
 
-This is a significant concept that is ubiquitous in applied mathematics, appearing in areas including signal processing, statistics, semantic indexing (search engines), and control theory.
+This significant concept is ubiquitous in applied mathematics, appearing in areas including signal processing, statistics, semantic indexing, and control theory.
 
 
 \begin{comment}
@@ -283,13 +290,13 @@ $$
 where $\sigma_{s+1}$ is the $(s+1)$-th singular value of $A$. 
 TODO: ref textbook.
 
-This suggests a way to approximate a matrix subject to an error bound. 
-To find the lowest-rank approximation of $A$ within an error tolerance, keep only the singular values that are greater than the error tolerance.
+This offers a way to approximate a matrix subject to an error tolerance: 
+choose the truncated SVD approximation such that the largest discarded singular value is less than the error tolerance.
 
 \begin{problem}
-Using your \li{svd_approx} function from Problem \ref{prob:svd_approx}, write a function \li{lowest_rank_approx} that takes as input a matrix $A$ and a positive number $e$ and returns
+Using \li{scipy.linalg.svd}, write a function \li{lowest_rank_approx} that takes as input a matrix $A$ and a positive number $e$ and returns
 the lowest rank approximation of $A$ with error less than $e$ (with respect to the induced 2-norm).
-You should only need to calculate the SVD once.
+You should only calculate the SVD once.
 \end{problem}
 
 
@@ -306,34 +313,39 @@ The number of singular values we decide to preserve depends on how close of an a
 Try plotting the singular values.
 \end{comment}
 
-\subsection*{Application to Imaging}
+\subsection*{Application to Image Compression}
 
 Sometimes there is not enough available bandwidth to transmit a full resolution photograph.
-You aim to reduce the amount of data that needs to be transmitted from a remote location such that loss of image detail is minimal, but the amount of data that needs to be sent has reduced as much as possible.
-In Figure \ref{fig:hubble} we present an image and a plot of its singular values.
-Matrix rank is on the x-axis and the singular values are on the y-axis.
-Note that the SVD orders the singular values from greatest to least.
-The more singular values we keep, the closer the approximation but the more data we have to store.
-By looking at the graph in Figure \ref{fig:svals_plot} we can have a rough idea of how many singular values we need to preserve to have a good approximation of $A$.
-The matrix rank of the image is $670$.
-However, we could easily approximate the image using only the first half of the singular values as the plot shows that all the values after are miniscule.
+Suppose you need to transmit an image from a remote location.
+You aim to to keep the amount of data to be sent below some limit, while also minimizing the loss of detail in the image.
 
+This can be done using the SVD.
+An image is just a matrix of pixel values, which means it has a singular value decomposition.
+Computing and sending a low-rank SVD approximation of the image can considerably reduce the amount of data sent, while retaining a high level of image detail.
 
-%The greatest singular values contribute most to the image while the smallest singular values hardly contribute anything to the final approximation. %said this earlier
+How low-rank can we make our approximation?
+In Figure \ref{fig:hubble} we present an image and a log plot of its singular values from greatest to least.
+The plot in \ref{fig:svals_plot} is typical of a photographic image;
+the singular values start out large but drop off rapidly.
+In this rank $670$ image, $624$ of the singular values are $50$ or more times smaller than the largest singular value.
+By discarding these relatively small singular values, we can retain nearly all of the image detail, while storing only a rank 46 image!
 
-In Figure \ref{fig:rankvalues}, we can see different rank approximations of the image in Figure \ref{fig:hubble}.
+Figure \ref{fig:rankvalues} shows several low-rank approximations of the image in Figure \ref{fig:hubble_original}.
+Even at a very low rank the image is recognizable.
+By the rank 40 approximation, all but the sharpest detail has been resolved.
 
 \begin{figure}
 \centering
 \begin{subfigure}[b]{.49\textwidth}
 \centering
-\includegraphics[width=\textwidth]{hubble_red}
+\includegraphics[width=\textwidth*5/6]{hubble_red}
 \caption{NGC 3603 (Hubble Space Telescope).}
+\label{fig:hubble_original}
 \end{subfigure}
 \begin{subfigure}[b]{.49\textwidth}
 \centering
-\includegraphics[width=\textwidth]{hubble_svals}
-\caption{Singular values from greatest to smallest.}
+\includegraphics[width=\textwidth*5/4]{hubble_svals}
+\caption{Singular values from greatest to smallest on a log scale}
 \label{fig:svals_plot}
 \end{subfigure}
 \caption{An image and its singular values.}
@@ -342,40 +354,40 @@ In Figure \ref{fig:rankvalues}, we can see different rank approximations of the 
 
 \begin{figure}
 \centering
-\begin{subfigure}[b]{.25\textwidth}
+\begin{subfigure}[b]{.35\textwidth}
 \centering
 \includegraphics[width=\textwidth]{rank1.jpg}
 \caption{Rank 1}
 \end{subfigure}
-\begin{subfigure}[b]{.25\textwidth}
+\begin{subfigure}[b]{.35\textwidth}
 \centering
 \includegraphics[width=\textwidth]{rank14.jpg}
 \caption{Rank 14}
 \end{subfigure}
 
-\begin{subfigure}[b]{.25\textwidth}
+\begin{subfigure}[b]{.35\textwidth}
 \centering
 \includegraphics[width=\textwidth]{rank27.jpg}
 \caption{Rank 27}
 \end{subfigure}
-\begin{subfigure}[b]{.25\textwidth}
+\begin{subfigure}[b]{.35\textwidth}
 \centering
 \includegraphics[width=\textwidth]{rank40.jpg}
 \caption{Rank 40}
 \end{subfigure}
-\caption{Different rank approximations for SVD based compression.  Notice that higher rank is needed to resolve finer detail.}
+\caption{Different rank approximations for SVD-based compression.  Notice that higher rank is needed to resolve finer detail.}
 \label{fig:rankvalues}
 \end{figure}
 
-To read in an image, convert it to black and white, and show it, use the code below.
-Then use your function from Problem \ref{prob:svd_approx} to calculate an approximation.
+The code below reads in an image, converts it to black and white, and shows it.
+The function from Problem \ref{prob:svd_approx} can then be used to calculate an approximation of \li{X}.
 %Enter the following into IPython (note that any image you might have will work):
 \begin{lstlisting}
 >>> import matplotlib.pyplot as plt
->>> from matplotlib import cm
+>>> # Take only one layer (layer 0) of the image
 >>> X = plt.imread('hubble_image.jpg')[:,:,0].astype(float)
 >>> X.nbytes     #number of bytes needed to store X
->>> plt.imshow(X, cmap=cm.gray)
+>>> plt.imshow(X, cmap="gray")
 >>> plt.show()
 \end{lstlisting}
 \begin{comment}
@@ -397,9 +409,18 @@ In the next code block, $k$ represents the desired rank of the output.
 \end{comment}
 
 \begin{problem}
-Using your \li{svd_approx} function from Problem \ref{prob:svd_approx}, write a function \li{compress_img} that accepts two parameters \li{filename} and \li{k}. Your function should plot the original image and the best rank k approximation of the original image. While your \li{svd_approx} function worked for grayscale images, your \li{compress_img} function should work on color images. Your output should be similar to Figure \ref{fig:compressed_image}.
+Using your \li{svd_approx} function from Problem \ref{prob:svd_approx}, write a function \li{compress_img} that accepts two parameters \li{filename} and \li{k}. Your function should plot the original image and the best rank k approximation of the original image. 
 
-At times, \li{plt.imshow} does not behave as expected when being passed RGB values between 0 and 255. It behaves much better when being passed numbers between 0 and 1. Additionally, since the SVD provides an approximation, it is possible that the SVD will generate values slightly outside the valid range of RGB values. To remedy this, use fancy indexing as discussed in the NumPy and SciPy lab. 
+While your \li{svd_approx} function worked for grayscale images, your \li{compress_img} function should work on color images. 
+You may split the image into its three RGB layers and approximate each layer separately, then recombine them.
+Your output should be similar to Figure \ref{fig:compressed_image}.
+
+Hints:
+\begin{itemize}
+\item Sometimes \li{plt.imshow} does not behave as expected when being passed RGB values between 0 and 255. It behaves much better when being passed values between 0 and 1. 
+\item Since the SVD provides an approximation, it is possible that the SVD will generate values slightly outside the valid range of RGB values. 
+To fix this, use fancy indexing (as discussed in the NumPy and SciPy lab) to set values greater than 1 to 1 and values less than 0 to 0. 
+\end{itemize}
 
 \begin{figure}[H]
 \includegraphics[width=\textwidth]{compressed.jpg}
