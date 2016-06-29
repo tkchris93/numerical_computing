@@ -30,7 +30,7 @@ This relationship and its inverse must be modeled with at least two tables.
 The general approach is to use a unique ID.
 Note that a relationship that appears one to one may actually be a one to many relationship.
 Many people will, therefore, use the same unique ID approach on one to one relationships too in the case it turns out to be a one to many relationship.
-An example of a one to many relationship would between an department and its employees.
+An example of a one to many relationship would be between an department and its employees.
 The department would receive a unique ID and then each employee in that department would be tagged with that ID.
 
 \subsection*{Many to Many}
@@ -140,7 +140,7 @@ Whether to normalize your database depends on your specific needs.
 Usually, though, the decision to denormalize a database is a last-resort attempt to improve performance.
 \end{info}
 
-\section*{Joining tables}
+\section*{Joining Tables}
 We can use SQL to join two or more tables together for a query.
 This is a very powerful tool.
 SQLite supports three types of standard table joins.
@@ -158,6 +158,8 @@ An inner join can be depicted as an intersection of two or more tables.
 \label{fig:inner_join}
 \end{figure}
 When performing an inner join on tables, the result will only be those records that match across all tables.
+For example, this join will select all the students' names along with their major as long as the students.majorcode matches the majors.id.
+If the students.majorcode is missing or null, then they won't be selected.
 \begin{lstlisting}[language=SQL]
 SELECT students.name, majors.name FROM students JOIN majors ON students.majorcode=majors.id;
 \end{lstlisting}
@@ -197,7 +199,7 @@ An illustration of a left outer join is given in figure \ref{fig:left_outer}.
 \label{fig:left_outer}
 \end{figure}
 
-A Pythonesque loop that illustrates performs a left outer join is
+A Pythonesque loop that illustrates how to perform a left outer join is
 \begin{lstlisting}
 for row_s in students:
     for row_m in majors:
@@ -237,10 +239,13 @@ Essentially a Cartesian product of tables.
 Care must be taken when using cross join because of the size of the joined table.
 A cross join should only be used on small tables.
 It matches each relation in one table with every other possible combination of relations in the joined tables.
+For example, if you were to run a cross join on the above join.  You would get every student matched with every major.
+This doesn't really make much sense but can be useful for other applications.
+Use with caution.
 
 \section*{Advanced Selections}
 Aggregate functions are useful for summarizing the data in a column.
-The functions are
+The functions can be found in \ref{table:aggregations}.
 \begin{table}
 \begin{tabular}{|l|l|}
 \hline
@@ -253,8 +258,8 @@ AVG() & Retrieve the average numeric value of the column \\
 COUNT() & Retrieve the total number of matching records in a column \\
 \hline
 \end{tabular}
-\label{table:aggregations}
 \caption{SQL aggregation functions}
+\label{table:aggregations}
 \end{table}
 
 We can count the number of students by executing the following SQL statement.
@@ -272,7 +277,7 @@ SELECT name FROM students ORDER BY name DESC;
 
 Another useful SQL keyword is the \lsql{GROUP BY} keyword.
 It is used along with an aggregating function to group the result set by columns.
-\begin{lstlisting}
+\begin{lstlisting}[language=SQL]
 SELECT grade, COUNT(studentid) FROM grades GROUP BY grade;
 \end{lstlisting}
 The result set is given in table \ref{table:group_by_grade}.
@@ -329,7 +334,7 @@ Since \lsql{COUNT} is an aggregating function, the following is required.
 SELECT grade FROM grades GROUP BY grade HAVING COUNT(*)=1;
 \end{lstlisting}
 This SQL query returns all the grades that occur only once in the table.
-A simple why to remember the difference is \emph{\lsql{WHERE} operates on individual records and \lsql{HAVING} operates on groups of records}.
+A simple way to remember the difference is \emph{\lsql{WHERE} operates on individual records and \lsql{HAVING} operates on groups of records}.
 
 \begin{problem}
 Select all the students who have received grades (non-null grades) in more than two classes.  How many grades did he receive?
@@ -341,6 +346,8 @@ A case expression allows you to temporarily modify records from a select operati
 There are two forms of the case expression; simple and searched.
 The simple form of the expression is a match and replace on a specified column.
 A simple case expression is demonstrated below.
+This code will return the name of the student along with their majorcode.
+But instead of integers, the names of the majors will be returned.
 \begin{lstlisting}[language=SQL]
 SELECT name, 
 CASE majorcode 
@@ -370,7 +377,7 @@ FROM students;
 \begin{problem}
 Find the overall GPA of all the students in the school.
 Use a regular 4.0 scale (A=4.0, B=3.0, C=2.0, D=1.0).
-Any pluses or minuses are dropped so an A- becomes and A.
+Any pluses or minuses are dropped so an A- becomes an A.
 
 Your result set should be one column and one row with average of all GPAs of all the students taking classes.  
 Your solution should return a single floating point number.
@@ -379,14 +386,23 @@ Use the \lsql{ROUND()} function in SQL to round your result to the nearest hundr
 \label{prob:studentGPA}
 \end{problem}
 
-\begin{problem}
+\subsection*{Like Command}
 The SQL keyword, \lsql{LIKE}, allows us to match patterns in a column.
 For example,
 \begin{lstlisting}[language=SQL]
 SELECT name, studentid FROM students WHERE studentid LIKE '\%4';
 \end{lstlisting}
 will return all the students that have a student ID that ends with the digit 4.
+Use `\textbackslash\%' before the `4' to signify that there can be any number of characters before the `4.'
+If you only want one character, you can use an underscore.
+For example, if you were to search a database of words in the english dictionary and you entered the following command:
+\begin{lstlisting}[language=SQL]
+SELECT word FROM englishDictionary WHERE word LIKE 'i_';
+\end{lstlisting}
+You would get words like `is,' `it,' or `in.'
 
+
+\begin{problem}
 Write a SQL statement that will find all students with a last name that begins with the letter `C' and return their names and majors.  Your returned records should be
 \begin{table}[H]
 \begin{tabular}{|l|l|}

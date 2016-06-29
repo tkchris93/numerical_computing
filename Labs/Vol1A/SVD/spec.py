@@ -1,4 +1,10 @@
-# solutions.py
+# name this file solutions.py
+"""Volume I - SVD 
+<Name>
+<Class>
+<Date>
+"""
+
 from scipy import linalg as la
 import numpy as np
 from matplotlib import pyplot as plt
@@ -15,10 +21,12 @@ def truncated_svd(A,k=None):
         s - the diagonals of Sigma in the SVD
         Vh - the matrix V^H in the SVD
     """
+    raise NotImplementedError("truncated_svd incomplete")
 
 # Problem 2
 def visualize_svd():
     """Plot each transformation associated with the SVD of A."""
+    raise NotImplementedError("visualize_svd incomplete")
 
 # Problem 3
 def svd_approx(A, k):
@@ -31,6 +39,7 @@ def svd_approx(A, k):
     Return:
     Ahat - the best rank k approximation
     """
+    raise NotImplementedError("svd_approx incomplete")
     
 # Problem 4
 def lowest_rank_approx(A,e):
@@ -44,6 +53,7 @@ def lowest_rank_approx(A,e):
     Return:
     Ahat - the lowest rank approximation of A with error less than e.
     """
+    raise NotImplementedError("lowest_rank_approx incomplete")
     
 # Problem 5
 def compress_image(filename,k):
@@ -53,3 +63,4 @@ def compress_image(filename,k):
     filename - jpg image file path
     k - rank
     """
+    raise NotImplementedError("compress_image incomplete")
