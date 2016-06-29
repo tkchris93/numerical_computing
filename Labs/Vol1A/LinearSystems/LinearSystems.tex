@@ -130,8 +130,8 @@ A = \left[\begin{array}{cc}
 \end{array}\right]
 \end{align*}
 
-In larger matrices, round-off error can propagate through many steps in a calculation, resulting in garbage output.
-NumPy's matrix algorithms that employ row reduction use several clever tricks to minimize the impact of round-off errors, but even these tricks can't fix ill-conditioned matrices.
+Round-off error can propagate through many steps in a calculation, resulting in garbage output.
+NumPy's routines that employ row reduction use several tricks to minimize the impact of round-off errors, but even these tricks can't fix ill-conditioned matrices.
 \end{warn}
 
 \subsection*{The LU Decomposition} % ------------------------------------------
@@ -184,7 +184,7 @@ You may assume the decomposition exists and requires no row swaps.
 \label{prob:LU-Decomposition}
 \end{problem}
 
-\subsection*{Back Substitution} % ---------------------------------------------
+\subsection*{Forward and Backward Substitution} % -----------------------------
 
 If $A\x = \b$ and $PA = LU$, then $LU\x = PA\x = P\b$.
 We can solve this system by first solving $L\y = P\b$, then $U\x = \y$.
@@ -192,7 +192,6 @@ Since $L$ and $U$ are both triangular, these systems can be solved with backward
 We can thus compute the $LU$ factorization of $A$ once, then use substitution to efficiently solve $A\x=\b$ for various values of $\b$.
 % This technique is significantly faster than storing $A^{-1}$ and then computing $A^{-1}\b$ (see Problem \ref{prob:solve}).
 
-\begin{problem} % Program back and forward substitution.
 The square, triangular system $L\y = \b$ has the following form:
 %
 \begin{align*}
@@ -211,59 +210,49 @@ y_1 \\ y_2 \\ y_3 \\ \vdots \\ y_n \\
 b_1 \\ b_2 \\ b_3 \\ \vdots \\ b_n \\
 \end{array}\right]
 \end{align*}
-\end{problem}
 
-
-\subsection*{Applications of the LU decomposition} % --------------------------
-
-The LU decomposition is a more efficient way to solve linear systems than row reduction, and it can also be used to quickly compute inverses and determinants.
-SciPy implements these methods in the \li{linalg} module, specifically in the functions \li{la.lu_factor()}, \li{la.solve()}, \li{la.inv()}, and \li{la.det()}.
-
-Let us see how to use the LU decomposition to solve matrix equations.
-
-\begin{problem}\label{prob:solve}
-In this problem you will solve the system $Ax = b$ for fixed $A$ and many different values of $b$.
-You will do this in two ways.
-For a random $1000 \times 1000$ array $A$ and a random $1000 \times 500$ array $B$ do the following.
-\begin{enumerate}
-\item Time \li{la.lu_factor(A)}.
-\item Time \li{la.inv(A)}.
-\item Store the output of \li{la.lu_factor()}
-Time \li{la.lu_solve()} on this stored output and $B$.
-\item Store the inverse of $A$
-Time how long it takes to multiply $A^{-1}$ by $B$.
-\item What can you conclude about the more efficient way to solve linear systems?
-\end{enumerate}
-\end{problem}
-
-Our technique for solving linear equations can also be used to invert matrices.
-We can compute $A^{-1}$ by solving $LUx_i = P_i$ for every $P_i$ that is a column of $P$.
-Then $A^{-1}$ is the matrix with columns $x_1, x_2, \ldots, x_n$.
-
-Finally, the LU decomposition also gives us an efficient way to compute determinants.
-If $PA=LU$, then $\det(A) = [\det(P)]^{-1}\det(L)\det(U)$.
-But the determinant of a triangular matrix is the product of its diagonal entries, and every diagonal entry of $L$ is 1.
-Also, $\det(P)$ is the number of row swaps we applied to $A$ to put it in the appropriate form.
-So if $U$ has diagonal entries $u_{ii}$ for $i=1, \ldots, n$, then
-
-\[
-\det(A) = (-1)^S\left(\displaystyle\prod_{i=1}^nu_{ii}\right),
-\]
-
-where $S$ is the number of row-swaps.
-
-%\begin{problem}
-%\label{prob:lusolve}
-%Write a function that takes the LU decomposition computed by the second function you made in Problem \ref{prob:LU} and another array representing the right hand side of a linear system and modifies the second array in place so that it represents the solution to the linear system.
-%No changes to the array storing the LU decomposition are necessary.
-%\end{problem}
+Matrix multiplication yields the following equations:
 %
+\begin{align}
+\nonumber y_1 &= b_1 & y_1 &= b_1 \\
+\nonumber l_{21}y_1 + y_2 &= b_2 & y_2 &= b_2 - l_{21}y_1 \\
+% \nonumber l_{31}y_1 + l_{21}y_2 + y_3 &= b_3 & y_3 &= b_3 - l_{31}y_1 - l_{32}y_2 \\
+\nonumber & \vdots & \vdots & \\
+\sum_{j=1}^{k-1}l_{kj}y_j + y_k &= b_k & y_k &= b_k - \sum_{j=1}^{k-1}l_{kj}y_j
+\label{eq:forward-substitution}
+\end{align}
 
-\begin{problem}
-\label{prob:det}
-Write a function that finds the determinant of a matrix using \li{la.lu_factor()} and the algorithm described above.
-Read the documentation to learn about the output of \li{la.lu_factor()}.
-Hint: If the $i^{th}$ entry of the output \li{piv} does not equal $i$, this means that a row swap occurred.
+The triangular system $U\x = \b$ yields similar equations, but in reverse order:
+%
+\begin{align*}
+\left[\begin{array}{ccccc}
+u_{11} & u_{12} & u_{13} & \cdots & u_{1n} \\
+0      & u_{22} & u_{23} & \cdots & u_{2n} \\
+0      & 0      & u_{33} & \cdots & u_{3n} \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+0      & 0      & 0      & \cdots & u_{nn}
+\end{array}\right]
+\left[\begin{array}{c}
+x_1 \\ x_2 \\ x_3 \\ \vdots \\ x_n \\
+\end{array}\right]
+=
+\left[\begin{array}{c}
+y_1 \\ y_2 \\ y_3 \\ \vdots \\ y_n \\
+\end{array}\right]
+\end{align*}
+%
+\begin{align}
+\nonumber u_{nn}x_n &= y_n & x_n &= \frac{1}{u_{nn}}y_n \\
+\nonumber u_{n-1,n-1}x_{n-1} + u_{n-1,n}x_{n} &= y_{n-1} & x_{n-1} &= \frac{1}{u_{n-1,n-1}}\left(y_{n-1} - u_{n-1,n}x_{n}\right)\\
+\nonumber & \vdots & \vdots & \\
+\sum_{j=k}^{n}u_{kj}x_j &= y_k & x_k &= \frac{1}{u_{kk}}\left(y_k - \sum_{j=k+1}^{n}u_{kj}x_j\right)
+\label{eq:backward-substitution}
+\end{align}
+
+\begin{problem} % Program back and forward substitution.
+Write a function that, given $A$ and $\b$, solves the square linear system $A\x = \b$.
+Use the function from Problem \ref{prob:LU-Decomposition} to compute $L$ and $U$, then use Equations \ref{eq:forward-substitution} and \ref{eq:backward-substitution} to solve for $\y$, then $\x$.
+You may again assume that there are no row swaps (so $P = I$ in this case).
 \end{problem}
 
 \section*{SciPy} % ============================================================
@@ -290,6 +279,21 @@ The matrix class can be convenient when doing matrix operations.
 However, in such situations we still recommend using NumPy arrrays, which have many of the same features and are also compatible with all other SciPy operations.
 
 The \li{scipy.linalg} library will be essential for the remainder of the labs in this manual.
+
+
+In this problem you will solve the system $Ax = b$ for fixed $A$ and many different values of $b$.
+You will do this in two ways.
+For a random $1000 \times 1000$ array $A$ and a random $1000 \times 500$ array $B$ do the following.
+\begin{enumerate}
+\item Time \li{la.lu_factor(A)}.
+\item Time \li{la.inv(A)}.
+\item Store the output of \li{la.lu_factor()}
+Time \li{la.lu_solve()} on this stored output and $B$.
+\item Store the inverse of $A$
+Time how long it takes to multiply $A^{-1}$ by $B$.
+\item What can you conclude about the more efficient way to solve linear systems?
+\end{enumerate}
+
 
 \subsection*{Spatial Complexity} % --------------------------------------------
 
@@ -668,7 +672,8 @@ This value is meaningful in operator theory.
 
 \end{problem}
 
-\section*{Sparse Matrices}
+\section*{Sparse Matrices} % ==================================================
+
 As mentioned in the introduction, there are some systems that have tens of
 thousands of parameters
 Storing such matrices in memory can become difficult.
@@ -805,7 +810,6 @@ It is not very fast for any other operation.
 \end{lstlisting}
 
 \begin{comment}
-
 The following is a quick example of how the different types of sparse matrices
 can be used to optimize performance.
 
@@ -851,10 +855,10 @@ matrix([[0],
 >>> print Adok[1,1]
 5
 \end{lstlisting}
-
 \end{comment}
 
-\subsection*{In Summary}
+\subsection*{Summary} % -------------------------------------------------------
+
 Since the \li{coo_matrix} type allows for fast sparse matrix type conversion, it is usually worth the time and memory to convert to the sparse matrix type that corresponds with the operations you are performing.
 For more information regarding the intended uses for each type of sparse matrix, see \url{http://docs.scipy.org/doc/scipy/reference/sparse.html}.
 
@@ -868,15 +872,30 @@ We will use the \li{scipy.sparse} and \li{scipy.sparse.linalg} modules more in f
 
 \section*{Additional Material} % ==============================================
 
-\subsection*{Robust REF Reducers}
+\subsection*{REF with Row Swaps} % --------------------------------------------
+
+\subsection*{More Efficiency with LU} % ---------------------------------------
 
 The LU decomposition can be performed in place by storing $U$ on and above the main diagonal of the array and storing $L$ below it.
 The main diagonal of $L$ does not need to be stored since all its entries are ones.
+Consider modifying your solutions to Problems \ref{prob:LU_copy} and \ref{} so that the LU decomposition is computed in place.
 
-\begin{problem}
-Modify your solution to Problem \ref{prob:LU_copy} so that the function computes the LU decomposition in place.
-\end{problem}
+\subsection*{More Applications of the LU Decomposition} % ---------------------
 
+The LU decomposition can also be used to invert matrices and compute determinants.
+Given $PA = LU$, compute $A^{-1}$ by solving $LUx_i = \p_i$ for every column $\p_i$ of $P$.
+Then $A^{-1}$ is the matrix with columns $x_1, x_2, \ldots, x_n$.
+
+As for the determinant, if $PA=LU$, then $\det(A) = [\det(P)]^{-1}\det(L)\det(U)$.
+But the determinant of a triangular matrix is the product of its diagonal entries, and every diagonal entry of $L$ is 1.
+Also, $\det(P)$ is the number of row swaps we applied to $A$ to put it in the appropriate form.
+So if $U$ has diagonal entries $u_{ii}$ for $i=1, \ldots, n$, then
+\[\det(A) = (-1)^S\left(\displaystyle\prod_{i=1}^nu_{ii}\right),\]
+where $S$ is the number of row-swaps.
+
+% Write a function that finds the determinant of a matrix using \li{la.lu_factor()} and the algorithm described above.
+% Read the documentation to learn about the output of \li{la.lu_factor()}.
+% Hint: If the $i^{th}$ entry of the output \li{piv} does not equal $i$, this means that a row swap occurred.
 
 \subsection*{The Cholesky Decomposition} % ------------------------------------
 
