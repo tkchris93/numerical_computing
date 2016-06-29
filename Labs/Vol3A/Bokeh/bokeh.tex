@@ -1,0 +1,464 @@
+\lab{Introduction to Bokeh}{Introduction to Bokeh}
+\label{lab:Bokeh}
+% Written by Tanner Christensen, Summer 2016
+
+\objective{In this lab, we will introduce the Bokeh python package. We will use
+Bokeh to produce interactive, dependency-free data visualizations that can
+be viewed in any web browser.}
+
+\begin{warn}
+As of June 2016, Bokeh was still under heavy development. In this lab, we will
+be using Bokeh 0.11.1. According to the Bokeh GitHub repository, version 0.12
+was set to be released in the middle of June, but is still under development.
+The Bokeh development team has announced that version 0.12 introduces a
+completely rewritten backend server, so some of the information in this lab will
+need to be updated once this new version has been released and is fully stable.
+\end{warn}
+
+Bokeh is a visualization package focused on making plots that can be viewed and
+shared in web browsers. We have already addressed data visualization practices
+in previous labs. In this lab, we will not exhaustively address how to generate
+all the plots you have made using matplotlib. Rather, we will highlight some of
+the key differences in Bokeh. For all other questions not addressed in this lab,
+we direct the reader to the online Bokeh documentation,
+\url{http://bokeh.pydata.org/en/0.11.1/}.
+
+\section*{Interactive Visualizations with Bokeh}
+
+One of the major selling points for the Bokeh Python package is the ability to
+generate interactive plots that can be viewed a web browser.
+The Bokeh Python package is being developed along with a Javascript library
+called BokehJS. The Bokeh Python package is simply a wrapper for this library.
+The BokehJS library handles all the visualizations in the web browser.
+
+Throughout this lab, all the exercises will piece together to form one final
+web-based visualization. To see the final result, go to
+\url{THE FINAL PROJECT HOSTED ON ACME/data or something}.
+
+Even though there are many options for adding interactions to your plots,
+(see \url{http://bokeh.pydata.org/en/0.11.1/docs/user_guide/interaction.html})
+we will only focus on pan, zoom, hover, and the slider widget.
+
+\section*{Cleaning the Data}
+For this project, we will be using the FARS (Fatality Analysis Reporting System)
+dataset. This is an incredibly rich data set of all fatal car accidents in the
+United States in a given year. We will be examining the data provided from
+2010-2014. The data for these years are spread across several files.
+
+\subsection*{The Accidents File}
+The columns found in the accidents table contains most of the data we will be
+analyzing. For the analysis we will be doing, we will be interested in the
+following columns:
+\begin{itemize}
+    \item ST\_CASE : The unique case ID. This will be used primarily for merging
+        information from the other tables.
+    \item STATE : State in which the accident occurred. There is a table at the
+        end of this lab containing the relationship between IDs and states.
+    \item LATITUDE : The latitude of the location where the accident occurred.
+        Values of 77.7777, 88.8888, 99.9999 will be considered null.
+    \item LONGITUD : The longitude of the location where the accident occurred.
+        Values of 777.7777, 888.8888, 999.9999 will be considered null.
+        NOTE: Yes, it is spelled ``LONGITUD" without the `E` on the end.
+    \item HOUR : Hour of the day when the accident occurred.
+    \item DRUNK\_DR : Number of drunk drivers involved in the accident.
+\end{itemize}
+
+\subsection*{The Vehicle File}
+The vehicle table is extremely rich. There is an entry for every vehicle involved
+in a fatal car accident. Many additional analyses could be performed
+on the data here, but we are interested in the following columns:
+\begin{itemize}
+    \item ST\_CASE : The unique case ID. This will be used primarily for merging
+        information from the other tables.
+    \item VEH\_NO : The unique vehicle ID identifying each car involved in a given
+        accident. This will also be used in merging information from the other
+        tables.
+    \item SPEEDREL : Whether or not speed was a factor in the car accident. In
+        the tables from 2010, 2011, and 2012, the value 0 means No, and the
+        value 1 means Yes. In the tables from 2013 and 2014, they begin classifying
+        how speed was a factor. The value 0 still means No, and for our purposes,
+        values from 2-5 mean Yes. Values of 8 or 9 mean Unknown.
+\end{itemize}
+
+\subsection*{The Person File}
+The person table is also extremely rich. Each entry contains information for all
+persons involved in the accident. For our analyses, we are interested in the
+following columns:
+\begin{itemize}
+    \item ST\_CASE : The unique case ID. This will be used primarily for merging
+        information from the other tables.
+    \item VEH\_NO : The unique vehicle ID identifying each car involved in a given
+        accident. This will also be used in merging information from the other
+        tables.
+    \item PER\_TYP : The role of this person in the accident. Though the labels in
+        this column vary greatly, we will only be interested in entries equal to
+        1, signifying the driver.
+    \item DRINKING : Whether or not alcohol was involved for this person. The value
+        0 means No, 1 means Yes, and 8,9 mean Unknown.
+\end{itemize}
+
+The first task is to prepare the DataFrames will we use in our analyses,
+the \li{accidents} DataFrame and the \li{drivers} DataFrame.
+In the provided file \li{fars_data.zip}, you will find pickle files for accidents,
+vehicles, and persons corresponding to each fatal accident. These files are
+divided by year, but we want to combine the data from all these years. These
+pickle files can be loaded using \li{pd.read_pickle()}.
+
+\begin{problem}
+For the \li{accidents} DataFrame, we will need the columns:
+\begin{lstlisting}
+    ST_CASE, STATE, LATITUDE, LONGITUD, HOUR, DRUNK_DR, SPEEDING.
+\end{lstlisting}
+
+The SPEEDING column is derived from
+the SPEEDREL column of the vehicles file. The SPEEDREL column describes
+which vehicles specifically were speeding. We want the SPEEDING column of this
+table to be 0 if no cars were speeding and 1 if any of the cars involved were
+speeding. Also, remove all rows containing latitudes or longitudes that we are
+considering null due to the criteria described above.
+
+The resulting DataFrame should be 149698 rows x 7 columns. As
+another indicator that you have done everything correctly, you should have a total
+of 44223 speed related accidents described in the SPEEDING column.
+
+Lastly, the STATE column is all based on ids. The \li{id_to_state.pickle} file
+contains a pickle file with a Python dictionary mapping IDs to states. Replace
+all the integer IDs in this column with the corresponding state abbreviation
+according to the mapping contained in this dictionaary.
+
+So in the end your DataFrame should look like this:
+TODO make a table that shows accidents.head()
+
+\begin{info}
+HINT: Though tedious, it will be easiest to do this whole process correctly if
+you do all the needed cleaning for each individual year, then concatenate all
+the years together into your final DataFrames. This is due to the fact that
+the IDs in the ST\_CASE column are not year specific.
+\end{info}
+\end{problem}
+
+\begin{problem}
+For the \li{drivers} DataFrame, we will need the columns:
+\begin{lstlisting}
+    ST_CASE, VEH_NO, PER_TYP, AGE, DRINKING, SPEEDREL, YEAR.
+\end{lstlisting}
+To obtain the information needed
+for this DataFrame, you will need merge the vehicles
+file and person file. You will want to merge on ST\_CASE and VEH\_NO.
+
+The resulting DataFrame should be 341436 rows x 7 columns. It is easiest to add
+the YEAR column manually. Additionally, we will
+only be interested in the entries where PER\_TYP is 1. This brings the final
+shape of the DataFrame to 223490 rows x 6 columns (since we can now eliminate
+PER\_TYP).
+\end{problem}
+
+Now with the necessary data cleaned, we can dive into the Bokeh package itself.
+
+\section*{Basic Plotting}
+
+The general framework of Bokeh is built on Figures, Glyphs, and Charts.
+Figures are analogous to Figure objects in matplotlib. Glyphs consist of any
+lines, circles, squares, or patches that we may want to add to the Figure.
+Charts are visualizations such as bar charts, histograms, box plots, etc.
+
+There are a few different ways to view your Bokeh plots, but we will address only
+two of them. These are \li{output_file()} and \li{output_notebook()}.
+If you choose to use \li{output_file}, your Bokeh plot will be saved to an HTML
+file that can be viewed in a web browser. This function accepts a string with
+the name of the desired filename. If you use \li{output_notebook()}, your Bokeh plots
+will appear in your Jupyter Notebook.
+
+\begin{info}
+    Because Bokeh is still under development, there are times that your plots
+    may not be behaving as expected. If you are sure there is not a problem with
+    your code, try restarting the Bokeh server. Assuming you are working in
+    a Jupyter Notebook, this is done by first restarting the kernel, then
+    reloading the webpage that hosts your Jupyter Notebook.
+\end{info}
+
+As has been mentioned already, this lab is not meant to be exhaustive, but
+rather is meant to expose you to the basics. For our project, we will be using
+Circle glyphs, Square glyphs, Patch glyphs, and Bar charts. Here are some very
+basic examples of how to use each of these.
+
+\subsection*{Marker Glyphs (Circles and Squares)}
+
+We use Circle glpyhs when we want to plot a collection of circles (such as in
+a scatter plot.) The following code example demonstrates the basic syntax of
+how this is done.
+
+\begin{lstlisting}
+from bokeh.plotting import figure, output_file, show
+
+output_file("my_plot.html")
+
+fig = figure(plot_width=500, plot_height=500)
+
+fig.circle(x=[1,2,3,3,4,5], y=[3,1,2,4,5,4])
+
+show(fig)
+\end{lstlisting}
+
+The appearance of marker glyphs is high customizable. There are more than 20 keyword
+arguments that allow you to tweak the appearance of your markers. Here are some
+of the arguments that are most commonly used.
+
+\begin{itemize}
+    \item size : size of marker measured in pixels on screen. So these will
+        appear the same size despite the level of zoom.
+    \item radius : size of marker measured by radius. These markers will scale
+        with the level of zoom.
+    \item fill\_color : string of the hex value or the name of the
+        color. Valid color names are all colors that have names in HTML.
+    \item fill\_alpha : value between 0 and 1 indicating alpha value. 0 indicates
+        invisible, 1 indicates opaque.
+    \item line\_color : string of the hex value or the name of the
+        color of the border. Valid color names are all colors that have
+        names in HTML.
+    \item line\_alpha : value between 0 and 1 indicating alpha value of the
+        border. 0 indicates invisible, 1 indicates opaque.
+    \item line\_width : thickness of the border.
+\end{itemize}
+
+Additionally, you can pass lists of items to these keyword arguments. The
+attributes you specific in these list will be consistent across the indices of
+these lists.
+
+\begin{lstlisting}
+fig = figure(plot_width=500, plot_height=500)
+
+cir = fig.circle(x=[1,2,3,3,4,5], y=[3,1,2,4,5,4], size=[15,25,10,20,10,15],
+            fill_color=["red", "yellow", "red", "blue", "blue", "limegreen"],
+            fill_alpha=[.8,.5,.9,.6,.9,.7], line_color="black", line_width=3)
+
+show(fig)
+\end{lstlisting}
+
+The syntax for squares is identical. In addition to the keyword arguments listed
+above, the \li{angle} keyword argument is also useful for squares.
+
+\begin{lstlisting}
+fig = figure(plot_width=500, plot_height=500)
+
+sq = fig.square(x=[1,2,3,3,4,5], y=[3,1,2,4,5,4], size=[15,25,10,20,10,15],
+            fill_color=["red", "yellow", "red", "blue", "blue", "limegreen"],
+            fill_alpha=[.8,.5,.9,.6,.9,.7], line_color="black", line_width=3,
+            angle=np.pi/4)
+
+show(fig)
+\end{lstlisting}
+
+\subsection*{Patch Glyphs}
+Patch glyphs are polygon shapes defined by a series of points locating the
+corners of the object. These shapes can be very complex. For our project, each
+state is a Patch glyph. The syntax for creating Patch glyphs is very similar to
+the syntax for creating markers. Most of the keyword arguments are the same as
+well.
+
+\begin{lstlisting}
+# first iteration of the Sierpinski triangle.
+fig = figure(plot_width=500, plot+height=500)
+
+pats = fig.patches(xs=[[1, 3, 2], [3, 5, 4], [2, 4, 3]],
+            ys=[[1, 1, 3], [1, 1, 3], [3, 3, 5]],
+            fill_color="yellow", line_color="orange",
+            line_alpha=.5, line_width=7)
+\end{lstlisting}
+
+\subsection*{ColumnDataSource Object}
+In the plotting examples we have addressed up to this point, we have expressed
+the x and y values explicitly. As mentioned throughout this lab, one of the key
+features of Bokeh is to be to interact with your plots. However, if you have
+a large dataset, the performance of the interactions can be severely hampered.
+
+Bokeh has a solution for this problem. It comes in the form of the
+\li{ColumnDataSource} object. We load our data into this object, connect our
+glyph to this object, then if necessary, Bokeh will automatically downsample the
+data to maintain acceptable performance. Once a glyph is linked to this source,
+you can also change the values in the source to update the positions and attributes
+of your glyph. This is an essential component to many of the key features of
+Bokeh.
+
+ColumnDataSource objects accept a dictionary or a pandas DataFrame as the source
+of data. We reference the different data in this source by the associated key
+(in the case of a dictionary) or column name (in the case of a DataFrame).
+
+\begin{lstlisting}
+# Replicate the circle marker plot using a DataFrame and ColumnDataSource.
+from bokeh.models import ColumnDataSource
+
+fig = figure(plot_width=500, plot_height=500)
+
+df = pd.DataFrame({"x_vals":[1,2,3,3,4,5],
+                   "y_vals":[3,1,2,4,5,4],
+                   "size":[15,25,10,20,10,15],
+                   "fill_color":["red", "yellow", "red", "blue", "blue", "limegreen"],
+                   "fill_alpha":[.8,.5,.9,.6,.9,.7]})
+cir_source = ColumnDataSource(df)
+
+cir = fig.circle(x="x_vals", y="y_vals", source=cir_source,
+            size="size", fill_color="fill_color",
+            fill_alpha="fill_alpha", line_color="black", line_width=3)
+
+show(fig)
+
+
+# Replicate the patches plot using a dictionary and ColumnDataSource.
+fig = figure(plot_width=500, plot+height=500)
+
+pat_data = dict("x_vals":[[1, 3, 2], [3, 5, 4], [2, 4, 3]],
+                "y_vals":[[1, 1, 3], [1, 1, 3], [3, 3, 5]])
+
+pat_source = ColumnDataSource(data=pat_data)
+
+pats = fig.patches(xs="x_vals", ys="y_vals",
+            fill_color="yellow", line_color="orange",
+            line_alpha=.5, line_width=7)
+
+show(fig)
+
+\end{lstlisting}
+
+\begin{problem} \label{prob:borders}
+In this problem, you will begin constructing the first tab of the project
+associated with this lab. Using Patch glyphs, draw all the borders for all the
+states. The border information you need is found in the pickle file
+\li{state_borders.pickle}. This pickle file contains a nested Python dictionary
+where the key is the two letter abbreviation for a given state and the value is
+a dictionary containing a list of latitudes and a list of longitudes.
+
+We need a list of lists of latitudes and longitudes to pass to the
+\li{fig.patches()} function.
+
+\begin{lstlisting}
+state_xs = [us_states[code]["lons"] for code in us_states]
+state_ys = [us_states[code]["lats"] for code in us_states]
+\end{lstlisting}
+
+Draw the state borders using the coordinates defined in \li{state_xs} and
+\li{state_ys} and using a \li{ColumnDataSource} object.
+\end{problem}
+
+\begin{problem} \label{prob:all_accidents}
+Your \li{accidents} DataFrame should contain the longitudes and latitudes for
+all the fatal accidents. In the same figure from Problem \ref{prob:borders},
+plot a circle for each fatal car accidents. For this problem, you should use
+your \li{accidents} DataFrame in conjuction with a ColumnDataSource.
+\end{problem}
+
+\subsection*{Speeding up Interactions with WebGL}
+As you pan around your figure from Problem \ref{prob:all_accidents}, it may take
+a few seconds to load after each movement. This may not be that surprising
+considering you have just added approximately 150,000 circles to your figure.
+The performence can be improved using WebGL. WebGL stands for Web Graphics
+Library. It takes advantage of a compmuter's GPU when plotting a large number of
+points.
+
+\begin{problem} \label{prob:webgl}
+To take advantage of WebGL, add \li{webgl=True} as a keyword argument to
+your figure. You should notice a significant improvement in the response time
+while panning and zooming.
+
+\begin{info}
+There are times that adding WebGL support to your figure will cause it to behave
+strangely, so adding WebGL support may not always be a feasible option. Remember
+that Bokeh is still in development, so hopefully things like this will be refineed
+in time.
+\end{info}
+\end{problem}
+
+\section*{Basic Charts}
+Like in pandas, it is very easy to make visualizations in Bokeh from DataFrames.
+Bokeh provides very accessible tools for creating bar charts, histograms, box
+plots, and scatter plots.
+
+\begin{problem}
+Before making the bar charts for this project, we will need to clean the data a
+little bit more. In your \li{drivers} DataFrame, we are interested in the columns
+AGE, DRINKING, and SPEEDREL. For the bar charts, creating an additional DataFrame
+will greatly simplify this task. Create a DataFrame called \li{counts} that has
+columns,
+\begin{itemize}
+    \item AGE : age of drivers
+    \item SPEEDING : number of drivers that where speeding when the accident
+                occurred.
+    \item NOT\_SP : number of drivers that were NOT speeding when the accident
+                occurred.
+    \item UN\_SP : number of drivers that were involved in accidents where the
+                role of speed was unknown.
+    \item DRUNK : number of drivers that were driving drunk when the accident
+                occurred.
+    \item NOT\_DR : number of drivers that were NOT driving drunk when the
+                accident occurred.
+    \item UN\_DR : number of drivers that were involved in accidents where the
+                role of drinking was unknown.
+\end{itemize}
+\end{problem}
+
+\subsection*{Bar Charts}
+Now with the \li{counts} DataFrame ready, we will focus on creating a stacked
+bar chart using this data.
+
+To initialize a Bokeh Bar Chart, we pass a pandas DataFrame and indicate what
+the label (x-axis) and values (y-axis) for the chart will be. The following
+code will create a bar chart that displays the number of drunk driving accidents
+based on age.
+
+\begin{lstlisting}
+from bokeh.charts import Bar
+
+b = Bar(counts, label="AGE", values="DRUNK")
+
+show(b)
+\end{lstlisting}
+
+When creating a stacked bar chart, we use an operation called \li{blend}. This
+groups columns of your DataFrame together in preparation for stacking the
+columns. The following code creates a stacked bar chart that displays the number
+of drivers in speed-related accidents by age.
+
+\begin{lstlisting}
+from bokeh.charts.operations import blend
+speed_bar = Bar(counts,
+              values=blend("UN_SP", "SPEEDING", "NOT_SP",
+                          name="totals", labels_name="speed"),
+              label="AGE",
+              stack="speed")
+show(speed_bar)
+\end{lstlisting}
+
+\begin{problem}
+Following the example above, create a stacked bar chart that displays the
+number of drivers in drunk-driving-related accidents by age.
+\end{problem}
+
+\section*{Adding Tooltips to Visualizations}
+Tooltips allow the user to gain more insight from the visualization.
+The process of tooltips differs depending on the type of visualization.
+We will address how to add hover interactions to bar charts and patch glyphs.
+
+\subsection*{Adding Tooltips to Bar Charts}
+With the stacked bar charts made in the last section, it is difficult to
+distinguish the age and exact number of people represented by each bar.
+Tooltips will be  particularly useful for clarifying these pieces of the data.
+
+Luckily, adding tooltips to bar charts is very easy. In fact, it is just a matter
+of adding a keyword argument. Here is a refined version of the code displaying
+drunk-driving-related accidents by age.
+
+\begin{lstlisting}
+b = Bar(counts, label="AGE", values="DR",
+        tooltips=[("AGE","@AGE"), ("TOTAL", "@height")])
+show(b)
+\end{lstlisting}
+
+The \li{tooltips} keyword argument is a list of tuples. The first entry in the
+tuple is the key and the second entry is the value. The value \li{"@AGE"}
+references what the which column is being selected. The value \li{"@height"} is
+a builtin option that displays the height of the selected bar.
+
+\subsection*{Adding Tooltips to Patch Glyphs}
+In the first figure we made with the map of the United States, it would be useful
+to display a bit more information. Once again, we can accomplish this with
+tooltips.
