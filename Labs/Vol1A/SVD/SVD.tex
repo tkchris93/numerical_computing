@@ -9,8 +9,8 @@
 
 
 The \emph{Singular Value Decomposition} or \emph{SVD} is a matrix decomposition that is widely used in both theoretical and applied mathematics. 
-Originally discovered by theoretical mathematicians, it is the canonical way to decompose a matrix.
-Its practical use became apparent later on when Erhard Schmidt showed how the SVD could be a computational tool for providing low-rank approximations.
+Originally discovered by theoretical mathematicians, it is a canonical way to decompose a matrix.
+Its practical use became apparent later on when Erhard Schmidt showed that the SVD could be a computational tool for providing low-rank matrix approximations.
 Modern developments continue to confirm the importance of the SVD in both computational and theoretical applications.
 
 \begin{comment}
@@ -73,7 +73,7 @@ Although we drop the decompositions of the nullspaces, by calculating $U_1 \Sigm
 
 The \emph{truncated SVD} is similar to the compact SVD, but instead of keeping all the nonzero singular values, we only keep the $k$ largest.
 While this saves space, it means that we cannot recover the whole matrix.
-Instead we end up with $\widehat A_k = U_k\Sigma_k V_k^H$ where $\widehat A_k$ is a rank-$k$ approximation of $A$, $U_k$ is $m\times k$, $\Sigma$ is $k \times k$ and diagonal, and $V_k^H$ is $k \times n$.
+Instead we end up with $\widehat A_k = U_k\Sigma_k V_k^H$ where $\widehat A_k$ is a rank $k$ approximation of $A$, $U_k$ is $m\times k$, $\Sigma$ is $k \times k$ and diagonal, and $V_k^H$ is $k \times n$.
 
 The components of the compact or truncated SVD can be calculated as follows:
 \begin{itemize}
@@ -236,9 +236,9 @@ As we make $k$ small, we eventually require very little storage---but at the cos
 The beauty of the SVD is that it keeps the information that is most important. 
 Larger singular values correspond to columns of $U$ and $V$ that contain more information, and so dropping the smallest singular values retains as much information as possible.
 When approximating a matrix at a lower rank, the truncated SVD is guaranteed to give the closest approximation possible.
-In mathematical terms, given a matrix $A$ and its SVD approximation $\widehat A_k = U_k\Sigma_k V_k^H$, the matrix $\widehat A_k$ is the \emph{best rank-$k$ approximation} to $A$ (with respect to the induced 2-norm and Frobenius norm). TODO: ref textbook.
+In mathematical terms, given a matrix $A$ and its SVD approximation $\widehat A_k = U_k\Sigma_k V_k^H$, the matrix $\widehat A_k$ is the \emph{best rank $k$ approximation} to $A$ (with respect to the induced 2-norm and Frobenius norm). TODO: ref textbook.
 
-This significant concept is ubiquitous in applied mathematics, appearing in areas including signal processing, statistics, semantic indexing, and control theory.
+This is a significant and ubiquitous concept, appearing in areas including signal processing, statistics, semantic indexing, and control theory.
 
 
 \begin{comment}
@@ -317,22 +317,23 @@ Try plotting the singular values.
 
 Sometimes there is not enough available bandwidth to transmit a full resolution photograph.
 Suppose you need to transmit an image from a remote location.
-You aim to to keep the amount of data to be sent below some limit, while also minimizing the loss of detail in the image.
+You might aim to reduce the amount of data being sent, while also minimizing the loss of detail in the image.
 
 This can be done using the SVD.
 An image is just a matrix of pixel values, which means it has a singular value decomposition.
 Computing and sending a low-rank SVD approximation of the image can considerably reduce the amount of data sent, while retaining a high level of image detail.
 
-How low-rank can we make our approximation?
-In Figure \ref{fig:hubble} we present an image and a log plot of its singular values from greatest to least.
+Examining the singular values of an image gives an idea of how low-rank the approximation can be.
+Figure \ref{fig:hubble} presents an image and a log plot of its singular values from greatest to least.
 The plot in \ref{fig:svals_plot} is typical of a photographic image;
 the singular values start out large but drop off rapidly.
 In this rank $670$ image, $624$ of the singular values are $50$ or more times smaller than the largest singular value.
 By discarding these relatively small singular values, we can retain nearly all of the image detail, while storing only a rank 46 image!
+This is a huge reduction in data size.
 
 Figure \ref{fig:rankvalues} shows several low-rank approximations of the image in Figure \ref{fig:hubble_original}.
 Even at a very low rank the image is recognizable.
-By the rank 40 approximation, all but the sharpest detail has been resolved.
+By rank 40, the approximation visibly differs very little from the original.
 
 \begin{figure}
 \centering
@@ -409,9 +410,9 @@ In the next code block, $k$ represents the desired rank of the output.
 \end{comment}
 
 \begin{problem}
-Using your \li{svd_approx} function from Problem \ref{prob:svd_approx}, write a function \li{compress_img} that accepts two parameters \li{filename} and \li{k}. Your function should plot the original image and the best rank k approximation of the original image. 
+Using the \li{svd_approx} function from Problem \ref{prob:svd_approx}, write a function \li{compress_img} that accepts two parameters \li{filename} and \li{k}. The function should plot the original image and the best rank k approximation of the original image. 
 
-While your \li{svd_approx} function worked for grayscale images, your \li{compress_img} function should work on color images. 
+While \li{svd_approx} worked for grayscale images, the \li{compress_img} function should work on color images. 
 You may split the image into its three RGB layers and approximate each layer separately, then recombine them.
 Your output should be similar to Figure \ref{fig:compressed_image}.
 
