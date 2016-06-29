@@ -77,7 +77,7 @@ def shear(A, a, b):
     """
     raise NotImplementedError("Problem 3 Incomplete")
 
-def reflection(A, a, b):
+def reflect(A, a, b):
     """Reflect the points in 'A' about the origin by 'theta' radians.
 
     Inputs:
@@ -86,7 +86,7 @@ def reflection(A, a, b):
     """
     raise NotImplementedError("Problem 3 Incomplete")
 
-def rotation(A, theta):
+def rotate(A, theta):
     """Rotate the points in 'A' about the origin by 'theta' radians.
 
     Inputs:
