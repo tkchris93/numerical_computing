@@ -1,185 +1,218 @@
 \lab{Linear Systems}{Linear Systems}
 \objective{The fundamental problem of linear algebra is solving the linear system $A\x = \b$, if it is even possible.
-There are many approaches to solving this problem, each with different problems and advantages.
-In this lab we implement the LU Decomposition and introduce the SciPy library for linear algebra and sparse matrices.
+There are many approaches to solving this problem, each with different pros and cons.
+In this lab we implement the LU Decomposition and use it to solve square linear systems.
+We also introduce SciPy, together with its libraries for linear algebra and working with sparse matrices.
 }
 
-\section*{Row Operations} % ---------------------------------------------------
+% TODO: In "type II elementary matrix", is 'type' capitalized?
 
-When you perform a row operation on a matrix, you are really left-multiplying by some elementary matrix.
-However, matrix multiplication is not the most efficient way to implement row operations. It is much faster to perform row operations by modifying the array in place, and only changing those entries that are affected by the operation.
-The following code implements the three elementary row operations by modifying the array in place.
+\section*{Gaussian Elimination} % =============================================
 
-\begin{lstlisting}
-def type_I(A, i, j):
-    """Swap the i-th and j-th rows of A."""
-    A[i], A[j] = np.copy(A[j]), np.copy(A[i])
+The standard approach for solving the linear system $A\x = b$ on paper is reducing the augmented matrix $\left[A\mid\b\right]$ to row-echelon form (REF) via \emph{Gaussian elimination}, then using back substitution.
+The matrix is in REF when the leading non-zero term in each row is the diagonal term, so the matrix is upper triangular.
 
-def type_II(A, i, alpha):
-    """Multiply the i-th row of A by a constant."""
-    A[i] *= alpha
-
-def type_III(A, i, j, alpha):
-    """Add a constant multiple of the j-th row of A to the i-th row."""
-    A[i] += alpha * A[j]
-\end{lstlisting}
-
-\subsection*{Programming Row Reduction} % -------------------------------------
-
-Reduce a system to row echelon form (REF)\footnote{We do not require leading coefficients to be 1 in the REF.}, then use back system to the system by row reduction.
-
-\begin{lstlisting}
->>> A = np.array([[4., 5., 6., 3.],[2., 4., 6., 4.],[7., 8., 0., 5.]])
->>> A
-array([[ 4.,  5.,  6.,  3.],
-       [ 2.,  4.,  6.,  4.],
-       [ 7.,  8.,  0.,  5.]])
->>> type_III(A, 1, 0, A[1,0]/A[0,0])
->>> type_III(A, 2, 0, A[2,0]/A[0,0])
->>> type_III(A, 2, 1, A[2,1]/A[1,1])
-
->>> A
-array([[ 4. ,  5. ,  6. ,  3. ],
-       [ 0. ,  1.5,  3. ,  2.5],
-       [ 0. ,  0. , -9. ,  1. ]])
-\end{lstlisting}
-
-The third row operation really only modifies a part of the third row because the first values in each affected row are each 0.
-Modifying only those entries of the array that are affected by a row operation will save a lot of time when row reducing a large matrix.
-
-Beware that round-off error in row reduction can cause serious problems.
-Suppose we wish to row reduce a matrix $A$ as follows.
-
-\begin{lstlisting}
->>> A = np.array([[4., 5., 6., 3.],[2., 2.5, 6., 4.],[7., 8., 0., 5.]])
-array([[ 4.,  5.,  6.,  3.],
-       [ 2.,  2.5,  6.,  4.],
-       [ 7.,  8.,  0.,  5.]])
->>> A[1] -= (A[1,0]/A[0,0]) * A[0]
->>> A[2] -= (A[2,0]/A[0,0]) * A[0]
-\end{lstlisting}
-
-If we work this out by hand, at this point we have
-
-\begin{align}
-A = \left[\begin{array}{cccc}
-4 &    5 &     6 &    3 \\
-0 &    0 &     3 &  2.5 \\
-0 & -7.5 & -10.5 & -.25
-\end{array}\right].
-\label{equ:row-reduction-no-errors}
-\end{align}
-
-If we swap the second and third rows, then the matrix is in row echelon form.
-However, suppose that due to round-off error, the machine instead computes
-
+At each step of the process, there are three possible operations: swapping two rows, multiplying one row by a scalar value, or adding a scalar multiple of one row to another.
+Many systems, like the one displayed below, can be reduced to REF using only the third type of operation.
+First we use multiples of the first row to get zeros below the diagonal in the first column, then we use a multiple of the second row to get zeros below the diagonal in the second column.
+%
 \begin{align*}
-A = \left[\begin{array}{cccc}
-4 & 5        &     6 &    3 \\
-0 & 10^{-15} &     3 &  2.5 \\
-0 & -7.5     & -10.5 & -.25
-\end{array}\right].
+\left[\begin{array}{ccc|c}
+1 & 1 & 1 & 1 \\
+1 & 4 & 2 & 3 \\
+4 & 7 & 8 & 9 \\
+\end{array}\right]
+\longrightarrow
+\left[\begin{array}{ccc|c}
+1 & 1 & 1 & 1 \\
+\textcolor{red}0 & 3 & 1 & 2 \\
+4 & 7 & 8 & 9 \\
+\end{array}\right]
+\longrightarrow
+\left[\begin{array}{ccc|c}
+1 & 1 & 1 & 1 \\
+0 & 3 & 1 & 2 \\
+\textcolor{red}0 & 3 & 4 & 5 \\
+\end{array}\right]
+\longrightarrow
+\left[\begin{array}{ccc|c}
+1 & 1 & 1 & 1 \\
+0 & 3 & 1 & 2 \\
+0 & \textcolor{red}0 & 3 & 3
+\end{array}\right]
 \end{align*}
 
-The algorithm would then attempt to pivot on the \li{A[1,1]} entry as follows.
+Each of these operations is mathematically equivalent to left-multiplying by a \emph{type III elementary matrix}, the identity with one non-diagonal non-zero term.
+If row operation $k$ corresponds to matrix $E_k$, the following equation is $E_3E_2E_1A = U$.
+%
+\begin{align*}
+\left[\begin{array}{ccc}
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+0 & -1 & 1 \\
+\end{array}\right]
+\left[\begin{array}{ccc}
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+-4 & 0 & 1 \\
+\end{array}\right]
+\left[\begin{array}{ccc}
+1 & 0 & 0 \\
+-1 & 1 & 0 \\
+0 & 0 & 1 \\
+\end{array}\right]
+\left[\begin{array}{ccc|c}
+1 & 1 & 1 & 1 \\
+1 & 4 & 2 & 3 \\
+4 & 7 & 8 & 9 \\
+\end{array}\right]
+=
+\left[\begin{array}{ccc|c}
+1 & 1 & 1 & 1 \\
+0 & 3 & 1 & 2 \\
+0 & 0 & 3 & 3
+\end{array}\right]
+\end{align*}
+
+However, matrix multiplication is an inefficient way to implement row reduction.
+Instead, modify the matrix \emph{in place} (without making a copy), changing only those entries that are affected by each row operation.
 
 \begin{lstlisting}
->>> A[2,1:] -= (A[2,1]/A[1,1]) * A[1,1:]
->>> A
-array([[ 4. ,  5.0e+00 , 6.00e+00 ,  3.000e-00 ],
-       [ 0. ,  1.0e-14 , 3.00e+00 ,  2.500e-00 ],
-       [ 0. ,  0.0e+00 , 2.25e+14 ,  1.875e+14 ]])
+>>> import numpy as np
+>>> A = np.array([[1, 1, 1, 1],
+...               [1, 4, 2, 3],
+...               [4, 7, 8, 9]], dtype=np.float)
+
+# Reduce the 0th column to zeros below the diagonal.
+>>> A[1,0:] -= (A[1,0] / A[0,0]) * A[0]
+>>> A[2,0:] -= (A[2,0] / A[0,0]) * A[0]
+
+# Reduce the 1st column to zeros below the diagonal.
+>>> A[2,1:] -= (A[2,1] / A[1,1]) * A[1,1:]
+>>> print A
+[[ 1.  1.  1.  1.]
+ [ 0.  3.  1.  2.]
+ [ 0.  0.  3.  3.]]
 \end{lstlisting}
 
-The round-off error in the \li{A[1,1]} entry has affected the third row, and the matrix is now much different than the correct answer in (\ref{equ:row-reduction-no-errors}).
-In larger matrices, round-off error can propagate through many steps in a calculation, resulting in garbage output.
+Note that the final row operation modifies only part of the third row to avoid spending the computation time of adding $0$ to $0$.
 
-Some of NumPy's matrix algorithms use row reduction.
-NumPy's methods use several clever tricks to minimize the impact of round-off errors.
-However, these methods may still give you garbage output due to round-off error, especially if the matrix is \emph{ill-conditioned}.
-You should always be aware of this possibility.
+If a $0$ appears on the main diagonal during any part of row reduction, the approach given above tries to divide by $0$.
+When this happens, swap the current row with one below it that does not have a $0$ in the same column.
+This is equivalent to left-multiplying by a type II elementary matrix, also called a \emph{permutation matrix}.
 
-\begin{problem}
-\label{prob:REF}
-Write a function which reduces a square matrix to REF.
-You may make the following assumptions:
-\begin{enumerate}
-\item The matrix is invertible.
-\item During your row reduction, a zero will never appear on the main diagonal.
-\item All round-off errors may be ignored.
-\end{enumerate}
-During a row operation, do not modify any entries that you know will be zero before and after the operation.
+\begin{problem} % Program simple row reduction to REF.
+Write a function which reduces a \textbf{square} matrix $A$ to REF.
+You may assume that $A$ is invertible and that a $0$ will never appear on the main diagonal (so only use type III row reductions, not type II).
+Avoid operating on entries that you know will be $0$ before and after a row operation.
+
+Consider generating small random matrices as test cases with NumPy's \li{random} module (\li{np.random.randint()} may be particularly useful).
 \end{problem}
+
+\begin{warn} % Gaussian Elimination is numerically unstable!
+Gaussian elimination is not always numerically stable.
+Suppose that, due to roundoff error, we have a matrix with a very small entry on the diagonal.
+
+\begin{align*}
+A = \left[\begin{array}{cc}
+10^{-15} & 1 \\
+-1 & 0 \\
+\end{array}\right]
+\end{align*}
+
+$10^{-15}$ is essentially zero, but instead of swapping the first and second rows to put the $A$ in REF, a computer might multiply the first row by $10^{15}$ and add it to the second row to eliminate the $-1$.
+The resulting matrix is far from what we would expect on paper.
+
+\begin{align*}
+A = \left[\begin{array}{cc}
+10^{-15} & 1 \\
+0 & 10^{15} \\
+\end{array}\right]
+\end{align*}
+
+In larger matrices, round-off error can propagate through many steps in a calculation, resulting in garbage output.
+NumPy's matrix algorithms that employ row reduction use several clever tricks to minimize the impact of round-off errors, but even these tricks can't fix ill-conditioned matrices.
+\end{warn}
 
 \subsection*{The LU Decomposition} % ------------------------------------------
 
-The LU decomposition of a square matrix $A$ is a factorization $A=LU$ where $U$ is an upper triangular and $L$ is a lower triangular matrix.
-In fact, $U$ is the REF of $A$ and $L$ is a product of Type III elementary matrices whose inverses reduce $A$ to $U$.
-Thus, the LU decomposition is a way of storing the REF and ``how we got there.''
+The \emph{LU decomposition} of a square matrix $A$ is a factorization $A=LU$ where $U$ is the \textbf{upper} triangular REF of $A$ and $L$ is the \textbf{lower} triangular product of the type III elementary matrices whose inverses reduce $A$ to $U$.
+% Thus, the LU decomposition is an efficient way of storing the REF and how we got there.
+The LU decomposition of $A$ exists when $A$ can be reduced to REF using only type III elementary matrices (no row swaps).
+However, the rows of $A$ can always be permuted in a way such that the decomposition exists.
+If $P$ is a permutation matrix encoding the appropriate row swaps, then the decomposition $PA = LU$ always exists.
 
-The LU factorization of $A$ exists only when $A$ can be reduced to REF using only Type III elementary matrices (no row swaps).
-However, we can always permute the rows of $A$ to obtain a matrix that has an LU decomposition.
-If $P$ encodes the row swaps, then a decomposition $PA = LU$ always exists.
-
-If $A$ has an LU decomposition (not requiring row swaps), then we can find it as follows.
-Reduce $A$ to REF with $k$ row operations, corresponding to matrices $E_1, \ldots, E_k$.
-Then $U = E_k \ldots E_2E_1A,$ where $U$ is the REF of $A$.
-Because there were no row swaps, each $E_i$ is a lower triangular Type III matrix. Then $E_i^{-1}$ is also lower triangular.
-Thus, $L=(E_k \ldots E_2E_1)^{-1}$ is lower triangular, and $LU=A.$
-
-Because $L=(E_k \ldots E_2E_1)^{-1} = IE_1^{-1}E_2^{-1}\ldots E_k^{-1}$, we can compute $L$ by right-multiplying the identity by the matrices we used to reduce $U$.
-In fact, in this special situation, each right-multiplication will change only one entry of $L$.
-We have the following algorithm for the LU decomposition, assuming it exists.
-
+Suppose $A$ has an LU decomposition (not requiring row swaps).
+Then $A$ can be reduced to REF with $k$ row operations, corresponding to left-multiplying the type III elementary matrices $E_1, \ldots, E_k$.
+% Then $U = E_k \ldots E_2E_1A,$ where $U$ is the REF of $A$.
+Because there were no row swaps, each $E_i$ is lower triangular, so each inverse $E_i^{-1}$ is also lower triangular.
+Furthermore, since the product of lower triangular matrices is lower triangular, $L$ is lower triangular.
 %
-%\begin{itemize}
-%\item Make a copy, $U$, of $A$.
-%\item Make an identity matrix $L$ that is the same shape as $A$.
-%\item Iterate through the entries below the diagonal of $U$.
-%
-%Now for each entry below the main diagonal of $U$ do the following:
-%   \begin{itemize}
-%   \item Set the corresponding entry of $L$ to the quotient of the current entry of $U$ and the entry of the main diagonal of $U$ located above the current entry.
-%   \item Perform the type 3 row operation to set the current entry of $U$ to 0.
-%       Do not modify any entries known to be 0.
-%   \end{itemize}
-%\item Return $L$ and $U$
-%\end{itemize}
+\begin{align*}
+E_k\ldots E_2E_1 A = U\quad \longrightarrow\quad A &= (E_k \ldots E_2E_1)^{-1} U \\
+&= E_1^{-1}E_2^{-1}\ldots E_k^{-1}U \\
+&= LU
+\end{align*}
 
-\begin{algorithm}
+We can thus compute $L$ by right-multiplying the identity by the matrices we used to reduce $U$.
+However, in this special situation, each right-multiplication only changes one entry of $L$, so we can avoid matrix multiplication altogether.
+The entire process, only slightly different than row reduction, is summarized below. % in Algorithm \ref{alg:LU-Decomposition}
+%
+\begin{algorithm}[H]
 \begin{algorithmic}[1]
-\Procedure{LU Decomposition}{$A$}
-\State Store the dimensions $(m, n)$ of $A$
-\State Initialize the $U$ matrix as a copy of $A$
-\State Initialize the $L$ matrix as the $n\times n$ identity matrix
-\State Then create your matrices as follows:
+\Procedure{LU\_Decomposition}{$A$}
+\State Store the dimensions $m, n$ of $A$.
+\State Initialize $U$ as a copy of $A$.
+\State Initialize $L$ as the $n\times n$ identity matrix.
 \For{$j=0 \ldots n-1$}
     \For{$i=j+1 \ldots m-1$}
-    %\State $L[i,j] \gets U[i, j]/U[j, j]
-    \State Set each element of $L$ to the corresponding element of $U$ divided by $U[j,j]$
-    %\State $U[i,j:] \gets U[i,j:] - L[i,j]U[j, j:]$
-    \State Set $U[i,j:]$ to itself minus $L[i,j] \times U[j,j:]$
+    % \State $L[i,j] \gets U[i, j]/U[j, j]$
+    \State Set the $(i,j)$th entry of $L$ to the $(i,j)$th entry of $U$ divided by $U[j,j]$.
+    % \State $U[i,j:] \gets U[i,j:] - L[i,j]U[j, j:]$
+    \State Set $U[i,j:]$ to itself minus $L[i,j] \cdot U[j,j:]$.
     \EndFor
 \EndFor
 \State \pseudoli{return} $L, U$
 \EndProcedure
 \end{algorithmic}
-\caption{The algorithm for the LU decomposition of a matrix $A$. This algorithm returns lower triangular $L$ and upper triangular $U$ such that $A = LU$.}
-\label{Alg:gram_schmidt}
+% \caption{}
 \end{algorithm}
-
+%
 \begin{problem}
-\label{prob:LU_copy}
 Write a function that finds the LU decomposition of a square matrix.
-You may assume that the matrix has an LU decomposition.
+You may assume the decomposition exists and requires no row swaps.
+\label{prob:LU-Decomposition}
 \end{problem}
 
-The LU decomposition can be performed in-place by storing $U$ on and above the main diagonal of the array and storing $L$ below it.
-The main diagonal of $L$ does not need to be stored since all its entries are ones.
+\subsection*{Back Substitution} % ---------------------------------------------
 
-\begin{problem}
-Modify your solution to Problem \ref{prob:LU_copy} so that the function computes the LU decomposition in place.
+If $A\x = \b$ and $PA = LU$, then $LU\x = PA\x = P\b$.
+We can solve this system by first solving $L\y = P\b$, then $U\x = \y$.
+Since $L$ and $U$ are both triangular, these systems can be solved with backward and forward substitution.
+We can thus compute the $LU$ factorization of $A$ once, then use substitution to efficiently solve $A\x=\b$ for various values of $\b$.
+% This technique is significantly faster than storing $A^{-1}$ and then computing $A^{-1}\b$ (see Problem \ref{prob:solve}).
+
+\begin{problem} % Program back and forward substitution.
+The square, triangular system $L\y = \b$ has the following form:
+%
+\begin{align*}
+\left[\begin{array}{ccccc}
+1      & 0      & 0      & \cdots & 0 \\
+l_{21} & 1      & 0      & \cdots & 0 \\
+l_{31} & l_{32} & 1      & \cdots & 0 \\
+\vdots & \vdots & \vdots & \ddots & \vdots \\
+l_{n1} & l_{n2} & l_{n3} & \cdots & 1
+\end{array}\right]
+\left[\begin{array}{c}
+y_1 \\ y_2 \\ y_3 \\ \vdots \\ y_n \\
+\end{array}\right]
+=
+\left[\begin{array}{c}
+b_1 \\ b_2 \\ b_3 \\ \vdots \\ b_n \\
+\end{array}\right]
+\end{align*}
 \end{problem}
+
 
 \subsection*{Applications of the LU decomposition} % --------------------------
 
@@ -187,12 +220,6 @@ The LU decomposition is a more efficient way to solve linear systems than row re
 SciPy implements these methods in the \li{linalg} module, specifically in the functions \li{la.lu_factor()}, \li{la.solve()}, \li{la.inv()}, and \li{la.det()}.
 
 Let us see how to use the LU decomposition to solve matrix equations.
-Suppose that after row swaps, $A$ has the decomposition $PA = LU$.
-Then $Ax=b$ is equivalent to $LUx=Pb$.
-We can solve this system by first solving $Ly = Pb$ and then $Ux = y$.
-Since $L$ and $U$ are triangular, these systems can be solved with backward and forward substitution, which is faster than row reduction.
-Thus, we can perform row reduction once to compute the $LU$ factorization of $A$, and then we can use substitution to solve $Ax=b$ for many different values of $b$.
-This technique is significantly faster than storing $A^{-1}$ and then computing $A^{-1}b$ (see Problem \ref{prob:solve}).
 
 \begin{problem}\label{prob:solve}
 In this problem you will solve the system $Ax = b$ for fixed $A$ and many different values of $b$.
@@ -201,8 +228,10 @@ For a random $1000 \times 1000$ array $A$ and a random $1000 \times 500$ array $
 \begin{enumerate}
 \item Time \li{la.lu_factor(A)}.
 \item Time \li{la.inv(A)}.
-\item Store the output of \li{la.lu_factor()}. Time \li{la.lu_solve()} on this stored output and $B$.
-\item Store the inverse of $A$. Time how long it takes to multiply $A^{-1}$ by $B$.
+\item Store the output of \li{la.lu_factor()}
+Time \li{la.lu_solve()} on this stored output and $B$.
+\item Store the inverse of $A$
+Time how long it takes to multiply $A^{-1}$ by $B$.
 \item What can you conclude about the more efficient way to solve linear systems?
 \end{enumerate}
 \end{problem}
@@ -264,7 +293,10 @@ The \li{scipy.linalg} library will be essential for the remainder of the labs in
 
 \subsection*{Spatial Complexity} % --------------------------------------------
 
-Analogous to temporal complexity, the spatial complexity of an algorithm is a function that describes how the algorithm's memory use increases as input sizes to the algorithm increase. For example, if your algorithm needs to store an $n \times n$ matrix, its memory use will increase at least as fast as $n^2$. Spatial complexity is important because  the spatial complexity of an algorithm can affect its speed in several ways. The most important way is that when the memory usage exceeds the amount of available RAM, the machine must use either the hard disk or some other slower method of storage.
+Analogous to temporal complexity, the spatial complexity of an algorithm is a function that describes how the algorithm's memory use increases as input sizes to the algorithm increase
+For example, if your algorithm needs to store an $n \times n$ matrix, its memory use will increase at least as fast as $n^2$
+Spatial complexity is important because  the spatial complexity of an algorithm can affect its speed in several ways
+The most important way is that when the memory usage exceeds the amount of available RAM, the machine must use either the hard disk or some other slower method of storage.
 
 This vocabulary allows us to discuss the question at the start of this lab: ``How long will a computer take to execute this algorithm?" The amount of time a computer takes to execute an algorithm depends both on the algorithm's temporal complexity and on its spatial complexity.
 
@@ -305,8 +337,16 @@ def func5(n):
 Plot your results in the following manner:
 \begin{enumerate}
 \item Time how long each function takes to run on an input of size $n$ for $n=100, 200, 400$, and $800$.
-\item For each function, plot a line using $100, 200, 400$, and $800$ for the $x$-values and your runtimes for the $y$-values. Make sure your $y$-values are all in the same units! When you call the matplotlib function \li{plot}, specify a value for the keyword parameter \li{label} so that you can reference each line later. For example, the call \li{plt.plot(x, y, label='Function 1')} attaches the label ``Function 1" to the line made by \li{x} and \li{y}.
-\item After plotting all your lines, call the function \li{legend} to draw a legend on your graph. Use the keyword argument \li{loc} to specify the location of the legend. Some possible values are \li{'upper left'} and \li{'right'}. See the documentation for more options. Your final graph should look something like the figure below.\footnote{From this graph, you can see that inverting a matrix is an incredibly time-consuming operation. In Lab \ref{lab:ChangeBasis} you will learn fast algorithms for solving linear systems without inverting matrices. In fact, inverting matrices is so costly in terms of temporal and spatial complexity that there is hardly ever a good reason to do it.}
+\item For each function, plot a line using $100, 200, 400$, and $800$ for the $x$-values and your runtimes for the $y$-values
+Make sure your $y$-values are all in the same units! When you call the matplotlib function \li{plot}, specify a value for the keyword parameter \li{label} so that you can reference each line later
+For example, the call \li{plt.plot(x, y, label='Function 1')} attaches the label ``Function 1" to the line made by \li{x} and \li{y}.
+\item After plotting all your lines, call the function \li{legend} to draw a legend on your graph
+Use the keyword argument \li{loc} to specify the location of the legend
+Some possible values are \li{'upper left'} and \li{'right'}
+See the documentation for more options
+Your final graph should look something like the figure below.\footnote{From this graph, you can see that inverting a matrix is an incredibly time-consuming operation
+In Lab \ref{lab:ChangeBasis} you will learn fast algorithms for solving linear systems without inverting matrices
+In fact, inverting matrices is so costly in terms of temporal and spatial complexity that there is hardly ever a good reason to do it.}
 \end{enumerate}
 Note that we rescaled the inputs to the functions so that your lines would begin at roughly the same place on the y-axis.
 
@@ -319,11 +359,11 @@ Note that we rescaled the inputs to the functions so that your lines would begin
 \section*{Sparse Matrices} % ==================================================
 
 A matrix with relatively few nonzero elements is called \emph{sparse}.
-Sparse matrices arise frequently in both theoretical and real-world applications.
-We can take advantage of the sparse structure of these matrices to use less memory and decrease computation time.
+% Sparse matrices arise frequently in both theoretical and real-world applications.
+Taking advantage of the sparse structure of these matrices uses less memory and decreases computation time.
 
 For example, diagonal matrices are sparse.
-Storing an $n \times n$ diagonal matrix in the naive way means storing $n^2$ values in memory.
+Storing an $n \times n$ diagonal matrix in the na\"{i}ve way means storing $n^2$ values in memory.
 For most applications, it makes more sense to store the diagonal entries in a 1-dimensional array of $n$ values.
 In addition to using less storage space, this allows for much faster matrix operations.
 Using the standard algorithm to multiply a matrix by a diagonal matrix involves $n^3$ steps, but most of these are multiplying by or adding zero.
@@ -343,7 +383,8 @@ You minimize spatial complexity when you store a sparse matrix with the \li{spar
 SciPy has seven sparse matrix types, listed in Table \ref{table:smr}.
 Each type is optimized either for storing sparse matrices whose nonzero entries follow certain patterns, or for performing certain computations.
 For example, the \li{csc_matrix} and \li{csr_matrix} types are optimized for arithmetic operations.
-We will introduce some other types later in this lab. For more information, see the documentation (\url{http://docs.scipy.org/doc/scipy/reference/sparse.html}).
+We will introduce some other types later in this lab
+For more information, see the documentation (\url{http://docs.scipy.org/doc/scipy/reference/sparse.html}).
 
 \begin{table}
 \centering
@@ -403,7 +444,9 @@ As you can see from this example, we get the best performance when we store a sp
 
 \begin{comment}
 \begin{problem}
-Create a $500\times 500$ matrix and vector of length 500, both full of random values. Use the \li{A.dot(b)} command to multiply your matrix and your vector, and time how long it takes to do so. Then convert your matrix to sparse format and again time how long it takes to multiply it by your vector using \li{A.dot(b)}.
+Create a $500\times 500$ matrix and vector of length 500, both full of random values
+Use the \li{A.dot(b)} command to multiply your matrix and your vector, and time how long it takes to do so
+Then convert your matrix to sparse format and again time how long it takes to multiply it by your vector using \li{A.dot(b)}.
 \end{problem}
 \end{comment}
 
@@ -566,7 +609,8 @@ However, if we store the tri-diagonal matrix as a \li{sparse} matrix, we can sol
 Let's first compute the spatial complexity of the above system when $A$ is stored as a sparse matrix.
 There are three diagonals that have roughly $100000$ non-zero entries.
 That's $300000$ double-precision floating point numbers, which is about 2.4 MB, or less storage than your favorite song.
-Thus, the sparse matrix will easily fit into the computer's RAM. Furthermore, the temporal complexity for solving a tri-diagonal matrix is $O(n)$.
+Thus, the sparse matrix will easily fit into the computer's RAM
+Furthermore, the temporal complexity for solving a tri-diagonal matrix is $O(n)$.
 \footnote{Because there are fast algorithms for solving a tri-diagonal linear system, you may think that there are fast algorithms for inverting a tri-diagonal matrix.
 In fact this is not true, and the inverse of a sparse matrix is usually not sparse.
 There is rarely a good reason to invert a matrix, sparse or dense.}
@@ -624,9 +668,215 @@ This value is meaningful in operator theory.
 
 \end{problem}
 
+\section*{Sparse Matrices}
+As mentioned in the introduction, there are some systems that have tens of
+thousands of parameters
+Storing such matrices in memory can become difficult.
+For example, when dealing with a system that is $100000 \times 100000$, it
+requires around 40 GB to store this matrix in its entirety (4 bytes per entry
+$\times$ $10^{10}$ entries)
+This is well beyond the amount of RAM in a normal
+laptop.
+
+However, in applications where systems of this size arise, it is also common
+that such matrices are sparse
+By sparse, we mean that most of the entries in
+the matrix are zeros
+The \li{scipy.sparse} module provides a solution to the
+problem of storage.
+A \li{sparse} matrix only stores the nonzero values and the positions of these values.
+For sufficiently sparse matrices, storing the matrix as a \li{sparse} matrix may take merely megabytes rather than gigabytes.
+
+\subsection*{Types of Sparse Matrices} % --------------------------------------
+
+There are different kinds of matrices in the \li{sparse} module
+If performance
+is an issue, it is necessary to be familiar with the strengths and weaknesses of each type.
+In Table \ref{table:sparse_matrices}, we briefly summarize the uses of these matrices.
+\begin{table}
+    \centering
+    \begin{tabular} {c | l } \label{table:sparse_matrices}
+                  & \multicolumn{1}{c}{Intended Uses} \\
+        \hline
+        \li{coo\_matrix} & Create a matrix using arrays of \\
+                         & coordinates and values. Also fast \\
+                         & sparse matrix type conversion. \\
+        \li{csc\_matrix} & Perform column-based matrix operations and slicing. \\
+        \li{csr\_matrix} & Perform row-based matrix operations and slicing.  \\
+        \li{dia\_matrix} & Create a matrix with diagonal structure.  \\
+        \li{dok\_matrix} & Access individual elements of the matrix.  \\
+        \end{tabular}
+\end{table}
+
+\subsection*{COO Matrix} % ----------------------------------------------------
+
+A \li{coo_matrix} is in COOrdinate format
+All nonzero values are stored as a
+location (or coordinate) and value
+Use this type of sparse matrix for creating
+a sparse matrix if you know the location of all the nonzero values
+Once a matrix
+in this format has been created, it also supports very fast conversion between
+the other sparse matrix types.
+
+\begin{lstlisting}
+# Initialize the matrix using a coo_matrix.
+>>> rows = np.array([0,1,2,3,0,2])
+>>> cols = np.array([0,1,2,3,1,0])
+>>> values = np.array([3,5,4,1,2,1])
+>>> A = spar.coo_matrix((values, (rows,cols)), shape=(4,4))
+
+To visualize how the values are stored,
+>>> print A
+    (0, 0)  3
+    (1, 1)  5
+    (2, 2)  4
+    (3, 3)  1
+    (0, 1)  2
+    (2, 0)  1
+
+# To visualize the matrix, use .todense(). Keep in mind doing
+#   operations on this dense matrix forfeits all sparse-related
+#   optimizations.
+>>> print A.todense()
+matrix([[3, 2, 0, 0],
+        [0, 5, 0, 0],
+        [1, 0, 4, 0],
+        [0, 0, 0, 1]])
+\end{lstlisting}
+
+\subsection*{CSR and CSC Matrices} % ------------------------------------------
+
+For the vast majority of matrix computation you can perform with sparse matrices, the \li{csr_matrix} and \li{csc_matrix} will be your best option.
+They stand for
+Compressed Sparse Row matrix and Compressed Sparse Column matrix, respectively.
+
+When choosing which format to use, we must determine what direction the matrix
+will be traversed, whether it is row-wise or column-wise.
+For example, in matrix-vector multiplication, the matrix is traversed row-wise, therefore we should choose the \li{csr_matrix}.
+
+\begin{lstlisting}
+>>> Acsr = A.tocsr()
+>>> x = np.array([1,0,-1,2])
+>>> b = Acsr.dot(x)
+array([3,0,-3,2])
+\end{lstlisting}
+
+For matrix-matrix multiplication, the left matrix is traversed row-wise and the
+right matrix is traversed column-wise.
+Therefore, we should make a \li{csr_matrix} copy and a \li{csc_matrix} copy.
+
+\begin{lstlisting}
+>>> Acsr = A.tocsr()
+>>> Acsc = A.tocsc()
+>>> Asquared = Acsr.dot(Acsc)
+\end{lstlisting}
+
+If you need to access rows or columns of these matrices, you can perform array
+slicing with syntax identical to array slicing for NumPy arrays.
+Row slicing is faster with a \li{csr_matrix} and column slicing is faster with a \li{csc_matrix}.
+
+\begin{lstlisting}
+>>> Acsr[0,:].todense()
+matrix([[3, 2, 0, 0]])
+
+>>> Acsc[:,2].todense()
+matrix([[0],
+        [0],
+        [4],
+        [0]])
+\end{lstlisting}
+
+Row-based operations on a \li{csc_matrix} are very slow, and similarly, column-based operations on a \li{csr_matrix} are very slow.
+Therefore, for the sake of performance, it is worth taking extra care to ensure the optimal matrix is being used.
+
+\subsection*{DOK Matrix} % ----------------------------------------------------
+
+The \li{dok_matrix} format stands for Dictionary Of Keys matrix.
+This type of matrix is optimal for accessing single elements.
+It is not very fast for any other operation.
+
+\begin{lstlisting}
+>>> Adok = A.todok()
+>>> print Adok[2,0]
+1
+>>> print Adok[1,1]
+5
+\end{lstlisting}
+
+\begin{comment}
+
+The following is a quick example of how the different types of sparse matrices
+can be used to optimize performance.
+
+\begin{lstlisting}
+# Initialize the matrix using a coo_matrix.
+>>> rows = np.array([0,1,2,3,0,2])
+>>> cols = np.array([0,1,2,3,1,0])
+>>> values = np.array([3,5,4,1,2,1])
+>>> A = spar.coo_matrix((values, (rows,cols)), shape=(4,4))
+
+# To visualize the matrix, use .todense(). Keep in mind doing
+#   operations on this dense matrix forfeits all sparse-related
+#   optimizations.
+>>> print A.todense()
+matrix([[3, 2, 0, 0],
+        [0, 5, 0, 0],
+        [1, 0, 4, 0],
+        [0, 0, 0, 1]])
+
+# perform matrix multiplicaton after converting to a csr_matrix.
+>>> Acsr = A.tocsr()
+>>> x = np.array([1,0,-1,2])
+>>> b = Acsr.dot(x)
+array([3,0,-3,2])
+
+# access rows of a csr_matrix. The syntax for slicing a csr_matrix
+#  (and csc_matrix) is identical to slicing NumPy arrays. For row slicing,
+#  use a csr_matrix. For column slicing, use a csc_matrix.
+>>> Acsr[0,:].todense()
+matrix([[3, 2, 0, 0]])
+
+>>> Acsc = A.tocsc()
+>>> Acsc[:,2].todense()
+matrix([[0],
+        [0],
+        [4],
+        [0]])
+
+# access individual elements of the matrix after converting to a dok_matrix.
+>>> Adok = A.todok()
+>>> print Adok[2,0]
+1
+>>> print Adok[1,1]
+5
+\end{lstlisting}
+
+\end{comment}
+
+\subsection*{In Summary}
+Since the \li{coo_matrix} type allows for fast sparse matrix type conversion, it is usually worth the time and memory to convert to the sparse matrix type that corresponds with the operations you are performing.
+For more information regarding the intended uses for each type of sparse matrix, see \url{http://docs.scipy.org/doc/scipy/reference/sparse.html}.
+
+Many familiar NumPy methods have analogs in the \li{scipy.sparse} module
+These methods take advantage of the sparse structure of the matrices and are, therefore, usually significantly faster.
+To learn which methods are available, see \url{http://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.html#scipy.sparse.csr_matrix}
+Note that there is also a \li{scipy.sparse.linalg} module that has linear algebra methods that have been optimized for sparse matrices.
+We will use the \li{scipy.sparse} and \li{scipy.sparse.linalg} modules more in future labs.
+
 \newpage
 
 \section*{Additional Material} % ==============================================
+
+\subsection*{Robust REF Reducers}
+
+The LU decomposition can be performed in place by storing $U$ on and above the main diagonal of the array and storing $L$ below it.
+The main diagonal of $L$ does not need to be stored since all its entries are ones.
+
+\begin{problem}
+Modify your solution to Problem \ref{prob:LU_copy} so that the function computes the LU decomposition in place.
+\end{problem}
+
 
 \subsection*{The Cholesky Decomposition} % ------------------------------------
 
@@ -639,7 +889,7 @@ A matrix $A$ is positive definite if  $\mathbf{z}\trp A\mathbf{z} > 0$ for all $
 Furthermore, $A$ is Hermitian if $A = A^*$ where $A^* = \overline{A\trp }$, so a real Hermitian matrix is just a symmetric matrix.
 The Cholesky decomposition is the matrix equivalent to taking the square root of a positive real number.
 
-The Cholesky decomposition of a $A$ is a lower-triangular matrix $L$ such that
+The Cholesky decomposition of a $A$ is a lower triangular matrix $L$ such that
 
 \begin{equation*}
  A = LL^*.
@@ -655,7 +905,7 @@ The entries of $L$ are calculated as follows.
 Notice that the entries of $L$ are defined recursively, with dependencies as diagrammed in Figure \ref{fig:cholesky}.
 Thus, an implementation of the Cholesky decomposition must compute the entries of $L$ in the correct order.
 
-\begin{figure}
+\begin{figure}[H]
 \begin{tikzpicture}[red dot/.style={draw, circle, fill=red, red},
     norm/.style={draw=none}, xscale=1.5, yscale=1.5]
 

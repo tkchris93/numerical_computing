@@ -8,18 +8,17 @@ def REF(A, verbose=False):
     """Reduce an mxn matrix to REF."""
     A = np.array(A, dtype=float, copy=True)
     m,n = A.shape
-    for i in xrange(min(m, n) - 1):
+    for j in xrange(min(m, n) - 1):
         if verbose:
             print A; raw_input()
         # Deal with 0's on the diagonal.
-        if np.allclose(A[i:,i], np.zeros(m-i)):
+        if np.allclose(A[j:,j], np.zeros(m-i)):
             continue
-        while np.allclose(A[i,i], 0):
-            # A[i:-1], A[-1] = np.copy(A[i+1:]), np.copy(A[i])
-            A[i:] = np.roll(A[i:], -1, axis=0)
-        # Zero out the rows before the current entry.
-        for j in xrange(i+1, m):
-            A[j,i:] -= A[i,i:] * A[j,i]/A[i,i]
+        while np.allclose(A[j,j], 0):
+            A[j:] = np.roll(A[j:], -1, axis=0)
+        # Zero out the rows below the current entry.
+        for i in xrange(j+1, m):
+            A[i,j:] -= A[j,j:] * A[i,j] / A[j,j]
     # Set extra rows to zero.
     if m > n:
         A[n:] = 0
@@ -31,9 +30,9 @@ def REF_Simple(A):
     operation."""
     A = np.array(A, dtype=np.float, copy=True)
     m,n = A.shape
-    for k in xrange(min(m,n) - 1):
+    for j in xrange(min(m,n) - 1):
         for i in xrange(j+1, m):
-            A[i,j:] -= A[j,j:] * A[i,j]/A[j,j]
+            A[i,j:] -= A[j,j:] * A[i,j] / A[j,j]
     return A
 
 def LU(A):
@@ -57,5 +56,39 @@ def LU_inplace(A):
             A[i,j:] -= L[i,j]*U[j,j:]
     return L,U
 
+def solve(A, b):
+    """Use the LU decomposition and back substitution to solve the linear
+    system Ax = b. You may assume that A is invertible (hence square).
+    """
+    A, b = np.array(A), np.ravel(b)
+    m, n = A.shape
+    assert m == n, "Matrix must be square."
+    assert b.size == m, "Bad shape!"
+
+    L, U = LU(A)
+
+    # LU = PA --> LUx = PAx --> LUx = Pb.
+
+    # First solve Ly = Pb (assume P = I).
+    y = np.zeros(n)
+    # y[0] = b[0]
+    for k in xrange(n):
+        y[k] = b[k] - np.dot(L[k,:k], y[:k])
+
+    # Now solve Ux = y.
+    x = np.zeros(n)
+    for k in reversed(xrange(n)):
+        x[k] = (y[k] - np.dot(U[k,k:], x[k:])) / U[k,k]
+
+    return x
 
 
+def lu_test(n=10):
+    L = np.tril(np.random.random((n,n)), -1)
+    np.fill_diagonal(L, 1)
+    U = np.triu(np.random.random((n,n)))
+    A = np.dot(L,U)
+    A = np.random.random((n,n))
+    b = np.random.random(n)
+    x = solve(A,b)
+    return np.allclose(A.dot(x), b)
