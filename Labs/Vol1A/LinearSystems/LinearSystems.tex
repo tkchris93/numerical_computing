@@ -5,8 +5,6 @@ In this lab we implement the LU Decomposition and use it to solve square linear 
 We also introduce SciPy, together with its libraries for linear algebra and working with sparse matrices.
 }
 
-% TODO: In "type II elementary matrix", is 'type' capitalized?
-
 \section*{Gaussian Elimination} % =============================================
 
 The standard approach for solving the linear system $A\x = b$ on paper is reducing the augmented matrix $\left[A\mid\b\right]$ to row-echelon form (REF) via \emph{Gaussian elimination}, then using back substitution.
@@ -107,6 +105,7 @@ You may assume that $A$ is invertible and that a $0$ will never appear on the ma
 Avoid operating on entries that you know will be $0$ before and after a row operation.
 
 Consider generating small random matrices as test cases with NumPy's \li{random} module (\li{np.random.randint()} may be particularly useful).
+\label{prob:ref-row-reduction}
 \end{problem}
 
 \begin{warn} % Gaussian Elimination is numerically unstable!
@@ -124,7 +123,12 @@ $10^{-15}$ is essentially zero, but instead of swapping the first and second row
 The resulting matrix is far from what we would expect on paper.
 
 \begin{align*}
-A = \left[\begin{array}{cc}
+\left[\begin{array}{cc}
+10^{-15} & 1 \\
+-1 & 0 \\
+\end{array}\right]
+\longrightarrow
+\left[\begin{array}{cc}
 10^{-15} & 1 \\
 0 & 10^{15} \\
 \end{array}\right]
@@ -156,28 +160,26 @@ E_k\ldots E_2E_1 A = U\quad \longrightarrow\quad A &= (E_k \ldots E_2E_1)^{-1} U
 
 We can thus compute $L$ by right-multiplying the identity by the matrices we used to reduce $U$.
 However, in this special situation, each right-multiplication only changes one entry of $L$, so we can avoid matrix multiplication altogether.
-The entire process, only slightly different than row reduction, is summarized below. % in Algorithm \ref{alg:LU-Decomposition}
+The entire process, only slightly different than row reduction, is summarized below. % in Algorithm \ref{alg:LU-Decomposition}.
 %
 \begin{algorithm}[H]
 \begin{algorithmic}[1]
-\Procedure{LU\_Decomposition}{$A$}
-\State Store the dimensions $m, n$ of $A$.
-\State Initialize $U$ as a copy of $A$.
-\State Initialize $L$ as the $n\times n$ identity matrix.
+\Procedure{LU Decomposition}{$A$}
+\State $U \gets A$ (make a copy of $A$ with \li{np.copy()})
+\State $L \gets I$ (the $n\times n$ identity matrix)
 \For{$j=0 \ldots n-1$}
     \For{$i=j+1 \ldots m-1$}
-    % \State $L[i,j] \gets U[i, j]/U[j, j]$
-    \State Set the $(i,j)$th entry of $L$ to the $(i,j)$th entry of $U$ divided by $U[j,j]$.
-    % \State $U[i,j:] \gets U[i,j:] - L[i,j]U[j, j:]$
-    \State Set $U[i,j:]$ to itself minus $L[i,j] \cdot U[j,j:]$.
+        \State $L_{i,j} \gets U_{i, j}/U_{j, j}$
+        \State $U_{i,j:} \gets U_{i,j:} - L_{i,j}U_{j,j:}$
     \EndFor
 \EndFor
 \State \pseudoli{return} $L, U$
 \EndProcedure
 \end{algorithmic}
-% \caption{}
+\caption{}
+\label{alg:LU-Decomposition}
 \end{algorithm}
-%
+
 \begin{problem}
 Write a function that finds the LU decomposition of a square matrix.
 You may assume the decomposition exists and requires no row swaps.
@@ -253,6 +255,7 @@ y_1 \\ y_2 \\ y_3 \\ \vdots \\ y_n \\
 Write a function that, given $A$ and $\b$, solves the square linear system $A\x = \b$.
 Use the function from Problem \ref{prob:LU-Decomposition} to compute $L$ and $U$, then use Equations \ref{eq:forward-substitution} and \ref{eq:backward-substitution} to solve for $\y$, then $\x$.
 You may again assume that there are no row swaps (so $P = I$ in this case).
+\label{prob:substitute-solve}
 \end{problem}
 
 \section*{SciPy} % ============================================================
@@ -872,50 +875,175 @@ We will use the \li{scipy.sparse} and \li{scipy.sparse.linalg} modules more in f
 
 \section*{Additional Material} % ==============================================
 
-\subsection*{REF with Row Swaps} % --------------------------------------------
+\subsection*{Row Swaps} % --------------------------------------------
+
+Row reduction can be made more robust by accounting for row swaps.
+To swap rows in a NumPy array, use \li{np.copy()} and reassign the rows simultaneously.
+
+\begin{lstlisting}
+>>> A = np.zeros(4) + np.vstack(np.arange(4))
+>>> print(A)
+[[ 0.  0.  0.  0.]
+ [ 1.  1.  1.  1.]
+ [ 2.  2.  2.  2.]
+ [ 3.  3.  3.  3.]]
+
+# Swap rows 1 and 2.
+>>> A[1], A[2] = np.copy(A[2]), np.copy(A[1])
+>>> print(A)
+[[ 0.  0.  0.  0.]
+ [ 2.  2.  2.  2.]
+ [ 1.  1.  1.  1.]
+ [ 3.  3.  3.  3.]]
+\end{lstlisting}
+
+Another helpful function is \li{np.roll()}, which rolls the entries, rows, or columns of an array forward or backward.
+
+\begin{lstlisting}
+>>> np.roll([1,2,3,4], 1)
+array([4, 1, 2, 3])
+
+# Roll the rows of A backward one position.
+>>> A = np.zeros(4) + np.vstack(np.arange(4))
+>>> print(np.roll(A, -1, axis=0))
+[[ 1.  1.  1.  1.]
+ [ 2.  2.  2.  2.]
+ [ 3.  3.  3.  3.]
+ [ 0.  0.  0.  0.]]
+\end{lstlisting}
+
+Consider making a modified version of the REF function from Problem \ref{prob:ref-row-reduction} that performs a row swap or roll when a $0$ appears on the diagonal.
+After the row swap or roll, the entry on the diagonal should be nonzero, and the entries to the left of the diagonal on that row should all be zero.
+
+To avoid rounding error, use \li{np.isclose()} to decide if the entry is close to zero.
+
+\begin{lstlisting}
+>>> 1e-15 == 0
+False
+
+>>> np.isclose(1e-15, 0)
+True
+\end{lstlisting}
+
+% Use the same approach to create a modified version of the function from Problem \ref{prob:LU-Decomposition} that performs row swaps when necessary.
+% The function should return $L$, $U$, and $P$, the permutation matrix.
+
+The same approach can be used in the LU decomposition to compute $PA = LU$.
+Instead of storing $P$ as an $n \times n$ array, fancy indexing allows us to encode row swaps in a 1-D array of length $n$.
+Initialize $P$ as the array $[0, 1, \ldots, n]$.
+As you perform row swaps or rolls on $A$, perform the same operations on $P$.
+Then the matrix product $PA$ will be the same as \li{A[P]}.
+
+\newpage
+
+\begin{lstlisting}
+>>> A = np.zeros(4) + np.vstack(np.arange(4))
+>>> P = np.arange(4)
+
+# Swap rows 1 and 2.
+>>> A[1], A[2] = np.copy(A[2]), np.copy(A[1])
+>>> P[1], P[2] = np.copy(P[2]), np.copy(P[1])
+
+>>> print(A)                        # A with the new row arrangement.
+[[ 0.  0.  0.  0.]
+ [ 2.  2.  2.  2.]
+ [ 1.  1.  1.  1.]
+ [ 3.  3.  3.  3.]]
+
+>>> print(P)                        # The permutation of the rows.
+[0 2 1 3]
+
+>>> print(A[P])                     # A with the original row arrangement.
+[[ 0.  0.  0.  0.]
+ [ 1.  1.  1.  1.]
+ [ 2.  2.  2.  2.]
+ [ 3.  3.  3.  3.]]
+\end{lstlisting}
 
 \subsection*{Improvements on the LU Decomposition} % --------------------------
 
 The LU decomposition can be performed in place by storing $U$ on and above the main diagonal of the array and storing $L$ below it.
 The main diagonal of $L$ does not need to be stored since all its entries are ones.
-Consider modifying your solutions to Problems \ref{prob:LU_copy} and \ref{} so that the LU decomposition is computed in place.
+Consider adding a keyword argument \li{inplace} to your function to Problem \ref{prob:LU-Decomposition}.
+If \li{inplace=True}, compute the LU decomposition in place.
 
-% Trefethen Exercise 20.4: vectorization to eliminate one loop.
+Algorithm \ref{alg:LU-Decomposition} uses two loops to compute the LU decomposition.
+With a little vectorization, we can reduce the process to a single loop.
+
+\begin{algorithm}[H]
+\begin{algorithmic}[1]
+\Procedure{Fast LU Decomposition}{$A$}
+\State $U \gets A$
+\State $L \gets I$
+\For{$k=0 \ldots n-1$}
+    \State $L_{k+1:,k} \gets U_{k+1:,k}/U_{k,k}$
+    \State $U_{k+1:,k:} \gets U_{k+1:,k:} - L_{k+1:,k}U_{k,k:}\trp$
+    \label{state:outer-product}
+\EndFor
+\State \pseudoli{return} $L, U$
+\EndProcedure
+\end{algorithmic}
+\caption{}
+\end{algorithm}
+
+Note that step \ref{state:outer-product} is an \emph{outer product}, not the regular dot product ($\x\y\trp$ instead of the usual $\x\trp\y$).
+Use \li{np.outer()} instead of \li{np.dot()} to get the desired result.
+
+\newpage
 
 \subsection*{More Applications of the LU Decomposition} % ---------------------
 
-The LU decomposition can also be used to invert matrices and compute determinants.
-Given $PA = LU$, compute $A^{-1}$ by solving $LUx_i = \p_i$ for every column $\p_i$ of $P$.
-Then $A^{-1}$ is the matrix with columns $x_1, x_2, \ldots, x_n$.
+The LU decomposition can also be used to compute inverses and determinants.
 
-As for the determinant, if $PA=LU$, then $\det(A) = [\det(P)]^{-1}\det(L)\det(U)$.
-But the determinant of a triangular matrix is the product of its diagonal entries, and every diagonal entry of $L$ is 1.
-Also, $\det(P)$ is the number of row swaps we applied to $A$ to put it in the appropriate form.
-So if $U$ has diagonal entries $u_{ii}$ for $i=1, \ldots, n$, then
-\[\det(A) = (-1)^S\left(\displaystyle\prod_{i=1}^nu_{ii}\right),\]
-where $S$ is the number of row-swaps.
+\begin{itemize}
+\item \textbf{Inverse}:
+$(PA)^{-1} = (LU)^{-1} \longrightarrow A^{-1}P^{-1} = U^{-1}L^{-1} \longrightarrow LUA^{-1} = P$.
+Solve $LU\a_i = \p_i$ with forward and backward substitution (as in Problem \ref{prob:substitute-solve}) for every column $\p_i$ of $P$.
+Then
+\[A^{-1} = \left[\begin{array}{c|c|c|c}\a_1&\a_2&\cdots&\a_n\end{array}\right],\]
+the matrix where $\a_k$ is the $k$th column.
+% Even this ``efficient'' method of inverting a matrix is computationally expensive.
 
-% Write a function that finds the determinant of a matrix using \li{la.lu_factor()} and the algorithm described above.
-% Read the documentation to learn about the output of \li{la.lu_factor()}.
-% Hint: If the $i^{th}$ entry of the output \li{piv} does not equal $i$, this means that a row swap occurred.
+\item \textbf{Determinant}: % \det(P^{-1})\det(L)\det(U) =
+$\det(A) = \det(P^{-1}LU) = \frac{\det(L)\det(U)}{\det(P)}$.
+The determinant of a triangular matrix is the product of its diagonal entries. Since every diagonal entry of $L$ is 1, $\det(L) = 1$.
+Also, $P$ is just a row permutation of the identity matrix (which has determinant $1$), and a single row swap negates the determinant.
+Thus
+\[\det(A) = (-1)^S\prod_{i=1}^nu_{ii},\]
+where $S$ is the number of row swaps.
+\end{itemize}
 
 \subsection*{The Cholesky Decomposition} % ------------------------------------
 
-The Cholesky decomposition requires half the calculations and memory of the LU decomposition.
-Furthermore, it is \emph{numerically stable}, which means that round-off errors do not propagate throughout the computation.
-Because of its efficiency and numerical stability, the Cholesky decomposition is used to solve least squares, optimization, and state estimation problems.
+A square matrix $A$ is called \emph{positive definite} if $\z\trp A\z > 0$ for all nonzero vectors $\z$.
+We call $A$ \emph{Hermitian} if $A = A\hrm = \overline{A\trp}$.
+If $A$ is Hermitian positive definite, it has a \emph{Cholesky Decomposition} $A = U\hrm U$ where $U$ is upper triangular with real, positive entries on the diagonal.
+This is the matrix equivalent to taking the square root of a positive real number.
 
-However, the Cholesky decomposition is only applicable to Hermitian positive definite matrices.
-A matrix $A$ is positive definite if  $\mathbf{z}\trp A\mathbf{z} > 0$ for all $\mathbf{z} \neq 0$.
-Furthermore, $A$ is Hermitian if $A = A^*$ where $A^* = \overline{A\trp }$, so a real Hermitian matrix is just a symmetric matrix.
-The Cholesky decomposition is the matrix equivalent to taking the square root of a positive real number.
+The Cholesky decomposition takes advantage of the conjugate symmetry of $A$ to simultaneously reduce the columns \emph{and} rows of $A$ to zeros (except for the diagonal).
+It thus requires only half of the calculations and memory of the LU decomposition.
+Furthermore, the algorithm is \emph{numerically stable}, which means that round-off errors do not propagate throughout the computation.
+Because of its efficiency and stability, this decomposition is used when possible to solve least squares, optimization, and state estimation problems.
 
-The Cholesky decomposition of a $A$ is a lower triangular matrix $L$ such that
+\begin{algorithm}[H]
+\begin{algorithmic}[1]
+\Procedure{Cholesky Decomposition}{$A$}
+\State $U \gets A$ (copied if desired)
+\For{$i=0 \ldots n-1$}
+    \For{$j=i+1 \ldots n-1$}
+        \State $U_{j,j:} \gets U_{j,j:} - U_{i,j:}\overline{U_{ij}}/U_{ii}$
+    \EndFor
+    \State $U_{i,i:} \gets U_{i,i:}/\sqrt{U_{ii}}$
+\EndFor
+\State \pseudoli{return} $U$
+\EndProcedure
+\end{algorithmic}
+\caption{}
+\end{algorithm}
 
-\begin{equation*}
- A = LL^*.
-\end{equation*}
+As with the LU decomposition, SciPy's \li{linalg} module has optimized routines, \li{la.cho_factor()} and \li{la.cho_solve()}, for obtaining and using the Cholesky decomposition.
 
+\begin{comment} % This uses the decomposition A = LL^H.
 The entries of $L$ are calculated as follows.
 
 \begin{align*}
@@ -923,7 +1051,7 @@ The entries of $L$ are calculated as follows.
 &L_{i,i} = \sqrt{A_{i,i} - \sum_{k=1}^{i-1}{L_{i,k}L_{i,k}}}.
 \end{align*}
 
-Notice that the entries of $L$ are defined recursively, with dependencies as diagrammed in Figure \ref{fig:cholesky}.
+Notice that the entries of $L$ are defined recursively, with dependencies as diagrammed in Figure \ref{fig:cholesky-decomposition-order}.
 Thus, an implementation of the Cholesky decomposition must compute the entries of $L$ in the correct order.
 
 \begin{figure}[H]
@@ -948,7 +1076,6 @@ Thus, an implementation of the Cholesky decomposition must compute the entries o
 \node[norm,black!25!](b4)at(.25,.25){\LARGE \textbullet};
 \node[norm,black!25!](b3)at(.75,.25){\LARGE \textbullet};
 \node[norm, shadecolor](r1)at(1.25,.25){\Huge \textbullet};
-
 \end{scope}
 
 \begin{scope}
@@ -958,7 +1085,6 @@ Thus, an implementation of the Cholesky decomposition must compute the entries o
 \draw [-,ultra thick](-.2,2.5)--(0,2.5);
 \draw [-,ultra thick](2.7,2.5)--(2.5,2.5);
 \draw [-,ultra thick](2.7,0)--(2.5,0);
-
 
 \node[norm, shadecolor](r1)at(1.75,.75){\Huge \textbullet};
 \node[norm,black](bk1)at(.25,2.25){\LARGE \textbullet};
@@ -970,20 +1096,8 @@ Thus, an implementation of the Cholesky decomposition must compute the entries o
 \node[norm, black!25!](bk1)at(1.25,.75){\LARGE \textbullet};
 \end{scope}
 \end{tikzpicture}
-\label{fig:cholesky}
-\caption{The entries of $L$ in the Cholesky decomposition are defined recursively, as illustrated in this picture.
+\caption{The entries of $L$ in the Cholesky decomposition are defined recursively.
 To calculate the green entry, you need to know each of the light gray entries.}
+\label{fig:cholesky-decomposition-order}
 \end{figure}
-
-
-\begin{problem}
-Write a function that finds the Cholesky decomposition of a Hermitian positive definite matrix.
-Hint: To generate symmetric positive definite matrices on which to test your function, recall that for any matrix $A$, the matrix $A\trp A$ is symmetric and positive definite.
-\end{problem}
-
-The \li{linalg} module of SciPy includes an optimized Cholesky decomposition.
-As with the LU decomposition, SciPy has the methods \li{la.cho_factor} and \li{la.cho_solve}.
-
-\begin{problem}
-Repeat problem \ref{prob:solve}, this time using the methods \li{la.cho_factor} and \li{la.cho_solve}.
-\end{problem}
+\end{comment}

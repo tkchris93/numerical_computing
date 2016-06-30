@@ -4,7 +4,7 @@
 import numpy as np
 from scipy import linalg as la
 
-def REF(A, verbose=False):
+def ref_with_swaps(A, verbose=False):
     """Reduce an mxn matrix to REF."""
     A = np.array(A, dtype=float, copy=True)
     m,n = A.shape
@@ -14,7 +14,7 @@ def REF(A, verbose=False):
         # Deal with 0's on the diagonal.
         if np.allclose(A[j:,j], np.zeros(m-i)):
             continue
-        while np.allclose(A[j,j], 0):
+        while np.isclose(A[j,j], 0):
             A[j:] = np.roll(A[j:], -1, axis=0)
         # Zero out the rows below the current entry.
         for i in xrange(j+1, m):
@@ -24,7 +24,8 @@ def REF(A, verbose=False):
         A[n:] = 0
     return A
 
-def REF_Simple(A):
+# Problem 1
+def ref(A):
     """Reduce a square matrix A to REF. During a row operation, do not
     modify any entries that you know will be zero before and after the
     operation."""
@@ -35,7 +36,8 @@ def REF_Simple(A):
             A[i,j:] -= A[j,j:] * A[i,j] / A[j,j]
     return A
 
-def LU(A):
+# Problem 2
+def lu_factor(A):
     """Compute the LU decomposition of A."""
     m, n = A.shape
     U = np.array(A, dtype=np.float, copy=True)
@@ -46,16 +48,7 @@ def LU(A):
             U[i,j:] -= L[i,j]*U[j,j:]
     return L,U
 
-def LU_inplace(A):
-    """Compute the LU decomposition of A *inplace*. Should be a bonus prob."""
-    m, n = A.shape
-    A = np.array(A, dtype=np.float, copy=False)
-    for j in xrange(n):
-        for i in xrange(j+1, m):
-            A[i,j] /= A[j,j]
-            A[i,j:] -= L[i,j]*U[j,j:]
-    return L,U
-
+# Problem 3
 def solve(A, b):
     """Use the LU decomposition and back substitution to solve the linear
     system Ax = b. You may assume that A is invertible (hence square).
