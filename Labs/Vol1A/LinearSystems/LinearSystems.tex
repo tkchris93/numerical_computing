@@ -874,11 +874,13 @@ We will use the \li{scipy.sparse} and \li{scipy.sparse.linalg} modules more in f
 
 \subsection*{REF with Row Swaps} % --------------------------------------------
 
-\subsection*{More Efficiency with LU} % ---------------------------------------
+\subsection*{Improvements on the LU Decomposition} % --------------------------
 
 The LU decomposition can be performed in place by storing $U$ on and above the main diagonal of the array and storing $L$ below it.
 The main diagonal of $L$ does not need to be stored since all its entries are ones.
 Consider modifying your solutions to Problems \ref{prob:LU_copy} and \ref{} so that the LU decomposition is computed in place.
+
+% Trefethen Exercise 20.4: vectorization to eliminate one loop.
 
 \subsection*{More Applications of the LU Decomposition} % ---------------------
 
