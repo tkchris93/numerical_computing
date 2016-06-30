@@ -92,7 +92,7 @@ Perhaps expert engineers have designed extremely robust and complicated software
 Briefly said, you simply don't want to understand it; nobody wants to understand it. 
 Fortunately, one can still optimize effectively in such situations by wisely selecting a correct algorithm.
 
-\begin{problem} % Minimize a 'blackbox' function. TODO: rename blackbox().
+\begin{problem} % Minimize a 'blackbox' function.
 Minimize the function \li{blackbox()} in the \li{blackbox_function} module, selecting the appropriate method of \li{scipy.optimize.minimize()} for this problem.  
 Do not pass your method a derivative. 
 You may need to test several methods and determine which is most appropriate.
@@ -281,6 +281,16 @@ Examine the following example from the online documentation.
 The variable \li{popt} now contains the fitted parameters and \li{pcov} gives the covariance of the fit.
 See Figure \ref{opt:curve_fit} for a plot of the data and the fitted curve.
 
+One of the most fundamental phenomena in the physical and engineering sciences is turbulent convection wherein an unstable density gradient induces a fluid to move chaotically (basically, hot air rises).  
+This problem is so important that experiments and numerical simulations have been pushed to their limits in the past several decades to determine the qualitative nature of the fluid's motion under an extreme forcing (think of boiling a pot of water, but instead at temperatures akin to the interior of the sun).  
+The strength of the forcing (amount of the enforced temperature gradient) is measured by the non-dimensional Rayleigh number.  
+Of paticular interest is to determine how well the chaotic turbulent flow transports the heat from the hot bottom to the cold top, as measured by the Nusselt number.  
+One of the primary goals of experiments, simulations, and analysis is to determine how the Nusselt number depends on the Rayleigh number, i.e. if the bottom of the pot of water is heated more strongly, how much faster does the boiling water transport heat to the top?
+
+It is often generically believed that the Nusselt number obeys a power law of the form $\nu = cR^\beta$, where $\beta \le 1/2$.  
+Through some mild assumptions on the temperature, we can construct an eigenvalue problem that we solve numerically for a variety of Rayleigh numbers, to obtain an upper bound on the Nusselt number given by the data prescribed here.  
+Hence, this data should give us some bound on the Nusselt number as $\nu \le cR^\beta$.  Depending on exact physical specifications of the problem, we may even expect $\beta < 1/2$.
+
 \begin{figure}
 \includegraphics[width=\textwidth]{curve_fit.pdf}
 \caption{Example of perturbed data graphed with the resulting curve using the fitted parameters: $a=2.72$,  $b=1.31$, and $c=0.45$.}
@@ -291,17 +301,17 @@ See Figure \ref{opt:curve_fit} for a plot of the data and the fitted curve.
 Use \li{opt.curve_fit()} to fit a curve to data obtained from numerical simulations of convection.
 The data are in the file \li{convection.npy}. 
 The first column is $R$, the Rayleigh number, and the second column is $\nu$, the Nusselt number.
-The relevant convection equation is:
+With the convection equation 
 \[
 \nu = cR^\beta,
 \]
-where $c$ and $\beta$ are some constants. 
-Use \li{opt.curve_fit()} to find a fit to the data using $c$ and $\beta$ as the fitting parameters. 
+use \li{opt.curve_fit()} to find a fit to the data using $c$ and $\beta$ as the fitting parameters. 
 See Figure \ref{opt:ConvectionFit} for a plot of the data along with a fitted curve.
-Though it may be difficult to see in the figure, the first six points skew the data, and do not help us determine the appropriate long-term values of $c$ and $\beta$. Thus, do not use the first six points when fitting a curve to the data.
+Though it may be difficult to see in the figure, the first four points skew the data, and do not help us determine the appropriate long-term values of $c$ and $\beta$. 
+Thus, do not use the first four points when fitting a curve to the data, but include them in the plot.
 
-Just so that you know that you are getting realistic values, $c$ should be on the order of $10^{-2}$, and $\beta$ on the order of $10^{0}$.
-Return your values for $c$, and $\beta$ in a NumPy array of length 2.
+Just so that you know that you are getting realistic values, $c$ should be around $.1$, and $\beta$ should be less than $1/2$.
+Return your values for $c$ and $\beta$ in a NumPy array of length 2.
 \end{problem}
 
 \begin{figure}

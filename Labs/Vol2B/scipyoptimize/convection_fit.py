@@ -6,7 +6,7 @@ import scipy.optimize as opt
 
 # Load in the data
 data = np.load("convection.npy")
-initial = 6
+initial = 4
 
 # Define the function to optimize.
 def nu(R, c, beta):

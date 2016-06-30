@@ -182,7 +182,7 @@ def prob5():
     Return the values c and beta as an array.
     """
     data = np.load("convection.npy")
-    initial = 6
+    initial = 4
 
     # Define the function to optimize.
     def nusselt(R, c, beta):
@@ -200,3 +200,6 @@ def prob5():
 
     # Return the parameter values.
     return popt
+
+
+print prob5()
