@@ -27,6 +27,7 @@ Note that the constraint $Gx +s = h$ includes the term $s$, which is not part of
 function, and is known as the \emph{slack variable}. Since $s  \geq 0$, the constraint
 $Gx + s = h$ is equivalent to $Gx \leq h$.
 
+\begin{comment}
 The corresponding \emph{dual program} for the above linear program has the form
 \begin{align*}
 \text{maximize}\qquad &-h^Tz - b^Ty \\
@@ -34,6 +35,7 @@ The corresponding \emph{dual program} for the above linear program has the form
  &z \geq 0.
 \end{align*}
 CVXOPT provides functions to solve both the original (\emph{primal}) linear program and its dual program.
+\end{comment}
 
 Consider the following example:
 \begin{align*}
