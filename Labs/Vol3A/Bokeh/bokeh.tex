@@ -372,6 +372,8 @@ in time.
 \end{info}
 \end{problem}
 
+\subsection*{Laying Out Plots}
+
 \section*{Basic Charts}
 Like in pandas, it is very easy to make visualizations in Bokeh from DataFrames.
 Bokeh provides very accessible tools for creating bar charts, histograms, box
@@ -473,7 +475,7 @@ to display a bit more information. Once again, we can accomplish this with
 tooltips. To be able to show more information, we will need to prepare a few more
 pieces of data.
 
-\begin{problem}
+\begin{problem} \label{prop:lists}
 In Problem \ref{prob:borders}, you created two lists of lists, \li{state_xs} and
 \li{state_ys}. When hovering over a Patch glyph, Bokeh keeps track which index
 corresponds with that Patch. For our tooltips, we will need a few more lists. We
@@ -494,29 +496,83 @@ to bar charts, but it is still fairly straight forward. The process is best
 explained by first presenting an example.
 
 \begin{lstlisting}
+import numpy as np
 from bokeh.plotting import figure, output_notebook, show
 from bokeh.models import HoverTool, ColumnDataSource
-
-output_notebook()
 
 x_vals = [[0,1,0], [0,1,1], [1,2,1], [1,2,2]]
 y_vals = [[0,0,1], [1,1,0], [0,0,1], [1,1,0]]
 
-fig = figure(plot_width=500, plot_height=300)
-col = ["blue", "red", "yellow", "green"]
+x_coords = [0,0,1,1,2,2]
+y_coords = [0,1,0,1,0,1]
 
-source = ColumnDataSource(
+fig = figure(plot_width=500, plot_height=300)
+col = ["Blue", "Red", "Yellow", "Green"]
+
+patch_source = ColumnDataSource(
     data=dict(
         col=col,
         x_vals=x_vals,
         y_vals=y_vals
     )
 )
-triangles = fig.patches("x_vals", "y_vals", color="col", source=source,
-           line_color='black', line_width=3, fill_alpha=.5,
+
+circle_source = ColumnDataSource(
+    data=dict(
+        x_coords=x_coords,
+        y_coords=y_coords
+    )
+)
+
+triangles = fig.patches("x_vals", "y_vals", color="col", source=patch_source,
+           line_color='black', line_width=3, fill_alpha=.5, line_alpha=0
            hover_color="col", hover_alpha=.8, hover_line_color='black')
+circles = fig.circle("x_coords", "y_coords", fill_color='black', source=circle_source,
+           fill_alpha=.5, hover_color="black", hover_alpha=1, line_alpha=0, size=18)
 
 fig.add_tools(HoverTool(renderers=[triangles], tooltips=[("Color", " @col")]))
+fig.add_tools(HoverTool(renderers=[circles], tooltips=[("Point", " (@x_coords, @y_coords)")]))
 
 show(fig)
 \end{lstlisting}
+
+Now let's piece apart this example. Notice first that we have a
+\li{ColumnDataSource} object for the patch coordinates and another
+\li{ColumnDataSource} for the circles. In general, it is a good idea to separate
+\li{ColumnDataSource} objects like this, but more specifically, we need to do this
+because we want to have two different hover behaviors.
+
+Next, notice that there are some keyword arguments included in these glyphs we
+have not discussed yet. The keyword arguments \li{hover_color}, \li{hover_alpha},
+and \li{hover_line_color}. When hovering over one of these glpyhs, these arguments
+overwrite \li{fill_color}, \li{fill_alpha}, and \li{line_color}, respectivley.
+
+Finally, when creating the \li{HoverTool} object, you will most commonly use
+the \li{renderers} and \li{tooltips} keyword arguments. The \li{renderers}
+argument accepts a list of glyphs. At times, there is unpredicted behavior if you
+include more than one glpyh in this list. The \li{tooltips} arguments functions
+just like the \li{tooltips} argument we discussed in the section on bar charts.
+
+\begin{problem}
+On your plot of the United States, we can provide much more information to this
+plot using tooltips. Using the lists you prepared in Problem \ref{prob:lists},
+add tooltips for the Patch objects in this plot. Also adjust the appearence of
+the Patch objects under the mouse so it is clear which state is being selected.
+\end{problem}
+
+\section*{Adding More Complicated Interactions}
+\begin{info}
+At the beginning of this lab, we mentioned that Bokeh is still in development
+so some explanations will need to be updated. There is some material in this
+section that is still under active development. In theory, the code presented
+here will still work, but it is quite possible that there will be a better way
+to do these tasks in the future.
+\end{info}
+
+One of the mottos the Bokeh developers have is, \emph{We write the Javascript so
+you don't have to.} If you happen to have experience with Javascript, you can
+do some pretty amazing things with Bokeh interactions. We will do our best to
+keep the Javascript to a minimum, but in time hopefully no knowledge of Javascript
+will be necessary.
+
+\subsection*{}
