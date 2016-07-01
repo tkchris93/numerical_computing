@@ -109,15 +109,20 @@ def prob4(N=12):
 
 
 # Problem 5
-def prob5(N=10):
+def prob5(n):
     """Return a sparse n x n tridiagonal matrix with 2's along the main
     diagonal and -1's along the first sub- and super-diagonals.
     """
+    return sparse.diags([2,-1,2], [-1,0,1], shape=(n,n))
+
+# Problem 5
+def prob6(N=10):
+
     domain = 2**np.arange(2,N+1)
     solve, spsolve = [], []
 
     for n in domain:
-        A = sparse.diags([2,-1,2], [-1,0,1], shape=(n,n)).tocsr()
+        A = prob5(n).tocsr()
         b = np.random.random(n)
 
         start = time()
@@ -145,7 +150,7 @@ def prob5(N=10):
 
 
 if __name__ == '__main__':
-    prob5(12)
+    prob6(12)
 
 # Additional Material =========================================================
 
