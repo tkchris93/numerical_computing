@@ -2,27 +2,10 @@
 """Volume I: Linear Systems. Solutions file."""
 
 import numpy as np
+from time import time
 from scipy import linalg as la
+from matplotlib import pyplot as plt
 
-def ref_with_swaps(A, verbose=False):
-    """Reduce an mxn matrix to REF."""
-    A = np.array(A, dtype=float, copy=True)
-    m,n = A.shape
-    for j in xrange(min(m, n) - 1):
-        if verbose:
-            print A; raw_input()
-        # Deal with 0's on the diagonal.
-        if np.allclose(A[j:,j], np.zeros(m-i)):
-            continue
-        while np.isclose(A[j,j], 0):
-            A[j:] = np.roll(A[j:], -1, axis=0)
-        # Zero out the rows below the current entry.
-        for i in xrange(j+1, m):
-            A[i,j:] -= A[j,j:] * A[i,j] / A[j,j]
-    # Set extra rows to zero.
-    if m > n:
-        A[n:] = 0
-    return A
 
 # Problem 1
 def ref(A):
@@ -36,6 +19,7 @@ def ref(A):
             A[i,j:] -= A[j,j:] * A[i,j] / A[j,j]
     return A
 
+
 # Problem 2
 def lu_factor(A):
     """Compute the LU decomposition of A."""
@@ -48,6 +32,7 @@ def lu_factor(A):
             U[i,j:] -= L[i,j]*U[j,j:]
     return L,U
 
+
 # Problem 3
 def solve(A, b):
     """Use the LU decomposition and back substitution to solve the linear
@@ -58,13 +43,10 @@ def solve(A, b):
     assert m == n, "Matrix must be square."
     assert b.size == m, "Bad shape!"
 
-    L, U = LU(A)
-
-    # LU = PA --> LUx = PAx --> LUx = Pb.
+    L, U = lu_factor(A)
 
     # First solve Ly = Pb (assume P = I).
     y = np.zeros(n)
-    # y[0] = b[0]
     for k in xrange(n):
         y[k] = b[k] - np.dot(L[k,:k], y[:k])
 
@@ -76,12 +58,67 @@ def solve(A, b):
     return x
 
 
-def lu_test(n=10):
-    L = np.tril(np.random.random((n,n)), -1)
-    np.fill_diagonal(L, 1)
-    U = np.triu(np.random.random((n,n)))
-    A = np.dot(L,U)
-    A = np.random.random((n,n))
-    b = np.random.random(n)
-    x = solve(A,b)
-    return np.allclose(A.dot(x), b)
+# Problem 4
+def prob4(N=12):
+    """Time different scipy.linalg functions for solving square linear systems.
+    """
+    domain = 2**np.arange(1,N+1)
+    inv, solve, lu_factor, lu_solve = [], [], [], []
+    for n in domain:
+        A = np.random.random((n,n))
+        b = np.random.random(n)
+
+        start = time()
+        la.inv(A).dot(b)
+        inv.append(time()-start)
+
+        start = time()
+        la.solve(A, b)
+        solve.append(time()-start)
+
+        start = time()
+        x = la.lu_factor(A)
+        la.lu_solve(x, b)
+        lu_factor.append(time()-start)
+
+        start = time()
+        la.lu_solve(x, b)
+        lu_solve.append(time()-start)
+
+    plt.subplot(121)
+    plt.plot(domain, inv, '.-', lw=2, label="la.inv()")
+    plt.plot(domain, solve, '.-', lw=2, label="la.solve()")
+    plt.plot(domain, lu_factor, '.-', lw=2,
+                                        label="la.lu_factor() + la.lu_solve()")
+    plt.plot(domain, lu_solve, '.-', lw=2, label="la.lu_solve() alone")
+    plt.legend(loc="upper left")
+
+    plt.subplot(122)
+    plt.loglog(domain, inv, '.-', basex=2, basey=2, lw=2)
+    plt.loglog(domain, solve, '.-', basex=2, basey=2, lw=2)
+    plt.loglog(domain, lu_factor, '.-', basex=2, basey=2, lw=2)
+    plt.loglog(domain, lu_solve, '.-', basex=2, basey=2, lw=2)
+    plt.suptitle("Problem 4 Solution")
+
+    plt.show()
+
+
+# Additional Material =========================================================
+
+def ref_with_swaps(A):
+    """Reduce an mxn matrix to REF."""
+    A = np.array(A, dtype=float, copy=True)
+    m,n = A.shape
+    for j in xrange(min(m, n) - 1):
+        # Deal with 0's on the diagonal.
+        if np.allclose(A[j:,j], np.zeros(m-i)):
+            continue
+        while np.isclose(A[j,j], 0):
+            A[j:] = np.roll(A[j:], -1, axis=0)
+        # Zero out the rows below the current entry.
+        for i in xrange(j+1, m):
+            A[i,j:] -= A[j,j:] * A[i,j] / A[j,j]
+    # Set extra rows to zero.
+    if m > n:
+        A[n:] = 0
+    return A

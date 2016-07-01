@@ -306,10 +306,9 @@ As with NumPy, SciPy's routines are all highly optimized.
 However, some algorithms are, by nature, faster than others.
 
 \begin{problem} % Time ways to solve Ax = b with scipy.linalg.
-Write a function that times different \li{scipy.linalg} methods for solving square linear systems of various sizes.
+Write a function that times different \li{scipy.linalg} functions for solving square linear systems.
 
-Choose an appropriate domain of values for $n$.
-For each value of $n$, generate a random $n \times n$ matrix $A$ and a random $n \times 1$ vector $\b$ using \li{np.random.random()}.
+For various values of $n$, generate a random $n \times n$ matrix $A$ and a random $n \times 1$ vector $\b$ using \li{np.random.random()}.
 Time how long it takes to solve the system $A\x = \b$ with each of the following approaches:
 %
 \begin{itemize}
@@ -318,8 +317,9 @@ Time how long it takes to solve the system $A\x = \b$ with each of the following
 \item Use \li{la.lu_factor()} and \li{la.lu_solve()} to solve the system with the LU decomposition.
 \item Use \li{la.lu_factor()} and \li{la.lu_solve()}, but only time \li{la.lu_solve()}.
 \end{itemize}
-
-Plot the size of the systems ($n$) versus the execution times.
+%
+Plot the system size $n$ versus the execution times.
+Use log scales if needed.
 \end{problem}
 
 \begin{info}
@@ -376,6 +376,175 @@ For more information, see (\url{http://docs.scipy.org/doc/scipy/reference/sparse
 \label{table:sparse_matrices}
 \end{table}
 
+% =============================================================================
+% =============================================================================
+% END OF OLD SPARSE MATRIX STUFF ==============================================
+% =============================================================================
+% =============================================================================
+
+\subsection*{Types of Sparse Matrices} % --------------------------------------
+
+There are different kinds of matrices in the \li{sparse} module.
+Each has strengths and weaknesses, summarized below.
+% If performance is an issue, it is necessary to be familiar with the strengths and weaknesses of each type.
+In Table \ref{table:sparse_matrices}, we briefly summarize the uses of these matrices.
+
+\subsection*{COO Matrix} % ----------------------------------------------------
+
+A \li{coo_matrix} is in COOrdinate format
+All nonzero values are stored as a
+location (or coordinate) and value
+Use this type of sparse matrix for creating
+a sparse matrix if you know the location of all the nonzero values
+Once a matrix
+in this format has been created, it also supports very fast conversion between
+the other sparse matrix types.
+
+\begin{lstlisting}
+# Initialize the matrix using a coo_matrix.
+>>> rows = np.array([0,1,2,3,0,2])
+>>> cols = np.array([0,1,2,3,1,0])
+>>> values = np.array([3,5,4,1,2,1])
+>>> A = spar.coo_matrix((values, (rows,cols)), shape=(4,4))
+
+To visualize how the values are stored,
+>>> print A
+    (0, 0)  3
+    (1, 1)  5
+    (2, 2)  4
+    (3, 3)  1
+    (0, 1)  2
+    (2, 0)  1
+
+# To visualize the matrix, use .todense(). Keep in mind doing
+#   operations on this dense matrix forfeits all sparse-related
+#   optimizations.
+>>> print A.todense()
+matrix([[3, 2, 0, 0],
+        [0, 5, 0, 0],
+        [1, 0, 4, 0],
+        [0, 0, 0, 1]])
+\end{lstlisting}
+
+\subsection*{CSR and CSC Matrices} % ------------------------------------------
+
+For the vast majority of matrix computation you can perform with sparse matrices, the \li{csr_matrix} and \li{csc_matrix} will be your best option.
+They stand for
+Compressed Sparse Row matrix and Compressed Sparse Column matrix, respectively.
+
+When choosing which format to use, we must determine what direction the matrix
+will be traversed, whether it is row-wise or column-wise.
+For example, in matrix-vector multiplication, the matrix is traversed row-wise, therefore we should choose the \li{csr_matrix}.
+
+\begin{lstlisting}
+>>> Acsr = A.tocsr()
+>>> x = np.array([1,0,-1,2])
+>>> b = Acsr.dot(x)
+array([3,0,-3,2])
+\end{lstlisting}
+
+For matrix-matrix multiplication, the left matrix is traversed row-wise and the
+right matrix is traversed column-wise.
+Therefore, we should make a \li{csr_matrix} copy and a \li{csc_matrix} copy.
+
+\begin{lstlisting}
+>>> Acsr = A.tocsr()
+>>> Acsc = A.tocsc()
+>>> Asquared = Acsr.dot(Acsc)
+\end{lstlisting}
+
+If you need to access rows or columns of these matrices, you can perform array
+slicing with syntax identical to array slicing for NumPy arrays.
+Row slicing is faster with a \li{csr_matrix} and column slicing is faster with a \li{csc_matrix}.
+
+\begin{lstlisting}
+>>> Acsr[0,:].todense()
+matrix([[3, 2, 0, 0]])
+
+>>> Acsc[:,2].todense()
+matrix([[0],
+        [0],
+        [4],
+        [0]])
+\end{lstlisting}
+
+Row-based operations on a \li{csc_matrix} are very slow, and similarly, column-based operations on a \li{csr_matrix} are very slow.
+Therefore, for the sake of performance, it is worth taking extra care to ensure the optimal matrix is being used.
+
+\subsection*{DOK Matrix} % ----------------------------------------------------
+
+The \li{dok_matrix} format stands for Dictionary Of Keys matrix.
+This type of matrix is optimal for accessing single elements.
+It is not very fast for any other operation.
+
+\begin{lstlisting}
+>>> Adok = A.todok()
+>>> print Adok[2,0]
+1
+>>> print Adok[1,1]
+5
+\end{lstlisting}
+
+\begin{comment}
+The following is a quick example of how the different types of sparse matrices
+can be used to optimize performance.
+
+\begin{lstlisting}
+# Initialize the matrix using a coo_matrix.
+>>> rows = np.array([0,1,2,3,0,2])
+>>> cols = np.array([0,1,2,3,1,0])
+>>> values = np.array([3,5,4,1,2,1])
+>>> A = spar.coo_matrix((values, (rows,cols)), shape=(4,4))
+
+# To visualize the matrix, use .todense(). Keep in mind doing
+#   operations on this dense matrix forfeits all sparse-related
+#   optimizations.
+>>> print A.todense()
+matrix([[3, 2, 0, 0],
+        [0, 5, 0, 0],
+        [1, 0, 4, 0],
+        [0, 0, 0, 1]])
+
+# perform matrix multiplicaton after converting to a csr_matrix.
+>>> Acsr = A.tocsr()
+>>> x = np.array([1,0,-1,2])
+>>> b = Acsr.dot(x)
+array([3,0,-3,2])
+
+# access rows of a csr_matrix. The syntax for slicing a csr_matrix
+#  (and csc_matrix) is identical to slicing NumPy arrays. For row slicing,
+#  use a csr_matrix. For column slicing, use a csc_matrix.
+>>> Acsr[0,:].todense()
+matrix([[3, 2, 0, 0]])
+
+>>> Acsc = A.tocsc()
+>>> Acsc[:,2].todense()
+matrix([[0],
+        [0],
+        [4],
+        [0]])
+
+# access individual elements of the matrix after converting to a dok_matrix.
+>>> Adok = A.todok()
+>>> print Adok[2,0]
+1
+>>> print Adok[1,1]
+5
+\end{lstlisting}
+\end{comment}
+
+\subsection*{Summary} % -------------------------------------------------------
+
+Since the \li{coo_matrix} type allows for fast sparse matrix type conversion, it is usually worth the time and memory to convert to the sparse matrix type that corresponds with the operations you are performing.
+For more information regarding the intended uses for each type of sparse matrix, see \url{http://docs.scipy.org/doc/scipy/reference/sparse.html}.
+
+Many familiar NumPy methods have analogs in the \li{scipy.sparse} module
+These methods take advantage of the sparse structure of the matrices and are, therefore, usually significantly faster.
+To learn which methods are available, see \url{http://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.html#scipy.sparse.csr_matrix}
+Note that there is also a \li{scipy.sparse.linalg} module that has linear algebra methods that have been optimized for sparse matrices.
+We will use the \li{scipy.sparse} and \li{scipy.sparse.linalg} modules more in future labs.
+
+\subsection*{OLD STUFF} % -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 Let us compare a \li{sparse} matrix computation with a full matrix computation.
 Note that we can convert any full matrix to a \li{sparse} matrix of any of the types listed in Table \ref{table:smr}.
@@ -639,174 +808,6 @@ This value is meaningful in operator theory.
 \li{Hint}: This value is the square of an important number.
 
 \end{problem}
-
-% =============================================================================
-% =============================================================================
-% END OF OLD SPARSE MATRIX STUFF ==============================================
-% =============================================================================
-% =============================================================================
-
-\subsection*{Types of Sparse Matrices} % --------------------------------------
-
-There are different kinds of matrices in the \li{sparse} module.
-Each has strengths and weaknesses, summarized below.
-% If performance is an issue, it is necessary to be familiar with the strengths and weaknesses of each type.
-In Table \ref{table:sparse_matrices}, we briefly summarize the uses of these matrices.
-
-\subsection*{COO Matrix} % ----------------------------------------------------
-
-A \li{coo_matrix} is in COOrdinate format
-All nonzero values are stored as a
-location (or coordinate) and value
-Use this type of sparse matrix for creating
-a sparse matrix if you know the location of all the nonzero values
-Once a matrix
-in this format has been created, it also supports very fast conversion between
-the other sparse matrix types.
-
-\begin{lstlisting}
-# Initialize the matrix using a coo_matrix.
->>> rows = np.array([0,1,2,3,0,2])
->>> cols = np.array([0,1,2,3,1,0])
->>> values = np.array([3,5,4,1,2,1])
->>> A = spar.coo_matrix((values, (rows,cols)), shape=(4,4))
-
-To visualize how the values are stored,
->>> print A
-    (0, 0)  3
-    (1, 1)  5
-    (2, 2)  4
-    (3, 3)  1
-    (0, 1)  2
-    (2, 0)  1
-
-# To visualize the matrix, use .todense(). Keep in mind doing
-#   operations on this dense matrix forfeits all sparse-related
-#   optimizations.
->>> print A.todense()
-matrix([[3, 2, 0, 0],
-        [0, 5, 0, 0],
-        [1, 0, 4, 0],
-        [0, 0, 0, 1]])
-\end{lstlisting}
-
-\subsection*{CSR and CSC Matrices} % ------------------------------------------
-
-For the vast majority of matrix computation you can perform with sparse matrices, the \li{csr_matrix} and \li{csc_matrix} will be your best option.
-They stand for
-Compressed Sparse Row matrix and Compressed Sparse Column matrix, respectively.
-
-When choosing which format to use, we must determine what direction the matrix
-will be traversed, whether it is row-wise or column-wise.
-For example, in matrix-vector multiplication, the matrix is traversed row-wise, therefore we should choose the \li{csr_matrix}.
-
-\begin{lstlisting}
->>> Acsr = A.tocsr()
->>> x = np.array([1,0,-1,2])
->>> b = Acsr.dot(x)
-array([3,0,-3,2])
-\end{lstlisting}
-
-For matrix-matrix multiplication, the left matrix is traversed row-wise and the
-right matrix is traversed column-wise.
-Therefore, we should make a \li{csr_matrix} copy and a \li{csc_matrix} copy.
-
-\begin{lstlisting}
->>> Acsr = A.tocsr()
->>> Acsc = A.tocsc()
->>> Asquared = Acsr.dot(Acsc)
-\end{lstlisting}
-
-If you need to access rows or columns of these matrices, you can perform array
-slicing with syntax identical to array slicing for NumPy arrays.
-Row slicing is faster with a \li{csr_matrix} and column slicing is faster with a \li{csc_matrix}.
-
-\begin{lstlisting}
->>> Acsr[0,:].todense()
-matrix([[3, 2, 0, 0]])
-
->>> Acsc[:,2].todense()
-matrix([[0],
-        [0],
-        [4],
-        [0]])
-\end{lstlisting}
-
-Row-based operations on a \li{csc_matrix} are very slow, and similarly, column-based operations on a \li{csr_matrix} are very slow.
-Therefore, for the sake of performance, it is worth taking extra care to ensure the optimal matrix is being used.
-
-\subsection*{DOK Matrix} % ----------------------------------------------------
-
-The \li{dok_matrix} format stands for Dictionary Of Keys matrix.
-This type of matrix is optimal for accessing single elements.
-It is not very fast for any other operation.
-
-\begin{lstlisting}
->>> Adok = A.todok()
->>> print Adok[2,0]
-1
->>> print Adok[1,1]
-5
-\end{lstlisting}
-
-\begin{comment}
-The following is a quick example of how the different types of sparse matrices
-can be used to optimize performance.
-
-\begin{lstlisting}
-# Initialize the matrix using a coo_matrix.
->>> rows = np.array([0,1,2,3,0,2])
->>> cols = np.array([0,1,2,3,1,0])
->>> values = np.array([3,5,4,1,2,1])
->>> A = spar.coo_matrix((values, (rows,cols)), shape=(4,4))
-
-# To visualize the matrix, use .todense(). Keep in mind doing
-#   operations on this dense matrix forfeits all sparse-related
-#   optimizations.
->>> print A.todense()
-matrix([[3, 2, 0, 0],
-        [0, 5, 0, 0],
-        [1, 0, 4, 0],
-        [0, 0, 0, 1]])
-
-# perform matrix multiplicaton after converting to a csr_matrix.
->>> Acsr = A.tocsr()
->>> x = np.array([1,0,-1,2])
->>> b = Acsr.dot(x)
-array([3,0,-3,2])
-
-# access rows of a csr_matrix. The syntax for slicing a csr_matrix
-#  (and csc_matrix) is identical to slicing NumPy arrays. For row slicing,
-#  use a csr_matrix. For column slicing, use a csc_matrix.
->>> Acsr[0,:].todense()
-matrix([[3, 2, 0, 0]])
-
->>> Acsc = A.tocsc()
->>> Acsc[:,2].todense()
-matrix([[0],
-        [0],
-        [4],
-        [0]])
-
-# access individual elements of the matrix after converting to a dok_matrix.
->>> Adok = A.todok()
->>> print Adok[2,0]
-1
->>> print Adok[1,1]
-5
-\end{lstlisting}
-\end{comment}
-
-\subsection*{Summary} % -------------------------------------------------------
-
-Since the \li{coo_matrix} type allows for fast sparse matrix type conversion, it is usually worth the time and memory to convert to the sparse matrix type that corresponds with the operations you are performing.
-For more information regarding the intended uses for each type of sparse matrix, see \url{http://docs.scipy.org/doc/scipy/reference/sparse.html}.
-
-Many familiar NumPy methods have analogs in the \li{scipy.sparse} module
-These methods take advantage of the sparse structure of the matrices and are, therefore, usually significantly faster.
-To learn which methods are available, see \url{http://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.html#scipy.sparse.csr_matrix}
-Note that there is also a \li{scipy.sparse.linalg} module that has linear algebra methods that have been optimized for sparse matrices.
-We will use the \li{scipy.sparse} and \li{scipy.sparse.linalg} modules more in future labs.
 
 \newpage
 
