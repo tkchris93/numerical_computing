@@ -135,7 +135,7 @@ The resulting matrix is far from what we would expect on paper.
 \end{align*}
 
 Round-off error can propagate through many steps in a calculation, resulting in garbage output.
-NumPy's routines that employ row reduction use several tricks to minimize the impact of round-off errors, but even these tricks can't fix ill-conditioned matrices.
+NumPy's routines that employ row reduction use several tricks to minimize the impact of round-off errors, but beware that these tricks can't fix every matrix.
 \end{warn}
 
 \subsection*{The LU Decomposition} % ------------------------------------------
@@ -260,125 +260,94 @@ You may again assume that there are no row swaps (so $P = I$ in this case).
 
 \section*{SciPy} % ============================================================
 
-SciPy is . . .
+SciPy is a powerful scientific computing library built upon NumPy.
+It includes high-level tools for linear algebra, statistics, signal processing, integration, optimization, machine learning, and more.
+% We typically import SciPy with the convention \li{import scipy as sp}.
 
 \subsection*{Linear Algebra} % ------------------------------------------------
 
-Both NumPy and SciPy have a linear algebra library, but the SciPy library is larger.
-The SciPy linear algebra library is typically imported as follows:
-
-\begin{lstlisting}
-from scipy import linalg as la
-\end{lstlisting}
-
-The linear algebra library contains several functions to construct special
-matrices, located in \li{linalg.special_matrices}.
-There are also functions that will invert matrices, find determinants and norms, solve linear systems and least squares problems, and find special matrix decompositions.
-You can read more about the linear algebra capabilities of SciPy in the documentation for the \li{linalg} module found at \url{http://docs.scipy.org/doc/scipy/reference/linalg.html}.
-
-Finally, the \li{scipy.linalg} library has a \li{matrix} class that is very
-similar to a 2-D NumPy array.
-The matrix class can be convenient when doing matrix operations.
-However, in such situations we still recommend using NumPy arrrays, which have many of the same features and are also compatible with all other SciPy operations.
-
-The \li{scipy.linalg} library will be essential for the remainder of the labs in this manual.
-
-
-In this problem you will solve the system $Ax = b$ for fixed $A$ and many different values of $b$.
-You will do this in two ways.
-For a random $1000 \times 1000$ array $A$ and a random $1000 \times 500$ array $B$ do the following.
-\begin{enumerate}
-\item Time \li{la.lu_factor(A)}.
-\item Time \li{la.inv(A)}.
-\item Store the output of \li{la.lu_factor()}
-Time \li{la.lu_solve()} on this stored output and $B$.
-\item Store the inverse of $A$
-Time how long it takes to multiply $A^{-1}$ by $B$.
-\item What can you conclude about the more efficient way to solve linear systems?
-\end{enumerate}
-
-
-\subsection*{Spatial Complexity} % --------------------------------------------
-
-Analogous to temporal complexity, the spatial complexity of an algorithm is a function that describes how the algorithm's memory use increases as input sizes to the algorithm increase
-For example, if your algorithm needs to store an $n \times n$ matrix, its memory use will increase at least as fast as $n^2$
-Spatial complexity is important because  the spatial complexity of an algorithm can affect its speed in several ways
-The most important way is that when the memory usage exceeds the amount of available RAM, the machine must use either the hard disk or some other slower method of storage.
-
-This vocabulary allows us to discuss the question at the start of this lab: ``How long will a computer take to execute this algorithm?" The amount of time a computer takes to execute an algorithm depends both on the algorithm's temporal complexity and on its spatial complexity.
-
-\begin{comment}
-\begin{problem}\label{prob:complexity_problem}
-In this problem you will analyze the complexity of the following functions:
-
-\begin{lstlisting}
-# Run through a single for loop.
-def func1(n):
-    n = 500*n
-    sum(xrange(n))
-# Run through a double for loop.
-def func2(n):
-    n = 3*n
-    t = 0
-    for i in xrange(n):
-        for j in xrange(i):
-            t += j
-# Square a matrix.
-def func3(n):
-    n = int(1.2*n)
-    A = np.random.rand(n, n)
-    np.power(A, 2)
-# Invert a matrix.
-from scipy import linalg as la
-def func4(n):
-    A = np.random.rand(n, n)
-    la.inv(A)
-# Find the determinant of a matrix.
-from scipy import linalg as la
-def func5(n):
-    n = int(1.25*n)
-    A = np.random.rand(n, n)
-    la.det(A)
-\end{lstlisting}
-
-Plot your results in the following manner:
-\begin{enumerate}
-\item Time how long each function takes to run on an input of size $n$ for $n=100, 200, 400$, and $800$.
-\item For each function, plot a line using $100, 200, 400$, and $800$ for the $x$-values and your runtimes for the $y$-values
-Make sure your $y$-values are all in the same units! When you call the matplotlib function \li{plot}, specify a value for the keyword parameter \li{label} so that you can reference each line later
-For example, the call \li{plt.plot(x, y, label='Function 1')} attaches the label ``Function 1" to the line made by \li{x} and \li{y}.
-\item After plotting all your lines, call the function \li{legend} to draw a legend on your graph
-Use the keyword argument \li{loc} to specify the location of the legend
-Some possible values are \li{'upper left'} and \li{'right'}
-See the documentation for more options
-Your final graph should look something like the figure below.\footnote{From this graph, you can see that inverting a matrix is an incredibly time-consuming operation
-In Lab \ref{lab:ChangeBasis} you will learn fast algorithms for solving linear systems without inverting matrices
-In fact, inverting matrices is so costly in terms of temporal and spatial complexity that there is hardly ever a good reason to do it.}
-\end{enumerate}
-Note that we rescaled the inputs to the functions so that your lines would begin at roughly the same place on the y-axis.
-
+NumPy and SciPy both have a linear algebra module, each called \li{linalg}, but SciPy's module is the larger of the two.
+Some of SciPy's common \li{linalg} functions are listed below.
+See \url{http://docs.scipy.org/doc/scipy/reference/linalg.html} for more documentation.
+%
+\begin{table}[H]
 \centering
-\includegraphics[width=\textwidth]{complexity_problem.pdf}
+\begin{tabular}{r|l}
+    Function & Returns \\ \hline
+    \li{det()} & The determinant of a square matrix. \\
+    \li{eig()} & The eigenvalues and eigenvectors of a square matrix. \\
+    \li{inv()} & The inverse of an invertible matrix. \\
+    \li{norm()} & The norm of a vector or matrix norm of a matrix. \\
+    \li{solve()} & The solution to $A\x = \b$ (the system may not be square).
+\end{tabular}
+\end{table}
 
+This library also includes routines for computing matrix decompositions.
+
+\begin{lstlisting}
+>>> from scipy import linalg as la
+
+# Make a random matrix and a random vector.
+>>> A = np.random.random((1000,1000))
+>>> b = np.random.random(1000)
+
+# Compute the LU decomposition of A, including pivots.
+>>> lu, piv = la.lu_factor(A)
+
+# Use the LU decomposition to solve Ax = b.
+>>> x = la.lu_solve((lu,piv), b)
+
+# Check that the solution is legitimate.
+>>> np.allclose(A.dot(x), b)
+True
+\end{lstlisting}
+
+As with NumPy, SciPy's routines are all highly optimized.
+However, some algorithms are, by nature, faster than others.
+
+\begin{problem} % Time ways to solve Ax = b with scipy.linalg.
+Write a function that times different \li{scipy.linalg} methods for solving square linear systems of various sizes.
+
+Choose an appropriate domain of values for $n$.
+For each value of $n$, generate a random $n \times n$ matrix $A$ and a random $n \times 1$ vector $\b$ using \li{np.random.random()}.
+Time how long it takes to solve the system $A\x = \b$ with each of the following approaches:
+%
+\begin{itemize}
+\item Invert $A$ with \li{la.inv()} and left-multiply the inverse to $\b$.
+\item Use \li{la.solve()}.
+\item Use \li{la.lu_factor()} and \li{la.lu_solve()} to solve the system with the LU decomposition.
+\item Use \li{la.lu_factor()} and \li{la.lu_solve()}, but only time \li{la.lu_solve()}.
+\end{itemize}
+
+Plot the size of the systems ($n$) versus the execution times.
 \end{problem}
-\end{comment}
 
-\section*{Sparse Matrices} % ==================================================
+\begin{info}
+Numerically inverting matrices is so costly that there is hardly ever a good reason to do it.
+Use a specific solver, like \li{la.lu_solve()}, whenever possible.
+\end{info}
 
-A matrix with relatively few nonzero elements is called \emph{sparse}.
-% Sparse matrices arise frequently in both theoretical and real-world applications.
+\subsection*{Sparse Matrices} % -----------------------------------------------
+
+Large linear systems can have tens of thousands of parameters.
+Storing such matrices in memory can be difficult: a $100000 \times 100000$ system requires around 40 GB to store in a matrix (4 bytes per entry $\times\ 10^{10}$ entries).
+This is well beyond the amount of RAM in a normal laptop.
+
+However, in applications where systems of this size arise, it is also common that such matrices are \emph{sparse}, meaning that most of the entries are $0$.
+SciPy's \li{sparse} module provides tools for constructing and manipulating sparse matrices efficiently.
+A \li{sparse} matrix only stores the nonzero values and the positions of these values.
 Taking advantage of the sparse structure of these matrices uses less memory and decreases computation time.
+For sufficiently sparse matrices, storing the matrix as a \li{sparse} matrix may only take megabytes, rather than gigabytes.
 
 For example, diagonal matrices are sparse.
 Storing an $n \times n$ diagonal matrix in the na\"{i}ve way means storing $n^2$ values in memory.
 For most applications, it makes more sense to store the diagonal entries in a 1-dimensional array of $n$ values.
 In addition to using less storage space, this allows for much faster matrix operations.
 Using the standard algorithm to multiply a matrix by a diagonal matrix involves $n^3$ steps, but most of these are multiplying by or adding zero.
-A smarter algorithm that knows all off-diagonal entries are zero can accomplish the same task much faster.
+A smarter algorithm that recognizes that all off-diagonal entries are zero can accomplish the same task much faster.
 
 \subsection*{The Sparse Module} % ---------------------------------------------
 
-The SciPy module \li{sparse} has storage methods to reduce the temporal and spatial complexity of handling sparse matrices.
 When we are not using these special methods, we say we are storing the \emph{full} matrix.
 We can also use \li{sparse} methods on dense matrices (matrices with mostly nonzero entries), but doing so will take longer than using the usual methods for handling full matrices.
 
@@ -389,28 +358,24 @@ You minimize spatial complexity when you store a sparse matrix with the \li{spar
 
 SciPy has seven sparse matrix types, listed in Table \ref{table:smr}.
 Each type is optimized either for storing sparse matrices whose nonzero entries follow certain patterns, or for performing certain computations.
-For example, the \li{csc_matrix} and \li{csr_matrix} types are optimized for arithmetic operations.
-We will introduce some other types later in this lab
-For more information, see the documentation (\url{http://docs.scipy.org/doc/scipy/reference/sparse.html}).
+For example, the \li{csc_matrix} and \li{csr_matrix} types are optimized for arithmetic operations. % Bleh!
+For more information, see (\url{http://docs.scipy.org/doc/scipy/reference/sparse.html}).
 
-\begin{table}
+\begin{table}[H]
 \centering
-\begin{tabular}{|r|l|}
-\hline
-Sparse Matrix Type & Description \\
-\hline
-\li{bsr_matrix} & Compressed Block Sparse Row\\
-\li{coo_matrix} & Coordinate\\
-\li{csc_matrix} & Compressed Sparse Column\\
-\li{csr_matrix} & Compressed Sparse Row\\
-\li{dia_matrix} & Sparse Diagonal\\
-\li{dok_matrix} & Dictionary of Keys\\
-\li{lil_matrix} & Linked List\\
-\hline
+\begin{tabular}{c|l}
+    Structure Name & Description and Advantages \\ \hline
+    \li{coo\_matrix} & Create a matrix using arrays of \\
+                     & coordinates and values. Also fast \\
+                     & sparse matrix type conversion. \\
+    \li{csc\_matrix} & Perform column-based matrix operations and slicing. \\
+    \li{csr\_matrix} & Perform row-based matrix operations and slicing.  \\
+    \li{dia\_matrix} & Create a matrix with diagonal structure.  \\
+    \li{dok\_matrix} & Access individual elements of the matrix.  \\
 \end{tabular}
-\caption{Sparse matrix representations in SciPy.}
-\label{table:smr}
+\label{table:sparse_matrices}
 \end{table}
+
 
 Let us compare a \li{sparse} matrix computation with a full matrix computation.
 Note that we can convert any full matrix to a \li{sparse} matrix of any of the types listed in Table \ref{table:smr}.
@@ -543,8 +508,8 @@ The following code outputs Figure \ref{fig:mpl_spy}.
 
 \begin{figure}
 \centering
-\includegraphics[width=.75\textwidth]{spy.png}
-\caption{The output of the \li{spy()} command}
+\includegraphics[width=.7\textwidth]{spy.png}
+\caption{}
 \label{fig:mpl_spy}
 \end{figure}
 
@@ -675,46 +640,18 @@ This value is meaningful in operator theory.
 
 \end{problem}
 
-\section*{Sparse Matrices} % ==================================================
-
-As mentioned in the introduction, there are some systems that have tens of
-thousands of parameters
-Storing such matrices in memory can become difficult.
-For example, when dealing with a system that is $100000 \times 100000$, it
-requires around 40 GB to store this matrix in its entirety (4 bytes per entry
-$\times$ $10^{10}$ entries)
-This is well beyond the amount of RAM in a normal
-laptop.
-
-However, in applications where systems of this size arise, it is also common
-that such matrices are sparse
-By sparse, we mean that most of the entries in
-the matrix are zeros
-The \li{scipy.sparse} module provides a solution to the
-problem of storage.
-A \li{sparse} matrix only stores the nonzero values and the positions of these values.
-For sufficiently sparse matrices, storing the matrix as a \li{sparse} matrix may take merely megabytes rather than gigabytes.
+% =============================================================================
+% =============================================================================
+% END OF OLD SPARSE MATRIX STUFF ==============================================
+% =============================================================================
+% =============================================================================
 
 \subsection*{Types of Sparse Matrices} % --------------------------------------
 
-There are different kinds of matrices in the \li{sparse} module
-If performance
-is an issue, it is necessary to be familiar with the strengths and weaknesses of each type.
+There are different kinds of matrices in the \li{sparse} module.
+Each has strengths and weaknesses, summarized below.
+% If performance is an issue, it is necessary to be familiar with the strengths and weaknesses of each type.
 In Table \ref{table:sparse_matrices}, we briefly summarize the uses of these matrices.
-\begin{table}
-    \centering
-    \begin{tabular} {c | l } \label{table:sparse_matrices}
-                  & \multicolumn{1}{c}{Intended Uses} \\
-        \hline
-        \li{coo\_matrix} & Create a matrix using arrays of \\
-                         & coordinates and values. Also fast \\
-                         & sparse matrix type conversion. \\
-        \li{csc\_matrix} & Perform column-based matrix operations and slicing. \\
-        \li{csr\_matrix} & Perform row-based matrix operations and slicing.  \\
-        \li{dia\_matrix} & Create a matrix with diagonal structure.  \\
-        \li{dok\_matrix} & Access individual elements of the matrix.  \\
-        \end{tabular}
-\end{table}
 
 \subsection*{COO Matrix} % ----------------------------------------------------
 
@@ -1000,7 +937,14 @@ The LU decomposition can also be used to compute inverses and determinants.
 $(PA)^{-1} = (LU)^{-1} \longrightarrow A^{-1}P^{-1} = U^{-1}L^{-1} \longrightarrow LUA^{-1} = P$.
 Solve $LU\a_i = \p_i$ with forward and backward substitution (as in Problem \ref{prob:substitute-solve}) for every column $\p_i$ of $P$.
 Then
-\[A^{-1} = \left[\begin{array}{c|c|c|c}\a_1&\a_2&\cdots&\a_n\end{array}\right],\]
+\begin{align*}
+A^{-1} =
+\left[\begin{array}{c|c|c|c}
+&&&\\
+\a_1&\a_2&\cdots&\a_n
+\\&&&
+\end{array}\right],
+\end{align*}
 the matrix where $\a_k$ is the $k$th column.
 % Even this ``efficient'' method of inverting a matrix is computationally expensive.
 
@@ -1024,6 +968,7 @@ The Cholesky decomposition takes advantage of the conjugate symmetry of $A$ to s
 It thus requires only half of the calculations and memory of the LU decomposition.
 Furthermore, the algorithm is \emph{numerically stable}, which means that round-off errors do not propagate throughout the computation.
 Because of its efficiency and stability, this decomposition is used when possible to solve least squares, optimization, and state estimation problems.
+% Try implementing the decomposition yourself.
 
 \begin{algorithm}[H]
 \begin{algorithmic}[1]
@@ -1041,7 +986,7 @@ Because of its efficiency and stability, this decomposition is used when possibl
 \caption{}
 \end{algorithm}
 
-As with the LU decomposition, SciPy's \li{linalg} module has optimized routines, \li{la.cho_factor()} and \li{la.cho_solve()}, for obtaining and using the Cholesky decomposition.
+As with the LU decomposition, SciPy's \li{linalg} module has optimized routines,\\\li{la.cho_factor()} and \li{la.cho_solve()}, for using the Cholesky decomposition.
 
 \begin{comment} % This uses the decomposition A = LL^H.
 The entries of $L$ are calculated as follows.

@@ -82,11 +82,10 @@ def _timeout(seconds):
             signal.signal(signal.SIGALRM, _handler)
             signal.alarm(seconds)               # Set the alarm.
             try:
-                result = func(*args, **kwargs)
+               return func(*args, **kwargs)
             finally:
                 signal.alarm(0)                 # Turn the alarm off.
-            return result
-        return wraps(func)(wrapper)
+        return wrapper
     return decorator
 
 # Test Script and Class =======================================================
