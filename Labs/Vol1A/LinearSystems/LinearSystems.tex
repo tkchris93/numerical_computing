@@ -330,103 +330,194 @@ Use a specific solver, like \li{la.lu_solve()}, whenever possible.
 \subsection*{Sparse Matrices} % -----------------------------------------------
 
 Large linear systems can have tens of thousands of parameters.
-Storing such matrices in memory can be difficult: a $100000 \times 100000$ system requires around 40 GB to store in a matrix (4 bytes per entry $\times\ 10^{10}$ entries).
+Storing the corresponding matrices in memory can be difficult: a $100000 \times 100000$ system requires around 40 GB to store in a NumPy array (4 bytes per entry $\times\ 10^{10}$ entries).
 This is well beyond the amount of RAM in a normal laptop.
 
-However, in applications where systems of this size arise, it is also common that such matrices are \emph{sparse}, meaning that most of the entries are $0$.
-SciPy's \li{sparse} module provides tools for constructing and manipulating sparse matrices efficiently.
+In applications where systems of this size arise, it is common that such matrices are \emph{sparse}, meaning that most of the entries are $0$.
+% Taking advantage of the sparse structure of these matrices uses less memory and decreases computation time.
+SciPy's \li{sparse} module provides tools for efficiently constructing and manipulating 1- and 2-D sparse matrices.
 A \li{sparse} matrix only stores the nonzero values and the positions of these values.
-Taking advantage of the sparse structure of these matrices uses less memory and decreases computation time.
 For sufficiently sparse matrices, storing the matrix as a \li{sparse} matrix may only take megabytes, rather than gigabytes.
 
 For example, diagonal matrices are sparse.
 Storing an $n \times n$ diagonal matrix in the na\"{i}ve way means storing $n^2$ values in memory.
-For most applications, it makes more sense to store the diagonal entries in a 1-dimensional array of $n$ values.
-In addition to using less storage space, this allows for much faster matrix operations.
-Using the standard algorithm to multiply a matrix by a diagonal matrix involves $n^3$ steps, but most of these are multiplying by or adding zero.
-A smarter algorithm that recognizes that all off-diagonal entries are zero can accomplish the same task much faster.
+It is almost always more efficient to instead store the diagonal entries in a 1-D array of $n$ values.
+In addition to using less storage space, this allows for much faster matrix operations: the standard algorithm to multiply a matrix by a diagonal matrix involves $n^3$ steps, but most of these are multiplying by or adding $0$.
+A smarter algorithm can accomplish the same task much faster.
 
-\subsection*{The Sparse Module} % ---------------------------------------------
+% \subsection*{Types of Sparse Matrices} % -----------------------------------
 
-When we are not using these special methods, we say we are storing the \emph{full} matrix.
-We can also use \li{sparse} methods on dense matrices (matrices with mostly nonzero entries), but doing so will take longer than using the usual methods for handling full matrices.
-
-The difference in spatial complexity occurs because a full array occupies a block of memory for each entry, so an $n \times n$ array requires $n^2$ blocks of memory.
-By contrast, SciPy's \li{sparse} methods store only the nonzero entries and their locations in the array.
-As long as most entries are 0 (i.e., the matrix is sparse), this decreases spatial complexity.
-You minimize spatial complexity when you store a sparse matrix with the \li{sparse} module and a dense matrix as a full (or ``regular'') matrix.
-
-SciPy has seven sparse matrix types, listed in Table \ref{table:smr}.
+SciPy has seven \li{sparse} matrix types, listed below.
 Each type is optimized either for storing sparse matrices whose nonzero entries follow certain patterns, or for performing certain computations.
-For example, the \li{csc_matrix} and \li{csr_matrix} types are optimized for arithmetic operations. % Bleh!
-For more information, see (\url{http://docs.scipy.org/doc/scipy/reference/sparse.html}).
 
 \begin{table}[H]
 \centering
-\begin{tabular}{c|l}
-    Structure Name & Description and Advantages \\ \hline
-    \li{coo\_matrix} & Create a matrix using arrays of \\
-                     & coordinates and values. Also fast \\
-                     & sparse matrix type conversion. \\
-    \li{csc\_matrix} & Perform column-based matrix operations and slicing. \\
-    \li{csr\_matrix} & Perform row-based matrix operations and slicing.  \\
-    \li{dia\_matrix} & Create a matrix with diagonal structure.  \\
-    \li{dok\_matrix} & Access individual elements of the matrix.  \\
+\begin{tabular}{c|l|l}
+    Name & \multicolumn{1}{c|}{Description} & \multicolumn{1}{c}{Advantages}
+    \\ \hline
+    \li{bsr_matrix} & Block Sparse Row & Specialized structure. \\
+    \li{coo_matrix} & Coordinate Format & Conversion among sparse formats. \\
+    \li{csc_matrix} & Compressed Sparse Column & Column-based operations and slicing.\\
+    \li{csr_matrix} & Compressed Sparse Row & Row-based operations and slicing. \\
+    \li{dia_matrix} & Diagonal Storage & Specialized structure. \\
+    \li{dok_matrix} & Dictionary of Keys & Element access, incremental construction. \\
+    \li{lil_matrix} & Row-based Linked List & Incremental construction. \\
+                    &                & Conversion to CSR or CSC format. \\
 \end{tabular}
-\label{table:sparse_matrices}
 \end{table}
 
-% =============================================================================
-% =============================================================================
-% END OF OLD SPARSE MATRIX STUFF ==============================================
-% =============================================================================
-% =============================================================================
+\subsubsection*{Creating Sparse Matrices} % -----------------------------------
 
-\subsection*{Types of Sparse Matrices} % --------------------------------------
+A regular, non-sparse matrix is called \emph{full} or \emph{dense}.
+Full matrices can be converted to each of the sparse matrix formats listed above.
+However, it is more memory efficient to never create the full matrix in the first place.
+There are really three different approaches for creating sparse matrices from scratch.
 
-There are different kinds of matrices in the \li{sparse} module.
-Each has strengths and weaknesses, summarized below.
-% If performance is an issue, it is necessary to be familiar with the strengths and weaknesses of each type.
-In Table \ref{table:sparse_matrices}, we briefly summarize the uses of these matrices.
+\begin{itemize}
 
-\subsection*{COO Matrix} % ----------------------------------------------------
-
-A \li{coo_matrix} is in COOrdinate format
-All nonzero values are stored as a
-location (or coordinate) and value
-Use this type of sparse matrix for creating
-a sparse matrix if you know the location of all the nonzero values
-Once a matrix
-in this format has been created, it also supports very fast conversion between
-the other sparse matrix types.
+\item \textbf{Coordinate Format}:
+When all of the nonzero values and their positions are known, create the entire sparse matrix at once as a \li{coo_matrix}.
+All nonzero values are stored as a location (or coordinate) and value.
+This format also supports very fast conversion between the other sparse matrix types.
 
 \begin{lstlisting}
-# Initialize the matrix using a coo_matrix.
->>> rows = np.array([0,1,2,3,0,2])
->>> cols = np.array([0,1,2,3,1,0])
->>> values = np.array([3,5,4,1,2,1])
->>> A = spar.coo_matrix((values, (rows,cols)), shape=(4,4))
+>>> from scipy import sparse
 
-To visualize how the values are stored,
->>> print A
-    (0, 0)  3
-    (1, 1)  5
-    (2, 2)  4
-    (3, 3)  1
-    (0, 1)  2
-    (2, 0)  1
+# Define the rows, columns, and values separately.
+>>> rows = np.array([0, 1, 0])
+>>> cols = np.array([0, 1, 1])
+>>> vals = np.array([3, 5, 2])
+>>> A = sparse.coo_matrix((vals, (rows,cols)), shape=(3,3))
+>>> print(A)
+  (0, 0)    3
+  (1, 1)    5
+  (0, 1)    2
 
-# To visualize the matrix, use .todense(). Keep in mind doing
-#   operations on this dense matrix forfeits all sparse-related
-#   optimizations.
->>> print A.todense()
-matrix([[3, 2, 0, 0],
-        [0, 5, 0, 0],
-        [1, 0, 4, 0],
-        [0, 0, 0, 1]])
+# The toarray() method casts the sparse matrix as a NumPy array.
+# However, using regular arrays forfeits all sparse-related optimizations.
+>>> print(A.toarray())
+[[3 2 0]
+ [0 5 0]
+ [0 0 0]]
 \end{lstlisting}
 
-\subsection*{CSR and CSC Matrices} % ------------------------------------------
+\item \textbf{DOK and LIL Formats}:
+If the matrix values and their locations are not known a priori, construct the matrix incrementally with \li{dok_matrix} or \li{lil_matrix}.
+Indicate the size of the matrix, then change individual values with regular slicing syntax.
+This method is quite similar syntactically to NumPy.
+
+\begin{lstlisting}
+>>> B = sparse.lil_matrix((2,6))
+>>> B[0,2] = 4
+>>> B[1,4] = 9
+
+>>> print(B.toarray())
+[[ 0.  0.  4.  0.  0.  0.]
+ [ 0.  0.  0.  0.  9.  0.]]
+\end{lstlisting}
+
+% OLD VERSION
+\begin{comment}
+A second way to create a sparse matrix is to pre-allocate an array of zeros and then specify the nonzero entries one at a time.
+The most efficient sparse matrix types for building matrices incrementally are \li{lil_matrix} and \li{dok_matrix}.
+Once you are done constructing the sparse matrix, you should convert it to a form that is optimized for computations.
+
+\begin{lstlisting}
+# Initialize Z.
+>>> Z = sparse.lil_matrix((400, 300))
+# Specify the nonzero entries of Z.
+>>> Z[1,34] = 23
+>>> Z[23,32] = 56
+>>> Z[2,:] = 13.2
+>>> Z
+<400x300 sparse matrix of type '<type 'numpy.float64'>'
+  with 302 stored elements in LInked List format>
+\end{lstlisting}
+
+When the matrix \li{Z} is initialized, all its entries are assumed to be zero.
+Note that at the end of \li{Z}'s construction, only 302 elements are being stored for a matrix with $120000$ entries.
+
+The only way to view a matrix as a 2-D array is to convert it to a full matrix.
+If your matrix is too large to do this, you can still visualize it using the \li{plt.spy()} command from matplotlib.
+This function plots the locations of the non-zero entries in a matrix.
+The following code outputs Figure \ref{fig:mpl_spy}.
+
+\begin{lstlisting}
+>>> from matplotlib import pyplot as plt
+>>> B = np.random.rand(3, 10000)
+>>> A = sparse.spdiags(B, [-1, 0, 1], 10000, 10000)
+>>> plt.spy(A)
+\end{lstlisting}
+
+\begin{figure}
+\centering
+\includegraphics[width=.7\textwidth]{spy.png}
+\caption{}
+\label{fig:mpl_spy}
+\end{figure}
+\end{comment}
+
+\item \textbf{DIA and BSR Formats}:
+When the matrix has a particular sparsity pattern, such as nonzero blocks or diagonals, use \li{bsr_matrix} or \li{dia_matrix}.
+
+% % spdiags() for some reason?
+Use the method \li{sparse.spdiags(data, diags, m, n)}.
+If \li{data} is a 1-D array and \li{diags} is a scalar, then this method creates an $m \times n$ matrix with \li{data} on the specified diagonal.
+The parameter \li{diags=0} indicates the main diagonal, with lower diagonals indexed by negative numbers and upper diagonals by positive numbers.
+If \li{data} is a 2-D array and \li{diags} is a list, then this method creates an $m \times n$ matrix with the rows of \li{data} on the diagonals specified by \li{diags}.
+
+\begin{lstlisting}
+# Create a sparse 3x3 matrix with (2, 3, 4) on the diagonal.
+>>> A = sparse.spdiags([2, 3, 4], 0, 3, 3)
+>>> A
+<<<3x3 sparse matrix of type '<type 'numpy.int64'>'
+  with 3 stored elements (1 diagonals) in DIAgonal format>>>
+# Convert A to a full matrix.
+>>> print(A.toarray())
+[[2, 0, 0],
+ [0, 3, 0],
+ [0, 0, 4]]
+
+# Create a sparse 4x4 matrix with the rows of diag_entries on the diagonals.
+>>> diag_entries = np.array([[3,6,9,0],[1,4,7,10],[0,2,5,8]])
+>>> B = sparse.spdiags(diag_entries, [-1, 0, 1], 4, 4)
+>>> B
+<<<4x4 sparse matrix of type '<type 'numpy.int64'>'
+  with 10 stored elements (3 diagonals) in DIAgonal format>>>
+>>> print(B.toarray())
+[[ 1,  2,  0,  0],
+ [ 3,  4,  5,  0],
+ [ 0,  6,  7,  8],
+ [ 0,  0,  9, 10]]
+\end{lstlisting}
+
+\end{itemize}
+
+\begin{info} % Note about banded matrices.
+The final matrix $B$ in the example above is called a \emph{banded} matrix.
+A banded matrix is a sparse matrix whose only non-zero entries are on the main diagonal and on some diagonals on either side.
+In fact, $B$ is an example of a \emph{tri-diagonal} matrix, because its nonzero entries are confined to the three central diagonals.
+Banded matrices arise naturally in many applications, including numerical methods for solving differential equations.
+\end{info}
+
+\begin{problem} % Construct a sparse tri-diagonal matrix.
+Write a function that accepts an integer $n$ and returns a sparse $n\times n$
+tri-diagonal array with $2$'s along the main diagonal and $-1$'s along
+the two sub-diagonals above and below the main diagonal.
+
+This matrix is the derivative operator in numerical analysis of differential equations.
+\label{prob:sparse-tridiag-construction}
+\end{problem}
+
+\subsubsection*{Sparse Matrix Operations} % -----------------------------------
+
+% We can also use \li{sparse} methods on dense matrices (matrices with mostly nonzero entries), but doing so will take longer than using the usual methods for handling full matrices.
+
+Many familiar NumPy methods have analogs in the \li{sparse} module.
+These methods take advantage of the sparse structure of the matrices and are, therefore, usually significantly faster.
+% To learn which methods are available, see \url{http://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.html#scipy.sparse.csr_matrix}
+There is also a \li{scipy.sparse.linalg} module containing linear algebra methods that have been optimized for sparse matrices.
+
 
 For the vast majority of matrix computation you can perform with sparse matrices, the \li{csr_matrix} and \li{csc_matrix} will be your best option.
 They stand for
@@ -471,19 +562,6 @@ matrix([[0],
 Row-based operations on a \li{csc_matrix} are very slow, and similarly, column-based operations on a \li{csr_matrix} are very slow.
 Therefore, for the sake of performance, it is worth taking extra care to ensure the optimal matrix is being used.
 
-\subsection*{DOK Matrix} % ----------------------------------------------------
-
-The \li{dok_matrix} format stands for Dictionary Of Keys matrix.
-This type of matrix is optimal for accessing single elements.
-It is not very fast for any other operation.
-
-\begin{lstlisting}
->>> Adok = A.todok()
->>> print Adok[2,0]
-1
->>> print Adok[1,1]
-5
-\end{lstlisting}
 
 \begin{comment}
 The following is a quick example of how the different types of sparse matrices
@@ -533,21 +611,13 @@ matrix([[0],
 \end{lstlisting}
 \end{comment}
 
-\subsection*{Summary} % -------------------------------------------------------
 
-Since the \li{coo_matrix} type allows for fast sparse matrix type conversion, it is usually worth the time and memory to convert to the sparse matrix type that corresponds with the operations you are performing.
-For more information regarding the intended uses for each type of sparse matrix, see \url{http://docs.scipy.org/doc/scipy/reference/sparse.html}.
-
-Many familiar NumPy methods have analogs in the \li{scipy.sparse} module
-These methods take advantage of the sparse structure of the matrices and are, therefore, usually significantly faster.
-To learn which methods are available, see \url{http://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.html#scipy.sparse.csr_matrix}
-Note that there is also a \li{scipy.sparse.linalg} module that has linear algebra methods that have been optimized for sparse matrices.
-We will use the \li{scipy.sparse} and \li{scipy.sparse.linalg} modules more in future labs.
+See \url{http://docs.scipy.org/doc/scipy/reference/sparse.html} for more details on the \li{sparse} module.
 
 \subsection*{OLD STUFF} % -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 Let us compare a \li{sparse} matrix computation with a full matrix computation.
-Note that we can convert any full matrix to a \li{sparse} matrix of any of the types listed in Table \ref{table:smr}.
+Note that we can convert any full matrix to a \li{sparse} matrix of any of the types.
 
 \begin{lstlisting}
 import numpy as np
@@ -584,103 +654,12 @@ from scipy import sparse
 As you can see from this example, we get the best performance when we store a sparse matrix with the \li{sparse} module and a dense matrix as a full matrix.
 
 \begin{comment}
-\begin{problem}
+\begin{problem} % *Very* simple timing problem
 Create a $500\times 500$ matrix and vector of length 500, both full of random values
 Use the \li{A.dot(b)} command to multiply your matrix and your vector, and time how long it takes to do so
 Then convert your matrix to sparse format and again time how long it takes to multiply it by your vector using \li{A.dot(b)}.
 \end{problem}
 \end{comment}
-
-\subsection*{Creating Sparse Matrices} % --------------------------------------
-
-One way to create a sparse matrix is to create a full matrix and then convert it to a sparse matrix, as we did in the previous example.
-However, you reduce spatial complexity if you never create the full matrix.
-Here are two ways to create sparse matrices directly.
-
-The first way is to use the method \li{sparse.spdiags(data, diags, m, n)}.
-If \li{data} is a 1-D array and \li{diags} is a scalar, then this method creates an $m \times n$ matrix with \li{data} on the specified diagonal.
-The parameter \li{diags=0} indicates the main diagonal, with lower diagonals indexed by negative numbers and upper diagonals by positive numbers.
-If \li{data} is a 2-D array and \li{diags} is a list, then this method creates an $m \times n$ matrix with the rows of \li{data} on the diagonals specified by \li{diags}.
-See the documentation for more information.
-
-\begin{lstlisting}
-# Create a sparse 3x3 matrix with (2, 3, 4) on the diagonal.
->>> A = sparse.spdiags([2, 3, 4], 0, 3, 3)
->>> A
-<3x3 sparse matrix of type '<type 'numpy.int64'>'
-  with 3 stored elements (1 diagonals) in DIAgonal format>
-# Convert A to a full matrix.
->>> A.todense()
-matrix([[2, 0, 0],
-        [0, 3, 0],
-        [0, 0, 4]])
-
-# Create a sparse 4x4 matrix with the rows of diag_entries on the diagonals.
->>> diag_entries = np.array([[3,6,9,0],[1,4,7,10],[0,2,5,8]])
->>> B = sparse.spdiags(diag_entries, [-1, 0, 1], 4, 4)
-<4x4 sparse matrix of type '<type 'numpy.int64'>'
-  with 10 stored elements (3 diagonals) in DIAgonal format>
->>> B.todense()
-matrix([[ 1,  2,  0,  0],
-        [ 3,  4,  5,  0],
-        [ 0,  6,  7,  8],
-        [ 0,  0,  9, 10]])
-\end{lstlisting}
-
-The final matrix $B$ in the example above is a special kind of matrix called a \emph{banded} matrix.
-A banded matrix is a sparse matrix whose only non-zero entries are on the main diagonal and some diagonals on either side.
-In fact, $B$ is an example of a \emph{tri-diagonal} matrix, because its nonzero entries are confined to the three central diagonals.
-Banded matrices arise naturally in many applications, including numerical methods for solving differential equations.
-
-\begin{problem}
-Write a function that takes an integer argument \li{n} and returns a sparse $n\times n$
-tri-diagonal array with $2$'s along the diagonal and $-1$'s along
-the two sub-diagonals above and below the diagonal.
-The array should be in \li{csr_matrix} format.
-\emph{Hint}: Read about the \li{format} keyword parameter of the \li{sparse.spdiags} method.
-
-This matrix is the derivative operator in numerical analysis of differential equations.
-\label{prob:sparse_tridiag}
-\end{problem}
-
-A second way to create a sparse matrix is to pre-allocate an array of zeros and then specify the nonzero entries one at a time.
-The most efficient sparse matrix types for building matrices incrementally are \li{lil_matrix} and \li{dok_matrix}.
-Once you are done constructing the sparse matrix, you should convert it to a form that is optimized for computations.
-
-\begin{lstlisting}
-# Initialize Z.
->>> Z = sparse.lil_matrix((400, 300))
-# Specify the nonzero entries of Z.
->>> Z[1,34] = 23
->>> Z[23,32] = 56
->>> Z[2,:] = 13.2
->>> Z
-<400x300 sparse matrix of type '<type 'numpy.float64'>'
-  with 302 stored elements in LInked List format>
-
-\end{lstlisting}
-
-When the matrix \li{Z} is initialized, all its entries are assumed to be zero.
-Note that at the end of \li{Z}'s construction, only 302 elements are being stored for a matrix with 120000 entries.
-
-You may have noticed that the only way to view a matrix as a 2-D array is to convert it to a full matrix.
-If your matrix is too large to do this, you can still visualize it using the \li{plt.spy()} command from matplotlib.
-This function plots the locations of the non-zero entries in a matrix.
-The following code outputs Figure \ref{fig:mpl_spy}.
-
-\begin{lstlisting}
->>> from matplotlib import pyplot as plt
->>> B = np.random.rand(3, 10000)
->>> A = sparse.spdiags(B, range(-1, 2), 10000, 10000)
->>> plt.spy(A)
-\end{lstlisting}
-
-\begin{figure}
-\centering
-\includegraphics[width=.7\textwidth]{spy.png}
-\caption{}
-\label{fig:mpl_spy}
-\end{figure}
 
 %insert problem here that lets them play around with large sparse matrices in diff forms
 

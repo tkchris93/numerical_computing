@@ -21,7 +21,7 @@ def ref(A):
 
 
 # Problem 2
-def lu_factor(A):
+def lu(A):
     """Compute the LU decomposition of A."""
     m, n = A.shape
     U = np.array(A, dtype=np.float, copy=True)
@@ -43,7 +43,7 @@ def solve(A, b):
     assert m == n, "Matrix must be square."
     assert b.size == m, "Bad shape!"
 
-    L, U = lu_factor(A)
+    L, U = lu(A)
 
     # First solve Ly = Pb (assume P = I).
     y = np.zeros(n)
@@ -101,6 +101,12 @@ def prob4(N=12):
     plt.suptitle("Problem 4 Solution")
 
     plt.show()
+
+
+# Problem 5 (TODO)
+
+
+# Problem 6 (TODO?)
 
 
 # Additional Material =========================================================
