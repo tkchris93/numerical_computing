@@ -11,9 +11,10 @@ from matplotlib import pyplot as plt
 
 # Problem 1
 def ref(A):
-    """Reduce a square matrix A to REF. During a row operation, do not
-    modify any entries that you know will be zero before and after the
-    operation."""
+    """Reduce the square matrix A to REF. You may assume that A is invertible
+    and that a 0 will never appear on the main diagonal. Avoid operating on
+    entries that you know will be 0 before and after a row operation.
+    """
     A = np.array(A, dtype=np.float, copy=True)
     m,n = A.shape
     for j in xrange(n):
@@ -24,7 +25,9 @@ def ref(A):
 
 # Problem 2
 def lu(A):
-    """Compute the LU decomposition of A."""
+    """Compute the LU decomposition of the square matrix A. You may assume the
+    decomposition exists and requires no row swaps.
+    """
     m, n = A.shape
     U = np.array(A, dtype=np.float, copy=True)
     L = np.eye(n)
@@ -63,6 +66,7 @@ def solve(A, b):
 # Problem 4
 def prob4(N=12):
     """Time different scipy.linalg functions for solving square linear systems.
+    Plot the system size versus the execution times. Use log scales if needed.
     """
     domain = 2**np.arange(1,N+1)
     inv, solve, lu_factor, lu_solve = [], [], [], []
@@ -115,9 +119,12 @@ def prob5(n):
     """
     return sparse.diags([2,-1,2], [-1,0,1], shape=(n,n))
 
-# Problem 5
-def prob6(N=10):
 
+# Problem 6
+def prob6(N=10):
+    """Time regular and sparse linear system solvers. Plot the system size
+    versus the execution times. As always, use log scales where appropriate.
+    """
     domain = 2**np.arange(2,N+1)
     solve, spsolve = [], []
 
@@ -145,17 +152,16 @@ def prob6(N=10):
     plt.loglog(domain, solve, '.-', basex=2, basey=2, lw=2)
     plt.xlabel("n")
 
-    plt.suptitle("Problem 5 Solution")
+    plt.suptitle("Problem 6 Solution")
     plt.show()
 
-
-if __name__ == '__main__':
-    prob6(12)
 
 # Additional Material =========================================================
 
 def ref_with_swaps(A):
-    """Reduce an mxn matrix to REF."""
+    """Reduce an mxn matrix to REF, using row swaps if necessary.
+    This is only one of a few ways to do it.
+    """
     A = np.array(A, dtype=float, copy=True)
     m,n = A.shape
     for j in xrange(min(m, n) - 1):
