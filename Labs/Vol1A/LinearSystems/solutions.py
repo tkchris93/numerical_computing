@@ -3,7 +3,9 @@
 
 import numpy as np
 from time import time
+from scipy import sparse
 from scipy import linalg as la
+from scipy.sparse import linalg as spla
 from matplotlib import pyplot as plt
 
 
@@ -14,7 +16,7 @@ def ref(A):
     operation."""
     A = np.array(A, dtype=np.float, copy=True)
     m,n = A.shape
-    for j in xrange(min(m,n) - 1):
+    for j in xrange(n):
         for i in xrange(j+1, m):
             A[i,j:] -= A[j,j:] * A[i,j] / A[j,j]
     return A
@@ -64,6 +66,7 @@ def prob4(N=12):
     """
     domain = 2**np.arange(1,N+1)
     inv, solve, lu_factor, lu_solve = [], [], [], []
+
     for n in domain:
         A = np.random.random((n,n))
         b = np.random.random(n)
@@ -91,6 +94,7 @@ def prob4(N=12):
     plt.plot(domain, lu_factor, '.-', lw=2,
                                         label="la.lu_factor() + la.lu_solve()")
     plt.plot(domain, lu_solve, '.-', lw=2, label="la.lu_solve() alone")
+    plt.xlabel("n"); plt.ylabel("Seconds")
     plt.legend(loc="upper left")
 
     plt.subplot(122)
@@ -98,16 +102,50 @@ def prob4(N=12):
     plt.loglog(domain, solve, '.-', basex=2, basey=2, lw=2)
     plt.loglog(domain, lu_factor, '.-', basex=2, basey=2, lw=2)
     plt.loglog(domain, lu_solve, '.-', basex=2, basey=2, lw=2)
-    plt.suptitle("Problem 4 Solution")
+    plt.xlabel("n")
 
+    plt.suptitle("Problem 4 Solution")
     plt.show()
 
 
-# Problem 5 (TODO)
+# Problem 5
+def prob5(N=10):
+    """Return a sparse n x n tridiagonal matrix with 2's along the main
+    diagonal and -1's along the first sub- and super-diagonals.
+    """
+    domain = 2**np.arange(2,N+1)
+    solve, spsolve = [], []
+
+    for n in domain:
+        A = sparse.diags([2,-1,2], [-1,0,1], shape=(n,n)).tocsr()
+        b = np.random.random(n)
+
+        start = time()
+        spla.spsolve(A, b)
+        spsolve.append(time()-start)
+
+        A = A.toarray()
+        start = time()
+        la.solve(A, b)
+        solve.append(time()-start)
+
+    plt.subplot(121)
+    plt.plot(domain, spsolve, '.-', lw=2, label="spla.spsolve()")
+    plt.plot(domain, solve, '.-', lw=2, label="la.solve()")
+    plt.xlabel("n"); plt.ylabel("Seconds")
+    plt.legend(loc="upper left")
+
+    plt.subplot(122)
+    plt.loglog(domain, spsolve, '.-', basex=2, basey=2, lw=2)
+    plt.loglog(domain, solve, '.-', basex=2, basey=2, lw=2)
+    plt.xlabel("n")
+
+    plt.suptitle("Problem 5 Solution")
+    plt.show()
 
 
-# Problem 6 (TODO?)
-
+if __name__ == '__main__':
+    prob5(12)
 
 # Additional Material =========================================================
 

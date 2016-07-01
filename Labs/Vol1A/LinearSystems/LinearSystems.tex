@@ -352,8 +352,8 @@ Each type is optimized either for storing sparse matrices whose nonzero entries 
 
 \begin{table}[H]
 \centering
-\begin{tabular}{c|l|l}
-    Name & \multicolumn{1}{c|}{Description} & \multicolumn{1}{c}{Advantages}
+\begin{tabular}{c|c|l}
+    Name & Description & \multicolumn{1}{c}{Advantages}
     \\ \hline
     \li{bsr_matrix} & Block Sparse Row & Specialized structure. \\
     \li{coo_matrix} & Coordinate Format & Conversion among sparse formats. \\
@@ -409,11 +409,11 @@ This method is quite similar syntactically to NumPy.
 \begin{lstlisting}
 >>> B = sparse.lil_matrix((2,6))
 >>> B[0,2] = 4
->>> B[1,4] = 9
+>>> B[1,3:] = 9
 
 >>> print(B.toarray())
 [[ 0.  0.  4.  0.  0.  0.]
- [ 0.  0.  0.  0.  9.  0.]]
+ [ 0.  0.  0.  9.  9.  9.]]
 \end{lstlisting}
 
 % OLD VERSION
@@ -422,20 +422,7 @@ A second way to create a sparse matrix is to pre-allocate an array of zeros and 
 The most efficient sparse matrix types for building matrices incrementally are \li{lil_matrix} and \li{dok_matrix}.
 Once you are done constructing the sparse matrix, you should convert it to a form that is optimized for computations.
 
-\begin{lstlisting}
-# Initialize Z.
->>> Z = sparse.lil_matrix((400, 300))
-# Specify the nonzero entries of Z.
->>> Z[1,34] = 23
->>> Z[23,32] = 56
->>> Z[2,:] = 13.2
->>> Z
-<400x300 sparse matrix of type '<type 'numpy.float64'>'
-  with 302 stored elements in LInked List format>
-\end{lstlisting}
-
-When the matrix \li{Z} is initialized, all its entries are assumed to be zero.
-Note that at the end of \li{Z}'s construction, only 302 elements are being stored for a matrix with $120000$ entries.
+% Note that at the end of \li{Z}'s construction, only 302 elements are being stored for a matrix with $120000$ entries.
 
 The only way to view a matrix as a 2-D array is to convert it to a full matrix.
 If your matrix is too large to do this, you can still visualize it using the \li{plt.spy()} command from matplotlib.
@@ -459,24 +446,32 @@ The following code outputs Figure \ref{fig:mpl_spy}.
 
 \item \textbf{DIA and BSR Formats}:
 When the matrix has a particular sparsity pattern, such as nonzero blocks or diagonals, use \li{bsr_matrix} or \li{dia_matrix}.
-
-% % spdiags() for some reason?
-Use the method \li{sparse.spdiags(data, diags, m, n)}.
-If \li{data} is a 1-D array and \li{diags} is a scalar, then this method creates an $m \times n$ matrix with \li{data} on the specified diagonal.
-The parameter \li{diags=0} indicates the main diagonal, with lower diagonals indexed by negative numbers and upper diagonals by positive numbers.
-If \li{data} is a 2-D array and \li{diags} is a list, then this method creates an $m \times n$ matrix with the rows of \li{data} on the diagonals specified by \li{diags}.
+The functions \li{sparse.bmat()} and \li{sparse.diags()} help create these structures conveniently.
 
 \begin{lstlisting}
+# Use sparse.bmat() to create a block matrix. Use 'None' for zero blocks.
+>>> A = sparse.coo_matrix(np.ones((2,2)))
+>>> B = sparse.coo_matrix(np.full((2,2), 2.))
+>>> print(sparse.bmat([[  A , None,   A ],
+                       [None,   B , None]], <<format>>='bsr').toarray())
+[[ 1.,  1.,  0.,  0.,  1.,  1.],
+ [ 1.,  1.,  0.,  0.,  1.,  1.],
+ [ 0.,  0.,  2.,  2.,  0.,  0.],
+ [ 0.,  0.,  2.,  2.,  0.,  0.]]
+
+# Use sparse.diags() to create diagonal matrices.
+>>>
+
 # Create a sparse 3x3 matrix with (2, 3, 4) on the diagonal.
->>> A = sparse.spdiags([2, 3, 4], 0, 3, 3)
+>>> A = sparse.diags([2, 3, 4], 0, shape=(3,3))
 >>> A
-<<<3x3 sparse matrix of type '<type 'numpy.int64'>'
+<<<3x3 sparse matrix of type '<type 'numpy.float64'>'
   with 3 stored elements (1 diagonals) in DIAgonal format>>>
 # Convert A to a full matrix.
 >>> print(A.toarray())
-[[2, 0, 0],
- [0, 3, 0],
- [0, 0, 4]]
+[[ 2.  0.  0.]
+ [ 0.  3.  0.]
+ [ 0.  0.  4.]]
 
 # Create a sparse 4x4 matrix with the rows of diag_entries on the diagonals.
 >>> diag_entries = np.array([[3,6,9,0],[1,4,7,10],[0,2,5,8]])
@@ -489,7 +484,15 @@ If \li{data} is a 2-D array and \li{diags} is a list, then this method creates a
  [ 3,  4,  5,  0],
  [ 0,  6,  7,  8],
  [ 0,  0,  9, 10]]
+
 \end{lstlisting}
+
+
+% % spdiags() for some reason?
+Use the method \li{sparse.spdiags(data, diags, m, n)}.
+If \li{data} is a 1-D array and \li{diags} is a scalar, then this method creates an $m \times n$ matrix with \li{data} on the specified diagonal.
+The parameter \li{diags=0} indicates the main diagonal, with lower diagonals indexed by negative numbers and upper diagonals by positive numbers.
+If \li{data} is a 2-D array and \li{diags} is a list, then this method creates an $m \times n$ matrix with the rows of \li{data} on the diagonals specified by \li{diags}.
 
 \end{itemize}
 
@@ -509,6 +512,24 @@ This matrix is the derivative operator in numerical analysis of differential equ
 \label{prob:sparse-tridiag-construction}
 \end{problem}
 
+\begin{problem} % TODO: Merge these problems.
+Write a function that accepts an integer argument \li{n} as well as a keyword argument \li{sparse} whose value is either \li{True} or \li{False} (default to \li{False}).
+Then do the following:
+\begin{enumerate}
+\item Inside of the function, use your previous solutions to generate an $n \times n$ tri-diagonal array $A$ -- either sparse or full depending on the value of the \li{sparse} argument.
+\item Generate an $n \times 1$ random array $b$
+\item Solve the system $Ax = b$, using either \li{scipy.sparse.linalg.spsolve} or \li{scipy.linalg.solve}
+(again depending on the value of \li{sparse}) and return the solution.
+\item Time the function for \li{n = 2000} using both the sparse and the full option.
+\end{enumerate}
+\end{problem}
+
+\begin{warn} % Don't try to invert sparse matrices.
+Because there are fast algorithms for solving a tri-diagonal linear system, you may think that there are fast algorithms for inverting a tri-diagonal matrix.
+In fact this is not true, and the inverse of a sparse matrix is usually not sparse.
+There is rarely a good reason to invert a matrix, sparse or dense.
+\end{warn}
+
 \subsubsection*{Sparse Matrix Operations} % -----------------------------------
 
 % We can also use \li{sparse} methods on dense matrices (matrices with mostly nonzero entries), but doing so will take longer than using the usual methods for handling full matrices.
@@ -518,6 +539,7 @@ These methods take advantage of the sparse structure of the matrices and are, th
 % To learn which methods are available, see \url{http://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.html#scipy.sparse.csr_matrix}
 There is also a \li{scipy.sparse.linalg} module containing linear algebra methods that have been optimized for sparse matrices.
 
+% Once you are done constructing the sparse matrix, you should convert it to a form that is optimized for computations.
 
 For the vast majority of matrix computation you can perform with sparse matrices, the \li{csr_matrix} and \li{csc_matrix} will be your best option.
 They stand for
@@ -549,11 +571,11 @@ slicing with syntax identical to array slicing for NumPy arrays.
 Row slicing is faster with a \li{csr_matrix} and column slicing is faster with a \li{csc_matrix}.
 
 \begin{lstlisting}
->>> Acsr[0,:].todense()
-matrix([[3, 2, 0, 0]])
+>>> Acsr[0,:].toarray()
+array([[3, 2, 0, 0]])
 
->>> Acsc[:,2].todense()
-matrix([[0],
+>>> Acsc[:,2].toarray()
+array([[0],
         [0],
         [4],
         [0]])
@@ -574,11 +596,11 @@ can be used to optimize performance.
 >>> values = np.array([3,5,4,1,2,1])
 >>> A = spar.coo_matrix((values, (rows,cols)), shape=(4,4))
 
-# To visualize the matrix, use .todense(). Keep in mind doing
+# To visualize the matrix, use .toarray(). Keep in mind doing
 #   operations on this dense matrix forfeits all sparse-related
 #   optimizations.
->>> print A.todense()
-matrix([[3, 2, 0, 0],
+>>> print A.toarray()
+array([[3, 2, 0, 0],
         [0, 5, 0, 0],
         [1, 0, 4, 0],
         [0, 0, 0, 1]])
@@ -592,12 +614,12 @@ array([3,0,-3,2])
 # access rows of a csr_matrix. The syntax for slicing a csr_matrix
 #  (and csc_matrix) is identical to slicing NumPy arrays. For row slicing,
 #  use a csr_matrix. For column slicing, use a csc_matrix.
->>> Acsr[0,:].todense()
-matrix([[3, 2, 0, 0]])
+>>> Acsr[0,:].toarray()
+array([[3, 2, 0, 0]])
 
 >>> Acsc = A.tocsc()
->>> Acsc[:,2].todense()
-matrix([[0],
+>>> Acsc[:,2].toarray()
+array([[0],
         [0],
         [4],
         [0]])
@@ -611,11 +633,11 @@ matrix([[0],
 \end{lstlisting}
 \end{comment}
 
-
 See \url{http://docs.scipy.org/doc/scipy/reference/sparse.html} for more details on the \li{sparse} module.
 
 \subsection*{OLD STUFF} % -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
+\begin{comment}
 Let us compare a \li{sparse} matrix computation with a full matrix computation.
 Note that we can convert any full matrix to a \li{sparse} matrix of any of the types.
 
@@ -652,28 +674,6 @@ from scipy import sparse
 \end{lstlisting}
 
 As you can see from this example, we get the best performance when we store a sparse matrix with the \li{sparse} module and a dense matrix as a full matrix.
-
-\begin{comment}
-\begin{problem} % *Very* simple timing problem
-Create a $500\times 500$ matrix and vector of length 500, both full of random values
-Use the \li{A.dot(b)} command to multiply your matrix and your vector, and time how long it takes to do so
-Then convert your matrix to sparse format and again time how long it takes to multiply it by your vector using \li{A.dot(b)}.
-\end{problem}
-\end{comment}
-
-%insert problem here that lets them play around with large sparse matrices in diff forms
-
-\begin{comment}
-\subsection*{Banded Matrices} % -----------------------------------------------
-
-\begin{problem}
-Write a function that takes an integer argument \li{n} and returns a full $n\times n$
-tri-diagonal array with $2$'s along the diagonal and $-1$'s along
-the two sub-diagonals above and below the diagonal.
-\\(Hint: \li{np.diagflat()} may be useful.)
-
-\label{full_tridiag}
-\end{problem}
 \end{comment}
 
 \subsection*{Manipulating Sparse Matrices} % ----------------------------------
@@ -684,20 +684,20 @@ You can multiply two sparse matrices element-wise with the \li{multiply()} metho
 \begin{lstlisting}
 >>> D = sparse.spdiags([2,3,4],0,3,3)
 >>> C = sparse.spdiags(np.ones((3,3)), [-1,0,1], 3, 3)
->>> (D.multiply(C)).todense()
-matrix([[ 2.,  0.,  0.],
+>>> (D.multiply(C)).toarray()
+array([[ 2.,  0.,  0.],
         [ 0.,  3.,  0.],
         [ 0.,  0.,  4.]])
 \end{lstlisting}
 
 On the other hand, the asterisk \li{*} performs ordinary matrix multiplication.
 You can also use the \li{dot} method of one of the sparse matrices.
-However, you should NOT use \li{np.dot} on sparse matrices because it may return an incorrect answer.
+However, you should NOT use \li{np.dot()} on sparse matrices because it may return an incorrect answer.
 
 \begin{lstlisting}
 # One correct way to mutliply sparse matrices
->>> (D.dot(C)).todense()
-matrix([[ 2.,  2.,  0.],
+>>> (D.dot(C)).toarray()
+array([[ 2.,  2.,  0.],
         [ 3.,  3.,  3.],
         [ 0.,  4.,  4.]])
 \end{lstlisting}
@@ -705,75 +705,14 @@ matrix([[ 2.,  2.,  0.],
 Addition and scalar multiplication are implemented as usual.
 
 \begin{lstlisting}
->>> (D + 3*C).todense()
-matrix([[ 5.,  3.,  0.],
+>>> (D + 3*C).toarray()
+array([[ 5.,  3.,  0.],
         [ 3.,  6.,  3.],
         [ 0.,  3.,  7.]])
 \end{lstlisting}
 
-\section*{Using Sparse Matrices to Reduce Runtimes} % =========================
-
-In addition to spatial complexity, the \li{sparse} module can reduce temporal complexity.
-Consider the linear system $A x = b$, where $A$ is a $100000\times 100000$ tri-diagonal matrix.
-Storing a full matrix of that size requires 10 billion double-precision floating-point numbers.
-Since it takes 8 bytes to store a double, we need roughly 80GB to store the full matrix.
-Lack of storage space makes this system impossible to solve for most desktop computers, but even more problematic is the temporal complexity.
-Methods for directly solving a linear system are usually $O(n^3)$.
-As a result, even if the computer could store an 80GB matrix in RAM, it would still take several weeks to solve the system.
-%However, since we don't typically have computers with that much available RAM, most of the
-%matrix would have to be stored on the hard drive, so the computation would probably take between $6$ months to a year.
-
-The point is, even as computers increase in processing speed and memory, we can still easily construct problems that they will struggle to solve in a reasonable amount of time.
-However, if we store the tri-diagonal matrix as a \li{sparse} matrix, we can solve the linear system, even with a modest computer.
-
-Let's first compute the spatial complexity of the above system when $A$ is stored as a sparse matrix.
-There are three diagonals that have roughly $100000$ non-zero entries.
-That's $300000$ double-precision floating point numbers, which is about 2.4 MB, or less storage than your favorite song.
-Thus, the sparse matrix will easily fit into the computer's RAM
-Furthermore, the temporal complexity for solving a tri-diagonal matrix is $O(n)$.
-\footnote{Because there are fast algorithms for solving a tri-diagonal linear system, you may think that there are fast algorithms for inverting a tri-diagonal matrix.
-In fact this is not true, and the inverse of a sparse matrix is usually not sparse.
-There is rarely a good reason to invert a matrix, sparse or dense.}
-Let's see how long it takes to solve the system when $A$ and $b$ are filled with random data.
-
-\begin{lstlisting}
->>> from scipy.sparse import linalg as sl
->>> G = np.random.rand(3, 100000)
->>> b = np.random.rand(1, 100000)
->>> A = sparse.spdiags(G,[-1,0,1],100000,100000, format='csr')
->>> def solSys():
-...     return sl.spsolve(A, b)
-
->>> %timeit solSys()
-1 loops, best of 3: 80.8 ms per loop
-
-\end{lstlisting}
-
-This computer solved the system in only 80.8 milliseconds.
-
-\begin{comment}
-\begin{problem}
-Write a function that accepts an integer argument \li{n} as well as a keyword argument \li{sparse} whose value is either \li{True} or \li{False} (default to \li{False}).
-Then do the following:
-\begin{enumerate}
-\item Inside of the function, use your previous solutions to generate an $n \times n$ tri-diagonal array $A$ -- either sparse or full depending on the value of the \li{sparse} argument.
-\item Generate an $n \times 1$ random array $b$
-\item Solve the system $Ax = b$, using either \li{scipy.sparse.linalg.spsolve} or \li{scipy.linalg.solve}
-(again depending on the value of \li{sparse}) and return the solution.
-\item Time the function for \li{n = 2000} using both the sparse and the full option.
-\end{enumerate}
-\end{problem}
-\end{comment}
-
-\begin{problem}
-Write a function that accepts an integer argument $n$ and does the following:
-\begin{enumerate}
-\item Generates an $n \times 1$ random array $b$.
-\item Solves the linear system $Ax = b$, where $A$ is the tri-diagonal array in Problem \ref{prob:sparse_tridiag} of size $n \times n$.
-\end{enumerate}
-\end{problem}
-
-\begin{problem}
+\begin{comment} % This problem sucks!
+\begin{problem} % Use sparse.linalg.eigs()
 Write a function that accepts an integer argument \li{n} and returns $\lambda n^2$, where
 $\lambda$ is the smallest eigenvalue of the sparse tri-diagonal array you built in Problem \ref{prob:sparse_tridiag}.
 
@@ -785,8 +724,8 @@ Read the documentation of \li{sl.eigs} for more information.
 What value does $\lambda n^2$ approach as $n$ approaches infinity?
 This value is meaningful in operator theory.
 \li{Hint}: This value is the square of an important number.
-
 \end{problem}
+\end{comment}
 
 \newpage
 
