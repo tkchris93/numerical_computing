@@ -79,7 +79,7 @@ Instead, modify the matrix \emph{in place} (without making a copy), changing onl
 >>> import numpy as np
 >>> A = np.array([[1, 1, 1, 1],
 ...               [1, 4, 2, 3],
-...               [4, 7, 8, 9]], dtype=np.float)
+...               [4, 7, 8, 9]], dtype=np.<<float>>)
 
 # Reduce the 0th column to zeros below the diagonal.
 >>> A[1,0:] -= (A[1,0] / A[0,0]) * A[0]
@@ -87,7 +87,7 @@ Instead, modify the matrix \emph{in place} (without making a copy), changing onl
 
 # Reduce the 1st column to zeros below the diagonal.
 >>> A[2,1:] -= (A[2,1] / A[1,1]) * A[1,1:]
->>> print A
+>>> print(A)
 [[ 1.  1.  1.  1.]
  [ 0.  3.  1.  2.]
  [ 0.  0.  3.  3.]]
@@ -192,9 +192,8 @@ If $A\x = \b$ and $PA = LU$, then $LU\x = PA\x = P\b$.
 We can solve this system by first solving $L\y = P\b$, then $U\x = \y$.
 Since $L$ and $U$ are both triangular, these systems can be solved with backward and forward substitution.
 We can thus compute the $LU$ factorization of $A$ once, then use substitution to efficiently solve $A\x=\b$ for various values of $\b$.
-% This technique is significantly faster than storing $A^{-1}$ and then computing $A^{-1}\b$ (see Problem \ref{prob:solve}).
 
-The square, triangular system $L\y = \b$ has the following form:
+Since the diagonal entries of $L$ are all $1$, the triangular system $L\y = \b$ has the following form:
 %
 \begin{align*}
 \left[\begin{array}{ccccc}
@@ -629,7 +628,7 @@ To swap rows in a NumPy array, use \li{np.copy()} and reassign the rows simultan
 Another helpful function is \li{np.roll()}, which rolls the entries, rows, or columns of an array forward or backward.
 
 \begin{lstlisting}
->>> np.roll([1,2,3,4], 1)
+>>> np.roll([1, 2, 3, 4], 1)
 array([4, 1, 2, 3])
 
 # Roll the rows of A backward one position.
@@ -671,7 +670,7 @@ Then the matrix product $PA$ will be the same as \li{A[P]}.
 
 # Swap rows 1 and 2.
 >>> A[1], A[2] = np.copy(A[2]), np.copy(A[1])
->>> P[1], P[2] = np.copy(P[2]), np.copy(P[1])
+>>> P[1], P[2] = P[2], P[1]
 
 >>> print(A)                        # A with the new row arrangement.
 [[ 0.  0.  0.  0.]
