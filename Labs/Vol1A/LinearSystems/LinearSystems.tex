@@ -7,7 +7,7 @@ We also introduce SciPy, together with its libraries for linear algebra and work
 
 \section*{Gaussian Elimination} % =============================================
 
-The standard approach for solving the linear system $A\x = b$ on paper is reducing the augmented matrix $\left[A\mid\b\right]$ to row-echelon form (REF) via \emph{Gaussian elimination}, then using back substitution.
+The standard approach for solving the linear system $A\x = \b$ on paper is reducing the augmented matrix $\left[A\mid\b\right]$ to row-echelon form (REF) via \emph{Gaussian elimination}, then using back substitution.
 The matrix is in REF when the leading non-zero term in each row is the diagonal term, so the matrix is upper triangular.
 
 At each step of the process, there are three possible operations: swapping two rows, multiplying one row by a scalar value, or adding a scalar multiple of one row to another.
