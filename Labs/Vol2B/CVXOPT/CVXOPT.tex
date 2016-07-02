@@ -280,13 +280,12 @@ we pass more arguments to \li{solvers.lp} since we have equality constraints.)
 >>> c = matrix([4., 7., 6., 8., 8., 9])
 >>> G = matrix(-1*np.eye(6))
 >>> h = matrix(np.zeros(6))
->>> A = matrix([[1., 0., 0., 1., 0.],
-                [1., 0., 0., 0., 1.],
-                [0., 1., 0., 1., 0.],
-                [0., 1., 0., 0., 1.],
-                [0., 0., 1., 1., 0.],
-                [0., 0., 1., 0., 1.]])
->>> b = matrix([7., 2., 4., 5., 8])
+>>> A = matrix(np.array([[1.,1.,0.,0.,0.,0.],
+                         [0.,0.,1.,1.,0.,0.],
+                         [0.,0.,0.,0.,1.,1.],
+                         [1.,0.,1.,0.,1.,0.],
+                         [0.,1.,0.,1.,0.,1.]]))
+>>> b = matrix([7., 2., 4., 5., 8.])
 >>> sol = solvers.lp(c, G, h, A, b)
      pcost       dcost       gap    pres   dres   k/t
  0:  8.9500e+01  8.9500e+01  2e+01  4e-17  2e-01  1e+00
@@ -305,11 +304,9 @@ Notice that some problems occurred. First, CVXOPT alerted us to the fact that th
 Further, the solution that was obtained does not consist of integer entries.
 
 So what went wrong? Recall that the matrix $A$ is required to have full row rank, but we can easily see that the rows of $A$
-are linearly dependent. We rectify this by converting some of the equality constraints into \emph{inequality} constraints, so that
+are linearly dependent. We rectify this by converting the last row of the equality constraints into \emph{inequality} constraints, so that
 the remaining equality constraints define a new matrix $A$ with linearly independent rows.
 
-Rather than fuss about which equality
-constraints to convert into inequality constraints, let us simply convert all of the equality constraints.
 This is done as follows:
 
  Suppose we have the equality constraint
@@ -329,10 +326,11 @@ x + 2y - 3z &\leq 4, \\
 -x - 2y + 3z &\leq -4.
 \end{align*}
 
-Apply this process to each of the equality constraints. You will obtain a new matrix $G$ with several additional rows (to account for the new inequality
-constraints), and a new vector $h$, also with more entries. Having done this, we no longer have equality constraints $A$ and $b$, so these can be ignored.
+Apply this process to the last equality constraint. 
+You will obtain a new matrix $G$ with several additional rows (to account for the new inequality
+constraints), and a new vector $h$, also with more entries. 
 \begin{problem}
-Solve the problem by converting all equality constraints into inequality constraints.
+Solve the problem by converting the last equality constraint into an inequality constraint.
 Report the optimal values for $x$ and the primal objective function.
 \end{problem}
 

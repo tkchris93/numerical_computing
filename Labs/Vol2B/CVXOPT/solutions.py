@@ -41,27 +41,34 @@ def prob1():
 
 
 def prob2():
-    """Solve the transportation problem by converting all equality constraints
-    into inequality constraints.
+    """Solve the transportation problem by converting the last equality constraint
+    into an inequality constraint.
 
     Returns (in order):
         The optimizer (sol['x'])
         The optimal value (sol['primal objective'])
     """
-    c = matrix([4., 7., 6., 8., 8., 9])
-    G = matrix([[-1., 0., 0., -1., 0., -1., 0., 0., 0., 0., 0.],
-                [-1., 0., 0., 0., -1., 0., -1., 0., 0., 0., 0.],
-                [0., -1., 0., -1., 0., 0., 0., -1., 0., 0., 0.],
-                [0., -1., 0., 0., -1., 0., 0., 0., -1., 0., 0.],
-                [0., 0., -1., -1., 0., 0., 0., 0., 0., -1., 0.],
-                [0., 0., -1., 0., -1., 0., 0., 0., 0., 0., -1.]])
-    h = matrix([-7., -2., -4., -5., -8., 0., 0., 0., 0., 0., 0.])
-    sol = solvers.lp(c,G,h)  
+    c = matrix([4., 7., 6., 8., 8., 9.])
+    G = matrix(np.array([[-1.,0.,0.,0.,0.,0.],
+                         [0.,-1.,0.,0.,0.,0.],
+                         [0.,0.,-1.,0.,0.,0.],
+                         [0.,0.,0.,-1.,0.,0.],
+                         [0.,0.,0.,0.,-1.,0.],
+                         [0.,0.,0.,0.,0.,-1.],
+                         [0.,1.,0.,1.,0.,1.],
+                         [0.,-1.,0.,-1.,0.,-1.]]))
+    h = matrix([0.,0.,0.,0.,0.,0., 8., -8.])
+    A = matrix(np.array([[1.,1.,0.,0.,0.,0.],
+                         [0.,0.,1.,1.,0.,0.],
+                         [0.,0.,0.,0.,1.,1.],
+                         [1.,0.,1.,0.,1.,0.]]))
+    b = matrix([7.,2.,4.,5.])
+    sol = solvers.lp(c,G,h,A,b)  
     return sol['x'], sol['primal objective']
 
     # Answers:
-    # np.array([[ 5.00e+00],[ 2.00e+00],[ 5.55e-08],
-    #           [ 2.00e+00],[ 1.05e-08],[ 4.00e+00]])
+    # np.array([[ 5.00e+00],[ 2.00e+00],[ -7.03e-09],
+    #           [ 2.00e+00],[ -5.45e-09],[ 4.00e+00]])
     # 86
 
 
