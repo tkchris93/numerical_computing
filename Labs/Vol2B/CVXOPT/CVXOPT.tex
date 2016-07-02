@@ -2,13 +2,13 @@
 \label{lab:Optimization 2}
 \objective{Introduce some of the basic optimization functions available in the CVXOPT package}
 
-You can learn more about CVXOPT at
-\url{http://abel.ee.ucla.edu/cvxopt/documentation/}.
-To install CVXOPT, use the following commands:
+Notebox: CVXOPT is not part of the standard library, nor is it included in the Anaconda distribution. To install CVXOPT, use the following commands:
 
+% Do terminal boxes
 for Windows: \li{conda install -c http://conda.anaconda.org/omnia cvxopt}
 
-for Mac: \li{pip install cvxopt}
+for Unix: \li{pip install cvxopt}
+End notebox.
 
 \section*{Linear Programs}
 
@@ -31,6 +31,7 @@ Note that the constraint $Gx +s = h$ includes the term $s$, which is not part of
 function, and is known as the \emph{slack variable}. Since $s  \geq 0$, the constraint
 $Gx + s = h$ is equivalent to $Gx \leq h$.
 
+% Students have not yet learned about the dual problem. May be included in a later lab.
 \begin{comment}
 The corresponding \emph{dual program} for the above linear program has the form
 \begin{align*}
@@ -117,6 +118,7 @@ and then simply convert them to the CVXOPT matrix data type:
 >>> h = matrix(h)
 \end{lstlisting}
 Use whichever method is most convenient. Note that we made sure the entries in the matrices are floats.
+% TODO: make this a warning box, about initialization and the need for float data type.
 
 Having initialized the necessary objects, we are now ready to solve the problem.
 We will use the CVXOPT function for linear programming \li{solvers.lp}, and we simply need to pass in $c$, $G$, and $h$ as arguments.
@@ -151,6 +153,52 @@ Solve the following convex optimization problem:
 \end{align*}
 Report the values for $x$ and the primal objective value that you obtain.
 Remember to make the necessary adjustments so that all inequality constraints are $\leq$ rather than $\geq$.
+\end{problem}
+
+The $l_1$ minimization problem is to
+\begin{align*}
+\text{minimize}\qquad &\|x\|_1\\
+\text{subject to} \qquad &Ax = b.
+\end{align*}
+
+This problem can be converted into a linear program by introducing an additional vector $u$ of length $n$, and then solving:
+\begin{align*}
+\text{minimize}\qquad 
+&\begin{bmatrix}
+\mathbf{1} & 0
+\end{bmatrix}
+\begin{bmatrix}
+u \\
+x
+\end{bmatrix}\\
+\text{subject to}\qquad
+&\begin{bmatrix}
+-I & I\\
+-I & -I
+\end{bmatrix}
+\begin{bmatrix}
+u \\
+x
+\end{bmatrix}
+\leq 
+\begin{bmatrix}
+0\\
+0
+\end{bmatrix},\\
+&\begin{bmatrix}
+0 & A
+\end{bmatrix}
+\begin{bmatrix}
+u \\
+x
+\end{bmatrix}
+= 
+b.
+\end{align*}
+Of course, solving this gives values for the optimal $u$ and the optimal $x$, but we only care about the optimal $x$.
+
+\begin{problem}
+Write a function called \li{l1Min()} that takes a matrix $A$ and vector $b$ as inputs, and returns the solution $x$ to the $l_1$ optimization problem. 
 \end{problem}
 
 \section*{The Transportation Problem}
@@ -430,6 +478,18 @@ $
 
 \end{problem}
 
+
+\begin{problem}
+The $l_2$ minimization problem is to
+\begin{align*}
+\text{minimize}\qquad &\|x\|_2\\
+\text{subject to} \qquad &Ax = b.
+\end{align*}
+
+This problem is equivalent to a quadratic program, since $\|x\|_2 = x^Tx$.
+Write a function called \li{l2Min()} that takes a matrix $A$ and vector $b$ as inputs, and returns the solution $x$ to the $l_2$ minimization problem.
+\end{problem}
+
 \section*{Allocation Models}
 Allocation models lead to simple linear programs. An allocation model seeks to allocate a valuable resource among competing needs. The following example is taken from ``Optimization in Operations Research" by Ronald L. Rardin. %%pg 132
 
@@ -500,3 +560,6 @@ Note that since acres are in thousands, we divide the constraints of timber and 
 \begin{problem}
 Solve the problem above. Output the value of each $x_{i,j}$ and the maximum total net present value (the primal objective of the appropriately minimized linear function multiplied by -1000).
 \end{problem} 
+
+You can learn more about CVXOPT at
+\url{http://abel.ee.ucla.edu/cvxopt/documentation/}.
