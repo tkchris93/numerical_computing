@@ -16,7 +16,7 @@ def prob1():
 
     minimize        2x + y + 3z
     subject to      x + 2y          >= 3
-                    2x + y + 3z     >= 10
+                    2x + 10y + 3z   >= 10
                     x               >= 0
                     y               >= 0
                     z               >= 0
@@ -29,7 +29,7 @@ def prob1():
     # Note that 'matrix' initializes by column, not row.
     c = matrix([2., 1., 3.])
     G = matrix([[-1., -2., -1.,  0.,  0.],
-                [-2., -1.,  0., -1.,  0.],
+                [-2., -10.,  0., -1.,  0.],
                 [ 0., -3.,  0.,  0., -1.]])
     h = matrix([ -3., -10., 0., 0., 0.])
     sol = solvers.lp(c,G,h)
