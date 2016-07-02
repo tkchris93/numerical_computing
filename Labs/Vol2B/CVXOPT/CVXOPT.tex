@@ -494,8 +494,7 @@ Allocation models lead to simple linear programs. An allocation model seeks to a
 The U.S. Forest service has used an allocation model to deal with the task of managing national forests. 
 The model begins by dividing the land into a set of analysis areas. Several land management policies (also 
 called prescriptions) are then proposed and evaluated for each area. 
-An \emph{allocation} is an assignment of land (in acreage) in each analysis area to each of the 
-prescriptions for that analysis area.
+An \emph{allocation} is how much land (in acreage) in each unique analysis area will be assigned to each of the possible prescriptions.
 We seek to find the best possible allocation, subject to forest-wide restrictions on land use.
 
 The file \li{ForestData.npy} contains data for a fictional national forest (you can also find the data
@@ -542,10 +541,9 @@ example, the allocation vector is of size $7\cdot 3 = 21$.
 Our goal is to find the allocation vector that maximizes net present value, while producing at least 40 million
 board-feet of timber, at least 5 thousand animal-unit months of grazing, and keeping the average wilderness index at least 70.
 
-Of course, the allocation vector is also constrained to be nonnegative, and all of the land must be allocated 
-precisely. 
+Of course, the allocation vector is also constrained to be nonnegative, and all of the land must be allocated precisely. 
 
-Note that since acres are in thousands, we divide the constraints of timber and animal months of grazing by 1000. We can summarize our problem as follows:
+Note that since acres are in thousands, we will divide the constraints of timber and animal months of grazing by 1000 in our problem setup, and compensate for this after we obtain a solution. We can summarize our problem as follows:
 \begin{align*}
 \text{maximize } &\sum\limits_{i=1}^7 \sum\limits_{j=1}^3 p_{i,j}x_{i,j} \\
 \text{subject to } &\sum\limits_{j=1}^3 x_{i,j} = s_i  \text{ for } i=1,..,7 \\
@@ -556,7 +554,8 @@ Note that since acres are in thousands, we divide the constraints of timber and 
 \end{align*}
 
 \begin{problem}
-Solve the problem above. Output the value of each $x_{i,j}$ and the maximum total net present value (the primal objective of the appropriately minimized linear function multiplied by -1000).
+Solve the problem above. Return the value of each $x_{i,j}$. 
+Also return the maximum total net present value. This will be equal to the primal objective of the appropriately minimized linear function, multiplied by -1000. (This final multiplication after we have obtained a solution changes our answer to be a maximum, and compensates for the data being in thousands of acres).
 \end{problem} 
 
 You can learn more about CVXOPT at
