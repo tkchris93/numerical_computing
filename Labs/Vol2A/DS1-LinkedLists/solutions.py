@@ -1,7 +1,5 @@
 # solutions.py
-"""Volume II Lab 4: Data Structures 1 (Linked Lists)
-Solutions file. Written by Shane McQuarrie.
-"""
+"""Volume II Lab 4: Data Structures 1 (Linked Lists). Solutions file."""
 
 # Problem 1: Modify the constructor of the Node class.
 class Node(object):
@@ -58,7 +56,7 @@ class LinkedList(object):
         else:
             # If the list is not empty, place new_node after the tail.
             self.tail.next = new_node               # tail --> new_node
-            new_node.prev = self.tail               # tail <-- new_node 
+            new_node.prev = self.tail               # tail <-- new_node
             # Now the last node in the list is new_node, so reassign the tail.
             self.tail = new_node
         self._size += 1                             # for __len__()
@@ -90,7 +88,7 @@ class LinkedList(object):
             current = current.next
         return str(items)
         # String construction method.
-        current = self.head          
+        current = self.head
         out = "["
         while current is not None:
             if isinstance(current.value, str):
@@ -152,7 +150,7 @@ class LinkedList(object):
 class SortedList(LinkedList):
     """Sorted doubly-linked list data structure class.
     Inherits from the 'LinkedList' class.
-    
+
     Attributes:
         head (LinkedListNode): the first node in the list.
         tail (LinkedListNode): the last node in the list.
@@ -171,7 +169,7 @@ class SortedList(LinkedList):
             while current.value < data:         # Find insertion location.
                 current = current.next
             LinkedList.insert(self, data, current.value)
-    
+
     def append(*args, **kwargs):
         raise NotImplementedError("append() is disabled (use add())")
 
@@ -250,7 +248,7 @@ from numpy.random import permutation, randint
 
 def test(student_module):
     """Test script. You must import the student's 'solutions.py' as a module.
-    
+
      5 points for problem 1: Node class restrictions
      5 points for problem 2: LinkedList.find()
     10 points for problem 3: LinkedList.__len__(), LinkedList.__str__()
@@ -258,11 +256,11 @@ def test(student_module):
     10 points for problem 5: LinkedList.insert()
     15 points for problem 6: SortedList, sort_file()
     15 points for problem 7: Deque, reverse_file()
-    
+
     Inputs:
         student_module: the imported module for the student's file.
         late (bool): if True, half credit is awarded.
-    
+
     Returns:
         score (int): the student's score, out of 70.
         feedback (str): a printout of test results for the student.
@@ -424,7 +422,7 @@ class _testDriver(object):
                 self.feedback += "\nNode.__init__ failed (expected TypeError, "
                 self.feedback += "(got {} instead)".format(self._errType(e))
             return 0
-        
+
         # Test that anyting other than int, long, float, or str are rejected.
         points  = test_Node(["This", "is", "a", "list"])
         points += test_Node({"This", "is", "a", "set"})
@@ -477,7 +475,7 @@ class _testDriver(object):
         """Test LinkedList.__len__() and LinkedList.__str__(). 10 Points."""
         if not hasattr(s.LinkedList, "__len__"):
             raise NotImplementedError("Problem 3 Incomplete")
-        
+
         # Test LinkedList.__len__() (4 points) --------------------------------
 
         # Empty list
@@ -503,36 +501,36 @@ class _testDriver(object):
                     "LinkedList.__len__() failed on list {}".format(l1))
 
         # Test LinkedList.__str__() (6 points) --------------------------------
-        
+
         # Empty list
         l1 = [int(i) for i in randint(1, 60, randint(5, 10))]
         l2 = s.LinkedList()
         points += self._strTest(l1[:0], l2, "LinkedList.__str__() failed")
-        
+
         # Single item (int)
         l2.append(l1[0])
         points += self._strTest(l1[:1], l2, "LinkedList.__str__() failed")
-        
+
         # Two items (int)
         l2.append(l1[1])
         points += self._strTest(l1[:2], l2, "LinkedList.__str__() failed")
-        
+
         # Many items (int)
         for i in l1[2:]:
             l2.append(i)
         points += self._strTest(l1, l2, "LinkedList.__str__() failed")
-        
+
         # Single item (str)
         l1 = [str(i) for i in permutation(["a", "b", "c", "d", "e", "f"])]
         l2 = s.LinkedList()
         l2.append(l1[0])
         points += self._strTest(l1[:1], l2, "LinkedList.__str__() failed")
-        
+
         # Many items (str)
         for i in l1[1:]:
             l2.append(i)
         points += self._strTest(l1, l2, "LinkedList.__str__() failed")
-        
+
         return points
 
     def problem4(self, s):
@@ -654,7 +652,7 @@ class _testDriver(object):
         if not issubclass(s.SortedList, s.LinkedList):
             raise AssertionError("SortedList must inherit from LinkedList!")
         points = 0
-        
+
         def test_disabled(func):
             l2 = SortedList()
             try:
@@ -699,7 +697,7 @@ class _testDriver(object):
         points += 5*self._strTest(sorted(words), data, "sort_file() failed")
         rm("__temp__.txt"); rm("__ans__.txt")
 
-        return points        
+        return points
 
     def problem7(self, s):
         """Test the Deque class and the reverse_file() function. 15 points."""
