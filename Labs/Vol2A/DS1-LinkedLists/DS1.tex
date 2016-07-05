@@ -284,7 +284,7 @@ At the bare minimum, we should give our linked list the same functionality.
 Add magic methods to the \li{LinkedList} class so it behaves more like the built-in Python list.
 \begin{enumerate}
 \item Write the \li{__len__()} method so that the length of a \li{LinkedList} instance is equal to the number of nodes in the list.
-To accomplish this, add an attribute that tracks the current size of the list.
+To accomplish this, consider adding an attribute that tracks the current size of the list.
 It should be updated every time a node is successfully added or removed.
 
 \item Write the \li{__str__()} method so that when a \li{LinkedList} instance is printed, its output matches that of a Python list.
@@ -338,10 +338,6 @@ However, the nodes before and after the target node are no longer linked.
 [0, 1, 2, 3]                        # Should be [0, 1, 2, 3, 5, 6, 7, 8, 9].
 \end{lstlisting}
 
-This can be remedied by pointing the previous node's \li{<<next>>} attribute to the node after the deleted node, and similarly changing that node's \li{prev} attribute.
-Then there will be no reference to the removed node and it will be deleted, but the chain will still be connected.
-See Figure \ref{fig:remove_good}.
-
 \begin{figure}[H] % Incorrect remove().
 \centering
 \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto, node distance=1.5cm,thick,main node/.style={rectangle,draw}, minimum size=.5cm]
@@ -380,6 +376,9 @@ See Figure \ref{fig:remove_good}.
 \caption{Na{\"i}ve Removal for Doubly-linked Lists. Deleting all references pointing to $C$ deletes the node, but it also separates nodes $A$ and $B$ from node $D$.}
 \label{fig:remove_bad}
 \end{figure}
+
+This can be remedied by pointing the previous node's \li{<<next>>} attribute to the node after the deleted node, and similarly changing that node's \li{prev} attribute.
+Then there will be no reference to the removed node and it will be deleted, but the chain will still be connected.
 
 \begin{figure}[H] % Correct remove().
 \centering
@@ -492,49 +491,6 @@ Note that since \li{insert()} places a new node before an existing node, it is n
 \label{fig:insert}
 \end{figure}
 
-% TODO: Move this to "Additional Material" section.
-\section*{Sorted Lists} % =====================================================
-
-The \li{LinkedList} class is now a fully-functional doubly-linked list\footnote{See the end of the lab for ideas on how to further improve the \li{LinkedList} class.}.
-We can use it as the backbone for other basic data structures via inheritance.
-
-\begin{problem} % SortedList class.
-Write a \li{SortedList} class that inherits from the \li{LinkedList} class.
-This data structure adds new nodes strategically so that the data is always kept in order.
-\begin{enumerate}
-\item Write a method called \li{add(self, data)} that inserts a new node containing \li{data} before the first node in the list that has a \li{value} that is greater or equal to \li{data} (thereby preserving the ordering).
-
-Hint: use inherited methods when appropriate.
-\item Override the \li{append()} method with the following:
-
-\begin{lstlisting}
-def append(*args, **kwargs):
-    raise NotImplementedError("append() is disabled (use add())")
-\end{lstlisting} % TODO: better error message?
-
-This effectively disables \li{append()} for the \li{SortedList} class, preventing the user from inserting a node in a location that would disrupt the ordering of the data in the list.
-
-\begin{info}
-The \li{*args} argument allows the \li{append()} method to receive any number of positional arguments without raising a \li{TypeError}, and the \li{**kwargs} argument allows it to receive any number of keyword arguments.
-This is the most general form of a function signature.
-\end{info}
-
-\item Also disable the \li{insert()} method.
-
-\end{enumerate}
-Outside of the class, write a function called \li{sort_file(infile, outfile)} that reads \li{infile}, adds each line to a \li{SortedList} instance, then writes the lines to \li{outfile} in alphabetical order by iterating through the list.
-
-If the file on the left is \li{infile}, the file on the right should be \li{outfile}.
-\begin{lstlisting}
-this                            a
-<<is                              is>>
-a                               this
-test                            test
-\end{lstlisting}
-
-\label{prob:sortedlist}
-\end{problem}
-
 \begin{info} % Big-O rates for Linked Lists.
 The temporal complexity for inserting to the beginning or end of a linked list is $O(1)$, but inserting anywhere else is $O(n)$, where $n$ is the number of nodes in the list (why?).
 This is quite slow compared other data structures.
@@ -546,55 +502,67 @@ In the next lab we turn our attention to \emph{trees}, special kinds of linked l
 It is sometimes wise to restrict the user's access to the some of the data within a structure.
 The three most common and basic restricted-access structures are \emph{stacks}, \emph{queues}, and \emph{deques}.
 Each structure restricts the user's access differently, making them ideal for different situations.
-% These structures will appear in many future labs and applications.
 
 \begin{itemize}
 \item \textbf{Stack}: \emph{Last In, First Out} (LIFO).
 Only the last item that was inserted can be accessed.
-A stack is like a pile of plates: the last plate put on the pile is the first one to be taken off.
+A stack is like a pile of plates: the last plate put on the pile is (or should be) the first one to be taken off.
 Stacks usually have two main methods: \li{push()}, to insert new data, and \li{pop()}, to remove and return the last piece of data inserted.
 
 \item \textbf{Queue} (pronounced ``cue''): \emph{First In, First Out} (FIFO).
-new nodes are added to the end of the queue, but an existing node can only be removed or accessed if it is at the front of the queue.
+New nodes are added to the end of the queue, but an existing node can only be removed or accessed if it is at the front of the queue.
 A queue is like a line at the bank: the person at the front of the line is served next, while newcomers add themselves to the back of the line.
-Queues also usually have a \li{push()} and a \li{pop()} method, but \li{push()} inserts data to the end of the queue while \li{pop()} removes and returns the data at the front of the queue (\li{push()} and \li{pop()} for queues are sometimes called \li{enqueue()} and \li{dequeue()}, respectively).
+Queues also usually have a \li{push()} and a \li{pop()} method, but \li{push()} inserts data to the end of the queue while \li{pop()} removes and returns the data at the front of the queue.\footnote{\li{push()} and \li{pop()} for queues are sometimes called \li{enqueue()} and \li{dequeue()}, respectively)}
 
 \item \textbf{Deque} (pronounced ``deck''): a double-ended queue.
 Data can be inserted or removed from either end, but data in the middle is inaccessible.
 A deque is like a deck of cards, where only the top and bottom cards are readily accessible.
 A deque has two methods for insertion and two for removal, usually called \li{append()}, \li{appendleft()}, \li{pop()}, and \li{popleft()}.
-
-In practice, a deque can also be used as a stack or a queue.
-If we restrict our usage to \li{append()} and \li{pop()} (or to \li{appendleft()} and \li{popleft()}), we effectively have a stack.
-Similarly, if we are restricted to \li{append()} and \li{popleft()} (or to \li{appendleft()} and \li{pop()}), we effectively have a queue.
 \end{itemize}
 
 \begin{problem} % Deque class.
 Write a \li{Deque} class that inherits from the \li{LinkedList} class.
+%
 \begin{enumerate}
-\item Use inheritance to implement the \li{appendleft()}, \li{pop()}, and \li{popleft()} methods as described in the preceding section (the \li{LinkedList} class already implements\li{append()}).
+\item Use inheritance to implement the following methods:
+%
+\begin{itemize}
+    \item \li{pop(self)}: Remove the last node in the list and return its data.
+    \item \li{popleft(self)}: Remove the first node in the list and return its data.
+    \item \li{appendleft(self, data)}: Insert a new node containing \li{data} at the beginning of the list.
+\end{itemize}
+The \li{LinkedList} class already implements the \li{append()} method.
 
-The \li{appendleft()} method should accept some data to be added and return nothing, while \li{pop()} and \li{popleft()} should accept no parameters (except \li{self}) and return the value of the data removed.
+\item Override the \li{remove()} method with the following:
 
-\item Disable all other methods to restrict data access.
-\end{enumerate}
-
-% TODO: Split this into a separate problem.
-Outside of the class, write a function called \li{reverse_file(infile, outfile)} that reads each line of \li{infile}, adds each line to a \li{Deque} instance, then writes the lines to \li{outfile} in reverse order by iterating backward through the deque.
-
-If the file on the left is \li{infile}, the file on the right should be \li{outfile}.
 \begin{lstlisting}
-this                            test
-<<is>>                              a
-a                               <<is>>
-test                            this
+def remove(*args, **kwargs):
+    raise NotImplementedError("Use pop() or popleft() for removal")
 \end{lstlisting}
+
+This effectively disables \li{remove()} for the \li{Deque} class, preventing the user from removing a node from the middle of the list.
+
+\item Disable the \li{insert()} method as well.
+\end{enumerate}
 \end{problem}
 
-\begin{info} % collections.deque
+\newpage
+
+\begin{info}
+The \li{*args} argument allows the \li{remove()} method to receive any number of positional arguments without raising a \li{TypeError}, and the \li{**kwargs} argument allows it to receive any number of keyword arguments.
+This is the most general form of a function signature.
+\end{info}
+
 The \li{collections} module in the Python standard library has a \li{deque} object, implemented as a doubly-linked list.
 This is an excellent object to use in practice instead of a Python list when speed is of the essence and data only needs to be accessed from the ends of the list.
-\end{info}
+
+\begin{problem} % Reverse a file using a deque.
+Write a function that accepts the name of a file to be read and a file to write to.
+Read the first file, adding each line to a deque (use your \li{Deque} class or \li{collections.deque}).
+Write the lines to the second file in reverse order by iterating backward through the deque.
+% Try using a regular Python list instead of a deque.
+% Which data structure works faster?
+\end{problem}
 
 \newpage
 
@@ -602,7 +570,7 @@ This is an excellent object to use in practice instead of a Python list when spe
 
 \subsection*{Improvements to the Linked List Class} % -------------------------
 
-The \li{LinkedList} class we have built is still somewhat minimal.
+Our \li{LinkedList} class is still somewhat plain.
 Below are some ideas for improving it.
 
 \begin{enumerate}
@@ -616,32 +584,40 @@ Python's standard data structures.
 >>> print(my_linked_list)
 [1, 2, 3, 4, 5]
 \end{lstlisting}
-Repeat this for the \li{SortedList} and \li{Deque} classes.
 
-\item Add a method called \li{sort()} that sorts the data of the list inplace.
+\item Add new methods:
+\begin{itemize}
+\item \li{count()}: return the number of occurrences of a specified value.
+\item \li{reverse()}: reverse the ordering of the nodes (in place).
+\item \li{rotate()}: rotate the nodes a given number of steps to the right (in place).
+\item \li{sort()}: sort the nodes by their data (in place).
+\end{itemize}
 
-\item Add a method called \li{reverse()} that reverses the ordering of the data of the list inplace.
-
-\item Implement the \li{__max__()} and \li{__min__()} magic methods for finding the greatest or least element in the list.
-
-\item Implement the \li{__getitem__()} and \li{__setitem__()} magic methods to enable standard bracket indexing.
-
-\item Implement the \li{__iter__()} magic method to support \li{for} loop iteration, the \li{iter()} built-in function, and the \li{in} statement.
+\item Implement more magic methods:
+\begin{itemize}
+\item \li{__max__()}: return the greatest element.
+\item \li{__min__()}: return the least element.
+\item \li{__getitem__()} and \li{__setitem__()}: enable standard bracket indexing.
+\item \li{__iter__()}: support \li{for} loop iteration, the \li{iter()} built-in function, and the \li{in} statement.
+\end{itemize}
 \end{enumerate}
-
-\begin{comment} % Extra problem idea: Stack and Queue classes.
 
 \subsection*{Other Linked List} % ---------------------------------------------
 
-% Stack
-% Queue
-% SortedList
-% CircularList (tikzpicture probably needed)
+In practice, a deque can also be used as a stack or a queue.
+If we restrict our usage to \li{append()} and \li{pop()} (or to \li{appendleft()} and \li{popleft()}), we effectively have a stack.
+Similarly, if we are restricted to \li{append()} and \li{popleft()} (or to \li{appendleft()} and \li{pop()}), we effectively have a queue.
+Consider writing \li{Stack} and \li{Queue} classes that inherit from the \li{Deque} class.
+Add a \li{push()} method and overload the \li{pop()} method in each class.
+Disable any other methods that add or remove nodes.
 
-\subsection*{Stacks and Queues}
-\begin{problem}[Optional]
-Write \li{Stack} and \li{Queue} classes that inherit from the \li{Deque} class.
-Add a \li{push()} method and overload the \li{pop()} method in each class to match the behaviors described in the preceding section.
-Disable any other methods.
-\end{problem}
-\end{comment}
+The \li{LinkedList} class can also be used as the backbone for other data structures.
+%
+\begin{enumerate}
+\item A \emph{Sorted List} adds new nodes strategically so that the data is always kept in order.
+A \li{SortedLinkedList} class that inherits from the \li{LinkedList} class should have a method called \li{add(self, data)} that inserts a new node containing \li{data} before the first node in the list that has a \li{value} that is greater or equal to \li{data} (thereby preserving the ordering).
+Other methods for adding nodes should be disabled.
+
+\item In a \emph{Circular Linked List}, the ``last'' node connects back to the first node.
+Thus a reference to the tail is unnecessary.
+\end{enumerate}
