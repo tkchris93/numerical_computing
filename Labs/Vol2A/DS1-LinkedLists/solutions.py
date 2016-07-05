@@ -1,6 +1,7 @@
 # solutions.py
 """Volume II Lab 4: Data Structures 1 (Linked Lists). Solutions file."""
 
+
 # Problem 1: Modify the constructor of the Node class.
 class Node(object):
     """A basic node class for storing data."""
@@ -28,7 +29,6 @@ class LinkedListNode(Node):
         self.prev = None
 
 
-# Problems 2, 3, 4, 5: Complete the LinkedList class.
 class LinkedList(object):
     """Doubly-linked list data structure class.
 
@@ -61,7 +61,7 @@ class LinkedList(object):
             self.tail = new_node
         self._size += 1                             # for __len__()
 
-    # Problem 2: Write LinkedList.find().
+    # Problem 2
     def find(self, data):
         """Return the first node in the list containing 'data'.
         If no such node exists, raise a ValueError.
@@ -73,11 +73,12 @@ class LinkedList(object):
             current = current.next          #  found, raise a ValueError.
         raise ValueError("{} is not in the list".format(data))
 
-    # Problem 3: Write LinkedList.__len__() and LinkedList.__str__().
+    # Problem 3
     def __len__(self):
         """Return the number of nodes in the list."""
         return self._size
 
+    # Problem 3
     def __str__(self):
         """String representation: the same as a standard Python list."""
         # List construction method (recommended).
@@ -87,12 +88,13 @@ class LinkedList(object):
             items.append(current.value)
             current = current.next
         return str(items)
+
         # String construction method.
         current = self.head
         out = "["
         while current is not None:
             if isinstance(current.value, str):
-                item = "'{}'".format(current.value)
+                item = "'" + str(current.value) + "'"
             else:
                 item = str(current.value)
             out += item
@@ -122,9 +124,9 @@ class LinkedList(object):
         else:                               # Case 3: remove from middle.
             target.prev.next = target.next      # -/-> target
             target.next.prev = target.prev      # target <-/-
-        self._size -= 1
+        self._size -= 1                     # for __len__()
 
-    # Problem 5: Write LinkedList.insert().
+    # Problem 5
     def insert(self, data, place):
         """Insert a node containing 'data' immediately before the first node
         in the list containing 'place'. Return nothing.
@@ -143,10 +145,64 @@ class LinkedList(object):
             new_node.prev = after.prev          # before <-- new
             new_node.next = after               # new --> after
             after.prev = new_node               # new <-- after
-        self._size += 1
+        self._size += 1                     # for __len__()
 
 
-# Problem 6: Write a SortedList class and a function called sort_file().
+# Problem 6
+class Deque(LinkedList):
+    """Deque doubly-linked list data structure class.
+
+    Attributes:
+        head (LinkedListNode): the first node in the list.
+        tail (LinkedListNode): the last node in the list.
+    """
+    def pop(self):
+        """Remove the last node in the list and return its value."""
+        if self.tail is None:               # Case 1: Empty list.
+            raise ValueError("The list is empty")
+        else:                               # Case 2: Nonempty list.
+            data = self.tail.value
+            LinkedList.remove(self, data)
+            return data
+
+    def popleft(self):
+        """Remove the first node in the list and return its value."""
+        if self.head is None:               # Case 1: Empty list.
+            raise ValueError("The list is empty")
+        else:                               # Case 2: Nonempty list.
+            data = self.head.value
+            LinkedList.remove(self, data)
+            return data
+
+    def appendleft(self, data):
+        """Place a new node containing 'data' at the beginning of the list."""
+        if self.head is None:               # Case 1: Empty list.
+            LinkedList.append(self, data)
+        else:                               # Case 2: Nonempty list.
+            LinkedList.insert(self, data, self.head.value)
+
+    def remove(*args, **kwargs):
+        raise NotImplementedError("Use pop() or popleft() for removal")
+
+    def insert(*args, **kwargs):
+        raise NotImplementedError("Use append() or appendleft() for insertion")
+
+
+# Problem 7
+def prob7(infile, outfile):
+    """Reverse the file 'infile' by line and write the results to 'outfile'."""
+    with open(infile, 'r') as f:            # Read the lines in as a list.
+        lines = f.readlines()
+    deque = Deque()                         # Instantiate a deque.
+    for line in lines:                      # Add each line to the deque.
+        deque.append(line)
+    with open(outfile, 'w') as f:           # Write to the outfile in reverse.
+        while deque.head is not None:
+            f.write(str(deque.pop()))
+
+
+# Additional Material =========================================================
+
 class SortedList(LinkedList):
     """Sorted doubly-linked list data structure class.
     Inherits from the 'LinkedList' class.
@@ -175,71 +231,6 @@ class SortedList(LinkedList):
 
     def insert(*args, **kwargs):
         raise NotImplementedError("insert() is disabled (use add())")
-
-def sort_file(infile, outfile):
-    """Sort the file 'infile' by line and write the results to 'outfile'."""
-    with open(infile, 'r') as f:            # Read the lines in as a list.
-        lines = f.readlines()
-    sorted_list = SortedList()              # Instantiate a SortedList object.
-    for line in lines:                      # Add each line to the SortedList.
-        sorted_list.add(line)
-    current = sorted_list.head              # Write the sorted lines to the
-    with open(outfile, 'w') as f:           #  outfile.
-        while current is not None:
-            f.write(str(current.value))
-            current = current.next
-
-
-# Problem 7: Write a Deque class and a function called reverse_file().
-class Deque(LinkedList):
-    """Deque doubly-linked list data structure class.
-
-    Attributes:
-        head (LinkedListNode): the first node in the list.
-        tail (LinkedListNode): the last node in the list.
-    """
-    def appendleft(self, data):
-        """Place a new node containing 'data' at the beginning of the list."""
-        if self.head is None:               # Case 1: Empty list.
-            LinkedList.append(self, data)
-        else:                               # Case 2: Nonempty list.
-            LinkedList.insert(self, data, self.head.value)
-
-    def pop(self):
-        """Remove the last node in the list and return its value."""
-        if self.tail is None:               # Case 1: Empty list.
-            raise ValueError("The list is empty")
-        else:                               # Case 2: Nonempty list.
-            data = self.tail.value
-            LinkedList.remove(self, data)
-            return data
-
-    def popleft(self):
-        """Remove the first node in the list and return its value."""
-        if self.head is None:               # Case 1: Empty list.
-            raise ValueError("The list is empty")
-        else:                               # Case 2: Nonempty list.
-            data = self.head.value
-            LinkedList.remove(self, data)
-            return data
-
-    def remove(*args, **kwargs):
-        raise NotImplementedError("remove() is disabled")
-
-    def insert(*args, **kwargs):
-        raise NotImplementedError("insert() is disabled")
-
-def reverse_file(infile, outfile):
-    """Reverse the file 'infile' by line and write the results to 'outfile'."""
-    with open(infile, 'r') as f:            # Read the lines in as a list.
-        lines = f.readlines()
-    deque = Deque()                         # Instantiate a SortedList object.
-    for line in lines:                      # Add each line to the SortedList.
-        deque.append(line)
-    with open(outfile, 'w') as f:           # Write to the outfile in reverse.
-        while deque.head is not None:
-            f.write(str(deque.pop()))
-
 
 # END OF SOLUTIONS ========================================================== #
 
