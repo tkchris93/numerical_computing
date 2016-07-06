@@ -25,7 +25,7 @@ class SinglyLinkedList(object):
             self.tail = n
 
 def iterative_search(linkedlist, data):
-    """Find the node containing 'data' using an iterative approach.
+    """Search 'linkedlist' iteratively for a node containing 'data'.
     If there is no such node in the list, or if the list is empty,
     raise a ValueError.
 
@@ -45,7 +45,7 @@ def iterative_search(linkedlist, data):
 
 # Problem 1
 def recursive_search(linkedlist, data):
-    """Find the node containing 'data' using a recursive approach.
+    """Search 'linkedlist' recursively for a node containing 'data'.
     If there is no such node in the list, or if the list is empty,
     raise a ValueError.
 
@@ -58,11 +58,11 @@ def recursive_search(linkedlist, data):
     """
     def _step(current):
         """Check the current node, and step right if not found."""
-        if current is None:         # Base case 1: dead end
+        if current is None:         # Base case 1: dead end.
             raise ValueError(str(data) + " is not in the list.")
-        if current.value == data:   # Base case 2: the data matches
+        if current.value == data:   # Base case 2: the data matches.
             return current
-        else:                       # Recurse if not found
+        else:                       # Recurse if not found.
             return _step(current.next)
 
     return _step(linkedlist.head)
