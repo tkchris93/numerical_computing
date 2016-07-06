@@ -72,11 +72,4 @@ class LinkedList(object):
 # Problem 7
 def prob7(infile, outfile):
     """Reverse the file 'infile' by line and write the results to 'outfile'."""
-    with open(infile, 'r') as f:            # Read the lines in as a list.
-        lines = f.readlines()
-    deque = Deque()                         # Instantiate a deque.
-    for line in lines:                      # Add each line to the deque.
-        deque.append(line)
-    with open(outfile, 'w') as f:           # Write to the outfile in reverse.
-        while deque.head is not None:
-            f.write(str(deque.pop()))
+    raise NotImplementedError("Problem 7 Incomplete")
