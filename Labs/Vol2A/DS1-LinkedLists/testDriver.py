@@ -72,7 +72,7 @@ def test(student_module):
 class _testDriver(object):
     """Class for testing a student's work. See test.__doc__ for more info."""
 
-    # File to pull info from for testing problems 6 and 7.
+    # File to pull info from for testing problem 7.
     data_file = "English.txt"
 
     # Constructor -------------------------------------------------------------

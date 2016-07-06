@@ -688,18 +688,15 @@ The AVL's balancing algorithm is beyond the scope of this project, but details a
 [4, 6, 9]
 \end{lstlisting}
 
-% Problem 4: compare build and search speeds.
-% TODO (?): Instead of a file to read from, have them generate random numbers.
-%   Reading data from a file is an over-complication (abolish English.txt).
-\begin{problem}
-Write a function to compare the build and search speeds of the data structures we have implemented so far.
+\begin{problem} % Compare build and search times.
+Write a function to compare the build and search times of the data structures we have implemented so far.
 
 Accept a file name to read from.
 Read the file, adding the contents of each line to a list of data.
 For various values of $n$, repeat the following:
 %
 \begin{enumerate}
-\item Get a subset of $n$ items from the data set.
+\item Get a subset of $n$ \textbf{ramdom} items from the data set.
 \item Time (separately) how long it takes to load a new \li{SinglyLinkedList}, a \li{BST}, and an \li{AVL} with the $n$ items.
 \item Choose 5 \textbf{random} items from the subset, and time how long it takes to find all 5 items in each data structure.
 Use the \li{find()} method for the trees, but to avoid exceeding the maximum recursion depth, use the provided \li{iterative_search()} function from Problem \ref{prob:recursion} to search the \li{SinglyLinkedList}.
