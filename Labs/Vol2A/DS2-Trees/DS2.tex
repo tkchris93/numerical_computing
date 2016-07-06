@@ -1,13 +1,9 @@
 \lab{Data Structures II: Trees}{Data Structures II}
 \label{lab:Python_DataStructures2}
 
-\objective{A \emph{Tree} is a linked list where each node in the list may refer to more than one other node. This structural flexibility makes trees more useful and efficient than regular linked lists in many applications. Many trees are most easily constructed recursively, so we begin with an overview of recursion. We then implement a recursively structured doubly-linked Binary Search Tree. Finally, we compare the standard linked list, our Binary Search Tree, and an AVL tree to illustrate the relative strengths and weaknesses of each structure.}
+\objective{A \emph{Tree} is a linked list where each node in the list may refer to more than one other node. This structural flexibility makes trees more useful and efficient than regular linked lists in many applications. Many trees are most easily constructed recursively, so we begin with an overview of recursion. We then implement a recursively structured doubly linked Binary Search Tree. Finally, we compare the standard linked list, our Binary Search Tree, and an AVL tree to illustrate the relative strengths and weaknesses of each structure.}
 
-
-% TODO:
-%     - No need to have 'item' as an argument to _step() in BST.find().
-
-\section*{Recursion}
+\section*{Recursion} % ========================================================
 
 A \emph{recursive} function is one that calls itself.
 When the function is executed, it continues calling itself until it reaches a specified \emph{base case} where the solution to the problem is known.
@@ -16,7 +12,7 @@ The function then exits without calling itself again, and each previous function
 As a simple example, consider the function that sums all positive integers from $1$ to some integer $n$.
 This function may be represented recursively:
 \[f(n) = \sum_{i=1}^ni = n + \sum_{i=1}^{n-1}i = n + f(n-1)\]
-So we may calculate $f(n)$ by recursively calculating $f(n-1)$, which calculates $f(n-2)$, and so on.
+$f(n)$ may be calculated by recursively calculating $f(n-1)$, which calculates $f(n-2)$, and so on.
 The recursion halts with the base case $f(1) = 1$.
 
 \begin{lstlisting}
@@ -36,8 +32,8 @@ def recursive_sum(n):
 The computer calculates \li{recursive_sum(5)} with a sequence of function calls.
 
 \begin{lstlisting}
-# To find the recursive_sum(5), we need to calculate recursive_sum(4).
-# But to find recursive_sum(4), we need to calculate recursive_sum(3).
+# To find the recursive_sum(5), calculate recursive_sum(4).
+# But to find recursive_sum(4), calculate recursive_sum(3).
 # This continues until the base case is reached.
 
 recursive_sum(5)		# return 5 + recursive_sum(4)
@@ -85,7 +81,7 @@ def recursive_fib(n):
 		return 0
 	elif n == 1:			# Base case 2: the 1st Fibonacci number is 1.
 		return 1
-	# If we haven't reached a base case, the function recurses by calling
+	# If this call isn't a base case, the function recurses by calling
 	# itself to calculate the previous two Fibonacci numbers.
 	else:
 		return recursive_fib(n-1) + recursive_fib(n-2)
@@ -114,17 +110,16 @@ recursive_fib(5)		# The original call makes two additional calls:
 The sum of all of the base case results, from top to bottom, is $1 + 0 + 1 + 1 + 0 + 1 + 0 + 1 = 5$, so \li{recursive_fib(5)} returns 5 (correctly).
 The key to recursion is understanding the base cases correctly and making correct recursive calls.
 
-% Problem 1: simple recursion for linked lists traversal
-\begin{problem}
-The following code defines a simple class for singly-linked lists.
+\begin{problem} % Simple recursion for linked lists traversal
+The following code defines a simple class for singly linked lists.
 \begin{lstlisting}
 class SinglyLinkedListNode(object):
-    """Simple singly-linked list node."""
+    """Simple singly linked list node."""
     def __init__(self, data):
         self.value, self.<<next>> = data, None
 
 class SinglyLinkedList(object):
-    """A very simple singly-linked list with a head and a tail."""
+    """A very simple singly linked list with a head and a tail."""
     def __init__(self):
         self.head, self.tail = None, None
     def append(self, data):
@@ -152,14 +147,14 @@ def iterative_search(linkedlist, data):
 \label{prob:recursion}
 \end{problem}
 
-\begin{warn}
-It is not usually better to rewrite an iterative method recursively.
+\begin{warn} % Iterative methods > Recursive methods, usually.
+It is \textbf{not} usually better to rewrite an iterative method recursively.
 In Python, a function may only call itself 999 times.
 On the $1000^{th}$ call, a \li{RuntimeError} is raised to prevent a stack overflow.
 Whether or not recursion is appropriate depends on the problem to be solved and the algorithm used to solve it.
 \end{warn}
 
-\section*{Trees}
+\section*{Trees} % ============================================================
 
 A \emph{tree} data structure is a specialized linked list.
 Trees are more difficult to build than standard linked lists, but they are almost always more efficient.
@@ -179,9 +174,17 @@ That child node also has one child node, which in turn has one child.
 The last node in the list is the only leaf node.
 
 Other kinds of trees may be more complicated.
-See Figure \ref{fig:trees}.
 
-\begin{figure}
+\section*{Binary Search Trees} % ==============================================
+
+A \emph{binary search tree} (BST) data structure is a tree that allows each node to have up to two children, usually called \li{left} and \li{right}.
+The left child of a node contains data that is less than its parent node's data.
+The right child's data is greater.
+
+The tree on the right in Figure \ref{fig:trees} is an example of a of binary search tree.
+In practice, binary search tree nodes have attributes that keep track of their data, their children, and (in doubly linked trees) their parent.
+
+\begin{figure}[H]
 \begin{tikzpicture}[
     level 1/.style={sibling distance=2cm},
     level 2/.style={sibling distance=20mm}]
@@ -204,7 +207,7 @@ See Figure \ref{fig:trees}.
         child{node[draw=none](2b){}edge from parent[draw=none]}
         child{node[draw=none](7b){}edge from parent[draw=none]}
         };
-\foreach \s/\t in {4a/5a, 4a/3a, 5a/2a, 3a/7a} 
+\foreach \s/\t in {4a/5a, 4a/3a, 5a/2a, 3a/7a}
     {\draw[->, >=stealth', shorten <=.23cm, shorten >=.1cm](\s)--(\t);}
 
 \end{tikzpicture}
@@ -217,7 +220,7 @@ See Figure \ref{fig:trees}.
     \node [circle,draw] (5a){5}
         child {node[circle,draw] (2a) {2}edge from parent[draw=none]
             child { node[circle,draw] (1a) {1}edge from parent[draw=none]}
-            child {node[draw = none] (invisble){} edge from parent[draw=none]}     
+            child {node[draw = none] (invisble){} edge from parent[draw=none]}
         }
         child {node[circle,draw] (7a) {7}edge from parent[draw=none]
         child{node[circle, draw](6a){6}edge from parent[draw=none]}
@@ -226,13 +229,13 @@ See Figure \ref{fig:trees}.
     \node [draw=none, node distance=.1cm] (i5a)[above of=5a]{}
         child {node[draw=none] (i2a) {}edge from parent[draw=none]
             child { node[draw=none] (i1a) {}edge from parent[draw=none]}
-            child {node[draw = none] (invisbleA){} edge from parent[draw=none]}     
+            child {node[draw = none] (invisbleA){} edge from parent[draw=none]}
         }
         child {node[draw=none] (i7a) {}edge from parent[draw=none]
         child{node[draw=none](i6a){}edge from parent[draw=none]}
         child{node[draw=none](i8a){}edge from parent[draw=none]}
         };
-\foreach \s/\t in {i5a/i2a, i5a/i7a} 
+\foreach \s/\t in {i5a/i2a, i5a/i7a}
     {\draw[->, >=stealth', shorten <=.23cm, shorten >=.1cm](\s)--(\t);}
 \foreach \s/\t in {i2a/i1a, i7a/i6a, i7a/i8a}
     {\draw[->, >=stealth', shorten <=.27cm, shorten >=.1cm](\s)--(\t);}
@@ -240,15 +243,6 @@ See Figure \ref{fig:trees}.
 \caption{Both of these graphs are trees, but only the tree on the right is a binary search tree. How could the graph on the left be altered to make it a BST?}
 \label{fig:trees}
 \end{figure}
-
-\section*{Binary Search Trees}
-
-A \emph{binary search tree} (BST) data structure is a tree that allows each node to have up to two children, usually called \li{left} and \li{right}.
-The left child of a node contains data that is less than its parent node's data.
-The right child's data is greater.
-
-The tree on the right in Figure \ref{fig:trees} is an example of a of binary search tree.
-In practice, binary search tree nodes have attributes that keep track of their data, their children, and (in doubly-linked trees) their parent.
 
 \begin{lstlisting}
 class BSTNode(object):
@@ -277,13 +271,13 @@ class BST(object):
         self.root = None
 \end{lstlisting}
 
-\subsection*{find()}
+\subsection*{find()} % --------------------------------------------------------
 
 Finding a node in a binary search tree can be done recursively.
-Starting at the root, we check if the data we are looking for matches the current node.
-If it does not, then if the data is less than the current node's value we search again on the left child.
-If the data is greater, we search on the right child.
-This process continues until the data is found or, if the data is not in the tree, an empty child is searched.
+Starting at the root, check if the target data matches the current node.
+If it does not, then if the data is less than the current node's value, search again on the left child.
+If the data is greater, search on the right child.
+Continue the process until the data is found or, if the data is not in the tree, an empty child is searched.
 
 \begin{lstlisting}
 class BST(object):
@@ -306,7 +300,7 @@ class BST(object):
                 return _step(current.left)
             else:                                   # Recursively search right.
                 return _step(current.right)
-        
+
         # Start the recursion on the root of the tree.
         return _step(self.root)
 \end{lstlisting}
@@ -316,15 +310,15 @@ Conceptually, each node of a BST partitions the data of its subtree into two hal
 We will extend this concept to higher dimensions in the next lab.
 \end{info}
 
-\subsection*{insert()}
+\subsection*{insert()} % ------------------------------------------------------
 
-To insert new data into a binary search tree, a leaf node is added at the correct location.
-First, we find the node that should be the parent of the new node.
-The parent is found recursively, using a similar approach to the \li{find()} method.
+To insert new data into a binary search tree, add a leaf node at the correct location.
+First, find the node that should be the parent of the new node.
+This parent node is found recursively, using a similar approach to the \li{find()} method.
 Then the new node is added as the left or right child of the parent.
 See Figure \ref{fig:BST.insertion}.
 
-\begin{figure} % BST.insert()
+\begin{figure}[H] % BST.insert()
 \begin{tikzpicture}[
     auto,
     level 1/.style={sibling distance=2cm},
@@ -333,7 +327,7 @@ See Figure \ref{fig:BST.insertion}.
     \node [circle,draw] (5a){5}
         child {node[circle,draw] (2a) {2}edge from parent[draw=none]
             child { node[circle,draw] (1a) {1}edge from parent[draw=none]}
-            child {node[draw = none] (invisble){} edge from parent[draw=none]}     
+            child {node[draw = none] (invisble){} edge from parent[draw=none]}
         }
         child {node[circle,draw] (7a) {7}edge from parent[draw=none]
         child{node[circle, draw](3a){3}edge from parent[draw=none]}
@@ -342,7 +336,7 @@ See Figure \ref{fig:BST.insertion}.
     \node [draw=none, node distance=.1cm] (i5a)[above of=5a]{}
         child {node[draw=none] (i2a) {}edge from parent[draw=none]
             child { node[draw=none] (i1a) {}edge from parent[draw=none]}
-            child {node[draw = none] (invisbleA){} edge from parent[draw=none]}     
+            child {node[draw = none] (invisbleA){} edge from parent[draw=none]}
         }
         child {node[draw=none] (i7a) {}edge from parent[draw=none]
         child{node[draw=none](i3a){}edge from parent[draw=none]}
@@ -351,7 +345,7 @@ See Figure \ref{fig:BST.insertion}.
     \node [draw=none, node distance=.1cm] (i5b)[below of=5a]{}
         child {node[draw=none] (i2b) {}edge from parent[draw=none]
             child { node[draw=none] (i1b) {}edge from parent[draw=none]}
-            child {node[draw = none] (invisbleB){} edge from parent[draw=none]}     
+            child {node[draw = none] (invisbleB){} edge from parent[draw=none]}
         }
         child {node[draw=none] (i7b) {}edge from parent[draw=none]
         child{node[draw=none](i3b){}edge from parent[draw=none]}
@@ -359,7 +353,7 @@ See Figure \ref{fig:BST.insertion}.
         };
 \node [draw=none, black!20!blue, node distance=1.5cm](root)[above right of=5a]{root};
 \draw[black!20!blue, ->, >=stealth', shorten >= .1cm](root)--(5a);
-\foreach \s/\t in {i5a/i2a, i2b/i5b, i5a/i7a, i7b/i5b} 
+\foreach \s/\t in {i5a/i2a, i2b/i5b, i5a/i7a, i7b/i5b}
     {\draw[->, >=stealth', shorten <=.23cm, shorten >=.1cm](\s)--(\t);}
 \foreach \s/\t in {i2a/i1a, i1b/i2b, i7a/i8a, i8b/i7b}
     {\draw[->, >=stealth', shorten <=.27cm, shorten >=.1cm](\s)--(\t);}
@@ -373,7 +367,7 @@ See Figure \ref{fig:BST.insertion}.
     \node [circle,draw] (5a){5}
         child {node[circle,draw] (2a) {2}edge from parent[draw=none]
             child { node[circle,draw] (1a) {1}edge from parent[draw=none]}
-            child {node[draw = none] (invisble){} edge from parent[draw=none]}     
+            child {node[draw = none] (invisble){} edge from parent[draw=none]}
         }
         child {node[circle,draw] (7a) {7}edge from parent[draw=none]
         child{node[circle, draw](3a){3}edge from parent[draw=none]}
@@ -382,7 +376,7 @@ See Figure \ref{fig:BST.insertion}.
     \node [draw=none, node distance=.1cm] (i5a)[above of=5a]{}
         child {node[draw=none] (i2a) {}edge from parent[draw=none]
             child { node[draw=none] (i1a) {}edge from parent[draw=none]}
-            child {node[draw = none] (invisbleA){} edge from parent[draw=none]}     
+            child {node[draw = none] (invisbleA){} edge from parent[draw=none]}
         }
         child {node[draw=none] (i7a) {}edge from parent[draw=none]
         child{node[draw=none](i3a){}edge from parent[draw=none]}
@@ -391,7 +385,7 @@ See Figure \ref{fig:BST.insertion}.
     \node [draw=none, node distance=.1cm] (i5b)[below of=5a]{}
         child {node[draw=none] (i2b) {}edge from parent[draw=none]
             child { node[draw=none] (i1b) {}edge from parent[draw=none]}
-            child {node[draw = none] (invisbleB){} edge from parent[draw=none]}     
+            child {node[draw = none] (invisbleB){} edge from parent[draw=none]}
         }
         child {node[draw=none] (i7b) {}edge from parent[draw=none]
         child{node[draw=none](i3b){}edge from parent[draw=none]}
@@ -401,57 +395,38 @@ See Figure \ref{fig:BST.insertion}.
 \draw[black!20!blue, ->, >=stealth', shorten >= .1cm](root)--(5a);
 \node [draw=none, black!20!blue, node distance=1.5cm](parent)[above left of=2a]{parent};
 \draw[black!20!blue, ->, >=stealth', shorten >= .1cm](parent)--(2a);
-\foreach \s/\t in {i5a/i2a, i2b/i5b, i5a/i7a, i7b/i5b} 
+\foreach \s/\t in {i5a/i2a, i2b/i5b, i5a/i7a, i7b/i5b}
     {\draw[->, >=stealth', shorten <=.23cm, shorten >=.1cm](\s)--(\t);}
 \foreach \s/\t in {i2a/i1a, i1b/i2b, i2a/i3a, i3b/i2b, i7a/i8a, i8b/i7b}
     {\draw[->, >=stealth', shorten <=.27cm, shorten >=.1cm](\s)--(\t);}
 \foreach \s/\t in {i2a/i3a, i3b/i2b}
     {\draw[red, ->, >=stealth', shorten <=.27cm, shorten >=.1cm](\s)--(\t);}
 \end{tikzpicture}
-\caption{To insert a node containing 3 to the BST on the left, we start at the root and recurse down the tree until we find the node that should be 3's parent. Connect that parent to the child, then the child to its new parent.}
+\caption{To insert a node containing 3 to the BST on the left, start at the root and recurse down the tree to find the node that should be 3's parent. Connect that parent to the child, then the child to its new parent.}
 \label{fig:BST.insertion}
 \end{figure}
 
-% Some pseudocode to help with insertion, if deemed necessary.
-\begin{comment}
-\begin{lstlisting}
-"""Pseudocode for finding the correct parent of a new node
-
-find the parent of node, data
-	if data < node.value:
-		if node.left is not None 
-			find the parent of node.left, data
-		else:
-			return node
-	if data > node.right:
-		if data > node.value:
-			if node.right is not None:
-				find the parent of node.right, data
-			else:
-				return node
-"""
-\end{lstlisting}
-\end{comment}
-
-% Problem 2: BST.insert()
-\begin{problem}
+\begin{problem} % BST.insert()
 Implement the \li{insert()} method in the \li{BST} class.
+%
 \begin{enumerate}
-\item Find the parent of the new node (consider writing a recursive method, similar to \li{find()}, to do this).
+\item Find the parent of the new node.
+Consider writing a recursive method, similar to \li{find()}, to do this.
 Determine whether the new node will be the parent's left or right child, then double-link the parent and the new child.
 \item Do not allow for duplicates in the tree. Raise a \li{ValueError} if there is already a node in the tree containing the input data.
 \end{enumerate}
+
 Be sure to consider the special case of inserting to an empty tree.
 To test your tree, use (but do not modify) the provided \li{BST.__str__()} method.
 \end{problem}
 
-\subsection*{remove()}
+\subsection*{remove()} % ------------------------------------------------------
 
 Deleting nodes from a binary search tree is more difficult than finding or inserting.
 Insertion always creates a new leaf node, but removal may delete any kind of node.
 This leads to several different cases to consider.
 
-\subsubsection*{Removing a leaf node}
+\subsubsection*{Removing a Leaf Node} % - - - - - - - - - - - - - - - - - - - -
 
 In Python, an object is automatically deleted if there are no references to it.
 Call the node to be removed the \emph{target node}, and suppose it has no children.
@@ -459,42 +434,22 @@ To remove the target, find the target's parent, then delete the parent's referen
 Then there are no references to the target, so the target node is deleted.
 Since the target is a leaf node, removing it does not affect the rest of the tree structure.
 
-\begin{comment} % Pseudocode for removing a leaf node
-\begin{lstlisting}
-<<if the target node does not have children:
-	if the target's data is smaller than its parent's data:
-		set the parent's left child to None
-	else:
-		set the parent's right child to None>>
-\end{lstlisting}
-\end{comment}
+\subsubsection*{Removing a Node with One Child} % - - - - - - - - - - - - - - -
 
-\subsubsection*{Removing a node with one child}
-
-If the target node has one or more children, we must be careful not to delete the children when the target is removed.
+If the target node has one or more children, be careful not to delete the children when the target is removed.
 Simply removing the target as if it were a leaf node would delete the entire subtree originating from the target.
 
-To avoid deleting all of the target's descendents, we point the target's parent to an appropriate successor.
+To avoid deleting all of the target's descendents, point the target's parent to an appropriate successor.
 If the target has only one child, then that child is the successor.
 Connect the target's parent to the successor, and double-link by setting the successor's parent to be the target node's parent.
 Then, since the target has no references pointing to it, it is deleted.
 The target's successor, however, is pointed to by the target's parent, and so it remains in the tree.
 % TODO: Perhaps a figure for this one, as it is the hardest one to implement.
 
-\begin{comment}
-\begin{lstlisting} % Pseudocode for removing a node with one child
-<<if the target node has one child:
-	if target.parent.right is the target:
-		set parent's right child to the target's child.
-	if target.parent.left is the target:
-		set parent's left child to the target's child.>>
-\end{lstlisting}
-\end{comment}
-
-\subsubsection*{Removing a node with two children}
+\subsubsection*{Removing a Node with Two Children} % - - - - - - - - - - - - -
 
 Removal is more complicated if the target node has two children.
-To delete this kind of node, first we find its immediate in-order successor.
+To delete this kind of node, first find its immediate in-order successor.
 This successor is the node with the smallest value that is larger than the target's value.
 It may be found by moving to the right child of the target (so that it's value is greater than the target's value), and then to the left for as long as possible (so that it has the smallest such value).
 Note that because of how the successor is chosen, any in-order successor can only have at most one child.
@@ -505,7 +460,7 @@ Then the node with the target data has at most one child, and may be deleted acc
 If the successor was chosen appropriately, then the binary search tree structure and ordering will be maintained once the deletion is finished.
 
 The easiest way to implement this is to use recursion.
-First, because the successor has at most one child, we may recursivley remove the successor node by calling \li{remove()} on the successor's value.
+First, because the successor has at most one child, remove the successor node recursively by calling \li{remove()} on the successor's value.
 Then set the data stored in the target node as the successor's value.
 See Figure \ref{fig:BST.remove_twoChild}.
 
@@ -521,7 +476,7 @@ See Figure \ref{fig:BST.remove_twoChild}.
             child{node[draw=none](invisible){} edge from parent[draw=none]}
             child{node[draw,circle](3){3} edge from parent[draw=none]}
        }
-            child {node[draw, circle] (4){4} edge from parent[draw=none]}     
+            child {node[draw, circle] (4){4} edge from parent[draw=none]}
         }
     child {node[circle,draw] (9a) {9}edge from parent[draw=none]
         child{node[draw=none](8){}edge from parent[draw=none]}
@@ -532,7 +487,7 @@ See Figure \ref{fig:BST.remove_twoChild}.
             child{node[draw=none](invisibleA){} edge from parent[draw=none]}
             child{node[draw=none](3a){} edge from parent[draw=none]}
         }
-            child {node[draw = none] (4a){} edge from parent[draw=none]}     
+            child {node[draw = none] (4a){} edge from parent[draw=none]}
         }
         child {node[draw=none] (9a) {}edge from parent[draw=none]
         child{node[draw=none](8a){}edge from parent[draw=none]}
@@ -544,7 +499,7 @@ See Figure \ref{fig:BST.remove_twoChild}.
             child{node[draw=none](invisibleB){} edge from parent[draw=none]}
             child{node[draw=none](3b){} edge from parent[draw=none]}
         }
-            child {node[draw = none] (4b){} edge from parent[draw=none]}     
+            child {node[draw = none] (4b){} edge from parent[draw=none]}
         }
         child {node[draw=none] (9b) {}edge from parent[draw=none]
         child{node[draw=none](8b){}edge from parent[draw=none]}
@@ -553,7 +508,7 @@ See Figure \ref{fig:BST.remove_twoChild}.
 \draw[black!20!blue, ->, >=stealth', shorten >= .2cm](target)--(2a);
 \node [draw=none, black!20!blue, node distance=2cm](successor)[right of=3a]{successor};
 \draw[black!20!blue, ->, >=stealth', shorten >= .2cm](successor)--(3a);
-\foreach \s/\t in {2a/1a, 1b/2b, 2a/4a, 4b/2b, 5a/2a, 2b/5b, 5a/9a, 9b/5b, 4a/3a, 3b/4b} 
+\foreach \s/\t in {2a/1a, 1b/2b, 2a/4a, 4b/2b, 5a/2a, 2b/5b, 5a/9a, 9b/5b, 4a/3a, 3b/4b}
     {\draw[->, >=stealth', shorten <=.23cm, shorten >=.1cm](\s)--(\t);}
 \end{tikzpicture}
 \qquad
@@ -568,7 +523,7 @@ See Figure \ref{fig:BST.remove_twoChild}.
             child{node[draw=none](invisible){} edge from parent[draw=none]}
             child{node[draw,circle](3){2} edge from parent[draw=none]}
        }
-            child {node[draw, circle] (4){4} edge from parent[draw=none]}     
+            child {node[draw, circle] (4){4} edge from parent[draw=none]}
         }
     child {node[circle,draw] (9a) {9}edge from parent[draw=none]
         child{node[draw=none](8){}edge from parent[draw=none]}
@@ -579,7 +534,7 @@ See Figure \ref{fig:BST.remove_twoChild}.
             child{node[draw=none](invisibleA){} edge from parent[draw=none]}
             child{node[draw=none](3a){} edge from parent[draw=none]}
         }
-            child {node[draw = none] (4a){} edge from parent[draw=none]}     
+            child {node[draw = none] (4a){} edge from parent[draw=none]}
         }
         child {node[draw=none] (9a) {}edge from parent[draw=none]
         child{node[draw=none](8a){}edge from parent[draw=none]}
@@ -591,7 +546,7 @@ See Figure \ref{fig:BST.remove_twoChild}.
             child{node[draw=none](invisibleB){} edge from parent[draw=none]}
             child{node[draw=none](3b){} edge from parent[draw=none]}
         }
-            child {node[draw = none] (4b){} edge from parent[draw=none]}     
+            child {node[draw = none] (4b){} edge from parent[draw=none]}
         }
         child {node[draw=none] (9b) {}edge from parent[draw=none]
         child{node[draw=none](8b){}edge from parent[draw=none]}
@@ -600,34 +555,21 @@ See Figure \ref{fig:BST.remove_twoChild}.
 \draw[black!20!blue, ->, >=stealth', shorten >= .2cm](target)--(2a);
 \node [draw=none, black!20!blue, node distance=2cm](successor)[right of=3a]{successor};
 \draw[black!20!blue, ->, >=stealth', shorten >= .2cm](successor)--(3a);
-\foreach \s/\t in {2a/1a, 1b/2b, 2a/4a, 4b/2b, 5a/2a, 2b/5b, 5a/9a, 9b/5b} 
+\foreach \s/\t in {2a/1a, 1b/2b, 2a/4a, 4b/2b, 5a/2a, 2b/5b, 5a/9a, 9b/5b}
     {\draw[->, >=stealth', shorten <=.23cm, shorten >=.1cm](\s)--(\t);}
 \end{tikzpicture}
 \caption{To remove the node containing 2 from the top left BST, locate the target and its in-order successor. Delete the successor, recording its value. Finally, replace the data in the target with the data that was in the successor.}
 \label{fig:BST.remove_twoChild}
 \end{figure}
 
-\begin{comment} % Pseudocode for removing a node with two children.
-\begin{lstlisting}
-<<find the successor:
-	set the current node to be target.left
-	set current to be current.right until there is no right child
-	return current.
-
-Remove the node that has the successor's data (it will only have one child).
-Change the target's data to the successor's data.>>
-\end{lstlisting}
-\end{comment}
-
-\subsubsection*{Removing the root node}
+\subsubsection*{Removing the Root Node} % - - - - - - - - - - - - - - - - - - -
 
 In each of the above cases, we must also consider the subcase where the target is the root node.
 If the root has no children, resetting the root or calling the constructor will do.
 If the root has one child, that child becomes the new root of the tree.
 If the root has two children, the successor becomes the new root of the tree.
 
-% Problem 3: BST.remove()
-\begin{problem}
+\begin{problem} % BST.remove()
 Implement the \li{remove()} method in the \li{BST} class.
 If the tree is empty, or if the target node is not in the tree, raise a \li{ValueError}.
 Test your solutions thoroughly, accounting for all possible cases:
@@ -647,22 +589,45 @@ Test your solutions thoroughly, accounting for all possible cases:
 	\item the target has two children.
 	\end{enumerate}
 \end{enumerate}
-(Hints: \textbf{Before coding anything} outline the entire function with comments and \li{if else} blocks.
-Use the \li{BST.find()} method wherever appropriate.)
+(Hints: \textbf{Before coding anything}, outline the entire function with comments and \li{if}-\li{else} blocks.
+Use the \li{find()} method wherever appropriate.)
 \end{problem}
 
-There are many variations on the binary search tree, each with their own particular advantages and disadvantages.
-The reader is encouraged to research \href{https://en.wikipedia.org/wiki/B-tree}{B-trees}, \href{https://en.wikipedia.org/wiki/Red%E2%80%93black_tree}{red-black trees}, and \href{https://en.wikipedia.org/wiki/Splay_tree}{splay trees}.
-We conclude with a discussion of one of the most famous BST variants: the AVL.
-
-\section*{AVL Trees}
+\section*{AVL Trees} % ========================================================
 
 Binary search trees are a good way of organizing data so that it is quickly accessible.
 However, pathologies may arise when certain data sets are stored using a basic binary serch tree.
 This is best demonstrated by inserting ordered data into a binary search tree.
-Since the data is already ordered, each node will only have one child, and we essentially end up with a linked list.
+Since the data is already ordered, each node will only have one child, and the result is essentially a linked list.
 
-\begin{figure}
+\begin{lstlisting}
+# Sequentially adding ordered integers destroys the efficiency of a BST.
+>>> unbalanced_tree = BST()
+>>> for i in range(10):
+...     unbalanced_tree.insert(i)
+...
+# The tree is perfectly flat, so it loses its search efficiency.
+>>> print(unbalanced_tree)
+[0]
+[1]
+[2]
+[3]
+[4]
+[5]
+[6]
+[7]
+[8]
+[9]
+\end{lstlisting}
+
+Problems also arise when one branch of the tree becomes much longer than the others, leading to longer search times.
+
+An \emph{AVL tree} (named after Georgy Adelson-Velsky and Evgenii Landis) is a tree that prevents any one branch from getting longer than the others.
+It accomplishes this by recursively ``balancing'' the branches as nodes are added.
+See Figure \ref{fig:avl_balance}.
+The AVL's balancing algorithm is beyond the scope of this project, but details and exercises on the algorithm can be found in Chapter 2 of the Volume II text.
+
+\begin{figure}[H] % AVL Tree
 \begin{tikzpicture}[
     auto,
     level 1/.style={sibling distance=2cm},
@@ -698,7 +663,7 @@ Since the data is already ordered, each node will only have one child, and we es
         child{node[draw=none](6b){}edge from parent[draw=none]}
     };
 
-\foreach \s/\t in {4a/2a, 2a/1a, 2a/3a, 4a/5a, 5a/6a} 
+\foreach \s/\t in {4a/2a, 2a/1a, 2a/3a, 4a/5a, 5a/6a}
     {\draw[->, >=stealth', shorten <=.23cm, shorten >=.1cm](\s)--(\t);}
 \node [draw=none, black!20!blue, node distance=1.5cm](root)[above right of=4a]{root};
 \draw[black!20!blue, ->, >=stealth', shorten >= .1cm](root)--(4);
@@ -708,38 +673,13 @@ Since the data is already ordered, each node will only have one child, and we es
 \label{fig:avl_balance}
 \end{figure}
 
-\begin{lstlisting}
-# Sequentially adding ordered integers destroys the efficiency of a BST.
->>> unbalanced_tree = BST()
->>> for i in range(10):
-...     unbalanced_tree.insert(i)
-... 
-# The tree is perfectly flat, so it loses its search efficiency.
->>> print(unbalanced_tree)
-[0]
-[1]
-[2]
-[3]
-[4]
-[5]
-[6]
-[7]
-[8]
-[9]
-\end{lstlisting}
-
-Problems also arise when one branch of the tree becomes much longer than the others, leading to longer search times.
-
-An \emph{AVL tree} (named after Georgy Adelson-Velsky and Evgenii Landis) is a tree that prevents any one branch from getting longer than the others.
-It accomplishes this by recursively ``balancing'' the branches as nodes are added.
-See Figure \ref{fig:avl_balance}.
-The AVL's balancing algorithm is beyond the scope of this project, but details and exercises on the algorithm can be found in Chapter 2 of the Volume II text.
+\newpage
 
 \begin{lstlisting}
 >>> balanced_tree = AVL()
 >>> for i in range(10):
 ...     balanced_tree.insert(i)
-... 
+...
 # The AVL tree is balanced, so it retains (and optimizes) its search efficiency.
 >>> print(balanced_tree)
 [3]
@@ -752,21 +692,24 @@ The AVL's balancing algorithm is beyond the scope of this project, but details a
 % TODO (?): Instead of a file to read from, have them generate random numbers.
 %   Reading data from a file is an over-complication (abolish English.txt).
 \begin{problem}
-Write a function to compare the build and search speeds the different data structures of this lab.
-Accept a \li{filename} to read data from and keyword arguments \li{start}, \li{stop}, and \li{step} to determine the domain.
-Read the specified file by adding the contents of each line to a list of data.
-Repeat the following for $n$ varying from \li{start} to \li{stop} at intervals of \li{step}:
+Write a function to compare the build and search speeds of the data structures we have implemented so far.
 
-Get a subset of $n$ items from the data set.
-Time (separately) how long it takes to load a new \li{LinkedList}, a \li{BST}, and an \li{AVL} with the $n$ items.
-Choose 5 \textbf{random} items from the subset, and time how long it takes to find all 5 items in each data structure.
-To avoid exceeding the maximum recursion depth, use the provided \li{iterative_search()} function from Problem \ref{prob:recursion} to search the linked list.
+Accept a file name to read from.
+Read the file, adding the contents of each line to a list of data.
+For various values of $n$, repeat the following:
+%
+\begin{enumerate}
+\item Get a subset of $n$ items from the data set.
+\item Time (separately) how long it takes to load a new \li{SinglyLinkedList}, a \li{BST}, and an \li{AVL} with the $n$ items.
+\item Choose 5 \textbf{random} items from the subset, and time how long it takes to find all 5 items in each data structure.
+To avoid exceeding the maximum recursion depth, use the provided \li{iterative_search()} function from Problem \ref{prob:recursion} to search the \li{SinglyLinkedList}.
+\end{enumerate}
 
-Create a single plot with two lin-log subplots (use \li{plt.semilogy()} instead of \li{plt.plot()}).
-In the first, plot the number of items in each subset against the time it took to build each object.
-In the second, plot the number of items in each subset against the time it took to search each object.
-With \li{start=500}, \li{stop=5000}, and \li{step=500}, your plot should look similar to Figure \ref{fig:times}, though your results will be less smooth.
-
+Report your findings in a single figure with two subplots: one for build times, and one for search times.
+Use log scales where appropriate.
+\begin{comment} % TODO: Decide whether or not to show them these plots.
+Your figure should resemble the following plots, though your results may be less smooth.
+%
 \begin{figure}[H] % Solution to problem 4.
     \centering
     \begin{subfigure}[b]{.5\textwidth}
@@ -777,29 +720,39 @@ With \li{start=500}, \li{stop=5000}, and \li{step=500}, your plot should look si
         \centering
         \includegraphics[width=\textwidth]{SearchTimes.pdf}
     \end{subfigure}
-    \caption{The \li{SinglyLinkedList} has the fastest build times, but the \li{AVL} has the fastest search times. How would the graphs be different if the data had been sorted to begin with?}
-    \label{fig:times}
+    % \caption{The \li{SinglyLinkedList} has the fastest build times, but the \li{AVL} has the fastest search times. How would the graphs be different if the data had been sorted to begin with?}
 \end{figure}
+\end{comment}
 \end{problem}
 
-\begin{comment} % TODO: Add this back in?
-\section*{Conclusion}
+\section*{Conclusion} % =======================================================
+
 Every data structure has advantages and disadvantages.
-Recognizing when an application may take advantage of a certain structure, especially when that structure is more complicated than a \li{list} or \li{set}, is an important skill.
-Choosing your structures wisely often results in huge speedups in applications.
-\end{comment}
+Recognizing when an application may take advantage of a certain structure, especially when that structure is more complicated than a Python list or set, is an important skill.
+Choosing structures wisely often results in huge speedups and easier data maintenance.
 
-% TODO: Add this back in?
-\begin{comment} % Additional material: improve the BST class, etc.
-\section*{Additional Material}
+\newpage
 
-The following are ideas for improving your \li{BST} class.
+\section*{Additional Material} % ==============================================
+
+\subsection*{Improvements to the BST} % ---------------------------------------
+The following are ideas for improving the \li{BST} class.
 
 \begin{enumerate}
+\item Modify the constructor so that it accepts an optional argument . . .
 \item Add an attribute that keeps track of the number of items in the tree.
 Use this attribute to implement the \li{__len__()} magic method.
-\item Add a method for translating the \li{BST} into a Python \li{list} using a depth-first search.
+\item Add a method for translating the \li{BST} into a regular Python list using a depth-first search.
 \end{enumerate}
 
-As mentioned, there are other types of trees that are more complicated than the standard \li{BST}. Consider implementing a B-Tree.
-\end{comment}
+\subsection*{Other Trees} % ---------------------------------------------------
+
+There are many variations on the Binary Search Tree, each with its own advantages and disadvantages.
+Consider writing classes for the following structures.
+%
+\begin{enumerate}
+\item A \href{https://en.wikipedia.org/wiki/B-tree}{\emph{B-Tree}} is a tree whose nodes can contain more than one piece of data.
+\item The nodes of a \href{https://en.wikipedia.org/wiki/Red%E2%80%93black_tree}{\emph{Red-Black Tree}} are labeled either red or black.
+\item A \href{https://en.wikipedia.org/wiki/Splay_tree}{\emph{Splay Tree}} is interesting.
+\end{enumerate}
+
