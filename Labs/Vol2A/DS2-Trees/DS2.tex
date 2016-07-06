@@ -702,11 +702,11 @@ For various values of $n$, repeat the following:
 \item Get a subset of $n$ items from the data set.
 \item Time (separately) how long it takes to load a new \li{SinglyLinkedList}, a \li{BST}, and an \li{AVL} with the $n$ items.
 \item Choose 5 \textbf{random} items from the subset, and time how long it takes to find all 5 items in each data structure.
-To avoid exceeding the maximum recursion depth, use the provided \li{iterative_search()} function from Problem \ref{prob:recursion} to search the \li{SinglyLinkedList}.
+Use the \li{find()} method for the trees, but to avoid exceeding the maximum recursion depth, use the provided \li{iterative_search()} function from Problem \ref{prob:recursion} to search the \li{SinglyLinkedList}.
 \end{enumerate}
 
 Report your findings in a single figure with two subplots: one for build times, and one for search times.
-Use log scales where appropriate.
+Use log scales if appropriate.
 \begin{comment} % TODO: Decide whether or not to show them these plots.
 Your figure should resemble the following plots, though your results may be less smooth.
 %
@@ -736,13 +736,17 @@ Choosing structures wisely often results in huge speedups and easier data mainte
 \section*{Additional Material} % ==============================================
 
 \subsection*{Improvements to the BST} % ---------------------------------------
-The following are ideas for improving the \li{BST} class.
+
+The following are a few ideas for improving the \li{BST} class.
 
 \begin{enumerate}
-\item Modify the constructor so that it accepts an optional argument . . .
+\item Add a keyword argument to the constructor so that if an iterable is input, each element of the iterable is immediately added to the tree.
+This makes it possible to cast other iterables as a \li{BST}, like
+Python's standard data structures.
 \item Add an attribute that keeps track of the number of items in the tree.
 Use this attribute to implement the \li{__len__()} magic method.
-\item Add a method for translating the \li{BST} into a regular Python list using a depth-first search.
+\item Add a method for translating the \li{BST} into a sorted Python list using a depth-first search.
+\\(Hint: examine the provided \li{__str__()} method carefully.)
 \end{enumerate}
 
 \subsection*{Other Trees} % ---------------------------------------------------
@@ -751,8 +755,17 @@ There are many variations on the Binary Search Tree, each with its own advantage
 Consider writing classes for the following structures.
 %
 \begin{enumerate}
-\item A \href{https://en.wikipedia.org/wiki/B-tree}{\emph{B-Tree}} is a tree whose nodes can contain more than one piece of data.
+\item A \href{https://en.wikipedia.org/wiki/B-tree}{\emph{B-Tree}} is a tree whose nodes can contain more than one piece of data and point to more than one other node.
+See the Volume II text for details.
 \item The nodes of a \href{https://en.wikipedia.org/wiki/Red%E2%80%93black_tree}{\emph{Red-Black Tree}} are labeled either red or black.
-\item A \href{https://en.wikipedia.org/wiki/Splay_tree}{\emph{Splay Tree}} is interesting.
+The tree satisfies the following rules.
+\begin{enumerate}
+    \item Every leaf node is black.
+    \item Red nodes only have black children.
+    \item Every (directed) path from a node to any of its descendent leaf nodes contains the same number of black nodes.
+\end{enumerate}
+When a node is added that violates one of these constraints, the tree is rebalanced and recolored.
+\item A \href{https://en.wikipedia.org/wiki/Splay_tree}{\emph{Splay Tree}} includes an additional operation, called splaying, that makes a specified node the root of the tree.
+Splaying several nodes of interest makes them easier to access because they will be close to the root.
 \end{enumerate}
 

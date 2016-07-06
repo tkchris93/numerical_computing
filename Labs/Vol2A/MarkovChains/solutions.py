@@ -139,7 +139,7 @@ class SentenceGenerator(object):
                 indices = [self.states.index(word) for word in sentence]
 
                 self.chain[0, indices[0]] += 1                 # &tart -> first
-                for i in xrange(len(index)-1):
+                for i in xrange(len(indices)-1):
                     self.chain[indices[i], indices[i+1]] += 1  # middle -> next
                 self.chain[indices[-1], -1] += 1               # last -> $top
 
