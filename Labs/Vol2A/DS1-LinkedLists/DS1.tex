@@ -67,12 +67,12 @@ Every linked list needs a reference to the first node in the chain, called the \
 A reference to the last node in the chain, called the \li{tail}, is also often included.
 Each node instance in the list stores a piece of data, plus at least one reference to another node in the list.
 
-The nodes of a \emph{singly-linked list} have a single reference to the next node in the list (see Figure \ref{fig:singly_linked}), while the nodes of a \emph{doubly-linked list} have two references: one for the previous node, and one for the next node in the list (see Figure \ref{fig:doubly_linked}).
-This allows for a doubly-linked list to be traversed in both directions, whereas a singly-linked list can only be traversed in one direction.
+The nodes of a \emph{singly linked list} have a single reference to the next node in the list (see Figure \ref{fig:singly_linked}), while the nodes of a \emph{doubly linked list} have two references: one for the previous node, and one for the next node in the list (see Figure \ref{fig:doubly_linked}).
+This allows for a doubly linked list to be traversed in both directions, whereas a singly linked list can only be traversed in one direction.
 
 \begin{lstlisting}
 class LinkedListNode(Node):
-    """A node class for doubly-linked lists. Inherits from the 'Node' class.
+    """A node class for doubly linked lists. Inherits from the 'Node' class.
     Contains references to the next and previous nodes in the linked list.
     """
     def __init__(self, data):
@@ -84,7 +84,7 @@ class LinkedListNode(Node):
         self.prev = None
 \end{lstlisting}
 
-\begin{figure} % Singly-linked list.
+\begin{figure} % Singly linked list.
 \centering
 \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto, node distance=1.5cm,thick,main node/.style={rectangle,draw}, minimum size=.5cm]
 \tikzset{rect node/.style={rectangle, draw, minimum height = .5cm, minimum width=.2cm}}
@@ -99,11 +99,11 @@ class LinkedListNode(Node):
 \foreach \s/\t  in {1/2, 2/3, 3/4}{\path[draw](\s) edge[shorten <=.1cm](\t);}
     \draw[black!20!blue] (H) edge (1.north);
 \end{tikzpicture}
-\caption{A singly-linked list. Each node has a reference to the next node in the list. The head attribute is always assigned to the first node.}
+\caption{A singly linked list. Each node has a reference to the next node in the list. The head attribute is always assigned to the first node.}
 \label{fig:singly_linked}
 \end{figure}
 
-\begin{figure} % Doubly-linked list.
+\begin{figure} % Doubly linked list.
 \centering
 \begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto, node distance=1.5cm, thick,main node/.style={rectangle,draw}, minimum size=.5cm]
 \tikzset{rect node/.style={rectangle, draw, minimum height = .5cm, minimum width=.9cm}}
@@ -130,7 +130,7 @@ class LinkedListNode(Node):
     \draw[black!20!blue] (H) edge (1.north);
     \draw[black!20!blue] (T) edge (4.north);
 \end{tikzpicture}
-\caption{A doubly-linked list. Each node has a reference to the node before it and a reference to the node after it. In addition to the head attribute, this list has a tail attribute that is always assigned to the last node.}
+\caption{A doubly linked list. Each node has a reference to the node before it and a reference to the node after it. In addition to the head attribute, this list has a tail attribute that is always assigned to the last node.}
 \label{fig:doubly_linked}
 \end{figure}
 
@@ -146,7 +146,7 @@ See Figure \ref{fig:append}.
 
 \begin{lstlisting}
 class LinkedList(object):
-    """Doubly-linked list data structure class.
+    """Doubly linked list data structure class.
 
     Attributes:
         head (LinkedListNode): the first node in the list.
@@ -214,7 +214,7 @@ class LinkedList(object):
     \draw[black!20!blue, shorten >=.1cm] (H2) edge (5.north);
     \draw[black!20!blue, shorten >=.1cm] (T2) edge (7.north);
 \end{tikzpicture}
-\caption{Appending a new node to the end of a nonempty doubly-linked list. The red arrows are the new connections. Note that the \li{tail} attribute is adjusted.}
+\caption{Appending a new node to the end of a nonempty doubly linked list. The red arrows are the new connections. Note that the \li{tail} attribute is adjusted.}
 \label{fig:append}
 \end{figure}
 
@@ -373,7 +373,7 @@ However, the nodes before and after the target node are no longer linked.
         \path[draw](\s) edge[shorten <=.1cm, shorten >=.1cm](\t);}
     \node[draw=none, node distance=1.5cm] [right of=8]{};  % Centralize
 \end{tikzpicture}
-\caption{Na{\"i}ve Removal for Doubly-linked Lists. Deleting all references pointing to $C$ deletes the node, but it also separates nodes $A$ and $B$ from node $D$.}
+\caption{Na{\"i}ve Removal for Doubly linked Lists. Deleting all references pointing to $C$ deletes the node, but it also separates nodes $A$ and $B$ from node $D$.}
 \label{fig:remove_bad}
 \end{figure}
 
@@ -417,7 +417,7 @@ Then there will be no reference to the removed node and it will be deleted, but 
     \path[draw, shorten <=.2cm](8) edge[red, bend left] (6);
     \node[draw=none, node distance=1.5cm] [right of=8]{};  % Centralize
 \end{tikzpicture}
-\caption{Correct Removal for Doubly-linked Lists. To avoid gaps in the chain, nodes $B$ and $D$ must be linked together.}
+\caption{Correct Removal for Doubly linked Lists. To avoid gaps in the chain, nodes $B$ and $D$ must be linked together.}
 \label{fig:remove_good}
 \end{figure}
 
@@ -487,7 +487,7 @@ Note that since \li{insert()} places a new node before an existing node, it is n
     \draw[black!20!blue, shorten >=.1cm] (T2) edge (7.north);
     \node[draw = none, node distance = 1.5cm] [right of=8]{};  % Centralize
 \end{tikzpicture}
-\caption{Insertion for Doubly-linked Lists.}
+\caption{Insertion for Doubly linked Lists.}
 \label{fig:insert}
 \end{figure}
 
@@ -553,13 +553,16 @@ The \li{*args} argument allows the \li{remove()} method to receive any number of
 This is the most general form of a function signature.
 \end{info}
 
-The \li{collections} module in the Python standard library has a \li{deque} object, implemented as a doubly-linked list.
+Python lists have \li{append()} and \li{pop()} methods, so they can be used as stacks.
+However, data access and removal from the front is much slower, as Python lists are not implemented as linked lists.
+
+The \li{collections} module in the standard library has a \li{deque} object, implemented as a doubly linked list.
 This is an excellent object to use in practice instead of a Python list when speed is of the essence and data only needs to be accessed from the ends of the list.
 
-\begin{problem} % Reverse a file using a deque.
+\begin{problem} % Reverse a file using a stack/deque.
 Write a function that accepts the name of a file to be read and a file to write to.
-Read the first file, adding each line to a deque (use your \li{Deque} class or \li{collections.deque}).
-Write the lines to the second file in reverse order by iterating backward through the deque.
+Read the first file, adding each line to a deque (use a Python \li{list}, your \li{Deque} class, or \li{collections.deque}. Which one is fastest?).
+After reading the entire file, pop each entry off the stack one at a time and write it to the second file.
 % Try using a regular Python list instead of a deque.
 % Which data structure works faster?
 \end{problem}
@@ -570,7 +573,7 @@ Write the lines to the second file in reverse order by iterating backward throug
 
 \subsection*{Improvements to the Linked List Class} % -------------------------
 
-Our \li{LinkedList} class is still somewhat plain.
+The \li{LinkedList} class is still somewhat plain.
 Below are some ideas for improving it.
 
 \begin{enumerate}
@@ -617,7 +620,8 @@ The \li{LinkedList} class can also be used as the backbone for other data struct
 \item A \emph{Sorted List} adds new nodes strategically so that the data is always kept in order.
 A \li{SortedLinkedList} class that inherits from the \li{LinkedList} class should have a method called \li{add(self, data)} that inserts a new node containing \li{data} before the first node in the list that has a \li{value} that is greater or equal to \li{data} (thereby preserving the ordering).
 Other methods for adding nodes should be disabled.
+How efficient is this data structure in the worst case scenario?
 
-\item In a \emph{Circular Linked List}, the ``last'' node connects back to the first node.
+\item In a \emph{Circular Linked List}, the ``last'' node connects back to the ``first'' node.
 Thus a reference to the tail is unnecessary.
 \end{enumerate}

@@ -15,7 +15,7 @@ class Node(object):
 
 
 class LinkedListNode(Node):
-    """A node class for doubly-linked lists. Inherits from the 'Node' class.
+    """A node class for doubly linked lists. Inherits from the 'Node' class.
     Contains references to the next and previous nodes in the linked list.
     """
     def __init__(self, data):
@@ -28,7 +28,7 @@ class LinkedListNode(Node):
 
 
 class LinkedList(object):
-    """Doubly-linked list data structure class.
+    """Doubly linked list data structure class.
 
     Attributes:
         head (LinkedListNode): the first node in the list.
