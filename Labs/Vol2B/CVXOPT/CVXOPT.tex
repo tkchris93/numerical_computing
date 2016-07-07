@@ -18,14 +18,14 @@ In this lab we will focus on linear and quadratic programming.
 A \emph{linear program} is a linear constrained optimization problem. Such a problem can be stated in several
 different forms, one of which is
 \begin{align*}
-\text{minimize}\qquad &c^Tx \\
+\text{minimize}\qquad &c\trp x \\
 \text{subject to}\qquad &Gx + s = h\\
 &Ax = b \\
  &s \geq 0.
 \end{align*}
 This is the formulation used by CVXOPT.
 In this formulation, we require that the matrix $A$ has full row rank,
-and that the block matrix $[G \quad A]^T$ has full column rank.
+and that the block matrix $[G \quad A]\trp $ has full column rank.
 
 Note that the constraint $Gx +s = h$ includes the term $s$, which is not part of the objective
 function, and is known as the \emph{slack variable}. Since $s  \geq 0$, the constraint
@@ -35,8 +35,8 @@ $Gx + s = h$ is equivalent to $Gx \leq h$.
 \begin{comment}
 The corresponding \emph{dual program} for the above linear program has the form
 \begin{align*}
-\text{maximize}\qquad &-h^Tz - b^Ty \\
-\text{subject to}\qquad &G^Tz + A^Ty + c = 0\\
+\text{maximize}\qquad &-h\trp z - b\trp y \\
+\text{subject to}\qquad &G\trp z + A\trp y + c = 0\\
  &z \geq 0.
 \end{align*}
 CVXOPT provides functions to solve both the original (\emph{primal}) linear program and its dual program.
@@ -122,7 +122,7 @@ and then simply convert them to the CVXOPT matrix data type:
 Use whichever method is most convenient. 
 In this lab, we will initialize non-trivial matrices first as ndarrays for consistency.
 
-Be sure the entries in the matrices are floats!
+Finally, be sure the entries in the matrices are floats!
 \end{warn}
 
 Having initialized the necessary objects, we are now ready to solve the problem.
@@ -421,13 +421,13 @@ Quadratic programming is similar to linear programming, one exception being that
 The constraints, if there are any, are still of the same form.
 Thus $G, h, A$, and $b$ are optional. The formulation that we will use is
 \begin{align*}
-\text{minimize}\qquad &\frac{1}{2}x^TPx + q^Tx \\
+\text{minimize}\qquad &\frac{1}{2}x\trp Px + q\trp x \\
 \text{subject to}\qquad &Gx \leq h\\
  &Ax = b,
 \end{align*}
 where $P$ is a positive semidefinite symmetric matrix.
 In this formulation, we require again that $A$ has full row rank, and that the block matrix
-$[P \quad G \quad A]^T$ has full column rank.
+$[P \quad G \quad A]\trp $ has full column rank.
 
 As an example, let us minimize the quadratic function
 \[
@@ -457,7 +457,7 @@ g(x,y,z) = \frac{3}{2}x^2 +2xy + xz+ 2y^2 +2yz+\frac{3}{2}z^2+3x + z
 \end{equation*}
 \begin{comment}
 \begin{equation}
-f(x) = \frac{1}{2}x^TQx - x^Tp
+f(x) = \frac{1}{2}x\trp Qx - x\trp p
 \end{equation}
 where
 
@@ -489,7 +489,7 @@ The $l_2$ minimization problem is to
 \text{subject to} \qquad &Ax = b.
 \end{align*}
 
-This problem is equivalent to a quadratic program, since $\|x\|_2 = x^Tx$.
+This problem is equivalent to a quadratic program, since $\|x\|_2 = x\trp x$.
 Write a function called \li{l2Min()} that takes a matrix $A$ and vector $b$ as inputs, and returns the solution $x$ to the $l_2$ minimization problem.
 \end{problem}
 
