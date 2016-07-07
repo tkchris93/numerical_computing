@@ -22,7 +22,9 @@ def _timeout(seconds):
 
     def _handler(signum, frame):
         """Handle the alarm by raising a custom exception."""
-        raise TimeoutError("Timeout after {0} seconds".format(seconds))
+        message = "Timeout after {} seconds".format(seconds)
+        print(message)
+        raise TimeoutError(message)
 
     def decorator(func):
         @wraps(func)
@@ -36,12 +38,9 @@ def _timeout(seconds):
         return wrapper
     return decorator
 
-class IncorrectAnswer(Exception):
-    pass
-
 # Test Driver =================================================================
 
-from os import remove as rm # TODO: use subprocess probably.
+from os import remove as rm
 from collections import deque
 from numpy.random import permutation, randint
 
@@ -193,6 +192,7 @@ class _testDriver(object):
         return credit
 
     # Problems ----------------------------------------------------------------
+    @_timeout(5)
     def problem1(self, s):
         """Test the Node class for input restrictions. 5 points."""
 
@@ -219,6 +219,7 @@ class _testDriver(object):
         s.Node(0)
         return points + 2
 
+    @_timeout(5)
     def problem2(self, s):
         """Test LinkedList.find(). 5 points."""
         source, _list = self._load_lists(s)
@@ -255,6 +256,7 @@ class _testDriver(object):
 
         return points
 
+    @_timeout(5)
     def problem3(self, s):
         """Test LinkedList.__len__() and LinkedList.__str__(). 10 Points."""
 
@@ -315,62 +317,65 @@ class _testDriver(object):
 
         return points
 
+    @_timeout(5)
     def problem4(self, s):
         """Test LinkedList.remove(). 10 points."""
         points = 0
 
         def test_remove(item, solList, stuList):
-            """Attempt to remove 'item' from the solution and student lists.
-            Report then pass along any formal Exceptions.
-            """
-            old = "\nPrevious list: {}\n".format(solList)
+            """Attempt to remove 'item' from the solution and student lists."""
+            old = "\n\tPrevious list:    {}".format(solList)
+            p = 1
             try:
                 solList.remove(item); stuList.remove(item)
                 if 0 == self._strTest(solList, stuList,
                     "LinkedList.remove({}) failed{}".format(item, old)):
-                    raise IncorrectAnswer("Incorrect list")
+                    p = 0
                 elif 0 == self._eqTest(len(solList), len(stuList),
-                    "LinkeList.__len__() failed on list {}".format(solList)):
-                    return 0, solList, stuList
-                else:
-                    return 1, solList, stuList
+                    "LinkedList.__len__() failed on list {}".format(solList)):
+                    p = 0
             except Exception as e:
                 self.feedback += "\n{} while removing {}: {}{}".format(
                                             self._errType(e), item, e, old)
-                raise
+            finally:
+                return p, solList, stuList
+
+        def remove_many(indices):
+            """Remove the entries at 'indices' until a problem arises."""
+            pts = 0
+            l1, l2 = self._load_lists(s)
+            for i in indices:
+                p, l1, l2 = test_remove(l1[i], l1, l2)
+                pts += p
+                if p == 0:
+                    return pts
+            return pts
 
         # Make sure LinkedList.append() still works.
         l1, l2 = self._load_lists(s)
         if 0 == self._strTest(l1, l2, "LinkedList.append() failed!!"):
-            raise IncorrectAnswer("Ungradable until LinkedList.append() works")
+            raise NotImplementedError("Ungradable until LinkedList.append()"
+                                            " and LinkedList.__str__() work")
 
         # Remove head, tail (4 points, 2 rounds of 2 points each)
-        for i in xrange(2):
-            l1, l2 = self._load_lists(s)
-            try:
-                p, l1, l2 = test_remove(l1[0],  l1, l2); points += p # head
-                p, l1, l2 = test_remove(l1[-1], l1, l2); points += p # tail
-            except: pass
+        points += remove_many([0,-1])
+        points += remove_many([0,-1])
 
-        # Remove from middle (4 points)
-        for i in xrange(2):
-            l1, l2 = self._load_lists(s)
-            try:
-                p, l1, l2 = test_remove(l1[1], l1, l2); points += p
-                p, l1, l2 = test_remove(l1[2], l1, l2); points += p
-            except: pass
+        # Remove from middle (4 points, 2 rounds of 2 points each)
+        points += remove_many([1,2])
+        points += remove_many([1,2])
 
         # Remove only value (2 points)
         for i in xrange(2):
             l1 = [randint(20)]
             l2 = s.LinkedList()
             l2.append(l1[0])
-            try:
-                p, l1, l2 = test_remove(l1[0], l1, l2); points += p
-            except: pass
+            p, l1, l2 = test_remove(l1[0], l1, l2)
+            points += p
 
         return points
 
+    @_timeout(5)
     def problem5(self, s):
         """Test LinkedList.insert(). 10 points."""
         points = 0
@@ -379,47 +384,53 @@ class _testDriver(object):
             """Attempt to insert 'item' to the solution and student lists at
             location 'place'.
             """
-            old = "\nPrevious list: {}\n".format(solList)
+            p = 1
+            old = "\n\tPrevious list:    {}".format(solList)
             try:
                 index = solList.index(place)
-                solList.insert(index, item)
-                stuList.insert(item, place)
+                solList.insert(index, item); stuList.insert(item, place)
                 if 0 == self._strTest(solList, stuList,
                     "LinkedList.insert({}, {}) failed{}".format(
                                                         item, place, old)):
-                    raise IncorrectAnswer("Incorrect list")
+                    p = 0
                 elif 0 == self._eqTest(len(solList), len(stuList),
-                    "LinkeList.__len__() failed on list {}".format(solList)):
-                    return 0, solList, stuList
-                else:
-                    return 1, solList, stuList
+                    "LinkedList.__len__() failed on list {}".format(solList)):
+                    p = 0
             except Exception as e:
                 self.feedback += "\n{} while inserting {}: {}{}".format(
                                             self._errType(e), item, e, old)
-                raise
+            finally:
+                return p, solList, stuList
+
+        def insert_many(indices):
+            """Insert entris at 'indices' until a problem arises."""
+            pts = 0
+            l1, l2 = self._load_lists(s)
+            for i,j in indices:
+                p, l1, l2 = test_insert(i, l1[j], l1, l2)
+                pts += p
+                if p == 0:
+                    return pts
+            return pts
 
         # Make sure LinkedList.append() still works.
         l1, l2 = self._load_lists(s)
         if 0 == self._strTest(l1, l2, "LinkedList.append() failed!!"):
-            raise AssertionError("Ungradable unless LinkedList.append() works")
+            raise NotImplementedError("Ungradable until LinkedList.append()"
+                                            " and LinkedList.__str__() work")
 
-        # Insert before head (2 points)
-        l1, l2 = self._load_lists(s)
-        try:
-            p, l1, l2 = test_insert(-1, l1[0], l1, l2); points += p
-            p, l1, l2 = test_insert(-2, l1[0], l1, l2); points += p
-        except: pass
+        # Insert before head (2 points).
+        points += insert_many([(-1,0), (-2,0)])
 
-        # Insert to middle (8 points)
-        for i in xrange(4):
-            l1, l2 = self._load_lists(s)
-            try:
-                p, l1, l2 = test_insert(-2, l1[1], l1, l2); points += p
-                p, l1, l2 = test_insert(-1, l1[3], l1, l2); points += p
-            except: pass
+        # Insert to middle (8 points).
+        points += insert_many([(-2,1), (-1,3)])
+        points += insert_many([(-2,1), (-1,3)])
+        points += insert_many([(-2,1), (-1,3)])
+        points += insert_many([(-2,1), (-1,3)])
 
         return points
 
+    @_timeout(5)
     def problem6(self, s):
         """Test the Deque class. 10 points."""
         if not issubclass(s.Deque, s.LinkedList):
@@ -437,46 +448,80 @@ class _testDriver(object):
                 return 1
             except Exception as e:
                 self.feedback += "\nDeque.{}() not disabled ".format(func)
-                self.feedback += "correctly (expected NotImplementedError, "
+                self.feedback += "correctly\n\t(expected NotImplementedError, "
                 self.feedback += "got {} instead)".format(self._errType(e))
                 self.feedback += "\n\tError message: {}".format(e)
             return 0
 
-        # Test that Deque.remove() and Deque.insert() are disabled (2 points)
+        def test_append(item, solDeque, stuDeque, func="append"):
+            old = "\n\tPrevious deque:   {}".format(list(solDeque))
+            p = 1
+            try:
+                eval("solDeque.{}(item)".format(func))
+                eval("stuDeque.{}(item)".format(func))
+                if 0 == self._strTest(list(solDeque), stuDeque,
+                    "Deque.{}({}) failed{}".format(func, item, old)):
+                    p = 0
+            except Exception as e:
+                self.feedback += "\n{} while {}ing {}: {}{}".format(
+                                        self._errType(e), func, item, e, old)
+            finally:
+                return p, solDeque, stuDeque
+
+        def test_pop(solDeque, stuDeque, func="pop"):
+            old = "\n\tPrevious deque:   {}".format(list(solDeque))
+            p = 1
+            try:
+                eval("solDeque.{}()".format(func))
+                eval("stuDeque.{}()".format(func))
+                if 0 == self._strTest(list(solDeque), stuDeque,
+                    "Deque.{}() failed{}".format(func, old)):
+                    p = 0
+            except Exception as e:
+                self.feedback += "\n{} while {}ing: {}{}".format(
+                                        self._errType(e), func, e, old)
+            finally:
+                return p, solDeque, stuDeque
+
+        def append_many(func):
+            items = self._load_lists(s)[0]
+            l1 = deque()
+            l2 = s.Deque()
+            pts = 0
+            for i in items:
+                p, l1, l2 = test_append(i, l1, l2, func)
+                pts += p
+                if p == 0:
+                    break
+            return pts == len(items)
+
+        def pop_many(func):
+            l1, l2 = self._load_lists(s, list_type="Deque")
+            num_items = len(l1)
+            l1 = deque(l1)
+            pts = 0
+            for _ in xrange(num_items):
+                p, l1, l2 = test_pop(l1, l2, func)
+                pts += p
+                if p == 0:
+                    break
+            return pts == num_items
+
+        # Test that Deque.remove() and Deque.insert() are disabled (2 points).
         points += test_disabled("remove")
         points += test_disabled("insert")
 
-        # Test Deque.append() (2 points)
-        l1, l2 = self._load_lists(s, list_type="Deque")
-        points += 2*self._strTest(l1, l2, "Deque.append() failed")
+        # Test Deque.append() and Deque.appendleft() (2 points each).
+        points += 2*append_many("append")
+        points += 2*append_many("appendleft")
 
-        # Test Deque.appendleft() (2 points)
-        l1 = [int(i) for i in randint(1, 60, randint(5, 10))]
-        l2 = s.Deque()
-        for i in l1:
-            l2.appendleft(i)
-        l1.reverse()
-        points += 2*self._strTest(l1, l2, "Deque.appendleft() failed")
-
-        # Test Deque.pop() (2 points)
-        l1, l2 = self._load_lists(s, list_type="Deque")
-        pops = []
-        while len(l2) != 0:
-            pops.append(l2.pop())
-        l1.reverse()
-        points += 2*self._strTest(l1, pops,
-                            "Deque.pop() failed (showing sequence of pops)")
-
-        # Test Deque.popleft() (2 points)
-        l1, l2 = self._load_lists(s, list_type="Deque")
-        pops = []
-        while len(l2) != 0:
-            pops.append(l2.popleft())
-        points += 2*self._strTest(l1, pops,
-                    "Deque.popleft() failed (showing sequence of poplefts)")
+        # Test Deque.pop() and Deque.popleft() (2 points each).
+        points += 2*pop_many("pop")
+        points += 2*pop_many("popleft")
 
         return points
 
+    @_timeout(5)
     def problem7(self, s):
         """Test prob7(), the file reversal problem."""
 

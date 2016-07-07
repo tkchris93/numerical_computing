@@ -36,7 +36,9 @@ def _timeout(seconds):
 
     def _handler(signum, frame):
         """Handle the alarm by raising a custom exception."""
-        raise TimeoutError("Timeout after {0} seconds".format(seconds))
+        message = "Timeout after {} seconds".format(seconds)
+        print(message)
+        raise TimeoutError(message)
 
     def decorator(func):
         @wraps(func)
@@ -221,11 +223,10 @@ class _testDriver(object):
                                  "on root insertion.\nPrevious tree:\n[]")
 
         def test_insert(value, solTree, stuTree):
-            oldTree = str(solTree)
+            oldTree = "\nPrevious tree:\n{}".format(solTree)
             solTree.insert(value); stuTree.insert(value)
             p = self._strTest(tree1, tree2,
-                        "BST.insert({0}) failed.\nPrevious tree:\n{1}".format(
-                                                            value, oldTree))
+                        "BST.insert({}) failed{}".format(value, oldTree))
             return p, solTree, stuTree
 
         # Inserting nonroot (9 pts)
@@ -267,19 +268,19 @@ class _testDriver(object):
                 student_tree.insert(i)
             if str(solutions_tree) != str(student_tree):
                 raise NotImplementedError("BST.remove() cannot be tested "
-                                          "until BST.insert() is correct.")
+                                          "until BST.insert() is correct")
             return solutions_tree, student_tree
 
         def test_remove(value, solTree, stuTree):
-            oldTree = str(solTree)
+            oldTree = "\nPrevious tree:\n{}".format(solTree)
             try:
                 solTree.remove(value); stuTree.remove(value)
                 p = self._strTest(solTree, stuTree,
-                        "BST.remove({}) failed.\nPrevious tree:\n{}".format(
-                                                            value, oldTree))
+                        "BST.remove({}) failed{}".format(value, oldTree))
             except Exception as e:
-                self.feedback += "\n\t{} while removing {}".format(self._errType(e), value)
-                self.feedback += ": {}\nPrevious tree:\n{}".format(e, oldTree)
+                self.feedback += "\n\t{} while removing {}".format(
+                                                    self._errType(e), value)
+                self.feedback += ": {}{}".format(e, oldTree)
                 p = 0
             finally:
                 return p, solTree, stuTree

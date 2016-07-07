@@ -75,7 +75,10 @@ def _timeout(seconds):
 
     def _handler(signum, frame):
         """Handle the alarm by raising a custom exception."""
-        raise TimeoutError("Timeout after {0} seconds".format(seconds))
+        message = "Timeout after {} seconds".format(seconds)
+        print(message)
+        raise TimeoutError(message)
+
 
     def decorator(func):
         @wraps(func)
