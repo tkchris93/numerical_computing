@@ -65,6 +65,17 @@ class LinkedList(object):
     def find(self, data):
         """Return the first node in the list containing 'data'.
         If no such node exists, raise a ValueError.
+
+        Examples:
+            >>> l = LinkedList()
+            >>> for i in [1,3,5,7,9]:
+            ...     l.append(i)
+            ...
+            >>> node = l.find(5)
+            >>> node.data
+            5
+            >>> l.find(10)
+            ValueError: <message>
         """
         current = self.head                 # Start at the head.
         while current is not None:          # Iterate through each node.
@@ -75,12 +86,33 @@ class LinkedList(object):
 
     # Problem 3
     def __len__(self):
-        """Return the number of nodes in the list."""
+        """Return the number of nodes in the list.
+
+        Examples:
+            >>> l = LinkedList()
+            >>> for i in [1,3,5]:
+            ...     l.append(i)
+            ...
+            >>> len(l)
+            3
+            >>> l.append(7)
+            >>> len(l)
+            4
+        """
         return self._size
 
     # Problem 3
     def __str__(self):
-        """String representation: the same as a standard Python list."""
+        """String representation: the same as a standard Python list.
+
+        Examples:
+            >>> l1 = LinkedList()   |   >>> l2 = LinkedList()
+            >>> for i in [1,3,5]:   |   >>> for i in ['a','b',"c"]:
+            ...     l1.append(i)    |   ...     l2.append(i)
+            ...                     |   ...
+            >>> print(l1)           |   >>> print(l2)
+            [1, 3, 5]               |   ['a', 'b', 'c']
+        """
         # List construction method (recommended).
         current = self.head
         items = []
@@ -104,12 +136,21 @@ class LinkedList(object):
         out += "]"
         return out
 
-    # Problem 4: Write LinkedList.remove().
+    # Problem 4
     def remove(self, data):
         """Remove the first node in the list containing 'data'. Return nothing.
 
         Raises:
             ValueError: if the list is empty, or does not contain 'data'.
+
+        Examples:
+            >>> print(l1)       |   >>> print(l2)
+            [1, 3, 5, 7, 9]     |   [2, 4, 6, 8]
+            >>> l1.remove(5)    |   >>> l2.remove(10)
+            >>> l1.remove(1)    |   ValueError: <message>
+            >>> l1.remove(9)    |   >>> l3 = LinkedList()
+            >>> print(l1)       |   >>> l3.remove(10)
+            [3, 7]              |   ValueError: <message>
         """
         target = self.find(data)            # Raise the ValueError if needed.
         if self.head is self.tail:          # Case 1: remove only node.
@@ -133,6 +174,16 @@ class LinkedList(object):
 
         Raises:
             ValueError: if the list is empty, or does not contain 'place'.
+
+        Examples:
+            >>> print(l1)           |   >>> print(l1)
+            [1, 3, 7]               |   [1, 3, 5, 7, 7]
+            >>> l1.insert(7,7)      |   >>> l1.insert(3, 2)
+            >>> print(l1)           |   ValueError: <message>
+            [1, 3, 7, 7]            |
+            >>> l1.insert(5,7)      |   >>> l2 = LinkedList()
+            >>> print(l1)           |   >>> l2.insert(10,10)
+            [1, 3, 5, 7, 7]         |   ValueError: <message>
         """
         after = self.find(place)            # Raise the ValueError if needed.
         new_node = LinkedListNode(data)      # Make the new node.
