@@ -18,14 +18,14 @@ In this lab we will focus on linear and quadratic programming.
 A \emph{linear program} is a linear constrained optimization problem. Such a problem can be stated in several
 different forms, one of which is
 \begin{align*}
-\text{minimize}\qquad &c^Tx \\
+\text{minimize}\qquad &c\trp x \\
 \text{subject to}\qquad &Gx + s = h\\
 &Ax = b \\
  &s \geq 0.
 \end{align*}
 This is the formulation used by CVXOPT.
 In this formulation, we require that the matrix $A$ has full row rank,
-and that the block matrix $[G \quad A]^T$ has full column rank.
+and that the block matrix $[G \quad A]\trp $ has full column rank.
 
 Note that the constraint $Gx +s = h$ includes the term $s$, which is not part of the objective
 function, and is known as the \emph{slack variable}. Since $s  \geq 0$, the constraint
@@ -35,8 +35,8 @@ $Gx + s = h$ is equivalent to $Gx \leq h$.
 \begin{comment}
 The corresponding \emph{dual program} for the above linear program has the form
 \begin{align*}
-\text{maximize}\qquad &-h^Tz - b^Ty \\
-\text{subject to}\qquad &G^Tz + A^Ty + c = 0\\
+\text{maximize}\qquad &-h\trp z - b\trp y \\
+\text{subject to}\qquad &G\trp z + A\trp y + c = 0\\
  &z \geq 0.
 \end{align*}
 CVXOPT provides functions to solve both the original (\emph{primal}) linear program and its dual program.
@@ -58,10 +58,7 @@ G = \begin{bmatrix}
   2 & 1\\
   -1 & 0\\
   0 & -1
-\end{bmatrix}
-\]
-and
-\[
+\end{bmatrix} \qquad \text{and} \qquad
 h = \begin{bmatrix}
   3\\
   3\\
@@ -71,10 +68,7 @@ h = \begin{bmatrix}
 \]
 then we can express the constraints compactly as
 \[
-Gx \leq h,
-\]
-where
-\[
+Gx \leq h,  \qquad \text{where} \qquad
 x = \begin{bmatrix}
   x_1\\
   x_2
@@ -122,7 +116,7 @@ and then simply convert them to the CVXOPT matrix data type:
 Use whichever method is most convenient. 
 In this lab, we will initialize non-trivial matrices first as ndarrays for consistency.
 
-Be sure the entries in the matrices are floats!
+Finally, be sure the entries in the matrices are floats!
 \end{warn}
 
 Having initialized the necessary objects, we are now ready to solve the problem.
@@ -421,20 +415,69 @@ Quadratic programming is similar to linear programming, one exception being that
 The constraints, if there are any, are still of the same form.
 Thus $G, h, A$, and $b$ are optional. The formulation that we will use is
 \begin{align*}
-\text{minimize}\qquad &\frac{1}{2}x^TPx + q^Tx \\
+\text{minimize}\qquad &\frac{1}{2}x\trp Px + q\trp x \\
 \text{subject to}\qquad &Gx \leq h\\
  &Ax = b,
 \end{align*}
 where $P$ is a positive semidefinite symmetric matrix.
 In this formulation, we require again that $A$ has full row rank, and that the block matrix
-$[P \quad G \quad A]^T$ has full column rank.
+$[P \quad G \quad A]\trp $ has full column rank.
 
 As an example, let us minimize the quadratic function
 \[
-f(x,y) = 2x^2 +2xy + y^2 +x -y.
+f(y,z) = 2y^2 +2yz + z^2 +y -z.
 \]
 Note that there are no constraints, so we only need to initialize the matrix $P$ and the vector $q$.
-To solve this optimization problem, we will use the CVXOPT function for quadratic programming \li{solvers.qp}.
+To find these, we first rewrite our function to match the formulation given above. 
+Note that if we let
+\[
+P = \begin{bmatrix}
+  a & b\\
+  b & c
+\end{bmatrix}, \qquad 
+q = \begin{bmatrix}
+  d\\
+  e
+\end{bmatrix},
+\qquad \text{and} \qquad
+x = \begin{bmatrix}
+  y\\
+  z
+\end{bmatrix},
+\]
+then 
+\begin{align*}
+\frac{1}{2}x\trp Px + q\trp x &= 
+\frac{1}{2}
+\begin{bmatrix}
+  y\\
+  z
+\end{bmatrix}\trp 
+\begin{bmatrix}
+  a & b\\
+  b & c
+\end{bmatrix}
+\begin{bmatrix}
+  y\\
+  z
+\end{bmatrix} + 
+\begin{bmatrix}
+  d\\
+  e
+\end{bmatrix}\trp 
+\begin{bmatrix}
+  y\\
+  z
+\end{bmatrix} \\
+&= \frac{1}{2}ay^2+byz+\frac{1}{2}cz^2+dy+ez
+\end{align*}
+Thus, we see that the proper values to initizalize our matrix $P$ and vector $q$ are:
+\begin{align*}
+a &= 4  &d = 1 \\
+b &= 2  &e = -1 \\
+c &= 2 
+\end{align*}
+Now that we have the matrix $P$ and vector $q$, we are ready to use the CVXOPT function for quadratic programming \li{solvers.qp}.
 \begin{lstlisting}
 >>> P = matrix(np.array([[4., 2.], [2., 2.]]))
 >>> q = matrix([1., -1.])
@@ -445,10 +488,6 @@ To solve this optimization problem, we will use the CVXOPT function for quadrati
 >>> print sol['primal objective']
 -1.25
 \end{lstlisting}
-Building the matrix $P$ from the function $f$ is straightforward. The coefficients for each squared term are doubled (because in the formulation we use we are minimizing $1/2$ of the $x^2$ term) and then placed on the main diagonal of $P$ (so the term $2x^2$ yields $4$ in the upper left entry of
-$P$, and the term $y^2$ yields $2$ in the lower right entry).
-The coefficient of each mixed term appears twice in the matrix (and hence does not need to be doubled), corresponding to the row and column of the two variables in the mixed term (so the term $2xy$ yields a $2$ placed in the first row, second column, and a $2$ in
-the second row, first column). 
 
 \begin{problem}
 Find the minimizer and minimum of
@@ -457,7 +496,7 @@ g(x,y,z) = \frac{3}{2}x^2 +2xy + xz+ 2y^2 +2yz+\frac{3}{2}z^2+3x + z
 \end{equation*}
 \begin{comment}
 \begin{equation}
-f(x) = \frac{1}{2}x^TQx - x^Tp
+f(x) = \frac{1}{2}x\trp Qx - x\trp p
 \end{equation}
 where
 
@@ -489,12 +528,12 @@ The $l_2$ minimization problem is to
 \text{subject to} \qquad &Ax = b.
 \end{align*}
 
-This problem is equivalent to a quadratic program, since $\|x\|_2 = x^Tx$.
+This problem is equivalent to a quadratic program, since $\|x\|_2 = x\trp x$.
 Write a function called \li{l2Min()} that takes a matrix $A$ and vector $b$ as inputs, and returns the solution $x$ to the $l_2$ minimization problem.
 \end{problem}
 
 \section*{Allocation Models}
-Allocation models lead to simple linear programs. An allocation model seeks to allocate a valuable resource among competing needs. The following example is taken from ``Optimization in Operations Research" by Ronald L. Rardin. %%pg 132
+Allocation models lead to simple linear programs. An allocation model seeks to allocate a valuable resource among competing needs. Consider the following example is taken from ``Optimization in Operations Research" by Ronald L. Rardin. %%pg 132
 
 The U.S. Forest service has used an allocation model to deal with the task of managing national forests. 
 The model begins by dividing the land into a set of analysis areas. Several land management policies (also 
@@ -504,9 +543,15 @@ We seek to find the best possible allocation, subject to forest-wide restriction
 
 The file \li{ForestData.npy} contains data for a fictional national forest (you can also find the data
 in Table \ref{tab:forest}). There are 7 areas of analysis and 3 prescriptions for each of them. 
-The first column is the area of analysis, denoted $i$. The second column is the size of the analysis area (in thousands of acres), denoted $s_i$. The third column is a prescription number, denoted $j$. The fourth column is the net present value (NPV) per acre of all uses in area $i$ under prescription $j$, and is denoted $p_{i,j}$. The fifth column is protected timber yield (in board-feet per acre) in area $i$ under prescription $j$, denoted $t_{i,j}$. The sixth column is protected grazing capability (in animal-unit months per acre) for area $i$ under prescription $j$, denoted
-$g_{i,j}$. The seventh and last column is the wilderness index rating (0 to 100) for area $i$ under prescription $j$, denoted $w_{i,j}$. Let $x_{i,j}$ be the amount of land in area $i$ allocated to prescription $j$.
-
+\begin{align*}
+&\text{Column 1: $i$, area of analysis} \\
+&\text{Column 2: $s_i$, size of the analysis area (in thousands of acres)} \\
+&\text{Column 3: $j$, prescription number} \\
+&\text{Column 4: $p_{i,j}$, net present value (NPV) per acre of in area $i$ under prescription $j$} \\
+&\text{Column 5: $t_{i,j}$, protected timber yield per acre in area $i$ under prescription $j$} \\
+&\text{Column 6: $g_{i,j}$, protected grazing capability per acre for area $i$ under prescription $j$} \\
+&\text{Column 7: $w_{i,j}$, wilderness index rating (0 to 100) for area $i$ under prescription $j$}
+\end{align*}
 \begin{table}[h]
 \centering
     \begin{tabular}{c c c c c c c}
@@ -540,7 +585,7 @@ $i$ &$s_i$&$j$& $p_{i,j}$ & $t_{i,j}$&$g_{i,j}$&$w_{i,j}$ \\\hline
     \end{tabular}
 \label{tab:forest}
 \end{table}
-
+Let $x_{i,j}$ be the amount of land in area $i$ allocated to prescription $j$.
 Under this notation, an allocation is just a vector consisting of the $x_{i,j}$'s. For this particular
 example, the allocation vector is of size $7\cdot 3 = 21$. 
 Our goal is to find the allocation vector that maximizes net present value, while producing at least 40 million
