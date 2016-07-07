@@ -44,6 +44,7 @@ grades it.
 
 import signal
 from functools import wraps
+from inspect import getsourcelines
 from matplotlib import pyplot as plt
 
 def _autoclose(func):
@@ -74,7 +75,10 @@ def _timeout(seconds):
 
     def _handler(signum, frame):
         """Handle the alarm by raising a custom exception."""
-        raise TimeoutError("Timeout after {0} seconds".format(seconds))
+        message = "Timeout after {} seconds".format(seconds)
+        print(message)
+        raise TimeoutError(message)
+
 
     def decorator(func):
         @wraps(func)
@@ -164,6 +168,30 @@ class _testDriver(object):
         """Get just the name of the exception 'error' in string format."""
         return str(type(error).__name__)
 
+    @staticmethod
+    def _printCode(f):
+        """Print a function's source code."""
+        print "".join(getsourcelines(f)[0][len(f.__doc__.splitlines())+1 :])
+
+    @staticmethod
+    def _checkCode(func, keyword):
+        """Check a function's source code for a key word."""
+        code = getsourcelines(func)[0][len(func.__doc__.splitlines())+1 :]
+        found = False
+        for line in code:
+            if keyword in line:
+                print line,
+                found = True
+        return found
+
+    def _addFeedback(self, correct, student, message):
+        """Add the correct answer, the student's answer, and a message to the
+        feedback string.
+        """
+        self.feedback += "\n{}".format(message)
+        self.feedback += "\n\tCorrect response: {}".format(correct)
+        self.feedback += "\n\tStudent response: {}".format(student)
+
     def _eqTest(self, correct, student, message):
         """Test to see if 'correct' and 'student' are equal.
         Report the given 'message' if they are not.
@@ -172,9 +200,7 @@ class _testDriver(object):
         if correct == student:
             return 1
         else:
-            self.feedback += "\n{}".format(message)
-            self.feedback += "\n\tCorrect response: {}".format(correct)
-            self.feedback += "\n\tStudent response: {}".format(student)
+            self._addFeedback(correct, student, message)
             return 0
 
     def _strTest(self, correct, student, message):
@@ -184,9 +210,7 @@ class _testDriver(object):
         if str(correct) == str(student):
             return 1
         else:
-            self.feedback += "\n{}".format(message)
-            self.feedback += "\n\tCorrect response: {}".format(correct)
-            self.feedback += "\n\tStudent response: {}".format(student)
+            self._addFeedback(correct, student, message)
             return 0
 
     def _grade(self, points, message=None):

@@ -1,9 +1,10 @@
-\lab{Nearest Neighbor Search}{Nearest Neighbor Search}
-\label{lab:NNS}
+\lab{Data Structures III: K-D Trees and Nearest Neighbor Searches}{Data Structures III}
+\label{lab:DS3}
 
-\objective{Nearest neighbor search is an optimization problem that arises in applications such as computer vision, pattern recognition, internet marketing, and data compression. In this lab we implement a k-d tree to solve the problem efficiently, then learn use SciPy's k-d tree from the \li{sklearn} module to implement a handwriting recognition algorithm.}
+\objective{Nearest neighbor search is an optimization problem that arises in applications such as computer vision, pattern recognition, internet marketing, and data compression.
+In this lab we solve the problem efficiently using a k-d tree, then use SciPy's k-d tree to implement a handwriting recognition algorithm.}
 
-\section*{The Nearest Neighbor Search Problem}
+\section*{The Nearest Neighbor Search Problem} % ==============================
 
 Suppose you move into a new city with several post offices.
 Since your time is valuable, you wish to know which post office is closest to your home.
@@ -15,9 +16,8 @@ The nearest neighbor search problem determines the point in $X$ that is closest 
 For example, in the post office problem the set $X$ could be addresses or latitude and longtitude data for each post office in the city.
 Then $y$ would be the data that represents your new home, and the task is to find the closest post office in $X$ to $y$.
 
-% Problem 1: Euclidean Distance
-\begin{problem}
-Roughly speaking, a function that measures the distance between two points in a set is called a \emph{metric}\footnote{Metrics and metric spaces are examined in detail in Chapter 5 of Volume I.}.
+\begin{problem} % Euclidean Distance
+Roughly speaking, a function that measures distance between two points in a set is called a \emph{metric}.\footnote{Metrics and metric spaces are examined in detail in Chapter 5 of Volume I.}
 The \emph{euclidean metric} measures the distance between two points in $\mathbb{R}^n$ with the familiar distance formula:
 \[
 d(\x,\y) = \sqrt{\displaystyle\sum_{i=1}^n (x_i - y_i)^2} = \| \x - \y \|_2
@@ -25,8 +25,8 @@ d(\x,\y) = \sqrt{\displaystyle\sum_{i=1}^n (x_i - y_i)^2} = \| \x - \y \|_2
 
 Write a function that accepts two 1-dimensional NumPy arrays and returns the euclidean distance between them.
 Raise a \li{ValueError} if the arrays don't have the same number of entries.
-
-(Hint: NumPy already has some functions to help do this quickly!)
+\\
+(Hint: NumPy already has some functions to help do this quickly.)
 \end{problem}
 
 Consider again the post office example.
@@ -35,8 +35,7 @@ This is called an \emph{exhaustive search}.
 More precisely, we measure the distance of $y$ to each point in $X$, and choose the point with the smallest distance.
 This method is ineffecient however, and only feasible for relatively small training sets.
 
-% Problem 2: Exhaustive search method.
-\begin{problem}
+\begin{problem} % Exhaustive search method.
 Write a function that solves the nearest neighbor search problem by exhaustively checking all of the distances between a given point and each point in a data set.
 The function should take in a set of data points (as an $m \times k$ NumPy array, where each row represents one of the $m$ points in the data set) and a single target point (as a 1-dimensional NumPy array with $k$ entries).
 Return the point in the training set that is closest to the target point and its distance from the target.
@@ -44,7 +43,7 @@ Return the point in the training set that is closest to the target point and its
 The complexity of this algorithm is $O(mk)$, where $k$ is the number of dimensions and $m$ is the number of data points.
 \end{problem}
 
-\section*{K-D Trees}
+\section*{K-D Trees} % ========================================================
 
 % \footnote{This lab is a sequel to the Data Structures II lab, and should not be attempted until the reader has successfully implemented a binary search tree in Python.}
 A \href{https://en.wikipedia.org/wiki/K-d_tree}{\emph{$k$-d tree}} is a special kind of binary search tree for high dimensional data (i.e., more dimensions than 1).
@@ -55,7 +54,7 @@ Recall that to search for a point in a binary search tree, we start at the root,
 If it is larger, we proceed down the right branch.
 By doing this, we exclude a region of the number line (and therefore the subtree in the opposite direction) from our search.
 By eliminating this region from consideration, we have far fewer points to search and the efficiency of our search is greatly increased.
-%See Figure \ref{fig:k-binary-search} for an illustration.
+% See Figure \ref{fig:k-binary-search} for an illustration.
 
 Like a binary search tree, a $k$-d tree starts with a root node with a depth, or level, of 0.
 At the $i^{th}$ level, the nodes to the left of a parent have a lower value in the $i^{th}$ dimension.
@@ -78,8 +77,7 @@ The \li{axis} attribute tells us which dimension of $\mathbb{R}^k$ to split on.
 \label{fig:k-binary-search}
 \end{figure}
 
-% KDT Node class
-\begin{comment}
+\begin{comment} % KDT Node class
 \begin{lstlisting}
 # import the BSTNode class from the previous lab.
 
@@ -101,15 +99,15 @@ class KDTNode(BSTNode):
 \end{lstlisting}
 \end{comment}
 
-% Problem 3: KDTNode class
-\begin{problem}
-Copy or import the \li{BSTNode} class from the previous lab\footnote{If the file containing the \li{BSTNode} class is in a different directory than your solutions file for this lab, see \url{https://docs.python.org/2/tutorial/modules.html\#packages} for instructions on packages and imports.}.
+\begin{problem} % KDTNode class
+Copy the \li{BSTNode} class from the previous lab.%\footnote{If the file containing the \li{BSTNode} class is in a different directory than your solutions file for this lab, see \url{https://docs.python.org/2/tutorial/modules.html\#packages} for instructions on packages and imports.}
 Write a \li{KDTNode} class that inherits from \li{BSTNode}.
+
 Modify the constructor so that a \li{KDTNode} can only hold a NumPy array (of type \li{np.ndarray}).
 If any other data type is given, raise a \li{TypeError}.
 Also create an \li{axis} attribute (set it to \li{None} or $0$ for now).
 
-\begin{comment} % Magic method was (outdated)
+\begin{comment} % Magic methods (outdated)
 \item Write the \li{__sub__} magic method so that \li{x} - \li{y} returns the euclidean distance between the data in node \li{x} and the data in node \li{y}.
 
 \item Write the \li{__eq__} magic method so that \li{x == y} is \li{True} if and only if \li{x} and \li{y} have the same data (Hint: \li{np.allclose()})
@@ -120,7 +118,7 @@ For example,
 \begin{lstlisting}
 >>> x = KDTNode(np.array([1,2]))
 >>> y = KDTNode(np.array([3,1]))
->>> y.axis = 0			# Compare the '0th' entry of the data 
+>>> y.axis = 0			# Compare the '0th' entry of the data
 >>> x < y				# True, since 1 < 3
 True
 >>> x > y
@@ -134,7 +132,6 @@ True
 \end{lstlisting}
 \end{comment}
 \end{problem}
-
 
 % Now we construct the $k$-d tree class.
 %The constructor accepts a set of data as an $m \times k$ NumPy array and inserts each $1 \times k$ point into the tree.
@@ -151,6 +148,7 @@ In the \li{find()} method, every comparison in the recursive \li{_step()} functi
 This way if each existing node in the tree has the correct \li{axis}, the correct comparisons are made as we descend through the tree.
 
 \begin{comment}
+\begin{lstlisting}
     def __init__(self, data_set):
         """Set the k attribute and fill the tree with the points in 'data_set'.
 
@@ -169,10 +167,11 @@ This way if each existing node in the tree has the correct \li{axis}, the correc
         # Load the data in one point at a time.
         for point in data_set:
             self.insert(point)
+\end{lstlisting}
 \end{comment}
 
 \begin{lstlisting}
-# import the BST class from the previous lab.
+# Copy the BST class from the previous lab.
 
 class KDT(BST):
     """A k-dimensional binary search tree object.
@@ -202,13 +201,12 @@ class KDT(BST):
                 return _step(current.left)          # Recursively search left.
             else:
                 return _step(current.right)         # Recursively search right.
-        
+
         # Start the recursion on the root of the tree.
         return _step(self.root)
 \end{lstlisting}
 
-% Problem 4: Implement the K-D Tree!
-\begin{problem}
+\begin{problem} % Implement the K-D Tree!
 Finish implementing the \li{KDT} class.
 \begin{enumerate}
 \item Override the \li{insert()} method.
@@ -266,7 +264,7 @@ If this sum is greater that the $i^{th}$ entry of the current search node, then 
 
 We summarize the algorithm below.
 
-\begin{algorithm}
+\begin{algorithm}[h] % K-d search algorithm.
 \begin{algorithmic}[1]
 \State (Given a set of data and a target)
 \State Build a $k$-d tree out of the data set.
@@ -298,7 +296,7 @@ We summarize the algorithm below.
 \end{algorithm}
 
 
-\begin{problem}
+\begin{problem} % K-d nearest neighbor search algorithm.
 Use Algorithm \ref{alg:kdneighborz} to write a function that solves the nearest neighbor search problem by searching through a $k$-d tree (your \li{KDT} object).
 The function should take in a data set and a single target point.
 Return the nearest neighbor in the data set and the distance from the nearest neighbor to the target point, as in Problem 2 (be sure to return a NumPy array, not a KDTNode for the neighbor).
@@ -327,16 +325,16 @@ The \li{query} method returns a tuple of the minimun distance and the index of t
 \end{lstlisting}
 \end{problem}
 
-\section*{Application: Handwriting Recognition}
+\section*{Handwriting Recognition} % ==========================================
 
-\subsection*{Classification}
+\subsection*{Classification} % ------------------------------------------------
 
 Suppose that we are given a training set of data as well as a set of \emph{labels} that describe each datum in the training set.
 For example, suppose that we had a training set containing the incomes and debt levels of $N$ individuals.
 Along with this data, we have a set $N$ labels that state whether the individual has filed for bankruptcy.
 The classification problem is to try and assign the correct label to an unlabelled data point.
 
-\subsection*{$k$-Nearest Neighbors}
+\subsection*{$k$-Nearest Neighbors} % -----------------------------------------
 
 In our previous work, we used a $k$-d tree to find the nearest neighbor of a target point.
 A more general problem is to find the \emph{k} nearest neighbors to a point (using some metric to measure ``distance'' between data points).
@@ -345,14 +343,14 @@ For example, consider the bankrupty case in the previous section.
 If we find the 10 nearest neighbors to a new individual, and 8 of them went bankrupt, then we would predict that the individual will also go bankrupt.
 On the other hand, if 7 of the nearest neighbors had not filed for bankruptcy, we would predict that the individual was at low risk for bankruptcy.
 
-\subsection*{The Handwriting Recognition Problem}
+\subsection*{The Handwriting Recognition Problem} % ---------------------------
 
 The problem of recognizing handwritten letters and numbers with a computer has many applications.
 A computer image may be thought of a vector in $\mathbb{R}^n$, where $n$ is the number of pixels in the image and the entries represent how bright each pixel is.
 If two people write the same number, we would expect the vectors representing a scanned image of those number to be close in the euclidean metric.
 This insight means that given a training set of scanned images along with correct labels, we may confidently infer the label of a new scanned image.
 
-\subsection*{sklearn}
+\subsection*{sklearn} % -------------------------------------------------------
 
 %More information about this package can be found at http://scikit-learn.org/stable/modules/neighbors.html.
 The \li{sklearn} module contains powerful tools for solving the nearest neighbor problem.
@@ -389,7 +387,7 @@ The second method, \li{predict}, will do a k-nearest neighbor search on the $k$-
 >>> np.average(prediction/testlabels)
 \end{lstlisting}
 
-\begin{problem}
+\begin{problem} % Postal data problem.
 The United States Postal Service has made a collection of labelled hand written digits available to the public, provided in \li{PostalData.npz}.
 We will use this data for k-nearest neighbor classification.
 This data set may be loaded by using the following command:
@@ -398,7 +396,7 @@ labels, points, testlabels, testpoints = np.load('PostalData.npz').items()
 \end{lstlisting}
 This contains a training set and a test set.
 The first entry of each array is a name, so \li{points[1]} and \li{labels[1]} are the actual points and labels to use.
-Each point is an image that is represented by a flattened $28 \times 28$ matrix of pixels. 
+Each point is an image that is represented by a flattened $28 \times 28$ matrix of pixels.
 The corresponding label indicates which number was written.
 
 Classify the testpoints with \li{n_neighbors} as 1, 4 or 10, and with \li{weights} as \li{'uniform'} or \li{'distance'}.
@@ -413,3 +411,12 @@ A similar classification process is used by the United States Postal Service to 
 \caption{An example of the number 6 taken from the data set}
 \end{figure}
 \end{problem}
+
+\begin{comment}
+\newpage
+
+\section*{Additional Material} % ==============================================
+
+\subsection*{The Curse of Dimensionality} % -----------------------------------
+
+\end{comment}
