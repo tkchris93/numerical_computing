@@ -425,10 +425,59 @@ $[P \quad G \quad A]\trp $ has full column rank.
 
 As an example, let us minimize the quadratic function
 \[
-f(x,y) = 2x^2 +2xy + y^2 +x -y.
+f(y,z) = 2y^2 +2yz + z^2 +y -z.
 \]
 Note that there are no constraints, so we only need to initialize the matrix $P$ and the vector $q$.
-To solve this optimization problem, we will use the CVXOPT function for quadratic programming \li{solvers.qp}.
+To find these, we first rewrite our function to match the formulation given above. 
+Note that if we let
+\[
+P = \begin{bmatrix}
+  a & b\\
+  b & c
+\end{bmatrix}, \qquad 
+q = \begin{bmatrix}
+  d\\
+  e
+\end{bmatrix},
+\qquad \text{and} \qquad
+x = \begin{bmatrix}
+  y\\
+  z
+\end{bmatrix},
+\]
+then 
+\begin{align*}
+\frac{1}{2}x\trp Px + q\trp x &= 
+\frac{1}{2}
+\begin{bmatrix}
+  y\\
+  z
+\end{bmatrix}\trp 
+\begin{bmatrix}
+  a & b\\
+  b & c
+\end{bmatrix}
+\begin{bmatrix}
+  y\\
+  z
+\end{bmatrix} + 
+\begin{bmatrix}
+  d\\
+  e
+\end{bmatrix}\trp 
+\begin{bmatrix}
+  y\\
+  z
+\end{bmatrix} \\
+&= \frac{1}{2}ay^2+byz+\frac{1}{2}cz^2+dy+ez
+\end{align*}
+Thus, we see that the proper values to initizalize our matrix $P$ and vector $q$ are:
+\begin{align*}
+a &= 4 \qquad &d = 1 \\
+b &= 2 \qquad &e = -1 \\
+c &= 2 
+\end{align*}
+Now that we have the matrix $P$ and vector $q$, we are ready to use the CVXOPT function for quadratic programming \li{solvers.qp}.
 \begin{lstlisting}
 >>> P = matrix(np.array([[4., 2.], [2., 2.]]))
 >>> q = matrix([1., -1.])
@@ -439,10 +488,6 @@ To solve this optimization problem, we will use the CVXOPT function for quadrati
 >>> print sol['primal objective']
 -1.25
 \end{lstlisting}
-Building the matrix $P$ from the function $f$ is straightforward. The coefficients for each squared term are doubled (because in the formulation we use we are minimizing $1/2$ of the $x^2$ term) and then placed on the main diagonal of $P$ (so the term $2x^2$ yields $4$ in the upper left entry of
-$P$, and the term $y^2$ yields $2$ in the lower right entry).
-The coefficient of each mixed term appears twice in the matrix (and hence does not need to be doubled), corresponding to the row and column of the two variables in the mixed term (so the term $2xy$ yields a $2$ placed in the first row, second column, and a $2$ in
-the second row, first column). 
 
 \begin{problem}
 Find the minimizer and minimum of
