@@ -136,10 +136,18 @@ Optimal solution found.
 [ 1.00e+00]
 >>> print sol['primal objective']
 -8.99999981141
+>>> print type(sol['x'])
+<type 'cvxopt.base.matrix'>
 \end{lstlisting}
 The function \li{solvers.lp} returns a dictionary containing useful information.
-For the time being, we will only focus on the values of $x$ and the primal objective value (i.e. the minimum value achieved by
-the objective function).
+For the time being, we will only focus on the values of $x$ and the primal objective value (i.e. the minimum value achieved by the objective function).
+
+\begin{warn}
+Note that the minimizer of the \li{solvers.lp()} function returns a \li{cvxopt.base.matrix} object.
+While it will not be required in this lab, if you want to use the minimzer again in other algebraic expressions, you may want to convert it first to a numpy array.
+This can be done quickly with \li{np.ravel()}.
+\end{warn}
+
 \begin{problem}
 Solve the following convex optimization problem:
 \begin{align*}

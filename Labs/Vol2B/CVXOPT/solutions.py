@@ -28,15 +28,18 @@ def prob1():
 
     # Note that 'matrix' initializes by column, not row.
     c = matrix([2., 1., 3.])
-    G = matrix([[-1., -2., -1.,  0.,  0.],
-                [-2., -10.,  0., -1.,  0.],
-                [ 0., -3.,  0.,  0., -1.]])
+    G = matrix(np.array([[-1.,-2.,0.],
+                         [-2.,-10.,-3.],
+                         [-1.,0.,0.],
+                         [0.,-1.,0.],
+                         [0.,0.,-1.]]))
+
     h = matrix([ -3., -10., 0., 0., 0.])
     sol = solvers.lp(c,G,h)
     return sol['x'], sol['primal objective']
 
     # Answers:
-    # np.array([[1.54643957],[ 1.20887997],[ 1.89941363]])
+    # np.array([[-1.15e-09],[ 1.50e+00],[ 6.95e-11]])
     # 10
 
 
@@ -81,9 +84,10 @@ def prob3():
         The optimizer (sol['x'])
         The optimal value (sol['primal objective'])
     """
-    Q = matrix([[3., 2., 1.],
-                [2., 4., 2.],
-                [1., 2., 3.]])
+    Q = matrix(np.array([[3.,2.,1.],
+                         [2.,4.,2.],
+                         [1.,2.,3.]]))
+
     p = matrix([3., 0., 1.])
     sol = solvers.qp(Q, p)
     return sol['x'], sol['primal objective']
