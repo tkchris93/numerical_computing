@@ -473,8 +473,8 @@ then
 \end{align*}
 Thus, we see that the proper values to initizalize our matrix $P$ and vector $q$ are:
 \begin{align*}
-a &= 4 \qquad &d = 1 \\
-b &= 2 \qquad &e = -1 \\
+a &= 4  &d = 1 \\
+b &= 2  &e = -1 \\
 c &= 2 
 \end{align*}
 Now that we have the matrix $P$ and vector $q$, we are ready to use the CVXOPT function for quadratic programming \li{solvers.qp}.
@@ -533,7 +533,7 @@ Write a function called \li{l2Min()} that takes a matrix $A$ and vector $b$ as i
 \end{problem}
 
 \section*{Allocation Models}
-Allocation models lead to simple linear programs. An allocation model seeks to allocate a valuable resource among competing needs. The following example is taken from ``Optimization in Operations Research" by Ronald L. Rardin. %%pg 132
+Allocation models lead to simple linear programs. An allocation model seeks to allocate a valuable resource among competing needs. Consider the following example is taken from ``Optimization in Operations Research" by Ronald L. Rardin. %%pg 132
 
 The U.S. Forest service has used an allocation model to deal with the task of managing national forests. 
 The model begins by dividing the land into a set of analysis areas. Several land management policies (also 
@@ -543,9 +543,15 @@ We seek to find the best possible allocation, subject to forest-wide restriction
 
 The file \li{ForestData.npy} contains data for a fictional national forest (you can also find the data
 in Table \ref{tab:forest}). There are 7 areas of analysis and 3 prescriptions for each of them. 
-The first column is the area of analysis, denoted $i$. The second column is the size of the analysis area (in thousands of acres), denoted $s_i$. The third column is a prescription number, denoted $j$. The fourth column is the net present value (NPV) per acre of all uses in area $i$ under prescription $j$, and is denoted $p_{i,j}$. The fifth column is protected timber yield (in board-feet per acre) in area $i$ under prescription $j$, denoted $t_{i,j}$. The sixth column is protected grazing capability (in animal-unit months per acre) for area $i$ under prescription $j$, denoted
-$g_{i,j}$. The seventh and last column is the wilderness index rating (0 to 100) for area $i$ under prescription $j$, denoted $w_{i,j}$. Let $x_{i,j}$ be the amount of land in area $i$ allocated to prescription $j$.
-
+\begin{align*}
+&\text{Column 1: $i$, area of analysis} \\
+&\text{Column 2: $s_i$, size of the analysis area (in thousands of acres)} \\
+&\text{Column 3: $j$, prescription number} \\
+&\text{Column 4: $p_{i,j}$, net present value (NPV) per acre of in area $i$ under prescription $j$} \\
+&\text{Column 5: $t_{i,j}$, protected timber yield per acre in area $i$ under prescription $j$} \\
+&\text{Column 6: $g_{i,j}$, protected grazing capability per acre for area $i$ under prescription $j$} \\
+&\text{Column 7: $w_{i,j}$, wilderness index rating (0 to 100) for area $i$ under prescription $j$}
+\end{align*}
 \begin{table}[h]
 \centering
     \begin{tabular}{c c c c c c c}
@@ -579,7 +585,7 @@ $i$ &$s_i$&$j$& $p_{i,j}$ & $t_{i,j}$&$g_{i,j}$&$w_{i,j}$ \\\hline
     \end{tabular}
 \label{tab:forest}
 \end{table}
-
+Let $x_{i,j}$ be the amount of land in area $i$ allocated to prescription $j$.
 Under this notation, an allocation is just a vector consisting of the $x_{i,j}$'s. For this particular
 example, the allocation vector is of size $7\cdot 3 = 21$. 
 Our goal is to find the allocation vector that maximizes net present value, while producing at least 40 million
