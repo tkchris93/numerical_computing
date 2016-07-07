@@ -1,5 +1,7 @@
 # plots.py
 """Volume 2: Data Structures 2 (Trees). Plotting file."""
+import matplotlib
+matplotlib.rcParams = matplotlib.rc_params_from_file('../../../matplotlibrc')
 
 import numpy as np
 from time import time
