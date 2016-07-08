@@ -1,12 +1,14 @@
-
+# solutions.py
+"""Introductory Labs: Matplotlib"""
 import numpy as np
 from matplotlib import pyplot as plt
 
-def prob1():
-    def var_of_means(n):
-        A = np.random.randn(n,n)
-        return A.mean(axis=1).var()
+def var_of_means(n):
+    A = np.random.randn(n,n)
+    return A.mean(axis=1).var()
 
+
+def prob1():
     y = np.array([var_of_means(n) for n in xrange(100, 1100, 100)])
     plt.plot(y)
     plt.show()
@@ -28,7 +30,7 @@ def prob3():
 
 def prob4_OLD():
     x = np.linspace(-np.pi, np.pi, 200)
-    
+
     plt.subplot(221)
     plt.plot(x, np.sin(x), linewidth=2)
     plt.xlim(-np.pi, np.pi)
@@ -66,6 +68,3 @@ def prob5():
     plt.xlim(-2*np.pi, 2*np.pi)
     plt.ylim(-2*np.pi, 2*np.pi)
     plt.show()
-
-if __name__ == '__main__':
-    prob5()
