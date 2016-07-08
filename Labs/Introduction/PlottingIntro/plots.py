@@ -23,7 +23,7 @@ def _save(filename):
         @wraps(func)
         def wrapper(*args, **kwargs):
             try:
-                print("{:.<25}".format(func.__name__+'()'), end='')
+                print("{:.<30}".format(filename), end='')
                 stdout.flush()
                 plt.clf()
                 out = func(*args, **kwargs)
@@ -46,53 +46,88 @@ def _save(filename):
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 
+# Problem 1 -------------------------------------------------------------------
+
 @_save("basic1.pdf")
 def basic1():
     y = np.array([i**2 for i in xrange(-5,6)])
     plt.plot(y)
 
 @_save("basic2.pdf")
-def basic2(n=50):
-    x = np.linspace(-5, 5, n)
+def basic2(N):
+    x = np.linspace(-5, 5, N)
     y = x**2
     plt.plot(x, y)
 
+def prob1():
+    basic1()
+    basic2(50)
+
+# Problem 3 -------------------------------------------------------------------
+
 @_save("custom1.pdf")
-def custom1(n=100):
-    x = np.linspace(-2, 4, n)
+def custom1(N):
+    x = np.linspace(-2, 4, N)
     plt.plot(x, np.exp(x), 'g:', linewidth=4, label="Exponential")
     # plt.xlabel("The x axis.")
     plt.title("This is the title.", fontsize=18)
     plt.legend(loc="upper left")
 
 @_save("custom2.pdf")
-def custom2(n=100):
-    x = np.linspace(1, 4, n)
+def custom2(N):
+    x = np.linspace(1, 4, N)
     plt.plot(x, np.log(x), 'r+', linewidth=2)
     # plt.grid()
     plt.xlim(0, 5)
     plt.xlabel("The x axis")
 
-@_save("layout.pdf")
+@_save("discontinuousProblem.pdf")
+def prob3_solution():
+    x1, x2 = np.split(np.linspace(-2, 6, 200), [75])
+    plt.plot(x1, 1/(x1 - 1), 'm--', lw=6)
+    plt.plot(x2, 1/(x2 - 1), 'm--', lw=6)
+    plt.ylim(-6, 6)
+
+def prob3():
+    custom1(100)
+    custom2(100)
+    prob3_solution()
+
+# Problem 4 -------------------------------------------------------------------
+
 def layout():
     for i in xrange(1,7):
-        plt.subplot(2,3,i)
-        plt.text(.44,.46,str(i),fontsize=20)
-        plt.tick_params(
-            axis='both',       # changes apply to the x-axis
-            which='both',      # both major and minor ticks are affected
-            bottom='off', top='off', left='off', right='off',
-            labelbottom='off', labelleft='off')
+        @_save("layout_{}.pdf".format(i))
+        def box():
+            plt.axis([-1,1,-1,1])
+            plt.text(-.1,-.14,str(i),fontsize=72)
+            plt.tick_params(
+                axis='both',       # changes apply to the x-axis
+                which='both',      # both major and minor ticks are affected
+                bottom='off', top='off', left='off', right='off',
+                labelbottom='off', labelleft='off')
+        box()
 
-@_save("subplots.pdf")
-def subplots(n=200):
-    x = np.linspace(-np.pi, np.pi, n)
-    plt.subplot(2, 1, 1)            # Draw the first subplot.
-    plt.plot(x, np.sin(x), 'b', linewidth=2)
-    plt.xlim(-np.pi, np.pi)
-    plt.subplot(2, 1, 2)            # Draw the second subplot.
-    plt.plot(x, np.cos(x), 'c', linewidth=2)
-    plt.xlim(-np.pi, np.pi)
+@_save("subplots_1.pdf")
+def subplots_1(N):
+    x = np.linspace(.1, 2, N)
+    plt.plot(x, np.exp(x), 'k', lw=2)
+    plt.plot(x, np.exp(2*x), 'b', lw=2)
+    plt.title("Exponential", fontsize=18)
+
+@_save("subplots_2.pdf")
+def subplots_2(N):
+    x = np.linspace(.1, 2, N)
+    plt.plot(x, np.log(x), 'k', lw=2)
+    plt.plot(x, np.log(2*x), 'b', lw=2)
+    plt.title("Logarithmic", fontsize=18)
+
+def prob4(N=200):
+    layout()
+    subplots_1(N)
+    subplots_2(N)
+
+# Problem 5 -------------------------------------------------------------------
 
 @_save("scatter.pdf")
 def scatter():
@@ -106,9 +141,11 @@ def scatter():
 
     plt.scatter(x, y, s=100)
 
+# Problem 6 -------------------------------------------------------------------
+
 @_save("sinxsiny.png")
-def sinxsiny(n=201):
-    x = np.linspace(-np.pi, np.pi, n)
+def sinxsiny(N):
+    x = np.linspace(-np.pi, np.pi, N)
     y = x.copy()
     X, Y = np.meshgrid(x, y)
 
@@ -116,6 +153,24 @@ def sinxsiny(n=201):
                         # edgecolors='face', shading='flat')
     plt.colorbar()
     plt.xlim(-np.pi, np.pi); plt.ylim(-np.pi, np.pi)
+
+@_save("colormeshProblem.png")
+def prob6_solution(N):
+    x = np.linspace(-2*np.pi, 2*np.pi, N)
+    y = np.copy(x)
+    X, Y = np.meshgrid(x,y)
+    Z = np.sin(X)*np.sin(Y)/(X*Y)
+
+    plt.pcolormesh(X, Y, Z, cmap="Spectral")
+    plt.colorbar()
+    plt.xlim(-2*np.pi, 2*np.pi)
+    plt.ylim(-2*np.pi, 2*np.pi)
+
+def prob6():
+    sinxsiny(200)
+    prob6_solution(200)
+
+# Additional Material ---------------------------------------------------------
 
 @_save("sinxsiny_3d.pdf")
 def sinxsiny_3d():
@@ -126,18 +181,6 @@ def sinxsiny_3d():
     X, Y = np.meshgrid(x, y)
     ax.view_init(elev=26, azim=-76)
     ax.plot_surface(X, Y, np.sin(X)*np.sin(Y))
-
-@_save("pcolor2.png")
-def pcolor2(n=200):
-    x = np.linspace(-2*np.pi, 2*np.pi, n)
-    y = np.copy(x)
-    X, Y = np.meshgrid(x,y)
-    Z = np.sin(X)*np.sin(Y)/(X*Y)
-
-    plt.pcolormesh(X, Y, Z, cmap="Spectral")
-    plt.colorbar()
-    plt.xlim(-2*np.pi, 2*np.pi)
-    plt.ylim(-2*np.pi, 2*np.pi)
 
 def widget_plot():
     ax = plt.subplot(111)
@@ -161,17 +204,15 @@ def widget_plot():
     samp.on_changed(update)
     plt.show()
 
+# Main Routine ================================================================
+
 def save_all():
-    basic1()
-    basic2()
-    custom1()
-    custom2()
-    layout()
-    subplots()
-    scatter()
-    sinxsiny()
-    sinxsiny_3d()
+    prob1()
+    prob3()
+    prob4()
+    # scatter()
+    prob6()
+    # sinxsiny_3d()
 
 if __name__ == '__main__':
     save_all()
-    widget_plot()

@@ -4,16 +4,32 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 def var_of_means(n):
+    """Construct a random matrix A with values drawn from the standard normal
+    distribution. Calculate the mean value of each row, then calculate the
+    variance of these means. Return the variance.
+
+    Inputs:
+        n (int): The number of rows and columns in the matrix A.
+
+    Returns:
+        (float) The variance of the means of each row.
+    """
     A = np.random.randn(n,n)
     return A.mean(axis=1).var()
 
-
 def prob1():
+    """Create an array of the results of var_of_means() with inputs
+    n = 100, 200, ..., 1000. Plot and show the resulting array.
+    """
     y = np.array([var_of_means(n) for n in xrange(100, 1100, 100)])
     plt.plot(y)
     plt.show()
 
 def prob2():
+    """Plot the functions sin(x), cos(x), and arctan(x) on the domain
+    [-2pi, 2pi]. Make sure the domain is refined enough to produce a figure
+    with good resolution.
+    """
     x = np.linspace(-2*np.pi, 2*np.pi, 200)
     plt.plot(x, np.sin(x))
     plt.plot(x, np.cos(x))
@@ -21,50 +37,80 @@ def prob2():
     plt.show()
 
 def prob3():
+    """Plot the curve f(x) = 1/(x-1) on the domain [-2,6].
+        1. Split the domain so that the curve looks discontinuous.
+        2. Plot both curves with a thick, dashed magenta line.
+        3. Change the range of the y-axis to [-6,6].
+    """
     x1, x2 = np.split(np.linspace(-2, 6, 200), [75])
     # x1, x2 = np.linspace(-2, 1, 75), np.linspace(1, 6, 125)
-    plt.plot(x1, 1/(x1 - 1), 'm--', linewidth=4)
-    plt.plot(x2, 1/(x2 - 1), 'm--', linewidth=4)
+    plt.plot(x1, 1/(x1 - 1), 'm--', lw=4)
+    plt.plot(x2, 1/(x2 - 1), 'm--', lw=4)
     plt.ylim(-6, 6)
     plt.show()
 
-def prob4_OLD():
-    x = np.linspace(-np.pi, np.pi, 200)
+def prob4():
+    """Plot the functions sin(x), sin(2x), 2sin(x), and 2sin(2x) over the
+    domain [0, 2pi].
+        1. Arrange the plots in a square grid of four subplots.
+        2. Set the limits of each subplot to [0, 2pi]x[-2, 2].
+        2. Give each subplot an appropriate title.
+        3. Give the overall figure a title.
+        4. Adjust the color and style of each line to match the fig in the lab.
+    """
+    x = np.linspace(0, 2*np.pi, 200)
 
-    plt.subplot(221)
-    plt.plot(x, np.sin(x), linewidth=2)
-    plt.xlim(-np.pi, np.pi)
-    plt.ylim(-2, 2)
-    plt.title(r"$\sin(x)$")
+    plt.subplot(221)    # sin(x)
+    plt.plot(x, np.sin(x), 'g-', lw=2)
+    plt.axis([0, 2*np.pi, -2, 2])
+    plt.title("sin(x)")
 
-    plt.subplot(222)
-    plt.plot(x, np.sin(2*x), linewidth=2)
-    plt.xlim(-np.pi, np.pi)
-    plt.ylim(-2, 2)
-    plt.title(r"$\sin(2x)$")
+    plt.subplot(222)    # sin(2x)
+    plt.plot(x, np.sin(2*x), 'r--', lw=2)
+    plt.axis([0, 2*np.pi, -2, 2])
+    plt.title("sin(2x)")
 
-    plt.subplot(223)
-    plt.plot(x, 2*np.sin(2*x), linewidth=2)
-    plt.xlim(-np.pi, np.pi)
-    plt.ylim(-2, 2)
-    plt.title(r"$2 \sin(x)$")
+    plt.subplot(223)    # 2sin(x)
+    plt.plot(x, 2*np.sin(x), 'b--', lw=2)
+    plt.axis([0, 2*np.pi, -2, 2])
+    plt.title("2sin(x)")
 
-    plt.subplot(224)
-    plt.plot(x, 2*np.sin(2*x), linewidth=2)
-    plt.xlim(-np.pi, np.pi)
-    plt.ylim(-2, 2)
-    plt.title(r"$2 \sin(2x)$")
+    plt.subplot(224)    # 2sin(2x)
+    plt.plot(x, 2*np.sin(2*x), 'm:', lw=2)
+    plt.axis([0, 2*np.pi, -2, 2])
+    plt.title("2sin(2x)")
 
+    plt.suptitle("Solution to Problem 4")
     plt.show()
 
-def prob5():
+def prob6():
+    """Plot the function f(x,y) = sin(x)sin(y)/xy over the domain
+    [-2pi, 2pi]x[-2pi, 2pi].
+        1. Create 2 subplots, side-by-side. In the first subplot, draw a heat
+            map of f. In the second subplot, draw a contour map of f with 10
+            level curves.
+        2. Set the limits of each subplot to [-2pi, 2pi]x[-2pi, 2pi].
+        3. Add a colorbar to each subplot.
+    """
+
+    # Define the mesgrid and calculate f() on the grid.
     x = np.linspace(-2*np.pi, 2*np.pi, 200)
     y = np.copy(x)
     X, Y = np.meshgrid(x,y)
     Z = np.sin(X)*np.sin(Y)/(X*Y)
 
-    plt.pcolormesh(X, Y, Z, cmap="seismic")
+    plt.subplot(121)        # Heat map.
+    plt.pcolormesh(X, Y, Z, cmap="Spectral")
+    plt.axis([-2*np.pi, 2*np.pi, -2*np.pi, 2*np.pi])
     plt.colorbar()
-    plt.xlim(-2*np.pi, 2*np.pi)
-    plt.ylim(-2*np.pi, 2*np.pi)
+
+    plt.subplot(122)        # Contour map.
+    plt.contour(X, Y, Z, 10, cmap="Spectral")
+    plt.axis([-2*np.pi, 2*np.pi, -2*np.pi, 2*np.pi])
+    plt.colorbar()
+
+    plt.suptitle("Solution to Problem 6")
     plt.show()
+
+if __name__ == '__main__':
+    prob6()
