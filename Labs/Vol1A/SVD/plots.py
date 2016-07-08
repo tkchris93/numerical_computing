@@ -52,6 +52,7 @@ def circles():
 
 def svals(img):
     U, s, Vt = svd(img)
+    s = np.sort(s)[::-1]
     plt.semilogy(s)
     plt.xlim([0,670])
     plt.xlabel('Matrix rank')
