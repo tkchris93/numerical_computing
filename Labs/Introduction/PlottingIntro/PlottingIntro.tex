@@ -85,7 +85,7 @@ In contrast, \li{np.linspace()} creates an array of evenly-spaced values in a gi
 
 \begin{lstlisting}
 # 4 evenly-spaced values between 0 and 32 (including endpoints).
->>> np.linspace(0, 32, 4) 
+>>> np.linspace(0, 32, 4)
 array([  0.        ,  10.66666667,  21.33333333,  32.        ])
 
 # Get 50 evenly-spaced values from -5 to 5 (including endpoints).
@@ -102,31 +102,6 @@ The resolution is also much better because \li{x} and \li{y} have $50$ entries e
 All calls to \li{plt} functions modify the same figure until \li{plt.show()} is executed, which displays the current figure and resets the system.
 The next time a \li{plt} function is called a new figure is created.
 This makes it possible to plot several lines in a single figure.
-
-\begin{comment} % Wordy details and unnecessary plots for multi-line plotting.
-We can take advantage of this system to plot multiple lines on the same axes.
-For example, the following code plots ten lines, each with random values at integers from 1 to 10. 
-The output is in Figure \ref{fig:statemachine}.
-
-\begin{lstlisting}
-x = np.linspace(1, 10, 10)
-
-# Create a 10x10 array of uniformly distributed values in [0,1).
-y = np.random.rand(10, 10)
-
-# Plot each row of y
-for row in y:
-    plt.plot(x, row)
-plt.show()
-\end{lstlisting}
-
-Alternatively, we can produce the same graph with a single call to \li{plt.plot()}.
-
-\begin{lstlisting}
-plt.plot(x, y[0], x, y[1], x, y[2], x, y[3], x, y[4], x, y[5], x, y[6], x, y[7], x, y[8], x, y[9])
-plt.show()
-\end{lstlisting}
-\end{comment}
 
 \begin{problem} % Plot two lines (sin() and cos()).
 Plot the functions $\sin(x)$, $\cos(x)$, and $\arctan(x)$ on the domain $[-2\pi, 2\pi]$ (use \li{np.pi} for $\pi$).
@@ -246,7 +221,7 @@ Other \li{plt} functions further customize a figure.
 \end{figure}
 
 See Appendix \ref{mpltables} for more comprehensive lists of colors, line styles, and figure customization routines.
-    
+
 \begin{problem} % Line plots with different domains but uniform style.
 \label{prob:lineplot}
 Write a function to plot the curve $f(x) = \frac{1}{x-1}$ on the domain $[-2,6]$.
@@ -401,7 +376,7 @@ Write a function to generate the following plot:
 \begin{enumerate}
 \item In one subplot, draw a histogram of the first array (\li{x}).
 Choose an appropriate range and number of bins to display the data accurately.
-\item In a second subplot, draw a scatter plot of \li{x} against \li{y}. 
+\item In a second subplot, draw a scatter plot of \li{x} against \li{y}.
 Plot a red horizontal line whose height is equal to the mean of the \li{x} data.\\
 (Hint: \li{plt.hlines()} may be useful.)
 \end{enumerate}
@@ -438,17 +413,17 @@ See Figure \ref{fig:meshgrid} for a visual explanation.
 \begin{tikzpicture}[>=stealth', shorten <= .1cm,shorten >=.1cm, dot/.style=
     {circle,fill=black,minimum size=3pt,inner sep=0pt, outer sep=-1pt} ]
 
-\foreach \x/\y in {0/0, 0/2, 0/4, 2/0, 2/2, 2/4, 4/0, 4/2, 4/4} 
+\foreach \x/\y in {0/0, 0/2, 0/4, 2/0, 2/2, 2/4, 4/0, 4/2, 4/4}
     \node[draw, dot]at(\x,\y){};
-\foreach \x/\y in {0/0, 0/1, 0/2, 1/0, 1/1, 1/2, 2/0, 2/1, 2/2} 
+\foreach \x/\y in {0/0, 0/1, 0/2, 1/0, 1/1, 1/2, 2/0, 2/1, 2/2}
     \node[draw=none]at(\x*2-.5, \y*2+.3){(\x,\y)};
 
-\foreach \x/\y in {0/0, 0/1, 0/2, 1/0, 1/1, 1/2, 2/0, 2/1, 2/2} 
+\foreach \x/\y in {0/0, 0/1, 0/2, 1/0, 1/1, 1/2, 2/0, 2/1, 2/2}
     \node[draw=none]at(\x*.75+7, \y*.75+.1){\y};
-\foreach \x/\y in {0/0, 0/1, 0/2, 1/0, 1/1, 1/2, 2/0, 2/1, 2/2} 
+\foreach \x/\y in {0/0, 0/1, 0/2, 1/0, 1/1, 1/2, 2/0, 2/1, 2/2}
     \node[draw=none]at(\x*.75+7, \y*-.75+3.9){\x};
 
-\draw[-, thick](6.7,-.25)--(6.7,1.95); 
+\draw[-, thick](6.7,-.25)--(6.7,1.95);
 \draw[-, thick](8.8,-.25)--(8.8,1.95);
 \draw[-, thick](6.7,2.05)--(6.7,4.25);
 \draw[-, thick](8.8,2.05)--(8.8,4.25);
@@ -476,7 +451,7 @@ See Figure \ref{fig:meshgrid} for a visual explanation.
 \node[draw=none, rotate=270, node distance=2cm](point6)
     [right of=point5]{0\big]};
 \end{tikzpicture}
-\caption{\li{np.meshgrid(x, y)}, returns the arrays \li{X} and \li{Y}. 
+\caption{\li{np.meshgrid(x, y)}, returns the arrays \li{X} and \li{Y}.
 The returned arrays give the $x$- and $y$-coordinates of the points in the grid formed by \li{x} and \li{y}.
 Specifically, the arrays \li{X} and \li{Y} satisfy \li{(X[i,j], Y[i,j]) = (x[i],y[j])}.}
 \label{fig:meshgrid}
@@ -547,183 +522,7 @@ The plot should be similar to the figure below.
 \begin{info} % Note about plt.imshow().
 Images are usually stored as either a 2-D array (for black-and-white pictures) or a 3-D array (a stack of 2-D arrays, one for each RGB value).
 This kind of data does not require a domain, and is easily visualized with \li{plt.imshow()}.
-% We will use this function often in future labs.
 \end{info}
-
-\section*{3-D Plotting with Mayavi} % =========================================
-
-Although Matplotlib is capable of creating 3-D plots, Mayavi\footnote{If Mayavi is not installed on your machine, run \li{conda install mayavi} from the command line. See Appendix \ref{updateinstall} for more info.} does it much faster and with better visuals.
-Here we introduce methods for plotting space curves, scatter plots, and surfaces in 3-D.
-The \li{mlab} submodule within the \li{mayavi} package contains the functions for creating these plots.
-% We will use Mayavi for all 3-D plots in these labs. % O RLY?
-
-\begin{warn}
-Mayavi must be imported before Matplotlib.
-\begin{lstlisting}
-from mayavi import mlab
-from matplotlib import pyplot as plt
-\end{lstlisting}
-\end{warn}
-
-\begin{comment}
-\begin{info} % Installation note. Make into a footnote?
-If you do not have the \li{Mayavi} package installed on your system, you may download it by running the following commands from the command line:
-\begin{lstlisting}
-$ conda install conda               # Download the most recent installer.
-$ conda install anaconda            # Update all packages.
-$ conda install mayavi              # Installs mayavi.
-\end{lstlisting}
-
-% For more information regarding installing Python packages, see Appendix \ref{updateinstall}.
-\end{info}
-
-\begin{table} % Mayavi plotting functions. Probably should put this back in.
-\begin{center}
-\begin{tabular}
-{|c|l|}
-\hline
-Function & Description \\
-\hline
-\li{barchart} & Produces 3D histogram-like plots\\
-\li{contour3d} & Plots level surfaces of functions of three variables\\
-\li{flow} & Creates a trajectory of particles following the flow of a vector field\\
-\li{imshow} & Use a colormap to view a 2D array as an image\\
-\li{mesh} & Plot a surface using \li{(x,y,z)} coordinates supplied as three 2D arrays\\
-\li{plot3d} & Draws lines between points\\
-\li{points3d} & Plots glyphs (like points) at the coordinates supplied\\
-\li{quiver3d} & Generate 3D vector fields\\
-\li{surf} & Plot a surface with a 2D array as elevation data\\
-\hline
-\end{tabular}
-\end{center}
-\caption{Some plotting functions in \li{mlab}.}
-\label{table:mlab_functions}
-\end{table}
-\end{comment}
-
-\subsection*{Lines} % ---------------------------------------------------------
-
-The function \li{mlab.plot3d()} is the 3-D Mayavi equivalent for Matplotlib's \li{plt.plot()}.
-Because the plot is 3-D, we must provide $x$, $y$, and $z$ coordinates, each contained in 1-D arrays of the same length.
-The points \li{(x[i], y[i], z[i])} are graphed in $\mathbb{R}^3$ and connected with straight lines.
-
-Consider the following curve, parametrized by time:
-\begin{align*}
-x(t) &= \cos(t)(1+\cos(6t))\\
-y(t) &= \sin(t)(1+\sin(6t)\\
-z(t) &= \sin\left(\frac{6}{11}t\right)
-\end{align*}
-The following code plots the curve over the time domain $t \in [0,2\pi]$.
-The resulting plot is shown in Figure \ref{fig:plot3d}.
-
-\begin{lstlisting}
->>> from mayavi import mlab
-
-# Calculate the coordinates of a curve parametrized by time.
->>> t = np.linspace(0, 2*np.pi, 100)
->>> x = np.cos(t) * (1 + np.cos(t*6))
->>> y = np.sin(t) * (1 + np.cos(t*6))
->>> z = np.sin(t*6/11.)
-
-# Plot and show the figure.
->>> mlab.plot3d(x, y, z)
->>> mlab.show()
-\end{lstlisting}
-
-\begin{figure} % Mayavi line and point plots.
-\captionsetup[subfigure]{justification=centering}
-\centering
-\begin{subfigure}{.5\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{plot3d.png}
-    \caption{A 3-D curve generated by \li{mlab.plot3d()}.}
-    \label{fig:plot3d}
-\end{subfigure}%
-\begin{subfigure}{.5\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{points3d.png}
-    \caption{A 3-D scatter plot generated by \li{mlab.points3d()}.}
-    \label{fig:points3d}
-\end{subfigure}
-\end{figure}
-
-\subsection*{Points} % --------------------------------------------------------
-
-The function \li{mlab.points3d()} is the 3-D Mayavi equivalent for Matplotlib's \li{plt.scatter()}.
-Each point is plotted, but not connected with lines.
-In the code below, the optional input array \li{s} defines a scalar for each point that modifies the color and size of the point.
-The output is in Figure \ref{fig:points3d}.
-
-\begin{lstlisting}
->>> t = np.linspace(0, 4*np.pi, 30)
->>> x = np.sin(2*t)
->>> y = np.cos(t)
->>> z = np.cos(2*t)
->>> s = 2 + np.sin(t)
-
-# Adjust the keyword argument 'scale_factor' so all points are visible.
->>> mlab.points3d(x, y, z, s, scale_factor=.15)
->>> mlab.show()
-\end{lstlisting}
-
-\subsection*{Surfaces} % ------------------------------------------------------
-
-The function \li{mlab.surf()} renders a 3-D surface.
-Because the surface is over a 2-D domain, we create a coordinate grid with \li{np.mgrid()} (similar to \li{np.meshgrid()}).
-This function uses the slicing syntax \li{[start:stop:step]}, similar to \li{range()} and \li{np.arange()}, but is accessed with brackets instead of parentheses.
-
-The following code produces the hyperbolic paraboloid $f(x,y) = \frac{x^2}{4} - \frac{y^2}{4}$ over the domain $[-4,4]\times[-4,4]$.
-The result is displayed in Figure \ref{fig:surf_example}.
-
-\begin{lstlisting}
->>> X, Y = np.mgrid[-4:4:.025, -4:4:.025]
->>> Z = (X**2)/4. - (Y**2)/4.
->>> mlab.surf(X, Y, Z, colormap='RdYlGn')
->>> mlab.show()
-\end{lstlisting}
-
-\begin{figure}
-\includegraphics[width=.7\textwidth]{mesh_example.png}
-\caption{Sample output of \li{mlab.surf()}.}
-\label{fig:surf_example}
-\end{figure}
-
-Like Matplotlib, Mayavi supports various color schemes, either as a solid color or with a varying colormap.
-For example, the plot in Figure \ref{fig:surf_example} uses the colormap \li{'RdYlGn'}.
-For a list of all colormaps in Mayavi, see \url{http://docs.enthought.com/mayavi/mayavi/mlab_changing_object_looks.html}.
-
-% TODO: More exercises with Mayavi!!! Don't have to be too hard either...
-\begin{problem}
-Plot the function $z = \frac{1}{10}\sin(10(x^2+y^2))$ on $[-1,1] \times [-1,1]$ using Mayavi.
-\end{problem}
-
-% TODO: this problem is copied from https://github.com/enthought/mayavi/blob/master/examples/mayavi/mlab/canyon.py.
-% We need to find a different problem.
-\begin{comment}
-\begin{problem}
-\label{prob:grand_canyon}
-Provided Grand Canyon topological radar data from NASA, do the following.
-
-\begin{itemize}
-\item Reshape the data to be 3601x3601.
-\item Cast the data type as \li{float32}.
-\item Slice the data, taking the first 1000 rows and columns 900-1900.
-\item There is some missing data, so set the minimum of your data equal to the minimum of the the positive data points.
-\item Preset the figure using the following commands: \li{mlab.figure(size=(400,320)}, \li{bgcolor = (.16, .28, .46))}
-\item Now plot with \li{mlab.surf}, using the colormap \li{gist_earth}, with a \li{warp_scale=.2}, \li{vmin=1200}, and \li{vmax=1610}.
-\item Take a smaller view of the canyon using \li{mlab.view(-5.9, 83, 570, [5.3, 20, 238])}.
-\end{itemize}
-
-This should produce Figure \ref{fig:GrandCanyon}
-
-\begin{figure}[H]
-\includegraphics[width=.7\textwidth]{GrandCanyon.png}
-\caption{Correct output for Problem \ref{prob:grand_canyon}.}
-\label{fig:GrandCanyon}
-\end{figure}
-
-\end{problem}
-\end{comment}
 
 \newpage
 
@@ -735,13 +534,13 @@ Matplotlib can also be used for 3D plotting, though it is much slower and not as
 The following code produces Figure \ref{fig:surface}.
 
 \begin{lstlisting}
-# Create the domain and calculate the range.
+# Create the domain and calculate the range like usual.
 >>> x = np.linspace(-np.pi, np.pi, n)
 >>> y = np.copy(x)
 >>> X, Y = np.meshgrid(x, y)
 >>> Z = np.sin(X)*np.sin(Y)
 
-# Draw the corresponding 3-D plot.
+# Draw the corresponding 3-D plot using some extra tools.
 >>> from mpl_toolkits.mplot3d import Axes3D
 >>> fig = plt.figure()
 >>> ax = fig.gca(projection='3d')
@@ -749,42 +548,36 @@ The following code produces Figure \ref{fig:surface}.
 >>> plt.show()
 \end{lstlisting}
 
-\begin{comment}
-\begin{problem}
-Plot the function $\frac{\cos\left(\sqrt{x^2 + y^2}\right)}{\frac{x^2 + y^2}{10} + 1}$ on $[-10, 10] \times [-10, 10]$.
-\end{problem}
-\end{comment}
-
-\subsection*{Interactive Plots}
+\subsection*{Interactive Plots} % ---------------------------------------------
 
 Matplotlib plots can be made interactive by adding \emph{widgets}.
 Consider the following example, TAKEN FROM THE MATPLOTLIB DOCS BASICALLY AHHH
 
-\begin{lstlisting} 
->>> from matplotlib import widgets as wg 
+\begin{lstlisting}
+>>> from matplotlib import widgets as wg
 
 >>> ax = plt.subplot(111)
 >>> plt.subplots_adjust(bottom=.25)         # Make some space for a slider bar.
->>> t = np.arange(0., 1., .001)     
->>> a0 = 5. 
->>> f0 = 3. 
->>> s = a0 * np.sin(2 * np.pi * f0 * t) 
+>>> t = np.arange(0., 1., .001)
+>>> a0 = 5.
+>>> f0 = 3.
+>>> s = a0 * np.sin(2 * np.pi * f0 * t)
 >>> l = plt.plot(t, s)[0]
->>> plt.axis([0, 1, -10, 10]) 
->>> axfreq = plt.axes([.25, .05, .65, .03]) 
->>> axamp = plt.axes([.25, .1, .65, .03]) 
+>>> plt.axis([0, 1, -10, 10])
+>>> axfreq = plt.axes([.25, .05, .65, .03])
+>>> axamp = plt.axes([.25, .1, .65, .03])
 
 # Make some slider bars.
->>> sfreq = wg.Slider(axfreq, 'Freq', .1, 30., valinit=f0) 
->>> samp = wg.Slider(axamp, 'Amp', .1, 10., valinit=a0) 
+>>> sfreq = wg.Slider(axfreq, 'Freq', .1, 30., valinit=f0)
+>>> samp = wg.Slider(axamp, 'Amp', .1, 10., valinit=a0)
 >>> def update(val):                        # Function for updating the plot.
 ...     amp = samp.val                          # Read from one slider.
 ...     freq = sfreq.val                        # Read from the other slider.
-...     l.set_ydata(amp * np.sin(2 * np.pi * freq * t)) 
+...     l.set_ydata(amp * np.sin(2 * np.pi * freq * t))
 ...     plt.draw()                              # Refresh the plot.
 >>> sfreq.on_changed(update)                # Connect the sliders to update().
 >>> samp.on_changed(update)
->>> plt.show() 
+>>> plt.show()
 \end{lstlisting}
 
 \begin{figure}[H]
@@ -808,7 +601,7 @@ Stuff from Volume 4.
 
 \begin{comment}
 \begin{info} % IPython Notebook inline plotting (move to another lab!)
-If you are executing these Matplotlib commands in an IPython shell, executing the \li{plt.show} method will open a new window with the plot. If you are using IPython Notebook, you have the option to display the plots within your notebook. You may opt into this feature by running \li{\%matplotlib inline} or \li{\%matplotlib notebook} in your IPython Notebook. The \li{inline} option shows the plot, whereas the \li{notebook} option shows the plot and provides controls to interact with the plot. Additionally, when using this option, the plot is displayed after running the \li{plt.plot} command; the \li{plt.show} command is not necessary. 
+If you are executing these Matplotlib commands in an IPython shell, executing the \li{plt.show} method will open a new window with the plot. If you are using IPython Notebook, you have the option to display the plots within your notebook. You may opt into this feature by running \li{\%matplotlib inline} or \li{\%matplotlib notebook} in your IPython Notebook. The \li{inline} option shows the plot, whereas the \li{notebook} option shows the plot and provides controls to interact with the plot. Additionally, when using this option, the plot is displayed after running the \li{plt.plot} command; the \li{plt.show} command is not necessary.
 \end{info}
 \end{comment}
 
