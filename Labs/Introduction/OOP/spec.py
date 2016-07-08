@@ -1,5 +1,5 @@
 # name this file 'solutions.py'
-"""Introductory Lab: Object Oriented Programming
+"""Introductory Labs: Object Oriented Programming.
 <Name>
 <Class>
 <Date>
@@ -7,7 +7,7 @@
 
 class Backpack(object):
     """A Backpack object class. Has a name and a list of contents.
-    
+
     Attributes:
         name (str): the name of the backpack's owner.
         contents (list): the contents of the backpack.
@@ -16,10 +16,10 @@ class Backpack(object):
     # Problem 1: Modify __init__() and put(), and write dump().
     def __init__(self, name):
         """Set the name and initialize an empty contents list.
-        
+
         Inputs:
             name (str): the name of the backpack's owner.
-        
+
         Returns:
             A Backpack object wth no contents.
         """
@@ -29,10 +29,12 @@ class Backpack(object):
     def put(self, item):
         """Add 'item' to the backpack's list of contents."""
         self.contents.append(item)
-    
+
     def take(self, item):
         """Remove 'item' from the backpack's list of contents."""
         self.contents.remove(item)
+
+    # Magic Methods -----------------------------------------------------------
 
     # Problem 3: Write __eq__() and __str__().
     def __add__(self, other):
@@ -45,14 +47,12 @@ class Backpack(object):
         """
         return len(self.contents) < len(other.contents)
 
-    # Problem 4: Write __hash__().
-
 
 # An example of inheritance. You are not required to modify this class.
 class Knapsack(Backpack):
     """A Knapsack object class. Inherits from the Backpack class.
     A knapsack is smaller than a backpack and can be tied closed.
-    
+
     Attributes:
         name (str): the name of the knapsack's owner.
         color (str): the color of the knapsack.
@@ -71,7 +71,7 @@ class Knapsack(Backpack):
             color (str): the color of the knapsack.
             max_size (int): the maximum number of items that can fit
                 in the knapsack. Defaults to 3.
-        
+
         Returns:
             A Knapsack object with no contents.
         """
@@ -84,7 +84,7 @@ class Knapsack(Backpack):
             print("I'm closed!")
         else:
             Backpack.put(self, item)
-    
+
     def take(self, item):
         """If the knapsack is untied, use the Backpack.take() method."""
         if self.closed:
@@ -93,6 +93,6 @@ class Knapsack(Backpack):
             Backpack.take(self, item)
 
 
-# Problem 2: Create a Jetpack class that inherits from the Backpack class.
+# Problem 2: Write a 'Jetpack' class that inherits from the 'Backpack' class.
 
-# Problem 5: Write a ComplexNumber class.
+# Problem 4: Write a 'ComplexNumber' class.

@@ -1,26 +1,63 @@
 # testDriver.py
 """Introductory Labs: Object Oriented Programming. Test Driver."""
 
-from solutions import Backpack, Jetpack
+# Decorator ===================================================================
+
+import signal
+from functools import wraps
+
+def _timeout(seconds):
+    """Decorator for preventing a function from running for too long.
+
+    Inputs:
+        seconds (int): The number of seconds allowed.
+
+    Notes:
+        This decorator uses signal.SIGALRM, which is only available on Unix.
+    """
+    assert isinstance(seconds, int), "@timeout(sec) requires an int"
+
+    class TimeoutError(Exception):
+        pass
+
+    def _handler(signum, frame):
+        """Handle the alarm by raising a custom exception."""
+        message = "Timeout after {0} seconds".format(seconds)
+        print(message)
+        raise TimeoutError(message)
+
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            signal.signal(signal.SIGALRM, _handler)
+            signal.alarm(seconds)               # Set the alarm.
+            try:
+               return func(*args, **kwargs)
+            finally:
+                signal.alarm(0)                 # Turn the alarm off.
+        return wrapper
+    return decorator
+
+# Test Driver =================================================================
 
 from math import sqrt
 from numpy.random import randint
+from solutions import Backpack, Jetpack
 
 # Test script
 def test(student_module):
     """Test script. Import the student's solutions file as a module.
-    
+
     10 points for problem 1: Backpack constructor, put(), and dump()
     10 points for problem 2: Jetpack constructor, fly(), and dump().
     10 points for problem 3: Backpack __eq__() and __str__().
-     5 points for problem 4: Backpack __hash__().
-    15 points for problem 5: ComplexNumber class. 
-    
+    10 points for problem 4: ComplexNumber class.
+
     Inputs:
         student_module: the imported module for the student's file.
-    
+
     Returns:
-        score (int): the student's score, out of 60.
+        score (int): the student's score, out of 40.
         feedback (str): a printout of test results for the student.
     """
     tester = _testDriver()
@@ -47,7 +84,7 @@ class _testDriver(object):
         self.feedback = ""
 
     # Main routine ------------------------------------------------------------
-    def test_all(self, student_module, total=60):
+    def test_all(self, student_module, total=40):
         """Grade the provided module on each problem and compile feedback."""
         # Reset feedback and score.
         self.feedback = ""
@@ -67,8 +104,7 @@ class _testDriver(object):
         test_one(self.problem1, "Problem 1", 10)
         test_one(self.problem2, "Problem 2", 10)
         test_one(self.problem3, "Problem 3", 10)
-        test_one(self.problem4, "Problem 4",  5)
-        test_one(self.problem5, "Problem 5", 25)
+        test_one(self.problem4, "Problem 4", 10)
 
         # Report final score.
         percentage = (100. * self.score) / total
@@ -150,7 +186,7 @@ class _testDriver(object):
         points += self._grade(1, 'Backpack.put() failed to print "No Room!"')
         points += self._eqTest(b1.contents, b2.contents,
                 "Backpack.put() failed to update Backpack.contents correctly")
-        
+
         b1 = Backpack("Teacher", "silver", 1)
         b2 = s.Backpack("Student", "green", 1)
         b1.put(100); b2.put(100)
@@ -168,7 +204,7 @@ class _testDriver(object):
 
     def problem2(self, s):
         """Test the Jetpack class. 10 Points."""
-        
+
         # Test the constructor (2 points)
         j1, j2 = Jetpack("Teacher", "silver"), s.Jetpack("Student", "green")
         points = 2
@@ -183,7 +219,7 @@ class _testDriver(object):
         points += self._grade(1, 'Jetpack.put() failed to print "No Room!"')
         points += .5*self._eqTest(j1.contents, j2.contents,
                 "Backpack.put() failed to update Backpack.contents correctly")
-        
+
         # Test fly() (4 points)
         print("\nCorrect output:\t"),; j1.fly(11)
         print("Student output:\t"),; j2.fly(11)
@@ -211,13 +247,13 @@ class _testDriver(object):
 
     def problem3(self, s):
         """Test the Backpack class's magic methods. 10 points."""
-        
+
         # Test Backpack.__eq__() in False case (3 points).
         b1 = s.Backpack("Name1", "Color", 10)
         b2 = s.Backpack("Name2", "Color", 10)
         points = self._evalTest(not b1==b2,
                                 "Backpack.__eq__() failed (different names)")
-        
+
         b1 = s.Backpack("Name", "Color1", 10)
         b2 = s.Backpack("Name", "Color2", 10)
         points += self._evalTest(not b1==b2,
@@ -237,12 +273,12 @@ class _testDriver(object):
         b2 = s.Backpack("Name", "Color", 10)
         points += self._evalTest(b1==b2,
                                     "Backpack.__eq__() failed (equal objects)")
-        
+
         for item in ["apple", "banana", "carrot"]:
             b1.put(item); b2.put(item)
         points += self._evalTest(b1==b2,
                                     "Backpack.__eq__() failed (equal objects)")
-        
+
         # Test Backpack.__str__() on an empty Backpack (2 points).
         b1 =   Backpack("Student", "green", 4)
         b2 = s.Backpack("Student", "green", 4)
@@ -250,7 +286,7 @@ class _testDriver(object):
         print("\nStudent output:"); print(b2)
         points += self._grade(2,
                             "Incorrect Backpack.__str__():\n{}\n".format(b2))
-        
+
         # Test Backpack.__str__() on a Backpack with contents (3 points).
         b1 =   Backpack("Master Yoda", "tan", 7)
         b2 = s.Backpack("Master Yoda", "tan", 7)
@@ -263,71 +299,36 @@ class _testDriver(object):
 
         return points
 
+    @_timeout(5)
     def problem4(self, s):
-
-        # Test Backpack.__hash__() on nonequal Backpacks.
-        b1 = s.Backpack("Name1", "Color", 10)
-        b2 = s.Backpack("Name2", "Color", 10)
-        points = self._evalTest(not hash(b1)==hash(b2),
-                            "Backpack.__hash__() failed (different names)")
-        
-        b1 = s.Backpack("Name", "Color1", 10)
-        b2 = s.Backpack("Name", "Color2", 10)
-        points += self._evalTest(not hash(b1)==hash(b2),
-                            "Backpack.__hash__() failed (different colors)")
-
-        b1 = s.Backpack("Name", "Color", 10)
-        b2 = s.Backpack("Name", "Color", 10)
-        for item in range(3):
-            b1.put(item); b2.put(item)
-        b2.put(3)
-        points += self._evalTest(not hash(b1)==hash(b2),
-                "Backpack.__hash__() failed (different number of contents)")
-
-        # Test Backpack.__hash__() on equal Backpacks.
-        b1 = s.Backpack("Name", "Color", 100)
-        b2 = s.Backpack("Name", "Color", 10)
-        points += self._evalTest(hash(b1)==hash(b2),
-                                "Backpack.__hash__() failed (equal objects)")
-        
-        for item in range(3):
-            b1.put(item); b2.put(item)
-        points += self._evalTest(hash(b1)==hash(b2),
-                                "Backpack.__hash__() failed (equal objects)")
-
-        return points
-
-    def problem5(self, s):
         """Test the ComplexNumber class. 25 points."""
-        if not hasattr(s, "ComplexNumber"):
-            raise NotImplementedError("Problem 4 Incomplete")
 
         # Check for cheating.
         if s.ComplexNumber is complex:
-            print("Check solutions file; ComplexNumber is complex.")
+            print("CHECK FOR CHEATING (ComplexNumber is complex)")
             return 0
 
-        # Test the constructor (2 points).
+        points = 0
+
+        # Test the constructor (0 points).
         a, b = randint(-50, 50, 2)
         cn = s.ComplexNumber(a, b)
         if not hasattr(cn, "real") or not hasattr(cn, "imag"):
             self.feedback += '\nComplexNumber class must have attributes '
-            self.feedback += '"real" and "imag"!'
+            self.feedback += '"real" and "imag"'
             return 0
-        points  = self._eqTest(a, cn.real,
-                            "ComplexNumber.__init__() failed on real part")
-        points += self._eqTest(b, cn.imag,
-                            "ComplexNumber.__init__() failed on imag failed")
+        self._eqTest(a, cn.real,"ComplexNumber.__init__() failed on real part")
+        self._eqTest(b, cn.imag,"ComplexNumber.__init__() failed on imag part")
 
-        # Test ComplexNumber.conjugate() (2 points).
+        # Test ComplexNumber.conjugate() (1 points).
         cn2 = cn.conjugate()
         if not isinstance(cn2, s.ComplexNumber):
             self.feedback += "ComplexNumber.conjugate() should return a "
             self.feedback += "new ComplexNumber object."
         else:
-            points += self._eqTest(a, cn2.real,
+            points += .5*self._eqTest(a, cn2.real,
                         "ComplexNumber.conjugate() failed on real part")
-            points += self._eqTest(-1*b, cn2.imag,
+            points += .5*self._eqTest(-1*b, cn2.imag,
                         "ComplexNumber.conjugate() failed on imag part")
 
         # Test ComplexNumber.__abs__() (1 point).
@@ -336,74 +337,72 @@ class _testDriver(object):
         points += self._eqTest(sqrt(a**2 + b**2), abs(cn),
                                         "ComplexNumber.__abs__() failed")
 
-        # Test ComplexNumber.__lt__() (2 points).
+        # Test ComplexNumber.__lt__() (1 point).
         cn1, cn2 = s.ComplexNumber(5, 7), s.ComplexNumber(1, 2)
-        points += self._evalTest(not cn1 < cn2,
+        points += .5*self._evalTest(not cn1 < cn2,
                                 "ComplexNumber.__lt__() failed")
-        points += self._evalTest(cn2 < cn1,
+        points += .5*self._evalTest(cn2 < cn1,
                                 "ComplexNumber.__lt__() failed")
 
-        # Test ComplexNumber.__gt__() (2 points).
+        # Test ComplexNumber.__gt__() (1 point).
         cn1, cn2 = s.ComplexNumber(1, 2), s.ComplexNumber(3, 4)
-        points += self._evalTest(not cn1 > cn2,
+        points += .5*self._evalTest(not cn1 > cn2,
                                 "ComplexNumber.__gt__() failed")
-        points += self._evalTest(cn2 > cn1,
+        points += .5*self._evalTest(cn2 > cn1,
                                 "ComplexNumber.__gt__() failed")
 
-        # Test ComplexNumber.__eq__() (2 points).
+        # Test ComplexNumber.__eq__() (1 point).
         cn1, cn2 = s.ComplexNumber(2, 3), s.ComplexNumber(3, 2)
-        points += self._evalTest(not cn1 == cn2,
+        points += .5*self._evalTest(not cn1 == cn2,
                         "ComplexNumber.__eq__() failed on nonequal")
         cn1, cn2 = s.ComplexNumber(2, 3), s.ComplexNumber(2, 3)
-        points += self._evalTest(cn2 == cn1,
+        points += .5*self._evalTest(cn2 == cn1,
                         "ComplexNumber.__eq__() failed on equal")
 
-        # Test ComplexNumber.__ne__() (2 points).
+        # Test ComplexNumber.__ne__() (1 point).
         cn1, cn2 = s.ComplexNumber(2, 3), s.ComplexNumber(3, 2)
-        points += self._evalTest(cn1 != cn2,
+        points += .5*self._evalTest(cn1 != cn2,
                         "ComplexNumber.__ne__() failed on nonequal")
         cn1, cn2 = s.ComplexNumber(2, 3), s.ComplexNumber(2, 3)
-        points += self._evalTest(not cn2 != cn1,
+        points += .5*self._evalTest(not cn2 != cn1,
                         "ComplexNumber.__ne__() failed on equal")
 
-        # Test ComplexNumber.__add__() (2 points).
+        # Test ComplexNumber.__add__() (1 point).
         a, b, c, d = randint(-50, 50, 4)
         cn = s.ComplexNumber(a, b) + s.ComplexNumber(c, d)
-        points += self._eqTest(a+c, cn.real,
+        points += .5*self._eqTest(a+c, cn.real,
                     "ComplexNumber.__add__() failed on real part")
-        points += self._eqTest(b+d, cn.imag,
+        points += .5*self._eqTest(b+d, cn.imag,
                     "ComplexNumber.__add__() failed on imag part")
 
-        # Test ComplexNumber.__sub__() (2 points).
+        # Test ComplexNumber.__sub__() (1 point).
         a, b, c, d = randint(-50, 50, 4)
         cn = s.ComplexNumber(a, b) - s.ComplexNumber(c, d)
-        points += self._eqTest(a-c, cn.real,
+        points += .5*self._eqTest(a-c, cn.real,
                     "ComplexNumber.__sub__() failed on real part")
-        points += self._eqTest(b-d, cn.imag,
+        points += .5*self._eqTest(b-d, cn.imag,
                     "ComplexNumber.__sub__() failed on real part")
 
-        # Test ComplexNumber.__mul__() (4 points).
+        # Test ComplexNumber.__mul__() (1 points).
         a, b, c, d = randint(-50, 50, 4)
         cn1 = (a + 1j*b) * (c + 1j*d)
         cn2 = s.ComplexNumber(a, b) * s.ComplexNumber(c, d)
-        points += 2*self._eqTest(cn1.real, cn2.real,
+        points += .5*self._eqTest(cn1.real, cn2.real,
                     "ComplexNumber.__mul__() failed on real part")
-        points += 2*self._eqTest(cn1.imag, cn2.imag,
+        points += .5*self._eqTest(cn1.imag, cn2.imag,
                     "ComplexNumber.__mul__() failed on imag part")
-        
-        # Test ComplexNumber.__div__() (4 points).
+
+        # Test ComplexNumber.__div__() (1 points).
         a, b, c, d = randint(-50, 50, 4)
         cn1 = (a + 1.0j*b) / (c + 1.0j*d)
         cn2 = s.ComplexNumber(a, b) / s.ComplexNumber(c, d)
-        points += 2*self._eqTest(cn1.real, cn2.real,
+        points += .5*self._eqTest(cn1.real, cn2.real,
                     "ComplexNumber.__div__() failed on real part")
-        points += 2*self._eqTest(cn1.imag, cn2.imag,
+        points += .5*self._eqTest(cn1.imag, cn2.imag,
                     "ComplexNumber.__div__() failed on imag part")
 
-        return points
+        return int(points)
 
 if __name__ == '__main__':
-    import solutions as sol
-    score, feedback = test(sol)
-
-# END OF FILE =================================================================
+    import solutions
+    test(solutions)
