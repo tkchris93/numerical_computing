@@ -23,7 +23,7 @@ def _save(filename):
         @wraps(func)
         def wrapper(*args, **kwargs):
             try:
-                print("{:.<20}".format(func.__name__+'()'), end='')
+                print("{:.<25}".format(func.__name__+'()'), end='')
                 stdout.flush()
                 plt.clf()
                 out = func(*args, **kwargs)
