@@ -1,8 +1,8 @@
 # solutions.py
-"""NumPy and SciPy Arrays solutions file."""
+"""Introductory Labs: Intro to NumPy. Solutions file."""
 
 import numpy as np
-from matplotlib import pyplot as plt
+# from matplotlib import pyplot as plt
 # from mpl_toolkits.mplot3d import Axes3D
 
 
@@ -58,6 +58,7 @@ def prob6(A):
     """
     return A / A.sum(axis=1)[:,np.newaxis].astype(np.float64)
 
+# TODO: Move this to IterativeSolvers.
 
 def jacobi(n=100, tol=1e-8):
     """Solve Laplace's Equation using the Jacobi method and array slicing."""
@@ -83,7 +84,7 @@ def jacobi(n=100, tol=1e-8):
     # Visualize the results.
     plt.imshow(U)
     plt.show()
-    
+
     # x, y = np.linspace(0, 1, n), np.linspace(0, 1, n)
     # X, Y = np.meshgrid(x, y)
     # fig = plt.figure()
@@ -92,7 +93,7 @@ def jacobi(n=100, tol=1e-8):
     # plt.show()
 
 
-    
+
 # END OF SOLUTIONS ============================================================
 
 from functools import wraps
@@ -101,16 +102,16 @@ from numpy.random import randint
 # Test script
 def test(student_module):
     """Test script. Import the student's solutions file as a module.
-    
+
      5 points for problem 1
      5 points for problem 2
     10 points for problem 3
     10 points for problem 4
     10 points for problem 5
-    
+
     Inputs:
         student_module: the imported module for the student's file.
-    
+
     Returns:
         score (int): the student's score, out of 40.
         feedback (str): a printout of test results for the student.
@@ -244,10 +245,10 @@ class _testDriver(object):
         points = 2*self._arrTest(nonnegative(first.copy()),
                                 s.nonnegative(first.copy()),
                                 "nonnegative(array(%s)) failed"%first)
-        
+
         second = randint(-50,50,10)
         points += 3*self._arrTest(nonnegative(second.copy()),
-                                s.nonnegative(second.copy()), 
+                                s.nonnegative(second.copy()),
                                 "nonnegative(array(%s)) failed"%second)
         return points
 

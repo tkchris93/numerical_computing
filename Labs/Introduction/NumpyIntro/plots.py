@@ -1,5 +1,6 @@
 # plots.py
 """Introductory Labs: NumPy. Plotting file."""
+
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -37,7 +38,7 @@ def make_plots():
                     bottom='off', top='off', left='off', right='off')
     plt.imshow(U1)
     plt.savefig("jacobi_small.pdf", format='pdf')
-    
+
     plt.clf()
     plt.tick_params(axis='both', which='both',
                     labelleft='off', labelbottom='off',
