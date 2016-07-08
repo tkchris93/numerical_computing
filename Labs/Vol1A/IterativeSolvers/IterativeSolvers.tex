@@ -375,7 +375,7 @@ def diag_dom(n, vals=[-4,4], num_entries=None):
         n (int) - dimension.
         vals (list) - range of values for off-diagonal entries.
         num_entries (int) - number of nonzero values. If None, num_entries
-                    defaults to n^(1.5) - n. 
+                    defaults to n^(1.5) - n.
 
     Returns:
         A (array) - nxn strictly diagonally dominant matrix.
@@ -692,3 +692,94 @@ following:
     Gauss-Seidel.
 \end{enumerate}
 \end{problem}
+
+% TODO: Figure out where to put this part.
+
+\begin{comment} % Migrated from NumPy lab.
+\begin{algorithm} % Laplace's equation procedure.
+\begin{algorithmic}[1]
+\Procedure{Jacobi}{$n$, tol}
+\State $U \gets$ an $n\times n$ array of zeros.
+\State Set the boundaries of $U$.
+\State $U^\prime \gets$ a copy of $U$.
+\State diff $\gets$ tol
+\While {diff $\ge$ tol}
+    \State Set all interior points of $U^\prime$ equal to the average of their neighbors.
+    \State diff $\gets$ the maximum of the absolute value of $U - U^\prime$.
+    \State Interior of $U \gets$ interior of $U^\prime $.
+\EndWhile
+\State \pseudoli{return} $U$
+\EndProcedure
+\end{algorithmic}
+\caption{The Jacobi method for solving Laplace's equation.}
+\label{alg:jacobi}
+\end{algorithm}
+
+\begin{problem}
+Laplace's equation is used to model steady-state heat flow on a square plate.
+The plate can be approximated by a matrix, where each entry of the matrix represents the average temperature over a small square portion of the plate.
+Suppose the plate starts at $0^\circ$ Celsius everywhere except on the east and west boundaries, which are held at a constant temperature of $100^\circ$.
+In addition, the north and south boundaries are held constant at $0^\circ$.
+
+\[
+U = \left[\begin{array}{ccccc}
+\textcolor[rgb]{0.,0.,1.}0 & \textcolor[rgb]{0.,0.,1.}0 & \textcolor[rgb]{0.,0.,1.}\cdots & \textcolor[rgb]{0.,0.,1.}0 & \textcolor[rgb]{0.,0.,1.}0\\
+\textcolor[rgb]{1.,0.,0.}{100} & 0 & \cdots & 0 & \textcolor[rgb]{1.,0.,0.}{100}\\
+\textcolor[rgb]{1.,0.,0.}\vdots & \vdots & \ddots & \vdots & \textcolor[rgb]{1.,0.,0.}\vdots \\
+\textcolor[rgb]{1.,0.,0.}{100} & 0 & \cdots & 0 & \textcolor[rgb]{1.,0.,0.}{100}\\
+\textcolor[rgb]{0.,0.,1.}0 & \textcolor[rgb]{0.,0.,1.}0 & \textcolor[rgb]{0.,0.,1.}\cdots & \textcolor[rgb]{0.,0.,1.}0 & \textcolor[rgb]{0.,0.,1.}0\\
+
+\end{array}\right]
+\]
+
+The non-boundary, interior portion of the matrix (with black text) can be accessed with the slice \li{U[1:-1,1:-1]}.
+To find the steady state of the hot plate, set each entry of the interior of $U$ equal to the average of its 4 immediate neighbors (the entries above, below, and to the left and right).
+This step should take only \emph{one line} and should be based entirely on array slicing.
+
+Continue updating the interior entries of $U$ until they stop changing significantly.
+The entire procedure is summarized in Algorithm \ref{alg:jacobi}.
+
+(Hint: The slice \li{U[:-2,1:-1]} references the upper neighbors of the interior points of $U$ and \li{U[1:-1,2:]} references the right neighbors. How can you reference the lower and left neighbors?)
+
+Use the following code to visualize your results.
+%% This does 3D visualization, but it's easier as a heat map.
+% from mpl_toolkits.mplot3d import Axes 3D
+
+%     x, y = np.linspace(0, 1, n), np.linspace(0, 1, n)
+%     X, Y = np.meshgrid(x, y)
+%     fig = plt.figure()
+%     ax = fig.gca(projection='3d')
+%     ax.plot_surface(X, Y, U, rstride=5)
+%     plt.show()
+
+\begin{lstlisting}
+from matplotlib import pyplot as plt
+
+def jacobi(n=100, tol=1e-8):
+
+    # Perform the algorithm, storing the result in the array 'U'.
+
+    # Visualize the results.
+    plt.imshow(U)
+    plt.show()
+\end{lstlisting}
+
+This Jacobi iteration is a \emph{finite difference method}, and is similar to many of the methods that we will use to find numerical solutions to differential equations in Volume IV.
+\end{problem}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{jacobi_small.pdf}
+    \caption{$10\times 10$ approximation.}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{jacobi_big.pdf}
+    \caption{$100\times 100$ approximation.}
+\end{subfigure}
+\caption{Hot plates in steady state with different resolutions.}
+\end{figure}
+\end{comment} % Move to Iterative Methods ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+

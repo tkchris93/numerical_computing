@@ -1,4 +1,3 @@
-Labs/Introduction/NumpyIntro/jacobi_small.pdf
 Labs/Introduction/PlottingIntro/3dplot.pdf
 Labs/Introduction/PlottingIntro/GrandCanyon.png
 Labs/Introduction/PlottingIntro/fancymesh.png
@@ -6,6 +5,7 @@ Labs/MachineLearning/Metropolis/samples.pdf
 Labs/Orphans/MultivariateDerivatives/Rosenbrock.pdf
 Labs/Orphans/RiemannSphere/mobius2.png
 Labs/Vol1A/LinearTransformations/horse.npy
+Labs/Vol1A/IterativeSolvers/jacobi_small.pdf
 Labs/Vol1B/Complex1-Plots/arctan_riemann_surface.pdf
 Labs/Vol1B/Complex1-Plots/poly_color_plot_imag.pdf
 Labs/Vol1B/Complex1-Plots/poly_color_plot_real.pdf
