@@ -1,14 +1,14 @@
 # newplots.py
 """Introductory Labs: Matploblib and Mayavi. Plotting file."""
+from __future__ import print_function
+import matplotlib
+matplotlib.rcParams = matplotlib.rc_params_from_file('../../../matplotlibrc')
 
-import numpy as np
-from matplotlib import pyplot as plt
-from mayavi import mlab
+# Decorator ===================================================================
 
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import widgets as wg
-
+from matplotlib import pyplot as plt, widgets as wg
 from functools import wraps
+from sys import stdout
 
 def _save(filename):
     """Decorator for saving, clearing, and closing figures automatically."""
@@ -41,6 +41,10 @@ def _save(filename):
         return wrapper
     return decorator
 
+# Plots =======================================================================
+
+import numpy as np
+from mpl_toolkits.mplot3d import Axes3D
 
 @_save("basic1.pdf")
 def basic1():
