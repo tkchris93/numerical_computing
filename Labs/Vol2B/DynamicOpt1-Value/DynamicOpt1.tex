@@ -110,7 +110,7 @@ The value function  $V(a,b,W)$ is the maximal value of
 for $t = a, a+1, ... b$.
 In other words, it gives the utility gained from following an optimal policy from time $a$ to time $b$.  
 %The Value function gives how much utility that a policy from time $a$ to $b$ yields given a cake of size $W$.
-So if we start with a cake of size $W_0$ and have half the cake left at time $t$, then $V(t, T, \frac{W_0}{2})$ gives how much utility we will gain by proceeding optimally from $t$.
+So if we start with a cake of size $W_0$ at time $0$ and have half the cake left at time $t$, then $V(t, T, \frac{W_0}{2})$ gives how much utility we will gain by proceeding optimally from $t$.
 
 Thus, if we know what the optimal policy in the future is, we can figure out the optimal policy for the present, since
 
@@ -129,24 +129,25 @@ Thus, if we can evaluate the value function, we can also determine the optimal p
 \begin{problem}
 
 In this problem we will write a helper function that will help us choose the optimal policy.
-Write a method that accepts an integer $N$ representing the number of pieces we want in a discretized cake and a utility function.
+We will assume our discritized cake has volume $1$ and an integer $N$ equaly-sized pieces.
+Write a method that accepts $N$ and a utility function.
 Create a vector whose entries correspond to possible amounts of cake given the discretization.
 For example, if we wanted to consider a cake split into 4 pieces, the vector should be
 \[
 w = (0, 0.25, 0.5, 0.75, 1.0)
 \]
-Return a matrix that whose $ij^{th}$ entry is the amount of utility gained by starting with $i$ cake pieces and ending with $j$ pieces.
+Return a matrix whose $ij^{th}$ entry is the amount of utility gained by starting with $i$ cake pieces and ending with $j$ pieces.
 In other words, the $ij^{th}$ entry should be $u(w_i - w_j)$.
 Let the default utility function be the square root function.
 Set impossible situations to 0 (i.e., eating more than you have).
-We call this matrix the consumption matrix.
+We call the resulting matrix the consumption matrix.
 
 \end{problem}
 
 How can we find the value function if we do not know the optimal policy?
 So far in our problem, we do not know how to start eating in order to maximize utility.
 However, we know that we do not want to have any cake left over when time runs out.
-Thus, the amount of utility we gain from having $W_{T-1}$ cake is given by $u(W_{T-1})$, and so we know $V(T-1, T, W_{T-1})$ for any choice of $W_{T-1}$.
+Thus, the amount of utility we gain from having $W_{T-1}$ cake at time $T-1$ is given by $u(W_{T-1})$, and so we know $V(T-1, T, W_{T-1})$ given a choice of $W_{T-1}$.
 For example, if we had a cake split into 4 pieces and wanted to eat it in $T=4$ time intervals, we could express what we know about the value function from time $T$ to $T+1$ as
 
 \[
@@ -182,11 +183,11 @@ If we are at time $t$, and we know what the value function evaluates to at time 
 V_t(W_t) = u(W_{t} - W_{t+1}) + \beta V_{t+1}(W_{t+1})
 \]
 for all possible values of $W_t$ and $W_{t+1}$.
-This will give an $N \times N$ matrix giving the value all possible values of starting with a cake of size $W_t$ and finishing with size $W_{t+1}$.
+This will produce an $N \times N$ matrix giving the value of all possible values of starting with a cake of size $W_t$ and finishing with size $W_{t+1}$.
 We call this matrix the current value matrix.
 %If we choose the maximal value of each row, then we know the optimal amount of cake to end up with a the end of time $t$, and thus how much cake to eat.
 The largest entry of each row then is the optimal value that the value function can attain at this step, given that we start with the amount of cake that corresponds to the row.
-Thus, the maximal values of each row becomes the column of the value function matrix at time $t$ and if we know one column of the value matrix, we may iterate backwards to fill the rest of it in.
+Thus, the maximal values of each row become the column of the value function matrix at time $t$ and if we know one column of the value matrix, we may iterate backwards to fill the rest of it in.
 Note that we can start this process with just the column of zeros that we know occupies the last column of the value function matrix.
 
 \begin{problem}
