@@ -3,17 +3,20 @@
 
 import numpy as np
 
+
 def prob1():
     """Define the matrices A and B as arrays. Return the matrix product AB."""
     A = np.array([[3,-1,4],[1,5,-9]])
     B = np.array([[2,6,-5,3],[5,-8,9,7],[9,-3,-2,-3]])
     return A.dot(B)
 
+
 def prob2():
     """Define the matrix A as an array. Return the matrix -A^3 + 9A^2 - 15A."""
     A = np.array([[3,1,4],[1,5,9],[-5,3,1]])
     A2 = np.dot(A, A)
     return -np.dot(A, A2) + 9*A2 - 15*A
+
 
 def prob3():
     """Define the matrices A and B as arrays. Calculate the matrix product ABA,
@@ -22,6 +25,7 @@ def prob3():
     A = np.triu(np.ones((7,7)))
     B = np.full_like(A, 5) - np.tril(np.full_like(A, 6))
     return np.dot(np.dot(A, B), A).astype(np.int64)
+
 
 def prob4(A):
     """Make a copy of 'A' and set all negative entries of the copy to 0.
@@ -35,6 +39,7 @@ def prob4(A):
     B = A.copy()
     B[A < 0] = 0
     return B
+
 
 def prob5():
     """Define the matrices A, B, and C as arrays. Return the block matrix
@@ -53,6 +58,7 @@ def prob5():
                         np.hstack((A,               np.zeros((m,m)), O)),
                         np.hstack((B,               O.T,             C))  ))
 
+
 def prob6(A):
     """Divide each row of 'A' by the row sum and return the resulting array.
 
@@ -65,6 +71,7 @@ def prob6(A):
     """
     return A / A.sum(axis=1)[:,np.newaxis].astype(np.float64)
     # Or use np.vstack() or np.reshape().
+
 
 def prob7():
     """Given the array stored in grid.npy, return the greatest product of four
