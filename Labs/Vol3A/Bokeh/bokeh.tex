@@ -475,7 +475,7 @@ to display a bit more information. Once again, we can accomplish this with
 tooltips. To be able to show more information, we will need to prepare a few more
 pieces of data.
 
-\begin{problem} \label{prop:lists}
+\begin{problem} \label{prob:lists}
 In Problem \ref{prob:borders}, you created two lists of lists, \li{state_xs} and
 \li{state_ys}. When hovering over a Patch glyph, Bokeh keeps track which index
 corresponds with that Patch. For our tooltips, we will need a few more lists. We
@@ -483,10 +483,11 @@ have to take extra special care that the indices of all these lists are
 consistent.
 
 Using list comprehension again, create a list of state abbreviations, a list of
-the total number of accidents by state, a list of the total number of speed-related
-accidents by state, and a list of drunk driving accidents by state. Alternatively,
-you can get this information from the `counts` DataFrame created in Problem
-\ref{prob:counts}. Whatever method you choose to use, take extra care to make
+the total number of accidents by state, a list of the percentage of speed-related
+accidents by state, and a list of the percentage of drunk driving accidents by
+state.
+
+There is more than one correct way to do this, but whatever method you choose to use, take extra care to make
 sure that the indices correspond to the same state across all these lists.
 \end{problem}
 
@@ -553,14 +554,14 @@ argument accepts a list of glyphs. At times, there is unpredicted behavior if yo
 include more than one glpyh in this list. The \li{tooltips} arguments functions
 just like the \li{tooltips} argument we discussed in the section on bar charts.
 
-\begin{problem}
+\begin{problem} \li{prob:hover_map}
 On your plot of the United States, we can provide much more information to this
 plot using tooltips. Using the lists you prepared in Problem \ref{prob:lists},
 add tooltips for the Patch objects in this plot. Also adjust the appearence of
 the Patch objects under the mouse so it is clear which state is being selected.
 \end{problem}
 
-\section*{Adding More Complicated Interactions}
+\section*{Adding More Complicated Interactions Using Widgets}
 \begin{info}
 At the beginning of this lab, we mentioned that Bokeh is still in development
 so some explanations will need to be updated. There is some material in this
@@ -571,8 +572,171 @@ to do these tasks in the future.
 
 One of the mottos the Bokeh developers have is, \emph{We write the Javascript so
 you don't have to.} If you happen to have experience with Javascript, you can
-do some pretty amazing things with Bokeh interactions. We will do our best to
-keep the Javascript to a minimum, but in time hopefully no knowledge of Javascript
-will be necessary.
+do some pretty amazing things with Bokeh interactions. In this section, we
+address some of the interactions that are possible without using Javascript.
 
-\subsection*{}
+\subsection*{Select}
+The Select widget is ideal for changing attributes of the figure where you want
+to allow only a few different options. The code for creating widgets is very
+straightforward.
+
+\begin{lstlisting}
+from bokeh.io import output_file, show
+from bokeh.models.widgets import Select
+
+output_file("select.html")
+
+select = Select(title="Option:", value="one", options=["one", "two", "three", "four"])
+
+show(select)
+\end{lstlisting}
+
+For our project, we want to be able to
+give the user the ability to gain information from the first map without needing
+to hover over each individual state. Since we are interested in drunk driving
+accidents and speeding accidents, it makes sense to give the user the option to
+color the states according to the percentage of these types of accidents.
+
+To be able to accomplish this, we will need to have some way of knowing if the
+value in the Select widget has changed, and if it has, what we should do with the
+new value.
+
+Most Bokeh widgets have a \li{on_change} method. This method is called whenever
+a certain parameter (usually \li{"value"}) is changed. Here is a simple example.
+
+\begin{lstlisting}
+import pandas as pd
+import numpy as np
+from bokeh.io import curdoc
+from bokeh.plotting import Figure
+from bokeh.models import ColumnDataSource, Select
+from bokeh.layouts import column
+
+COUNT = 10
+df = pd.DataFrame({"x":np.random.rand(COUNT),
+                   "y":np.random.rand(COUNT),
+                   "color":"white"})
+source = ColumnDataSource(df)
+
+fig = Figure()
+fig.circle(source=source, x="x", y="y", fill_color="color",
+           line_color="black", size=40)
+
+select = Select(title="Option:", value="white",
+                options=["white", "red", "blue", "yellow"])
+
+def update_color(attrname, old, new):
+    source.data["color"] = [select.value]*COUNT
+
+select.on_change('value', update_color)
+
+curdoc().add_root(column(fig, select))
+\end{lstlisting}
+
+There are a few things to point out with this example. Note that we have a function
+called \li{update_color}. This function is called whenever the \li{"value"} of
+the Select widget is changed. The function arguments \li{attrname, old, new}
+are used by Bokeh, but you don't need to worry about them at all in this lab.
+Because we have our Circle glyph tied to a
+\li{ColumnDataSource}, any change to this source will affect the Circle glpyh.
+
+Second, note that we have not specified an \li{output_file}. Instead, we use
+\li{curdoc()}, which stands for ``current document". We add the layouts we want
+to the current document through the \li{add_root()} method. In our case, we
+stack all the elements of our document using the \li{column()} function. You can
+learn more about possible layouts here:
+\url{http://bokeh.pydata.org/en/latest/docs/user_guide/layout.html}
+
+Using the  \li{on_change} function requires a Bokeh Server to be running.
+You can view the code above by executing
+\begin{lstlisting}
+$ bokeh serve <FILENAME>.py
+\end{lstlisting}
+in your terminal, then going to \li{localhost:5006/<FILENAME>} in your web
+browser.
+
+\begin{problem}
+In this problem, we will add a Select widget to our map. This Select widget will
+specify the color map we wish to use for the states.
+
+In your Select widget, have options for \li{"None"}, \li{"Drunk \%"}, and
+\li{"Speeding \%"}. To assign the states the appropriate color, you may use
+the following code, or you may adjust the functionality as you like.
+
+\begin{lstlisting}
+# change this first line if you want a different colormap
+from bokeh.palettes import Reds9
+
+COLORS.reverse()
+no_colors = ['#FFFFFF']*len(state_names)
+drunk_colors = [COLORS[i] for i in pd.qcut(state_percent_dr, len(COLORS)).codes]
+speeding_colors = [COLORS[i] for i in pd.qcut(state_percent_sp, len(COLORS)).codes]
+\end{lstlisting}
+
+This code assumes you have lists named \li{state_names}, \li{state_percent_dr},
+and \li{state_percent_sp} from Problem \ref{prob:lists}.
+
+\end{problem}
+
+\subsection*{Slider}
+Sliders are very useful when slicing across sections of data or adjusting
+attributes of glyphs. If adjusting attributes of a glyph, it makes more sense to
+use a Slider rather than a Select widget if you have a range of valid values.
+
+\begin{lstlisting}
+import pandas as pd
+import numpy as np
+from bokeh.io import curdoc
+from bokeh.plotting import Figure
+from bokeh.models import ColumnDataSource, Slider
+from bokeh.layouts import column
+
+COUNT = 10
+df = pd.DataFrame({"x":np.random.rand(COUNT), "y":np.random.rand(COUNT), "radius":0.05})
+source = ColumnDataSource(df)
+
+fig = Figure()
+fig.circle(source=source, x="x", y="y", fill_color="red", line_color="black", radius="radius")
+
+slider = Slider(start=1, end=10, step=0.1, value=5)
+
+def update_size(attrname, old, new):
+    source.data["radius"] = [slider.value / 100.]*COUNT
+
+slider.on_change('value', update_size)
+
+curdoc().add_root(column(fig,slider))
+\end{lstlisting}
+
+\begin{problem}
+In this problem, you will create a figure that allows the user to interact with
+the data in multiple ways. Create a Slider widget that displays the accidents by
+hour. Also include a HoverTool for the accident markers that displays a tooltip
+with the format:
+\begin{itemize}
+    \item Date: MM/DD/YEAR
+    \item Fatalities: NUMBER OF FATALITIES
+    \item Drunk: YES/NO
+    \item Speeding: YES/NO
+    \item Weather: Conditions translated from ID to English.
+\end{itemize}
+
+\begin{info}
+Depending on the capabilities of your computer
+\end{info}
+
+\end{problem}
+
+\subsection*{\texttt{on\_change} vs Callbacks}
+
+\section*{Tying It All Together}
+
+\subsection*{Tab}
+
+\section*{Suggestions for Further Learning}
+
+\begin{itemize}
+    \item Streaming data
+    \item Dashboards
+    \item Data Exploration (crossfilter)
+\end{itemize}
