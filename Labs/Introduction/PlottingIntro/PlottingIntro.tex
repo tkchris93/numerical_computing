@@ -7,7 +7,7 @@ The plotting techniques presented here will be used in the majority of the labs 
 
 \section*{Line Plots} % =======================================================
 
-The quickest way to visualize a simple 1-D array is via a \emph{line plot}.
+The quickest way to visualize a simple 1-dimensional array is via a \emph{line plot}.
 The following code creates an array of outputs of the function $f(x) = x^2$, then visualizes the array using the \li{matplotlib} module.\footnote{Like NumPy, Matplotlib is \emph{not} part of the Python standard library, but it is included in most Python distributions.}
 
 \begin{lstlisting}
@@ -395,14 +395,14 @@ Plot a red horizontal line whose height is equal to the mean of the \li{x} data.
 \end{enumerate}
 \end{problem}
 
-Other kinds of plots for 1-D data includes bar plots, box plots, and others.
+Other kinds of plots for 1-dimensional data includes bar plots, box plots, and others.
 See Appendix \ref{mpltables} for more.
 
 \section*{Visualizing 2-D Data} % =============================================
 
-To plot a function $f: \mathbb{R}^2 \rightarrow \mathbb{R}$, we must choose and construct a 2-D domain, then calculate the function at each point of that domain.
-NumPy's \li{np.meshgrid()} is the standard tool for creating a 2-D domain in the Cartesian plane.
-Given two 1-D coordinate arrays, \li{np.meshgrid()} creates two corresponding coordinate matrices.
+To plot a function $f: \mathbb{R}^2 \rightarrow \mathbb{R}$, we must choose and construct a 2-dimensional domain, then calculate the function at each point of that domain.
+NumPy's \li{np.meshgrid()} is the standard tool for creating a 2-dimensional domain in the Cartesian plane.
+Given two 1-dimensional coordinate arrays, \li{np.meshgrid()} creates two corresponding coordinate matrices.
 % See Figure \ref{fig:meshgrid} for a visual explanation.
 
 \begin{figure}[h] % np.meshgrid() visual demonstration.
@@ -456,7 +456,7 @@ Specifically, the arrays \li{X} and \li{Y} satisfy \li{(X[i,j], Y[i,j]) = (x[i],
 With a 2-dimensional domain, we usually visualize $f$ with two kinds of plots.
 
 \begin{itemize}
-\item A \emph{heat map} assigns a color to each entry in the matrix, producing a 2-D picture describing a 3-D shape.
+\item A \emph{heat map} assigns a color to each entry in the matrix, producing a 2-dimensional picture describing a 3-dimensional shape.
 Darker colors typically correspond to lower values while lighter colors typically correspond to higher values.
 
 Use \li{plt.pcolormesh()} to create a heat map.
@@ -533,7 +533,7 @@ Choose an appropriate number of level curves, or specify the curves yourself.
 \end{problem}
 
 \begin{info} % Note about plt.imshow().
-Images are usually stored as either a 2-D array (for black-and-white pictures) or a 3-D array (a stack of 2-D arrays, one for each RGB value).
+Images are usually stored as either a 2-dimensional array (for black-and-white pictures) or a 3-dimensional array (a stack of 2-dimensional arrays, one for each RGB value).
 This kind of data does not require a domain, and is easily visualized with \li{plt.imshow()}.
 \end{info}
 
@@ -543,12 +543,12 @@ This kind of data does not require a domain, and is easily visualized with \li{p
 
 \subsection*{3-D Plotting} % --------------------------------------------------
 
-Matplotlib can also be used for 3D plotting.
+Matplotlib can also be used to plot 3-dimensional surfaces.
 The following code produces the surface corresponding to $f(x,y) = \sin(x)\sin(y)$.
 
 \begin{lstlisting}
 # Create the domain and calculate the range like usual.
->>> x = np.linspace(-np.pi, np.pi, n)
+>>> x = np.linspace(-np.pi, np.pi, 200)
 >>> y = np.copy(x)
 >>> X, Y = np.meshgrid(x, y)
 >>> Z = np.sin(X)*np.sin(Y)
@@ -559,6 +559,24 @@ The following code produces the surface corresponding to $f(x,y) = \sin(x)\sin(y
 >>> ax = fig.gca(projection='3d')
 >>> ax.plot_surface(X, Y, Z)
 >>> plt.show()
+\end{lstlisting}
+
+\begin{figure}[H]
+    \includegraphics[width=.7\textwidth]{figures/surface_plot.pdf}
+\end{figure}
+
+\begin{comment}
+\subsection*{Animations} % ----------------------------------------------------
+
+Lines and other graphs can be altered dynamically to produce animations.
+Follow these steps to create a Matplotlib animation:
+\begin{enumerate}
+    \item Calculate all data that is needed for the animation.
+    \item Define a figure explicitly with \li{plt.fig()} and set its window boundaries.
+    \item Set
+\end{enumerate}
+
+\begin{lstlisting}
 \end{lstlisting}
 
 \subsection*{Interactive Plots} % ---------------------------------------------
@@ -594,12 +612,9 @@ Consider the following example, TAKEN FROM THE MATPLOTLIB DOCS BASICALLY AHHH
 \end{lstlisting}
 
 \begin{figure}[H]
-\includegraphics[width=.7\textwidth]{figures/interact.pdf}
+\includegraphics[width=.7\textwidth]{figures/interactive_plot.pdf}
 \end{figure}
-
-\subsection*{Animations} % ----------------------------------------------------
-
-Stuff from Volume 4. % TODO
+\end{comment}
 
 % =============================================================================
 % =============================================================================
