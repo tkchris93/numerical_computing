@@ -8,7 +8,7 @@ The plotting techniques presented here will be used in the majority of the labs 
 \section*{Line Plots} % =======================================================
 
 The quickest way to visualize a simple 1-D array is via a \emph{line plot}.
-The following code creates an array of outputs of the function $f(x) = x^2$, then visualizes the array using the \li{matplotlib} module.\footnote{Like NumPy, Matplotlib is \emph{not} part of the Python standard library, but is included in most Python distributions.}
+The following code creates an array of outputs of the function $f(x) = x^2$, then visualizes the array using the \li{matplotlib} module.\footnote{Like NumPy, Matplotlib is \emph{not} part of the Python standard library, but it is included in most Python distributions.}
 
 \begin{lstlisting}
 >>> import numpy as np
@@ -36,13 +36,13 @@ Calling \li{plt.show()} then displays the figure.
 \centering
 \begin{subfigure}{.5\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{basic1.pdf}
+    \includegraphics[width=\linewidth]{figures/basic1.pdf}
     \caption{\li{plt.plot(y)} uses the indices of\\the array for the $x$-axis.}
     \label{fig:basic1}
 \end{subfigure}%
 \begin{subfigure}{.5\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{basic2.pdf}
+    \includegraphics[width=\linewidth]{figures/basic2.pdf}
     \caption{\li{plt.plot(x,y)} specifies both the\\domain and the range.}
     \label{fig:basic2}
 \end{subfigure}
@@ -204,13 +204,13 @@ Other \li{plt} functions further customize a figure.
 \centering
 \begin{subfigure}{.49\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{custom1.pdf}
+    \includegraphics[width=\linewidth]{figures/custom1.pdf}
     \label{fig:custom1}
 \end{subfigure}
 %
 \begin{subfigure}{.49\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{custom2.pdf}
+    \includegraphics[width=\linewidth]{figures/custom2.pdf}
     \label{fig:custom2}
 \end{subfigure}
 \label{fig:custom}
@@ -230,7 +230,7 @@ The keyword arguments \li{linewidth} or \li{lw} specify the line thickness.
 The plot should resemble the figure below.
 
 \begin{figure}[H] % Solution.
-\includegraphics[width=.5\textwidth]{discontinuousProblem.pdf}
+\includegraphics[width=.5\textwidth]{figures/discontinuousProblem.pdf}
 \end{figure}
 \end{problem}
 
@@ -247,32 +247,32 @@ See Figure \ref{fig:subplots-layout}.
 \centering
 \begin{subfigure}{.15\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{layout_1.pdf}
+    \includegraphics[width=\linewidth]{figures/layout_1.pdf}
 \end{subfigure}
 %
 \begin{subfigure}{.15\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{layout_2.pdf}
+    \includegraphics[width=\linewidth]{figures/layout_2.pdf}
 \end{subfigure}
 %
 \begin{subfigure}{.15\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{layout_3.pdf}
+    \includegraphics[width=\linewidth]{figures/layout_3.pdf}
 \end{subfigure}
 \\
 \begin{subfigure}{.15\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{layout_4.pdf}
+    \includegraphics[width=\linewidth]{figures/layout_4.pdf}
 \end{subfigure}
 %
 \begin{subfigure}{.15\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{layout_5.pdf}
+    \includegraphics[width=\linewidth]{figures/layout_5.pdf}
 \end{subfigure}
 %
 \begin{subfigure}{.15\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{layout_6.pdf}
+    \includegraphics[width=\linewidth]{figures/layout_6.pdf}
 \end{subfigure}
 \caption{The layout of subplots with \li{plt.subplot(2,3,i)} (2 rows, 3 columns), where \li{i} is the index pictured above.}
 \label{fig:subplots-layout}
@@ -302,12 +302,12 @@ For example, \li{plt.subplot(3,2,2)} and \li{plt.subplot(322)} are equivalent.
 \centering
 \begin{subfigure}{.49\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{subplots_1.pdf}
+    \includegraphics[width=\linewidth]{figures/subplots_1.pdf}
 \end{subfigure}
 %
 \begin{subfigure}{.49\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{subplots_2.pdf}
+    \includegraphics[width=\linewidth]{figures/subplots_2.pdf}
 \end{subfigure}
 \end{figure}
 
@@ -363,13 +363,13 @@ To create a scatter plot, use \li{plt.scatter()}, or use \li{plt.plot()} and spe
 \centering
 \begin{subfigure}{.49\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{histogram.pdf}
+    \includegraphics[width=\linewidth]{figures/histogram.pdf}
     \label{fig:histogram}
 \end{subfigure}
 %
 \begin{subfigure}{.49\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{scatterplot.pdf}
+    \includegraphics[width=\linewidth]{figures/scatterplot.pdf}
 \end{subfigure}
 \end{figure}
 
@@ -507,15 +507,15 @@ Finally, to see how the colors in these plots relate to the values of the functi
 \centering
 \begin{subfigure}{.33\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{heatmap.png}
+    \includegraphics[width=\linewidth]{figures/heatmap.png}
 \end{subfigure}%
 \begin{subfigure}{.33\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{contour.pdf}
+    \includegraphics[width=\linewidth]{figures/contour.pdf}
 \end{subfigure}%
 \begin{subfigure}{.33\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{contourf.pdf}
+    \includegraphics[width=\linewidth]{figures/contourf.pdf}
 \end{subfigure}
 \end{figure}
 
@@ -525,9 +525,9 @@ Write a function to plot $f(x,y) = \frac{\sin(x)\sin(y)}{xy}$ on the domain $[-2
 
 \begin{enumerate}
 \item Create 2 subplots: one with a heat map of $f$, and one with a contour map of $f$.
-Choose an appropriate number of level curves.
+Choose an appropriate number of level curves, or specify the curves yourself.
 \item Set the limits of each subplot to $[-2\pi,2\pi] \times [-2\pi,2\pi]$.
-\item Choose a non-default scheme (\li{"Spectral"} and \li{"viridis"} are both popular).
+\item Choose a non-default color scheme.
 \item Include the color scale bar for each subplot.
 \end{enumerate}
 \end{problem}
@@ -594,7 +594,7 @@ Consider the following example, TAKEN FROM THE MATPLOTLIB DOCS BASICALLY AHHH
 \end{lstlisting}
 
 \begin{figure}[H]
-\includegraphics[width=.7\textwidth]{interact.pdf}
+\includegraphics[width=.7\textwidth]{figures/interact.pdf}
 \end{figure}
 
 \subsection*{Animations} % ----------------------------------------------------

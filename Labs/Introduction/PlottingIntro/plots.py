@@ -28,9 +28,10 @@ def _save(filename):
                 plt.clf()
                 out = func(*args, **kwargs)
                 if extension == "pdf":
-                    plt.savefig(filename, format='pdf')
+                    plt.savefig("figures/"+filename, format='pdf')
                 elif extension == "png":
-                    plt.savefig(filename, format='png', size=(1024, 768))
+                    plt.savefig("figures/"+filename, format='png',
+                                                    size=(1024,768))
                 print("done.")
                 return out
             except Exception as e:
@@ -43,6 +44,7 @@ def _save(filename):
 
 # Plots =======================================================================
 
+import os
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -178,36 +180,42 @@ def prob6():
 
 # Additional Material ---------------------------------------------------------
 
+@_save("interact.pdf")
 def widget_plot():
     ax = plt.subplot(111)
     plt.subplots_adjust(bottom=.25)
+
     t = np.arange(0., 1., .001)
-    a0 = 5.
-    f0 = 3.
+    a0, f0 = 5, 3
     s = a0 * np.sin(2 * np.pi * f0 * t)
     l = plt.plot(t, s)[0]
+
     plt.axis([0, 1, -10, 10])
     axfreq = plt.axes([.25, .05, .65, .03])
     axamp = plt.axes([.25, .1, .65, .03])
     sfreq = wg.Slider(axfreq, 'Freq', .1, 30., valinit=f0)
     samp = wg.Slider(axamp, 'Amp', .1, 10., valinit=a0)
+
     def update(val):
         amp = samp.val
         freq = sfreq.val
         l.set_ydata(amp * np.sin(2 * np.pi * freq * t))
         plt.draw()
+
     sfreq.on_changed(update)
     samp.on_changed(update)
-    plt.show()
 
 # Main Routine ================================================================
 
 def save_all():
+    if not os.path.isdir("figures"):
+        os.mkdir("figures")
     prob1()
     prob3()
     prob4()
     prob5()
     prob6()
+    widget_plot()
 
 if __name__ == '__main__':
     save_all()
