@@ -565,20 +565,145 @@ The following code produces the surface corresponding to $f(x,y) = \sin(x)\sin(y
     \includegraphics[width=.7\textwidth]{figures/surface_plot.pdf}
 \end{figure}
 
-\begin{comment}
 \subsection*{Animations} % ----------------------------------------------------
 
 Lines and other graphs can be altered dynamically to produce animations.
 Follow these steps to create a Matplotlib animation:
+%
 \begin{enumerate}
     \item Calculate all data that is needed for the animation.
     \item Define a figure explicitly with \li{plt.fig()} and set its window boundaries.
-    \item Set
+    \item Draw empty objects that can be altered dynamically.
+    \item Define a function to update the drawing objects.
+    \item Use \li{matplotlib.animation.FuncAnimation()}.
 \end{enumerate}
 
+The submodule \li{matplotlib.animation} contains the tools putting together and managing animations.
+The function \li{matplotlib.animation.FuncAnimation()} accepts the figure to animate, the function that updates the figure, the number of frames to show before repeating, and how fast to run the animation (lower numbers mean faster animations).
+
 \begin{lstlisting}
+from matplotlib.animation import FuncAnimation
+
+def sine_animation():
+    # Calculate the data to be animated.
+    x = np.linspace(0, 2*np.pi, 200)[:-1]
+    y = np.sin(x)
+
+    # Create a figure and set its window boundaries.
+    fig = plt.figure()
+    plt.xlim(0, 2*np.pi)
+    plt.ylim(-1.2, 1.2)
+
+    # Draw an empty line. The comma after 'drawing' is crucial.
+    drawing, = plt.plot([],[])
+
+    # Define a function that updates the line data.
+    def update(index):
+        drawing.set_data(x[:index], y[:index])
+        return drawing,                     # Note the comma!
+
+    a = FuncAnimation(fig, update, frames=len(x), interval=10)
+    plt.show()
 \end{lstlisting}
 
+Try using the following function in place of \li{update()}.
+Can you explain why this animation is different from the original?
+
+\begin{lstlisting}
+def wave(index):
+    drawing.set_data(x, np.roll(y, index))
+    return drawing,
+\end{lstlisting}
+
+To animate multiple objects at once, define the objects separately and make sure the update function returns both objects.
+
+\begin{lstlisting}
+def sine_cosine_animation():
+    x = np.linspace(0, 2*np.pi, 200)[:-1]
+    y1, y2 = np.sin(x), np.cos(x)
+
+    fig = plt.figure()
+    plt.xlim(0, 2*np.pi)
+    plt.ylim(-1.2, 1.2)
+
+    sin_drawing, = plt.plot([],[])
+    cos_drawing, = plt.plot([],[])
+
+    def update(index):
+        sin_drawing.set_data(x[:index], y1[:index])
+        cos_drawing.set_data(x[:index], y2[:index])
+        return sin_drawing, cos_drawing,    # Note the comma!
+
+    a = FuncAnimation(fig, update, frames=len(x), interval=10)
+    plt.show()
+\end{lstlisting}
+
+Animations are very useful for describing parametrized curves, as the ``speed'' of the curve is displayed.
+The code below animates the rose curve, parametrized by the angle $\theta \in [0, 2\pi]$, given by the following equations:
+%
+\[\begin{array}{ccc}
+x(\theta) = \cos(\theta)\cos(6\theta), && y(\theta) = \sin(\theta)\cos(6\theta)
+\end{array}\]
+
+\begin{lstlisting}
+def rose_animation():
+    # Calculate the parametrized data.
+    theta = np.linspace(0, 2*np.pi, 200)
+    x = np.cos(theta)*np.cos(6*theta)
+    y = np.sin(theta)*np.cos(6*theta)
+
+    fig = plt.figure()
+    plt.xlim(-1.2, 1.2)
+    plt.ylim(-1.2, 1.2)
+    plt.gca().set_aspect("equal")           # Make the figure exactly square.
+
+    drawing, = plt.plot([],[])
+
+    # Define a function that updates the line data.
+    def update(index):
+        drawing.set_data(x[:index], y[:index])
+        return drawing,
+
+    a = FuncAnimation(fig, update, frames=len(x), interval=10, repeat=False)
+    plt.show()              # repeat=False freezes the animation at the end.
+\end{lstlisting}
+
+Animations can also be 3-dimensional.
+The only major difference is an extra operation to set the 3-dimensional component of the drawn object.
+The code below animates the space curve parametrized by the following equations:
+%
+\[\begin{array}{ccccc}
+x(\theta) = \cos(\theta)\cos(6\theta), &&
+y(\theta) = \sin(\theta)\cos(6\theta), &&
+z(\theta) = \frac{\theta}{10}
+\end{array}\]
+
+\begin{lstlisting}
+def rose_animation_3D():
+    theta = np.linspace(0, 2*np.pi, 200)
+    x = np.cos(theta)*np.cos(6*theta)
+    y = np.sin(theta)*np.cos(6*theta)
+    z = theta / 10
+
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')           # Make the figure 3-D.
+    ax.set_xlim3d(-1.2, 1.2)                # Use ax instead of plt.
+    ax.set_ylim3d(-1.2, 1.2)
+    ax.set_aspect("equal")
+
+    drawing, = ax.plot([],[],[])            # Provide 3 empty lists.
+
+    # Update the first 2 dimensions like usual, then update the 3-D component.
+    def update(index):
+        drawing.set_data(x[:index], y[:index])
+        drawing.set_3d_properties(z[:index])
+        return drawing,
+
+    a = FuncAnimation(fig, update, frames=len(x), interval=10, repeat=False)
+    plt.show()
+\end{lstlisting}
+
+\begin{comment}
 \subsection*{Interactive Plots} % ---------------------------------------------
 
 Matplotlib plots can be made interactive by adding \emph{widgets}.
