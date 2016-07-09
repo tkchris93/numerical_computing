@@ -1,5 +1,5 @@
 # solutions.py
-"""Introductory Labs: Matplotlib"""
+"""Introductory Labs: Intro to Matplotlib. Solutions file."""
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -90,6 +90,10 @@ def prob4():
 
     plt.suptitle("Solution to Problem 4")
     plt.show()
+
+
+def prob5():
+    raise NotImplementedError("PROBLEM 5 NOT WRITTEN")
 
 
 def prob6():
