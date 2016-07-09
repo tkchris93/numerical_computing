@@ -40,11 +40,10 @@ points. The if __name__ == '__main__' clause imports the solutions file and
 grades it.
 """
 
-# Wrappers ====================================================================
+# Decorators ==================================================================
 
 import signal
 from functools import wraps
-from inspect import getsourcelines
 from matplotlib import pyplot as plt
 
 def _autoclose(func):
@@ -92,8 +91,9 @@ def _timeout(seconds):
         return wrapper
     return decorator
 
-# Test Script and Class =======================================================
+# Test Driver =================================================================
 
+from inspect import getsourcelines
 # from solutions import [functions / classes that are needed for testing]
 
 def test(student_module):
@@ -173,16 +173,17 @@ class _testDriver(object):
         """Print a function's source code."""
         print "".join(getsourcelines(f)[0][len(f.__doc__.splitlines())+1 :])
 
-    @staticmethod
-    def _checkCode(func, keyword):
-        """Check a function's source code for a key word."""
+    def _checkCode(self, func, keyword):
+        """Check a function's source code for a key word. If the word is found,
+        print the code to the screen and prompt the grader to check the code.
+        Use this function to detect cheating. Returns a score out of 10.
+        """
         code = getsourcelines(func)[0][len(func.__doc__.splitlines())+1 :]
-        found = False
-        for line in code:
-            if keyword in line:
-                print line,
-                found = True
-        return found
+        if any([keyword in line for line in code]):
+            print("\nStudent {}() code:\n{}\nCheating? [OK=10, Bad=0]".format(
+                                                func.__name__, "".join(code)))
+            return self._grade(10)
+        return 10
 
     def _addFeedback(self, correct, student, message):
         """Add the correct answer, the student's answer, and a message to the
@@ -256,5 +257,3 @@ if __name__ == '__main__':
     # from importlib import reload  # Python 3.4+
     # reload(solutions)
     test(solutions)
-
-

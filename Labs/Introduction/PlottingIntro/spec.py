@@ -1,7 +1,9 @@
-# solutions.py
-"""Introductory Labs: Intro to Matplotlib. Solutions file."""
-import numpy as np
-from matplotlib import pyplot as plt
+# name this file 'solutions.py'.
+"""Introductory Labs: Intro to Matplotlib.
+<Name>
+<Class>
+<Date>
+"""
 
 
 def var_of_means(n):
@@ -15,16 +17,14 @@ def var_of_means(n):
     Returns:
         (float) The variance of the means of each row.
     """
-    A = np.random.randn(n,n)
-    return A.mean(axis=1).var()
+    pass
+
 
 def prob1():
     """Create an array of the results of var_of_means() with inputs
     n = 100, 200, ..., 1000. Plot and show the resulting array.
     """
-    y = np.array([var_of_means(n) for n in xrange(100, 1100, 100)])
-    plt.plot(y)
-    plt.show()
+    pass
 
 
 def prob2():
@@ -32,11 +32,7 @@ def prob2():
     [-2pi, 2pi]. Make sure the domain is refined enough to produce a figure
     with good resolution.
     """
-    x = np.linspace(-2*np.pi, 2*np.pi, 200)
-    plt.plot(x, np.sin(x))
-    plt.plot(x, np.cos(x))
-    plt.plot(x, np.arctan(x))
-    plt.show()
+    pass
 
 
 def prob3():
@@ -45,12 +41,7 @@ def prob3():
         2. Plot both curves with a thick, dashed magenta line.
         3. Change the range of the y-axis to [-6,6].
     """
-    x1, x2 = np.split(np.linspace(-2, 6, 200), [75])
-    # x1, x2 = np.linspace(-2, 1, 75), np.linspace(1, 6, 125)
-    plt.plot(x1, 1/(x1 - 1), 'm--', lw=4)
-    plt.plot(x2, 1/(x2 - 1), 'm--', lw=4)
-    plt.ylim(-6, 6)
-    plt.show()
+    pass
 
 
 def prob4():
@@ -66,30 +57,7 @@ def prob4():
              2sin(x): blue dashed line.
             2sin(2x): magenta dotted line.
     """
-    x = np.linspace(0, 2*np.pi, 200)
-
-    plt.subplot(221)    # sin(x)
-    plt.plot(x, np.sin(x), 'g-', lw=2)
-    plt.axis([0, 2*np.pi, -2, 2])
-    plt.title("sin(x)")
-
-    plt.subplot(222)    # sin(2x)
-    plt.plot(x, np.sin(2*x), 'r--', lw=2)
-    plt.axis([0, 2*np.pi, -2, 2])
-    plt.title("sin(2x)")
-
-    plt.subplot(223)    # 2sin(x)
-    plt.plot(x, 2*np.sin(x), 'b--', lw=2)
-    plt.axis([0, 2*np.pi, -2, 2])
-    plt.title("2sin(x)")
-
-    plt.subplot(224)    # 2sin(2x)
-    plt.plot(x, 2*np.sin(2*x), 'm:', lw=2)
-    plt.axis([0, 2*np.pi, -2, 2])
-    plt.title("2sin(2x)")
-
-    plt.suptitle("Solution to Problem 4")
-    plt.show()
+    pass
 
 
 def prob5():
@@ -106,25 +74,4 @@ def prob6():
         3. Choose a non-default color scheme.
         4. Add a colorbar to each subplot.
     """
-
-    # Define the mesgrid and calculate f() on the grid.
-    x = np.linspace(-2*np.pi, 2*np.pi, 200)
-    y = np.copy(x)
-    X, Y = np.meshgrid(x,y)
-    Z = np.sin(X)*np.sin(Y)/(X*Y)
-
-    plt.subplot(121)        # Heat map.
-    plt.pcolormesh(X, Y, Z, cmap="Spectral")
-    plt.axis([-2*np.pi, 2*np.pi, -2*np.pi, 2*np.pi])
-    plt.colorbar()
-
-    plt.subplot(122)        # Contour map.
-    plt.contour(X, Y, Z, 10, cmap="Spectral")
-    plt.axis([-2*np.pi, 2*np.pi, -2*np.pi, 2*np.pi])
-    plt.colorbar()
-
-    plt.suptitle("Solution to Problem 6")
-    plt.show()
-
-if __name__ == '__main__':
-    prob6()
+    pass

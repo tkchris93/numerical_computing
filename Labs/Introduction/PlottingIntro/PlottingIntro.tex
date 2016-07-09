@@ -8,7 +8,7 @@ The plotting techniques presented here will be used in the majority of the labs 
 \section*{Line Plots} % =======================================================
 
 The quickest way to visualize a simple 1-D array is via a \emph{line plot}.
-In the following example, we create an array to visualize and plot it using the \li{matplotlib} module.\footnote{Like NumPy, Matplotlib is \emph{not} part of the Python standard library, but is included in most Python distributions.}
+The following code creates an array of outputs of the function $f(x) = x^2$, then visualizes the array using the \li{matplotlib} module.\footnote{Like NumPy, Matplotlib is \emph{not} part of the Python standard library, but it is included in most Python distributions.}
 
 \begin{lstlisting}
 >>> import numpy as np
@@ -36,13 +36,13 @@ Calling \li{plt.show()} then displays the figure.
 \centering
 \begin{subfigure}{.5\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{basic1.pdf}
+    \includegraphics[width=\linewidth]{figures/basic1.pdf}
     \caption{\li{plt.plot(y)} uses the indices of\\the array for the $x$-axis.}
     \label{fig:basic1}
 \end{subfigure}%
 \begin{subfigure}{.5\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{basic2.pdf}
+    \includegraphics[width=\linewidth]{figures/basic2.pdf}
     \caption{\li{plt.plot(x,y)} specifies both the\\domain and the range.}
     \label{fig:basic2}
 \end{subfigure}
@@ -61,14 +61,14 @@ Write a function that accepts an integer $n$ as input.
 Define a new function that creates an array of the results of the first function with inputs $n = 100,\ 200,\ \ldots,\ 1000$.
 Plot (and show) the resulting array.
 
-This illustrates one version of the \emph{Law of Large Numbers}.
+This result illustrates one version of the \emph{Law of Large Numbers}.
 \end{problem}
 
 \subsection*{Specifying a Domain} % -----------------------------------------
 
 An obvious problem with Figure \ref{fig:basic1} is that the $x$-axis does not correspond correctly to the $y$-axis for the function $f(x) = x^2$ that is being drawn.
-To correct this, we provide an array for the domain as well as one for the range.
-That is, we first define an array \li{x} for the domain, then use that array to calculate the range \li{y} of the function we would like to plot.
+To correct this, we need an array for the domain as well as one for the range.
+First define an array \li{x} for the domain, then use that array to calculate the range \li{y} of $f$.
 The command \li{plt.plot(x,y)} then plots \li{x} against \li{y}.
 That is, each point \li{(x[i], y[i])} is drawn and consecutive points are connected.
 % Thus both arrays must have the same number of elements to be compatible.
@@ -99,7 +99,7 @@ The next time a \li{plt} function is called a new figure is created.
 This makes it possible to plot several lines in a single figure.
 
 \begin{problem} % Plot two lines (sin() and cos()).
-Plot the functions $\sin(x)$, $\cos(x)$, and $\arctan(x)$ on the domain $[-2\pi, 2\pi]$ (use \li{np.pi} for $\pi$).
+Write a function that plots the functions $\sin(x)$, $\cos(x)$, and $\arctan(x)$ on the domain $[-2\pi, 2\pi]$ (use \li{np.pi} for $\pi$).
 % Call \li{plt.xlim(-2*np.pi, 2*np.pi)} before \li{plt.show()} to stretch the $x$-axis appropriately.
 Make sure the domain is refined enough to produce a figure with good resolution.
 \end{problem}
@@ -134,7 +134,7 @@ It is wise to use interactive mode \textbf{only} with IPython, as it exhibits er
 
 \li{plt.plot()} receives several keyword arguments for customizing the drawing.
 For example, the color and style of the line are specified by the following string arguments.
-
+%
 \begin{table}[H] % Color and style.
 \begin{tabular}{r|l}
     Key & Color \\
@@ -152,7 +152,7 @@ For example, the color and style of the line are specified by the following stri
 \begin{tabular}{r|l}
     Key & Style \\
     \hline
-    \li{'-'}' & solid line\\
+    \li{'-'} & solid line\\
     \li{'--'} & dashed line\\
     \li{'-.'} & dash-dot line\\
     \li{':'} & dotted line\\
@@ -166,11 +166,11 @@ For example, the color and style of the line are specified by the following stri
 
 Specify one or both of these string codes as an argument to \li{plt.plot()} to change from the default color and style.
 Other \li{plt} functions further customize a figure.
-
+%
 \begin{table}[H]
 \centering
 \begin{tabular}{r|l}
-    Function & Description\\
+    Function & \multicolumn{1}{|c}{Description}\\
     \hline
     % \li{grid()} & Add grid lines\\
     \li{legend()} & Place a legend in the plot\\
@@ -187,13 +187,13 @@ Other \li{plt} functions further customize a figure.
 
 \begin{lstlisting}
 >>> x1 = np.linspace(-2, 4, 100)
->>> plt.plot(x1, np.exp(x1), 'g:', linewidth=2, label="Exponential")
+>>> plt.plot(x1, np.exp(x1), 'g:', linewidth=6, label="Exponential")
 >>> plt.title("This is the title.", fontsize=18)
 >>> plt.legend(loc="upper left")    # plt.legend() uses the 'label' argument of
 >>> plt.show()                      # plt.plot() to create a legend.
 
 >>> x2 = np.linspace(1, 4, 100)
->>> plt.plot(x2, np.log(x2), 'r+', linewidth=2)
+>>> plt.plot(x2, np.log(x2), 'r+', markersize=4)
 >>> plt.xlim(0, 5)                  # Set the visible limits of the x axis.
 >>> plt.xlabel("The x axis")        # Give the x axis a label.
 >>> plt.show()
@@ -202,14 +202,15 @@ Other \li{plt} functions further customize a figure.
 \begin{figure}[H] % Figure customizations.
 \captionsetup[subfigure]{justification=centering}
 \centering
-\begin{subfigure}{.5\textwidth}
+\begin{subfigure}{.49\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{custom1.pdf}
+    \includegraphics[width=\linewidth]{figures/custom1.pdf}
     \label{fig:custom1}
-\end{subfigure}%
-\begin{subfigure}{.5\textwidth}
+\end{subfigure}
+%
+\begin{subfigure}{.49\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{custom2.pdf}
+    \includegraphics[width=\linewidth]{figures/custom2.pdf}
     \label{fig:custom2}
 \end{subfigure}
 \label{fig:custom}
@@ -229,35 +230,9 @@ The keyword arguments \li{linewidth} or \li{lw} specify the line thickness.
 The plot should resemble the figure below.
 
 \begin{figure}[H] % Solution.
-\includegraphics[width=.7\textwidth]{soln2.pdf}
+\includegraphics[width=.5\textwidth]{figures/discontinuousProblem.pdf}
 \end{figure}
 \end{problem}
-
-\begin{comment} % Could still maybe be a good problem if simplified (?)
-\begin{problem} Plot the curve $\frac{\sin(x)}{x+1}$ from $0$ to $10$.
-
-Use blue shading under the curve when it is positive and red when it is negative (you may want to consider using \li{plt.fill_between()}.
-Make the line dotted.
-Label the x-axis ``x-axis'', the y-axis ``y-axis'',and the plot ``My Plot''.
-Enable the grid lines.
-
-Finally, use \li{plt.scatter()} to include a scatter plot of half of the value of the function at each of its maxima and minima in the range.
-Display these points as upward-pointing triangles.
-Don't forget to make sure the x limits of the plot are still 0 and 10.
-
-\emph{Hint}: Since you are working with arrays of discrete values, you will want to find the index values where your $x$ and $y$ values are closest to the actual maxima and minima. As you work, consider the following:
-\begin{itemize}
-\item How would you manually find maxima and minima of a function?
-\item How could you do something similar with your $x$ and $y$ arrays?
-\end{itemize}
-The plot should look like the figure below.
-
-\begin{figure}[H]
-\includegraphics[width=\textwidth]{soln3.pdf}
-\label{fig:problem3}
-\end{figure}
-\end{problem}
-\end{comment}
 
 \subsection*{Subplots} % ------------------------------------------------------
 
@@ -265,66 +240,110 @@ The plot should look like the figure below.
 To create a figure with a grid of subplots, use \li{plt.subplot(numrows, numcols, fignum)}.
 Here, \li{numrows} is the number of rows of subplots in the figure, \li{numcols} is the number of columns, and \li{fignum} specifies which subplot to modify.
 % This index starts at 1 and increments across rows first.
-See Figure \ref{fig:subplots}.
+See Figure \ref{fig:subplots-layout}.
 
-\begin{lstlisting}
->>> x = np.linspace(-np.pi, np.pi, 200)
->>> plt.subplot(2, 1, 1)            # Draw the first subplot.
->>> plt.plot(x, np.sin(x), 'b', linewidth=2)
->>> plt.xlim(-np.pi, np.pi)
->>> plt.subplot(2, 1, 2)            # Draw the second subplot.
->>> plt.plot(x, np.cos(x), 'c', linewidth=2)
->>> plt.xlim(-np.pi, np.pi)
->>> plt.show()                      # Show the figure with two subplots.
-\end{lstlisting}
-
-\begin{figure}[H] % Subplots
+\begin{figure}[H] % The layout created by subplots(23i).
 \captionsetup[subfigure]{justification=centering}
 \centering
-\begin{subfigure}{.49\textwidth}
+\begin{subfigure}{.15\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{layout.pdf}
-    \caption{The layout of subplots with \li{plt.subplot(2,3,i)} (2 rows, 3 columns), where \li{i} is the index pictured above.}
-    \label{fig:layout}
+    \includegraphics[width=\linewidth]{figures/layout_1.pdf}
 \end{subfigure}
 %
-\begin{subfigure}{.49\textwidth}
+\begin{subfigure}{.15\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{subplots.pdf}
-    \caption{The graphs of $\sin(x)$ and $\cos(x)$ as subplots in a single figure with 2 rows\\and 1 column.}
-    \label{fig:sincossubplots}
+    \includegraphics[width=\linewidth]{figures/layout_2.pdf}
 \end{subfigure}
-\label{fig:subplots}
+%
+\begin{subfigure}{.15\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/layout_3.pdf}
+\end{subfigure}
+\\
+\begin{subfigure}{.15\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/layout_4.pdf}
+\end{subfigure}
+%
+\begin{subfigure}{.15\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/layout_5.pdf}
+\end{subfigure}
+%
+\begin{subfigure}{.15\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/layout_6.pdf}
+\end{subfigure}
+\caption{The layout of subplots with \li{plt.subplot(2,3,i)} (2 rows, 3 columns), where \li{i} is the index pictured above.}
+\label{fig:subplots-layout}
 \end{figure}
 
 If the inputs for \li{plt.subplot()} are all integers, the commas between the entries can be omitted.
 For example, \li{plt.subplot(3,2,2)} and \li{plt.subplot(322)} are equivalent.
 
-\begin{comment}
-\begin{problem} % A new subplots problem (?)
-Write a function to plot the functions $sin(x)$, $sin(2x)$, $2sin(x)$, and $2sin(2x)$ over the interval $[0, 4pi]$.
+\begin{lstlisting}
+>>> x = np.linspace(.1, 2, 200)
+
+>>> plt.subplot(121)                # Start drawing the first subplot.
+>>> plt.plot(x, np.exp(x), 'k', lw=2)
+>>> plt.plot(x, np.exp(2*x), 'b', lw=2)
+>>> plt.title("Exponential", fontsize=18)
+
+>>> plt.subplot(122)                # Start drawing the second subplot.
+>>> plt.plot(x, np.log(x), 'k', lw=2)
+>>> plt.plot(x, np.log(2*x), 'b', lw=2)
+>>> plt.title("Logarithmic", fontsize=18)
+
+>>> plt.show()
+\end{lstlisting}
+
+\begin{figure}[H] % The layout created by subplots(23i).
+\captionsetup[subfigure]{justification=centering}
+\centering
+\begin{subfigure}{.49\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/subplots_1.pdf}
+\end{subfigure}
+%
+\begin{subfigure}{.49\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/subplots_2.pdf}
+\end{subfigure}
+\end{figure}
+
+\begin{problem} % Subplots of sine functions.
+Write a function that plots the functions $\sin(x)$, $\sin(2x)$, $2\sin(x)$, and $2\sin(2x)$ on the domain $[0, 2\pi]$, each in a separate subplot.
 \begin{enumerate}
-\item Arrange the plots in a square grid of 4 subplots.
-\item Use \li{plt.title()} to give each subplot an appropriate title.
-\item Use \li{plt.suptitle()} to give the overall figure a title.
-\item Adjust the color and linewidth of each line to match the figure below.
+    \item Arrange the plots in a square grid of 4 subplots.
+    \item Set the limits of each subplot to $[0, 2\pi]\times[-2,2]$.
+    \\(Hint: \li{plt.axis()} can do this in one line, instead of using both
+    \\\li{plt.xlim()} and \li{plt.ylim()}.)
+    \item Use \li{plt.title()} to give each subplot an appropriate title.
+    \item Use \li{plt.suptitle()} to give the overall figure a title.
+    \item Use the following colors and line styles.
+    \begin{align*}\begin{array}{rcl}
+    \sin(x)\text{: plain green line.} && \sin(2x)\text{: red dashed line.}\\ \\
+    2\sin(x)\text{: blue dashed line.} && 2\sin(2x)\text{: magenta dotted line.}
+    \end{array}\end{align*}
 \end{enumerate}
-The plot should look like the figure below.
-
-% FIGURE HERE
-
 \end{problem}
-\end{comment}
 
 \section*{Other Kinds of Plots} % =============================================
 
-A \emph{histogram} groups entries of a 1-D data set into a given number of intervals, called \emph{bins}.
-Each bin has a bar whose height indicates the number of values that fall in the range of the bin.
-To create a histogram, use \li{plt.hist()} instead of \li{plt.plot()}.
-% We may specify the number of bins and the range of values to control the precision of the plot.
+Line plots are not always the most illuminating choice graph to describe a set of data.
+Matplotlib provides several other easy ways to visualize data.
 
-A \emph{scatter plot} plots two arrays against each other without drawing lines between the points.
-Use \li{plt.scatter()}, or use \li{plt.plot()} and specify a point marker (such as \li{'o'} or \li{'+'}) for the line style.
+\begin{itemize}
+\item A \emph{histogram} groups entries of a 1-dimensional data set into a given number of intervals, called \emph{bins}.
+Each bin has a bar whose height indicates the number of values that fall in the range of the bin.
+
+To create a histogram, use \li{plt.hist()} instead of \li{plt.plot()}.
+Specify the number of bins with the argument \li{bins} and the range of values with the argument \li{<<range>>} to control the precision of the plot.
+
+\item A \emph{scatter plot} plots two 1-dimensional arrays against each other without drawing lines between the points.
+
+To create a scatter plot, use \li{plt.scatter()}, or use \li{plt.plot()} and specify a point marker (such as \li{'o'} or \li{'+'}) for the line style.
+\end{itemize}
 
 \begin{lstlisting}
 # Get 2 sets of 20 random integers in the interval [1, 11).
@@ -333,24 +352,24 @@ Use \li{plt.scatter()}, or use \li{plt.plot()} and specify a point marker (such 
 # Draw a histograms and a scatter plot to display the data.
 >>> plt.subplot(121)
 >>> plt.hist(x, bins=10, <<range>>=[.5, 10.5])
+
 >>> plt.subplot(122)
 >>> plt.scatter(x, y, s=100)        # The 's' argument specifies the marker size.
 >>> plt.show()
 \end{lstlisting}
 
 \begin{figure}[H]
+\captionsetup[subfigure]{justification=centering}
 \centering
-\begin{subfigure}{.5\textwidth}
+\begin{subfigure}{.49\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{histogram.pdf}
-    % \caption{A histogram.}
+    \includegraphics[width=\linewidth]{figures/histogram.pdf}
     \label{fig:histogram}
-\end{subfigure}%
-\begin{subfigure}{.5\textwidth}
+\end{subfigure}
+%
+\begin{subfigure}{.49\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{scatter.pdf}
-    % \caption{A scatter plot.}
-    \label{fig:scatter}
+    \includegraphics[width=\linewidth]{figures/scatterplot.pdf}
 \end{subfigure}
 \end{figure}
 
@@ -374,36 +393,19 @@ Choose an appropriate range and number of bins to display the data accurately.
 Plot a red horizontal line whose height is equal to the mean of the \li{x} data.\\
 (Hint: \li{plt.hlines()} may be useful.)
 \end{enumerate}
-
-\begin{figure}[H]
-\centering
-\begin{subfigure}{.5\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{histogram.pdf}
-    % \caption{A histogram.}
-    \label{fig:histogram}
-\end{subfigure}%
-\begin{subfigure}{.5\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{scatter.pdf}
-    % \caption{A scatter plot.}
-    \label{fig:scatter}
-\end{subfigure}
-\caption{TODO: Replace this figure (or nuke it).}
-\end{figure}
 \end{problem}
 
 Other kinds of plots for 1-D data includes bar plots, box plots, and others.
 See Appendix \ref{mpltables} for more.
 
-\subsection*{Visualizing 2-D Data} % ------------------------------------------
+\section*{Visualizing 2-D Data} % =============================================
 
 To plot a function $f: \mathbb{R}^2 \rightarrow \mathbb{R}$, we must choose and construct a 2-D domain, then calculate the function at each point of that domain.
 NumPy's \li{np.meshgrid()} is the standard tool for creating a 2-D domain in the Cartesian plane.
 Given two 1-D coordinate arrays, \li{np.meshgrid()} creates two corresponding coordinate matrices.
-See Figure \ref{fig:meshgrid} for a visual explanation.
+% See Figure \ref{fig:meshgrid} for a visual explanation.
 
-\begin{figure} % np.meshgrid() visual demonstration.
+\begin{figure}[h] % np.meshgrid() visual demonstration.
 \begin{tikzpicture}[>=stealth', shorten <= .1cm,shorten >=.1cm, dot/.style=
     {circle,fill=black,minimum size=3pt,inner sep=0pt, outer sep=-1pt} ]
 
@@ -451,66 +453,83 @@ Specifically, the arrays \li{X} and \li{Y} satisfy \li{(X[i,j], Y[i,j]) = (x[i],
 \label{fig:meshgrid}
 \end{figure}
 
-With a domain, we can visualize $f$ with a \emph{heat map}.% or a \emph{surface plot}.
-A heat map assigns a color to each entry in the matrix, producing a 2-D picture describing a 3-D shape.
+With a 2-dimensional domain, we usually visualize $f$ with two kinds of plots.
+
+\begin{itemize}
+\item A \emph{heat map} assigns a color to each entry in the matrix, producing a 2-D picture describing a 3-D shape.
+Darker colors typically correspond to lower values while lighter colors typically correspond to higher values.
+
 Use \li{plt.pcolormesh()} to create a heat map.
-% Matplotlib can also produce 3-D surface plots, but we will prefer to use Mayavi for 3-D plots.
+
+\item A \emph{contour map} draws several \emph{level curves} of $f$.
+A level curve corresponding to the constant $c$ is the collection of points $\left\{(x,y)\mid c = f(x,y)\right\}$.
+Coloring the space between the level curves produces a discretized version of a heat map.
+Including more and more level curves makes a filled contour plot look more and more like the complete, blended heat map.
+
+Use \li{plt.contour()} to create a contour plot and \li{plt.contourf()} to create a filled contour plot.
+Specify either the number of level curves to draw, or a list of constants corresponding to specific level curves.
+\end{itemize}
+
+These three functions all receive the keyword argument \li{cmap} to specify a color scheme (some of the better schemes are \li{"viridis"}, \li{"magma"}, and \li{"Spectral"}).
+See \url{http://matplotlib.org/examples/color/colormaps_reference.html} for the list of all Matplotlib color schemes.
+
+Finally, to see how the colors in these plots relate to the values of the function, use \li{plt.colorbar()} to draw the color scale beside the plot.
 
 \begin{lstlisting}
 # Create a 2-D domain with np.meshgrid().
->>> x = np.linspace(-np.pi, np.pi, n)
->>> y = np.copy(x)
+>>> x = np.linspace(-np.pi, np.pi, 100)
+>>> y = x.copy()
 >>> X, Y = np.meshgrid(x, y)
 
 # Calculate z = f(x,y) = sin(x)sin(y) using the meshgrid coordinates.
->>> Z = np.sin(X)*np.sin(Y)
+>>> Z = np.sin(X) * np.sin(Y)
 
-# Plot the heat map.
->>> plt.pcolormesh(X, Y, Z)
->>> plt.colorbar()                  # Show the color scale.
+# Plot the heat map of f over the 2-D domain.
+>>> plt.subplot(131)
+>>> plt.pcolormesh(X, Y, Z, cmap="viridis")
+>>> plt.colorbar()
 >>> plt.xlim(-np.pi, np.pi)
 >>> plt.ylim(-np.pi, np.pi)
+
+# Plot a contour map of f with 10 level curves.
+>>> plt.subplot(132)
+>>> plt.contour(X, Y, Z, 10, cmap="Spectral")
+
+# Plot a filled contour map, specifying the level curves.
+>>> plt.subplot(133)
+>>> plt.contourf(X, Y, Z, [-1, -.8, -.5, 0, .5, .8, 1], cmap="magma")
+
 >>> plt.show()
 \end{lstlisting}
 
-
-\begin{figure}[H] % 2D heat map vs 3D surface.
+\begin{figure}[H] % heat map and contour plots.
 \captionsetup[subfigure]{justification=centering}
 \centering
-\begin{subfigure}{.5\textwidth}
+\begin{subfigure}{.33\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{sinxsiny.png}
-    \caption{A heat map of $f$.}
-    \label{fig:heatmap}
+    \includegraphics[width=\linewidth]{figures/heatmap.png}
 \end{subfigure}%
-\begin{subfigure}{.5\textwidth}
+\begin{subfigure}{.33\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{sinxsiny_3d.pdf}
-    \caption{A 3-D surface plot of $f$.}
-    \label{fig:surface}
+    \includegraphics[width=\linewidth]{figures/contour.pdf}
+\end{subfigure}%
+\begin{subfigure}{.33\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/contourf.pdf}
 \end{subfigure}
-\caption{Visualization of the function $f(x,y) = \sin(x)\sin(y)$.}
 \end{figure}
 
-\begin{problem} % Heatmap problem
+\begin{problem} % Heat map / contour plot of a function f:R2->R.
 \label{prob:heatmap}
-Write a function to plot a heat map of $f(x,y) = \frac{\sin(x)\sin(y)}{xy}$ on the domain $[-2\pi,2\pi] \times [-2\pi,2\pi]$.
+Write a function to plot $f(x,y) = \frac{\sin(x)\sin(y)}{xy}$ on the domain $[-2\pi,2\pi] \times [-2\pi,2\pi]$.
 
 \begin{enumerate}
-\item The keyword \li{cmap} for \li{plt.pcolormesh()} determines the coloring scheme for the heat map.
-Choose a non-default color scheme (\li{'Spectral'} is used in the figure displayed below).
-For the list of all Matplotlib color schemes, see\\\url{http://matplotlib.org/examples/color/colormaps_reference.html}.
-\item Include the color scale bar.
-\item Change the limits on the $x$- and $y$-axes so that the plot is only over the domain $[-2\pi,2\pi] \times [-2\pi,2\pi]$.
-% \item Fix the aspect ratio of your plot so that it is a square using the line \li{plt.gca().set_aspect('equal')}.
+\item Create 2 subplots: one with a heat map of $f$, and one with a contour map of $f$.
+Choose an appropriate number of level curves, or specify the curves yourself.
+\item Set the limits of each subplot to $[-2\pi,2\pi] \times [-2\pi,2\pi]$.
+\item Choose a non-default color scheme.
+\item Include the color scale bar for each subplot.
 \end{enumerate}
-The plot should be similar to the figure below.
-
-\begin{figure}[H]
-\includegraphics[width=.7\textwidth]{pcolor2.png}
-% \caption{Correct output for Problem \ref{prob:heatmap}.}
-% \label{fig:heatmapProb}
-\end{figure}
 \end{problem}
 
 \begin{info} % Note about plt.imshow().
@@ -522,10 +541,10 @@ This kind of data does not require a domain, and is easily visualized with \li{p
 
 \section*{Additional Material} % ==============================================
 
-\subsection*{3-D Plotting with Matplotlib} % ----------------------------------
+\subsection*{3-D Plotting} % --------------------------------------------------
 
-Matplotlib can also be used for 3D plotting, though it is much slower and not as visually appealing as Mayavi plots.
-The following code produces Figure \ref{fig:surface}.
+Matplotlib can also be used for 3D plotting.
+The following code produces the surface corresponding to $f(x,y) = \sin(x)\sin(y)$.
 
 \begin{lstlisting}
 # Create the domain and calculate the range like usual.
@@ -575,17 +594,12 @@ Consider the following example, TAKEN FROM THE MATPLOTLIB DOCS BASICALLY AHHH
 \end{lstlisting}
 
 \begin{figure}[H]
-\includegraphics[width=.7\textwidth]{interact.pdf}
-\caption{A snapshot of an interactive plot made using Matplotlib.}
-\label{mpl:interact} \end{figure}
-
-% \begin{problem} Modify the code above to add a third slider to
-% manipulate the phase of the wave shown. Have it range from 0 to $2\pi$
-% and set the default value to zero. \end{problem}
+\includegraphics[width=.7\textwidth]{figures/interact.pdf}
+\end{figure}
 
 \subsection*{Animations} % ----------------------------------------------------
 
-Stuff from Volume 4.
+Stuff from Volume 4. % TODO
 
 % =============================================================================
 % =============================================================================
@@ -595,21 +609,11 @@ Stuff from Volume 4.
 
 \begin{comment}
 \begin{info} % IPython Notebook inline plotting (move to another lab!)
-If you are executing these Matplotlib commands in an IPython shell, executing the \li{plt.show} method will open a new window with the plot. If you are using IPython Notebook, you have the option to display the plots within your notebook. You may opt into this feature by running \li{\%matplotlib inline} or \li{\%matplotlib notebook} in your IPython Notebook. The \li{inline} option shows the plot, whereas the \li{notebook} option shows the plot and provides controls to interact with the plot. Additionally, when using this option, the plot is displayed after running the \li{plt.plot} command; the \li{plt.show} command is not necessary.
+If you are executing these Matplotlib commands in an IPython shell, executing the \li{plt.show()} method will open a new window with the plot.
+If you are using IPython Notebook, you have the option to display the plots within your notebook.
+You may opt into this feature by running \li{\%matplotlib inline} or \li{\%matplotlib notebook} in your IPython Notebook.
+The \li{inline} option shows the plot, whereas the \li{notebook} option shows the plot and provides controls to interact with the plot.
+Additionally, when using this option, the plot is displayed after running the \li{plt.plot()} command; the \li{plt.show()} command is not necessary.
 \end{info}
 \end{comment}
 
-
-\begin{comment} % This will be covered in the Complex labs.
-\begin{problem} Use \li{plt.pcolormesh()} to plot the absolute value of the function $x^3 +2x^2 -x +3$ on the complex plane with 0 $\leq$ \li{x} $\leq$ 2 and 0 $\leq$ \li{y} $\leq$ 2.
-\emph{Helpful Hint}: First create your domain arrays, then convert these to a single array of complex variables to evaluate the function.
-
-The plot should look like Figure \ref{fig:pcolormesh}.
-
-\begin{figure}[H] % Complex colorplot
-\includegraphics[width=\textwidth]{pcolor2.png}
-\caption{Another example of a colorplot.}
-\label{fig:pcolormesh}
-\end{figure}
-\end{problem}
-\end{comment}
