@@ -68,18 +68,19 @@ def prob1():
 @_save("custom1.pdf")
 def custom1(N):
     x = np.linspace(-2, 4, N)
-    plt.plot(x, np.exp(x), 'g:', linewidth=4, label="Exponential")
-    # plt.xlabel("The x axis.")
+    plt.plot(x, np.exp(x), 'g:', linewidth=6, label="Exponential")
+    plt.xlabel("The x axis.", color='white')
     plt.title("This is the title.", fontsize=18)
     plt.legend(loc="upper left")
 
 @_save("custom2.pdf")
 def custom2(N):
     x = np.linspace(1, 4, N)
-    plt.plot(x, np.log(x), 'r+', linewidth=2)
+    plt.plot(x, np.log(x), 'r+', markersize=4)
     # plt.grid()
     plt.xlim(0, 5)
     plt.xlabel("The x axis")
+    plt.title("This is the title.", fontsize=18, color='w')
 
 @_save("discontinuousProblem.pdf")
 def prob3_solution():
@@ -129,58 +130,53 @@ def prob4(N=200):
 
 # Problem 5 -------------------------------------------------------------------
 
-@_save("scatter.pdf")
+@_save("scatterplot.pdf")
 def scatter():
     x = np.random.randint(1, 11, 20)
     y = np.random.randint(1, 11, 20)
-
-    # Draw two histograms and a scatter plot to display the data.
-    plt.hist(x, bins=10, range=[.5, 10.5])
-    plt.savefig("histogram.pdf", format='pdf')
-    plt.clf()
-
     plt.scatter(x, y, s=100)
+    return x
+
+@_save("histogram.pdf")
+def hist(x):
+    plt.hist(x, bins=10, range=[.5, 10.5])
+
+def prob5():
+    x = scatter()
+    hist(x)
 
 # Problem 6 -------------------------------------------------------------------
 
-@_save("sinxsiny.png")
-def sinxsiny(N):
+@_save("heatmap.png")
+def heatmap(N):
     x = np.linspace(-np.pi, np.pi, N)
     y = x.copy()
     X, Y = np.meshgrid(x, y)
 
-    plt.pcolormesh(X, Y, np.sin(X) * np.sin(Y))
+    plt.pcolormesh(X, Y, np.sin(X) * np.sin(Y), cmap="viridis")
                         # edgecolors='face', shading='flat')
+    plt.axis([-np.pi, np.pi, -np.pi, np.pi])
     plt.colorbar()
-    plt.xlim(-np.pi, np.pi); plt.ylim(-np.pi, np.pi)
 
-@_save("colormeshProblem.png")
-def prob6_solution(N):
-    x = np.linspace(-2*np.pi, 2*np.pi, N)
-    y = np.copy(x)
-    X, Y = np.meshgrid(x,y)
-    Z = np.sin(X)*np.sin(Y)/(X*Y)
+    return X, Y
 
-    plt.pcolormesh(X, Y, Z, cmap="Spectral")
+@_save("contour.pdf")
+def contour(X, Y):
+    plt.contour(X, Y, np.sin(X) * np.sin(Y), 10, cmap="Spectral")
     plt.colorbar()
-    plt.xlim(-2*np.pi, 2*np.pi)
-    plt.ylim(-2*np.pi, 2*np.pi)
+
+@_save("contourf.pdf")
+def contourf(X, Y):
+    plt.contourf(X, Y, np.sin(X) * np.sin(Y), [-1, -.8, -.5, 0, .5, .8, 1],
+                 cmap="magma")
+    plt.colorbar()
 
 def prob6():
-    sinxsiny(200)
-    prob6_solution(200)
+    x, y = heatmap(200)
+    contour(x, y)
+    contourf(x, y)
 
 # Additional Material ---------------------------------------------------------
-
-@_save("sinxsiny_3d.pdf")
-def sinxsiny_3d():
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
-    x = np.linspace(-np.pi, np.pi, 101)
-    y = x.copy()
-    X, Y = np.meshgrid(x, y)
-    ax.view_init(elev=26, azim=-76)
-    ax.plot_surface(X, Y, np.sin(X)*np.sin(Y))
 
 def widget_plot():
     ax = plt.subplot(111)
@@ -210,9 +206,8 @@ def save_all():
     prob1()
     prob3()
     prob4()
-    # scatter()
+    prob5()
     prob6()
-    # sinxsiny_3d()
 
 if __name__ == '__main__':
     save_all()

@@ -3,6 +3,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
+
 def var_of_means(n):
     """Construct a random matrix A with values drawn from the standard normal
     distribution. Calculate the mean value of each row, then calculate the
@@ -25,6 +26,7 @@ def prob1():
     plt.plot(y)
     plt.show()
 
+
 def prob2():
     """Plot the functions sin(x), cos(x), and arctan(x) on the domain
     [-2pi, 2pi]. Make sure the domain is refined enough to produce a figure
@@ -35,6 +37,7 @@ def prob2():
     plt.plot(x, np.cos(x))
     plt.plot(x, np.arctan(x))
     plt.show()
+
 
 def prob3():
     """Plot the curve f(x) = 1/(x-1) on the domain [-2,6].
@@ -49,14 +52,19 @@ def prob3():
     plt.ylim(-6, 6)
     plt.show()
 
+
 def prob4():
     """Plot the functions sin(x), sin(2x), 2sin(x), and 2sin(2x) over the
     domain [0, 2pi].
         1. Arrange the plots in a square grid of four subplots.
         2. Set the limits of each subplot to [0, 2pi]x[-2, 2].
-        2. Give each subplot an appropriate title.
-        3. Give the overall figure a title.
-        4. Adjust the color and style of each line to match the fig in the lab.
+        3. Give each subplot an appropriate title.
+        4. Give the overall figure a title.
+        5. Use the following line colors and styles.
+              sin(x): plain green line.
+             sin(2x): red dashed line.
+             2sin(x): blue dashed line.
+            2sin(2x): magenta dotted line.
     """
     x = np.linspace(0, 2*np.pi, 200)
 
@@ -83,14 +91,14 @@ def prob4():
     plt.suptitle("Solution to Problem 4")
     plt.show()
 
+
 def prob6():
-    """Plot the function f(x,y) = sin(x)sin(y)/xy over the domain
+    """Plot the function f(x,y) = sin(x)sin(y)/xy on the domain
     [-2pi, 2pi]x[-2pi, 2pi].
-        1. Create 2 subplots, side-by-side. In the first subplot, draw a heat
-            map of f. In the second subplot, draw a contour map of f with 10
-            level curves.
+        1. Create 2 subplots: one with a heat map of f, and one with a contour
+            map of f. Choose an appropriate number of level curves.
         2. Set the limits of each subplot to [-2pi, 2pi]x[-2pi, 2pi].
-        3. Add a colorbar to each subplot.
+        4. Add a colorbar to each subplot.
     """
 
     # Define the mesgrid and calculate f() on the grid.
