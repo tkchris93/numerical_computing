@@ -9,6 +9,7 @@ matplotlib.rcParams = matplotlib.rc_params_from_file('../../../matplotlibrc')
 from matplotlib import pyplot as plt, widgets as wg
 from functools import wraps
 from sys import stdout
+import os
 
 def _save(filename):
     """Decorator for saving, clearing, and closing figures automatically."""
@@ -18,6 +19,8 @@ def _save(filename):
         raise ValueError("Invalid file name '{}'".format(filename))
     if extension not in {"pdf", "png"}:
         raise ValueError("Invalid file extension '{}'".format(extension))
+    if not os.path.isdir("figures"):
+        os.mkdir("figures")
 
     def decorator(func):
         @wraps(func)
@@ -35,7 +38,7 @@ def _save(filename):
                 print("done.")
                 return out
             except Exception as e:
-                print("\n", e, sep='')
+                print("\n\t", e, sep='')
             finally:
                 plt.clf()
                 plt.close('all')
@@ -44,7 +47,6 @@ def _save(filename):
 
 # Plots =======================================================================
 
-import os
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -180,7 +182,19 @@ def prob6():
 
 # Additional Material ---------------------------------------------------------
 
-@_save("interact.pdf")
+@_save("surface_plot.pdf")
+def surface_plot():
+    x = np.linspace(-np.pi, np.pi, 200)
+    y = np.copy(x)
+    X, Y = np.meshgrid(x, y)
+
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    ax.view_init(elev=26, azim=-76)
+    ax.plot_surface(X, Y, np.sin(X)*np.sin(Y))
+
+
+@_save("interactive_plot.pdf")
 def widget_plot():
     ax = plt.subplot(111)
     plt.subplots_adjust(bottom=.25)
@@ -205,17 +219,20 @@ def widget_plot():
     sfreq.on_changed(update)
     samp.on_changed(update)
 
+
+def additional_material():
+    surface_plot()
+    widget_plot()
+
 # Main Routine ================================================================
 
 def save_all():
-    if not os.path.isdir("figures"):
-        os.mkdir("figures")
     prob1()
     prob3()
     prob4()
     prob5()
     prob6()
-    widget_plot()
+    additional_material()
 
 if __name__ == '__main__':
     save_all()
