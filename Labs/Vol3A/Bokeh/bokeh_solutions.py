@@ -1,6 +1,26 @@
+# To run the solutions, you must have bokeh 0.12.0 and pyproj installed.
+# To install these packages, in a terminal/commandline run
+#
+#       conda install bokeh==0.12.0
+#       conda install pyproj
+#
+# This lab also includes data sets you will need to download. To download
+# the needed data, in ipython run
+#
+#       import bokeh
+#       bokeh.sampledata.download()
+#
+# Then to view the Bokeh application, in a termrinal/commandline, run
+#
+#       bokeh serve bokeh_solutions.py
+#
+# Then navigate to localhost:5006/bokeh_solutions in your web browser.
+
+
 from __future__ import division
 import numpy as np
 import pandas as pd
+import pickle
 from bokeh.io import curdoc
 from bokeh.plotting import Figure, output_file, show
 from bokeh.layouts import column, row, layout, widgetbox
@@ -17,16 +37,12 @@ from bokeh.models.widgets import CheckboxButtonGroup, Select
 from pyproj import Proj, transform
 
 # Prep data
-accidents = pd.read_pickle("final_accidents2.pickle")
-#accidents = accidents[accidents.STATE != 2]
-#accidents = accidents[accidents.STATE != 15]
-
+accidents = pd.read_pickle("fars_accidents.pickle")
 drivers = pd.read_pickle("final_drivers.pickle")
 
-us_states = us_states.data.copy()
-
-#del us_states["HI"]
-#del us_states["AK"]
+#us_states = us_states.data.copy()
+with open("us_states.pickle", "rb") as file:
+    us_states = pickle.load(file)
 
 state_xs = [us_states[code]["lons"] for code in us_states]
 state_ys = [us_states[code]["lats"] for code in us_states]
@@ -42,6 +58,9 @@ id_to_st = {1:"AL", 2:"AK", 4:"AZ", 5:"AR", 6:"CA", 8:"CO", 9:"CT", 10:"DE",
             48:"TX", 49:"UT", 50:"VT", 51:"VA", 53:"WA", 54:"WV", 55:"WI",
             56:"WY"}
 
+with open("id_to_state.pickle", "wb") as f:
+    pickle.dump(id_to_st, f)
+
 st_to_id = {v: k for k, v in id_to_st.items()}
 
 id_list = []
@@ -55,6 +74,7 @@ state_speed = [accidents[(accidents["STATE"]==s) & (accidents["SP"]==1)].shape[0
 state_percent_sp = (np.array(state_speed) / np.array(state_totals, dtype=float)) * 100
 
 # Convert data to appropriate format for map
+"""
 from_proj = Proj(init="epsg:4326")
 to_proj = Proj(init="epsg:3857")
 
@@ -70,12 +90,20 @@ def convert(longitudes, latitudes):
 accidents["x"], accidents["y"] = convert(accidents.LONGITUD, accidents.LATITUDE)
 accidents["r"] = 10000
 
+accidents.to_pickle("fars_accidents.pickle")
+
+
 borders_x = []
 borders_y = []
 for i in xrange(len(state_xs)):
     cx, cy = convert(state_xs[i], state_ys[i])
     borders_x.append(cx)
     borders_y.append(cy)
+
+borders = dict(x=borders_x, y=borders_y)
+with open("borders.pickle", "wb") as f:
+    pickle.dump(borders, f)
+"""
 
 # set up map
 mercator_extent = dict(start=-1400000, end=2000000, bounds="auto", )
@@ -125,11 +153,15 @@ COLORS.reverse()
 no_colors = ['#FFFFFF']*len(state_names)
 drunk_colors = [COLORS[i] for i in pd.qcut(state_percent, len(COLORS)).codes]
 speeding_colors = [COLORS[i] for i in pd.qcut(state_percent_sp, len(COLORS)).codes]
-alpha=[0]*51
+alpha=[0]*len(state_names)
+
+
+with open("borders.pickle", "rb") as f:
+    b = pickle.load(f)
 
 patch_source = ColumnDataSource(
-    data=dict(borders_x=borders_x,
-        borders_y=borders_y,
+    data=dict(borders_x=b["x"],
+        borders_y=b["y"],
         colors=no_colors,
         alpha=alpha,
         state_names=state_names,

@@ -7,12 +7,9 @@ Bokeh to produce interactive, dependency-free data visualizations that can
 be viewed in any web browser.}
 
 \begin{warn}
-As of June 2016, Bokeh was still under heavy development. In this lab, we will
-be using Bokeh 0.11.1. According to the Bokeh GitHub repository, version 0.12
-was set to be released in the middle of June, but is still under development.
-The Bokeh development team has announced that version 0.12 introduces a
-completely rewritten backend server, so some of the information in this lab will
-need to be updated once this new version has been released and is fully stable.
+This lab uses Bokeh version 0.12.0. It was released in the summer 2016. Bokeh
+is still under development, so the syntax is subject to change. However, the
+development is far enough along that the general framework has been solidified.
 \end{warn}
 
 Bokeh is a visualization package focused on making plots that can be viewed and
@@ -33,10 +30,10 @@ The BokehJS library handles all the visualizations in the web browser.
 
 Throughout this lab, all the exercises will piece together to form one final
 web-based visualization. To see the final result, go to
-\url{THE FINAL PROJECT HOSTED ON ACME/data or something}.
+\url{THE_FINAL_PROJECT_HOSTED_ON_ACME/data_or_something}.
 
 Even though there are many options for adding interactions to your plots,
-(see \url{http://bokeh.pydata.org/en/0.11.1/docs/user_guide/interaction.html})
+(see \url{http://bokeh.pydata.org/en/latest/docs/user_guide/interaction.html})
 we will only focus on pan, zoom, hover, and the slider widget.
 
 \section*{Cleaning the Data}
@@ -59,8 +56,13 @@ following columns:
     \item LONGITUD : The longitude of the location where the accident occurred.
         Values of 777.7777, 888.8888, 999.9999 will be considered null.
         NOTE: Yes, it is spelled ``LONGITUD" without the `E` on the end.
+
     \item HOUR : Hour of the day when the accident occurred.
+    \item DAY : The day of the month when the accidents happened.
+    \item MONTH : The month the accident happened.
+    \item YEAR : The year the accident happened.
     \item DRUNK\_DR : Number of drunk drivers involved in the accident.
+    \item FATALS : The number of fatalities in the accident.
 \end{itemize}
 
 \subsection*{The Vehicle File}
@@ -107,7 +109,8 @@ pickle files can be loaded using \li{pd.read_pickle()}.
 \begin{problem}
 For the \li{accidents} DataFrame, we will need the columns:
 \begin{lstlisting}
-    ST_CASE, STATE, LATITUDE, LONGITUD, HOUR, DRUNK_DR, SPEEDING.
+    ST_CASE, STATE, LATITUDE, LONGITUD, FATALS, HOUR, DAY, MONTH,
+    YEAR, DRUNK_DR, SPEEDING.
 \end{lstlisting}
 
 The SPEEDING column is derived from
@@ -121,10 +124,16 @@ The resulting DataFrame should be 149698 rows x 7 columns. As
 another indicator that you have done everything correctly, you should have a total
 of 44223 speed related accidents described in the SPEEDING column.
 
-Lastly, the STATE column is all based on ids. The \li{id_to_state.pickle} file
+Lastly, the STATE column is all based on IDs. The \li{id_to_state.pickle} file
 contains a pickle file with a Python dictionary mapping IDs to states. Replace
 all the integer IDs in this column with the corresponding state abbreviation
-according to the mapping contained in this dictionaary.
+according to the mapping contained in this dictionary. To load this pickle file,
+execute the following code:
+\begin{lstlisting}
+import pickle
+with open("id_to_state.pickle") as file:
+    id_to_state = pickle.load(file)
+\end{lstlisting}
 
 So in the end your DataFrame should look like this:
 TODO make a table that shows accidents.head()
@@ -135,6 +144,39 @@ you do all the needed cleaning for each individual year, then concatenate all
 the years together into your final DataFrames. This is due to the fact that
 the IDs in the ST\_CASE column are not year specific.
 \end{info}
+\end{problem}
+
+\begin{problem} \label{prob:convert}
+The map we will be using does not does not recognize latitude and longitude
+coordinates, but rather coordinates in meters. The FARS data set represents
+the location of the accidents in terms of latitude and longitude, so we will
+need to convert the coordinate system. This is done with the following code:
+
+\begin{lstlisting}
+from_proj = Proj(init="epsg:4326")
+to_proj = Proj(init="epsg:3857")
+
+def convert(longitudes, latitudes):
+    """Converts latlon coordinates to meters.
+
+    Inputs:
+        longitudes (array-like) : array of longitudes
+        latitudes (array-like) : array of latitudes
+
+    Example:
+        x,y = convert(accidents.LONGITUD, accidents.LATITUDE)
+    """
+
+    x_vals = []
+    y_vals = []
+    for lon, lat in zip(longitudes, latitudes):
+        x, y = transform(from_proj, to_proj, lon, lat)
+        x_vals.append(x)
+        y_vals.append(y)
+    return x_vals, y_vals
+
+accidents["x"], accidents["y"] = convert(accidents.LONGITUD, accidents.LATITUDE)
+\end{lstlisting}
 \end{problem}
 
 \begin{problem}
@@ -170,7 +212,7 @@ the name of the desired filename. If you use \li{output_notebook()}, your Bokeh 
 will appear in your Jupyter Notebook.
 
 \begin{info}
-    Because Bokeh is still under development, there are times that your plots
+    There may be times that your plots
     may not be behaving as expected. If you are sure there is not a problem with
     your code, try restarting the Bokeh server. Assuming you are working in
     a Jupyter Notebook, this is done by first restarting the kernel, then
@@ -321,19 +363,49 @@ pats = fig.patches(xs="x_vals", ys="y_vals",
             line_alpha=.5, line_width=7)
 
 show(fig)
-
 \end{lstlisting}
 
+\begin{problem} \label{prob:map}
+We will start by adding a map to a Bokeh Figure. Here is the code you will need.
+This code will serve as the building block for the rest of this lab.
+
+\begin{lstlisting}
+from bokeh.plotting import Figure
+from bokeh.models import WMTSTileSource
+
+fig = Figure(plot_width=1100, plot_height=650,
+            x_range=(-13000000, -7000000), y_range=(2750000, 6250000),
+            tools=["wheel_zoom", "pan"], active_scroll="wheel_zoom")
+fig.axis.visible = False
+
+STAMEN_TONER_BACKGROUND = WMTSTileSource(
+    url='http://tile.stamen.com/toner-background/{Z}/{X}/{Y}.png',
+    attribution=(
+        'Map tiles by <a href="http://stamen.com">Stamen Design</a>, '
+        'under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>.'
+        'Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, '
+        'under <a href="http://www.openstreetmap.org/copyright">ODbL</a>'
+    )
+)
+
+fig.add_tile(STAMEN_TONER_BACKGROUND)
+\end{lstlisting}
+
+\end{problem}
+
 \begin{problem} \label{prob:borders}
-In this problem, you will begin constructing the first tab of the project
-associated with this lab. Using Patch glyphs, draw all the borders for all the
+Using Patch glyphs, draw all the borders for all the
 states. The border information you need is found in the pickle file
-\li{state_borders.pickle}. This pickle file contains a nested Python dictionary
+\li{borders.pickle}. This pickle file contains a nested Python dictionary
 where the key is the two letter abbreviation for a given state and the value is
 a dictionary containing a list of latitudes and a list of longitudes.
 
-We need a list of lists of latitudes and longitudes to pass to the
-\li{fig.patches()} function.
+We need a list of lists of x-values and y-values to pass to the
+\li{fig.patches()} function. You will need to convert these coordinates the
+same way you converted the coordinates in Problem \ref{prob:convert}
+
+To get a list of lists of latitudes and longitudes, you may use the following
+code:
 
 \begin{lstlisting}
 state_xs = [us_states[code]["lons"] for code in us_states]
@@ -345,10 +417,14 @@ Draw the state borders using the coordinates defined in \li{state_xs} and
 \end{problem}
 
 \begin{problem} \label{prob:all_accidents}
-Your \li{accidents} DataFrame should contain the longitudes and latitudes for
-all the fatal accidents. In the same figure from Problem \ref{prob:borders},
+Your \li{accidents} DataFrame should contain the converted longitudes and
+latitudes for all the fatal accidents.
+In the same figure from Problem \ref{prob:borders},
 plot a circle for each fatal car accidents. For this problem, you should use
-your \li{accidents} DataFrame in conjuction with a ColumnDataSource.
+your \li{accidents} DataFrame in conjuction with a ColumnDataSource. For an
+added level of detail, color the markers depending on the type of accident:
+drunk, speeding, other. The best way to do this would be to have 3 different
+\li{ColumnDataSource} objects.
 \end{problem}
 
 \subsection*{Speeding up Interactions with WebGL}
@@ -366,13 +442,242 @@ while panning and zooming.
 
 \begin{info}
 There are times that adding WebGL support to your figure will cause it to behave
-strangely, so adding WebGL support may not always be a feasible option. Remember
-that Bokeh is still in development, so hopefully things like this will be refineed
+strangely. WebGL support is still a fairly new feature of Bokeh. Remember
+that Bokeh is still in development, so hopefully things like this will be refined
 in time.
 \end{info}
 \end{problem}
 
-\subsection*{Laying Out Plots}
+\section*{Adding Tooltips}
+It would be useful to display a bit more information on our map. We will
+accomplish this with tooltips. When we hover over each state, we will display
+a few pieces of key data that may be interesting to the viewer.
+To be able to show more information, we will need to prepare a few more
+pieces of data.
+
+\begin{problem} \label{prob:lists}
+In Problem \ref{prob:borders}, you created two lists of lists, \li{state_xs} and
+\li{state_ys}. When hovering over a Patch glyph, Bokeh keeps track which index
+corresponds with that Patch. For our tooltips, we will need a few more lists. We
+have to take extra special care that the indices of all these lists are
+consistent.
+
+Using list comprehension again, create a list of state abbreviations, a list of
+the total number of accidents by state, a list of the percentage of speed-related
+accidents by state, and a list of the percentage of drunk driving accidents by
+state.
+
+There is more than one correct way to do this, but whatever method you choose to
+use, take extra care to make sure that the indices correspond to the same state
+across all these lists.
+\end{problem}
+
+\subsection*{HoverTool and Tooltips}
+Adding tooltips to Patch glyphs is fairly straightforward. The process is best
+explained by first presenting an example.
+
+\begin{lstlisting}
+import numpy as np
+from bokeh.plotting import figure, output_notebook, show
+from bokeh.models import HoverTool, ColumnDataSource
+
+x_vals = [[0,1,0], [0,1,1], [1,2,1], [1,2,2]]
+y_vals = [[0,0,1], [1,1,0], [0,0,1], [1,1,0]]
+
+x_coords = [0,0,1,1,2,2]
+y_coords = [0,1,0,1,0,1]
+
+fig = figure(plot_width=500, plot_height=300)
+col = ["Blue", "Red", "Yellow", "Green"]
+
+patch_source = ColumnDataSource(
+    data=dict(
+        col=col,
+        x_vals=x_vals,
+        y_vals=y_vals
+    )
+)
+
+circle_source = ColumnDataSource(
+    data=dict(
+        x_coords=x_coords,
+        y_coords=y_coords
+    )
+)
+
+triangles = fig.patches("x_vals", "y_vals", color="col", source=patch_source,
+           line_color='black', line_width=3, fill_alpha=.5, line_alpha=0
+           hover_color="col", hover_alpha=.8, hover_line_color='black')
+circles = fig.circle("x_coords", "y_coords", fill_color='black', source=circle_source,
+           fill_alpha=.5, hover_color="black", hover_alpha=1, line_alpha=0, size=18)
+
+fig.add_tools(HoverTool(renderers=[triangles], tooltips=[("Color", " @col")]))
+fig.add_tools(HoverTool(renderers=[circles], tooltips=[("Point", " (@x_coords, @y_coords)")]))
+
+show(fig)
+\end{lstlisting}
+
+Now let's piece apart this example. Notice first that we have a
+\li{ColumnDataSource} object for the patch coordinates and another
+\li{ColumnDataSource} for the circles. In general, it is a good idea to separate
+\li{ColumnDataSource} objects like this, but more specifically, we need to do this
+because we want to have two different hover behaviors.
+
+Next, notice that there are some keyword arguments included in these glyphs we
+have not discussed yet. The keyword arguments \li{hover_color}, \li{hover_alpha},
+and \li{hover_line_color}. When hovering over one of these glpyhs, these arguments
+overwrite \li{fill_color}, \li{fill_alpha}, and \li{line_color}, respectivley.
+
+Finally, when creating the \li{HoverTool} object, you will most commonly use
+the \li{renderers} and \li{tooltips} keyword arguments. The \li{renderers}
+argument accepts a list of glyphs. At times, there is unpredicted behavior if you
+include more than one glpyh in this list. The \li{tooltips} arguments functions
+just like the \li{tooltips} argument we discussed in the section on bar charts.
+
+\begin{problem} \li{prob:hover_map}
+On your plot of the United States, we can provide much more information to this
+plot using tooltips. Using the lists you prepared in Problem \ref{prob:lists},
+add tooltips for the Patch objects in this plot. Also adjust the appearence of
+the Patch objects under the mouse so it is clear which state is being selected.
+\end{problem}
+
+\section*{Adding More Complicated Interactions Using Widgets}
+\begin{info}
+At the beginning of this lab, we mentioned that Bokeh is still in development
+so some explanations will need to be updated. There is some material in this
+section that is still under active development. In theory, the code presented
+here will still work, but it is quite possible that there will be a better way
+to do these tasks in the future.
+\end{info}
+
+One of the mottos the Bokeh developers have is, \emph{We write the Javascript so
+you don't have to.} If you happen to have experience with Javascript, you can
+do some pretty amazing things with Bokeh interactions. In this section, we
+address some of the interactions that are possible without using Javascript.
+
+\subsection*{Select}
+The Select widget is ideal for changing attributes of the figure where you want
+to allow only a few different options. The code for creating Select widgets is
+very straightforward.
+
+\begin{lstlisting}
+from bokeh.io import output_file, show
+from bokeh.models.widgets import Select
+
+output_file("select.html")
+
+select = Select(title="Option:", value="one",
+                options=["one", "two", "three", "four"])
+
+show(select)
+\end{lstlisting}
+
+For our project, we want to be able to
+give the user the ability to gain information from the first map without needing
+to hover over each individual state. Since we are interested in drunk driving
+accidents and speeding accidents, it makes sense to give the user the option to
+color the states according to the percentage of these types of accidents.
+
+To be able to accomplish this, we will need to have some way of knowing if the
+value in the Select widget has changed, and if it has, what we should do with the
+new value.
+
+Most Bokeh widgets have a \li{on_change} method. This method is called whenever
+a certain parameter (usually \li{"value"}) is changed. Here is a simple example.
+
+\begin{lstlisting}
+import pandas as pd
+import numpy as np
+from bokeh.io import curdoc
+from bokeh.plotting import Figure
+from bokeh.models import ColumnDataSource, Select
+from bokeh.layouts import column
+
+COUNT = 10
+df = pd.DataFrame({"x":np.random.rand(COUNT),
+                   "y":np.random.rand(COUNT),
+                   "color":"white"})
+source = ColumnDataSource(df)
+
+fig = Figure()
+fig.circle(source=source, x="x", y="y", fill_color="color",
+           line_color="black", size=40)
+
+select = Select(title="Option:", value="white",
+                options=["white", "red", "blue", "yellow"])
+
+def update_color(attrname, old, new):
+    source.data["color"] = [select.value]*COUNT
+
+select.on_change('value', update_color)
+
+curdoc().add_root(column(fig, select))
+\end{lstlisting}
+
+There are a few things to point out with this example. Note that we have a function
+called \li{update_color}. This function is called whenever the \li{"value"} of
+the Select widget is changed. The function arguments \li{attrname, old, new}
+are used by Bokeh, but you don't need to worry about them at all in this lab.
+Because we have our Circle glyph tied to a
+\li{ColumnDataSource}, any change to this source will affect the Circle glpyh.
+
+Second, note that we have not specified an \li{output_file}. Instead, we use
+\li{curdoc()}, which stands for ``current document". We add the layouts we want
+to the current document through the \li{add_root()} method. In our case, we
+stack all the elements of our document using the \li{column()} function. You can
+learn more about possible layouts here:
+\url{http://bokeh.pydata.org/en/latest/docs/user_guide/layout.html}
+
+Using the \li{on_change} function requires a Bokeh Server to be running.
+You can view the code above by executing
+\begin{lstlisting}
+$ bokeh serve <FILENAME>.py
+\end{lstlisting}
+in your terminal, then going to \li{localhost:5006/<FILENAME>} in your web
+browser.
+
+\begin{problem}
+In this problem, we will add a Select widget to our map. This Select widget will
+specify the color map we wish to use for the states.
+
+In your Select widget, have options for \li{"None"}, \li{"Drunk \%"}, and
+\li{"Speeding \%"}. To assign the states the appropriate color, you may use
+the following code, or you may adjust the functionality as you like.
+
+\begin{lstlisting}
+# change this first line if you want a different colormap
+from bokeh.palettes import Reds9
+
+COLORS.reverse()
+no_colors = ['#FFFFFF']*len(state_names)
+drunk_colors = [COLORS[i] for i in pd.qcut(state_percent_dr, len(COLORS)).codes]
+speeding_colors = [COLORS[i] for i in pd.qcut(state_percent_sp, len(COLORS)).codes]
+\end{lstlisting}
+
+This code assumes you have lists named \li{state_names}, \li{state_percent_dr},
+and \li{state_percent_sp} from Problem \ref{prob:lists}.
+
+\end{problem}
+
+\begin{comment}
+
+\subsection*{Interactions in Jupyter Notebook}
+
+\section*{Tying It All Together}
+
+\subsection*{Tab}
+
+\section*{Suggestions for Further Learning}
+
+\begin{itemize}
+    \item Streaming data
+    \item Dashboards
+    \item Data Exploration (crossfilter)
+\end{itemize}
+
+
+
+\section*{Supplemental Stuffs}
 
 \section*{Basic Charts}
 Like in pandas, it is very easy to make visualizations in Bokeh from DataFrames.
@@ -469,215 +774,6 @@ Add a tooltip to both of the stacked bar charts. Include at least the age and
 total number of people per category.
 \end{problem}
 
-\subsection*{Adding Tooltips to Patch Glyphs}
-In the first figure we made with the map of the United States, it would be useful
-to display a bit more information. Once again, we can accomplish this with
-tooltips. To be able to show more information, we will need to prepare a few more
-pieces of data.
-
-\begin{problem} \label{prob:lists}
-In Problem \ref{prob:borders}, you created two lists of lists, \li{state_xs} and
-\li{state_ys}. When hovering over a Patch glyph, Bokeh keeps track which index
-corresponds with that Patch. For our tooltips, we will need a few more lists. We
-have to take extra special care that the indices of all these lists are
-consistent.
-
-Using list comprehension again, create a list of state abbreviations, a list of
-the total number of accidents by state, a list of the percentage of speed-related
-accidents by state, and a list of the percentage of drunk driving accidents by
-state.
-
-There is more than one correct way to do this, but whatever method you choose to use, take extra care to make
-sure that the indices correspond to the same state across all these lists.
-\end{problem}
-
-\subsection*{HoverTool and Tooltips}
-Adding tooltips to Patch glyphs is a little bit more involved than adding tooltips
-to bar charts, but it is still fairly straight forward. The process is best
-explained by first presenting an example.
-
-\begin{lstlisting}
-import numpy as np
-from bokeh.plotting import figure, output_notebook, show
-from bokeh.models import HoverTool, ColumnDataSource
-
-x_vals = [[0,1,0], [0,1,1], [1,2,1], [1,2,2]]
-y_vals = [[0,0,1], [1,1,0], [0,0,1], [1,1,0]]
-
-x_coords = [0,0,1,1,2,2]
-y_coords = [0,1,0,1,0,1]
-
-fig = figure(plot_width=500, plot_height=300)
-col = ["Blue", "Red", "Yellow", "Green"]
-
-patch_source = ColumnDataSource(
-    data=dict(
-        col=col,
-        x_vals=x_vals,
-        y_vals=y_vals
-    )
-)
-
-circle_source = ColumnDataSource(
-    data=dict(
-        x_coords=x_coords,
-        y_coords=y_coords
-    )
-)
-
-triangles = fig.patches("x_vals", "y_vals", color="col", source=patch_source,
-           line_color='black', line_width=3, fill_alpha=.5, line_alpha=0
-           hover_color="col", hover_alpha=.8, hover_line_color='black')
-circles = fig.circle("x_coords", "y_coords", fill_color='black', source=circle_source,
-           fill_alpha=.5, hover_color="black", hover_alpha=1, line_alpha=0, size=18)
-
-fig.add_tools(HoverTool(renderers=[triangles], tooltips=[("Color", " @col")]))
-fig.add_tools(HoverTool(renderers=[circles], tooltips=[("Point", " (@x_coords, @y_coords)")]))
-
-show(fig)
-\end{lstlisting}
-
-Now let's piece apart this example. Notice first that we have a
-\li{ColumnDataSource} object for the patch coordinates and another
-\li{ColumnDataSource} for the circles. In general, it is a good idea to separate
-\li{ColumnDataSource} objects like this, but more specifically, we need to do this
-because we want to have two different hover behaviors.
-
-Next, notice that there are some keyword arguments included in these glyphs we
-have not discussed yet. The keyword arguments \li{hover_color}, \li{hover_alpha},
-and \li{hover_line_color}. When hovering over one of these glpyhs, these arguments
-overwrite \li{fill_color}, \li{fill_alpha}, and \li{line_color}, respectivley.
-
-Finally, when creating the \li{HoverTool} object, you will most commonly use
-the \li{renderers} and \li{tooltips} keyword arguments. The \li{renderers}
-argument accepts a list of glyphs. At times, there is unpredicted behavior if you
-include more than one glpyh in this list. The \li{tooltips} arguments functions
-just like the \li{tooltips} argument we discussed in the section on bar charts.
-
-\begin{problem} \li{prob:hover_map}
-On your plot of the United States, we can provide much more information to this
-plot using tooltips. Using the lists you prepared in Problem \ref{prob:lists},
-add tooltips for the Patch objects in this plot. Also adjust the appearence of
-the Patch objects under the mouse so it is clear which state is being selected.
-\end{problem}
-
-\section*{Adding More Complicated Interactions Using Widgets}
-\begin{info}
-At the beginning of this lab, we mentioned that Bokeh is still in development
-so some explanations will need to be updated. There is some material in this
-section that is still under active development. In theory, the code presented
-here will still work, but it is quite possible that there will be a better way
-to do these tasks in the future.
-\end{info}
-
-One of the mottos the Bokeh developers have is, \emph{We write the Javascript so
-you don't have to.} If you happen to have experience with Javascript, you can
-do some pretty amazing things with Bokeh interactions. In this section, we
-address some of the interactions that are possible without using Javascript.
-
-\subsection*{Select}
-The Select widget is ideal for changing attributes of the figure where you want
-to allow only a few different options. The code for creating widgets is very
-straightforward.
-
-\begin{lstlisting}
-from bokeh.io import output_file, show
-from bokeh.models.widgets import Select
-
-output_file("select.html")
-
-select = Select(title="Option:", value="one", options=["one", "two", "three", "four"])
-
-show(select)
-\end{lstlisting}
-
-For our project, we want to be able to
-give the user the ability to gain information from the first map without needing
-to hover over each individual state. Since we are interested in drunk driving
-accidents and speeding accidents, it makes sense to give the user the option to
-color the states according to the percentage of these types of accidents.
-
-To be able to accomplish this, we will need to have some way of knowing if the
-value in the Select widget has changed, and if it has, what we should do with the
-new value.
-
-Most Bokeh widgets have a \li{on_change} method. This method is called whenever
-a certain parameter (usually \li{"value"}) is changed. Here is a simple example.
-
-\begin{lstlisting}
-import pandas as pd
-import numpy as np
-from bokeh.io import curdoc
-from bokeh.plotting import Figure
-from bokeh.models import ColumnDataSource, Select
-from bokeh.layouts import column
-
-COUNT = 10
-df = pd.DataFrame({"x":np.random.rand(COUNT),
-                   "y":np.random.rand(COUNT),
-                   "color":"white"})
-source = ColumnDataSource(df)
-
-fig = Figure()
-fig.circle(source=source, x="x", y="y", fill_color="color",
-           line_color="black", size=40)
-
-select = Select(title="Option:", value="white",
-                options=["white", "red", "blue", "yellow"])
-
-def update_color(attrname, old, new):
-    source.data["color"] = [select.value]*COUNT
-
-select.on_change('value', update_color)
-
-curdoc().add_root(column(fig, select))
-\end{lstlisting}
-
-There are a few things to point out with this example. Note that we have a function
-called \li{update_color}. This function is called whenever the \li{"value"} of
-the Select widget is changed. The function arguments \li{attrname, old, new}
-are used by Bokeh, but you don't need to worry about them at all in this lab.
-Because we have our Circle glyph tied to a
-\li{ColumnDataSource}, any change to this source will affect the Circle glpyh.
-
-Second, note that we have not specified an \li{output_file}. Instead, we use
-\li{curdoc()}, which stands for ``current document". We add the layouts we want
-to the current document through the \li{add_root()} method. In our case, we
-stack all the elements of our document using the \li{column()} function. You can
-learn more about possible layouts here:
-\url{http://bokeh.pydata.org/en/latest/docs/user_guide/layout.html}
-
-Using the  \li{on_change} function requires a Bokeh Server to be running.
-You can view the code above by executing
-\begin{lstlisting}
-$ bokeh serve <FILENAME>.py
-\end{lstlisting}
-in your terminal, then going to \li{localhost:5006/<FILENAME>} in your web
-browser.
-
-\begin{problem}
-In this problem, we will add a Select widget to our map. This Select widget will
-specify the color map we wish to use for the states.
-
-In your Select widget, have options for \li{"None"}, \li{"Drunk \%"}, and
-\li{"Speeding \%"}. To assign the states the appropriate color, you may use
-the following code, or you may adjust the functionality as you like.
-
-\begin{lstlisting}
-# change this first line if you want a different colormap
-from bokeh.palettes import Reds9
-
-COLORS.reverse()
-no_colors = ['#FFFFFF']*len(state_names)
-drunk_colors = [COLORS[i] for i in pd.qcut(state_percent_dr, len(COLORS)).codes]
-speeding_colors = [COLORS[i] for i in pd.qcut(state_percent_sp, len(COLORS)).codes]
-\end{lstlisting}
-
-This code assumes you have lists named \li{state_names}, \li{state_percent_dr},
-and \li{state_percent_sp} from Problem \ref{prob:lists}.
-
-\end{problem}
-
 \subsection*{Slider}
 Sliders are very useful when slicing across sections of data or adjusting
 attributes of glyphs. If adjusting attributes of a glyph, it makes more sense to
@@ -718,25 +814,8 @@ with the format:
     \item Fatalities: NUMBER OF FATALITIES
     \item Drunk: YES/NO
     \item Speeding: YES/NO
-    \item Weather: Conditions translated from ID to English.
 \end{itemize}
-
-\begin{info}
-Depending on the capabilities of your computer
-\end{info}
 
 \end{problem}
 
-\subsection*{\texttt{on\_change} vs Callbacks}
-
-\section*{Tying It All Together}
-
-\subsection*{Tab}
-
-\section*{Suggestions for Further Learning}
-
-\begin{itemize}
-    \item Streaming data
-    \item Dashboards
-    \item Data Exploration (crossfilter)
-\end{itemize}
+\end{comment}
