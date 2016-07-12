@@ -61,7 +61,7 @@ def prob4():
         3. Give each subplot an appropriate title.
         4. Give the overall figure a title.
         5. Use the following line colors and styles.
-              sin(x): plain green line.
+              sin(x): green solid line.
              sin(2x): red dashed line.
              2sin(x): blue dashed line.
             2sin(2x): magenta dotted line.
@@ -88,13 +88,34 @@ def prob4():
     plt.axis([0, 2*np.pi, -2, 2])
     plt.title("2sin(2x)")
 
-    plt.suptitle("Solution to Problem 4")
+    plt.suptitle("Solution to Problem 4 (subplots)")
     plt.show()
 
 
 def prob5():
-    raise NotImplementedError("PROBLEM 5 NOT WRITTEN")
+    """Visualize the data in FARS.npy. Use np.load() to load the data, then
+    create a single figure with two subplots:
+        1. A scatter plot of longitudes against latitudes. Because of the
+            large number of data points, use black pixel markers (use "k,"
+            as the third argument to plt.plot()). Label both axes.
+        2. A histogram of the hours of the day, with one bin per hour.
+            Label and set the limits of the x-axis.
+    """
+    data = np.load("FARS.npy")
 
+    plt.subplot(211)
+    plt.plot(data[:,1], data[:,2], 'k,')
+    plt.xlabel("Longitude")
+    plt.ylabel("Latitude")
+    plt.gca().set_aspect("equal")
+
+    plt.subplot(212)
+    plt.hist(data[:,0], bins=24, range=[-.5, 23.5])
+    plt.xlim(-.5,23.5)
+    plt.xlabel("Hour (Military Time)")
+
+    plt.suptitle("Solution to Problem 5 (FARS data)")
+    plt.show()
 
 def prob6():
     """Plot the function f(x,y) = sin(x)sin(y)/xy on the domain
@@ -123,8 +144,5 @@ def prob6():
     plt.axis([-2*np.pi, 2*np.pi, -2*np.pi, 2*np.pi])
     plt.colorbar()
 
-    plt.suptitle("Solution to Problem 6")
+    plt.suptitle("Solution to Problem 6 (meshgrids)")
     plt.show()
-
-if __name__ == '__main__':
-    prob6()

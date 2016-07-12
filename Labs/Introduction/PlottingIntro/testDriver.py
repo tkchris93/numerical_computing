@@ -148,7 +148,8 @@ class _testDriver(object):
         print("""\nSpecifications:
         1. Discontinuous line plotted over x-domain [-2,6]  (2 points)
         2. Think, magenta, dotted line                      (2 points)
-        3. y-axis limits are exactly [-6,6]                 (1 point)""")
+        3. y-axis limits are exactly [-6,6]                 (1 point)
+        (Title, axis labels, and legend unnecessary)""")
         return self._grade(5, "prob3() plot does not match specifications")
 
     @_autoclose
@@ -171,6 +172,18 @@ class _testDriver(object):
     @_autoclose
     def problem5(self, s):
         s.prob5()
+        print("""\nSpecifications:
+        1. Scatter plot in one subplot                          (1 point)
+            - Clearly maps the United States                    (2 points)
+            - Uses black pixel markers                          (1 point)
+            - Both axes are labeled                             (1 point)
+        2. Histogram in other subplot                           (1 point)
+            - Low point at 4, peak at 18                        (1 point)
+            - One bin per integer over [0, 23]                  (1 point)
+            - x-axis limits are about [-.5, 23.5]               (1 point)
+            - x-axis is labeled                                 (1 point)
+        (Titles and legends unnecessary)
+        (Aspect ratio may not be perfect)""")
         return self._grade(10, "prob5() plot does not match specification")
 
     @_autoclose

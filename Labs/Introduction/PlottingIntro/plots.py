@@ -136,14 +136,14 @@ def prob4(N=200):
 
 @_save("scatterplot.pdf")
 def scatter():
-    x = np.random.randint(1, 11, 20)
-    y = np.random.randint(1, 11, 20)
-    plt.scatter(x, y, s=100)
+    x = np.random.normal(scale=1.5, size=500)
+    y = np.random.normal(scale=0.5, size=500)
+    plt.plot(x, y, 'o', ms=10)
     return x
 
 @_save("histogram.pdf")
 def hist(x):
-    plt.hist(x, bins=10, range=[.5, 10.5])
+    plt.hist(x, bins=9, range=[-4.5, 4.5])
 
 def prob5():
     x = scatter()
