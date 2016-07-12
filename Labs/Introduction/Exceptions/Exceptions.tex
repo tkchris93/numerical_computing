@@ -79,58 +79,101 @@ Exception>>
 ValueError: 'x' should not exceed 5.>>
 \end{lstlisting}
 
-% TODO: Make this much more interesting. Like so much more.
-\begin{problem} % Problem: Raising Exceptions 101.
-Python functions do not require specific types of data for each functional input.
-Sometimes, however, it is important to validate input types before they are utilized. TODO: Make \li{my_func()} waaay more interesting.
-\begin{lstlisting}
-def my_func(a, b, c, d, e):
-    print("The first argument is " + a)
-    x = sum([b, c])
-    y = d + e
-    return a, x, y
-\end{lstlisting}
-Modify \li{my_func()} so that it raises a \li{TypeError} if:
+\begin{problem} % Problem: Raising Exceptions 101. Magic trick.
+Consider the following arithmetic ``magic'' trick.
 \begin{enumerate}
-\item $a$ is not a string (of type \li{str}),
-\item $b$ or $c$ is not a numerical type (\li{int}, \li{float}, \li{long}, or \li{complex}), or
-\item $d$ and $e$ are not the same type.
+    \item Choose a 3-digit number where the first and last digits differ by 2 or more (for example, $123$).
+    \label{magic-trick-step-1}
+    \item Reverse this number by reading it backwards ($321$).
+    \item Calculate the positive difference of these numbers ($321 - 123 = 198$).
+    \item Add the reverse of the result to itself ($198 + 891 = 1089$).
 \end{enumerate}
-Include an informative error message with each exception.
-\\
-(Hint: investigate the \li{type()} and \li{isinstance()} built-in functions.)
+The result of the last step will \emph{always} be $1089$, regardless of the original number chosen in step \ref{magic-trick-step-1} (can you explain why?).
+
+The following function prompts the user for input at each step of the magic trick, but does not check that the user's inputs are correct.
+\newpage
+\begin{lstlisting}
+def arithmagic():
+    step_1 = raw_input("Enter a 3-digit number where the first and last "
+                                           "digits differ by 2 or more: ")
+    step_2 = raw_input("Enter the reverse of the first number, obtained "
+                                              "by reading it backwards: ")
+    step_3 = raw_input("Enter the positive difference of these numbers: ")
+    step_4 = raw_input("Enter the reverse of the previous result: ")
+    print str(step_3) + " + " + str(step_4) + " = 1089 (ta-da!)"
+\end{lstlisting}
+
+Modify \li{arithmagic()} so that it verifies the user's input at each step.
+Raise a \li{ValueError} with an informative error message if any of the following occur:
+\begin{enumerate}
+\item The first number (\li{step_1}) is not a 3-digit number.
+\item The first number's first and last digits differ by less than $2$.
+\item The second number (\li{step_2}) is not the reverse of the first number.
+\item The third number (\li{step_3}) is not the positive difference of the first two numbers.
+\item The fourth number (\li{step_4}) is not the reverse of the third number.
+\end{enumerate}
+%
+(Hint: \li{raw_input()} always returns a string, so each variable is a string initially. Use \li{int()} to cast the variables as integers when necessary. The built-in function \li{abs()} may also be useful.)
 \end{problem}
 
 \subsection*{Handling Exceptions} % -------------------------------------------
 
-To prevent an exception from stopping the program, it must be handled by
+To prevent an exception from halting the program, it must be handled by
 placing the problematic lines of code in a \li{try} block.
 An \li{except} block then follows.
 
 \begin{lstlisting}
 # The 'try' block should hold any lines of code that might raise an exception.
 >>> try:
-...     raise Exception("for no reason.")
+...     raise Exception("for no reason")
 ...     print "No exception raised"
 ... # The 'except' block is executed when an exception is raised.
 ... except Exception as e:
 ...     print "Exception raised", e
-... # The program then continues as usual.
-... print "Good for you."
 ...
-<<Exception raised for no reason.
-Good for you.>>
+<<Exception raised for no reason>>
+>>> # The program then continues on.
 \end{lstlisting}
-%
-The try statement induces a control flow that proceeds as follows:
-\begin{description}
-\item The \li{try} block is executed until an exception is raised.
-\item An \li{except} statement specifying the \emph{same kind} of exception that was raised in the try block ``catches'' the exception, and the block is then executed.
+
+In this example, the name \li{e} represents the exception within the except block.
+Printing \li{e} displays its error message.
+
+\begin{comment}
+We could also raise the exception again with the syntax \li{raise e} or just \li{raise}.
+
+\begin{lstlisting}
+>>> try:
+...     raise Exception("for no reason")
+... except Exception as e:
+...     print "Exception raised", e
+...     e.args = ("BECAUSE MATH!!",)        # Assign 'e' a new error message.
+...     raise e                             # Raise the exception again.
+...
+Exception raised for no reason
+<<Traceback (most recent call last):
+  File "<stdin>", line 6, in <module>
+Exception: BECAUSE MATH!!>>
+\end{lstlisting}
+\end{comment}
+
+\newpage
+
+The try-except control flow can be expanded with two other blocks.
+The flow proceeds as follows:
+
+\begin{enumerate}
+\item The \li{try} block is executed until an exception is raised, if at all.
+
+\item An \li{except} statement specifying the same kind of exception that was raised in the try block ``catches'' the exception, and the block is then executed.
 There may be multiple except blocks following a single try block (similiar to having several \li{elif} statements following a single \li{if} statement), and a single except statement may specify multiple kinds of exceptions to catch.
+
 \item The optional \li{else} block is executed if an exception was \emph{not} raised in the try block.
-% Thus either an except block or the else block are executed, but not both.
+Thus either an except block or the else block is executed, but not both.
+
 \item Lastly, the optional \li{finally} block is always executed if it is included.
-\end{description}
+\end{enumerate}
+
+% Note that a try block must always be followed by at least one except or finally block.
 
 \begin{lstlisting}
 >>> try:
@@ -171,41 +214,6 @@ Traceback (most recent call last):
   File "<stdin>", line 3, in <module>
 ValueError: The house is on fire!>>
 \end{lstlisting}
-
-\begin{comment} % Additional material ?
-\begin{warn} % Don't use except: by itself; specify an exception class.
-Having \li{except} by itself will catch \emph{any} exception raised in the \li{try} block, but this approach can mistakenly mask unexpected errors.
-Consider the following function, which intends to avoid dividing by zero.
-
-\begin{lstlisting}
->>> def divider(x, y):
-...     try:
-...         return x / float(yy)
-...     except:
-...         print("y must not equal zero!")
-...
->>> divider(2, 3)
-<<y must not equal zero!>>
-\end{lstlisting}
-
-Because \li{y} was misspelled, a \li{NameError} will be raised every time this function is called.
-Be specific about the kind of exception you expect to encounter.
-
-\begin{lstlisting}
->>> def divider(x, y):
-...     try:
-...         return x / float(yy)
-...     except ZeroDivisionError:
-...         print("y must not equal zero!")
-...
->>> divider(2, 3)
-<<Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-  File "<stdin>", line 3, in divider
-NameError: global name 'yy' is not defined>>
-\end{lstlisting}
-\end{warn}
-\end{comment}
 
 \begin{comment} % Overkill
 An exception that is caught by an \li{except} statement can be captured as a variable within the \li{except} block if it is declared using the keyword \li{as}.
@@ -250,10 +258,10 @@ A \li{KeyboardInterrupt} is a special exception that can be triggered at any tim
 \begin{lstlisting}
 from random import choice
 
-def random_walk(max_iters=1e9):
+def random_walk(max_iters=1e12):
     walk = 0
     direction = [1, -1]
-    for i in xrange(max_iters):
+    for i in xrange(int(max_iters)):
         walk += choice(direction)
     return walk
 \end{lstlisting}
@@ -261,18 +269,6 @@ Modify \li{random_walk()} so that if the user raises a \li{KeyboardInterrupt}, t
 If no \li{KeyboardInterrupt} is raised, print ``Process Completed''.
 In both cases, return \li{walk} as before.
 \end{problem}
-
-% TODO: For Python 3, discuss chaining Exceptions. Put this in Additional Material.
-\begin{comment}
-\subsection*{Chaining Exceptions}
-\begin{lstlisting}
->>> try:
->>>     raise ValueError("First Exception")
->>> except ValueError as e:
->>>     raise TypeError("Second Exception") from e
-\end{lstlisting}
-This syntax makes it possible to see where an error originated from and to ``pass it up'' to the next process.
-\end{comment}
 
 \subsection*{The Exception Hierarchy} % ---------------------------------------
 
@@ -300,6 +296,39 @@ StandardError: This is a StandardError!>>     # The exception wasn't caught!
 It turns out that the \li{ValueError} class inherits from the \li{StandardError} class.
 Thus a \li{ValueError} \emph{is} a \li{StandardError}, so the first \li{except} statement was able to catch the exception, but a \li{StandardError} is \emph{not} a \li{ValueError}, so the second \li{except} statement could not catch the exception.
 The complete exception classes hierarchy is documented at \url{https://docs.python.org/2/library/exceptions.html#exception-hierarchy}.
+
+\begin{warn} % Don't use except: by itself; specify an exception class.
+Having \li{except} by itself will catch \emph{any} exception raised in the \li{try} block, but this approach can mistakenly mask unexpected errors.
+Consider the following function, which intends to avoid dividing by zero.
+
+\begin{lstlisting}
+>>> def divider(x, y):
+...     try:
+...         return x / float(yy)
+...     except:
+...         print("y must not equal zero!")
+...
+>>> divider(2, 3)
+<<y must not equal zero!>>
+\end{lstlisting}
+
+Because \li{y} was misspelled, a \li{NameError} will be raised every time this function is called.
+Be specific about the kind of exception you expect to encounter.
+
+\begin{lstlisting}
+>>> def divider(x, y):
+...     try:
+...         return x / float(yy)
+...     except ZeroDivisionError:
+...         print("y must not equal zero!")
+...
+>>> divider(2, 3)
+<<Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "<stdin>", line 3, in divider
+NameError: global name 'yy' is not defined>>
+\end{lstlisting}
+\end{warn}
 
 \section*{File Input and Output} % ============================================
 
@@ -409,10 +438,6 @@ Implement the constructor so that it accepts the name of a file to be read.
 Store the name of the file and its contents as attributes and securely close the file stream.
 If the filename argument is not a string, raise a \li{TypeError}.
 \end{problem}
-
-% =============================================================================
-% Done to here ================================================================
-% =============================================================================
 
 \section*{String Formatting} % ================================================
 
@@ -536,6 +561,18 @@ The \li{assert} statement is a shortcut for testing the truthfulness of an expre
 >>> if not <expression>:
 ...     raise AssertionError(<message>)
 \end{lstlisting}
+
+\begin{comment} % This is only a feature in Python 3 (TODO).
+\subsection*{Chaining Exceptions} % -------------------------------------------
+\begin{lstlisting}
+>>> try:
+>>>     raise ValueError("First Exception")
+>>> except ValueError as e:
+>>>     raise TypeError("Second Exception") from e
+\end{lstlisting}
+This syntax makes it possible to see where an error originated from and to ``pass it up'' to the next process.
+\end{comment}
+
 
 \begin{comment}
 \subsection*{Buffering} % -----------------------------------------------------
