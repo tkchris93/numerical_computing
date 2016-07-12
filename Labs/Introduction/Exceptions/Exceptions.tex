@@ -2,36 +2,42 @@
 \label{lab:Exceptions}
 \objective{
 In Python, an \emph{exception} is an error detected during execution.
-Exceptions are important for regulating program usage and correctly informing the programmer of problems.
+Exceptions are important for regulating program usage and for correctly reporting problems to the programmer.
 Understanding exceptions allows us to safely read data from and export data to external files.
-Reading and parsing data is an essential skill in scientific computing, and will be an important element of many future labs.
+In this lab we present exception syntax and file interaction protocols.
 }
 
 % TODO
-%       - print statments --> print function calls in Python 3 (parentheses)
+%       - print statements --> print function calls in Python 3 (parentheses)
 %       - String Formatting section. ALMOST THERE!!!!
 
 \section*{Exceptions} % =======================================================
 
 Every programming language has a formal way of indicating and handling errors.
 In Python, we raise and handle \emph{exceptions}.
-There are different kinds of exceptions, each with its appropriate usage.
+Some of the more common exceptions are listed below, along with the kinds of problems that they typically indicate.
+%
+\begin{table}[H]
+\centering
+\begin{tabular}{r|l}
+    Exception & Indication \\ \hline
+    \li{AttributeError} & An attribute reference or assignment failed.\\
+    % \li{ImportError} & An \li{import} statement failed.\\
+    \li{IndexError} & A sequence subscript was out of range.\\
+    \li{NameError} & A local or global name was not found.\\
+    \li{SyntaxError} & The parser encountered a syntax error.\\
+    \li{TypeError} & An operation or function was applied to an object of \\ &inappropriate type.\\
+    \li{ValueError} & An operation or function received an argument that had \\ & the right type but an inappropriate value.\\
+    % \li{ZeroDivisionError} & The second argument of a division or modulo operation \\ & was zero.
+\end{tabular}
+\end{table}
 
 \begin{lstlisting}
-# A 'NameError' exception indicates that a nonexistant name was used.
->>> print(x)
-<<Traceback (most recent call last):
-  File "<stdin>", line 1, in <module>
-NameError: name 'x' is not defined>>
-
-# An 'AttributeError' exception indicates that a nonexistant method
-# or attribute was called on some object.
 >>> [1, 2, 3].fly()
 <<Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
 AttributeError: 'list' object has no attribute 'fly'>>
 
-# A 'SyntaxError' exception indicates bad Python syntax.
 >>> def myFunction(a, b)             # Forgot the colon!
 <<  File "<stdin>", line 1
     def myFunction(a, b)
@@ -56,7 +62,7 @@ We typically provide a single string detailing the reasons for the error.
 # Raise a generic exception, without an error message.
 >>> if 7 is not 7.0:
 ...     raise Exception
-... 
+...
 <<Traceback (most recent call last):
   File "<stdin>", line 2, in <module>
 Exception>>
@@ -66,7 +72,7 @@ Exception>>
 ...     if x > 5:
 ...         raise ValueError("'x' should not exceed 5.")
 ...     print(x),
-... 
+...
 0 1 2 3 4 5
 <<Traceback (most recent call last):
   File "<stdin>", line 3, in <module>
@@ -111,7 +117,7 @@ An \li{except} block then follows.
 ...     print "Exception raised", e
 ... # The program then continues as usual.
 ... print "Good for you."
-... 
+...
 <<Exception raised for no reason.
 Good for you.>>
 \end{lstlisting}
@@ -159,7 +165,7 @@ The code in the \li{finally} block is \emph{always} executed, even if a \li{retu
 ...     raise ValueError("The house is on fire!")
 ... finally:                        # Executes before the error is reported.
 ...     print "The house may be on fire."
-... 
+...
 <<The house may be on fire.
 Traceback (most recent call last):
   File "<stdin>", line 3, in <module>
@@ -177,7 +183,7 @@ Consider the following function, which intends to avoid dividing by zero.
 ...         return x / float(yy)
 ...     except:
 ...         print("y must not equal zero!")
-... 
+...
 >>> divider(2, 3)
 <<y must not equal zero!>>
 \end{lstlisting}
@@ -191,7 +197,7 @@ Be specific about the kind of exception you expect to encounter.
 ...         return x / float(yy)
 ...     except ZeroDivisionError:
 ...         print("y must not equal zero!")
-... 
+...
 >>> divider(2, 3)
 <<Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
@@ -210,7 +216,7 @@ An exception that is caught by an \li{except} statement can be captured as a var
 ...     bad = 100 / 0
 ... except ZeroDivisionError as e:
 ...     print(e)
-... 
+...
 <<integer division or modulo by zero>>
 
 # Here a different exception is raised than the one in the except statement.
@@ -226,7 +232,7 @@ TypeError: unsupported operand type(s) for +: 'int' and 'str'>>
 ...     import magic
 ... except ImportError as e:
 ...     print "Sorry!", e
-... 
+...
 Sorry! No module named magic
 \end{lstlisting}
 
@@ -256,14 +262,14 @@ If no \li{KeyboardInterrupt} is raised, print ``Process Completed''.
 In both cases, return \li{walk} as before.
 \end{problem}
 
-% TODO: For Python 3, discuss chaining Exceptions.
+% TODO: For Python 3, discuss chaining Exceptions. Put this in Additional Material.
 \begin{comment}
 \subsection*{Chaining Exceptions}
 \begin{lstlisting}
 >>> try:
 >>>     raise ValueError("First Exception")
 >>> except ValueError as e:
->>>     raise ZeroDivisionError("Second Exception") from e
+>>>     raise TypeError("Second Exception") from e
 \end{lstlisting}
 This syntax makes it possible to see where an error originated from and to ``pass it up'' to the next process.
 \end{comment}
@@ -332,7 +338,7 @@ The more flexible \li{try}-\li{finally} approach is typically better for working
 
 \begin{lstlisting}
 >>> myfile = open("in.txt", 'r')        # Open 'in.txt' with read-only access.
->>> try:    
+>>> try:
 ...     contents = myfile.readlines()   # Read in the content by line.
 ... finally:
 ...     myfile.close()                  # Explicitly close the file.
@@ -384,7 +390,7 @@ Be mindful of spaces and newlines to separate the data.
 
 \begin{lstlisting}
 >>> with open("out.txt", 'w') as outfile:   # Open 'out.txt' for writing.
-...     for i in xrange(10):                
+...     for i in xrange(10):
 ...         outfile.write(str(i**2)+' ')    # Write some strings (and spaces).
 ...
 >>> outfile.closed                          # The file is closed automatically.
@@ -394,7 +400,7 @@ True
 Executing this code replaces whatever used to be in \texttt{out.txt} (if it even existed) with the following:
 
 \begin{lstlisting}
-0 1 4 9 16 25 36 49 64 81 
+0 1 4 9 16 25 36 49 64 81
 \end{lstlisting}
 
 \begin{problem} % Problem: Start the ContentFilter class.
@@ -498,10 +504,9 @@ Number of lines:          <The number of lines>>>
 
 \newpage
 
-% TODO: This stuff.
 \section*{Additional Material} % ==============================================
 
-\subsection*{Custom Exceptions}
+\subsection*{Custom Exception Classes} % --------------------------------------
 
 Custom exceptions can be defined by writing a class that inherits from some existing exception class.
 The generic \li{Exception} class is typically the parent class of choice.
@@ -509,7 +514,7 @@ The generic \li{Exception} class is typically the parent class of choice.
 \begin{lstlisting}
 >>> class TooHardError(Exception):
 ...     pass
-... 
+...
 >>> raise TooHardError("This lab is impossible!")
 Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
@@ -545,43 +550,8 @@ The \li{csv} module in the standard library has some methods that work with the 
 This can also be useful for STUFF.
 \end{comment}
 
+\begin{comment}
 \subsection*{More String Formatting} % ----------------------------------------
 
 See \url{https://docs.python.org/2/library/string.html\#format-string-syntax}.
-
-% TODO: Does this really belong here?
-\begin{comment}
-\subsection*{Function Wrappers} % ---------------------------------------------
-
-A \emph{function wrapper} or \emph{decorator} is a function that is meant to ``wrap'' another function by being called on top of the target function.
-That is, if we have a function $f$, wrapped by function $g$, then whenever $f$ is called, we actually are calling $g(f(x))$.
-
-For example, the following wrapper prints out the current time whenever the inner function is called.
-
-\begin{lstlisting}
->>> from time import strftime
-
->>> def time_stamp(func):
-...     def wrapper(*args, **kwargs):
-...         try:
-...             return func(*args, **kwargs)
-...         finally:
-...             print strftime("%H:%M:%S")
-...     return wrapper
-...
->>> @time_stamp
->>> def example():
-...     return 10
-
->>> example()
-10
-16:27:17
-\end{lstlisting}
-
-% The syntax \li{def wrapper(*args, **kwargs)} means that \li{wrapper()} accepts any number of positional or keyword arguments.
-
-Decorators are very useful for pre-processing functional inputs or formatting returned values.
-
-% Create a decorator that raises a \li{RuntimeError} after 10 seconds.
-% Consider using the \li{signal} module.\footnote{The \li{signal} module only works on unix machines (mac, linux).}
 \end{comment}
