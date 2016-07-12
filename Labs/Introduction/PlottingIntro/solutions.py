@@ -93,19 +93,26 @@ def prob4():
 
 
 def prob5():
-    """FARS data."""
+    """Visualize the data in FARS.npy. Use np.load() to load the data, then
+    create a single figure with two subplots:
+        1. A scatter plot of longitudes against latitudes. Because of the
+            large number of data points, use black pixel markers (use "k,"
+            as the third argument to plt.plot()). Label both axes.
+        2. A histogram of the hours of the day, with one bin per hour.
+            Label and set the limits of the x-axis.
+    """
     data = np.load("FARS.npy")
-
-    plt.subplot(212)
-    plt.hist(data[:,0], bins=24, range=[-.5, 23.5])
-    plt.xlim(-1,24)
-    plt.xlabel("Hour (Military Time)")
 
     plt.subplot(211)
     plt.plot(data[:,1], data[:,2], 'k,')
     plt.xlabel("Longitude")
     plt.ylabel("Latitude")
     plt.gca().set_aspect("equal")
+
+    plt.subplot(212)
+    plt.hist(data[:,0], bins=24, range=[-.5, 23.5])
+    plt.xlim(-.5,23.5)
+    plt.xlabel("Hour (Military Time)")
 
     plt.suptitle("Solution to Problem 5 (FARS data)")
     plt.show()
@@ -139,6 +146,3 @@ def prob6():
 
     plt.suptitle("Solution to Problem 6 (meshgrids)")
     plt.show()
-
-if __name__ == '__main__':
-    prob5()

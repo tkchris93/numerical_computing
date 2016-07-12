@@ -384,7 +384,7 @@ On the histogram, specifying 9 bins in the range $[-4.5, 4.5]$ creates a bin cen
 \begin{problem} % FARS data visualization.
 The Fatality Analysis Reporting System (FARS) is a nationwide census providing yearly data regarding fatal injuries suffered in motor vehicle traffic crashes (see \url{http://www.nhtsa.gov/FARS}).
 The array contained in \texttt{FARS.npy} is a small subset of the FARS database from 2010--2014.
-Each of the 148,206 rows in the array represents a different crash.
+Each of the 148,206 rows in the array represents a different car crash.
 The columns represent the hour of the crash (in military time, as an integer), the longitude of the crash, and the latitude of the crash, in that order.
 
 Write a function to visualize the data in \texttt{FARS.npy}.
@@ -398,7 +398,8 @@ Label both axes.
 (Hint: the command \li{plt.gca().set_aspect("equal")} fixes the scaling of the axes so the picture is not skewed.)
 
 \item A histogram of the hours of the day, with one bin per hour.
-Label and set the limits of the $x$-axis.
+Set the limits of the $x$-axis appropriately.
+Label the $x$-axis.
 \end{enumerate}
 \end{problem}
 
@@ -408,10 +409,9 @@ See Appendix \ref{mpltables} for examples and syntax.
 \subsection*{Visualizing 2-D Data} % ------------------------------------------
 
 To plot a function $f: \mathbb{R}^2 \rightarrow \mathbb{R}$, we must choose and construct a 2-dimensional domain, then calculate the function at each point of that domain.
-NumPy's \li{np.meshgrid()} is the standard tool for creating a 2-dimensional domain in the Cartesian plane.
+The standard tool for creating a 2-dimensional domain in the Cartesian plane is \li{np.meshgrid()}.
 Given two 1-dimensional coordinate arrays, \li{np.meshgrid()} creates two corresponding coordinate matrices.
-% See Figure \ref{fig:meshgrid} for a visual explanation.
-
+%
 \begin{figure}[H] % np.meshgrid() visual demonstration.
 \begin{tikzpicture}[>=stealth', shorten <= .1cm,shorten >=.1cm, dot/.style=
     {circle,fill=black,minimum size=3pt,inner sep=0pt, outer sep=-1pt} ]
@@ -501,10 +501,12 @@ Finally, to see how the colors in these plots relate to the values of the functi
 # Plot a contour map of f with 10 level curves.
 >>> plt.subplot(132)
 >>> plt.contour(X, Y, Z, 10, cmap="Spectral")
+>>> plt.colorbar()
 
 # Plot a filled contour map, specifying the level curves.
 >>> plt.subplot(133)
 >>> plt.contourf(X, Y, Z, [-1, -.8, -.5, 0, .5, .8, 1], cmap="magma")
+>>> plt.colorbar()
 
 >>> plt.show()
 \end{lstlisting}
