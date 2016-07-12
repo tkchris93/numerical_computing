@@ -297,7 +297,7 @@ For example, \li{plt.subplot(3,2,2)} and \li{plt.subplot(322)} are equivalent.
 >>> plt.show()
 \end{lstlisting}
 
-\begin{figure}[H] % The layout created by subplots(23i).
+\begin{figure}[H] % The layout created by plt.subplot(23i).
 \captionsetup[subfigure]{justification=centering}
 \centering
 \begin{subfigure}{.49\textwidth}
@@ -322,7 +322,7 @@ Write a function that plots the functions $\sin(x)$, $\sin(2x)$, $2\sin(x)$, and
     \item Use \li{plt.suptitle()} to give the overall figure a title.
     \item Use the following colors and line styles.
     \begin{align*}\begin{array}{rcl}
-    \sin(x)\text{: plain green line.} && \sin(2x)\text{: red dashed line.}\\ \\
+    \sin(x)\text{: green solid line.} && \sin(2x)\text{: red dashed line.}\\ \\
     2\sin(x)\text{: blue dashed line.} && 2\sin(2x)\text{: magenta dotted line.}
     \end{array}\end{align*}
 \end{enumerate}
@@ -334,27 +334,34 @@ Line plots are not always the most illuminating choice graph to describe a set o
 Matplotlib provides several other easy ways to visualize data.
 
 \begin{itemize}
+\item A \emph{scatter plot} plots two 1-dimensional arrays against each other without drawing lines between the points.
+Scatter plots are particularly useful for data that is not inherently correlated or ordered.
+
+To create a scatter plot, use \li{plt.plot()} and specify a point marker (such as \li{'o'} or \li{'+'}) for the line style.%
+\footnote{\li{plt.scatter()} can also be used to create scatter plots, but it accepts slightly different arguments than \li{plt.plot()} and is often less flexible.}
+
 \item A \emph{histogram} groups entries of a 1-dimensional data set into a given number of intervals, called \emph{bins}.
 Each bin has a bar whose height indicates the number of values that fall in the range of the bin.
+% The more bins, the greater the detail, but having too many bins can also destroy the picture by creating interval gaps between values.
+Histograms are best for displaying distributions, relating data values to frequency.
 
 To create a histogram, use \li{plt.hist()} instead of \li{plt.plot()}.
 Specify the number of bins with the argument \li{bins} and the range of values with the argument \li{<<range>>} to control the precision of the plot.
-
-\item A \emph{scatter plot} plots two 1-dimensional arrays against each other without drawing lines between the points.
-
-To create a scatter plot, use \li{plt.scatter()}, or use \li{plt.plot()} and specify a point marker (such as \li{'o'} or \li{'+'}) for the line style.
 \end{itemize}
 
 \begin{lstlisting}
-# Get 2 sets of 20 random integers in the interval [1, 11).
->>> x, y = np.random.randint(1, 11, 20), np.random.randint(1, 11, 20)
+# Get 500 random samples from two normal distributions.
+>>> x = np.random.normal(scale=1.5, size=500)
+>>> y = np.random.normal(scale=0.5, size=500)
 
-# Draw a histograms and a scatter plot to display the data.
+# Draw a scatter plot of x against y, using a circle marker.
 >>> plt.subplot(121)
->>> plt.hist(x, bins=10, <<range>>=[.5, 10.5])
+>>> plt.plot(x, y, 'o', markersize=10)
 
+# Draw a histogram to display the distribution of the data in x.
 >>> plt.subplot(122)
->>> plt.scatter(x, y, s=100)        # The 's' argument specifies the marker size.
+>>> plt.hist(x, bins=9, <<range>>=[-4.5, 4.5])
+
 >>> plt.show()
 \end{lstlisting}
 
@@ -363,49 +370,49 @@ To create a scatter plot, use \li{plt.scatter()}, or use \li{plt.plot()} and spe
 \centering
 \begin{subfigure}{.49\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/histogram.pdf}
-    \label{fig:histogram}
+    \includegraphics[width=\linewidth]{figures/scatterplot.pdf}
 \end{subfigure}
 %
 \begin{subfigure}{.49\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/scatterplot.pdf}
+    \includegraphics[width=\linewidth]{figures/histogram.pdf}
 \end{subfigure}
 \end{figure}
 
-In this example the data set \li{x} consists of only integer values.
-Specifying 10 bins in the range [.5, 10.5] creates one bin per integer.
+On the histogram, specifying 9 bins in the range $[-4.5, 4.5]$ creates a bin centered over each integer from $-4$ to $4$.
 
-\begin{problem} % Find some real data to use with this problem. age v height?
-\label{prob:subplot}
-The file \texttt{TODO.npz} contains some interesting data that is described here.
-Use \li{np.load()} to load the two arrays in the file:
-\begin{lstlisting}
->>> data = np.load("TODO.npz")
->>> x, y = data['TODO_1'], data['TODO_2']
-\end{lstlisting}
+\begin{problem} % FARS data visualization.
+The Fatality Analysis Reporting System (FARS) is a nationwide census providing yearly data regarding fatal injuries suffered in motor vehicle traffic crashes (see \url{http://www.nhtsa.gov/FARS}).
+The array contained in \texttt{FARS.npy} is a small subset of the FARS database from 2010--2014.
+Each of the 148,206 rows in the array represents a different crash.
+The columns represent the hour of the crash (in military time, as an integer), the longitude of the crash, and the latitude of the crash, in that order.
 
-Write a function to generate the following plot:
+Write a function to visualize the data in \texttt{FARS.npy}.
+Use \li{np.load()} to load the data, then create a single figure with two subplots:
+%
 \begin{enumerate}
-\item In one subplot, draw a histogram of the first array (\li{x}).
-Choose an appropriate range and number of bins to display the data accurately.
-\item In a second subplot, draw a scatter plot of \li{x} against \li{y}.
-Plot a red horizontal line whose height is equal to the mean of the \li{x} data.\\
-(Hint: \li{plt.hlines()} may be useful.)
+\item A scatter plot of longitudes against latitudes.
+Because of the large number of data points, use black pixel markers (use \li{"k,"} as the third argument to \li{plt.plot()}).
+Label both axes.
+\\
+(Hint: the command \li{plt.gca().set_aspect("equal")} fixes the scaling of the axes so the picture is not skewed.)
+
+\item A histogram of the hours of the day, with one bin per hour.
+Label and set the limits of the $x$-axis.
 \end{enumerate}
 \end{problem}
 
 Other kinds of plots for 1-dimensional data includes bar plots, box plots, and others.
-See Appendix \ref{mpltables} for more.
+See Appendix \ref{mpltables} for examples and syntax.
 
-\section*{Visualizing 2-D Data} % =============================================
+\subsection*{Visualizing 2-D Data} % ------------------------------------------
 
 To plot a function $f: \mathbb{R}^2 \rightarrow \mathbb{R}$, we must choose and construct a 2-dimensional domain, then calculate the function at each point of that domain.
 NumPy's \li{np.meshgrid()} is the standard tool for creating a 2-dimensional domain in the Cartesian plane.
 Given two 1-dimensional coordinate arrays, \li{np.meshgrid()} creates two corresponding coordinate matrices.
 % See Figure \ref{fig:meshgrid} for a visual explanation.
 
-\begin{figure}[h] % np.meshgrid() visual demonstration.
+\begin{figure}[H] % np.meshgrid() visual demonstration.
 \begin{tikzpicture}[>=stealth', shorten <= .1cm,shorten >=.1cm, dot/.style=
     {circle,fill=black,minimum size=3pt,inner sep=0pt, outer sep=-1pt} ]
 

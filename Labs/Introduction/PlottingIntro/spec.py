@@ -52,7 +52,7 @@ def prob4():
         3. Give each subplot an appropriate title.
         4. Give the overall figure a title.
         5. Use the following line colors and styles.
-              sin(x): plain green line.
+              sin(x): green solid line.
              sin(2x): red dashed line.
              2sin(x): blue dashed line.
             2sin(2x): magenta dotted line.
