@@ -5,7 +5,267 @@ Linear transformations are the most basic and essential operations in vector spa
 % \objective{Apply affine transformations to a set of vectors in $\mathbb{R}^2$.}
 % \objective{Introduce the temporal and spatial complexity and explore SciPy's methods for working with sparse matrices.}
 
-\section*{Matrix Operations} % ================================================
+\section*{Linear Transformations} % ===========================================
+
+% TODO: does Volume 1 use L or T for linear transformations?
+
+A \emph{linear transformation} is a mapping between vector spaces that preserves addition and scalar multiplication.
+More precisely, for arbitrary vector spaces $V$ and $W$, the mapping $L:V\rightarrow W$ is a linear transformation if and only if it satisfies the following conditions:
+%
+\begin{enumerate}
+\item $L(\x + \y) = L\x + L\y$ for any two vectors $\x,\ \y \in V$
+\item $L(\alpha\x) = \alpha L\x$ for any vector $\x \in V$ and any scalar $\alpha \in \mathbb{F}$.
+\end{enumerate}
+
+Every linear transformation $L$ from an $m$-dimensional vector space to an $n$-dimensional vector space can be represented by an $m\times n$ matrix $A$, called the \emph{transformation matrix} of $L$.
+To apply $L$ to a vector $\x$, left multiply by its transformation matrix.
+This results in a new vector $\x^\prime$, where each component is some linear combination of the elements of $\x$.
+For linear transformations from $\mathbb{R}^2$ to $\mathbb{R}^2$, this process has the following form.
+% So if $L\x \mapsto \y$, then we calculate $A\x = \y$.
+%
+\begin{align*}
+A\x =
+\left[\begin{array}{cc}
+a & b \\
+c & d \\
+\end{array}\right]
+\left[\begin{array}{c}
+x\\y
+\end{array}\right]
+=
+\left[\begin{array}{cc}
+ax + by \\cx + dy
+\end{array}\right]
+=
+\left[\begin{array}{cc}
+x^\prime \\y^\prime
+\end{array}\right]
+= \x^\prime
+\end{align*}
+
+Linear transformations can be interpreted geometrically.
+To demonstrate this, we examine a set of points that collectively form a picture of a horse, stored in the file \texttt{horse.npy} (\texttt{.npy} files contain a single NumPy array).
+The coordinate pairs are organized by column, so the array has two rows: one for $x$-coordinates, and one for $y$-coordinates.
+%
+\begin{align*}
+\left[\begin{array}{cccc}
+x_1 & x_2 & x_3 & \ldots \\
+y_1 & y_2 & y_3 & \ldots \\
+\end{array}\right]
+\end{align*}
+
+Use \li{np.load()}
+% \footnote{See \url{http://docs.scipy.org/doc/numpy/reference/routines.io.html} for info on saving and loading arrays.}
+to extract the array from the \texttt{.npy} file, then plot the points as individual pixels.
+See Figure \ref{fig:linearly-transformed-horses} for the result.
+
+\begin{lstlisting}
+>>> import numpy as np
+>>> from matplotlib import pyplot as plt
+
+# Load the array from the .npy file.
+>>> data = np.load("horse.npy")
+
+# Plot the x row against the y row with black pixels.
+>>> plt.plot(data[0], data[1], 'k,')
+
+# Set the window limits to [-1, 1] by [-1, 1] and make the window square.
+>>> plt.axis([-1,1,-1,1])
+>>> plt.gca().set_aspect("equal")
+>>> plt.show()
+\end{lstlisting}
+
+\subsection*{Types of Linear Transformations} % -------------------------------
+
+Linear transformations from $\mathbb{R}^2$ to $\mathbb{R}^2$ can be classified in a few ways.
+
+\begin{itemize}
+
+\item \textbf{Stretch}: %$L(x,y) \mapsto (ax,by)$.
+Stretches or compresses the vector along each axis.
+The transformation matrix is diagonal:
+%
+\begin{align*}
+\left[\begin{array}{rr}
+a & 0  \\
+0 & b
+\end{array}\right]
+\end{align*}
+%
+If $a=b$, the transformation is called a \emph{dilation}.
+The stretch in Figure \ref{fig:linearly-transformed-horses} uses $a = \frac{1}{2}$ and $b = \frac{6}{5}$ to compress the $x$-axis and stretch the $y$-axis.
+
+\item \textbf{Shear}: %$L(x,y) \mapsto (x + ay, y)$ or $L(x,y) \mapsto (x, bx + y)$.
+Slants the vector by a scalar factor horizontally or vertically.
+There are two matrix representations:
+% The corresponding matrix is a Type III elementary matrix.
+%
+\begin{align*}
+\text{horizontal shear:\ }
+\left[\begin{array}{cc}
+1 & a\\
+0 & 1
+\end{array}\right]
+&&
+\text{vertical shear:\ }
+\left[\begin{array}{cc}
+1 & 0\\
+b & 1
+\end{array}\right]
+\end{align*}
+%
+Horizontal shears skew the $x$-coordinate of the vector while vertical shears skew the $y$-coordinate.
+Figure \ref{fig:linearly-transformed-horses} has a horizontal shear with $a=\frac{1}{2}$.
+
+\item \textbf{Reflection}: Reflects the vector about a line that passes through the origin.
+% Also sometimes called a \emph{Householder transformation}.
+The reflection about the line spanned by the vector $\left[a, b\right]\trp$ has the matrix representation
+%
+\begin{align*}
+\frac{1}{a^2 + b^2}
+\left[\begin{array}{cc}
+a^2 - b^2 & 2ab \\
+2ab       & b^2 - a^2
+\end{array}\right].
+\end{align*}
+%
+The reflection in Figure \ref{fig:linearly-transformed-horses} reflects the image about the $y$-axis ($a=0$, $b=1$).
+
+\item \textbf{Rotation}: %$L(x,y) \mapsto (x\cos\theta-y\sin\theta,\ x\sin\theta + y\cos\theta)$.
+Rotates the vector around the origin.
+A counterclockwise rotation of $\theta$ radians has the following transformation matrix:
+%
+\begin{align*}
+\left[\begin{array}{rr}
+\cos\theta & -\sin\theta\\
+\sin\theta &  \cos\theta
+\end{array}\right]
+\end{align*}
+%
+A negative value of $\theta$ performs a clockwise rotation.
+Choosing $\theta = \frac{\pi}{2}$ produces the rotation in Figure \ref{fig:linearly-transformed-horses}.
+
+\end{itemize}
+
+\begin{figure}[H] % Generated with horse_drawings() in plots.py.
+\captionsetup[subfigure]{justification=centering}
+\centering
+\begin{subfigure}{.32\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/OriginalHorse.pdf}
+\end{subfigure}
+%
+\begin{subfigure}{.32\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/StretchHorse.pdf}
+\end{subfigure}
+%
+\begin{subfigure}{.32\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/ShearHorse.pdf}
+\end{subfigure}
+\\
+\begin{subfigure}{.32\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/ReflectionHorse.pdf}
+\end{subfigure}
+%
+\begin{subfigure}{.32\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/RotationHorse.pdf}
+\end{subfigure}
+%
+\begin{subfigure}{.32\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/CompositionHorse.pdf}
+\end{subfigure}
+\caption{The points stored in \texttt{horse.npy} under various linear transformations.}
+\label{fig:linearly-transformed-horses}
+\end{figure}
+
+
+\begin{problem} % Implement linear transformations.
+Write a function for each of the linear transformations listed above.
+Each function should accept an array to transform and the scalars that define the transformation ($a$ and $b$ for stretch, shear, and reflection, and $\theta$ for rotation).
+Construct the transformation matrix and left multiply it with the input array.
+Return the transformed array.
+
+To test your functions, consider writing a separate function that plots two arrays (the original and the transformed) for a side-by-side comparison.
+\label{prob:implement-linear-transformations}
+\end{problem}
+
+\begin{info} % Look ahead to the QR decomposition.
+Reflections and rotations are two ways to implement the QR Decomposition, an important matrix factorization which we will implement in a future lab. % In the next lab.
+\end{info}
+
+\subsection*{Compositions of Linear Transformations} % ------------------------
+
+Let $V$, $W$, and $Z$ be finite-dimensional vector spaces.
+If $L:V\rightarrow W$ and $K:W\rightarrow Z$ are linear transformations with transformation matrices $A$ and $B$, respectively, then the \emph{composition} $KL:V\rightarrow Z$ is also a linear transformation, and its transformation matrix is the matrix product $BA$.
+
+For example, if $S$ is a matrix representing a shear and $R$ is a matrix representing a rotation, then $RS$ represents a shear followed by a rotation.
+In fact, any linear transformation $L:\mathbb{R}^2 \rightarrow\mathbb{R}^2$ is a composition of the four transformations discussed above.
+Figure \ref{fig:linearly-transformed-horses} displays the composition of all four previous transformations, applied in order (stretch, shear, reflection, then rotation).
+% This is because reflections, dilations, and shears provide us with all the elementary matrices, and every matrix is a product of elementary matrices.
+
+\section*{Affine Transformations} % ===========================================
+
+All linear transformations map the origin to itself.
+An \emph{affine transformation} is a mapping between vector spaces that preserves the relationships between points and lines, but that may not preserve the origin.
+Every affine transformation $T$ can be represented by a matrix $A$ and a vector $\b$.
+To apply $T$ to a vector $x$, we calculate $A\x + \b$.
+If $\b = \0$ then the transformation is linear, and if $A = I$ but $\b\neq\0$ then it is called a \emph{translation}.
+
+For example, if $T$ is the translation with $\mathbf{b} = \left[\frac{3}{4}, \frac{1}{2}\right]\trp$, then applying $T$ to an image will shift it right by $\frac{3}{4}$ and up by $\frac{1}{2}$.
+This translation is illustrated below.
+
+\begin{figure}[H] % Generated with translated_horse() in plots.py.
+\captionsetup[subfigure]{justification=centering}
+\centering
+\begin{subfigure}{.32\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/OriginalHorse.pdf}
+\end{subfigure}%
+\begin{subfigure}{.32\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/TranslationHorse.pdf}
+\end{subfigure}
+\end{figure}
+
+Affine transformations include all compositions of stretches, shears, rotations, reflections, and translations.
+For example, if $S$ represents a shear and $R$ a rotation, and if $\b$ is a vector, then $RS\x + \b$ shears, then rotates, then translates $\x$.
+
+\newpage % TODO: one more demonstration here to take up space. Maybe some hints for the earth problem?
+
+\begin{problem}
+The moon travels around the earth while the earth orbits the sun.
+Assuming circular orbits, we can compute the trajectories of both the earth and the moon using only linear and affine transformations.
+
+Assume an orientation where both the earth and moon travel counterclockwise, with the sun at the origin.
+Let $\p_e(t)$ and $\p_m(t)$ be the positions of the earth and the moon at time $t$, and let $\omega_e$ and $\omega_m$ be each celestial body's angular momentum (how fast they are orbiting).
+
+\begin{enumerate}
+\item Compute $\p_e(t)$ by rotating the initial vector $\p_e(0)$ counterclockwise about the origin by $t\omega_e$ radians.
+\item Calculate the position of the moon relative to the earth at time $t$ by rotating the vector $\p_m(0) - \p_e(0)$ counterclockwise about the origin by $t\omega_m$ radians.
+\item To compute $\p_m(t)$, translate the vector resulting from the previous step by $\p_e(t)$.
+\end{enumerate}
+
+Write a function that accepts a final time $T$ and the angular momenta $\omega_e$ and $\omega_m$.
+Assuming initial positions $\p_e(0) = (10,0)$ and $\p_m(0) = (11,0)$, plot $\p_e(t)$ and $\p_m(t)$ over the time interval $t \in [0, T]$.
+
+The moon rotates around the earth approximately 13 times every year.
+With $T = \frac{3\pi}{2}$, $\omega_e = 1$, and $\omega_m = 13$, your plot should resemble the following figure.
+\\
+\begin{figure}[H]
+    \includegraphics[width=.7\textwidth]{figures/SolarSystem.pdf}
+\end{figure}
+
+\label{prob:solar-system-trajectories}
+\end{problem}
+
+\section*{Timing Matrix Operations} % =========================================
+
+% TODO: Transition sentence.
 
 \subsection*{Timing Code} % ---------------------------------------------------
 
@@ -53,19 +313,20 @@ In [4]: %timeit for_loop()
 1 loop, best of 3: 801 ms per loop
 \end{lstlisting}
 
+\newpage
+
 \subsection*{Timing an Algorithm} % -------------------------------------------
 
 Most algorithms have at least one input that dictates the size of the problem to be solved.
-For example, the following functions take in a single integer $n$ and produce a random vector of length $n$ as a list or a random $n\times n$ matrix as a list of lists:
+For example, the following functions take in a single integer $n$ and produce a random vector of length $n$ as a list or a random $n\times n$ matrix as a list of lists.
 
 \begin{lstlisting}
 from random import random
-
-def random_vector(n):
+def random_vector(n):       # Equivalent to np.random.random(n).tolist()
     """Generate a random vector of length n as a list."""
     return [random() for i in xrange(n)]
 
-def random_matrix(n):
+def random_matrix(n):       # Equivalent to np.random.random((n,n)).tolist()
     """Generate a random nxn matrix as a list of lists."""
     return [[random() for j in xrange(n)] for i in xrange(n)]
 \end{lstlisting}
@@ -78,7 +339,6 @@ To visualize this phenomenon, we time \li{random_matrix()} for $n = 2^1,\ 2^2,\ 
 The result is displayed below on the left.% in Figure \ref{fig:matrix_time_result1}.
 
 \begin{lstlisting}
->>> from matplotlib import pyplot as plt
 >>> domain = 2**np.arange(1,13)
 >>> times = []
 >>> for n in domain:
@@ -114,25 +374,25 @@ In fact, the blue dotted line in the figure on the right is the parabola $y = an
 \begin{problem} % Time Matrix-Vector and Matrix-Matrix Multiplication.
 Let $A$ be an $m \times n$ matrix with entries $a_{ij}$, $\x$ be an $n \times 1$ vector with entries $x_k$, and $B$ be an $n \times p$ matrix with entries $b_{ij}$.
 %
-\begin{align*}
-A = \left[\begin{array}{cccc}
-a_{11} & a_{12} & \cdots & a_{1n} \\
-a_{21} & a_{22} & \cdots & a_{2n} \\
-\vdots & \vdots & \ddots & \vdots \\
-a_{m1} & a_{m2} & \cdots & a_{mn}
-\end{array}\right]
-&&
-\x = \left[\begin{array}{c}
-x_1 \\ x_2 \\ \vdots \\ x_n
-\end{array}\right]
-&&
-B = \left[\begin{array}{cccc}
-b_{11} & b_{12} & \cdots & b_{1p} \\
-b_{21} & b_{22} & \cdots & b_{2p} \\
-\vdots & \vdots & \ddots & \vdots \\
-b_{n1} & b_{n2} & \cdots & b_{np}
-\end{array}\right]
-\end{align*}
+% \begin{align*}
+% A = \left[\begin{array}{cccc}
+% a_{11} & a_{12} & \cdots & a_{1n} \\
+% a_{21} & a_{22} & \cdots & a_{2n} \\
+% \vdots & \vdots & \ddots & \vdots \\
+% a_{m1} & a_{m2} & \cdots & a_{mn}
+% \end{array}\right]
+% &&
+% \x = \left[\begin{array}{c}
+% x_1 \\ x_2 \\ \vdots \\ x_n
+% \end{array}\right]
+% &&
+% B = \left[\begin{array}{cccc}
+% b_{11} & b_{12} & \cdots & b_{1p} \\
+% b_{21} & b_{22} & \cdots & b_{2p} \\
+% \vdots & \vdots & \ddots & \vdots \\
+% b_{n1} & b_{n2} & \cdots & b_{np}
+% \end{array}\right]
+% \end{align*}
 
 The matrix-vector product $A\x = \y$ is a new $m \times 1$ vector and the matrix-matrix product $AB = C$ is a new $m \times p$ matrix.
 The entries $y_i$ of $\y$ and $c_{ij}$ of $C$ are determined by the following formulas:
@@ -146,12 +406,12 @@ c_{ij} = \sum_{k=1}^n a_{ik}b_{kj}%,\quad i = 1,\, 2,\, \ldots,\ m, \quad j = 1,
 Below, we implement these multiplication formulas without using NumPy.
 
 \begin{lstlisting}
-def matrix_vector_product(A, x):
+def matrix_vector_product(A, x):    # Equivalent to np.dot(A,x).tolist()
     """Compute the matrix-vector product Ax as a list."""
     m, n = len(A), len(x)
     return [sum([A[i][k] * x[k] for k in range(n)]) for i in range(m)]
 
-def matrix_matrix_product(A, B):
+def matrix_matrix_product(A, B):    # Equivalent to np.dot(A,B).tolist()
     """Compute the matrix-matrix product AB as a list of lists."""
     m, n, p = len(A), len(B), len(B[0])
     return [[sum([A[i][k] * B[k][j] for k in range(n)])
@@ -272,288 +532,6 @@ Matrix-matrix multiplication grows cubically regardless of the implementation; h
 % \includegraphics[width=.5\textwidth]{figures/cachingDemo.pdf}
 % \end{figure}
 \end{info}
-
-\section*{Linear Transformations} % ===========================================
-
-% TODO: does Volume 1 use L or T for linear transformations?
-
-A \emph{linear transformation} is a mapping between vector spaces that preserves addition and scalar multiplication.
-More precisely, for arbitrary vector spaces $V$ and $W$, the mapping $L:V\rightarrow W$ is a linear transformation if and only if it satisfies the following conditions:
-%
-\begin{enumerate}
-\item $L(\x + \y) = L\x + L\y$ for any two vectors $\x,\ \y \in V$
-\item $L(\alpha\x) = \alpha L\x$ for any vector $\x \in V$ and any scalar $\alpha \in \mathbb{F}$.
-\end{enumerate}
-
-Every linear transformation $L$ from an $m$-dimensional vector space to an $n$-dimensional vector space can be represented by an $m\times n$ matrix $A$, called the \emph{transformation matrix} of $L$.
-To apply $L$ to a vector $\x$, left multiply by its transformation matrix.
-This results in a new vector $\x^\prime$, where each component is some linear combination of the elements of $\x$.
-For linear transformations from $\mathbb{R}^2$ to $\mathbb{R}^2$, this process has the following form.
-% So if $L\x \mapsto \y$, then we calculate $A\x = \y$.
-%
-\begin{align*}
-A\x =
-\left[\begin{array}{cc}
-a & b \\
-c & d \\
-\end{array}\right]
-\left[\begin{array}{c}
-x\\y
-\end{array}\right]
-=
-\left[\begin{array}{cc}
-ax + by \\cx + dy
-\end{array}\right]
-=
-\left[\begin{array}{cc}
-x^\prime \\y^\prime
-\end{array}\right]
-= \x^\prime
-\end{align*}
-
-Linear transformations can be interpreted geometrically.
-To demonstrate this, we examine a set of points that collectively form a picture of a horse, stored in the file \texttt{horse.npy} (\texttt{.npy} files contain a single NumPy array).
-The coordinate pairs are organized by column, so the array has two rows: one for $x$-coordinates, and one for $y$-coordinates.
-%
-\begin{align*}
-\left[\begin{array}{cccc}
-x_1 & x_2 & x_3 & \ldots \\
-y_1 & y_2 & y_3 & \ldots \\
-\end{array}\right]
-\end{align*}
-
-Use \li{np.load()}
-% \footnote{See \url{http://docs.scipy.org/doc/numpy/reference/routines.io.html} for info on saving and loading arrays.}
-to extract the array from the \texttt{.npy} file, then plot the points as individual pixels.
-See Figure \ref{fig:linearly-transformed-horses} for the result.
-
-\begin{lstlisting}
-# Load the array from the .npy file.
->>> import numpy as np
->>> data = np.load("horse.npy")
-
-# Plot the x row against the y row with black pixels.
->>> plt.plot(data[0], data[1], 'k,')
-
-# Set the window limits to [-1, 1] by [-1, 1] and make the window square.
->>> plt.axis([-1,1,-1,1])
->>> plt.gca().set_aspect("equal")
->>> plt.show()
-\end{lstlisting}
-
-\begin{figure}[h] % Generated with horse_drawings() in plots.py.
-\captionsetup[subfigure]{justification=centering}
-\centering
-\begin{subfigure}{.32\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{figures/OriginalHorse.pdf}
-\end{subfigure}
-%
-\begin{subfigure}{.32\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{figures/StretchHorse.pdf}
-\end{subfigure}
-%
-\begin{subfigure}{.32\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{figures/ShearHorse.pdf}
-\end{subfigure}
-\\
-\begin{subfigure}{.32\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{figures/ReflectionHorse.pdf}
-\end{subfigure}
-%
-\begin{subfigure}{.32\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{figures/RotationHorse.pdf}
-\end{subfigure}
-%
-\begin{subfigure}{.32\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{figures/CompositionHorse.pdf}
-\end{subfigure}
-\caption{The points stored in \texttt{horse.npy} under various linear transformations.}
-\label{fig:linearly-transformed-horses}
-\end{figure}
-
-\subsection*{Types of Linear Transformations} % -------------------------------
-
-Linear transformations from $\mathbb{R}^2$ to $\mathbb{R}^2$ can be classified in a few ways.
-
-\begin{itemize}
-
-\item \textbf{Stretch}: %$L(x,y) \mapsto (ax,by)$.
-Stretches or compresses the vector along each axis.
-The transformation matrix is diagonal:
-%
-\begin{align*}
-\left[\begin{array}{rr}
-a & 0  \\
-0 & b
-\end{array}\right]
-\end{align*}
-%
-If $a=b$, the transformation is called a \emph{dilation}.
-The stretch in Figure \ref{fig:linearly-transformed-horses} uses $a = \frac{1}{2}$ and $b = \frac{6}{5}$ to compress the $x$-axis and stretch the $y$-axis.
-
-\item \textbf{Shear}: %$L(x,y) \mapsto (x + ay, y)$ or $L(x,y) \mapsto (x, bx + y)$.
-Slants the vector by a scalar factor horizontally or vertically.
-There are two matrix representations:
-% The corresponding matrix is a Type III elementary matrix.
-%
-\begin{align*}
-\text{horizontal shear:\ }
-\left[\begin{array}{cc}
-1 & a\\
-0 & 1
-\end{array}\right]
-&&
-\text{vertical shear:\ }
-\left[\begin{array}{cc}
-1 & 0\\
-b & 1
-\end{array}\right]
-\end{align*}
-%
-Horizontal shears skew the $x$-coordinate of the vector while vertical shears skew the $y$-coordinate.
-Figure \ref{fig:linearly-transformed-horses} has a horizontal shear with $a=\frac{1}{2}$.
-
-\item \textbf{Reflection}: Reflects the vector about a line that passes through the origin.
-% Also sometimes called a \emph{Householder transformation}.
-The reflection about the line spanned by the vector $\left[a, b\right]\trp$ has the matrix representation
-%
-\begin{align*}
-\frac{1}{a^2 + b^2}
-\left[\begin{array}{cc}
-a^2 - b^2 & 2ab \\
-2ab       & b^2 - a^2
-\end{array}\right].
-\end{align*}
-%
-The reflection in Figure \ref{fig:linearly-transformed-horses} reflects the image about the $y$-axis ($a=0$, $b=1$).
-
-\item \textbf{Rotation}: %$L(x,y) \mapsto (x\cos\theta-y\sin\theta,\ x\sin\theta + y\cos\theta)$.
-Rotates the vector around the origin.
-A counterclockwise rotation of $\theta$ radians has the following transformation matrix:
-%
-\begin{align*}
-\left[\begin{array}{rr}
-\cos\theta & -\sin\theta\\
-\sin\theta &  \cos\theta
-\end{array}\right]
-\end{align*}
-%
-A negative value of $\theta$ performs a clockwise rotation.
-Choosing $\theta = \frac{\pi}{2}$ produces the rotation in Figure \ref{fig:linearly-transformed-horses}.
-
-\end{itemize}
-
-\begin{problem} % Implement linear transformations.
-Write a function for each of the linear transformations listed above.
-Each function should accept an array to transform and the scalars that define the transformation ($a$ and $b$ for stretch, shear, and reflection, and $\theta$ for rotation).
-Construct the transformation matrix and left multiply it with the input array.
-Return the transformed array.
-
-To test your functions, consider writing a separate function that plots two arrays (the original and the transformed) for a side-by-side comparison.
-\label{prob:implement-linear-transformations}
-\end{problem}
-
-\begin{info} % Look ahead to the QR decomposition.
-Reflections and rotations are two ways to implement the QR Decomposition, an important matrix factorization which we will implement in a future lab. % In the next lab.
-\end{info}
-
-\subsection*{Compositions of Linear Transformations} % ------------------------
-
-Let $V$, $W$, and $Z$ be finite-dimensional vector spaces.
-If $L:V\rightarrow W$ and $K:W\rightarrow Z$ are linear transformations with transformation matrices $A$ and $B$, respectively, then the \emph{composition} $KL:V\rightarrow Z$ is also a linear transformation, and its transformation matrix is the matrix product $BA$.
-
-For example, if $S$ is a matrix representing a shear and $R$ is a matrix representing a rotation, then $RS$ represents a shear followed by a rotation.
-In fact, any linear transformation $L:\mathbb{R}^2 \rightarrow\mathbb{R}^2$ is a composition of the four transformations discussed above.
-Figure \ref{fig:linearly-transformed-horses} displays the composition of all four previous transformations, applied in order (stretch, shear, reflection, then rotation).
-% This is because reflections, dilations, and shears provide us with all the elementary matrices, and every matrix is a product of elementary matrices.
-
-\section*{Affine Transformations} % ===========================================
-
-All linear transformations map the origin to itself.
-An \emph{affine transformation} is a mapping between vector spaces that preserves the relationships between points and lines, but that may not preserve the origin.
-Every affine transformation $T$ can be represented by a matrix $A$ and a vector $\b$.
-To apply $T$ to a vector $x$, we calculate $A\x + \b$.
-If $\b = \0$ then the transformation is linear, and if $A = I$ but $\b\neq\0$ then it is called a \emph{translation}.
-
-For example, if $T$ is the translation with $\mathbf{b} = \left[\frac{3}{4}, \frac{1}{2}\right]\trp$, then applying $T$ to an image will shift it right by $\frac{3}{4}$ and up by $\frac{1}{2}$.
-This translation is illustrated below.
-
-\begin{figure}[H] % Generated with translated_horse() in plots.py.
-\captionsetup[subfigure]{justification=centering}
-\centering
-\begin{subfigure}{.32\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{figures/OriginalHorse.pdf}
-\end{subfigure}%
-\begin{subfigure}{.32\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{figures/TranslationHorse.pdf}
-\end{subfigure}
-\end{figure}
-
-Affine transformations include all compositions of stretches, shears, rotations, reflections, and translations.
-For example, if $S$ represents a shear and $R$ a rotation, and if $\b$ is a vector, then $RS\x + \b$ shears, then rotates, then translates $\x$.
-
-\begin{problem}
-The moon travels around the earth while the earth orbits the sun.
-Assuming circular orbits, we can compute the trajectories of both the earth and the moon using only linear and affine transformations.
-
-Assume an orientation where both the earth and moon travel counterclockwise, with the sun at the origin.
-Let $\p_e(t)$ and $\p_m(t)$ be the positions of the earth and the moon at time $t$, and let $\omega_e$ and $\omega_m$ be each celestial body's angular momentum (how fast they are orbiting).
-
-\begin{enumerate}
-\item Compute $\p_e(t)$ by rotating the initial vector $\p_e(0)$ counterclockwise about the origin by $t\omega_e$ radians.
-\item Calculate the position of the moon relative to the earth at time $t$ by rotating the vector $\p_m(0) - \p_e(0)$ counterclockwise about the origin by $t\omega_m$ radians.
-\item To compute $\p_m(t)$, translate the vector resulting from the previous step by $\p_e(t)$.
-\end{enumerate}
-
-Write a function that accepts a final time $T$ and the angular momenta $\omega_e$ and $\omega_m$.
-Assuming initial positions $\p_e(0) = (10,0)$ and $\p_m(0) = (11,0)$, plot $\p_e(t)$ and $\p_m(t)$ over the time interval $t \in [0, T]$.
-
-The moon rotates around the earth approximately 13 times every year.
-With $T = \frac{3\pi}{2}$, $\omega_e = 1$, and $\omega_m = 13$, your plot should resemble the following figure.
-\\
-\begin{figure}[H]
-    \includegraphics[width=.8\textwidth]{figures/SolarSystem.pdf}
-\end{figure}
-
-\label{prob:solar-system-trajectories}
-\end{problem}
-
-\begin{comment} % Old trajectory problem --------------------------------------
-\begin{problem}
-Imagine a particle $\p_1$ rotating around a second particle $\p_2$ which is moving through $\mathbb{R}^2$ in a straight line.
-Suppose $\p_2$ begins at the origin and $\p_1$ begins at $(1, 0)$.
-We can compute the trajectory of $\p_1$ using affine transformations.
-
-\begin{enumerate}\label{prob:trajectory}
-\item Write a function that returns the position of $\p_1$ at a time $t$.
-Your function should accept a time $t$, an angular velocity $\omega$, a direction vector $\mathbf{v}$, and a speed $s$.
-Assume $\p_1$ rotates with angular velocity $\omega$ and $\p_2$ moves in the direction of $\mathbf{v}$ with speed $s$.
-The location of $\p_1$ at time $t$ can be computed as follows:
-\begin{itemize}
-\item Calculate the position of $\p_2$ at time $t$ with the formula $\frac{st}{\|\mathbf{v}\|}\mathbf{v}$.
-\item Calculate the position of $\p_1$ as follows:
-\begin{itemize}
-\item Rotate $\p_1$ by $t\omega$ radians.
-\item Translate the resulting vector by the vector equal to the position of $\p_2$ at time $t$.
-\end{itemize}
-\end{itemize}
-\end{enumerate}
-\item Plot the trajectory of $\p_1$ on the time interval $(0, 10)$ assuming $\omega=\pi$, $v=(1, 1)$, and $s=3$.
-
-Your graph should resemble the following figure.
-\begin{figure}[H]
-    \includegraphics[width=\textwidth]{figures/trajectory.pdf}
-\end{figure}
-\end{problem}
-\end{comment}
 
 \newpage
 
