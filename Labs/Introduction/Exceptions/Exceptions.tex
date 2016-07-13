@@ -79,7 +79,7 @@ Exception>>
 ValueError: 'x' should not exceed 5.>>
 \end{lstlisting}
 
-\begin{problem} % Problem: Raising Exceptions 101. Magic trick.
+\begin{problem} % Raising Exceptions during magic trick.
 Consider the following arithmetic ``magic'' trick.
 \begin{enumerate}
     \item Choose a 3-digit number where the first and last digits differ by 2 or more (for example, $123$).
@@ -215,40 +215,6 @@ Traceback (most recent call last):
 ValueError: The house is on fire!>>
 \end{lstlisting}
 
-\begin{comment} % Overkill
-An exception that is caught by an \li{except} statement can be captured as a variable within the \li{except} block if it is declared using the keyword \li{as}.
-
-\begin{lstlisting}
-# Catch only a specific class of exceptions.
->>> try:
-...     bad = 100 / 0
-... except ZeroDivisionError as e:
-...     print(e)
-...
-<<integer division or modulo by zero>>
-
-# Here a different exception is raised than the one in the except statement.
->>> try:
-...     1 + 'a' + 2 + 'b' + 3
-... except ValueError as e:
-...     print(e)
-<<Traceback (most recent call last):
-  File "<stdin>", line 2, in <module>
-TypeError: unsupported operand type(s) for +: 'int' and 'str'>>
-
->>> try:
-...     import magic
-... except ImportError as e:
-...     print "Sorry!", e
-...
-Sorry! No module named magic
-\end{lstlisting}
-
-Multiple kinds of exceptions can be caught by a single \li{except} statement using a parenthesized list of exceptions.
-There can also be more than one \li{except} statements corresponding to a single \li{try} statement, each indicating which exception class(es) to catch.
-An \li{else} statement can also be attached after \li{except} statements, which is only executed if the \li{try} block is executed to completion.
-\end{comment}
-
 See \url{https://docs.python.org/2/tutorial/errors.html} for more examples.
 
 \begin{problem} % Problem: Catch a KeyboardInterrupt to stop a random walk.
@@ -340,25 +306,29 @@ NameError: global name 'yy' is not defined>>    # Now we can see the mistake.
 \section*{File Input and Output} % ============================================
 
 Python has a useful \li{file} object that acts as an interface to all kinds of different file streams.
-The built-in function \li{open()} creates a \li{file} object.
+The built-in function \li{open()} creates a file object.
+It accepts the name of the file to open and an editing mode.
+The mode determines the kind of access to use when opening the file.
+There are three common options:
+%
+\begin{description}
+\item \li{'r'}: \textbf{read}.
+This is the default mode.
+The file must already exist.
+\item \li{'w'}: \textbf{write}.
+This mode creates the file if it doesn't already exist and \textcolor{red}{\textbf{overwrites everything}} in the file if it does already exist. %(wake up and pay attention to this)
+\item \li{'a'}: \textbf{append}.
+New data is written to the end of the file.
+This mode also creates a new file if it doesn't already exist.
+\end{description}
 
 \begin{lstlisting}
 >>> myfile = open("in.txt", 'r')        # Open 'in.txt' with read-only access.
->>> print myfile.read()                 # Print the contents of the file.
+>>> print(myfile.read())                # Print the contents of the file.
 Hello World!                            # (it's a really small file.)
 >>> myfile.close()                      # Close the file connection.
 \end{lstlisting}
 
-\li{open()} accepts up to three arguments: the filename, mode, and buffering options.
-The mode determines the kind of access to use when opening the file.
-\begin{description}
-\item \li{'r'}: opens an existing file for read-only access.
-This is the default mode.
-\item \li{'w'}: opens a file for write-only access.
-This mode creates the file if it doesn't already exist and \textbf{overwrites everything} in the file if it does exist.
-\item \li{'a'}: opens a file for appending, meaning new data is written to the end of the file.
-This mode also creates a new file if it doesn't already exist.
-\end{description}
 
 \subsection*{The With Statement} % --------------------------------------------
 
@@ -388,37 +358,37 @@ The more flexible \li{try}-\li{finally} approach is typically better for working
 In both cases, if the file \texttt{in.txt} does not exist in the current directory, an \li{IOError} will be raised.
 However, errors in the \li{try} or \li{with} blocks will not prevent the file from being safely closed.
 
+\newpage
+
 \subsection*{Reading and Writing} % -------------------------------------------
 
 Open file objects have an implicit \emph{cursor} that determines the location in the file to read from or write data to.
-After reading a file once, the cursor must be reset to the beginning of the file with \li{seek(0)}.
+After reading a file once, either the file must be closed and reopened, or the cursor must be reset to the beginning of the file with \li{seek(0)} before it can be read again.
 
-Most of the time, we only need to read a file once and store the result in memory.
-Usually the \li{read()} or \li{readlines()} methods get the job done.
+% Small files can usually be read once and stored entirely in memory.
+% Usually the \li{read()} or \li{readlines()} methods get the job done.
+Some of more important file object attributes and methods are listed below.
 
 \begin{table}[H]
 \begin{tabular}{r|l}
-Attribute & Description \\
+Attribute & \multicolumn{1}{c}{Description} \\
 \hline
 \li{closed} & \li{True} if the object is closed.\\
 \li{mode} & The access mode used to open the file object.\\
 \li{name} & The name of the file.\\ \\
-Method & Description\\
+Method & \multicolumn{1}{c}{Description}\\
 \hline
 \li{close()} & Close the connection to the file.\\%Flush any delayed writes
 % \li{flush()} & Flush the internal I/O buffer.\\
 % \li{<<next()>>} & Read the next value.\\
 \li{read()} & Read a given number of bytes; with no input, read the entire file.\\
 \li{readline()} & Read a line of the file, including the newline character at the end.\\
-% \li{readlines()} & [readlines() for line in file]\\
 \li{readlines()} & Call \li{readline()} repeatedly and return a list of the resulting lines.\\
 \li{seek()} & Move the cursor to a new position.\\
 \li{tell()} & Report the current position of the cursor.\\
 \li{write()} & Write a single string to the file (spaces are \emph{not} added).\\
 \li{writelines()} & Write a list of strings to the file (newline characters are \emph{not} added).\\
 \end{tabular}
-\caption{Important \li{file} object attributes and methods.}
-\label{table:fileattribs}
 \end{table}
 
 Only strings can be written to files; to write a non-string type, first cast it as a string with \li{str()}.
@@ -433,27 +403,30 @@ Be mindful of spaces and newlines to separate the data.
 True
 \end{lstlisting}
 
-Executing this code replaces whatever used to be in \texttt{out.txt} (if it even existed) with the following:
+Executing this code replaces whatever used to be in \texttt{out.txt} (whether or not it existed previously) with the following:
 
 \begin{lstlisting}
 0 1 4 9 16 25 36 49 64 81
 \end{lstlisting}
 
-\begin{problem} % Problem: Start the ContentFilter class.
+\begin{problem} % ContentFilter.__init__().
 Define a class called \li{ContentFilter}.
 Implement the constructor so that it accepts the name of a file to be read.
 Store the name of the file and its contents as attributes and securely close the file stream.
 If the filename argument is not a string, raise a \li{TypeError}.
+\\
+(Hint: You might store the file's contents as a single string, a list of lines, or in another format.
+Read Problem \ref{prob:content-filter-methods} and decide which format will be easiest for you to work with.)
 \end{problem}
 
 \section*{String Formatting} % ================================================
 
-Python's \li{str} type class has several useful methods for parsing and formatting strings.
+Python's string type class, \li{str}, has several useful methods for parsing and formatting strings.
 They are particularly useful for processing data from a source file and for preparing data to be written to an external file.
 
 \begin{table}[H]
 \begin{tabular}{r|l}
-Method & Returns \\
+Method & \multicolumn{1}{c}{Returns} \\
 \hline
 \li{count()} & The number of times a given substring occurs within the string.\\
 \li{find()} & The lowest index where a given substring is found.\\
@@ -469,11 +442,9 @@ Method & Returns \\
  & as a delimiter.\\
 \li{strip()} & A copy of the string with leading and trailing whitespace removed. \\
 \end{tabular}
-\caption{Some of the more important \li{str} object methods.}
-\label{table:strmethods}
 \end{table}
 
-The \li{join()} method translates a list of strings into a single string by concatenating the entries and placing the principal string between the entries.
+The \li{join()} method translates a list of strings into a single string by concatenating the entries of the list and placing the principal string between the entries.
 Conversely, \li{split()} translates the principal string into a list of substrings, with the separation determined by the a single input.
 
 \begin{lstlisting}
@@ -495,6 +466,7 @@ Conversely, \li{split()} translates the principal string into a list of substrin
 \end{lstlisting}
 
 Can you tell the difference between the following routines?
+
 \begin{lstlisting}
 >>> with open("in.txt", 'r') as myfile:
 ...     contents = myfile.readlines()
@@ -503,22 +475,19 @@ Can you tell the difference between the following routines?
 ...     contents = myfile.read().split('\n')
 \end{lstlisting}
 
-\begin{problem} % Problem: Add methods to the ContentFilter class.
+\begin{problem} % ContentFilter methods.
 Add the following methods to the \li{ContentFilter} class for writing the contents of the original file to new files.
-Each method should accept a filename to write to and a keyword argument \li{mode} that specifies the file access mode, defaulting to \li{'w'}.
+Each method should accept a the name of a file to write to and a keyword argument \li{mode} that specifies the file access mode, defaulting to \li{'w'}.
 If \li{mode} is not either \li{'w'} or \li{'a'}, raise a \li{ValueError} with an informative message.
 
 \begin{enumerate}
+\item \li{uniform()}: write the data to the outfile with uniform case. Include an additional keyword argument \li{case} that defaults to \li{"upper"}.
 
-\item \li{hyphenate()}: write the data to the outfile in a single line, with \li{"-"} placed between each word and line.
+If \li{case="upper"}, write the data in upper case. If \li{case="lower"}, write the data in lower case. If \li{case} is not one of these two values, raise a \li{ValueError}.
 
-\item \li{uniform()}: write the data to the outfile with uniform case. Include an additional keyword argument, \li{case}, that defaults to \li{'upper'}.
+\item \li{reverse()}: write the data to the outfile in reverse order. Include an additional keyword argument \li{unit} that defaults to \li{"line"}.
 
-If \li{case='upper'}, write the data in upper case. If \li{case='lower'}, write the data in lower case. If \li{case} is not one of these two values, raise a \li{ValueError}.
-
-\item \li{reverse()}: write the data to the outfile in reverse order. Include an additional keyword argument \li{unit} that defaults to \li{'line'}.
-
-If \li{unit='word'}, reverse the ordering of the words in each line, but write the lines in the same order as the original file. If \li{unit='line'}, reverse the ordering of the lines, but do not change the ordering of the words on each individual line. If \li{unit} is not one of these two values, raise a \li{ValueError}.
+If \li{unit="word"}, reverse the ordering of the words in each line, but write the lines in the same order as the original file. If \li{unit="line"}, reverse the ordering of the lines, but do not change the ordering of the words on each individual line. If \li{unit} is not one of these two values, raise a \li{ValueError}.
 
 \item \li{transpose()}: write a ``transposed'' version of the data to the outfile. That is, write the first word of each line of the data to the first line of the new file, the second word of each line of the data to the second line of the new file, and so on.
 \end{enumerate}
@@ -532,6 +501,8 @@ Numerical characters:     <The number of digits>
 Whitespace characters:    <The number of spaces, tabs, and newlines>
 Number of lines:          <The number of lines>>>
 \end{lstlisting}
+
+\label{prob:content-filter-methods}
 \end{problem}
 
 \newpage
@@ -553,12 +524,12 @@ Traceback (most recent call last):
 <<__main__.TooHardError: This lab is impossible!>>
 \end{lstlisting}
 
-This class seems like a trivial extension of the \li{Exception} class, but it is useful because the interpreter never automatically raises a \li{TooHardError}.
+This may seem like a trivial extension of the \li{Exception} class, but it is useful because the interpreter never automatically raises a \li{TooHardError}.
 If you see a \li{TooHardError}, it must have originated from a hand-written \li{raise} command.
 
 \subsection*{Assertions} % ----------------------------------------------------
 
-An \li{AssertionError} is a special exception that is used primarily during software testing.
+An \li{AssertionError} is a special exception that is used primarily for software testing.
 The \li{assert} statement is a shortcut for testing the truthfulness of an expression and raising an \li{AssertionError}
 
 \begin{lstlisting}
@@ -590,7 +561,7 @@ Details about file.flush(), the buffer argument for open(), and reading large fi
 \subsection*{The CSV Module} % ------------------------------------------------
 
 The CSV format (comma separated value) is a common file format for spreadsheets and grid-like data.
-The \li{csv} module in the standard library has some methods that work with the \li{file} object to read a CSV file.
+The \li{csv} module in the standard library has some methods that work with the file object to read a CSV file.
 This can also be useful for STUFF.
 \end{comment}
 

@@ -10,7 +10,7 @@ def arithmagic():
     if len(step_1) != 3:
         raise ValueError("Input must be 3 digits")
     elif abs(int(step_1[0]) - int(step_1[-1])) < 2:
-        raise ValueError("First and last digits must differ by more than 2")
+        raise ValueError("First and last digit must differ by 2 or more")
     step_2 = raw_input("Enter the reverse of the first number, obtained "
                                             "by reading it backwards: ")
     if step_1 != step_2[::-1]:
@@ -43,8 +43,8 @@ class ContentFilter(object):
 
     # Problem 3
     def __init__(self, filename):
-        if not isinstance(filename, str):
-            raise TypeError("'filename' must be a string")
+        if not isinstance(filename, str): # or 'if type(filename) is not str:'
+            raise TypeError("'filename' argument must be a string")
         self.filename = filename
         with open(filename, 'r') as f:
             self.contents = f.read()
@@ -53,24 +53,6 @@ class ContentFilter(object):
         """Validate the 'mode' keyword argument for each method."""
         if mode not in {'a', 'w'}:
             raise ValueError("'mode' must be 'a' or 'w'")
-
-    # Problem 4
-    def hyphenate(self, outfile, mode='w'):
-        """Write the data to the outfile in a single line,
-        with hyphens between each word.
-        """
-        self._validate_mode(mode)
-
-        # Replace whitespace with hyphens.
-        out = self.contents.replace('\n', '-')
-        out = out.replace('\t', '-')
-        out = out.replace(' ', '-')
-
-        # Write the results.
-        with open(outfile, mode) as f:
-            f.write(out)
-            if self.contents[-1].isspace():     # replace final character
-                f.write(self.contents[-1])
 
     # Problem 4
     def uniform(self, outfile, mode='w', case='upper'):

@@ -1,6 +1,7 @@
 # solution.py
 """Introductory Labs: Exceptions and File I/O. Test Driver."""
 
+import sys
 import signal
 from os import remove as rm
 
@@ -30,7 +31,10 @@ class _testDriver(object):
     Attributes:
         Score (int)
         Feedback (str)
+        data_file (str): the name of the file to use in testing.
     """
+
+    data_file = "contentfilter_test.txt"
 
     # Constructor -------------------------------------------------------------
     def __init__(self):
@@ -115,44 +119,68 @@ class _testDriver(object):
     def problem1(self, s):
         """Test arithmagic(). 5 points."""
 
-        def test_arithmagic(entries):
-            try:
-                print("\nEnter the following sequence: {}".format(entries))
-                s.arithmagic()
-            except ValueError as e:
-                print("\nStudent Error message: {}".format(e))
-                return self._grade(1, "Use a more informative error message")
-            except BaseException as e:
-                self.feedback += "\narithmagic() failed to raise a ValueError "
-                self.feedback += "(got {} instead)".format(self._errType(e))
-                self.feedback += "\n\tError message: {}".format(e)
-            else:
-                self.feedback += "\narithmagic() failed to raise a ValueError"
-            return 0
+        def test_arithmagic(entries, err):
 
-        points  = test_arithmagic([1234])
-        points += test_arithmagic([121])
-        points += test_arithmagic([123, 323])
-        points += test_arithmagic([123, 321, 111])
-        points += test_arithmagic([123, 321, 198, 899])
+            standard_in = sys.stdin
+            standard_out = sys.stdout
+            try:
+
+                with open("__IN__.txt", 'w') as f:
+                    f.writelines([str(i) + '\n' for i in entries])
+                sys.stdin = open("__IN__.txt", 'r')     # Redirect std in.
+                sys.stdout = open("__OUT__.txt", 'w')   # Redirect std out.
+                message = "\narithmagic() failed to raise a ValueError "
+
+                try:
+                    s.arithmagic()
+                except ValueError as e:
+                    sys.stdin = standard_in             # Reset std in.
+                    sys.stdout = standard_out           # Reset std out.
+                    print("\nCorrect Error message: {}".format(err))
+                    print("Student Error message: {}".format(e))
+                    return self._grade(1, "Poor error message")
+                except Exception as e:
+                    self.feedback += message
+                    self.feedback +="(got {} instead)".format(self._errType(e))
+                    self.feedback += "\n\tError message: {}".format(e)
+                else:
+                    self.feedback += message
+                return 0
+            finally:
+                sys.stdin = standard_in                 # Reset std in.
+                sys.stdout = standard_out               # Reset std out.
+                rm("__IN__.txt")
+                rm("__OUT__.txt")
+
+
+        points  = test_arithmagic([1234], "Input must be 3 digits")
+        points += test_arithmagic([121],
+                            "First and last digit must differ by 2 or more")
+        points += test_arithmagic([123, 323], "Incorrect reversal")
+        points += test_arithmagic([123, 321, 111], "Incorrect difference")
+        points += test_arithmagic([123, 321, 198, 899], "Incorrect reversal")
 
         return points
 
     def problem2(self, s):
         """Test random_walk(). 5 points."""
+
+        points = 0
         def _handle(signum, frame):
             raise KeyboardInterrupt("Arificial KeyboardInterrupt")
 
         # Let random_walk() it run to completion (2 points).
         print("\nCorrect Output:\tProcess Completed\nStudent Output:\t"),
-        points = self._eqTest(s.random_walk(10000), 10000,
-                                "random_walk() returned incorrect value")
+        if s.random_walk(10000) is None:
+            self.feedback += "\nrandom_walk() failed to return a value"
+        else:
+            points += 1
         points += self._grade(1,
                         "random_walk() failed to print 'Process Completed'")
 
         # Interrupt random_walk() it with a KeyboardInterrupt (3 points).
         print("\nCorrect Output:\tProcess Interrupted at iteration <i>")
-        print("\nStudent Output:\t"),
+        print("Student Output:\t"),
         signal.signal(signal.SIGALRM, _handle)
         signal.alarm(1)
         try:
@@ -169,9 +197,6 @@ class _testDriver(object):
 
     def problem3(self, s):
         """Test ContentFilter.__init__(). 5 points."""
-
-        if not hasattr(s, "ContentFilter"):
-            raise NotImplementedError("Problem 4 Incomplete")
         points = 0
 
         # Test faulty initialization (2 points).
@@ -179,21 +204,20 @@ class _testDriver(object):
             x = s.ContentFilter(123456789)
         except TypeError as e:
             points += 2
-        except BaseException as e:
-            self.feedback += "\nFailed to raise a TypeError "
-            self.feedback += "(got a %s instead)"%self._errType(e)
+        except Exception as e:
+            self.feedback += "\nContentFilter.__init__() failed to raise a "
+            self.feedback += "TypeError (got {} instead)".format(
+                                                            self._errType(e))
         else:
             self.feedback += "\nFailed to raise a TypeError"
 
         # Test proper initialization (3 points).
-        x = s.ContentFilter("contentfilter_test.txt")
+        x = s.ContentFilter(self.data_file)
         return points + 3
 
-    def problem4(self, s, sourcefile="contentfilter_test.txt"):
+    def problem4(self, s):
         """Test the ContentFilter class's methods. 20 points."""
-        if not hasattr(s, "ContentFilter"):
-            raise NotImplementedError("Problem 5 Incomplete")
-        sFilter = s.ContentFilter(sourcefile)
+        sFilter = s.ContentFilter(self.data_file)
 
         def test_bad(x, statement, method):
             """Test that eval(statement) raises an ValueError."""
@@ -201,7 +225,7 @@ class _testDriver(object):
                 eval(statement)
             except s.ValueError:
                 return 1
-            except BaseException as e:
+            except Exception as e:
                 self.feedback += "\nContentFilter.%s() "%method
                 self.feedback += "failed to raise an ValueError "
                 self.feedback += "(got a %s instead)"%self._errType(e)
@@ -238,7 +262,7 @@ class _testDriver(object):
 
         # Test each method with correct usage (11 points).
         print("\nSource file for testing ContentFilter class:\n")
-        with open(sourcefile) as f:
+        with open(self.data_file) as f:
             for line in f:
                 print(line.rstrip())
 
@@ -261,7 +285,7 @@ class _testDriver(object):
         rm("temporary_outfile.txt")
 
         # Test ContentFilter.__str__() (3 points).
-        template = ContentFilter(sourcefile)
+        template = ContentFilter(self.data_file)
         print("\nCorrect ContentFilter.__str__() output:\n")
         print(template)
         print("\nStudent ContentFilter.__str__() output:\n")
