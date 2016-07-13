@@ -32,7 +32,7 @@ def random_walk(max_iters=1e12):
         for i in xrange(int(max_iters)):
             walk += choice(direction)
     except KeyboardInterrupt:
-        print("Process Interrupted at iteration {}%".format(i))
+        print("Process Interrupted at iteration {}".format(i))
     else:
         print("Process Completed")
     return walk
@@ -161,3 +161,6 @@ class ContentFilter(object):
         out += "\nWhitespace characters:\t" + str(space)
         out += "\nNumber of lines:\t" + str(lines)
         return out
+
+if __name__ == '__main__':
+    random_walk(1e8)

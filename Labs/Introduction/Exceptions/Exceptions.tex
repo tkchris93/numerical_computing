@@ -211,7 +211,7 @@ The code in the \li{finally} block is \emph{always} executed, even if a \li{retu
 ...
 <<The house may be on fire.
 Traceback (most recent call last):
-  File "<stdin>", line 3, in <module>
+  File "<stdin>", line 2, in <module>
 ValueError: The house is on fire!>>
 \end{lstlisting}
 
@@ -252,8 +252,9 @@ An \li{else} statement can also be attached after \li{except} statements, which 
 See \url{https://docs.python.org/2/tutorial/errors.html} for more examples.
 
 \begin{problem} % Problem: Catch a KeyboardInterrupt to stop a random walk.
-A \li{KeyboardInterrupt} is a special exception that can be triggered at any time by entering \li{ctrl c} (on most systems) in the keyboard.
-% Usually a \li{KeyboardInterrupt} is used to manually escape faulty code that runs forever, but it can also be used intentionally to truncate a process.
+A \emph{random walk} is a path created by a series of random steps.
+% Random walks are used in many applications, including molecular movement, image segmentation, and (somewhat disturbingly) stock market prices.
+The following function simulates a random walk where at every step, we either step forward (adding $1$ to the total) or backward (adding $-1$).
 
 \begin{lstlisting}
 from random import choice
@@ -265,28 +266,30 @@ def random_walk(max_iters=1e12):
         walk += choice(direction)
     return walk
 \end{lstlisting}
-Modify \li{random_walk()} so that if the user raises a \li{KeyboardInterrupt}, the function prints ``Process Interrupted at iteration $i$''.
-If no \li{KeyboardInterrupt} is raised, print ``Process Completed''.
+
+A \li{KeyboardInterrupt} is a special exception that can be triggered at any time by entering \li{ctrl c} (on most systems) in the keyboard.
+% A \li{KeyboardInterrupt} is usually used to manually escape faulty code that runs forever, but it can also be used to intentionally truncate a process.
+Modify \li{random_walk()} so that if the user raises a \li{KeyboardInterrupt}, the function handles the exception and prints ``Process interrupted at iteration $i$''.
+If no \li{KeyboardInterrupt} is raised, print ``Process completed''.
 In both cases, return \li{walk} as before.
 \end{problem}
 
-\subsection*{The Exception Hierarchy} % ---------------------------------------
-
+\begin{info} % Exception Hierarchy
 The built-in Python exceptions are organized into a class hierarchy.
-This can lead to some confusing behavior if you aren't careful!
+This can lead to some confusing behavior.
 
 \begin{lstlisting}
 >>> try:
 ...     raise ValueError("This is a ValueError!")
 ... except StandardError as e:
-...     print e
+...     print(e)
 ...
 <<This is a ValueError!>>                       # The exception was caught.
 
 >>> try:
 ...     raise StandardError("This is a StandardError!")
 ... except ValueError as e:
-...     print e
+...     print(e)
 ...
 <<Traceback (most recent call last):
   File "<stdin>", line 2, in <module>
@@ -294,11 +297,14 @@ StandardError: This is a StandardError!>>     # The exception wasn't caught!
 \end{lstlisting}
 
 It turns out that the \li{ValueError} class inherits from the \li{StandardError} class.
-Thus a \li{ValueError} \emph{is} a \li{StandardError}, so the first \li{except} statement was able to catch the exception, but a \li{StandardError} is \emph{not} a \li{ValueError}, so the second \li{except} statement could not catch the exception.
-The complete exception classes hierarchy is documented at \url{https://docs.python.org/2/library/exceptions.html#exception-hierarchy}.
+Thus a \li{ValueError} \emph{is} a \li{StandardError}, so the first except statement was able to catch the exception, but a \li{StandardError} is \emph{not} a \li{ValueError}, so the second except statement could not catch the exception.
 
-\begin{warn} % Don't use except: by itself; specify an exception class.
-Having \li{except} by itself will catch \emph{any} exception raised in the \li{try} block, but this approach can mistakenly mask unexpected errors.
+The complete exception class hierarchy is documented at \url{https://docs.python.org/2/library/exceptions.html#exception-hierarchy}.
+\end{info}
+
+\begin{comment}
+\begin{warn} % Don't use except by itself; specify an exception class.
+An \li{except} statement by itself catches \emph{any} exception raised in the corresponding try block, but this approach can mistakenly mask unexpected errors.
 Consider the following function, which intends to avoid dividing by zero.
 
 \begin{lstlisting}
@@ -312,8 +318,8 @@ Consider the following function, which intends to avoid dividing by zero.
 <<y must not equal zero!>>
 \end{lstlisting}
 
-Because \li{y} was misspelled, a \li{NameError} will be raised every time this function is called.
-Be specific about the kind of exception you expect to encounter.
+Because \li{y} is misspelled as \li{yy}, a \li{NameError} is always raised in the try block.
+Always specify the kinds of exceptions you expect to encounter.
 
 \begin{lstlisting}
 >>> def divider(x, y):
@@ -326,13 +332,14 @@ Be specific about the kind of exception you expect to encounter.
 <<Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
   File "<stdin>", line 3, in divider
-NameError: global name 'yy' is not defined>>
+NameError: global name 'yy' is not defined>>    # Now we can see the mistake.
 \end{lstlisting}
 \end{warn}
+\end{comment}
 
 \section*{File Input and Output} % ============================================
 
-Python has a useful \li{file} object which acts as an interface to all kinds of different file streams.
+Python has a useful \li{file} object that acts as an interface to all kinds of different file streams.
 The built-in function \li{open()} creates a \li{file} object.
 
 \begin{lstlisting}
@@ -348,7 +355,7 @@ The mode determines the kind of access to use when opening the file.
 \item \li{'r'}: opens an existing file for read-only access.
 This is the default mode.
 \item \li{'w'}: opens a file for write-only access.
-This mode creates the file if it doesn't already exist, and \textbf{\emph{overwrites everything}} in the file if it does exist.
+This mode creates the file if it doesn't already exist and \textbf{overwrites everything} in the file if it does exist.
 \item \li{'a'}: opens a file for appending, meaning new data is written to the end of the file.
 This mode also creates a new file if it doesn't already exist.
 \end{description}

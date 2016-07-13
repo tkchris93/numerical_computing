@@ -139,51 +139,35 @@ class _testDriver(object):
         return points
 
     def problem2(self, s):
-        """Test Problem 2. 5 points."""
+        """Test random_walk(). 5 points."""
         def _handle(signum, frame):
             raise KeyboardInterrupt("Arificial KeyboardInterrupt")
 
-        # Test forever(), letting it run to completion (2 points).
+        # Let random_walk() it run to completion (2 points).
         print("\nCorrect Output:\tProcess Completed\nStudent Output:\t"),
-        points = self._eqTest(s.forever(10),10,
-                                "forever() returned incorrect value")
-        points += self._grade(1, "'Process Completed' failed to print")
+        points = self._eqTest(s.random_walk(10000), 10000,
+                                "random_walk() returned incorrect value")
+        points += self._grade(1,
+                        "random_walk() failed to print 'Process Completed'")
 
-        # Test forever(), interrupting it with a KeyboardInterrupt (3 points).
-        print("\nCorrect Output:\tProcess Interrupted\nStudent Output:\t"),
-        signal.signal(signal.SIGALRM, _handle); signal.alarm(1)
+        # Interrupt random_walk() it with a KeyboardInterrupt (3 points).
+        print("\nCorrect Output:\tProcess Interrupted at iteration <i>")
+        print("\nStudent Output:\t"),
+        signal.signal(signal.SIGALRM, _handle)
+        signal.alarm(1)
         try:
-            x = s.forever(1000000000)
+            s.random_walk(1e12)
         except KeyboardInterrupt:
-            self.feedback += "\nKeyboardInterrupt not caught in forever()"
+            self.feedback += "\nrandom_walk() failed to handle the "
+            self.feedback += "KeyboardInterrupt"
         else:
             points += 2
-        points += self._grade(1, "'Process Interrupted' failed to print")
+        points += self._grade(1,
+                        "random_walk() failed to print 'Process Interrupted'")
 
         return points
 
     def problem3(self, s):
-        """Test ValueError. 5 points."""
-        if not hasattr(s, "ValueError"):
-            raise NotImplementedError("Problem 3 Incomplete")
-
-        # Check that ValueError inherits from Exception (1 point).
-        points = 0
-        if issubclass(s.ValueError, Exception):
-            points += 1
-
-        # Check that ValueError behaves like Exception (4 points).
-        try:
-            raise s.ValueError("This", "is", "a", "test")
-        except s.ValueError as e:
-            points += 4
-        except BaseException as e:
-            self.feedback += "\nFailed to raise an ValueError "
-            self.feedback += "(got a %s instead)"%self._errType(e)
-
-        return points
-
-    def problem4(self, s):
         """Test ContentFilter.__init__(). 5 points."""
 
         if not hasattr(s, "ContentFilter"):
@@ -205,7 +189,7 @@ class _testDriver(object):
         x = s.ContentFilter("contentfilter_test.txt")
         return points + 3
 
-    def problem5(self, s, sourcefile="contentfilter_test.txt"):
+    def problem4(self, s, sourcefile="contentfilter_test.txt"):
         """Test the ContentFilter class's methods. 20 points."""
         if not hasattr(s, "ContentFilter"):
             raise NotImplementedError("Problem 5 Incomplete")

@@ -26,3 +26,4 @@ def random_walk(max_iters=1e12):
     return walk
 
 
+# Problems 3 and 4: Write a 'ContentFilter' class.
