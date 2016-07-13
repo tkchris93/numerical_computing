@@ -114,6 +114,7 @@ Raise a \li{ValueError} with an informative error message if any of the followin
 \end{enumerate}
 %
 (Hint: \li{raw_input()} always returns a string, so each variable is a string initially. Use \li{int()} to cast the variables as integers when necessary. The built-in function \li{abs()} may also be useful.)
+
 \end{problem}
 
 \subsection*{Handling Exceptions} % -------------------------------------------
@@ -362,11 +363,9 @@ However, errors in the \li{try} or \li{with} blocks will not prevent the file fr
 
 \subsection*{Reading and Writing} % -------------------------------------------
 
-Open file objects have an implicit \emph{cursor} that determines the location in the file to read from or write data to.
-After reading a file once, either the file must be closed and reopened, or the cursor must be reset to the beginning of the file with \li{seek(0)} before it can be read again.
+Open file objects have an implicit \emph{cursor} that determines the location in the file to read from or write to.
+After the entire file has been read once, either the file must be closed and reopened, or the cursor must be reset to the beginning of the file with \li{seek(0)} before it can be read again.
 
-% Small files can usually be read once and stored entirely in memory.
-% Usually the \li{read()} or \li{readlines()} methods get the job done.
 Some of more important file object attributes and methods are listed below.
 
 \begin{table}[H]
@@ -412,22 +411,26 @@ Executing this code replaces whatever used to be in \texttt{out.txt} (whether or
 \begin{problem} % ContentFilter.__init__().
 Define a class called \li{ContentFilter}.
 Implement the constructor so that it accepts the name of a file to be read.
-Store the name of the file and its contents as attributes and securely close the file stream.
-If the filename argument is not a string, raise a \li{TypeError}.
-\\
-(Hint: You might store the file's contents as a single string, a list of lines, or in another format.
-Read Problem \ref{prob:content-filter-methods} and decide which format will be easiest for you to work with.)
+%
+\begin{enumerate}
+\item If the filename argument is not a string, raise a \li{TypeError}.
+
+(Hint: The built-in functions \li{type()} and \li{isinstance()} may be useful.)
+
+\item Read the file and store its name and contents as attributes
+(store the contents as a single string).
+Securely close the file stream.
+\end{enumerate}
 \end{problem}
 
 \section*{String Formatting} % ================================================
 
-Python's string type class, \li{str}, has several useful methods for parsing and formatting strings.
+Python's \li{str} type class has several useful methods for parsing and formatting strings.
 They are particularly useful for processing data from a source file and for preparing data to be written to an external file.
 
 \begin{table}[H]
 \begin{tabular}{r|l}
-Method & \multicolumn{1}{c}{Returns} \\
-\hline
+Method & \multicolumn{1}{c}{Returns} \\ \hline
 \li{count()} & The number of times a given substring occurs within the string.\\
 \li{find()} & The lowest index where a given substring is found.\\
 \li{isalpha()} & \li{True} if all characters in the string are alphabetic (a, b, c, \ldots).\\
@@ -483,13 +486,18 @@ If \li{mode} is not either \li{'w'} or \li{'a'}, raise a \li{ValueError} with an
 \begin{enumerate}
 \item \li{uniform()}: write the data to the outfile with uniform case. Include an additional keyword argument \li{case} that defaults to \li{"upper"}.
 
-If \li{case="upper"}, write the data in upper case. If \li{case="lower"}, write the data in lower case. If \li{case} is not one of these two values, raise a \li{ValueError}.
+If \li{case="upper"}, write the data in upper case.
+If \li{case="lower"}, write the data in lower case.
+If \li{case} is not one of these two values, raise a \li{ValueError}.
 
 \item \li{reverse()}: write the data to the outfile in reverse order. Include an additional keyword argument \li{unit} that defaults to \li{"line"}.
 
-If \li{unit="word"}, reverse the ordering of the words in each line, but write the lines in the same order as the original file. If \li{unit="line"}, reverse the ordering of the lines, but do not change the ordering of the words on each individual line. If \li{unit} is not one of these two values, raise a \li{ValueError}.
+If \li{unit="word"}, reverse the ordering of the words in each line, but write the lines in the same order as the original file.
+If \li{unit="word"}, reverse the ordering of the lines, but do not change the ordering of the words on each individual line.
+If \li{unit} is not one of these two values, raise a \li{ValueError}.
 
-\item \li{transpose()}: write a ``transposed'' version of the data to the outfile. That is, write the first word of each line of the data to the first line of the new file, the second word of each line of the data to the second line of the new file, and so on.
+\item \li{transpose()}: write a ``transposed'' version of the data to the outfile.
+That is, write the first word of each line of the data to the first line of the new file, the second word of each line of the data to the second line of the new file, and so on.
 \end{enumerate}
 
 Also implement the \li{__str__()} magic method so that printing a \li{ContentFilter} object yields the following output:
@@ -502,7 +510,50 @@ Whitespace characters:    <The number of spaces, tabs, and newlines>
 Number of lines:          <The number of lines>>>
 \end{lstlisting}
 
-\label{prob:content-filter-methods}
+\begin{comment}
+Examples:
+
+\begin{lstlisting}
+# example.txt
+a b c
+d e f
+\end{lstlisting}
+
+\begin{lstlisting}
+>>> cf = ContentFilter("example.txt")
+
+>>> cf.uniform("uniform.txt", mode='w', case="upper")
+>>> cf.uniform("uniform.txt", mode='a', case="lower")
+
+>>> cf.reverse("reverse.txt", mode='w', unit="word")
+>>> cf.reverse("reverse.txt", mode='a', unit="line")
+
+>>> cf.transpose("transpose.txt", mode='w')
+\end{lstlisting}
+
+\begin{lstlisting}
+# uniform.txt
+A B C
+D E F
+a b c
+d e f
+\end{lstlisting}
+
+\begin{lstlisting}
+# reverse.txt
+c b a
+f e d
+d e f
+a b c
+\end{lstlisting}
+
+\begin{lstlisting}
+a d
+b e
+c f
+\end{lstlisting}
+\end{comment}
+
 \end{problem}
 
 \newpage
@@ -519,25 +570,26 @@ The generic \li{Exception} class is typically the parent class of choice.
 ...     pass
 ...
 >>> raise TooHardError("This lab is impossible!")
-Traceback (most recent call last):
+<<Traceback (most recent call last):
   File "<stdin>", line 1, in <module>
-<<__main__.TooHardError: This lab is impossible!>>
+__main__.TooHardError: This lab is impossible!>>
 \end{lstlisting}
 
-This may seem like a trivial extension of the \li{Exception} class, but it is useful because the interpreter never automatically raises a \li{TooHardError}.
-If you see a \li{TooHardError}, it must have originated from a hand-written \li{raise} command.
+This may seem like a trivial extension of the \li{Exception} class, but it is useful to do because the interpreter never automatically raises a \li{TooHardError}.
+Any \li{TooHardError} must have originated from a hand-written \li{raise} command, making it easier to identify the exact source of the problem.
 
 \subsection*{Assertions} % ----------------------------------------------------
 
 An \li{AssertionError} is a special exception that is used primarily for software testing.
-The \li{assert} statement is a shortcut for testing the truthfulness of an expression and raising an \li{AssertionError}
+The \li{assert} statement is a shortcut for testing the truthfulness of an expression and raising an \li{AssertionError}.
 
 \begin{lstlisting}
 >>> assert <expression>, <message>
 
-# In other words...
+# Equivalently...
 >>> if not <expression>:
 ...     raise AssertionError(<message>)
+...
 \end{lstlisting}
 
 \begin{comment} % This is only a feature in Python 3 (TODO).
@@ -551,22 +603,68 @@ The \li{assert} statement is a shortcut for testing the truthfulness of an expre
 This syntax makes it possible to see where an error originated from and to ``pass it up'' to the next process.
 \end{comment}
 
-
 \begin{comment}
 \subsection*{Buffering} % -----------------------------------------------------
-Details about file.flush(), the buffer argument for open(), and reading large files.
+The {open()} function also accepts a third argument that specifies buffering size.
+% TODO: Details about file.flush(), the buffer argument for open(), and reading large files.
 \end{comment}
 
-\begin{comment}
 \subsection*{The CSV Module} % ------------------------------------------------
 
 The CSV format (comma separated value) is a common file format for spreadsheets and grid-like data.
-The \li{csv} module in the standard library has some methods that work with the file object to read a CSV file.
-This can also be useful for STUFF.
-\end{comment}
+The \li{csv} module in the standard library contains functions that work in conjunction with the built-in \li{file} object to read from or write to CSV files.
+See \url{https://docs.python.org/2/library/csv.html} for details.
 
-\begin{comment}
+\newpage
+
 \subsection*{More String Formatting} % ----------------------------------------
 
-See \url{https://docs.python.org/2/library/string.html\#format-string-syntax}.
-\end{comment}
+Concatenating string values with non-string values is often cumbersome and tedious.
+Consider the problem of printing a simple date:
+
+\begin{lstlisting}
+>>> day, month, year = 14, "March", 2015
+>>> print("Is today " + str(day) + str(month) + ", " + str(year) + "?")
+Is today 14 March, 2015?
+\end{lstlisting}
+
+The \li{str} class's \li{<<format()>>} method makes it easier to insert non-string values into the middle of a string.
+Write the desired output in its entirety, replacing non-string values with curly braces \li{\{\}}.
+Then use the \li{<<format()>>} method, entering each replaced value in order.
+
+\begin{lstlisting}
+>>> print("Is today {} {}, {}?".<<format>>(day, month, year))
+Is today 14 March, 2015?
+\end{lstlisting}
+
+This method is extremely flexible and provides many convenient ways to format string output nicely.
+Suppose, for example, that we would like to visualize the progress that a program is making through a loop.
+The following code prints out a simple status bar.
+
+\begin{lstlisting}
+>>> from sys import stdout
+
+>>> iters = int(1e7)
+>>> chunk = iters // 20
+>>> for i in xrange(iters):
+...     print("\r[{:<20}] i = {}".<<format>>('='*((i//chunk)+1), i)),
+...     stdout.flush()
+...
+\end{lstlisting}
+
+Here the string \li{"\\r[\{:<20\}]"} used in conjunction with the \li{<<format()>>} method tells the cursor to go back to the beginning of the line, print an opening bracket, then print the first argument of \li{<<format()>>} left-aligned with at least $20$ total spaces before printing the closing bracket.
+The comma after the print command suppresses the automatic newline character, keeping the output of each individual print statements on the same line.
+Finally, \li{sys.stdout.flush()} flushes the internal buffer so that the status bar is printed in real time.
+
+Of course, printing at each iteration dramatically slows down the progression through the loop.
+How does the following code solve that problem?
+
+\begin{lstlisting}
+>>> for i in xrange(iters):
+...     if not i % chunk:
+...         print "\r[{:<20}] i = {}".<<format>>('='*((i//chunk)+1), i),
+...         stdout.flush()
+...
+\end{lstlisting}
+
+See \url{https://docs.python.org/2/library/string.html\#format-string-syntax} for more examples and specific syntax for using \li{str.<<format()>>}.
