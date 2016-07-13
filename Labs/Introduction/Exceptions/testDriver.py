@@ -4,6 +4,7 @@
 import sys
 import signal
 from os import remove as rm
+from solutions import ContentFilter
 
 def test(student_module):
     """Test script. Import the student's solutions file as a module.
@@ -216,82 +217,65 @@ class _testDriver(object):
         return points + 3
 
     def problem4(self, s):
-        """Test the ContentFilter class's methods. 20 points."""
-        sFilter = s.ContentFilter(self.data_file)
+        """Test the ContentFilter class's methods. 25 points."""
 
-        def test_bad(x, statement, method):
+        def test_bad(cf, method, *args, **kwargs):
             """Test that eval(statement) raises an ValueError."""
+            ags = ["'{}'".format(arg) for arg in args]
+            kwgs = ["{}='{}'".format(key, val) for key,val in kwargs.items()]
+            message = "\nContentFilter.{}({}, {}) failed to raise a ValueError".format(method, ", ".join(ags), ", ".join(kwgs))
             try:
-                eval(statement)
-            except s.ValueError:
+                eval("cf.{}(*args, **kwargs)".format(method))
+            except ValueError:
                 return 1
             except Exception as e:
-                self.feedback += "\nContentFilter.%s() "%method
-                self.feedback += "failed to raise an ValueError "
-                self.feedback += "(got a %s instead)"%self._errType(e)
+                self.feedback += message
+                self.feedback +="\n\t(got {} instead)".format(self._errType(e))
             else:
-                self.feedback += "\nContentFilter.%s() "%method
-                self.feedback += "failed to raise an ValueError"
+                self.feedback += message
             return 0
 
-        # Test that each method raises an ValueError for bad 'mode'.
-        points  = test_bad(sFilter, 'x.hyphenate("out.txt", mode="z")',
-                                                                "hyphenate")
-        points += test_bad(sFilter, 'x.uniform("out.txt", mode="z")',
-                                                                "uniform")
-        points += test_bad(sFilter, 'x.reverse("out.txt", mode="z")',
-                                                                "reverse")
-        points += test_bad(sFilter, 'x.transpose("out.txt", mode="z")',
-                                                                "transpose")
+        def test_good(cf, method, value, *args, **kwargs):
+            ags = ["'{}'".format(arg) for arg in args]
+            kwgs = ["{}='{}'".format(key, val) for key,val in kwargs.items()]
+            message = "ContentFilter.{}({}, {})".format(
+                                    method, ", ".join(ags), ", ".join(kwgs))
+            eval("cf.{}(*args, **kwargs)".format(method))
+            print("\n{}:\n".format(message))
+            with open(args[0], 'r') as f:
+                print(f.read())
+            return self._grade(value, message + " failed")
 
-        # Test that uniform() and reverse() raise ValueErrors correctly
-        points += test_bad(sFilter, 'x.uniform("out.txt", case="middle")',
-                                                                    'uniform')
-        points += test_bad(sFilter, 'x.reverse("out.txt", unit="chunk")',
-                                                                    'reverse')
+        sCF = s.ContentFilter(self.data_file)
 
-        def test_good(x, statement, method, value):
-            """Test a ContentFilter method with correct usage."""
-            print("\nOutput of ContentFilter.%s:\n"%method)
-            filename = "temporary_outfile.txt"
-            eval(statement)
-            with open(filename, 'r') as f:
-                for line in f:
-                    print(line.rstrip())
-            return self._grade(value, "ContentFilter.%s failed"%method)
+        # Test that each method raises an ValueError for bad 'mode' (3 points).
+        points  = test_bad(sCF, "uniform",   "_OUT_", mode='z')
+        points += test_bad(sCF, "reverse",   "_OUT_", mode='z')
+        points += test_bad(sCF, "transpose", "_OUT_", mode='z')
 
-        # Test each method with correct usage (11 points).
-        print("\nSource file for testing ContentFilter class:\n")
+        # Test that uniform() and reverse() raise ValueErrors (2 points).
+        points += test_bad(sCF, "uniform", "_OUT_", case="middle")
+        points += test_bad(sCF, "reverse", "_OUT_", unit="chunk")
+
+        print("\nSource file:\n")
         with open(self.data_file) as f:
-            for line in f:
-                print(line.rstrip())
+            print(f.read())
 
-        points += test_good(sFilter, 'x.hyphenate(filename, mode="w")',
-                                                        'hyphenate()', 2)
-        points += test_good(sFilter,
-                            'x.uniform(filename, mode="w", case="upper")',
-                                                'uniform(case="upper")', 1)
-        points += test_good(sFilter,
-                            'x.uniform(filename, mode="w", case="lower")',
-                                                'uniform(case="lower")', 1)
-        points += test_good(sFilter,
-                            'x.reverse(filename, mode="w", unit="word")',
-                                                'reverse(unit="word")', 2)
-        points += test_good(sFilter,
-                            'x.reverse(filename, mode="w", unit="line")',
-                                                'reverse(unit="line")', 2)
-        points += test_good(sFilter, 'x.transpose(filename, mode="w")',
-                                                        'transpose()', 3)
-        rm("temporary_outfile.txt")
+        # Test each method with correct usage (15 points).
+        points += test_good(sCF, "uniform", 3, "_OUT_", mode='w', case="upper")
+        points += test_good(sCF, "uniform", 3, "_OUT_", mode='w', case="lower")
+        points += test_good(sCF, "reverse", 3, "_OUT_", mode="w", unit="word")
+        points += test_good(sCF, "reverse", 3, "_OUT_", mode="w", unit="line")
+        points += test_good(sCF, "transpose", 3, "_OUT_", mode="w")
+        rm("_OUT_")
 
-        # Test ContentFilter.__str__() (3 points).
-        template = ContentFilter(self.data_file)
+        # Test ContentFilter.__str__() (5 points).
         print("\nCorrect ContentFilter.__str__() output:\n")
-        print(template)
+        print(ContentFilter(self.data_file))
         print("\nStudent ContentFilter.__str__() output:\n")
-        print(sFilter)
-        points += self._grade(3,
-                        "ContentFilter.__str__() failed:\n\n%s\n"%sFilter)
+        print(sCF)
+        points += self._grade(5,
+                    "ContentFilter.__str__() failed:\n\n{}\n".format(sCF))
         return points
 
 
