@@ -1,18 +1,19 @@
-import numpy as np
 import pandas as pd
-from matplotlib import pyplot as plt
 
+titanic = pd.read_csv("titanic.csv")[['Pclass','Survived','Sex','Age','Fare']]
+titanic['Age'].fillna(titanic['Age'].mean())
+titanic.dropna(inplace=True)
+#print titanic.head()
 
-titanic = pd.read_csv('titanic.csv')
+tab = titanic.pivot_table('Survived', index='Sex', columns='Pclass',aggfunc='count')
+#print tab
+tab2 = titanic.pivot_table('Survived', index='Sex', columns='Pclass')
+#print tab2
+age = pd.cut(titanic['Age'], [0,12,18,80])
+tab3 = titanic.pivot_table('Survived',index =['Sex', age], columns='Pclass',aggfunc='count')
 
-def problem_1():
-    # Problem 1a
-    titanic.groupby('embark_town')[['survived']].mean() 
-    # Problem 1b
-    titanic.pivot_table('survived', index='embark_town', columns='sex')
-    # Problem 1c
-    # We look at the number of data points in each category of the above pivot table
-    titanic.pivot_table('survived', index='embark_town', columns='sex', aggfunc='count')
-    print 'It seems that the place of embarkment isnt as important as the class and gender are. If someone embarked from Queenstown, it was more likely that they were 3rd class, affecting the probability of them surviving.'
-    titanic.pivot_table('survived', index='sex', columns='class')
+fare = pd.qcut(titanic['Fare'], 2)
+tab4 = titanic.pivot_table('Survived',index=['Sex',age],columns=[fare,'Pclass'])
 
+tab5 = titanic.pivot_table('Survived',index=['Sex',age],columns=[fare,'Pclass'], fill_value=0.0)
+print tab5
