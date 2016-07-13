@@ -2,17 +2,6 @@
 \objective{Learn about Pivot tables, groupby, etc.}
 \label{lab:pandas3}
 
-MAJOR REVISIONS IN PROGRESS!!!!!!!!!!!!!!
-
-\begin{comment}
-This section will probably use 1-3 datasets from PyDataset describing diseases.
-Since these datasets are easy to download and use, that will be a good way to compare how different datasets match certain plots better, and then similarly divide certain aspects of the data into different plots.
-
-One example here will be the PyDataset's AIDS dataset.
-In addition to its categories of infection and induction periods, we can compare adult cases to children using a bar chart, or simply focus on one of these two using a scatter plot.
-There are many different ways to describe the data, here we will discuss how what we want to display effects the plot we choose.
-\end{comment}
-
 \section*{Introduction}
 Pandas originated as a wrapper for numpy that was developed for purposes of data analysis. Data seldom comes in a format that is perfectly ready to use.  We always need to be able to interpret what our data is telling us.  Some data may be of little or no use, while other aspects of our data may be vital.  \emph{Pivoting} is an extremely useful way to sort through data and be able to present results clearly and compactly.  Two central ways to accomplish this are by using \li{groupby} and by using \emph{Pivot Tables}.
 
@@ -111,13 +100,13 @@ Here, we use the \li{DataFrame.loc} method to access three specific columns in t
 \begin{problem} 
 Examine the \li{diamonds} dataset found in the \li{pydataset} module. 
 This dataset contains the identifiers and attributes of 53,940  individual round cut diamonds. 
-Using the \li{groupby} method, create three different visuals highlighting and comparing different aspects of the data.
+Using the \li{groupby} method, create a visual highlighting and comparing different aspects of the data.
 This can be in the form of a single plot or comparative subplots.  Use the plotting techniques from Lab \ref{lab:pandas2}.
 
-Print a few sentences for each plot explaining what type of graph you used, why, and what we learn about the dataset from your plot.
+Print a paragraph explaining what type of graph you used, why, and what we learn about the dataset from your plot.
 Don't forget to include titles, clear labels, and sourcing. 
 
-The following is an example of comparative subplots, which may \emph{not} be used for your plots.
+The following is an example of comparative subplots, which may \emph{not} be used for your plot.
 \begin{figure}[H] % Matplotlib vs. Pandas
     \centering
     \begin{minipage}[b]{0.48\textwidth}
@@ -154,6 +143,7 @@ The code for the above figure is included here:
 \end{comment}
 
 The following is an appropriate (if lengthy) description of our plots:
+
 The above plots were created using \li{groupby} on the diamond colors and then using a hexbin comparing carats to price for the highest and lowest quality diamonds, respectively. 
 This hexbin is particularly revealing for each set of thousands of diamonds because it meaningfully displays concentration of datapoints. 
 Matplotlib's new \li{viridis} colorplot, with a dark background, reveals bins that would have been invisible with a white background.
@@ -167,7 +157,7 @@ Both hexbins reveal a linearity between diamond weight and diamond price, with D
 \li{Groupby} is a very useful method to order data.  However, it is not the perfect tool for every situation.  As we saw when sorting data by multiple columns, we can end up with a useful grouping, but too much information to display.  If we want to see information in table format, we can make use Pivot Tables.
 
 \section*{Pivot Tables}
-With a given pandas \li{DataFrame}, we can visualize data easily with the method \li{pivot_table()}. The Titanic dataset (\li{titanic.csv}) is especially apt for this.  It includes many columns, but we will use only \li{Survived}, \li{Pclass}, \li{Sex}, \li{Age}, and \li{Fare} here.  You will need to load in this dataset for upcoming problems, using principles taught in Lab \ref{lab:pandas1}. Note that many of the ages are missing values.  For our purposes, simply fill these missing values with the average age.  Then drop any rows that are missing data. Once we have a usable dataset, we can make Pivot Tables to view trends in the data.
+With a given pandas \li{DataFrame}, we can visualize data easily with the method \li{pivot_table()}. The Titanic dataset (\li{titanic.csv}) is especially apt for this.  It includes many columns, but we will use only \li{Survived}, \li{Pclass}, \li{Sex}, \li{Age}, \li{Fare}, and \li{Embarked} here.  You will need to load in this dataset for upcoming problems, using principles taught in Lab \ref{lab:pandas1}. Note that many of the ages are missing values.  For our purposes, simply fill these missing values with the average age.  Then drop any rows that are missing data. Once we have a usable dataset, we can make Pivot Tables to view trends in the data.
 
 \begin{lstlisting}
 >>> titanic.pivot_table('Survived', index='Sex', columns='Pclass')
@@ -179,18 +169,16 @@ male    0.350993  0.145570  0.169540
 
 This simple command makes a table with rows \li{Sex} and columns \li{Pclass}, and averages the result of the column \li{Survived}, thereby giving the percentage of survivors in each grouping.  Note that this is similar to \li{groupby}: it sorts all entries into their gender and class, and the ``function" it performs is getting the percentage of survivors.
 
-Add in multi-indexing.
+This is interesting, and we can clearly see how much more likely females were to survive than males.  But how does age factor into survival rates? Were male children really that likely to die as compared to females in general?
 
-This is interesting, and we can clearly see how much more likely females were to survive than males.  But how does age factor into survival rates? Were male children really that likely to die as compared to female children?.
-
-Noting that in the original dataset, the column \li{Age} has a floating point value for the age of each passenger. If we were to just add `age' as an argument for index, then the table would create a new row for \emph{each} age present. This wouldn't be a very useful or simple table to visualize, so we desire to partition the ages into 3 categories. We use the function \li{cut()} to do this.
+We can investigate these results by \emph{multi-indexing}.  We can pivot based on more than just two variables, by adding in another index. Note that in the original dataset, the column \li{Age} has a floating point value for the age of each passenger. If we were to just add `age' as an argument for index, then the table would create a new row for \emph{each} age present. This wouldn't be a very useful or simple table to visualize, so we desire to partition the ages into 3 categories. We use the function \li{cut()} to do this.
 
 \begin{lstlisting}
 >>> # Partition each of the passengers into 3 categories based on their age
 >>> age = pd.cut(titanic['Age'], [0,12,18,80])
 \end{lstlisting}
 
-Now with this other partition of the column age, we can add this dimension to our pivot table, passing it along with \li{Sex} in a list to the parameter index.
+Now with this other partition of the column age, we can add this dimension to our pivot table, passing it along with \li{Sex} in a list to the parameter \li{index}.
 
 \begin{lstlisting}
 >>> # Add a third dimension, age, to our pivot table
@@ -219,41 +207,45 @@ male   (0, 12]     4   11   35
        (18, 80]  143  137  276
 \end{lstlisting}
 
-The parameter aggfunc defaults to `mean', which is why we have seen the mean survival rate for each of the different categories. By specifying aggfunc to be `count', we get how many passengers of each category are present in the table. In this case, specifying the value is `survived' is redundant. We get the same table if we put in \li{Fare} in place of li{Survived}.
+The parameter aggfunc defaults to `mean', which is why we have seen the mean survival rate for each of the different categories. By specifying aggfunc to be `count', we get how many passengers of each category are present in the table. In this case, specifying the value is `survived' is redundant. We get the same table if we put in \li{Fare} in place of \li{Survived}.
 
-This brings up another point about these datasets. We note for this dataset, we have roughly 800 passengers' data. This is not that large of a data set relatively, and we aren't guaranteed significant sample sizes for each possible partitioning of the the data columns. This is important to keep in mind with any dataset, and you should always ask questions about the numbers you see in pivot tables before making any conclusions.
+This table brings up another point about partitioning datasets. This Titanic dataset includes data for only about 1000 passengers. This is not that large of a sample size, relatively speaking, and significant sample sizes aren't guaranteed for each possible partitioning of the the data columns. It is a good practice to ask questions about the numbers you see in pivot tables before making any conclusions.
 
-Now, for fun, let's add a fourth dimension to our table- the cost of the passenger's ticket. Let's add this dimension to our columns of the pivot table. We now use the function \li{qcut()} to partition the fare column's data into two different categories.
-
-With this partition we add this dimension to columns, passing fare and `class' in as a list to the argument ``columns".
+Now, for fun, let's add a fourth dimension to our table--the cost of the passenger's ticket. Let's add this dimension to our columns of the pivot table. We now use the function \li{qcut()} to partition the fare column's data into two different categories.
 
 \begin{lstlisting}
 >>> # Partition fare column into 2 categories based on the values present in fare column
 >>> fare = pd.qcut(titanic['fare'], 2)
 >>> # Add the fare as a dimension of columns
->>> titanic.pivot_table('survived', index=['sex',age], columns=[fare, 'class'])
+>>> titanic.pivot_table('Survived', index=['Sex',age], columns=[fare, 'Pclass'])
+Fare					  [0, 15.75]					(15.75, 512.329]            
+Pclass				 1		  2		    3			1		    2			3
+Sex		   Age                                                                  
+female	 (0, 12]	NaN	  1.000000	0.600000	0.000000	1.000000	0.400000     
+		(12, 18]	NaN	  0.750000	0.666667	1.000000	1.000000	0.250000     
+		(18, 80]	NaN	  0.875000	0.434783	0.966667	0.880000	0.440000   
+male	 (0, 12]	NaN	  1.000000	0.636364	1.000000	1.000000	0.208333    
+		(12, 18]	NaN	  0.000000	0.115385	0.500000	0.000000	0.000000    
+		(18, 80]	0.2	  0.113636	0.153846	0.333333	0.040816	0.206897     
 \end{lstlisting}
 
-Add table
-%\begin{figure}
-%    \centering
-%    \includegraphics[width=.75\textwidth]{fare_splice.pdf}
-%\end{figure}
-
-We now see something else about our dataset - we get NaNs in some entries. The dataset has some invalid entries or incomplete data for the column fare. Let's investigate further.
+We now see something else about our dataset--we get NaNs in some entries. The dataset has some invalid entries or incomplete data for the column fare. Let's investigate further.
 
 By inspecting our dataset, we can see that there might not be any people in the categories given in the pivot table. We can fill in the NaN values in the pivot table with the argument \li{fill_value}. We show this below.
 
 \begin{lstlisting}
 >>> # Specify fill_value = 0.0
 >>> titanic.pivot_table('survived', index=['sex',age], columns=[fare, 'class'], fill_value=0.0)
+Fare					  [0, 15.75]					(15.75, 512.329]            
+Pclass				 1		  2		    3			1		    2			3
+Sex		   Age                                                                  
+female	 (0, 12]	0.0	  1.000000	0.600000	0.000000	1.000000	0.400000     
+		(12, 18]	0.0	  0.750000	0.666667	1.000000	1.000000	0.250000     
+		(18, 80]	0.0	  0.875000	0.434783	0.966667	0.880000	0.440000   
+male	 (0, 12]	0.0	  1.000000	0.636364	1.000000	1.000000	0.208333    
+		(12, 18]	0.0	  0.000000	0.115385	0.500000	0.000000	0.000000    
+		(18, 80]	0.2	  0.113636	0.153846	0.333333	0.040816	0.206897    
 \end{lstlisting}
-
-Add table
-%\begin{figure}
-%    \centering
-%    \includegraphics[width=.75\textwidth]{fill_zeros.pdf}
-%\end{figure}
 
 It should be noted though that with datasets where NaN's occur frequently, some preprocessing needs to be done so as to get the most accurate statistics and insights about your dataset. You should've worked on cleaning datasets in previous lab, so we don't go further into detail about the topic here.
 
@@ -262,13 +254,22 @@ Suppose that someone claims that the city from which a passenger embarked had a 
 \begin{enumerate}
 \item Using a \li{groupby()} call, see what the survival rates of the passengers were based on where they embarked from (\li{embark_town}).
 \item Next, create a pivot table to further look at survival rates based on both place of embarkment and gender.
-\item What do these tables suggest to you about the significance of where people embarked in influencing their survival rate? But in light of the context of the problem, what do you think this really means? Find 2 more pivot tables that investigate the claim further, looking at other criterion (e.g., class, age, etc.).
+\item What do these tables suggest to you about the significance of where people embarked in influencing their survival rate? Examine the context of the problem, and explain what you think this really means. Find 2 more pivot tables that investigate the claim further, looking at other criterion (e.g., class, age, etc.). Include explanations.
 \end{enumerate}
 \end{problem}
 
+As you have learned in the pandas labs, pandas is a powerful tool for data processing, and has a plethora of built-in functions that greatly simplify data analysis.  Ler's now put the skills you have acquired to practical use.
 
-
-
+\begin{problem}
+Search through the \li{pydatasets} and find one which you would like to present.  Make sure there is enough data to produce a proper presentation. Process the data appropriately, and create your own presentation, as though you were presenting to a superior in the appropriate line of work.  Your presentation can be in any format you like, but as a bare minimum, it must include the following:
+\begin{itemize}
+\item An appropriate title.
+\item 3 charts or visuals with captions.
+\item 3 tables with captions.
+\item 2 paragraps of textual explanations.
+\item Appropriate data sourcing.
+\end{itemize}
+\end{problem} 
 
 
 

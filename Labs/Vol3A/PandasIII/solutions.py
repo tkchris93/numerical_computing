@@ -11,4 +11,9 @@ tab2 = titanic.pivot_table('Survived', index='Sex', columns='Pclass')
 #print tab2
 age = pd.cut(titanic['Age'], [0,12,18,80])
 tab3 = titanic.pivot_table('Survived',index =['Sex', age], columns='Pclass',aggfunc='count')
-print tab3
+
+fare = pd.qcut(titanic['Fare'], 2)
+tab4 = titanic.pivot_table('Survived',index=['Sex',age],columns=[fare,'Pclass'])
+
+tab5 = titanic.pivot_table('Survived',index=['Sex',age],columns=[fare,'Pclass'], fill_value=0.0)
+print tab5
