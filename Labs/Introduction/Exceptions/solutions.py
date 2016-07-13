@@ -49,15 +49,11 @@ class ContentFilter(object):
         with open(filename, 'r') as f:
             self.contents = f.read()
 
-    def _validate_mode(self, mode):
-        """Validate the 'mode' keyword argument for each method."""
-        if mode not in {'a', 'w'}:
-            raise ValueError("'mode' must be 'a' or 'w'")
-
     # Problem 4
     def uniform(self, outfile, mode='w', case='upper'):
         """Write the data ot the outfile in uniform case."""
-        self._validate_mode(mode)
+        if mode not in {'a', 'w'}:
+            raise ValueError("'mode' must be 'a' or 'w'")
 
         # Translate into the indicated case.
         if case == "upper":
@@ -74,57 +70,49 @@ class ContentFilter(object):
     # Problem 4
     def reverse(self, outfile, mode='w', unit='word'):
         """Write the data to the outfile in reverse order."""
-        self._validate_mode(mode)
+        if mode not in {'a', 'w'}:
+            raise ValueError("'mode' must be 'a' or 'w'")
 
         # Get the data into a list of lists: each inner list is a line
         # of the data, containing the words of the line.
         lines = self.contents.split('\n')
-        if lines[-1] == '':
-            lines = lines[:-1]
         lines = [line.split() for line in lines]
 
         # Perform the reversal.
         if unit == 'word':
             data = [line[::-1] for line in lines]
         elif unit == 'line':
-            data = list(reversed(lines))
+            data = lines[::-1]
         else:
             raise ValueError("'unit' must be 'word' or 'line'")
 
-        # Paste each line back together.
-        data = [" ".join(line) for line in data]
+        # Paste each line back together. Include newlines for writing.
+        data = [" ".join(line) + '\n' for line in data]
 
         # Write the data out. Don't forget newlines!
         with open(outfile, mode) as f:
-            for line in data:
-                f.write(line)
-                f.write('\n')
+            f.writelines(data)
 
     # Problem 4
     def transpose(self, outfile, mode='w'):
         """Write the transposed version of the data to the outfile."""
-        self._validate_mode(mode)
+        if mode not in {'a', 'w'}:
+            raise ValueError("'mode' must be 'a' or 'w'")
 
         # Get the data into a list of lists as in reverse().
         lines = self.contents.split('\n')
-        if lines[-1] == '':
-            lines = lines[:-1]
         lines = [line.split(' ') for line in lines]
 
         # Calculate the max length so we can iterate.
         max_len = max([len(line) for line in lines])
 
         # Write the data.
-        f = open(outfile, mode)
-        for i in xrange(max_len):
-            for line in lines:
-                try:
-                    f.write(line[i] + " ")
-                except IndexError:
-                    # Catch errors
-                    pass
-            f.write("\n")
-        f.close()
+        with open(outfile, mode) as f:
+            for i in xrange(max_len):
+                for line in lines:
+                    if i < len(line):
+                        f.write(line[i] + " ")
+                f.write("\n")
 
     # Problem 4
     def __str__(self):
@@ -144,5 +132,3 @@ class ContentFilter(object):
         out += "\nNumber of lines:\t" + str(lines)
         return out
 
-if __name__ == '__main__':
-    random_walk(1e8)
