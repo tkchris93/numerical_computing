@@ -115,7 +115,6 @@ Raise a \li{ValueError} with an informative error message if any of the followin
 %
 (Hint: \li{raw_input()} always returns a string, so each variable is a string initially. Use \li{int()} to cast the variables as integers when necessary. The built-in function \li{abs()} may also be useful.)
 
-\ref{prob:arithmetic-magic}
 \end{problem}
 
 \subsection*{Handling Exceptions} % -------------------------------------------
@@ -412,11 +411,16 @@ Executing this code replaces whatever used to be in \texttt{out.txt} (whether or
 \begin{problem} % ContentFilter.__init__().
 Define a class called \li{ContentFilter}.
 Implement the constructor so that it accepts the name of a file to be read.
-Store the name of the file and its contents as attributes and securely close the file stream.
-If the filename argument is not a string, raise a \li{TypeError}.
-\\
-(Hint: You might store the file's contents as a single string, a list of lines, or in another format.
-Read Problem \ref{prob:content-filter-methods} and decide which format will be easiest for you to work with.)
+%
+\begin{enumerate}
+\item If the filename argument is not a string, raise a \li{TypeError}.
+
+(Hint: The built-in functions \li{type()} and \li{isinstance()} may be useful.)
+
+\item Read the file and store its name and contents as attributes
+(store the contents as a single string).
+Securely close the file stream.
+\end{enumerate}
 \end{problem}
 
 \section*{String Formatting} % ================================================
@@ -550,7 +554,6 @@ c f
 \end{lstlisting}
 \end{comment}
 
-\label{prob:content-filter-methods}
 \end{problem}
 
 \newpage
