@@ -26,7 +26,6 @@ def _save(filename):
     if not os.path.isdir("figures"):
         os.mkdir("figures")
 
-
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -48,10 +47,7 @@ def _save(filename):
 
 # Horse Pictures ==============================================================
 
-horse = np.load("horse.npy")[:,::10]
-
-def save_horse(data, title, top=True):
-    plt.clf()
+def pixel_picture(data, title, top=True):
     plt.plot(data[0], data[1], 'k,')
     if top:
         plt.title(title, fontsize=24)
@@ -64,68 +60,42 @@ def save_horse(data, title, top=True):
         labelbottom='off', labelleft='off')
     plt.axis([-1,1,-1,1])
     plt.gca().set_aspect("equal")
-    plt.savefig("figures/{}Horse.pdf".format(title), format="pdf")
-    plt.clf()
-    plt.close("all")
 
-def original_horse():
-    save_horse(horse, "Original")
+@_save("OriginalHorse.pdf")
+def original(data):
+    pixel_picture(data, "Original", top=True)
 
-def stretched_horse(data=horse, save=True):
-    dilation = np.dot([[.5,0],[0,1.2]], data)
-    if save:
-        save_horse(dilation, "Stretch")
-    return dilation
+@_save("StretchHorse.pdf")
+def stretched(data, a, b):
+    pixel_picture(solutions.stretch(data, a, b), "Stretch", top=True)
 
-def sheared_horse(data=horse, save=True):
-    shear = np.dot([[1, .5],[0, 1]], data)
-    if save:
-        save_horse(shear, "Shear")
-    return shear
+@_save("ShearHorse.pdf")
+def sheared(data, a, b):
+    pixel_picture(solutions.shear(data, a, b), "Shear", top=True)
 
-def reflected_horse(data=horse, save=True):
-    l1, l2 = 0, 1
-    reflection = np.dot(np.array([[l1**2 - l2**2, 2*l1*l2],
-                            [2*l1*l2, l2**2 - l1**2]])/(l1**2 + l2**2), data)
-    if save:
-        save_horse(reflection, "Reflection", top=False)
-    return reflection
+@_save("ReflectionHorse.pdf")
+def reflected(data, a, b):
+    pixel_picture(solutions.reflect(data, a, b), "Reflection", top=False)
 
-def rotated_horse(data=horse, save=True):
-    theta = np.pi/2.
-    rotation = np.dot([[np.cos(theta),-np.sin(theta)],
-                       [np.sin(theta),np.cos(theta)]], data)
-    if save:
-        save_horse(rotation, "Rotation", top=False)
-    return rotation
+@_save("RotationHorse.pdf")
+def rotated(data, theta):
+    pixel_picture(solutions.rotate(data, theta), "Rotation", top=False)
 
-def combo_horse(data=horse):
-    data = stretched_horse(data, save=False)
-    data = sheared_horse(data, save=False)
-    data = reflected_horse(data, save=False)
-    data = rotated_horse(data, save=False)
-    save_horse(data, "Composition", top=False)
+@_save("CompositionHorse.pdf")
+def combo(data, a1, b1, a2, b2, a3, b3, theta):
+    pixel_picture(
+        solutions.rotate(
+            solutions.reflect(
+                solutions.shear(
+                    solutions.stretch(data, a1, b1),
+                a2, b2),
+            a3, b3),
+        theta),
+    "Composition", top=False)
 
-def translated_horse():
-    translation = horse + np.vstack([.75, .5])
-    save_horse(translation, "Translation")
-
-@_save("trajectory.pdf")
-def trajectory():
-    direction = np.array(direction)
-    T = np.linspace(time[0],time[1],100)
-    start_P1 = [1,0]
-    posP1_x = []
-    posP1_y = []
-
-    for t in T:
-        posP2 = speed*t*direction/la.norm(direction)
-        posP1 = translate2D(rotate2D(start_P1, t*omega), posP2)[0]
-        posP1_x.append(posP1[0])
-        posP1_y.append(posP1[1])
-
-    plt.plot(posP1_x, posP1_y)
-    plt.gca().set_aspect('equal')
+@_save("TranslationHorse.pdf")
+def translated(data, a, b):
+    pixel_picture(data + np.vstack([a, b]), "Translation", top=True)
 
 @_save("SolarSystem.pdf")
 def solar_system(T=3*np.pi/2, omega_e=1, omega_m=13, N=400):
@@ -149,14 +119,15 @@ def solar_system(T=3*np.pi/2, omega_e=1, omega_m=13, N=400):
     plt.gca().set_aspect("equal")
     plt.legend(loc="upper left")
 
-
-def horse_drawings():
-    for func in [original_horse, stretched_horse, sheared_horse, rotated_horse,
-                 reflected_horse, combo_horse, translated_horse]:
-        print("{:.<40}".format(func.__name__+'()'), end='')
-        stdout.flush()
-        func()
-        print("done.")
+def horse_drawings(a1, b1, a2, b2, a3, b3, theta, a4, b4):
+    horse = np.load("horse.npy")[:,::10]
+    original(horse)
+    stretched(horse, a1, b1)
+    sheared(horse, a2, b2)
+    reflected(horse, a3, b3)
+    rotated(horse, theta)
+    combo(horse, a1, b1, a2, b2, a3, b3, theta)
+    translated(horse, a4, b4)
     solar_system()
 
 # Timing Pictures =============================================================
@@ -262,8 +233,8 @@ def timing_drawings():
 # =============================================================================
 
 def draw_all():
-    horse_drawings()
-    timing_drawings()
+    horse_drawings(.5, 1.2, .5, 0., 0., 1., np.pi/2., .75, .5)
+    # timing_drawings()
 
 if __name__ == "__main__":
     draw_all()
