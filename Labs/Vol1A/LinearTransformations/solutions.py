@@ -100,8 +100,8 @@ def solar_system(T, omega_e, omega_m):
     earth = np.transpose(earth)
     moon = np.transpose(moon)
 
-    plt.plot(earth[0], earth[1], label="Earth")
-    plt.plot(moon[0], moon[1], label="Moon")
+    plt.plot(earth[0], earth[1], label="Earth", lw=2)
+    plt.plot(moon[0], moon[1], label="Moon", lw=2)
     plt.gca().set_aspect("equal")
     plt.legend(loc="upper left")
     plt.show()

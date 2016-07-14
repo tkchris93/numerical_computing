@@ -206,7 +206,6 @@ If $L:V\rightarrow W$ and $K:W\rightarrow Z$ are linear transformations with tra
 For example, if $S$ is a matrix representing a shear and $R$ is a matrix representing a rotation, then $RS$ represents a shear followed by a rotation.
 In fact, any linear transformation $L:\mathbb{R}^2 \rightarrow\mathbb{R}^2$ is a composition of the four transformations discussed above.
 Figure \ref{fig:linearly-transformed-horses} displays the composition of all four previous transformations, applied in order (stretch, shear, reflection, then rotation).
-% This is because reflections, dilations, and shears provide us with all the elementary matrices, and every matrix is a product of elementary matrices.
 
 \section*{Affine Transformations} % ===========================================
 
@@ -235,14 +234,21 @@ This translation is illustrated below.
 Affine transformations include all compositions of stretches, shears, rotations, reflections, and translations.
 For example, if $S$ represents a shear and $R$ a rotation, and if $\b$ is a vector, then $RS\x + \b$ shears, then rotates, then translates $\x$.
 
-\newpage % TODO: one more demonstration here to take up space. Maybe some hints for the earth problem?
+\subsection*{Modeling Motion with Affine Transformations} % -------------------
 
-\begin{problem}
-The moon travels around the earth while the earth orbits the sun.
+Affine transformations can be used to model particle motion, such as a planet rotating around the sun.
+Let the sun be the origin, the planet's location at time $t$ be given by the vector $\p(t)$, and suppose the planet has angular momentum $\omega$ (a measure of how fast the planet goes around the sun).
+To find the planet's position at time $t$ given the planet's initial position $\p(0)$, rotate the vector $\p(0)$ around the origin by $t\omega$ radians.
+Thus if $R(\theta)$ is the matrix representation of the linear transformation that rotates a vector around the origin by $\theta$ radians, then \[\p(t) = R(t\omega)\p(0).\]
+
+Composing the rotation with a translation shifts the center of rotation away from the origin, yielding more complicated motion.
+
+\begin{problem} % Moon orbiting the earth orbiting the sun.
+The moon circles the earth while the earth orbits the sun.
 Assuming circular orbits, we can compute the trajectories of both the earth and the moon using only linear and affine transformations.
 
 Assume an orientation where both the earth and moon travel counterclockwise, with the sun at the origin.
-Let $\p_e(t)$ and $\p_m(t)$ be the positions of the earth and the moon at time $t$, and let $\omega_e$ and $\omega_m$ be each celestial body's angular momentum (how fast they are orbiting).
+Let $\p_e(t)$ and $\p_m(t)$ be the positions of the earth and the moon at time $t$, and let $\omega_e$ and $\omega_m$ be each celestial body's angular momentum.
 
 \begin{enumerate}
 \item Compute $\p_e(t)$ by rotating the initial vector $\p_e(0)$ counterclockwise about the origin by $t\omega_e$ radians.
@@ -253,7 +259,7 @@ Let $\p_e(t)$ and $\p_m(t)$ be the positions of the earth and the moon at time $
 Write a function that accepts a final time $T$ and the angular momenta $\omega_e$ and $\omega_m$.
 Assuming initial positions $\p_e(0) = (10,0)$ and $\p_m(0) = (11,0)$, plot $\p_e(t)$ and $\p_m(t)$ over the time interval $t \in [0, T]$.
 
-The moon rotates around the earth approximately 13 times every year.
+The moon travels around the earth approximately 13 times every year.
 With $T = \frac{3\pi}{2}$, $\omega_e = 1$, and $\omega_m = 13$, your plot should resemble the following figure.
 \\
 \begin{figure}[H]
