@@ -21,7 +21,6 @@ Every linear transformation $L$ from an $m$-dimensional vector space to an $n$-d
 To apply $L$ to a vector $\x$, left multiply by its transformation matrix.
 This results in a new vector $\x^\prime$, where each component is some linear combination of the elements of $\x$.
 For linear transformations from $\mathbb{R}^2$ to $\mathbb{R}^2$, this process has the following form.
-% So if $L\x \mapsto \y$, then we calculate $A\x = \y$.
 %
 \begin{align*}
 A\x =
@@ -54,9 +53,7 @@ y_1 & y_2 & y_3 & \ldots \\
 \end{array}\right]
 \end{align*}
 
-Use \li{np.load()}
-% \footnote{See \url{http://docs.scipy.org/doc/numpy/reference/routines.io.html} for info on saving and loading arrays.}
-to extract the array from the \texttt{.npy} file, then plot the points as individual pixels.
+Use \li{np.load()} to extract the array from the \texttt{.npy} file, then plot the points as individual pixels.
 See Figure \ref{fig:linearly-transformed-horses} for the result.
 
 \begin{lstlisting}
@@ -195,7 +192,7 @@ To test your functions, consider writing a separate function that plots two arra
 \end{problem}
 
 \begin{info} % Look ahead to the QR decomposition.
-Reflections and rotations are two ways to implement the QR Decomposition, an important matrix factorization which we will implement in a future lab. % In the next lab.
+Reflections and rotations are two ways to implement the QR Decomposition, an important matrix factorization that will be studied in another lab.
 \end{info}
 
 \subsection*{Compositions of Linear Transformations} % ------------------------
@@ -271,7 +268,9 @@ With $T = \frac{3\pi}{2}$, $\omega_e = 1$, and $\omega_m = 13$, your plot should
 
 \section*{Timing Matrix Operations} % =========================================
 
-% TODO: Transition sentence.
+Linear transformations are easy to perform through simple matrix multiplication.
+However, performing matrix multiplication with very large matrices can strain a machine's time and memory constraints.
+For the remainder of this lab we take an empirical approach to explore how much time and memory different matrix operations require.
 
 \subsection*{Timing Code} % ---------------------------------------------------
 
@@ -319,8 +318,6 @@ In [4]: %timeit for_loop()
 1 loop, best of 3: 801 ms per loop
 \end{lstlisting}
 
-\newpage
-
 \subsection*{Timing an Algorithm} % -------------------------------------------
 
 Most algorithms have at least one input that dictates the size of the problem to be solved.
@@ -342,7 +339,7 @@ By contrast, executing \li{random_matrix(n)} calls \li{random()} $n^2$ times ($n
 Therefore doubling $n$ will likely more than double the amount of time \li{random_matrix(n)} takes to execute, especially if $n$ is large.
 
 To visualize this phenomenon, we time \li{random_matrix()} for $n = 2^1,\ 2^2,\ \ldots,\ 2^{12}$ and plot $n$ against the execution time.
-The result is displayed below on the left.% in Figure \ref{fig:matrix_time_result1}.
+The result is displayed below on the left.
 
 \begin{lstlisting}
 >>> domain = 2**np.arange(1,13)
@@ -364,7 +361,6 @@ The result is displayed below on the left.% in Figure \ref{fig:matrix_time_resul
 \begin{subfigure}{.5\textwidth}
     \centering
     \includegraphics[width=\linewidth]{figures/time_random_matrix1.pdf}
-    % \label{fig:matrix_time_result1}
 \end{subfigure}%
 \begin{subfigure}{.5\textwidth}
     \centering
@@ -373,9 +369,9 @@ The result is displayed below on the left.% in Figure \ref{fig:matrix_time_resul
 \end{figure}
 
 The figure on the left shows that the execution time for \li{random_matrix(n)} increases quadratically in $n$.
-In fact, the blue dotted line in the figure on the right is the parabola $y = an^2$, which fits nicely over the timed observations. Here $a$ is a small constant, but it is much less significant than the exponent on the $n$---we can leave it off altogether and write \li{random_matrix(n)} $\sim n^2$.%\footnote{In precise mathematical terms, we might write \li{random_matrix(n)} $\in O(n^2)$. See Volume II for more details on Big-O notation.}
-
-% TODO: More explanation here? Reference to Vol II?
+In fact, the blue dotted line in the figure on the right is the parabola $y = an^2$, which fits nicely over the timed observations. Here $a$ is a small constant, but it is much less significant than the exponent on the $n$.
+To represent this algorithm's growth, we ignore $a$ altogether and write \li{random_matrix(n)} $\sim n^2$.
+% \footnote{In precise mathematical terms, we might write \li{random_matrix(n)} $\in O(n^2)$. See Chapter 1 of Volume II for more details on Big-O notation.}
 
 \begin{problem} % Time Matrix-Vector and Matrix-Matrix Multiplication.
 Let $A$ be an $m \times n$ matrix with entries $a_{ij}$, $\x$ be an $n \times 1$ vector with entries $x_k$, and $B$ be an $n \times p$ matrix with entries $b_{ij}$.
@@ -501,7 +497,7 @@ The following code produces Figure \ref{fig:loglogdemo}.
 \end{figure}
 
 In the log-log plot, the slope of the \li{matrix_matrix_product()} line is about $3$ and the slope of the \li{matrix_vector_product()} line is about $2$.
-This reflects the fact that matrix-matrix multiplication (which uses 3 \li{for} loops) is $\sim n^3$, while matrix-vector multiplication (which only has 2 loops) is only $\sim n^2$.
+This reflects the fact that matrix-matrix multiplication (which uses 3 loops) is $\sim n^3$, while matrix-vector multiplication (which only has 2 loops) is only $\sim n^2$.
 
 \begin{problem} % Why NumPy ROCKS.
 NumPy is built specifically for fast numerical computations.
@@ -524,19 +520,32 @@ Compare your results to Figure \ref{fig:loglogdemo}.
 \begin{info} % Note about Caching.
 Problem \ref{prob:numpy-is-awesome} shows that \textbf{matrix  operations are significantly faster in NumPy than in plain Python}.
 Matrix-matrix multiplication grows cubically regardless of the implementation; however, with lists the times grows at a rate of $an^3$ while with NumPy the times grow at a rate of $bn^3$, where $a$ is much larger than $b$.
-% Since the exponent on the $n$ is the same in both cases, the disparity between the coefficients makes a significant impact.
-% Iterating through loops is very expensive.
-% NumPy also uses loops, but it uses C loops instead of Python loops.
+NumPy is more efficient for several reasons:
+\begin{enumerate}
+    \item Iterating through loops is very expensive.
+    Many of NumPy's operations are implemented in C, which are much faster than Python loops.
+    \item Arrays are designed specifically for matrix operations, while Python list are general purpose.
+    \item NumPy takes careful advantage of computer hardware, efficiently using different levels of computer memory.
+\end{enumerate}
 
-% However, the execution times for matrix multiplication with NumPy seem to increase somewhat inconsistently.
-% The fastest levels of computer memory can only handle so much information before it has to turn over to the next level of computer memory that is harder and slower to access.
+
 % NumPy operations are optimized for computer hardware.
-% Below, we plot execution times for vector-vector addition with NumPy.
-% The spikes in the plot indicate the times that the array no longer fits in the current level of memory
-%
-% \begin{figure}[H]
-% \includegraphics[width=.5\textwidth]{figures/cachingDemo.pdf}
-% \end{figure}
+
+% is heavily optimized for matrix operations.% and takes advantage of the computer's hardware.
+% Since the exponent on the $n$ is the same in both cases, the disparity between the coefficients makes a significant impact.
+
+However, in Problem \ref{prob:numpy-is-awesome}, the execution times for matrix multiplication with NumPy seem to increase somewhat inconsistently.
+This is because the fastest layer of computer memory can only handle so much information before the computer has to turn over to a larger, slower layer of memory.
+
+\begin{comment}
+Below, we plot execution times for vector-vector addition with NumPy.
+The spikes in the plot indicate the times that the array no longer fits in the current level of memory
+
+\begin{figure}[H]
+\includegraphics[width=.5\textwidth]{figures/cachingDemo.pdf}
+\end{figure}
+\end{comment}
+
 \end{info}
 
 \newpage
