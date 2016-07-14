@@ -13,6 +13,7 @@ from sys import stdout
 from time import time
 import numpy as np
 import solutions
+import os
 
 def _save(filename):
     """Decorator for saving, clearing, and closing figures automatically."""
@@ -22,137 +23,31 @@ def _save(filename):
         raise ValueError("Invalid file name '{}'".format(filename))
     if extension not in {"pdf", "png"}:
         raise ValueError("Invalid file extension '{}'".format(extension))
+    if not os.path.isdir("figures"):
+        os.mkdir("figures")
 
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
             try:
-                print("{:.<20}".format(func.__name__+'()'), end='')
+                print("{:.<40}".format(filename), end='')
                 stdout.flush()
                 plt.clf()
                 out = func(*args, **kwargs)
-                if extension == "pdf":
-                    plt.savefig(filename, format='pdf')
-                elif extension == "png":
-                    plt.savefig(filename, format='png')
+                plt.savefig("figures/"+filename, format=extension)
                 print("done.")
                 return out
             except Exception as e:
-                print("\n", e, sep='')
+                print("\n\t", e, sep='')
             finally:
                 plt.clf()
                 plt.close('all')
         return wrapper
     return decorator
 
-# Timing Pictures =============================================================
-
-@_save("time_random_matrix2.pdf")
-def timing_demo(N=12):
-    """Generate the two figures used just before Problem 1."""
-
-    domain = 2**np.arange(1,N+1)
-    times = []
-    for n in domain:
-        start = time()
-        solutions.random_matrix(n)
-        times.append(time() - start)
-
-    plt.plot(domain, times, 'g.-', linewidth=2, markersize=15)
-    plt.xlabel("n", fontsize=14)
-    plt.ylabel("Seconds", fontsize=14)
-    plt.savefig("time_random_matrix1.pdf", format="pdf")
-
-    # Plot the dotted blue line over the green line.
-    def f(x, a, b):
-        return a*x**2 + b
-    a, b = curve_fit(f, domain, times)[0]
-
-    refinement = np.linspace(1, 2**N, 200)
-    plt.plot(refinement, f(refinement, a, b), 'b--', lw=5)
-    plt.ylim(ymin=0)
-    plt.ylabel("Seconds", fontsize=14, color="white")
-
-@_save("matrixMatrixMultiplication.pdf")
-def prob1_solution(N=9):
-    """Generate the two figures used at the end of Problem 1."""
-
-    domain = 2**np.arange(1,N+1)
-    vector_times, matrix_times = [], []
-
-    for n in domain:
-        A = solutions.random_matrix(n)
-        x = solutions.random_vector(n)
-        B = solutions.random_matrix(n)
-
-        start = time()
-        solutions.matrix_vector_product(A, x)
-        vector_times.append(time() - start)
-
-        start = time()
-        solutions.matrix_matrix_product(A, B)
-        matrix_times.append(time() - start)
-
-    # Matrix-Vector Multiplication.
-    plt.plot(domain, vector_times, 'b.-', lw=2, ms=15)
-    plt.xlabel("n", fontsize=14); plt.ylabel("Seconds", fontsize=14)
-    plt.title("Matrix-Vector Multiplication")
-
-    plt.savefig("matrixVectorMultiplication.pdf", format="pdf")
-    plt.clf()
-    plt.close()
-
-    # Matrix-Matrix Multiplication.
-    plt.plot(domain, matrix_times, 'g.-', lw=2, ms=15)
-    plt.xlabel("n", fontsize=14); plt.ylabel("Seconds", fontsize=14, color="w")
-    plt.title("Matrix-Matrix Multiplication")
-
-    return domain, vector_times, matrix_times
-
-@_save("loglogDemoGood.pdf")
-def loglog_demo(domain, vector_times, matrix_times):
-    """Generate the two figures between Problem 1 and Problem 2."""
-
-    plt.plot(domain, vector_times, 'b.-', lw=2, ms=15, label="Matrix-Vector")
-    plt.plot(domain, matrix_times, 'g.-', lw=2, ms=15, label="Matrix-Matrix")
-    plt.legend(loc="upper left")
-    plt.savefig("loglogDemoBad.pdf", format="pdf")
-    plt.clf()
-    plt.close("all")
-
-    plt.loglog(domain, vector_times, 'b.-', basex=2, basey=2, lw=2, ms=15)
-    plt.loglog(domain, matrix_times, 'g.-', basex=2, basey=2, lw=2, ms=15)
-
-@_save("cachingDemo.pdf")
-def caching_demo():
-
-    sizes = 2**np.arange(2,19,.2)
-    times = []
-    for size in sizes:
-        A, B = np.random.random((2, size))
-        def func():
-            A + B
-        times.append(timeit(func, number=50) / 50.)
-
-    plt.loglog(sizes[1:], times[1:], basex=2, basey=2, lw=2, ms=15)
-    plt.ylabel("Seconds")
-    plt.xlabel("n")
-
-
-def timing_drawings():
-    timing_demo(12)
-    a, b, c = prob1_solution(8)
-    loglog_demo(a, b, c)
-    caching_demo()
-
 # Horse Pictures ==============================================================
 
-horse = np.load("horse.npy")[:,::10]
-
-# TODO: Get rid of tick marks.
-
-def save_horse(data, title, top=True):
-    plt.clf()
+def pixel_picture(data, title, top=True):
     plt.plot(data[0], data[1], 'k,')
     if top:
         plt.title(title, fontsize=24)
@@ -165,68 +60,42 @@ def save_horse(data, title, top=True):
         labelbottom='off', labelleft='off')
     plt.axis([-1,1,-1,1])
     plt.gca().set_aspect("equal")
-    plt.savefig("{}Horse.pdf".format(title), format="pdf")
-    plt.clf()
-    plt.close("all")
 
-def original_horse():
-    save_horse(horse, "Original")
+@_save("OriginalHorse.pdf")
+def original(data):
+    pixel_picture(data, "Original", top=True)
 
-def stretched_horse(data=horse, save=True):
-    dilation = np.dot([[.5,0],[0,1.2]], data)
-    if save:
-        save_horse(dilation, "Stretch")
-    return dilation
+@_save("StretchHorse.pdf")
+def stretched(data, a, b):
+    pixel_picture(solutions.stretch(data, a, b), "Stretch", top=True)
 
-def sheared_horse(data=horse, save=True):
-    shear = np.dot([[1, .5],[0, 1]], data)
-    if save:
-        save_horse(shear, "Shear")
-    return shear
+@_save("ShearHorse.pdf")
+def sheared(data, a, b):
+    pixel_picture(solutions.shear(data, a, b), "Shear", top=True)
 
-def reflected_horse(data=horse, save=True):
-    l1, l2 = 0, 1
-    reflection = np.dot(np.array([[l1**2 - l2**2, 2*l1*l2],
-                            [2*l1*l2, l2**2 - l1**2]])/(l1**2 + l2**2), data)
-    if save:
-        save_horse(reflection, "Reflection", top=False)
-    return reflection
+@_save("ReflectionHorse.pdf")
+def reflected(data, a, b):
+    pixel_picture(solutions.reflect(data, a, b), "Reflection", top=False)
 
-def rotated_horse(data=horse, save=True):
-    theta = np.pi/2.
-    rotation = np.dot([[np.cos(theta),-np.sin(theta)],
-                       [np.sin(theta),np.cos(theta)]], data)
-    if save:
-        save_horse(rotation, "Rotation", top=False)
-    return rotation
+@_save("RotationHorse.pdf")
+def rotated(data, theta):
+    pixel_picture(solutions.rotate(data, theta), "Rotation", top=False)
 
-def combo_horse(data=horse):
-    data = stretched_horse(data, save=False)
-    data = sheared_horse(data, save=False)
-    data = reflected_horse(data, save=False)
-    data = rotated_horse(data, save=False)
-    save_horse(data, "Composition", top=False)
+@_save("CompositionHorse.pdf")
+def combo(data, a1, b1, a2, b2, a3, b3, theta):
+    pixel_picture(
+        solutions.rotate(
+            solutions.reflect(
+                solutions.shear(
+                    solutions.stretch(data, a1, b1),
+                a2, b2),
+            a3, b3),
+        theta),
+    "Composition", top=False)
 
-def translated_horse():
-    translation = horse + np.vstack([.75, .5])
-    save_horse(translation, "Translation")
-
-@_save("trajectory.pdf")
-def trajectory():
-    direction = np.array(direction)
-    T = np.linspace(time[0],time[1],100)
-    start_P1 = [1,0]
-    posP1_x = []
-    posP1_y = []
-
-    for t in T:
-        posP2 = speed*t*direction/la.norm(direction)
-        posP1 = translate2D(rotate2D(start_P1, t*omega), posP2)[0]
-        posP1_x.append(posP1[0])
-        posP1_y.append(posP1[1])
-
-    plt.plot(posP1_x, posP1_y)
-    plt.gca().set_aspect('equal')
+@_save("TranslationHorse.pdf")
+def translated(data, a, b):
+    pixel_picture(data + np.vstack([a, b]), "Translation", top=True)
 
 @_save("SolarSystem.pdf")
 def solar_system(T=3*np.pi/2, omega_e=1, omega_m=13, N=400):
@@ -250,21 +119,123 @@ def solar_system(T=3*np.pi/2, omega_e=1, omega_m=13, N=400):
     plt.gca().set_aspect("equal")
     plt.legend(loc="upper left")
 
-
-def horse_drawings():
-    for func in [original_horse, stretched_horse, sheared_horse, rotated_horse,
-                 reflected_horse, combo_horse, translated_horse]:
-        print("{:.<20}".format(func.__name__+'()'), end='')
-        stdout.flush()
-        func()
-        print("done.")
+def horse_drawings(a1, b1, a2, b2, a3, b3, theta, a4, b4):
+    horse = np.load("horse.npy")[:,::10]
+    original(horse)
+    stretched(horse, a1, b1)
+    sheared(horse, a2, b2)
+    reflected(horse, a3, b3)
+    rotated(horse, theta)
+    combo(horse, a1, b1, a2, b2, a3, b3, theta)
+    translated(horse, a4, b4)
     solar_system()
+
+# Timing Pictures =============================================================
+
+@_save("time_random_matrix1.pdf")
+def timing_demo1(N=12):
+    domain = 2**np.arange(1,N+1)
+    times = []
+
+    for n in domain:
+        start = time()
+        solutions.random_matrix(n)
+        times.append(time() - start)
+
+    plt.plot(domain, times, 'g.-', linewidth=2, markersize=15)
+    plt.xlabel("n", fontsize=14)
+    plt.ylabel("Seconds", fontsize=14)
+
+    return domain, times
+
+@_save("time_random_matrix2.pdf")
+def timing_demo2(N, domain, times):
+    plt.plot(domain, times, 'g.-', linewidth=2, markersize=15)
+    plt.xlabel("n", fontsize=14)
+    plt.ylabel("Seconds", fontsize=14)
+
+    # Plot the dotted blue line over the green line.
+    def f(x, a, b):
+        return a*x**2 + b
+    a, b = curve_fit(f, domain, times)[0]
+
+    refinement = np.linspace(1, 2**N, 200)
+    plt.plot(refinement, f(refinement, a, b), 'b--', lw=5)
+    plt.ylim(ymin=0)
+    plt.ylabel("Seconds", fontsize=14, color="white")
+
+@_save("matrixVectorMultiplication.pdf")
+def prob1A(N=9):
+    domain = 2**np.arange(1,N+1)
+    vector_times, matrix_times = [], []
+
+    for n in domain:
+        A = solutions.random_matrix(n)
+        x = solutions.random_vector(n)
+        B = solutions.random_matrix(n)
+
+        start = time()
+        solutions.matrix_vector_product(A, x)
+        vector_times.append(time() - start)
+
+        start = time()
+        solutions.matrix_matrix_product(A, B)
+        matrix_times.append(time() - start)
+
+    plt.plot(domain, vector_times, 'b.-', lw=2, ms=15)
+    plt.xlabel("n", fontsize=14); plt.ylabel("Seconds", fontsize=14)
+    plt.title("Matrix-Vector Multiplication")
+
+    return domain, vector_times, matrix_times
+
+
+@_save("matrixMatrixMultiplication.pdf")
+def prob1B(domain, matrix_times):
+    plt.plot(domain, matrix_times, 'g.-', lw=2, ms=15)
+    plt.xlabel("n", fontsize=14); plt.ylabel("Seconds", fontsize=14, color="w")
+    plt.title("Matrix-Matrix Multiplication")
+
+@_save("loglogDemoBad.pdf")
+def loglog_bad(domain, vector_times, matrix_times):
+    plt.plot(domain, vector_times, 'b.-', lw=2, ms=15, label="Matrix-Vector")
+    plt.plot(domain, matrix_times, 'g.-', lw=2, ms=15, label="Matrix-Matrix")
+    plt.legend(loc="upper left")
+
+@_save("loglogDemoGood.pdf")
+def loglog_good(domain, vector_times, matrix_times):
+    """Generate the two figures between Problem 1 and Problem 2."""
+    plt.loglog(domain, vector_times, 'b.-', basex=2, basey=2, lw=2, ms=15)
+    plt.loglog(domain, matrix_times, 'g.-', basex=2, basey=2, lw=2, ms=15)
+
+@_save("cachingDemo.pdf")
+def caching_demo():
+
+    sizes = 2**np.arange(2,19,.2)
+    times = []
+    for size in sizes:
+        A, B = np.random.random((2, size))
+        def func():
+            A + B
+        times.append(timeit(func, number=50) / 50.)
+
+    plt.loglog(sizes[1:], times[1:], basex=2, basey=2, lw=2, ms=15)
+    plt.ylabel("Seconds")
+    plt.xlabel("n")
+
+def timing_drawings(N1, N2):
+    dom, times = timing_demo1(N1)
+    timing_demo2(N1, dom, times)
+    dom, vt, mt = prob1A(N2)
+    prob1B(dom, mt)
+    loglog_bad(dom, vt, mt)
+    loglog_good(dom, vt, mt)
+    caching_demo()
 
 # =============================================================================
 
 def draw_all():
-    timing_drawings()
-    horse_drawings()
+    horse_drawings(.5, 1.2, .5, 0., 0., 1., np.pi/2., .75, .5)
+    timing_drawings(12, 8)
 
 if __name__ == "__main__":
     draw_all()

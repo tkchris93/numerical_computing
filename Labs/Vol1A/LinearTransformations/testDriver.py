@@ -1,46 +1,5 @@
 # testDriver.py
-"""Outline for Foundations of Applied Mathematics lab test drivers.
-
-Test driver files should be named testDriver.py and should be placed in the
-same folder as the lab that it corresponds to. The testDriver.py file should
-have dependencies on the corresponding solutions.py file so that student
-submissions are tested directly against the solutions when possible.
-
-test() function and _testDriver class -----------------------------------------
-
-The _testDriver class is designed to be flexible. The test_all() routine will
-grade each problem and collect feedback, but each problem can be graded
-individually via the different problemX() methods. This allows the instructor
-to grade from IPython, or to automate grading using Git, Google Drive, or
-another file system manager.
-
-The test() function creates an instance of the _testDriver class, grades every
-problem, and returns the score feedback. Use this function to automate the
-grading process.
-
-Customize the docstrings of the test() function and the _testDriver class to
-give specific instructions about how the lab is to be graded.
-
-Tags --------------------------------------------------------------------------
-
-The @_autoclose tag makes it easy to grade a problem that produces a plot.
-It should only be on a problem-grading function that uses _testDriver._grade()
-or some other pausing command (like raw_input()) so that the plot is not closed
-immediately after it is created.
-
-The @_timeout tag prevents a function from running for longer than a
-specificied number of seconds. Be careful not to use this wrapper in
-conjunction with _testDriver._grade() or another pausing command that waits
-for the grader's response. NOTE: this decorator will only work on Unix.
-
-Testing -----------------------------------------------------------------------
-
-To test the test driver, make sure that the solutions file passes with full
-points. The if __name__ == '__main__' clause imports the solutions file and
-grades it.
-"""
-
-# Decorators ==================================================================
+"""Volume I: Linear Transformations. Test driver."""
 
 import signal
 from functools import wraps
@@ -93,15 +52,15 @@ def _timeout(seconds):
 
 # Test Driver =================================================================
 
-from inspect import getsourcelines
-# from solutions import [functions / classes that are needed for testing]
+from solutions import *
 
 def test(student_module):
     """Grade a student's entire solutions file.
 
-    X points for problem 1
-    X points for problem 2
-    ...
+    10 points for problem 1
+    10 points for problem 2
+    10 points for problem 3
+    10 points for problem 4
 
     Inputs:
         student_module: the imported module for the student's file.
@@ -128,6 +87,8 @@ class _testDriver(object):
         """Initialize the feedback attribute."""
         self.feedback = ""
 
+    data_file = "horse.npy"
+
     # Main routine ------------------------------------------------------------
     def test_all(self, student_module, total=40):
         """Grade the provided module on each problem and compile feedback."""
@@ -146,8 +107,10 @@ class _testDriver(object):
                 self.feedback += "\n{}: {}".format(self._errType(e), e)
 
         # Grade each problem.
-        test_one(self.problem1, "Problem 1", 0)   # Problem 1: X points.
-        test_one(self.problem2, "Problem 2", 0)   # Problem 2: X points.
+        test_one(self.problem1, "Problem 1", 10)   # Problem 1: 10 points.
+        test_one(self.problem2, "Problem 2", 10)   # Problem 2: 10 points.
+        test_one(self.problem3, "Problem 3", 10)   # Problem 3: 10 points.
+        test_one(self.problem4, "Problem 4", 10)   # Problem 4: 10 points.
 
         # Report final score.
         percentage = (100. * self.score) / total
@@ -168,36 +131,17 @@ class _testDriver(object):
         """Get just the name of the exception 'error' in string format."""
         return str(type(error).__name__)
 
-    @staticmethod
-    def _printCode(f):
-        """Print a function's source code."""
-        print "".join(getsourcelines(f)[0][len(f.__doc__.splitlines())+1 :])
-
-    def _checkCode(self, func, keyword):
-        """Check a function's source code for a key word. If the word is found,
-        print the code to the screen and prompt the grader to check the code.
-        Use this function to detect cheating. Returns a score out of 10.
-        """
-        code = getsourcelines(func)[0][len(func.__doc__.splitlines())+1 :]
-        if any([keyword in line for line in code]):
-            print("\nStudent {}() code:\n{}\nCheating? [OK=10, Bad=0]".format(
-                                                func.__name__, "".join(code)))
-            return self._grade(10)
-        return 10
-
-    def _eqTest(self, correct, student, message):
+    def _eqTest(self, correct, student, message, compare=True):
         """Test to see if 'correct' and 'student' are equal.
         Report the given 'message' if they are not.
         """
-        # if np.allclose(correct, student):
-        # if str(correct) == str(student):
-        # if correct is student:            # etc.
-        if correct == student:
+        if np.allclose(correct, student):
             return 1
         else:
             self.feedback += "\n{}".format(message)
-            self.feedback += "\n\tCorrect response: {}".format(correct)
-            self.feedback += "\n\tStudent response: {}".format(student)
+            if compare:
+                self.feedback += "\n\tCorrect response: {}".format(correct)
+                self.feedback += "\n\tStudent response: {}".format(student)
             return 0
 
     def _grade(self, points, message=None):
@@ -221,25 +165,79 @@ class _testDriver(object):
         return credit
 
     # Problems ----------------------------------------------------------------
+    @_timeout(5)
     def problem1(self, s):
-        """Test Problem 1. X points."""
+        """Test stretch(), shear(), reflect(), and rotate(). 10 points."""
         points = 0
-        # Test problem 1 here.
+        data = np.load(self.data_file)
+
+        # stretch() (2 points).
+        a, b = np.random.randint(1,11,2)
+        points += 2 * self._eqTest(stretch(data, a, b), s.stretch(data, a, b),
+                                                    "stretch() failed", False)
+
+        # shear() (2 points).
+        a, b = np.random.randint(1,11,2)
+        points += 2 * self._eqTest(shear(data, a, b), s.shear(data, a, b),
+                                                    "shear() failed", False)
+
+        # reflect() (3 points).
+        a, b = np.random.randint(1,11,2)
+        points += 3 * self._eqTest(reflect(data, a, b), s.reflect(data, a, b),
+                                                    "reflect() failed", False)
+
+        # rotate() (3 points).
+        theta = np.random.uniform(.1, 2*np.pi-.1)
+        points += 3 * self._eqTest(rotate(data, theta), s.rotate(data, theta),
+                                                    "rotate() failed", False)
+
         return points
 
+    @_autoclose
     def problem2(self, s):
-        """Test Problem 2. X points."""
-        points = 0
-        # Test problem 2 here.
+        """Test solar_system(). 10 points."""
+
+        s.solar_system(np.pi, 1, 13)
+        print("""\nSpecifications:
+        1. Blue semicircle from 0 to pi
+        2. Green line rotates around blue line 6 times
+        (Title and legend unnecessary)
+        (Aspect ratio may be stretched)""")
+        return self._grade(10, "solar_system() does not match specifications")
         return points
 
+    @_autoclose
+    def problem3(self, s):
+        """Test prob3(). 10 points."""
+
+        print("Running prob3()... (60 second time limit)")
+        _timeout(60)(s.prob3)()
+        print("""\nSpecifications:
+        1. Two plots: matrix-vector times, matrix-matrix times
+        2. Both plots are quadratically increasing
+        3. Matrix-matrix times are much greater than matrix-vector times
+        (Titles and legend unnecessary)""")
+        return self._grade(10, "prob3() does not match specifications")
+        return points
+
+    @_autoclose
+    def problem4(self, s):
+        """Test prob4(). 10 points."""
+
+        print("Running prob4()... (60 second time limit)")
+        _timeout(60)(s.prob4)()
+        print("""\nSpecifications:
+        1. Two plots: lin-lin scale, log-log scale
+        2. All lines are quadratically increasing (at different rates)
+        3. NumPy times are significantly lower than list times
+        4. A legend with good labels is included
+        (Titles unnecessary)
+        (NumPy lines may be less bumpy in the log-log plot)""")
+        return self._grade(10, "prob4() does not match specifications")
+        return points
 
 # Validation ==================================================================
 if __name__ == '__main__':
     """Validate the test driver by testing the solutions file."""
     import solutions
-    # If you really like using IPython for validation, include these lines:
-    # from imp import reload        # Python 3.0-3.3
-    # from importlib import reload  # Python 3.4+
-    # reload(solutions)
     test(solutions)
