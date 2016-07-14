@@ -132,12 +132,11 @@ def horse_drawings(a1, b1, a2, b2, a3, b3, theta, a4, b4):
 
 # Timing Pictures =============================================================
 
-@_save("time_random_matrix2.pdf")
-def timing_demo(N=12):
-    """Generate the two figures used just before Problem 1."""
-
+@_save("time_random_matrix1.pdf")
+def timing_demo1(N=12):
     domain = 2**np.arange(1,N+1)
     times = []
+
     for n in domain:
         start = time()
         solutions.random_matrix(n)
@@ -146,7 +145,14 @@ def timing_demo(N=12):
     plt.plot(domain, times, 'g.-', linewidth=2, markersize=15)
     plt.xlabel("n", fontsize=14)
     plt.ylabel("Seconds", fontsize=14)
-    plt.savefig("figures/time_random_matrix1.pdf", format="pdf")
+
+    return domain, times
+
+@_save("time_random_matrix2.pdf")
+def timing_demo2(N, domain, times):
+    plt.plot(domain, times, 'g.-', linewidth=2, markersize=15)
+    plt.xlabel("n", fontsize=14)
+    plt.ylabel("Seconds", fontsize=14)
 
     # Plot the dotted blue line over the green line.
     def f(x, a, b):
@@ -158,10 +164,8 @@ def timing_demo(N=12):
     plt.ylim(ymin=0)
     plt.ylabel("Seconds", fontsize=14, color="white")
 
-@_save("matrixMatrixMultiplication.pdf")
-def prob1_solution(N=9):
-    """Generate the two figures used at the end of Problem 1."""
-
+@_save("matrixVectorMultiplication.pdf")
+def prob1A(N=9):
     domain = 2**np.arange(1,N+1)
     vector_times, matrix_times = [], []
 
@@ -178,33 +182,28 @@ def prob1_solution(N=9):
         solutions.matrix_matrix_product(A, B)
         matrix_times.append(time() - start)
 
-    # Matrix-Vector Multiplication.
     plt.plot(domain, vector_times, 'b.-', lw=2, ms=15)
     plt.xlabel("n", fontsize=14); plt.ylabel("Seconds", fontsize=14)
     plt.title("Matrix-Vector Multiplication")
 
-    plt.savefig("figures/matrixVectorMultiplication.pdf", format="pdf")
-    plt.clf()
-    plt.close()
+    return domain, vector_times, matrix_times
 
-    # Matrix-Matrix Multiplication.
+
+@_save("matrixMatrixMultiplication.pdf")
+def prob1B(domain, matrix_times):
     plt.plot(domain, matrix_times, 'g.-', lw=2, ms=15)
     plt.xlabel("n", fontsize=14); plt.ylabel("Seconds", fontsize=14, color="w")
     plt.title("Matrix-Matrix Multiplication")
 
-    return domain, vector_times, matrix_times
-
-@_save("loglogDemoGood.pdf")
-def loglog_demo(domain, vector_times, matrix_times):
-    """Generate the two figures between Problem 1 and Problem 2."""
-
+@_save("loglogDemoBad.pdf")
+def loglog_bad(domain, vector_times, matrix_times):
     plt.plot(domain, vector_times, 'b.-', lw=2, ms=15, label="Matrix-Vector")
     plt.plot(domain, matrix_times, 'g.-', lw=2, ms=15, label="Matrix-Matrix")
     plt.legend(loc="upper left")
-    plt.savefig("figures/loglogDemoBad.pdf", format="pdf")
-    plt.clf()
-    plt.close("all")
 
+@_save("loglogDemoGood.pdf")
+def loglog_good(domain, vector_times, matrix_times):
+    """Generate the two figures between Problem 1 and Problem 2."""
     plt.loglog(domain, vector_times, 'b.-', basex=2, basey=2, lw=2, ms=15)
     plt.loglog(domain, matrix_times, 'g.-', basex=2, basey=2, lw=2, ms=15)
 
@@ -223,18 +222,20 @@ def caching_demo():
     plt.ylabel("Seconds")
     plt.xlabel("n")
 
-
-def timing_drawings():
-    timing_demo(12)
-    a, b, c = prob1_solution(8)
-    loglog_demo(a, b, c)
+def timing_drawings(N1, N2):
+    dom, times = timing_demo1(N1)
+    timing_demo2(N1, dom, times)
+    dom, vt, mt = prob1A(N2)
+    prob1B(dom, mt)
+    loglog_bad(dom, vt, mt)
+    loglog_good(dom, vt, mt)
     caching_demo()
 
 # =============================================================================
 
 def draw_all():
     horse_drawings(.5, 1.2, .5, 0., 0., 1., np.pi/2., .75, .5)
-    # timing_drawings()
+    timing_drawings(12, 8)
 
 if __name__ == "__main__":
     draw_all()
