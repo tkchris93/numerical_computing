@@ -16,4 +16,5 @@ else                                # Delete the specified git branch.
     git push origin :$1
     echo -e "\nDone\n"
     git branch
+    git status
 fi
