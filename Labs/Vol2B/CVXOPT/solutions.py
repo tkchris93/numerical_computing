@@ -133,12 +133,12 @@ def prob4():
         The optimizer (sol['x'])
         The optimal value (sol['primal objective'])
     """
-    Q = matrix(np.array([[3.,2.,1.],
+    P = matrix(np.array([[3.,2.,1.],
                          [2.,4.,2.],
                          [1.,2.,3.]]))
 
-    p = matrix([3., 0., 1.])
-    sol = solvers.qp(Q, p)
+    q = matrix([3., 0., 1.])
+    sol = solvers.qp(P, q)
     return np.array(sol['x']).ravel(), sol['primal objective']
 
     # Answers:
@@ -178,14 +178,14 @@ def l2Min(A, b):
     # Build the matrices for cvxopt (make sure dtype=np.floats)
     P = matrix(2*I)
     q = matrix(np.zeros(n))
-    new_A = matrix(np.hstack((np.zeros_like(A), A)).astype(np.float))
+    new_A = matrix(A.astype(np.float))
     new_b = matrix(b.astype(np.float))
 
     # Perform the optimization.
-    sol = solvers.lp(P, q, A=new_A, b=new_b)
+    sol = solvers.qp(P, q, A=new_A, b=new_b)
 
     # Flatten out the array and only get the x value.
-    return np.array(sol['x']).ravel()[n:]
+    return np.array(sol['x']).ravel()
 
 
 def prob6():
