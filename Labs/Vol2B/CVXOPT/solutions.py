@@ -1,16 +1,10 @@
 # solutions.py
-"""Volume II Lab 14: CVXOPT. Solutions file."""
+"""Volume 2 Lab 14: Optimization Packages II (CVXOPT)"""
 
 from cvxopt import matrix, solvers
 import numpy as np
 from scipy import linalg as la
 
-# name this file solutions.py
-"""Volume 2 Lab 14: Optimization Packages II (CVXOPT)
-<Name>
-<Class>
-<Date>
-"""
 
 def prob1():
     """Solve the following convex optimization problem:
@@ -23,7 +17,7 @@ def prob1():
                     z               >= 0
 
     Returns (in order):
-        The optimizer (sol['x'])
+        The optimizer (sol['x']), converted to ndarray
         The optimal value (sol['primal objective'])
     """
 
@@ -97,7 +91,7 @@ def prob3():
     into an inequality constraint.
 
     Returns (in order):
-        The optimizer (sol['x'])
+        The optimizer (sol['x']), converted to ndarray
         The optimal value (sol['primal objective'])
     """
     c = matrix([4., 7., 6., 8., 8., 9.])
@@ -130,7 +124,7 @@ def prob4():
     g(x,y,z) = (3/2)x^2 + 2xy + xz + 2y^2 + 2yz + (3/2)z^2 + 3x + z
 
     Returns (in order):
-        The optimizer (sol['x'])
+        The optimizer (sol['x']), converted to ndarray
         The optimal value (sol['primal objective'])
     """
     P = matrix(np.array([[3.,2.,1.],
@@ -160,7 +154,7 @@ def l2Min(A, b):
         b ((m, ) ndarray)
 
     Returns:
-        x ((n, ) ndarray): The solution to the minimization problem.
+        The optimizer (sol['x']), converted to ndarray
     """
 
     assert A.shape[0] == b.shape[0], "mismatched dimensions"
@@ -195,7 +189,7 @@ def prob6():
     analysis area, and so on.
 
     Returns (in order):
-        The optimizer (sol['x'])
+        The optimizer (sol['x']), converted to ndarray
         The optimal value (sol['primal objective']*-1000)
     """
     data = np.load('ForestData.npy')
