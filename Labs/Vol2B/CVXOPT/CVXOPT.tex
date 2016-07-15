@@ -206,7 +206,8 @@ Of course, solving this gives values for the optimal $u$ and the optimal $x$, bu
 
 \begin{problem}
 Write a function called \li{l1Min()} that takes a matrix $A$ and vector $b$ as inputs, and solves the $l_1$ optimization problem. 
-Report only the minimizer $x$. Remember to first discard the unneccesary $u$ values.
+Report the values for $x$ and the objective value. 
+Remember to first discard the unneccesary $u$ values from the minimizer.
 \end{problem}
 
 \section*{The Transportation Problem}
@@ -538,7 +539,8 @@ The $l_2$ minimization problem is to
 \end{align*}
 
 This problem is equivalent to a quadratic program, since $\|x\|_2 = x\trp x$.
-Write a function called \li{l2Min()} that takes a matrix $A$ and vector $b$ as inputs, and returns the solution $x$ to the $l_2$ minimization problem.
+Write a function called \li{l2Min()} that takes a matrix $A$ and vector $b$ as inputs and solves the $l_2$ minimization problem.
+Report the values for $x$ and the objective value. 
 \end{problem}
 
 \section*{Allocation Models}
@@ -613,8 +615,10 @@ Note that since acres are in thousands, we will divide the constraints of timber
 \end{align*}
 
 \begin{problem}
-Solve the problem above. Return the value of each $x_{i,j}$. 
-Also return the maximum total net present value. This will be equal to the primal objective of the appropriately minimized linear function, multiplied by -1000. (This final multiplication after we have obtained a solution changes our answer to be a maximum, and compensates for the data being in thousands of acres).
+Solve the problem above. 
+Return the minimizer $x$ of $x_{i,j}$'s. 
+Also return the maximum total net present value, which will be equal to the primal objective of the appropriately minimized linear function, multiplied by -1000. 
+(This final multiplication after we have obtained a solution changes our answer to be a maximum, and compensates for the data being in thousands of acres).
 \end{problem} 
 
 You can learn more about CVXOPT at

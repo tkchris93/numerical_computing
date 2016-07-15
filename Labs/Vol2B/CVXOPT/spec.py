@@ -21,7 +21,7 @@ def prob1():
                     z               >= 0
 
     Returns (in order):
-        The optimizer (sol['x']), converted to ndarray
+        The optimizer x (ndarray)
         The optimal value (sol['primal objective'])
     """
     raise NotImplementedError("Introductory problem not started.")
@@ -34,24 +34,23 @@ def l1Min(A, b):
         minimize    ||x||_1
         subject to  Ax = b
 
-    Return only the solution x (not any slack variables u), as a flat NumPy array.
-
     Parameters:
         A ((m,n) ndarray)
         b ((m, ) ndarray)
 
     Returns:
-        x ((n, ) ndarray): The solution to the minimization problem.
+        The optimizer x (ndarray), without any slack variables u
+        The optimal value (sol['primal objective'])
     """
     raise NotImplementedError("L1 problem not started.")
 
 
 def prob3():
     """Solve the transportation problem by converting the last equality constraint
-    into an inequality constraint.
+    into inequality constraints.
 
     Returns (in order):
-        The optimizer (sol['x']), converted to ndarray
+        The optimizer x (ndarray)
         The optimal value (sol['primal objective'])
     """
     raise NotImplementedError("Transportation problem not started.")
@@ -63,7 +62,7 @@ def prob4():
     g(x,y,z) = (3/2)x^2 + 2xy + xz + 2y^2 + 2yz + (3/2)z^2 + 3x + z
 
     Returns (in order):
-        The optimizer (sol['x']), converted to ndarray
+        The optimizer x (ndarray)
         The optimal value (sol['primal objective'])
     """
     raise NotImplementedError("Quadratic minimization problem not started.")
@@ -76,14 +75,13 @@ def l2Min(A, b):
         minimize    ||x||_2
         subject to  Ax = b
 
-    Return only the solution x as a flat NumPy array.
-
     Parameters:
         A ((m,n) ndarray)
         b ((m, ) ndarray)
 
     Returns:
-        The optimizer (sol['x']), converted to ndarray
+        The optimizer x (ndarray)
+        The optimal value (sol['primal objective'])
     """
     raise NotImplementedError("L2 problem not started.")
 
@@ -95,7 +93,8 @@ def prob6():
     analysis area, and so on.
 
     Returns (in order):
-        The optimizer (sol['x']), converted to ndarray
+        The optimizer x (ndarray)
         The optimal value (sol['primal objective']*-1000)
     """
     raise NotImplementedError("Forest problem not started.")
+    
