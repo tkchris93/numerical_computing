@@ -8,7 +8,7 @@ env:
 
 before_install:
   - python travis_pre.py
-  
+
 install:
   - cd ../
   - wget -c http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz
@@ -24,10 +24,11 @@ install:
   - sudo /usr/local/texlive/2014/bin/x86_64-linux/texhash
   - cd $TRAVIS_BUILD_DIR
 
-script: 
+script:
   - pdflatex Vol1.tex
   - pdflatex Vol2.tex
   - pdflatex Vol3.tex
   - pdflatex Vol4.tex
   - pdflatex ExtraLabs.tex
+  - pdflatex InstructorNotes.tex
   - python travis_post.py
