@@ -136,10 +136,18 @@ Optimal solution found.
 [ 1.00e+00]
 >>> print sol['primal objective']
 -8.99999981141
+>>> print type(sol['x'])
+<type 'cvxopt.base.matrix'>
 \end{lstlisting}
 The function \li{solvers.lp} returns a dictionary containing useful information.
-For the time being, we will only focus on the values of $x$ and the primal objective value (i.e. the minimum value achieved by
-the objective function).
+For the time being, we will only focus on the values of $x$ and the primal objective value (i.e. the minimum value achieved by the objective function).
+
+\begin{warn}
+Note that the minimizer of the \li{solvers.lp()} function returns a \li{cvxopt.base.matrix} object.
+In order to use the minimzer again in other algebraic expressions, you need to convert it first to a flattened numpy array, which can be done quickly with \li{np.ravel()}.
+Please return all minimizers in this lab as flattened numpy arrays.
+\end{warn}
+
 \begin{problem}
 Solve the following convex optimization problem:
 \begin{align*}
@@ -150,7 +158,7 @@ Solve the following convex optimization problem:
 		&x_2 \geq 0 \\
 		&x_3 \geq 0
 \end{align*}
-Report the values for $x$ and the primal objective value that you obtain.
+Report the values for $x$ and the objective value that you obtain.
 Remember to make the necessary adjustments so that all inequality constraints are $\leq$ rather than $\geq$.
 \end{problem}
 
@@ -197,7 +205,9 @@ b.
 Of course, solving this gives values for the optimal $u$ and the optimal $x$, but we only care about the optimal $x$.
 
 \begin{problem}
-Write a function called \li{l1Min()} that takes a matrix $A$ and vector $b$ as inputs, and returns the solution $x$ to the $l_1$ optimization problem. 
+Write a function called \li{l1Min()} that takes a matrix $A$ and vector $b$ as inputs, and solves the $l_1$ optimization problem. 
+Report the values for $x$ and the objective value. 
+Remember to first discard the unneccesary $u$ values from the minimizer.
 \end{problem}
 
 \section*{The Transportation Problem}
@@ -327,10 +337,10 @@ x + 2y - 3z &\leq 4, \\
 
 Apply this process to the last equality constraint. 
 You will obtain a new matrix $G$ with several additional rows (to account for the new inequality
-constraints), and a new vector $h$, also with more entries. 
+constraints); a new vector $h$, also with more entries; a smaller matrix $A$; a smaller vector $b$. 
 \begin{problem}
 Solve the problem by converting the last equality constraint into an inequality constraint.
-Report the optimal values for $x$ and the primal objective function.
+Report the optimal values for $x$ and the objective function.
 \end{problem}
 
 \begin{comment}
@@ -529,7 +539,8 @@ The $l_2$ minimization problem is to
 \end{align*}
 
 This problem is equivalent to a quadratic program, since $\|x\|_2 = x\trp x$.
-Write a function called \li{l2Min()} that takes a matrix $A$ and vector $b$ as inputs, and returns the solution $x$ to the $l_2$ minimization problem.
+Write a function called \li{l2Min()} that takes a matrix $A$ and vector $b$ as inputs and solves the $l_2$ minimization problem.
+Report the values for $x$ and the objective value. 
 \end{problem}
 
 \section*{Allocation Models}
@@ -604,8 +615,10 @@ Note that since acres are in thousands, we will divide the constraints of timber
 \end{align*}
 
 \begin{problem}
-Solve the problem above. Return the value of each $x_{i,j}$. 
-Also return the maximum total net present value. This will be equal to the primal objective of the appropriately minimized linear function, multiplied by -1000. (This final multiplication after we have obtained a solution changes our answer to be a maximum, and compensates for the data being in thousands of acres).
+Solve the problem above. 
+Return the minimizer $x$ of $x_{i,j}$'s. 
+Also return the maximum total net present value, which will be equal to the primal objective of the appropriately minimized linear function, multiplied by -1000. 
+(This final multiplication after we have obtained a solution changes our answer to be a maximum, and compensates for the data being in thousands of acres).
 \end{problem} 
 
 You can learn more about CVXOPT at
