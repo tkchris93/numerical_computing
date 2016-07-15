@@ -3,6 +3,7 @@
 
 from cvxopt import matrix, solvers
 import numpy as np
+from scipy import linalg as la
 
 # name this file solutions.py
 """Volume 2 Lab 14: Optimization Packages II (CVXOPT)
@@ -108,26 +109,25 @@ def prob4():
         The optimal value (sol['primal objective']*-1000)
     """
     data = np.load('ForestData.npy')
+
     c = matrix(data[:,3]*-1)
-    G = np.zeros((21,7+3+21))
-    h = np.zeros(7+3+21)
-    G[:,-21:] = -1*np.eye(21)
-    h[:7] = data[::3,1]
-    for i in xrange(7):
-        G[i*3:(i+1)*3,i]=np.ones(3)
-    G[:,7]=-1*data[:,4]
-    G[:,8]=-1*data[:,5]
-    G[:,9]=-1*data[:,6]
-    h[7]=-40000
-    h[8]=-5
-    h[9]=-70*788
-    G=G.T
+
+    A = la.block_diag(*[[1.,1.,1.] for _ in xrange(7)])
+    b = data[::3,1].copy()
+
+    G = np.vstack((-data[:,4], -data[:,5], -data[:,6], -np.eye(21))) # flip the inequality signs
+    h = np.hstack(([-40000., -5., -70.*788.], np.zeros(21)))         # flip the inequality signs
+
     c = matrix(c)
+    A = matrix(A)
+    b = matrix(b)
     G = matrix(G)
     h = matrix(h)
-    sol = solvers.lp(c,G,h)  
-    return sol['x'], sol['primal objective']*-1000
 
+    sol = solvers.lp(c,G,h,A,b)
+    return np.ravel(sol['x']), sol['primal objective']*-1000.
+
+print prob4()
     # Answers:
     # np.array([[ 1.41e-08],[ 6.76e-08],[ 7.50e+01],[ 9.00e+01],[ 1.28e-07],
     #           [ 2.52e-07],[ 1.40e+02],[ 4.18e-07],[ 5.52e-06],[ 1.04e-08],
