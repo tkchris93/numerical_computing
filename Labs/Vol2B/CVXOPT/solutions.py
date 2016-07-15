@@ -37,14 +37,62 @@ def prob1():
 
     h = matrix([ -3., -10., 0., 0., 0.])
     sol = solvers.lp(c,G,h)
-    return sol['x'], sol['primal objective']
+    return np.array(sol['x']).ravel(), sol['primal objective']
 
     # Answers:
     # np.array([[-1.15e-09],[ 1.50e+00],[ 6.95e-11]])
     # 10
 
 
-def prob2():
+# Problem 2
+def l1Min(A, b):
+    """Calculate the solution to the optimization problem
+
+        minimize    ||x||_1
+        subject to  Ax = b
+
+    Return only the solution x (not any slack variables u), as a flat NumPy array.
+
+    Parameters:
+        A ((m,n) ndarray)
+        b ((m, ) ndarray)
+
+    Returns:
+        x ((n, ) ndarray): The solution to the minimization problem.
+    """
+
+    assert A.shape[0] == b.shape[0], "mismatched dimensions"
+
+    n = A.shape[1]
+    I = np.eye(n, dtype=np.float)
+
+    '''The optimization problem to solve is:
+
+    minimize                [u]
+                      [1 0] [x]
+
+    subject to      [-I  I] [u]     [0]
+                    [-I -I] [x]  <= [0]
+
+                            [u]
+                    [0   A] [x]  ==  b
+    '''
+
+    # Build the matrices for cvxopt (make sure dtype=np.floats)
+    c = matrix(np.hstack((np.ones(n), np.zeros(n))).astype(np.float))
+    G = matrix(np.vstack((np.hstack((-I, I)),np.hstack((-I, -I)))))
+    h = matrix(np.zeros(2*n))
+    new_A = matrix(np.hstack((np.zeros_like(A), A)).astype(np.float))
+    new_b = matrix(b.astype(np.float))
+
+    # Perform the optimization.
+    sol = solvers.lp(c, G, h, new_A, new_b)
+
+    # Flatten out the array and only get the x value.
+    return np.array(sol['x']).ravel()[n:]
+
+
+def prob3():
     """Solve the transportation problem by converting the last equality constraint
     into an inequality constraint.
 
@@ -68,7 +116,7 @@ def prob2():
                          [1.,0.,1.,0.,1.,0.]]))
     b = matrix([7.,2.,4.,5.])
     sol = solvers.lp(c,G,h,A,b)  
-    return sol['x'], sol['primal objective']
+    return np.array(sol['x']).ravel(), sol['primal objective']
 
     # Answers:
     # np.array([[ 5.00e+00],[ 2.00e+00],[ -7.03e-09],
@@ -76,7 +124,7 @@ def prob2():
     # 86
 
 
-def prob3():
+def prob4():
     """Find the minimizer and minimum of
 
     g(x,y,z) = (3/2)x^2 + 2xy + xz + 2y^2 + 2yz + (3/2)z^2 + 3x + z
@@ -91,14 +139,56 @@ def prob3():
 
     p = matrix([3., 0., 1.])
     sol = solvers.qp(Q, p)
-    return sol['x'], sol['primal objective']
+    return np.array(sol['x']).ravel(), sol['primal objective']
 
     # Answers:
     # np.array([[-1.50],[ 1.00],[-.5]])
     # -2.5
 
 
-def prob4():
+# Problem 5
+def l2Min(A, b):
+    """Calculate the solution to the optimization problem
+
+        minimize    ||x||_2
+        subject to  Ax = b
+
+    Return only the solution x as a flat NumPy array.
+
+    Parameters:
+        A ((m,n) ndarray)
+        b ((m, ) ndarray)
+
+    Returns:
+        x ((n, ) ndarray): The solution to the minimization problem.
+    """
+
+    assert A.shape[0] == b.shape[0], "mismatched dimensions"
+
+    n = A.shape[1]
+    I = np.eye(n, dtype=np.float)
+
+    '''The optimization problem to solve is:
+
+    minimize              x*x
+
+    subject to          A  =  b
+    '''
+
+    # Build the matrices for cvxopt (make sure dtype=np.floats)
+    P = matrix(2*I)
+    q = matrix(np.zeros(n))
+    new_A = matrix(np.hstack((np.zeros_like(A), A)).astype(np.float))
+    new_b = matrix(b.astype(np.float))
+
+    # Perform the optimization.
+    sol = solvers.lp(P, q, A=new_A, b=new_b)
+
+    # Flatten out the array and only get the x value.
+    return np.array(sol['x']).ravel()[n:]
+
+
+def prob6():
     """Solve the allocation model problem in 'ForestData.npy'.
     Note that the first three rows of the data correspond to the first
     analysis area, the second group of three rows correspond to the second
@@ -127,7 +217,6 @@ def prob4():
     sol = solvers.lp(c,G,h,A,b)
     return np.ravel(sol['x']), sol['primal objective']*-1000.
 
-print prob4()
     # Answers:
     # np.array([[ 1.41e-08],[ 6.76e-08],[ 7.50e+01],[ 9.00e+01],[ 1.28e-07],
     #           [ 2.52e-07],[ 1.40e+02],[ 4.18e-07],[ 5.52e-06],[ 1.04e-08],
