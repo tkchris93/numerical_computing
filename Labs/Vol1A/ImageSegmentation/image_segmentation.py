@@ -1,5 +1,5 @@
-# name this file solutions.py
-"""Volume I - Image Segmentation 
+# image_segmentation.py
+"""Volume I - Image Segmentation
 <Name>
 <Class>
 <Date>
@@ -14,7 +14,7 @@ def laplacian(A):
              shape (n,n)
     Returns:
         L (array): Laplacian matrix of A
-        
+
     '''
     raise NotImplementedError("Problem 1 Incomplete")
 
@@ -39,7 +39,7 @@ def adjacency(img_brightness, radius = 5.0, sigma_I = .15, sigma_d = 1.7):
     Compute the weighted adjacency matrix for
     the image given the radius. Do all computations with sparse matrices.
     Also, return an array giving the main diagonal of the degree matrix.
-    
+
     Inputs:
         img_brightness (array): array of brightnesses given by the function getImage()
         radius (float): maximum distance where the weight isn't 0
@@ -55,10 +55,10 @@ def adjacency(img_brightness, radius = 5.0, sigma_I = .15, sigma_d = 1.7):
 # Problem 4: Implement this function.
 def segment(img_brightness):
     '''
-    Compute and return the two segments of the image as described in the text. 
+    Compute and return the two segments of the image as described in the text.
     Compute L, the laplacian matrix. Then compute D^(-1/2)LD^(-1/2),and find
     the eigenvector corresponding to the second smallest eigenvalue.
-    Use this eigenvector to calculate a mask that will be usedto extract 
+    Use this eigenvector to calculate a mask that will be usedto extract
     the segments of the image.
     Inputs:
         img_brightness (array): an array of brightnesses given by the function
@@ -93,7 +93,7 @@ def getImage(filename='dream.png'):
     '''
     Reads an image and converts the image to a 2-D array of brightness
     values.
-    
+
     Inputs:
         filename (str): filename of the image to be transformed.
     Returns:
@@ -112,16 +112,16 @@ def getNeighbors(index, radius, height, width):
     of the pixel at index, where the pixels are in a (height, width) shaped
     array. The returned indices are with respect to the flattened version of the
     array. This is a helper function for adjacency.
-    
+
     Inputs:
-        index (int): denotes the index in the flattened array of the pixel we are 
+        index (int): denotes the index in the flattened array of the pixel we are
                 looking at
         radius (float): radius of the circular region centered at pixel (row, col)
         height, width (int,int): the height and width of the original image, in pixels
     Returns:
         indices (int): a flat array of indices of pixels that are within distance r
                    of the pixel at (row, col)
-        distances (int): a flat array giving the respective distances from these 
+        distances (int): a flat array giving the respective distances from these
                      pixels to the center pixel.
     '''
     # Find appropriate row, column in unflattened image for flattened index
@@ -145,7 +145,7 @@ def displayPosNeg(img_color,pos,neg):
     '''
     Displays the original image along with the positive and negative
     segments of the image.
-    
+
     Inputs:
         img_color (array): Original image
         pos (array): Positive segment of the original image
