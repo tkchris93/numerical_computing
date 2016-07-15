@@ -1,4 +1,4 @@
-# name this file 'solutions.py'
+# oop.py
 """Introductory Labs: Object Oriented Programming.
 <Name>
 <Class>

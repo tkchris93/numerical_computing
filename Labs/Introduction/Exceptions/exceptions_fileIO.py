@@ -1,4 +1,4 @@
-# name this file 'solutions.py'.
+# exceptions_fileIO.py
 """Introductory Labs: Exceptions and File I/O.
 <Name>
 <Class>

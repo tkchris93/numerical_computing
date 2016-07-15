@@ -1,4 +1,4 @@
-# Name this file 'solutions.py'.
+# python_intro.py
 """Introductory Labs: Getting Started.
 <Name>
 <Class>
@@ -26,10 +26,10 @@ def first_half(my_string):
         'ipy'
     """
     pass
-    
+
 def backward(my_string):
     """Return the reverse of the string 'my_string'.
-    
+
     Examples:
         >>> backward("python")
         'nohtyp'
@@ -55,14 +55,14 @@ def list_ops():
 # Problem 5
 def pig_latin(word):
     """Translate the string 'word' into Pig Latin
-    
+
     Examples:
         >>> pig_latin("apple")
         'applehay'
         >>> pig_latin("banana")
         'ananabay'
     """
-    pass        
+    pass
 
 
 # Problem 6

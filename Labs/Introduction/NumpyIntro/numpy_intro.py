@@ -1,4 +1,4 @@
-# name this file 'solutions.py'.
+# numpy_intro.py
 """Introductory Labs: Intro to NumPy.
 <Name>
 <Class>
