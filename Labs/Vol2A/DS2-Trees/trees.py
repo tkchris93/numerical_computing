@@ -1,4 +1,4 @@
-# name this file 'solutions.py'
+# trees.py
 """Volume II Lab 5: Data Structures II (Trees)
 <Name>
 <Class>
