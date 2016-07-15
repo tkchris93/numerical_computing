@@ -1,5 +1,6 @@
 \lab{Introduction to Bokeh}{Introduction to Bokeh}
 \label{lab:Bokeh}
+
 % Written by Tanner Christensen, Summer 2016
 
 \objective{In this lab, we will introduce the Bokeh python package. We will use
@@ -136,7 +137,26 @@ with open("id_to_state.pickle") as file:
 \end{lstlisting}
 
 So in the end your DataFrame should look like this:
-TODO make a table that shows accidents.head()
+
+\label{my-label}
+\begin{tabular}{lllllllllll}
+ST\_CASE & STATE & LATITUDE  & LONGITUD   & HOUR & DAY \\
+10001    & AL    & 32.641064 & -85.354692 & 4    & 15 \\
+10002    & AL    & 31.430447 & -86.956694 & 6    & 11 \\
+10003    & AL    & 30.691631 & -88.085778 & 15   & 14 \\
+10004    & AL    & 33.868700 & -86.291164 & 1    & 21 \\
+10005    & AL    & 33.309742 & -86.787222 & 6    & 4
+\end{tabular}
+
+\label{my-label}
+\begin{tabular}{lllllllllll}
+MONTH & YEAR & DRUNK\_DR & SPEEDING & FATALS \\
+1     & 2010 & 1         & 0        & 1      \\
+1     & 2010 & 0         & 0        & 1      \\
+1     & 2010 & 0         & 1        & 1      \\
+1     & 2010 & 0         & 0        & 1      \\
+1     & 2010 & 0         & 0        & 1
+\end{tabular}
 
 \begin{info}
 HINT: Though tedious, it will be easiest to do this whole process correctly if
@@ -193,6 +213,17 @@ the YEAR column manually. Additionally, we will
 only be interested in the entries where PER\_TYP is 1. This brings the final
 shape of the DataFrame to 223490 rows x 6 columns (since we can now eliminate
 PER\_TYP).
+
+Your DataFrame should look like this:
+
+\begin{tabular}{llllll}
+ST\_CASE & VEH\_NO & AGE & DRINKING & SPEEDREL & YEAR \\
+10001    & 1       & 51  & 9        & 0        & 2010 \\
+10002    & 1       & 44  & 0        & 0        & 2010 \\
+10003    & 1       & 27  & 9        & 1        & 2010 \\
+10003    & 2       & 45  & 0        & 0        & 2010 \\
+10003    & 3       & 28  & 0        & 0        & 2010
+\end{tabular}
 \end{problem}
 
 Now with the necessary data cleaned, we can dive into the Bokeh package itself.
@@ -229,6 +260,16 @@ Circle glyphs, Square glyphs, Patch glyphs, and Bar charts. Here are some very
 basic examples of how to use each of these.
 
 \subsection*{Marker Glyphs (Circles and Squares)}
+
+\begin{comment}
+\begin{figure}
+\centering
+\includegraphics[width=.3\textwidth]{BokehFigs/circles.png} \hfill
+\includegraphics[width=.3\textwidth]{BokehFigs/colored_circles.png} \hfill
+\includegraphics[width=.3\textwidth]{BokehFigs/squares.png}
+\end{figure}
+\end{comment}
+
 
 We use Circle glpyhs when we want to plot a collection of circles (such as in
 a scatter plot.) The following code example demonstrates the basic syntax of
@@ -295,6 +336,28 @@ sq = fig.square(x=[1,2,3,3,4,5], y=[3,1,2,4,5,4], size=[15,25,10,20,10,15],
 show(fig)
 \end{lstlisting}
 
+\begin{figure}
+    \begin{subfigure}{.33\textwidth}
+        \centering
+            \includegraphics[width=.9\linewidth]{BokehFigs/circles.png}
+            \caption{Default circles}
+            \label{fig:circles}
+    \end{subfigure}%
+    \begin{subfigure}{.33\textwidth}
+        \centering
+            \includegraphics[width=.9\linewidth]{BokehFigs/colored_circles.png}
+            \caption{Customized circles}
+            \label{fig:circles}
+    \end{subfigure}%
+    \begin{subfigure}{.33\textwidth}
+        \centering
+            \includegraphics[width=.9\linewidth]{BokehFigs/squares.png}
+            \caption{Customized Squares}
+            \label{fig:circles}
+    \end{subfigure}
+
+\end{figure}
+
 \subsection*{Patch Glyphs}
 Patch glyphs are polygon shapes defined by a series of points locating the
 corners of the object. These shapes can be very complex. For our project, each
@@ -304,13 +367,22 @@ well.
 
 \begin{lstlisting}
 # first iteration of the Sierpinski triangle.
-fig = figure(plot_width=500, plot+height=500)
+fig = figure(plot_width=500, plot_height=500)
 
 pats = fig.patches(xs=[[1, 3, 2], [3, 5, 4], [2, 4, 3]],
             ys=[[1, 1, 3], [1, 1, 3], [3, 3, 5]],
             fill_color="yellow", line_color="orange",
             line_alpha=.5, line_width=7)
+
+show(fig)
 \end{lstlisting}
+
+\begin{figure}
+    \centering
+        \includegraphics[width=.4\linewidth]{BokehFigs/triforce.png}
+        \caption{Collection of patch glyphs}
+        \label{fig:circles}
+\end{figure}
 
 \subsection*{ColumnDataSource Object}
 In the plotting examples we have addressed up to this point, we have expressed
@@ -472,6 +544,12 @@ use, take extra care to make sure that the indices correspond to the same state
 across all these lists.
 \end{problem}
 
+\begin{figure}
+    \includegraphics[width=.5\linewidth]{BokehFigs/hover.png}
+    \caption{Example of state hover tooltip.}
+    \label{fig:hover}
+\end{figure}
+
 \subsection*{HoverTool and Tooltips}
 Adding tooltips to Patch glyphs is fairly straightforward. The process is best
 explained by first presenting an example.
@@ -534,12 +612,17 @@ argument accepts a list of glyphs. At times, there is unpredicted behavior if yo
 include more than one glpyh in this list. The \li{tooltips} arguments functions
 just like the \li{tooltips} argument we discussed in the section on bar charts.
 
-\begin{problem} \li{prob:hover_map}
+\begin{problem} \label{prob:hover_map}
 On your plot of the United States, we can provide much more information to this
 plot using tooltips. Using the lists you prepared in Problem \ref{prob:lists},
 add tooltips for the Patch objects in this plot. Also adjust the appearence of
 the Patch objects under the mouse so it is clear which state is being selected.
+
+Your tooltips should look similar to Figure \ref{fig:hover}.
+
 \end{problem}
+
+
 
 \section*{Adding More Complicated Interactions Using Widgets}
 \begin{info}
@@ -657,7 +740,18 @@ speeding_colors = [COLORS[i] for i in pd.qcut(state_percent_sp, len(COLORS)).cod
 This code assumes you have lists named \li{state_names}, \li{state_percent_dr},
 and \li{state_percent_sp} from Problem \ref{prob:lists}.
 
+Changing the values of the select box should result in something similar to
+Figure \ref{fig:select}.
 \end{problem}
+
+\begin{figure}
+    \includegraphics[width=.7\linewidth]{BokehFigs/color_states.png}
+    \caption{Example of coloring states based on percentage of drunk
+            driving fatalities.}
+    \label{fig:select}
+\end{figure}
+
+%====SUPPLEMENTAL MATERIALS====
 
 \begin{comment}
 
