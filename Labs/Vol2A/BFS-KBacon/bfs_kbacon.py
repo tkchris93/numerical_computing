@@ -1,4 +1,4 @@
-# spec.py
+# bfs_kbacon.py
 """Volume II Lab 7: Breadth-First Search (Kevin Bacon)
 <name>
 <class>
@@ -23,7 +23,7 @@ class Graph(object):
     # Problem 1
     def __str__(self):
         """String representation: a sorted view of the adjacency dictionary.
-        
+
         Example:
             >>> test = {'A':['B'], 'B':['A', 'C',], 'C':['B']}
             >>> print(Graph(test))
@@ -121,7 +121,7 @@ def parse(filename="movieData.txt"):
         # add the actors to the dictionary
         for actor in names[1:]:
             graph[title].append(actor)
-    
+
     return graph
 
 

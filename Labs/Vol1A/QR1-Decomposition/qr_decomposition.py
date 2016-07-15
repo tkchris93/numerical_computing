@@ -1,4 +1,4 @@
-# spec.py
+# qr_decomposition.py
 """Volume I Lab 6: QR Decomposition.
 Name:
 Date:
@@ -7,14 +7,14 @@ Date:
 def QR(A):
     '''
     Compute the QR decomposition of a matrix.
-    Accept an m by n matrix A of rank n. 
+    Accept an m by n matrix A of rank n.
     Return Q, R
     '''
     pass
-    
+
 def prob2(A):
     '''
-    Use your QR decomposition from the previous problem to compute 
+    Use your QR decomposition from the previous problem to compute
     the determinant of A.
     Accept a square matrix A of full rank.
     Return |det(A)|.
@@ -25,7 +25,7 @@ def householder(A):
     '''
     Use the Householder algorithm to compute the QR decomposition
     of a matrix.
-    Accept an m by n matrix A of rank n. 
+    Accept an m by n matrix A of rank n.
     Return Q, R
     '''
     pass
@@ -54,6 +54,6 @@ def prob6(H):
     EXTRA 20% CREDIT
     Compute the Givens triangularization of an upper Hessenberg matrix.
     Accept upper Hessenberg H.
-    
+
     '''
     pass

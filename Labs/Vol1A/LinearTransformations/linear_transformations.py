@@ -1,4 +1,4 @@
-# name this file 'solutions.py'.
+# linear_transformations.py
 """Volume I: Linear Transformations.
 <Name>
 <Class>

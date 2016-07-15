@@ -1,4 +1,4 @@
-# name this file 'solutions.py'.
+# matplotlib_intro.py
 """Introductory Labs: Intro to Matplotlib.
 <Name>
 <Class>

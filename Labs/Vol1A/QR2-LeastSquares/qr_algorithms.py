@@ -1,4 +1,9 @@
-#spec.py
+# qr_algorithms.py
+"""Volume 1: QR 2 (Least Squares and Eigenvalues)
+<Name>
+<Class>
+<Date>
+"""
 
 # Problem 1
 def least_squares(A,b):
@@ -21,7 +26,7 @@ def plot_ellipse(X, Y, a, b, c, d, e):
     Input:
       X (array) - x-coordinates of all the data points.
       Y (array) - y-coordinates of all the data points.
-      a,b,c,d,e (float) - the coefficients from the equation of an 
+      a,b,c,d,e (float) - the coefficients from the equation of an
                     ellipse of the form ax^2 + bx + cxy + dy + ey^2 = 1.
     """
     def get_r(a, b, c, d, e):
@@ -30,7 +35,7 @@ def plot_ellipse(X, Y, a, b, c, d, e):
         B = b*np.cos(theta) + d*np.sin(theta)
         r = (-B + np.sqrt(B**2 + 4*A))/(2*A)
         return r, theta
-        
+
     r,theta = get_r(a,b,c,d,e)
     plt.plot(r*np.cos(theta), r*np.sin(theta), color = "r")
     plt.plot(X,Y,".", color = "b")
@@ -41,7 +46,7 @@ def plot_ellipse(X, Y, a, b, c, d, e):
 def power_method(A,tol):
     """Return the dominant eigenvalue of A and its corresponding eigenvector."""
     pass
-    
+
 # Problem 5
 def QR_algorithm(A,niter,tol):
     """Return the eigenvalues of A using the QR algorithm."""

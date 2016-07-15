@@ -1,4 +1,4 @@
-# name this file 'solutions.py'
+# markov_chains.py
 """Volume II: Markov Chains.
 <Name>
 <Class>

@@ -1,4 +1,4 @@
-# name this file 'solutions.py'
+# standard_library.py
 """Introductory Labs: The Standard Library
 <Name>
 <Class>

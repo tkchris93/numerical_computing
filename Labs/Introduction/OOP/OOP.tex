@@ -56,7 +56,7 @@ In the following code, we import the \li{Backpack} class and instantiate a \li{B
 
 \begin{lstlisting}
 # Import the Backpack class and instantiate an object called 'my_backpack'.
->>> from Packs import Backpack
+>>> from oop import Backpack
 >>> my_backpack = Backpack("Fred")
 
 # Access the object's attributes with a period and the attribute name.
@@ -228,7 +228,7 @@ All methods defined in the \li{Backpack} class are available to instances of the
 For example, the \li{dump()} method is available even though it is not defined explicitly in the \li{Knapsack} class.
 
 \begin{lstlisting}
->>> from Packs import Knapsack
+>>> from oop import Knapsack
 >>> my_knapsack = Knapsack("Brady", "brown")
 >>> isinstance(my_knapsack, Backpack)       # A Knapsack is a Backpack.
 True
@@ -273,7 +273,7 @@ Every Python object is automatically endowed with several magic methods, but the
 To see an object's magic methods, type an underscore before pressing tab.
 
 \begin{lstlisting}
-In [1]: from Packs import Backpack
+In [1]: from oop import Backpack
 
 In [2]: b = Backpack("Oscar", "green")
 

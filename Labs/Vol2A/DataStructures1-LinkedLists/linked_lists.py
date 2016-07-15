@@ -1,4 +1,4 @@
-# name this file 'solutions.py'.
+# linked_lists.py
 """Volume II Lab 4: Data Structures 1 (Linked Lists)
 <Name>
 <Class>
