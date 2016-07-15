@@ -161,17 +161,12 @@ For example, if we try using the Nelder-Mead method as previously, with an initi
 
 However, SciPy does have some tools to help us with these problems. 
 Specifically, we can use the \li{opt.basinhopping()} function.
-Conceptually, most of the minimizing algorithms use the derivative of the function to search in a downhill direction for potential minimizers.
-Often they overshoot the minimum and later backtrack. 
-You can think of it as a ball rolling down a hill into a valley.
-At first, the momentum of the ball carries it across the valley floor and partially up the other wall, only to roll back into the valley.
-Slowly the ball loses momentum as it repeatedly overshoots and backtracks. 
-Eventually the ball comes to rest at the bottom of a valley -- hopefully the lowest valley.
-However, if there are many valleys (or local minima), the ball can get stuck in one that's not the lowest.
+
 The \li{opt.basinhopping()} function uses the same minimizing algorithms (in fact, you can tell it whatever minimizing algorithm you can pass to \li{opt.minimize()}).
-However, once it settles on a minimum, it hops to a new point in the domain (depending on how we set the ``hopping" distance) that hopefully lies outside of the valley
+However, once it settles on a minimum, it hops randomly to a new point in the domain (depending on how we set the ``hopping" distance) that hopefully lies outside of the valley
 or basin belonging to the current local minimum.
 It then searches for the minimum from this new starting point, and if it finds a better minimizer, it repeats the hopping process from this new minimizer. 
+Thus, the \li{opt.basinhopping()} function has multiple chances to escape a local basin and find the correct global minimum. 
 
 \emph{Only Scipy Version 0.12+ has \li{opt.basinhopping}. In earlier versions, such as 0.11, you won't find it.}
 
