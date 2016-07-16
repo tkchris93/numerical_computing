@@ -1,69 +1,70 @@
-\lab{Data Visualization}{Data Visualization} 
-\objective{Use visualizations to explore and communicate insights in data.}
+\lab{Data Visualization}{Data Visualization}
 \label{lab:DataVis}
-
-%\noindent\emph{At their best, graphics are instruments for reasoning about quantitative information.} \small{---Edward Tufte}
-% from the introduction of his book 'The Visual Display of Quantitative Information'
+\objective{Correctly presenting and interpreting data with visualizations is a fundamental skills for all scientists.
+Different data sets are best visualized in different ways.
+In this lab we discuss the principles of good data visualization, including the key characteristics of good graphs, common mistakes, and how to avoid unethical visualizations.}
 
 \section*{Exploring Data with Visualizations} % ===============================
 
-Using visualizations to understand data can reveal insights that may not be noticed otherwise.
-The following problem is a famous example of this phenomenon.
+Using visualizations to understand data often reveals insights that may not immediately obvious from simple statistics.
+The following data set, known as \emph{Anscombe's quartet}, is a famous example of the importance of graphing data.
 
-\begin{problem} % Problem: Anscombe data set.
-\label{prob:anscombe}
-Consider the following data sets:
 \begin{table}[H]
-\begin{tabular}{l l  |  l l  |  l l  |  l l }
-I & & II & & III & & IV\\
-x & y & x & y & x & y & x & y \\
+\scriptsize{
+\begin{tabular}{rr|rr|rr|rr}
+
+\multicolumn{2}{c|}{I}    & \multicolumn{2}{|c|}{II} &
+\multicolumn{2}{|c|}{III} & \multicolumn{2}{|c}{IV} \\
+\multicolumn{1}{c}{$x$}   & \multicolumn{1}{c|}{$y$} &
+\multicolumn{1}{|c}{$x$}  & \multicolumn{1}{c|}{$y$} &
+\multicolumn{1}{|c}{$x$}  & \multicolumn{1}{c|}{$y$} &
+\multicolumn{1}{|c}{$x$}  & \multicolumn{1}{c}{$y$} \\
 \hline
-10.0 & 8.04 & 10.0 & 9.14 & 10.0 & 7.46 & 8.0 & 6.58 \\
-8.0 & 6.95 & 8.0 & 8.14 & 8.0 & 6.77 & 8.0 & 5.76 \\
-13.0 & 7.58 & 13.0 & 8.74 & 13.0 & 12.74 & 8.0 & 7.71 \\
-9.0 & 8.81 & 9.0 & 8.77 & 9.0 & 7.11 & 8.0 & 8.84 \\
-11.0 & 8.33 & 11.0 & 9.26 & 11.0 & 7.81 & 8.0 & 8.47 \\
-14.0 & 9.96 & 14.0 & 8.10 & 14.0 & 8.84 & 8.0 & 7.04 \\
-6.0 & 7.24 & 6.0 & 6.13 & 6.0 & 6.08 & 8.0 & 5.25 \\
-4.0 & 4.26 & 4.0 & 3.10 & 4.0 & 5.39 & 19.0 & 12.50 \\
-12.0 & 10.84 & 12.0 & 9.13 & 12.0 & 8.15 & 8.0 & 5.56 \\
-7.0 & 4.82 & 7.0 & 7.26 & 7.0 & 6.42 & 8.0 & 7.91 \\
-5.0 & 5.68 & 5.0 & 4.74 & 5.0 & 5.73 & 8.0 & 6.89 \\
-\end{tabular}
-\caption{These four sets of data are known as Anscombe's quartet.}
-\label{table:anscombe}
+10.0 & 8.04  & 10.0 & 9.14 & 10.0 & 7.46  & 8.0  & 6.58  \\
+8.0  & 6.95  & 8.0  & 8.14 & 8.0  & 6.77  & 8.0  & 5.76  \\
+13.0 & 7.58  & 13.0 & 8.74 & 13.0 & 12.74 & 8.0  & 7.71  \\
+9.0  & 8.81  & 9.0  & 8.77 & 9.0  & 7.11  & 8.0  & 8.84  \\
+11.0 & 8.33  & 11.0 & 9.26 & 11.0 & 7.81  & 8.0  & 8.47  \\
+14.0 & 9.96  & 14.0 & 8.10 & 14.0 & 8.84  & 8.0  & 7.04  \\
+6.0  & 7.24  & 6.0  & 6.13 & 6.0  & 6.08  & 8.0  & 5.25  \\
+4.0  & 4.26  & 4.0  & 3.10 & 4.0  & 5.39  & 19.0 & 12.50 \\
+12.0 & 10.84 & 12.0 & 9.13 & 12.0 & 8.15  & 8.0  & 5.56  \\
+7.0  & 4.82  & 7.0  & 7.26 & 7.0  & 6.42  & 8.0  & 7.91  \\
+5.0  & 5.68  & 5.0  & 4.74 & 5.0  & 5.73  & 8.0  & 6.89  \\
+\end{tabular}}
 \end{table}
 
-The data sets I-IV in Table \ref{table:anscombe} are known as Anscombe's quartet. 
-Each data set has identical statistical properties. 
-In each case,
+Each section of Anscombe's quartet the following statistical properties:
 \begin{itemize}
-\item The mean of $x$ is 9 and the mean of $y$ is $7.5$.
-\item The variance of $x$ is 11 and the variance of $y$ is 4.127.
-\item The correlation between $x$ and $y$ is .816.
-\item The linear regression line is $y=3+5x$.
+\item The means are $9$ for $x$ and $7.5$ for $y$.
+\item The sample variances are $11$ for $x$ and $3.75$ for $y$.
+\item The correlation between $x$ and $y$ is $.816$.
+\item The linear least squares regression line is $y=\frac{x}{2}+3$.
 \end{itemize}
-Plot each data set.
-What do you notice? % TODO: ask a more specific question?
+
+Despite these similarities, each section is graphically very different.
+
+\begin{problem} % Describe Anscombe's quartet.
+\label{prob:anscombe}
+The file \texttt{anscombe.npy} contains Anscombe's quartet in the same format as displayed above.
+Plot each section of the quartet separately as a scatter plot.
+Also plot the regression line $y = \frac{1}{2}x + 3$ on the domain $x\in[0,25]$ over each scatter plot.
+
+Write a few sentences describing what makes each section unique.
 \end{problem}
 
-\subsection*{The Iterative Process of Exploratory Visualization} % ------------
-
-As Problem \ref{prob:anscombe} demonstrates, a picture quickly reveals properties of the data that are difficult to see in a list of numbers.
 Understanding a data set through visualization is an iterative process.
-Start with an initial visualization---usually a broad overview---and examine the data.
-Adjust the visualization or create other visualizations based on what you observe.
-Ask questions as you look for insights; this will help you find the right visualization.
-
-Some good questions to ask include:
+Start with an initial visualization---usually a broad overview---and examine the data, then adjust the visualization or create other visualizations based on what you observe.
+Ask yourself the following questions as you look for insights:
 \begin{enumerate}
 \item Does the data make sense?
-\item Would a different visualization give more information?
+\item Would a different visualization communicate more information?
 \item Would visualizing a subset of the data provide more information?
 \item Would transforming the data reveal a hidden pattern?
 \end{enumerate}
 
-\begin{figure}[H] % Different visuaizations for earthquake data. 
+\begin{comment}
+\begin{figure}[H] % Different visuaizations for earthquake data.
 \centering
 \begin{subfigure}{.45\textwidth}
 \centering
@@ -79,15 +80,14 @@ different magnitudes. Note the scale of the y-axis is logarithmic.}
 \label{fig:logexample}
 \end{figure}
 
-This last question is particularly important.
+
 Consider Figure \ref{fig:logexample} which shows data about large earthquakes from the United States Geological Survey.
 It appears to be somewhat random however, when transformed, the frequency of the magnitudes on a logarithmic scale show a fairly strong linear relationship
 between the variables.
-Transformations and data exploration will be discussed more in Volume 3.
+% Transformations and data exploration will be discussed more in Volume 3.
+\end{comment}
 
-\newpage
-
-\subsection*{Types of Visualizations} % ---------------------------------------
+\section*{Choosing the Right Visualization} % =================================
 
 \subsubsection*{Bar Charts} % -------------------------------------------------
 
@@ -175,7 +175,7 @@ plt.show()
 
 \end{lstlisting}
 
-\begin{problem} % Problem: Histograms. TODO: Needs a real data set.
+\begin{problem} % Problem: Histograms. TODO: This problem sucks.
 Plot two histograms with data drawn randomly from a normal and exponential distribution.
 
 \begin{lstlisting}
@@ -205,7 +205,7 @@ Does this change how we interpret the distribution of the data?
 \label{fig:lineplot_bad}
 \end{figure}
 
-A line plot represents $(x,y)$-pairs as points and connects them with a curve. 
+A line plot represents $(x,y)$-pairs as points and connects them with a curve.
 This works well with continuous functions or when there is a natural order in two-dimensional data, for example when the data is a sequence of values over time.
 Line plots should \emph{not} be used for data that is one-dimensional or is two-dimensional with no natural
 progression (see Figure \ref{fig:lineplotbadX}). % TODO: warning box?
@@ -221,8 +221,6 @@ progression (see Figure \ref{fig:lineplotbadX}). % TODO: warning box?
 \end{figure}
 
 You can create a line plot in Matplotlib with the command \li{plt.plot()}.
-
-\newpage
 
 \subsubsection*{Scatter Plots} % ----------------------------------------------
 
@@ -259,7 +257,7 @@ Manipulating these can change your interpretation and should be done with carefu
 \includegraphics[width=\textwidth]{earthquake_data.png}
 \end{subfigure}
 \caption{USGS Earthquake data. The scatter plot on the left only plots earthquakes with
-magnitude 7.5 or greater from 1980-2010 and appears to have a correlation. 
+magnitude 7.5 or greater from 1980-2010 and appears to have a correlation.
 However, the plot on the right shows all recorded earthquakes from 1900-2010 and shows that the correlation
 is not a true correlation.}
 \label{fig:scatterquake}
@@ -267,13 +265,11 @@ is not a true correlation.}
 
 Scatter plots may reveal insights other than correlation.
 Consider Figure \ref{fig:scatterquake} which plots earthquake data from the United States Geological Survey (USGS).
-The USGS data began including earthquakes with magnitude 6.5 or greater; this is clearly seen 
+The USGS data began including earthquakes with magnitude 6.5 or greater; this is clearly seen
 in the scatter plot of the entire dataset.
 Plots like this may also reveal errors in the dataset that are harder to detect in a table of values.
- 
-You can create a scatter plot in Matplotlib with the command \li{plt.scatter()}.
 
-\newpage
+You can create a scatter plot in Matplotlib with the command \li{plt.scatter()}.
 
 \subsubsection*{Contour Plots and Heat Maps} % --------------------------------
 
@@ -295,14 +291,14 @@ You can create a scatter plot in Matplotlib with the command \li{plt.scatter()}.
 \centering
 \includegraphics[width=\textwidth]{contour_map_rainbow.png}
 \end{subfigure}
-\caption{Contour Maps.  A contour map (top left) and a heat map (top right). 
+\caption{Contour Maps.  A contour map (top left) and a heat map (top right).
 The color choices of the bottom row are less intuitive and make the visualization harder to interpret.}
 \label{fig:contour}
 \end{figure}
 
 
-Three-dimensional data can be displayed with a contour plot. 
-This draws lines in the plane where the third value is constant---like a topographical map.  
+Three-dimensional data can be displayed with a contour plot.
+This draws lines in the plane where the third value is constant---like a topographical map.
 Coloring the space between the contour lines produces a heat map.
 Heat maps work best when only one or two colors are used.
 
@@ -318,8 +314,8 @@ Heat maps work best when only one or two colors are used.
 \end{subfigure}
 %\includegraphics[width=\textwidth]{heatmap.png}
 \caption{Both of these pseudocolor plots depict the function
-	$z = \sin(x)\sin(y)$ on the domain $[-1,4] \times [-4,1]$. 
-The plot on the left uses a rainbow gradient, which has no meaningful relationship to the data. 
+	$z = \sin(x)\sin(y)$ on the domain $[-1,4] \times [-4,1]$.
+The plot on the left uses a rainbow gradient, which has no meaningful relationship to the data.
 The plot on the right uses the colormap \li{afmhot}.  The lighter and darker colors are a more intuitive
 representation of higher and lower values.}
 
@@ -330,7 +326,7 @@ representation of higher and lower values.}
 % TODO: Reword (awkward).
 A good default colormap is Matplotlib's \li{viridis}.
 Other colormaps that are appropriate for the data can be selected using the argument \li{cmap='NAME\_OF\_COLORMAP'}, where \li{NAME\_OF\_COLORMAP} is one of Matplotlib's sequential or diverging colormaps.
-Two sequential colormaps are \li{afmhot} and \li{cool}. Two diverging colormaps are \li{seismic} and \li{bwr}. 
+Two sequential colormaps are \li{afmhot} and \li{cool}. Two diverging colormaps are \li{seismic} and \li{bwr}.
 These colormaps along with their color scheme can be found on
 \url{http://matplotlib.org/examples/color/colormaps_reference.html}.
 Although three-dimensional data can be plotted as a surface in 3-space, it is often difficult to find a view where none of the important features of the data are obscured.
@@ -354,9 +350,9 @@ plt.contourf(X, Y, F, [-2,-1,0.0001,1,2,3,4,5] ,cmap=plt.get_cmap('afmhot'))
 \end{lstlisting}
 
 \begin{problem} % Contour map problem. TODO: don't specify number of intervals?
-Using 400 intervals, plot a filled contour map of the function \[f(x,y) = \sin(x) + \sin(y)\] over the domain $[0,12\pi]\times[0,12\pi]$. 
+Using 400 intervals, plot a filled contour map of the function \[f(x,y) = \sin(x) + \sin(y)\] over the domain $[0,12\pi]\times[0,12\pi]$.
 
-Be sure to use an appropriate color map. 
+Be sure to use an appropriate color map.
 \end{problem}
 
 \section*{Communicating Insights with Visualizations} % =======================
@@ -372,7 +368,7 @@ These practices will help the reader correctly interpret the visualization.
 
 Some popular visualizations (pie charts, radar graphs, stacked bar charts and others) interfere with our ability to interpret the information they display.
 For example, it is more difficult to detect differences in a pie chart than on a bar chart with the same data.
-This is because differences in area are more difficult to detect than differences in length. 
+This is because differences in area are more difficult to detect than differences in length.
 As a result, charts that depend on detecting variation in area will be less effective.
 Instead, choose visualizations that compare the data to the a simple standard that is easy to understand and interpret.
 Figures \ref{fig:pievsbar} and \ref{fig:stacked} are examples of poorly chosen visualizations.
@@ -424,7 +420,7 @@ Spam: 21, Eggs: 20, Ham: 22, Sausage: 21, Bacon: 20, Baked Beans: 11, Lobster Th
 
 % TODO: WHY IS THIS PROBLEM WAY DOWN HERE??? Shouldn't this be part of the histogram section?
 \begin{problem} % Problem: histogram of earthquake magnitudes.
-Plot a histogram of earthquake magnitudes using the data in the file \li{earthquake.txt}. 
+Plot a histogram of earthquake magnitudes using the data in the file \li{earthquake.txt}.
 Remove reference lines, tick marks and bar lines.
 Use the numpy function \li{np.loadtxt()} to read in the data.
 Is the data distributed normally or exponentially?
@@ -498,24 +494,24 @@ def Chebyshev_subplots():
         if i<6:
             # remove the inner x-ticks and labels.
             ax.xaxis.set_ticks_position('none')
-            ax.set_xticklabels([]) 
+            ax.set_xticklabels([])
 
     plt.show()
 \end{lstlisting}
 
 \begin{problem} % Problem: plot the Bernstein polynomials.
-The $n+1$ Bernstein basis polynomials of degree $n$ are defined as 
+The $n+1$ Bernstein basis polynomials of degree $n$ are defined as
 
 $$b_{v,n} = {{n} \choose {v}} x^v (1-x)^{n-v}, v = 0, 1,..., n.$$
 
 Plot the Bernstein basis polynomials for $v,n$ in [0,3] as small multiples and compare that to the cluttered version of plotting them on top of each other.
 \end{problem}
 
-% \begin{comment}
+\begin{comment}
 
 \subsection*{Additional Material} % ===========================================
 
-There are many software packages that facilitate the visual exploration of data. 
+There are many software packages that facilitate the visual exploration of data.
 One Python library is Glue (see \cite{glue}).
 
 Some packages for making nicer looking plots include \li{Seaborn} and \li{prettyplotlib}.  TODO get refs
@@ -532,6 +528,7 @@ TODO get full refs for the follwoing
 \item \emph{Now you see it} by Stephen Few
 \end{itemize}
 
-% \end{comment}
+\end{comment}
 
-\printbibliography
+%\noindent\emph{At their best, graphics are instruments for reasoning about quantitative information.} \small{---Edward Tufte}
+% from the introduction of his book 'The Visual Display of Quantitative Information'
