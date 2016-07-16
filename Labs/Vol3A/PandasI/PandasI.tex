@@ -434,9 +434,11 @@ For the following examples, we will use the following data:
 >>> mathInfo = pd.DataFrame({'ID': mathID, 'Grade': mathGd, 'Math_Major': major})
 \end{lstlisting}
 
-Before querying our data, it is important to know some of its basic properties, such as
-number of columns, number of rows, and the datatypes of the columns. This can be done
-by simply calling the \li{info()} method on the desired \li{DataFrame}:
+Before querying our data, it is important to know some of its basic properties,
+such as number of columns, number of rows, and the datatypes of the columns.
+This can be done by simply calling the \li{info()} method on the desired
+\li{DataFrame}:
+
 \begin{lstlisting}
 >>> mathInfo.info()
 <class 'pandas.core.frame.DataFrame'>
@@ -446,6 +448,19 @@ Grade         5 non-null float64
 ID            5 non-null int64
 Math_Major    5 non-null object
 dtypes: float64(1), int64(1), object(1)
+\end{lstlisting}
+
+We can also get some basic information about the structure of the \li{DataFrame}
+using the \li{head()} or \li{tail()} methods.
+
+\begin{lstlisting}
+>>> mathInfo.head()
+   Grade  ID Math_Major  ID  Age  GPA
+0    4.0   0          y   0   20  3.8
+1    3.0   1          n   2   18  3.0
+2    3.5   5          y   4   19  2.8
+3    3.0   6          n   6   20  3.8
+4    4.0   3          n   7   19  3.4
 \end{lstlisting}
 
 The method \li{isin()} is a useful way to find certain values in a
