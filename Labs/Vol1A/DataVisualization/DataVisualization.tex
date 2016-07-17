@@ -53,9 +53,11 @@ Also plot the regression line $y = \frac{1}{2}x + 3$ on the domain $x\in[0,25]$ 
 Write a few sentences describing what makes each section unique.
 \end{problem}
 
+\section*{Choosing the Right Visualization} % =================================
+
 Understanding a data set through visualization is an iterative process.
 Start with an initial visualization---usually a broad overview---and examine the data, then adjust the visualization or create other visualizations based on what you observe.
-Ask yourself the following questions as you look for insights:
+Ask the following questions as you search for insights:
 \begin{enumerate}
 \item Does the data make sense?
 \item Would a different visualization communicate more information?
@@ -63,35 +65,9 @@ Ask yourself the following questions as you look for insights:
 \item Would transforming the data reveal a hidden pattern?
 \end{enumerate}
 
-\begin{comment}
-\begin{figure}[H] % Different visuaizations for earthquake data.
-\centering
-\begin{subfigure}{.45\textwidth}
-\centering
-\includegraphics[width=\textwidth]{large_quake.png}
-\end{subfigure}
-\centering
-\begin{subfigure}{.45\textwidth}
-\centering
-\includegraphics[width=\textwidth]{freq_earthquake_log.png}
-\end{subfigure}
-\caption{The left plot shows earthquakes of magnitudes 7.5 or higher over time. The right plot shows the frequencies of
-different magnitudes. Note the scale of the y-axis is logarithmic.}
-\label{fig:logexample}
-\end{figure}
-
-
-Consider Figure \ref{fig:logexample} which shows data about large earthquakes from the United States Geological Survey.
-It appears to be somewhat random however, when transformed, the frequency of the magnitudes on a logarithmic scale show a fairly strong linear relationship
-between the variables.
-% Transformations and data exploration will be discussed more in Volume 3.
-\end{comment}
-
-\section*{Choosing the Right Visualization} % =================================
-
 \subsubsection*{Bar Charts} % -------------------------------------------------
 
-\begin{figure}[H] % Bar chart styles
+\begin{figure}[h] % Bar chart styles
 \centering
 \begin{subfigure}{.45\textwidth}
   \centering
@@ -191,7 +167,7 @@ Does this change how we interpret the distribution of the data?
 
 \subsubsection*{Line Plots} % -------------------------------------------------
 
-\begin{figure}[H] % Line plots.
+\begin{figure}[h] % Line plots.
 \centering
 \begin{subfigure}{.45\textwidth}
 \centering
@@ -210,7 +186,7 @@ This works well with continuous functions or when there is a natural order in tw
 Line plots should \emph{not} be used for data that is one-dimensional or is two-dimensional with no natural
 progression (see Figure \ref{fig:lineplotbadX}). % TODO: warning box?
 
-\begin{figure}[H]
+\begin{figure}[h]
 \centering
 \begin{subfigure}{.5\textwidth}
 \centering
@@ -269,11 +245,64 @@ The USGS data began including earthquakes with magnitude 6.5 or greater; this is
 in the scatter plot of the entire dataset.
 Plots like this may also reveal errors in the dataset that are harder to detect in a table of values.
 
+% TODO: BAD!!! use plt.plot(), not plt.scatter().
 You can create a scatter plot in Matplotlib with the command \li{plt.scatter()}.
+
+\begin{comment}
+\begin{figure}[h] % Bad visualization: earthquake data, year vs magnitude.
+\captionsetup[subfigure]{justification=centering}
+\centering
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/earthquake_bad.pdf}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{freq_earthquake_log.png}
+\end{subfigure}
+\caption{The left plot shows earthquakes of magnitudes 7.5 or higher over time. The right plot shows the frequencies of
+different magnitudes. Note the scale of the y-axis is logarithmic.}
+\label{fig:logexample}
+\end{figure}
+\end{comment}
+
+\begin{problem} % Earthquake data
+The file \texttt{earthquakes.npy} contains data from the 17,065 earthquakes between 2000 and 2010 that were at least a 5 on the Richter scale.\footnote{See \url{http://earthquake.usgs.gov/earthquakes/search/}.}
+Each row in the array represents a different earthquake;
+the columns are the date (as a fraction of the year), the magnitude, the longitude, and the latitude, in that order.
+
+Because each earthquake is a distinct event, a good way to start visualizing this data might be a scatter plot of the years versus the magnitudes of each earthquake.
+
+\begin{lstlisting}
+>>> year, magnitude, longitude, latitude = np.load("earthquakes.npy").T
+>>> plt.plot(year, magnitude, '.')
+>>> plt.xlabel("Year")
+>>> plt.ylabel("Magnitude")
+>>> plt.show()
+\end{lstlisting}
+
+\begin{figure}[H] % Bad visualization: earthquake data, year vs magnitude.
+    \centering
+    \includegraphics[width=.7\textwidth]{figures/earthquake_bad.pdf}
+\end{figure}
+
+Unfortunately, this plot communicates very little information because the data is so cluttered.
+Describe the data with two or three better visualizations.
+Your graphs should clearly answer the following questions:
+\begin{enumerate}
+    \item How many earthquakes happened every year?
+    \item How often do strong earthquakes happen compared to weaker ones?
+    \item Where do earthquakes happen?
+\end{enumerate}
+% (Hint: \li{plt.gca().set_aspect("equal")} fixes the aspect ratio, which may improve comparisons between longitude and latitude.)
+\end{problem}
+
+% Consider Figure \ref{fig:logexample} which shows data about large earthquakes from the United States Geological Survey.
+% It appears to be somewhat random however, when transformed, the frequency of the magnitudes on a logarithmic scale show a fairly strong linear relationship between the variables.
 
 \subsubsection*{Contour Plots and Heat Maps} % --------------------------------
 
-\begin{figure}[H]
+\begin{figure}[h]
 \centering
 \begin{subfigure}{.45\textwidth}
 \centering
