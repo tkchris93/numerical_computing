@@ -4,7 +4,7 @@
 Different data sets are best visualized in different ways.
 In this lab we discuss the principles of good data visualization, including the key characteristics of good graphs, common mistakes, and how to avoid unethical visualizations.}
 
-\section*{Exploring Data with Visualizations} % ===============================
+\section*{The Importance of Visualizations} % =================================
 
 Using visualizations to understand data often reveals insights that may not immediately obvious from simple statistics.
 The following data set, known as \emph{Anscombe's quartet}, is a famous example of the importance of graphing data.
@@ -55,7 +55,8 @@ Write a few sentences describing what makes each section unique.
 
 \section*{Choosing the Right Visualization} % =================================
 
-Understanding a data set through visualization is an iterative process.
+\begin{comment} % This needs to go somewhere else.
+Understanding a data set through visualizations is an iterative process.
 Start with an initial visualization---usually a broad overview---and examine the data, then adjust the visualization or create other visualizations based on what you observe.
 Ask the following questions as you search for insights:
 \begin{enumerate}
@@ -64,56 +65,129 @@ Ask the following questions as you search for insights:
 \item Would visualizing a subset of the data provide more information?
 \item Would transforming the data reveal a hidden pattern?
 \end{enumerate}
+\end{comment}
 
-\subsubsection*{Bar Charts} % -------------------------------------------------
+Most data sets are more naturally described with one type of visualization than another.
+Below we review three common ways to visualize one or two 1-dimensional arrays:
 
-\begin{figure}[h] % Bar chart styles
-\centering
-\begin{subfigure}{.45\textwidth}
-  \centering
-  \includegraphics[width=\textwidth]{bar_chart_horizontal_sorted.png}
-\end{subfigure}
-\begin{subfigure}{.45\textwidth}
-  \centering
-  \includegraphics[width=\textwidth]{bar_chart_unsorted.png}
-\end{subfigure}
-\begin{subfigure}{.45\textwidth}
-  \centering
-  \includegraphics[width=\textwidth]{bar_chart_vertical_bars_horizontal_labels.png}
-\end{subfigure}
-\begin{subfigure}{.45\textwidth}
-  \centering
-  \includegraphics[width=\textwidth]{bar_chart_vertical_bars_vertical_labels.png}
-\end{subfigure}
+\begin{itemize}
+\item \textbf{Line Plot}: Connects ordered $(x,y)$ points with straight lines.
 
-\caption{Bar Charts.
-The example in the upper left is easier to use for comparison than the upper right, and easier to read than the bottom two charts.
-The labels overlap in the bottom left and the labels are vertical in the bottom right, making them hard to read.}
-\label{fig:barchart}
-\end{figure}
+Used to visualize one or two ordered arrays, such as functional outputs over an ordered domain or a sequence of values over time.
 
-Bar charts are best for small sets of discrete, one-dimensional, categorical data.
-Usually, a horizontal bar chart is preferred over a vertical bar chart because it's harder to read vertical labels than horizontal labels.
-Also, horizontal labels on a vertical bar chart may not fit on the graph well (see Figure \ref{fig:barchart}).
+% Use \li{plt.plot()} to create a line plot.
 
-The data in a bar chart should be sorted in a logical way.
-If the chart is being used to compare the values of different data points, it is best to sort by size; if the chart is being used to look up specific values, the labels should be sorted in a way that makes it easy to find specific values (for example, alphabetically).
+\item \textbf{Scatter Plot}: Draws $(x,y)$ points without connecting them.
 
-Use \li{plt.bar()} or \li{plt.barh()} to create a bar chart in Matplotlib.
+Displays for two corresponding arrays without a natural order, where the $(x,y)$ points are individual non-related instances.
+
+% Use \li{plt.plot()} with a point marker (\li{'.'}, \li{','}, \li{'o'}, etc.) to draw a scatter plot.
+
+\begin{comment} % Window size, also should go later (with ethics).
+Figure \ref{fig:scatter_correlation} displays two scatter plots.
+The first appears to have a weak correlation and the second appears to have a strong correlation.
+However, the same data is being plotted and the only difference is the scale and window size.
+Manipulating these can change your interpretation and should be done with careful consideration.
+\end{comment}
+
+\item \textbf{Histogram}: Groups $x$ values into a number of bins over an interval and displays the number of values in each bin.
+
+Best for visualizing a single unordered array, such as draws from a probability distribution.
+
+% Use \li{plt.hist()} to create a histogram.
+% The arguments \li{bins} and \li{<<range>>} specify the number of bins to draw and over what domain.
+
+\begin{comment} % Details for later.
+A histogram with only a few bins or too many bins will fail to give a clear view of the distribution of the data, therefore it is important to choose the number of bins that gives the best view of the distribution of the data.
+
+Similarly, reference lines are distracting and focus on unnecessary details instead of the shape of the distribution.
+If more precise details are desired, exact figures can be presented alongside the histogram in a table.
+\end{comment}
+\end{itemize}
+%
+\begin{table}[H]
+\begin{tabular}{rcc}
+& \textbf{One Array} & \textbf{Two Arrays} \\
+\cline{2-3}
+\textbf{Ordered Data} &
+\multicolumn{1}{|c|}{Line Plot} & \multicolumn{1}{|c|}{Line Plot} \\
+\cline{2-3}
+\textbf{Unordered Data} &
+\multicolumn{1}{|c|}{Histogram} & \multicolumn{1}{|c|}{Scatter Plot} \\
+\cline{2-3}
+\textbf{Categorical Data} &
+\multicolumn{1}{|c|}{Bar Chart} & \multicolumn{1}{|c|}{Scatter Plot} \\
+\cline{2-3}
+\end{tabular}
+\end{table}
+
+\subsection*{Examples} % ------------------------------------------------------
+
+% Get a marker and a line.
+Line plots and scatter plots are sometimes used together.
+A line connecting points implies a relationship between the points, while drawing point markers emphasizes that each point is a unique instance of data.
+
+Line plots should \emph{not} be used for data without a natural progression.
+For example, suppose we would like to make a large number of random draws from a distribution and visualize the results.
+In this case, the line plot is completely incoherent, but the histogram provides an accurate picture of the statistical distribution.
+
+A histogram plots an array of values against the frequency with which the values occur.
+To plot a line plot of values against frequency (without drawing a histogram), use \li{np.histogram()}.
+This function returns the number of values in each bin and the locations of the edges of the bins.
+Use the edges of the bins to calculate the center of the bins, then use a line plot to connect the two.
 
 \begin{lstlisting}
-# This code created the top right bar chart.
-labels = 'Spam', 'Eggs', 'Ham', 'Sausage', 'Bacon', 'Baked beans','Lobster thermidor'
-val = [10, 11, 18, 19, 20, 21, 22]    # the bar lengths
-pos = np.arange(7)+.5    # the bar centers on the y axis
-plt.barh(pos,val, align='center')
-plt.yticks(pos, labels[::-1])
-plt.show()
+>>> import numpy as np
+>>> from matplotlib import pyplot as plt
+
+# Get 10,000 random samples from the standard exponential distribution.
+>>> data = np.random.exponential(size=10000)\begin{lstlisting}
+
+# Calculate the bin centers.
+>>> counts, bin_edges = np.histogram(data, bins=30)
+>>> bin_centers = (bin_edges[:-1] + bin_edges[1:])/2.
+
+>>> plt.subplot(131)                # Regular line plot of the data.
+>>> plt.plot(data)
+
+>>> plt.subplot(132)                # Histogram of the data.
+>>> plt.hist(data, bins=30)
+
+>>> plt.subplot(133)                # Line plot of values versus frequencies.
+>>> plt.hist(data, bins=30, alpha=.1)       # Small alpha values fade the plot.
+>>> plt.plot(bin_centers, counts, 'b.-', lw=2, ms=12)
+
+>>> plt.show()
 \end{lstlisting}
 
-\subsubsection*{Histograms} % -------------------------------------------------
+\begin{figure}[H] % line plot versus a histogram.
+\captionsetup[subfigure]{justification=centering}
+\centering
+\begin{subfigure}{.325\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/line_bad.pdf}
+\end{subfigure}
+%
+\begin{subfigure}{.325\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/histogram_good.pdf}
+\end{subfigure}
+%
+\begin{subfigure}{.325\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/histogram_line.pdf}
+\end{subfigure}
+\end{figure}
 
-\begin{figure}[H] % Histograms
+% Example of using np.histogram() for histogram with ordered data.
+
+\begin{figure}[H] % line plot versus a histogram.
+    \centering
+    \includegraphics[width=.7\textwidth]{figures/histogram_line.pdf}
+\end{figure}
+
+\begin{comment} % USE THIS AS AN EXAMPLE LATER.
+\begin{figure}[H] % Histogram with and without busy information.
 \centering
 \begin{subfigure}{.45\textwidth}
 \centering
@@ -128,30 +202,6 @@ plt.show()
 \label{fig:histogram}
 \end{figure}
 
-A histogram depicts a distribution of numerical data.
-The data are sorted into ``bins'' based on what range they lie in.
-The height of each vertical bar represents the number of data points in each bin.
-A histogram with only a few bins or too many bins will fail to give a clear view of the distribution of the data, therefore it is important to choose the number of bins that gives the best view of the distribution of the data.
-
-Similarly, reference lines are distracting and focus on unnecessary details instead of the shape of the distribution.
-If more precise details are desired, exact figures can be presented alongside the histogram in a table.
-
-Use \li{plt.hist()} to create a Matplotlib histogram.
-
-
-\begin{lstlisting}
-from numpy.random import randn
-from matplotlib import pyplot as plt
-
-data = randn(75) + randn(75) + randn(75) + randn(75)
-plt.hist(data, bins=30)
-
-plt.title("histogram")
-plt.show()
-
-\end{lstlisting}
-
-\begin{problem} % Problem: Histograms. TODO: This problem sucks.
 Plot two histograms with data drawn randomly from a normal and exponential distribution.
 
 \begin{lstlisting}
@@ -163,10 +213,9 @@ exp_data = exponential(size=1000)
 
 For each distribution, plot a histogram using 30 bins, 15 bins and 5 bins.
 Does this change how we interpret the distribution of the data?
-\end{problem}
+\end{comment}
 
-\subsubsection*{Line Plots} % -------------------------------------------------
-
+\begin{comment}
 \begin{figure}[h] % Line plots.
 \centering
 \begin{subfigure}{.45\textwidth}
@@ -177,14 +226,9 @@ Does this change how we interpret the distribution of the data?
 \centering
 \includegraphics[width=\textwidth]{line_plot_good.png}
 \end{subfigure}
-\caption{Line Plot.  The left plot is plotted with \li{lw=1} whereas the right plot is plotted with \li{lw=2}.  Notice that the right plot is better because it is easier to see the line.}
+\caption{Line Plot.  The left plot is plotted with \li{lw=1} whereas the right plot is plotted with \li{lw=2}.  Notice that the right plot is better because it is easier to see the line.} % Irrelevant for right here.
 \label{fig:lineplot_bad}
 \end{figure}
-
-A line plot represents $(x,y)$-pairs as points and connects them with a curve.
-This works well with continuous functions or when there is a natural order in two-dimensional data, for example when the data is a sequence of values over time.
-Line plots should \emph{not} be used for data that is one-dimensional or is two-dimensional with no natural
-progression (see Figure \ref{fig:lineplotbadX}). % TODO: warning box?
 
 \begin{figure}[h]
 \centering
@@ -192,15 +236,13 @@ progression (see Figure \ref{fig:lineplotbadX}). % TODO: warning box?
 \centering
 \includegraphics[width=\textwidth]{line_plot_bad_X.png}
 \end{subfigure}
-\caption{Line plot.  Notice that this graph appears to show that the x-values are ordered.  However, in reality, they are unordered.  This is a bad practice and misrepresents the data.}
+\caption{Line plot. Notice that this graph appears to show that the x-values are ordered. However, in reality, they are unordered. This is a bad practice and misrepresents the data.}
 \label{fig:lineplotbadX}
 \end{figure}
+\end{comment}
 
-You can create a line plot in Matplotlib with the command \li{plt.plot()}.
-
-\subsubsection*{Scatter Plots} % ----------------------------------------------
-
-\begin{figure}[h]
+\begin{comment} % MOVE BELOW.
+\begin{figure}[h] % Choose an ethical scale and window.
 \centering
 \begin{subfigure}{.45\textwidth}
 \centering
@@ -210,18 +252,13 @@ You can create a line plot in Matplotlib with the command \li{plt.plot()}.
 \centering
 \includegraphics[width=\textwidth]{scale_scatter_zoomed_out.png}
 \end{subfigure}
-\caption{Scatter Plots.  The data in both plots are the same but there appears to be a weaker
+\caption{Scatter Plots. The data in both plots are the same but there appears to be a weaker
 correlation in the first plot compared to the second.}
 \label{fig:scatter_correlation}
 \end{figure}
+\end{comment}
 
-Scatter plots graph $(x,y)$ tuples and should be used instead of line plots when the data is two-dimensional but has no natural order.
-
-Figure \ref{fig:scatter_correlation} displays two scatter plots.
-The first appears to have a weak correlation and the second appears to have a strong correlation.
-However, the same data is being plotted and the only difference is the scale and window size.
-Manipulating these can change your interpretation and should be done with careful consideration.
-
+\begin{comment}
 \begin{figure}[h]
 \centering
 \begin{subfigure}{.45\textwidth}
@@ -244,9 +281,7 @@ Consider Figure \ref{fig:scatterquake} which plots earthquake data from the Unit
 The USGS data began including earthquakes with magnitude 6.5 or greater; this is clearly seen
 in the scatter plot of the entire dataset.
 Plots like this may also reveal errors in the dataset that are harder to detect in a table of values.
-
-% TODO: BAD!!! use plt.plot(), not plt.scatter().
-You can create a scatter plot in Matplotlib with the command \li{plt.scatter()}.
+\end{comment}
 
 \begin{comment}
 \begin{figure}[h] % Bad visualization: earthquake data, year vs magnitude.
@@ -300,7 +335,7 @@ Your graphs should clearly answer the following questions:
 % Consider Figure \ref{fig:logexample} which shows data about large earthquakes from the United States Geological Survey.
 % It appears to be somewhat random however, when transformed, the frequency of the magnitudes on a logarithmic scale show a fairly strong linear relationship between the variables.
 
-\subsubsection*{Contour Plots and Heat Maps} % --------------------------------
+\subsubsection*{Visualizing 2-D Surfaces} % -----------------------------------
 
 \begin{figure}[h]
 \centering
@@ -561,3 +596,49 @@ TODO get full refs for the follwoing
 
 %\noindent\emph{At their best, graphics are instruments for reasoning about quantitative information.} \small{---Edward Tufte}
 % from the introduction of his book 'The Visual Display of Quantitative Information'
+
+\begin{comment} % Move to 'Additional Material'.
+\textbf{Bar Chart}: Best for small sets of discrete, one-dimensional, categorical data.
+Usually, a horizontal bar chart is preferred over a vertical bar chart because it's harder to read vertical labels than horizontal labels.
+Also, horizontal labels on a vertical bar chart may not fit on the graph well (see Figure \ref{fig:barchart}).
+
+The data in a bar chart should be sorted in a logical way.
+If the chart is being used to compare the values of different data points, it is best to sort by size; if the chart is being used to look up specific values, the labels should be sorted in a way that makes it easy to find specific values (for example, alphabetically).
+Use \li{plt.bar()} or \li{plt.barh()} to create a bar chart in Matplotlib.
+
+\begin{figure}[h] % Bar chart styles
+\centering
+\begin{subfigure}{.45\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{bar_chart_horizontal_sorted.png}
+\end{subfigure}
+\begin{subfigure}{.45\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{bar_chart_unsorted.png}
+\end{subfigure}
+\begin{subfigure}{.45\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{bar_chart_vertical_bars_horizontal_labels.png}
+\end{subfigure}
+\begin{subfigure}{.45\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{bar_chart_vertical_bars_vertical_labels.png}
+\end{subfigure}
+
+\caption{Bar Charts.
+The example in the upper left is easier to use for comparison than the upper right, and easier to read than the bottom two charts.
+The labels overlap in the bottom left and the labels are vertical in the bottom right, making them hard to read.}
+\label{fig:barchart}
+\end{figure}
+
+\begin{lstlisting}
+# This code created the top right bar chart.
+labels = 'Spam', 'Eggs', 'Ham', 'Sausage', 'Bacon', 'Baked beans','Lobster thermidor'
+val = [10, 11, 18, 19, 20, 21, 22]    # the bar lengths
+pos = np.arange(7)+.5    # the bar centers on the y axis
+plt.barh(pos,val, align='center')
+plt.yticks(pos, labels[::-1])
+plt.show()
+\end{lstlisting}
+\end{comment}
+

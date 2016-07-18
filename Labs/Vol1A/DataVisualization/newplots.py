@@ -50,6 +50,18 @@ def _save(filename):
 
 import numpy as np
 
+# Problem 2 -------------------------------------------------------------------
+
+@_save("line_bad.pdf")
+def lineplot_bad(N):
+    data = np.random.exponential(size=N)
+    plt.plot(data)
+    return data
+
+@_save("histogram_good.pdf")
+def histogram_bad(data):
+    plt.hist(data, bins=30)
+
 @_save("earthquake_bad.pdf")
 def earthquake_bad():
     years, magnitudes, longitude, latitude = np.load("earthquakes.npy").T
@@ -58,5 +70,19 @@ def earthquake_bad():
     plt.ylabel("Magnitude")
 
 
+@_save("histogram_line.pdf")
+def histogram_line(data):
+    freq, bin_edges = np.histogram(data, bins=30)
+    bin_centers = (bin_edges[:-1] + bin_edges[1:])/2.
+    plt.hist(data, bins=30, alpha=.1)
+    plt.plot(bin_centers, freq, 'b.-', ms=12)
+
+
+def prob2():
+    data = lineplot_bad(10000)
+    histogram_bad(data)
+    histogram_line(data)
+    # earthquake_bad()
+
 if __name__ == '__main__':
-    earthquake_bad()
+    prob2()
