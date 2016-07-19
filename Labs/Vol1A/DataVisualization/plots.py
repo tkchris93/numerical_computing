@@ -96,12 +96,7 @@ def simplify_plot():
     s = 0.63
 
     num_samples = 10000
-    samples = []
-
-    for i in xrange(num_samples):
-        samples.append(sp.random.lognormal(m, s))
-
-    sp_samples = sp.array(samples)
+    samples = sp.array([sp.random.lognormal(m,s) for _ in xrange(num_samples)])
 
     # Get rid of lines
     plt.hist(sp.log(sp_samples), 100, edgecolor='none')

@@ -1,16 +1,16 @@
 \lab{Data Visualization}{Data Visualization}
 \label{lab:DataVis}
 \objective{Correctly presenting and interpreting data with visualizations is a fundamental skills for all scientists.
-Different data sets are best visualized in different ways.
-In this lab we discuss the principles of good data visualization, including the key characteristics of good graphs, common mistakes, and how to avoid unethical visualizations.}
+In this lab we discuss and demonstrate the principles of good data visualization, including the key characteristics of good graphs, common mistakes, and how to avoid unethical visualizations.}
 
 \section*{The Importance of Visualizations} % =================================
 
 Using visualizations to understand data often reveals insights that may not immediately obvious from simple statistics.
 The following data set, known as \emph{Anscombe's quartet}, is a famous example of the importance of graphing data.
 
+% \begin{comment} % TODO: change the paragraph before this to account for taking the table out.
 \begin{table}[H]
-\scriptsize{
+\small{
 \begin{tabular}{rr|rr|rr|rr}
 
 \multicolumn{2}{c|}{I}    & \multicolumn{2}{|c|}{II} &
@@ -36,13 +36,14 @@ The following data set, known as \emph{Anscombe's quartet}, is a famous example 
 
 Each section of Anscombe's quartet the following statistical properties:
 \begin{itemize}
+\setlength\itemsep{0em}
 \item The means are $9$ for $x$ and $7.5$ for $y$.
 \item The sample variances are $11$ for $x$ and $3.75$ for $y$.
 \item The correlation between $x$ and $y$ is $.816$.
-\item The linear least squares regression line is $y=\frac{x}{2}+3$.
+\item The linear least squares regression line is $y=\frac{1}{2}x+3$.
 \end{itemize}
 
-Despite these similarities, each section is graphically very different.
+Despite these similarities, each section is very different graphically.
 
 \begin{problem} % Describe Anscombe's quartet.
 \label{prob:anscombe}
@@ -51,35 +52,36 @@ Plot each section of the quartet separately as a scatter plot.
 Also plot the regression line $y = \frac{1}{2}x + 3$ on the domain $x\in[0,20]$ over each scatter plot.
 
 Write a few sentences describing what makes each section unique.
+% How would you effectivly describe each section to another person?
 \end{problem}
 
 \section*{Choosing the Right Visualization} % =================================
 
-\begin{comment} % This needs to go somewhere else.
-Understanding a data set through visualizations is an iterative process.
-Start with an initial visualization---usually a broad overview---and examine the data, then adjust the visualization or create other visualizations based on what you observe.
-Ask the following questions as you search for insights:
-\begin{enumerate}
-\item Does the data make sense?
-\item Would a different visualization communicate more information?
-\item Would visualizing a subset of the data provide more information?
-\item Would transforming the data reveal a hidden pattern?
-\end{enumerate}
-\end{comment}
-
 Most data sets are more naturally described with one type of visualization than another.
-Below we review three common ways to visualize one or two 1-dimensional arrays:
+Below we review several common visualizations, their standard usages, and questions to consider during their construction.
 
 \begin{itemize}
 \item \textbf{Line Plot}: Connects ordered $(x,y)$ points with straight lines.
 
 Used to visualize one or two ordered arrays, such as functional outputs over an ordered domain or a sequence of values over time.
+%
+\begin{itemize}
+    % \item What do the axes represent? How should they be labeled?
+    \item Are linear or logarithmic scales more effective?
+    \item Is the line an appropriate thickness and color?
+\end{itemize}
 
 % Use \li{plt.plot()} to create a line plot.
 
 \item \textbf{Scatter Plot}: Draws $(x,y)$ points without connecting them.
 
-Displays for two corresponding arrays without a natural order, where the $(x,y)$ points are individual non-related instances.
+Best for displaying points without a natural order or where each point is an individual instance and not inherently related to the other points in the set.
+%
+\begin{itemize}
+    % \item What do the axes represent? How should they be labeled?
+    \item Which marker is most appropriate?
+    \item Are the markers an appropriate size and color?
+\end{itemize}
 
 % Use \li{plt.plot()} with a point marker (\li{'.'}, \li{','}, \li{'o'}, etc.) to draw a scatter plot.
 
@@ -90,9 +92,15 @@ However, the same data is being plotted and the only difference is the scale and
 Manipulating these can change your interpretation and should be done with careful consideration.
 \end{comment}
 
-\item \textbf{Histogram}: Groups $x$ values into a number of bins over an interval and displays the number of values in each bin.
+\item \textbf{Histogram}: Partitions an interval into a number of bins and counts the number of values that fall into each bin.
 
 Best for visualizing a single unordered array, such as draws from a probability distribution.
+%
+\begin{itemize}
+    \item How many bins should be used?
+    \item Over what range should the bins be?
+    \item Is a linear or a logarithmic scale more appropriate for the frequency axis?
+\end{itemize}
 
 % Use \li{plt.hist()} to create a histogram.
 % The arguments \li{bins} and \li{<<range>>} specify the number of bins to draw and over what domain.
@@ -103,33 +111,88 @@ A histogram with only a few bins or too many bins will fail to give a clear view
 Similarly, reference lines are distracting and focus on unnecessary details instead of the shape of the distribution.
 If more precise details are desired, exact figures can be presented alongside the histogram in a table.
 \end{comment}
+
+\item \textbf{Heat Map}: Assigns a color to each point on a 2-D domain, providing a 2-D picture representing a 3-D surface.
+
+Best for visualizing functions $f:\mathbb{R}^2\rightarrow\mathbb{R}$, usually over a domain constructed with \li{np.meshgrid()}.
+%
+\begin{itemize}
+    \item Is the domain sufficiently refined?
+    \item Which color scheme is most clear and effective?
+    \item Is a linear or a logarithmic scale more appropriate for the color?
+\end{itemize}
+
+\item \textbf{Contour Map}: Draws level curves of a function $f:\mathbb{R}^2\rightarrow\mathbb{R}$.
+
+A filled contour map is discretized version of a heat map.
+%
+\begin{itemize}
+    \item How many / which contour lines should be drawn?
+    % \item Is the color scheme clear and effective?
+    \item Is a linear or a logarithmic scale more appropriate for the color?
+\end{itemize}
+
 \end{itemize}
 %
-\begin{table}[H]
-\begin{tabular}{rcc}
-& \textbf{One Array} & \textbf{Two Arrays} \\
-\cline{2-3}
-\textbf{Ordered Data} &
-\multicolumn{1}{|c|}{Line Plot} & \multicolumn{1}{|c|}{Line Plot} \\
-\cline{2-3}
-\textbf{Unordered Data} &
-\multicolumn{1}{|c|}{Histogram} & \multicolumn{1}{|c|}{Scatter Plot} \\
-\cline{2-3}
-\textbf{Categorical Data} &
-\multicolumn{1}{|c|}{Bar Chart} & \multicolumn{1}{|c|}{Scatter Plot} \\
-\cline{2-3}
-\end{tabular}
-\end{table}
+% \begin{table}[H]
+% \begin{tabular}{rcc}
+% & \textbf{One Array} & \textbf{Two Arrays} \\
+% \cline{2-3}
+% \textbf{Ordered Data} &
+% \multicolumn{1}{|c|}{Line Plot} & \multicolumn{1}{|c|}{Line Plot} \\
+% \cline{2-3}
+% \textbf{Unordered Data} &
+% \multicolumn{1}{|c|}{Histogram} & \multicolumn{1}{|c|}{Scatter Plot} \\
+% \cline{2-3}
+% % \textbf{Categorical Data} & \multicolumn{1}{|c|}{Bar Chart} & \multicolumn{1}{|c|}{Scatter Plot} \\ \cline{2-3}
+% \end{tabular}
+% \end{table}
 
-\subsection*{Examples} % ------------------------------------------------------
+\subsection*{1- and 2-D Data} % -----------------------------------------------
 
-% Get a marker and a line.
+% Example of using a marker and a line.
 Line plots and scatter plots are sometimes used together.
-A line connecting points implies a relationship between the points, while drawing point markers emphasizes that each point is a unique instance of data.
+A line connecting points implies a relationship or correlation between the points, while drawing point markers emphasizes that each point is a unique instance of data.
+Use \li{plt.plot()} and specify a marker \emph{and} a line style in the third argument to do both at once.
+% The keywords \li{linewidth} (or \li{ls}) and \li{markersize} (or \li{ms}) control the thickness of the line and the size of the markers, respectively.
 
+\begin{lstlisting}
+>>> x = np.linspace(0, 4, 8)
+>>> data = x**2
+
+>>> plt.subplot(131)                # Regular line plot of the data.
+>>> plt.plot(x, data, 'b-', linewidth=2)
+
+>>> plt.subplot(132)                # Scatter plot of the data.
+>>> plt.plot(x, data, 'g.', markersize=15)
+
+>>> plt.subplot(133)                # Line and scatter plot.
+>>> plt.plot(x, data, 'r.-', linewidth=2, markersize=15)
+\end{lstlisting}
+
+\begin{figure}[H] % line plot versus a histogram.
+\captionsetup[subfigure]{justification=centering}
+\centering
+\begin{subfigure}{.325\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/line_vs_scatter_line.pdf}
+\end{subfigure}
+%
+\begin{subfigure}{.325\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/line_vs_scatter_scat.pdf}
+\end{subfigure}
+%
+\begin{subfigure}{.325\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/line_vs_scatter_both.pdf}
+\end{subfigure}
+\end{figure}
+
+% Example of using np.histogram() for histogram with ordered data.
 Line plots should \emph{not} be used for data without a natural progression.
-For example, suppose we would like to make a large number of random draws from a distribution and visualize the results.
-In this case, the line plot is completely incoherent, but the histogram provides an accurate picture of the statistical distribution.
+For example, suppose we would like to make a large number of random draws from a distribution to visualize its probability density function.
+In this case, a plain line plot is completely useless, but the histogram provides an accurate picture of the statistical distribution.
 
 A histogram plots an array of values against the frequency with which the values occur.
 To plot a line plot of values against frequency (without drawing a histogram), use \li{np.histogram()}.
@@ -141,7 +204,7 @@ Use the edges of the bins to calculate the center of the bins, then use a line p
 >>> from matplotlib import pyplot as plt
 
 # Get 10,000 random samples from the standard exponential distribution.
->>> data = np.random.exponential(size=10000)\begin{lstlisting}
+>>> data = np.random.exponential(size=10000)
 
 # Calculate the bin centers.
 >>> counts, bin_edges = np.histogram(data, bins=30)
@@ -155,7 +218,7 @@ Use the edges of the bins to calculate the center of the bins, then use a line p
 
 >>> plt.subplot(133)                # Line plot of values versus frequencies.
 >>> plt.hist(data, bins=30, alpha=.1)       # Small alpha values fade the plot.
->>> plt.plot(bin_centers, counts, 'b.-', lw=2, ms=12)
+>>> plt.plot(bin_centers, counts, 'g.-', lw=2, ms=12)
 
 >>> plt.show()
 \end{lstlisting}
@@ -165,26 +228,139 @@ Use the edges of the bins to calculate the center of the bins, then use a line p
 \centering
 \begin{subfigure}{.325\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/line_bad.pdf}
+    \includegraphics[width=\linewidth]{figures/line_vs_histogram_bad.pdf}
 \end{subfigure}
 %
 \begin{subfigure}{.325\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/histogram_good.pdf}
+    \includegraphics[width=\linewidth]{figures/line_vs_histogram_hist.pdf}
 \end{subfigure}
 %
 \begin{subfigure}{.325\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/histogram_line.pdf}
+    \includegraphics[width=\linewidth]{figures/line_vs_histogram_line.pdf}
 \end{subfigure}
 \end{figure}
 
-% Example of using np.histogram() for histogram with ordered data.
+\begin{problem} % Earthquake data
+The file \texttt{earthquakes.npy} contains data from the 17,065 earthquakes between 2000 and 2010 that were at least a 5 on the Richter scale.\footnote{See \url{http://earthquake.usgs.gov/earthquakes/search/}.}
+Each row in the array represents a different earthquake;
+the columns are the date (as a fraction of the year), the magnitude, the longitude, and the latitude, in that order.
 
-\begin{figure}[H] % line plot versus a histogram.
+Because each earthquake is a distinct event, a good way to start visualizing this data might be a scatter plot of the years versus the magnitudes of each earthquake.
+
+\begin{lstlisting}
+>>> year, magnitude, longitude, latitude = np.load("earthquakes.npy").T
+>>> plt.plot(year, magnitude, '.')
+>>> plt.xlabel("Year")
+>>> plt.ylabel("Magnitude")
+>>> plt.show()
+\end{lstlisting}
+
+\begin{figure}[H] % Bad visualization: earthquake data, year vs magnitude.
     \centering
-    \includegraphics[width=.7\textwidth]{figures/histogram_line.pdf}
+    \includegraphics[width=.7\textwidth]{figures/earthquake_bad.pdf}
 \end{figure}
+
+Unfortunately, this plot communicates very little information because the data is so cluttered.
+Describe the data with two or three better visualizations.
+Your graphs should clearly answer the following questions:
+\begin{enumerate}
+    \item How many earthquakes happened every year?
+    \item How often do stronger earthquakes happen compared to weaker ones?
+    \item Where do earthquakes happen? Where do the strongest earthquakes happen?
+\end{enumerate}
+% (Hint: \li{plt.gca().set_aspect("equal")} fixes the aspect ratio, which may improve comparisons between longitude and latitude.)
+\end{problem}
+
+% Consider Figure \ref{fig:logexample} which shows data about large earthquakes from the United States Geological Survey.
+% It appears to be somewhat random however, when transformed, the frequency of the magnitudes on a logarithmic scale show a fairly strong linear relationship between the variables.
+
+\subsection*{3-D Surfaces} % --------------------------------------------------
+
+\begin{figure}[h]
+\centering
+\begin{subfigure}{.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{contour_map.png}
+\end{subfigure}
+\begin{subfigure}{.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{contour_map_filled.png}
+\end{subfigure}
+\begin{subfigure}{.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{contour_map_rainbow_filled.png}
+\end{subfigure}
+\begin{subfigure}{.45\textwidth}
+\centering
+\includegraphics[width=\textwidth]{contour_map_rainbow.png}
+\end{subfigure}
+\caption{Contour Maps.  A contour map (top left) and a heat map (top right).
+The color choices of the bottom row are less intuitive and make the visualization harder to interpret.}
+\label{fig:contour}
+\end{figure}
+
+
+Three-dimensional data can be displayed with a contour plot.
+This draws lines in the plane where the third value is constant---like a topographical map.
+Coloring the space between the contour lines produces a heat map.
+Heat maps work best when only one or two colors are used.
+
+\begin{figure}[h]
+\centering
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{heatmap_color.png}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=\textwidth]{heatmap_hot.png}
+\end{subfigure}
+%\includegraphics[width=\textwidth]{heatmap.png}
+\caption{Both of these pseudocolor plots depict the function
+    $z = \sin(x)\sin(y)$ on the domain $[-1,4] \times [-4,1]$.
+The plot on the left uses a rainbow gradient, which has no meaningful relationship to the data.
+The plot on the right uses the colormap \li{afmhot}.  The lighter and darker colors are a more intuitive
+representation of higher and lower values.}
+
+\label{fig:heatmap}
+\end{figure}
+
+% TODO: In the next release of Matplotlib (version 2.0) viridis is the default.
+% TODO: Reword (awkward).
+A good default colormap is Matplotlib's \li{viridis}.
+Other colormaps that are appropriate for the data can be selected using the argument \li{cmap='NAME\_OF\_COLORMAP'}, where \li{NAME\_OF\_COLORMAP} is one of Matplotlib's sequential or diverging colormaps.
+Two sequential colormaps are \li{afmhot} and \li{cool}. Two diverging colormaps are \li{seismic} and \li{bwr}.
+These colormaps along with their color scheme can be found on
+\url{http://matplotlib.org/examples/color/colormaps_reference.html}.
+Although three-dimensional data can be plotted as a surface in 3-space, it is often difficult to find a view where none of the important features of the data are obscured.
+A heatmap avoids this problem and is easier to understand.
+
+You can create a contour plot in Matplotlib with \li{plt.contour()}.
+
+You can also create a pseudocolor plot in Matplotlib with the \li{plt.pcolormesh()} command.
+
+% # This code corresponds to the figure on the top right of the contour maps.
+\begin{lstlisting}
+import numpy as np
+from matplotlib import pyplot as plt
+
+n=400
+xran = np.linspace(-1.5,1.5,n)
+yran = np.linspace(-1.5,1.5,n)
+X, Y = np.meshgrid(xran,yran)
+F = Y**2 - X**3 + X**2
+plt.contourf(X, Y, F, [-2,-1,0.0001,1,2,3,4,5] ,cmap=plt.get_cmap('afmhot'))
+\end{lstlisting}
+
+\begin{problem} % Contour map problem. TODO: don't specify number of intervals?
+Using 400 intervals, plot a filled contour map of the function \[f(x,y) = \sin(x) + \sin(y)\] over the domain $[0,12\pi]\times[0,12\pi]$.
+
+Be sure to use an appropriate color map.
+\end{problem}
+
+\section*{Communicating Insights with Visualizations} % =======================
 
 \begin{comment} % USE THIS AS AN EXAMPLE LATER.
 \begin{figure}[H] % Histogram with and without busy information.
@@ -301,125 +477,17 @@ different magnitudes. Note the scale of the y-axis is logarithmic.}
 \end{figure}
 \end{comment}
 
-\begin{problem} % Earthquake data
-The file \texttt{earthquakes.npy} contains data from the 17,065 earthquakes between 2000 and 2010 that were at least a 5 on the Richter scale.\footnote{See \url{http://earthquake.usgs.gov/earthquakes/search/}.}
-Each row in the array represents a different earthquake;
-the columns are the date (as a fraction of the year), the magnitude, the longitude, and the latitude, in that order.
-
-Because each earthquake is a distinct event, a good way to start visualizing this data might be a scatter plot of the years versus the magnitudes of each earthquake.
-
-\begin{lstlisting}
->>> year, magnitude, longitude, latitude = np.load("earthquakes.npy").T
->>> plt.plot(year, magnitude, '.')
->>> plt.xlabel("Year")
->>> plt.ylabel("Magnitude")
->>> plt.show()
-\end{lstlisting}
-
-\begin{figure}[H] % Bad visualization: earthquake data, year vs magnitude.
-    \centering
-    \includegraphics[width=.7\textwidth]{figures/earthquake_bad.pdf}
-\end{figure}
-
-Unfortunately, this plot communicates very little information because the data is so cluttered.
-Describe the data with two or three better visualizations.
-Your graphs should clearly answer the following questions:
+\begin{comment} % This needs to go somewhere else.
+Understanding a data set through visualizations is an iterative process.
+Start with an initial visualization---usually a broad overview---and examine the data, then adjust the visualization or create other visualizations based on what you observe.
+Ask the following questions as you search for insights:
 \begin{enumerate}
-    \item How many earthquakes happened every year?
-    \item How often do stronger earthquakes happen compared to weaker ones?
-    \item Where do earthquakes happen? Where do the strongest earthquakes happen?
+\item Does the data make sense?
+\item Would a different visualization communicate more information?
+\item Would visualizing a subset of the data provide more information?
+\item Would transforming the data reveal a hidden pattern?
 \end{enumerate}
-% (Hint: \li{plt.gca().set_aspect("equal")} fixes the aspect ratio, which may improve comparisons between longitude and latitude.)
-\end{problem}
-
-% Consider Figure \ref{fig:logexample} which shows data about large earthquakes from the United States Geological Survey.
-% It appears to be somewhat random however, when transformed, the frequency of the magnitudes on a logarithmic scale show a fairly strong linear relationship between the variables.
-
-\subsubsection*{Visualizing 2-D Surfaces} % -----------------------------------
-
-\begin{figure}[h]
-\centering
-\begin{subfigure}{.45\textwidth}
-\centering
-\includegraphics[width=\textwidth]{contour_map.png}
-\end{subfigure}
-\begin{subfigure}{.45\textwidth}
-\centering
-\includegraphics[width=\textwidth]{contour_map_filled.png}
-\end{subfigure}
-\begin{subfigure}{.45\textwidth}
-\centering
-\includegraphics[width=\textwidth]{contour_map_rainbow_filled.png}
-\end{subfigure}
-\begin{subfigure}{.45\textwidth}
-\centering
-\includegraphics[width=\textwidth]{contour_map_rainbow.png}
-\end{subfigure}
-\caption{Contour Maps.  A contour map (top left) and a heat map (top right).
-The color choices of the bottom row are less intuitive and make the visualization harder to interpret.}
-\label{fig:contour}
-\end{figure}
-
-
-Three-dimensional data can be displayed with a contour plot.
-This draws lines in the plane where the third value is constant---like a topographical map.
-Coloring the space between the contour lines produces a heat map.
-Heat maps work best when only one or two colors are used.
-
-\begin{figure}[h]
-\centering
-\begin{subfigure}{.5\textwidth}
-  \centering
-  \includegraphics[width=\textwidth]{heatmap_color.png}
-\end{subfigure}%
-\begin{subfigure}{.5\textwidth}
-  \centering
-  \includegraphics[width=\textwidth]{heatmap_hot.png}
-\end{subfigure}
-%\includegraphics[width=\textwidth]{heatmap.png}
-\caption{Both of these pseudocolor plots depict the function
-	$z = \sin(x)\sin(y)$ on the domain $[-1,4] \times [-4,1]$.
-The plot on the left uses a rainbow gradient, which has no meaningful relationship to the data.
-The plot on the right uses the colormap \li{afmhot}.  The lighter and darker colors are a more intuitive
-representation of higher and lower values.}
-
-\label{fig:heatmap}
-\end{figure}
-
-% TODO: In the next release of Matplotlib (version 2.0) viridis is the default.
-% TODO: Reword (awkward).
-A good default colormap is Matplotlib's \li{viridis}.
-Other colormaps that are appropriate for the data can be selected using the argument \li{cmap='NAME\_OF\_COLORMAP'}, where \li{NAME\_OF\_COLORMAP} is one of Matplotlib's sequential or diverging colormaps.
-Two sequential colormaps are \li{afmhot} and \li{cool}. Two diverging colormaps are \li{seismic} and \li{bwr}.
-These colormaps along with their color scheme can be found on
-\url{http://matplotlib.org/examples/color/colormaps_reference.html}.
-Although three-dimensional data can be plotted as a surface in 3-space, it is often difficult to find a view where none of the important features of the data are obscured.
-A heatmap avoids this problem and is easier to understand.
-
-You can create a contour plot in Matplotlib with \li{plt.contour()}.
-
-You can also create a pseudocolor plot in Matplotlib with the \li{plt.pcolormesh()} command.
-
-% # This code corresponds to the figure on the top right of the contour maps.
-\begin{lstlisting}
-import numpy as np
-from matplotlib import pyplot as plt
-
-n=400
-xran = np.linspace(-1.5,1.5,n)
-yran = np.linspace(-1.5,1.5,n)
-X, Y = np.meshgrid(xran,yran)
-F = Y**2 - X**3 + X**2
-plt.contourf(X, Y, F, [-2,-1,0.0001,1,2,3,4,5] ,cmap=plt.get_cmap('afmhot'))
-\end{lstlisting}
-
-\begin{problem} % Contour map problem. TODO: don't specify number of intervals?
-Using 400 intervals, plot a filled contour map of the function \[f(x,y) = \sin(x) + \sin(y)\] over the domain $[0,12\pi]\times[0,12\pi]$.
-
-Be sure to use an appropriate color map.
-\end{problem}
-
-\section*{Communicating Insights with Visualizations} % =======================
+\end{comment}
 
 As in any form of communication, integrity is important in data visualization.
 Every visualization should be presented alongside all relevant information including who created it, where the data was obtained, how it was collected, whether it was cleaned or transformed, and whether there are conflicts of
