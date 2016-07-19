@@ -144,6 +144,7 @@ def scatter():
 @_save("histogram.pdf")
 def hist(x):
     plt.hist(x, bins=9, range=[-4.5, 4.5])
+    # plt.hist(x, bins=np.arange(-4.5, 5.5))
 
 def prob5():
     x = scatter()
