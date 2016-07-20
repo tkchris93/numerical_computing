@@ -179,18 +179,18 @@ Try it first with \li{stepsize=0.5} and then with \li{stepsize=0.2}.
 
 Plot the multimin function using the following code:
 \begin{lstlisting}
->>> xdomain = np.linspace(-3.5,1.5,70)
->>> ydomain = np.linspace(-2.5,2.5,60)
->>> X,Y = np.meshgrid(xdomain,ydomain)
->>> Z = multimin((X,Y))
->>> fig = plt.figure()
->>> ax1 = fig.add_subplot(111, projection='3d')
->>> ax1.plot_wireframe(X, Y, Z, linewidth=.5, color='c')
+xdomain = np.linspace(-3.5,1.5,70)
+ydomain = np.linspace(-2.5,2.5,60)
+X,Y = np.meshgrid(xdomain,ydomain)
+Z = multimin((X,Y))
+fig = plt.figure()
+ax1 = fig.add_subplot(111, projection='3d')
+ax1.plot_wireframe(X, Y, Z, linewidth=.5, color='c')
 \end{lstlisting}
 
 Plot the initial point and minima by adapting the following line:
 \begin{lstlisting}
->>> ax1.scatter(x_value, y_value, z_value)     
+ax1.scatter(x_value, y_value, z_value)     
 \end{lstlisting}
 
 Why doesn't the alogrithm find the global minimum with \li{stepsize=0.2}?
