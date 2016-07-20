@@ -66,5 +66,5 @@ if __name__ == '__main__':
     cmap = cm.jet
     plt = ax.plot_surface(A, B, Z, cmap=cmap, **plotkwargs)
     plt.set_cmap(cmap_center_adjust(cmap, .25))
-
+    # ax.scatter([0.], [0.], rosenbrock(0.,0.), s=30, c='r')
     pyplot.show()
