@@ -27,4 +27,5 @@ def blackbox(y_free):
     partial_norms = []
     for i,item in enumerate(y[:-1]):
         partial_norms.append(la.norm(np.array([x[i+1]-x[i],y[i+1] - item])))
-    return np.sum(partial_norms)
+    weights = np.linspace(1,3,19)
+    return np.sum(partial_norms*weights)
