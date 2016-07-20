@@ -149,7 +149,7 @@ A filled contour map is discretized version of a heat map.
 % \end{tabular}
 % \end{table}
 
-\subsection*{1- and 2-D Data} % -----------------------------------------------
+\subsection*{Line and Scatter Plots} % ----------------------------------------
 
 % Example of using a marker and a line.
 Line plots and scatter plots are sometimes used together.
@@ -171,55 +171,24 @@ Use \li{plt.plot()} and specify a marker \emph{and} a line style in the third ar
 >>> plt.plot(x, data, 'r.-', linewidth=2, markersize=15)
 \end{lstlisting}
 
-\begin{figure}[H] % line plot versus a histogram.
-\captionsetup[subfigure]{justification=centering}
-\centering
-\begin{subfigure}{.325\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{figures/line_vs_scatter_line.pdf}
-\end{subfigure}
-%
-\begin{subfigure}{.325\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{figures/line_vs_scatter_scat.pdf}
-\end{subfigure}
-%
-\begin{subfigure}{.325\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{figures/line_vs_scatter_both.pdf}
-\end{subfigure}
-\end{figure}
+\subsection*{Histograms} % ----------------------------------------------------
 
-% Example of using np.histogram() for histogram with ordered data.
 Line plots should \emph{not} be used for data without a natural progression.
 For example, suppose we would like to make a large number of random draws from a distribution to visualize its probability density function.
 In this case, a plain line plot is completely useless, but the histogram provides an accurate picture of the statistical distribution.
-
-A histogram plots an array of values against the frequency with which the values occur.
-To plot a line plot of values against frequency (without drawing a histogram), use \li{np.histogram()}.
-This function returns the number of values in each bin and the locations of the edges of the bins.
-Use the edges of the bins to calculate the center of the bins, then use a line plot to connect the two.
 
 \begin{lstlisting}
 >>> import numpy as np
 >>> from matplotlib import pyplot as plt
 
-# Get 10,000 random samples from the standard exponential distribution.
->>> data = np.random.exponential(size=10000)
+# Get 10,000 random samples from the standard normal distribution.
+>>> data = np.random.normal(size=10000)
 
-# Calculate the bin centers.
->>> counts, bin_edges = np.histogram(data, bins=30)
->>> bin_centers = (bin_edges[:-1] + bin_edges[1:])/2.
-
->>> plt.subplot(131)                # Regular line plot of the data.
+>>> plt.subplot(121)                # Regular line plot of the data.
 >>> plt.plot(data)
 
->>> plt.subplot(132)                # Histogram of the data.
+>>> plt.subplot(122)                # Histogram of the data.
 >>> plt.hist(data, bins=30)
-
->>> plt.subplot(133)                # Line plot of values versus frequencies.
->>> plt.hist(data, bins=30, alpha=.1)       # Small alpha values fade the plot.
->>> plt.plot(bin_centers, counts, 'g.-', lw=2, ms=12)
 
 >>> plt.show()
 \end{lstlisting}
@@ -227,19 +196,81 @@ Use the edges of the bins to calculate the center of the bins, then use a line p
 \begin{figure}[H] % line plot versus a histogram.
 \captionsetup[subfigure]{justification=centering}
 \centering
-\begin{subfigure}{.325\textwidth}
+\begin{subfigure}{.49\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/line_vs_histogram_bad.pdf}
+    \includegraphics[width=\linewidth]{figures/hist_1_bad.pdf}
 \end{subfigure}
 %
-\begin{subfigure}{.325\textwidth}
+\begin{subfigure}{.49\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/line_vs_histogram_hist.pdf}
+    \includegraphics[width=\linewidth]{figures/hist_1_good.pdf}
+\end{subfigure}
+\end{figure}
+
+% TODO: Less is more (cleaning up histograms)
+
+\begin{lstlisting}
+# Get 10,000 random samples from the standard exponential distribution.
+>>> data = np.random.exponential(size=N)
+
+>>> plt.subplot(121)
+>>> plt.hist(data, bins=30)
+
+>>> plt.subplot(122)                # Histogram with no lines or tick marks.
+>>> plt.hist(data, bins=30, lw=0, histtype="stepfilled")
+>>> plt.tick_params(axis="both", which="both", labelleft='off',
+...                              left="off", top="off", right="off")
+
+>>> plt.show()
+\end{lstlisting}
+
+\begin{figure}[H] % Cleaning up a histogram.
+\captionsetup[subfigure]{justification=centering}
+\centering
+\begin{subfigure}{.49\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/hist_2_bad.pdf}
 \end{subfigure}
 %
-\begin{subfigure}{.325\textwidth}
+\begin{subfigure}{.49\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{figures/line_vs_histogram_line.pdf}
+    \includegraphics[width=\linewidth]{figures/hist_2_good.pdf}
+\end{subfigure}
+\end{figure}
+
+A histogram plots an array of values against the frequency with which the values occur.
+To plot a line plot of values against frequency (without drawing a histogram), use \li{np.histogram()}.
+This function returns the number of values in each bin and the locations of the edges of the bins.
+Use the edges of the bins to calculate the center of the bins, then use a line plot to connect the two.
+
+\begin{lstlisting}
+# Get samples from a beta distribution and draw its PDF.
+>>> for i,N in enumerate([10000, 10000000]):
+...     plt.subplot(1,2,i+1)
+...     data = np.random.beta(a=5, b=2, size=N)
+...     # Draw a line plot using the bin centers and frequencies.
+...     frequencies, bin_edges = np.histogram(data, bins=50)
+...     bin_centers = (bin_edges[:-1] + bin_edges[1:])/2.
+...     plt.plot(bin_centers, frequencies, 'b-', lw=4)
+...     # Plot the faded histogram for comparison.
+...     plt.hist(data, bins=50, alpha=.1)
+...     plt.tick_params(axis="both", which="both", labelleft='off',
+...                                  left="off", top="off", right="off")
+...
+>>> plt.show()
+\end{lstlisting}
+
+\begin{figure}[H] % Histogram Line Plot Hybrid
+\captionsetup[subfigure]{justification=centering}
+\centering
+\begin{subfigure}{.49\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/hist_3_bad.pdf}
+\end{subfigure}
+%
+\begin{subfigure}{.49\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/hist_3_good.pdf}
 \end{subfigure}
 \end{figure}
 
@@ -260,7 +291,7 @@ Because each earthquake is a distinct event, a good way to start visualizing thi
 
 \begin{figure}[H] % Bad visualization: earthquake data, year vs magnitude.
     \centering
-    \includegraphics[width=.7\textwidth]{figures/earthquake_bad.pdf}
+    \includegraphics[width=.7\textwidth]{figures/earthquake.pdf}
 \end{figure}
 
 Unfortunately, this plot communicates very little information because the data is so cluttered.
@@ -277,7 +308,7 @@ Your graphs should clearly answer the following questions:
 % Consider Figure \ref{fig:logexample} which shows data about large earthquakes from the United States Geological Survey.
 % It appears to be somewhat random however, when transformed, the frequency of the magnitudes on a logarithmic scale show a fairly strong linear relationship between the variables.
 
-\subsection*{3-D Surfaces} % --------------------------------------------------
+\subsection*{Heat and Contour Maps} % -----------------------------------------
 
 \begin{figure}[h]
 \centering
@@ -301,7 +332,6 @@ Your graphs should clearly answer the following questions:
 The color choices of the bottom row are less intuitive and make the visualization harder to interpret.}
 \label{fig:contour}
 \end{figure}
-
 
 Three-dimensional data can be displayed with a contour plot.
 This draws lines in the plane where the third value is constant---like a topographical map.

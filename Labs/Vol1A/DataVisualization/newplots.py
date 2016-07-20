@@ -53,6 +53,8 @@ import numpy as np
 
 # Problem 2 -------------------------------------------------------------------
 
+# Line and Scatter Plot stuff - - - - - - - - - - - - - - - - - - - - - - - - -
+
 @_save("line_vs_scatter_line.pdf")
 def line_vs_scatter_line():
     x = np.linspace(0, 4, 8)
@@ -68,47 +70,60 @@ def line_vs_scatter_scat(x, data):
 def line_vs_scatter_both(x, data):
     plt.plot(x, data, 'r.-', linewidth=2, markersize=15)
 
+# Histogram stuff - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-@_save("clean_histogram.pdf")
-def clean_histogram(data):
-    plt.hist(data, bins=30, lw=0, histtype="stepfilled")
-    plt.tick_params(axis="y", which="both", left='off', labelleft='off')
-
-@_save("line_vs_histogram_bad.pdf")
-def line_vs_histogram_bad(N):
-    data = np.random.beta(2, 4, size=N)
+@_save("hist_1_bad.pdf")
+def hist_1_bad(N):
+    data = np.random.normal(size=N)
     plt.plot(data)
     return data
 
-@_save("line_vs_histogram_hist.pdf")
-def line_vs_histogram_hist(data):
+@_save("hist_1_good.pdf")
+def hist_1_good(data):
     plt.hist(data, bins=30)
 
-@_save("line_vs_histogram_line.pdf")
-def line_vs_histogram_line(data):
-    freq, bin_edges = np.histogram(data, bins=30)
-    bin_centers = (bin_edges[:-1] + bin_edges[1:])/2.
-    plt.hist(data, bins=30, alpha=.1)
-    plt.plot(bin_centers, freq, 'g.-', ms=12)
+@_save("hist_2_bad.pdf")
+def hist_2_bad(N):
+    data = np.random.exponential(size=N)
+    plt.hist(data, bins=30)
+    return data
 
-@_save("earthquake_bad.pdf")
-def earthquake_bad():
+@_save("hist_2_good.pdf")
+def hist_2_good(data):
+    plt.hist(data, bins=30, lw=0, histtype="stepfilled")
+    plt.tick_params(axis="y", which="both", labelcolor='white', left='off',
+                                                                right="off")
+    plt.tick_params(axis="x", which="both", top='off')
+
+def hist_3(N):
+    data = np.random.beta(a=5, b=2, size=N)
+    freq, bin_edges = np.histogram(data, bins=50)
+    bin_centers = (bin_edges[:-1] + bin_edges[1:])/2.
+    plt.plot(bin_centers, freq, 'b-', lw=4)
+    plt.hist(data, bins=50, alpha=.1)
+    plt.tick_params(axis="both", which="both", labelleft='off',
+                                left="off", top="off", right="off")
+
+# Problem Statement - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+@_save("earthquake.pdf")
+def earthquake():
     years, magnitudes, longitude, latitude = np.load("earthquakes.npy").T
     plt.plot(years, magnitudes, '.')
     plt.xlabel("Year")
     plt.ylabel("Magnitude")
 
 def prob2():
-    # x, data = line_vs_scatter_line()
-    # line_vs_scatter_scat(x, data)
-    # line_vs_scatter_both(x, data)
+    x, data = line_vs_scatter_line()
+    line_vs_scatter_scat(x, data)
+    line_vs_scatter_both(x, data)
 
-    data = line_vs_histogram_bad(10000)
-    clean_histogram(data)
-    line_vs_histogram_hist(data)
-    line_vs_histogram_line(data)
+    hist_1_good(hist_1_bad(10000))
+    hist_2_good(hist_2_bad(10000))
+    _save("hist_3_bad.pdf")(hist_3)(10000)
+    _save("hist_3_good.pdf")(hist_3)(10000000)
 
-    # earthquake_bad()
+    earthquake()
 
 # Problem 3 -------------------------------------------------------------------
 
