@@ -87,11 +87,13 @@ The \li{minimize()} function can use various algorithms, each of which is best f
 Which algorithm one uses depends on the specific nature of one's problem. 
 
 It is also important to note that in many optimization applications, very little is known about the function to optimize. 
-These problems are often called \emph{blackbox problems}.
+These functions are often called \emph{blackbox functions}.
 For example, one may be asked in the airline industry to analyze and optimize certain properties involving a segment of airplane wing. 
 Perhaps expert engineers have designed extremely robust and complicated software to model this wing segment given certain inputs, but this function is so complicated that nobody except the experts dares to try parcing it.
 Briefly said, you simply don't want to understand it; nobody wants to understand it. 
+
 Fortunately, one can still optimize effectively in such situations by wisely selecting a correct algorithm.
+However, because so little is known about the blackbox function, one must wisely select an appropriate minimization method and follow the specifications of the problem exactly.
 
 \begin{problem} % Minimize a 'blackbox' function.
 Minimize the \li{blackbox()} function in the \li{blackbox_function} module. 
