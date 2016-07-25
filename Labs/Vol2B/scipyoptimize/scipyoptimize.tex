@@ -87,17 +87,21 @@ The \li{minimize()} function can use various algorithms, each of which is best f
 Which algorithm one uses depends on the specific nature of one's problem. 
 
 It is also important to note that in many optimization applications, very little is known about the function to optimize. 
+These functions are often called \emph{blackbox functions}.
 For example, one may be asked in the airline industry to analyze and optimize certain properties involving a segment of airplane wing. 
 Perhaps expert engineers have designed extremely robust and complicated software to model this wing segment given certain inputs, but this function is so complicated that nobody except the experts dares to try parcing it.
 Briefly said, you simply don't want to understand it; nobody wants to understand it. 
+
 Fortunately, one can still optimize effectively in such situations by wisely selecting a correct algorithm.
+However, because so little is known about the blackbox function, one must wisely select an appropriate minimization method and follow the specifications of the problem exactly.
 
 \begin{problem} % Minimize a 'blackbox' function.
-Minimize the function \li{blackbox()} in the \li{blackbox_function} module, selecting the appropriate method of \li{scipy.optimize.minimize()} for this problem.  
-Do not pass your method a derivative. 
+Minimize the \li{blackbox()} function in the \li{blackbox_function} module. 
+You don't need to know the source code or how it works in order to minimize it.
+Simply select the appropriate method of \li{scipy.optimize.minimize()} for this problem, without passing your method a derivative. 
 You may need to test several methods and determine which is most appropriate.
 
-The function \li{blackbox()} returns the length of a piecewise-linear curve between two fixed points: the origin, and the point \li{(40,30)}.
+The function \li{blackbox()} returns a certain measure of a piecewise-linear curve between two fixed points: the origin, and the point \li{(40,30)}.
 This function accepts a one-dimensional \li{ndarray} of length \li{m} of y-values, where \li{m} is the number of points of the piecewise curve excluding endpoints.
 These points are spaced evenly along the x-axis, so only the y-values of each point are passed into \li{blackbox()}.
 
@@ -177,18 +181,18 @@ Try it first with \li{stepsize=0.5} and then with \li{stepsize=0.2}.
 
 Plot the multimin function using the following code:
 \begin{lstlisting}
->>> xdomain = np.linspace(-3.5,1.5,70)
->>> ydomain = np.linspace(-2.5,2.5,60)
->>> X,Y = np.meshgrid(xdomain,ydomain)
->>> Z = multimin((X,Y))
->>> fig = plt.figure()
->>> ax1 = fig.add_subplot(111, projection='3d')
->>> ax1.plot_wireframe(X, Y, Z, linewidth=.5, color='c')
+xdomain = np.linspace(-3.5,1.5,70)
+ydomain = np.linspace(-2.5,2.5,60)
+X,Y = np.meshgrid(xdomain,ydomain)
+Z = multimin((X,Y))
+fig = plt.figure()
+ax1 = fig.add_subplot(111, projection='3d')
+ax1.plot_wireframe(X, Y, Z, linewidth=.5, color='c')
 \end{lstlisting}
 
 Plot the initial point and minima by adapting the following line:
 \begin{lstlisting}
->>> ax1.scatter(x_value, y_value, z_value)     
+ax1.scatter(x_value, y_value, z_value)     
 \end{lstlisting}
 
 Why doesn't the alogrithm find the global minimum with \li{stepsize=0.2}?
