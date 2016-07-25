@@ -245,7 +245,7 @@ Use the edges of the bins to calculate the center of the bins, then use a line p
 
 \begin{lstlisting}
 # Get samples from a beta distribution and draw its PDF.
->>> for i,N in enumerate([10000, 10000000]):
+>>> for i, N in enumerate([10000, 10000000]):
 ...     plt.subplot(1,2,i+1)
 ...     data = np.random.beta(a=5, b=2, size=N)
 ...     # Draw a line plot using the bin centers and frequencies.
