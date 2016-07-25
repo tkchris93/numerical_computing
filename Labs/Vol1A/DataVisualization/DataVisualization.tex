@@ -84,7 +84,7 @@ Best for displaying points without a natural order or where each point is an ind
     \item Are the markers an appropriate size and color?
 \end{itemize}
 
-% Use \li{plt.plot()} with a point marker (\li{'.'}, \li{','}, \li{'o'}, etc.) to draw a scatter plot.
+% Use \li{plt.plot()} with a point marker (\li{'.'}, \li{','}, \li{'o'}, etc.) or \li{plt.scatter()} to draw a scatter plot.
 
 \begin{comment} % Window size, also should go later (with ethics).
 Figure \ref{fig:scatter_correlation} displays two scatter plots.
@@ -149,7 +149,7 @@ A filled contour map is discretized version of a heat map.
 % \end{tabular}
 % \end{table}
 
-\subsection*{Line and Scatter Plots} % ----------------------------------------
+\subsection*{Scatter Plots} % -------------------------------------------------
 
 % Example of using a marker and a line.
 Line plots and scatter plots are sometimes used together.
@@ -170,6 +170,45 @@ Use \li{plt.plot()} and specify a marker \emph{and} a line style in the third ar
 >>> plt.subplot(133)                # Line and scatter plot.
 >>> plt.plot(x, data, 'r.-', linewidth=2, markersize=15)
 \end{lstlisting}
+
+\begin{figure}[H] % Different coloring in a scatter plot.
+\captionsetup[subfigure]{justification=centering}
+\centering
+\begin{subfigure}{.49\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/scatter_1_bad.pdf}
+\end{subfigure}
+%
+\begin{subfigure}{.49\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/scatter_1_good.pdf}
+\end{subfigure}
+\end{figure}
+
+\begin{figure}[H] % Different sizing in a scatter plot.
+\captionsetup[subfigure]{justification=centering}
+\centering
+\begin{subfigure}{.49\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/scatter_2_bad.pdf}
+\end{subfigure}
+%
+\begin{subfigure}{.49\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/scatter_2_good.pdf}
+\end{subfigure}
+\end{figure}
+
+
+% Explain plt.scatter(), especially the 'c' and 's' keyword arguments.
+
+\begin{problem} % Scatter plots with visualizations.
+The file \texttt{MLB.npy} contains measurements from over 1,000 recent Major League Baseball players, compiled by UCLA.\footnote{See \url{http://wiki.stat.ucla.edu/socr/index.php/SOCR_Data_MLB_HeightsWeights}.}
+Each row in the array represents a different player; the columns are the player's height (in inches), weight (in pounds), and age (in years), in that order.
+
+Describe the data with at least one visualization.
+Your graph(s) should demonstrate whether height, weight, or age correlated with each other in the MLB.
+\end{problem}
 
 \subsection*{Histograms} % ----------------------------------------------------
 
@@ -277,7 +316,7 @@ Use the edges of the bins to calculate the center of the bins, then use a line p
 \begin{problem} % Earthquake data
 The file \texttt{earthquakes.npy} contains data from the 17,065 earthquakes between 2000 and 2010 that were at least a 5 on the Richter scale.\footnote{See \url{http://earthquake.usgs.gov/earthquakes/search/}.}
 Each row in the array represents a different earthquake;
-the columns are the date (as a fraction of the year), the magnitude, the longitude, and the latitude, in that order.
+the columns are the earthquake's date (as a fraction of the year), magnitude, longitude, and latitude, in that order.
 
 Because each earthquake is a distinct event, a good way to start visualizing this data might be a scatter plot of the years versus the magnitudes of each earthquake.
 

@@ -32,11 +32,7 @@ def _save(filename):
                 stdout.flush()
                 plt.clf()
                 out = func(*args, **kwargs)
-                if extension == "pdf":
-                    plt.savefig("figures/"+filename, format='pdf')
-                elif extension == "png":
-                    plt.savefig("figures/"+filename, format='png',
-                                                    size=(1024,768))
+                plt.savefig("figures/"+filename, format=extension)
                 print("done.")
                 return out
             except Exception as e:
@@ -51,9 +47,27 @@ def _save(filename):
 
 import numpy as np
 
+# Problem 1 -------------------------------------------------------------------
+
+def anscombe_data(save=False):
+    data = np.array([[10.0,  8.04, 10.0, 9.14, 10.0,  7.46,  8.0,  6.58],
+                     [ 8.0,  6.95,  8.0, 8.14,  8.0,  6.77,  8.0,  5.76],
+                     [13.0,  7.58, 13.0, 8.74, 13.0, 12.74,  8.0,  7.71],
+                     [ 9.0,  8.81,  9.0, 8.77,  9.0,  7.11,  8.0,  8.84],
+                     [11.0,  8.33, 11.0, 9.26, 11.0,  7.81,  8.0,  8.47],
+                     [14.0,  9.96, 14.0, 8.10, 14.0,  8.84,  8.0,  7.04],
+                     [ 6.0,  7.24,  6.0, 6.13,  6.0,  6.08,  8.0,  5.25],
+                     [ 4.0,  4.26,  4.0, 3.10,  4.0,  5.39, 19.0, 12.50],
+                     [12.0, 10.84, 12.0, 9.13, 12.0,  8.15,  8.0,  5.56],
+                     [ 7.0,  4.82,  7.0, 7.26,  7.0,  6.42,  8.0,  7.91],
+                     [ 5.0,  5.68,  5.0, 4.74,  5.0,  5.73,  8.0,  6.89]])
+    if save:
+        np.save("anscombe.npy", data)
+    return data
+
 # Problem 2 -------------------------------------------------------------------
 
-# Line and Scatter Plot stuff - - - - - - - - - - - - - - - - - - - - - - - - -
+# Line Plots - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 @_save("line_vs_scatter_line.pdf")
 def line_vs_scatter_line():
@@ -70,7 +84,42 @@ def line_vs_scatter_scat(x, data):
 def line_vs_scatter_both(x, data):
     plt.plot(x, data, 'r.-', linewidth=2, markersize=15)
 
-# Histogram stuff - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Scatter Plots - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+@_save("scatter_1_bad.pdf")
+def scat_1_bad():
+    data = anscombe_data()
+    x, y = data[:,2], data[:,3]
+    plt.scatter(x, y, c='b', s=500)
+    return x, y
+
+@_save("scatter_1_good.pdf")
+def scat_1_good(x, y):
+    plt.scatter(x, y, s=.5*y**4, alpha=.8)
+    return x, y
+
+@_save("scatter_2_bad.pdf")
+def scat_2_bad():
+    data = anscombe_data()
+    x, y = data[:,4], data[:,5]
+    plt.scatter(x, y, c='b', s=500)
+    return x, y
+
+@_save("scatter_2_good.pdf")
+def scat_2_good(x, y):
+    plt.scatter(x, y, s=500, c=y, alpha=.8)
+    cbar = plt.colorbar()
+    cbar.set_label("y")
+
+def prob2():
+    # x, data = line_vs_scatter_line()
+    # line_vs_scatter_scat(x, data)
+    # line_vs_scatter_both(x, data)
+
+    scat_1_good(*scat_1_bad())
+    scat_2_good(*scat_2_bad())
+
+# Problem 3 -------------------------------------------------------------------
 
 @_save("hist_1_bad.pdf")
 def hist_1_bad(N):
@@ -113,10 +162,7 @@ def earthquake():
     plt.xlabel("Year")
     plt.ylabel("Magnitude")
 
-def prob2():
-    x, data = line_vs_scatter_line()
-    line_vs_scatter_scat(x, data)
-    line_vs_scatter_both(x, data)
+def prob3():
 
     hist_1_good(hist_1_bad(10000))
     hist_2_good(hist_2_bad(10000))
@@ -125,7 +171,7 @@ def prob2():
 
     earthquake()
 
-# Problem 3 -------------------------------------------------------------------
+# Problem 4 -------------------------------------------------------------------
 
 @_save("rosenbrock.pdf")
 def rosenbrock():
@@ -144,6 +190,11 @@ def rosenbrock():
     plt.xlabel("x")
     plt.ylabel("y")
 
-if __name__ == '__main__':
+def save_all():
     prob2()
-    # rosenbrock()
+    prob3()
+    rosenbrock()
+
+if __name__ == '__main__':
+    # prob2()
+    save_all()
