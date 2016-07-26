@@ -569,8 +569,10 @@ It returns two flat arrays: \li{indices} and \li{distances}.
 The array \li{indices} contains the indices of the neighbor pixels within distance $r$ of the input pixel. 
 The array \li{distances} contains the corresponding distances of those pixels from the input pixel.
 %According to (\ref{eq:adjacency}), the array \li{indices} contains exactly the indices of the nonzero entries of the current row of \li{W}.  
-Using Figure \ref{fig:adjacency} as an example, with the inputs 6, 1.2, 4, and 4 the outputs would be \li{indices = array([2,5,6,7,10])} and \li{distances = array([1,1,0,1,1])}. Look at the function definition and play with the function to build intuition about what it does.
+Using Figure \ref{fig:adjacency} as an example, with the inputs 6, 1.2, 4, and 4 the outputs would be \li{indices = array([2,5,6,7,10])} and \li{distances = array([1,1,0,1,1])}. 
+Try running the function with different inputs to build intuition about what it does.
 
+Finally, convert \li{W} to the sparse matrix type \li{csc_matrix}, which is faster for computations. Then return \li{W} and \li{D}.
 
 \begin{problem}
 Write the function \li{adjacency} described in this section.
@@ -598,10 +600,9 @@ This eigenvector will have $MN$ entries.
 Shi and Malik proved that the indices of its \emph{positive} entries are the indices of the pixels in the flattened image which belong in one segment.
 Likewise, the indices of its \emph{negative} entries are the indices of the pixels which belong in the other segment.
 
-To get the segments, reshape this eigenvector as an $M \times N$ array.
-Set its positive entries to True and negative entries to False.
-We can multiply this True-False mask by the image entry-wise. 
-This zeros out the pixels in the matrix corresponding to the \li{False} entries in the mask and leaves the pixels corresponding to \li{True} entries unaffected. 
+To compute the segments, reshape this eigenvector as an $M \times N$ array, and set the positive entries to True and the negative entries to False.
+We can multiply this True-False mask entry-wise by the image. 
+This zeros out the pixels in the image corresponding to the \li{False} entries in the mask, without affecting the pixels corresponding to \li{True} entries. 
 We can negate the mask using the tilde operator, which lets us compute the other segment of the image. 
 Finally we return the two segments.
 
@@ -646,18 +647,26 @@ Next we create a mask that is \li{True} wherever \li{eigvec} is positive and res
 
 \end{comment}
 
-\begin{problem} Write the function \li{segment} described in this section.  Test your function on the image \li{dream.png}. Use the function \li{displayPosNeg} to plot your images. Your segments should look like the segments in Figure \ref{fig:dream_solution} (the original image is on the left). Here are some hints:
+\begin{problem} Write the function \li{segment} to segment an image.
+The function should accept an image filename and return both of the segments.
+You should call the code you wrote in Problem \ref{prob:adjacency_dream}.
+Use sparse matrices where possible.
 
+
+Test on the image \li{dream.png}.
+Your segments should look like the segments in Figure \ref{fig:dream_solution} (the original image is on the left). 
+
+Hints:
 \begin{enumerate}
-\item Once you have defined $D^{-1/2}$, convert $D$ and $D^{-1/2}$ into sparse matrices using \li{scipy.sparse.spdiags}.
-\item You should NOT use your solution to Problem \ref{prob:laplacian} to calculate the Laplacian matrix because in this problem we are working with sparse matrices, and you have already computed the degree matrix.
+\item After defining $D^{-1/2}$, convert $D$ and $D^{-1/2}$ into sparse matrices using \li{scipy.sparse.spdiags}.
+\item Since are now dealing with sparse instead of dense matrices, you shouldn't use your solution to Problem \ref{prob:laplacian} to calculate the Laplacian. 
 
 \item Multiply sparse matrices with \li{A.dot(B)}.
 
-\item Use \li{scipy.sparse.eigs} to calculate the eigenvector. Set the keyword \li{which = "SR"}.
+\item Use \li{scipy.sparse.eigsh} to calculate the eigenvector. This is a sparse eigenvalue solver optimized for symmetric matrices.
+Set the keyword \li{which = "SM"} to return the smallest eigenvalues.
 
-\item Reshape the mask to be an $M \times N$ matrix
-
+\item The provided function \li{displayPosNeg} can be used to plot your images. 
 
 \end{enumerate}
 
@@ -706,7 +715,6 @@ Later, our function will iterate through the rows of the adjacency matrix, initi
 \end{lstlisting}
 \end{comment}
 
-Finally, convert \li{W} to the sparse matrix type \li{csc_matrix}, which is faster for computations. Then return \li{W} and \li{D}.
 \begin{comment}
 \begin{lstlisting}
 11.    W = W.tocsc()
