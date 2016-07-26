@@ -163,7 +163,7 @@ def segment(img):
     # calculate the eigenvector. Use the eigs function in sparla. 
     # Be sure to set the appropriate keyword argument so that you 
     # compute the two eigenvalues with the smallest real part.
-    e = sparla.eigs(P, k=2, which="SR")
+    e = sparla.eigsh(P, k=2, which="SR")
     eigvec = e[1][:,1]
     
     # create a mask array that is True wherever the eigenvector is positive.
