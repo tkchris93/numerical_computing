@@ -356,19 +356,19 @@ What do you notice about the likelihood that a random graph is connected?
 \label{fig:monument}
 \end{figure}
 Image segmentation is the process of finding natural boundaries in an image (see Figure \ref{fig:monument}).
-This is an easy task for humans, who can easily pick out portions of an image that ``belong together.''
-In this lab, you will learn one way to segment images using graph theory.
+This is a simple task for humans, who can easily pick out portions of an image that ``belong together.''
+In this lab, you will learn one way for a computer to segment images using graph theory.
 
 The algorithm we will present comes from a paper by Jianbo Shi and Jitendra Malik in 2000 (\cite{Shi2000}).
-They present the following steps to segment an image.
+They segment an image using the following steps.
 \begin{enumerate}
 	\item \textbf{Represent the image as a weighted graph of pixels.} 
 An image is made up of individual pixels, each having a brightness and a location.
-(Here, \emph{brightness} is equivalent the grayscale value of the pixel.)
-To define a graph representing this image, we let each pixel be a vertex.
+(Here, \emph{brightness} is equivalent to the grayscale value of the pixel.)
+To define a graph representing the image, we let each pixel be a vertex.
 %We say that two pixels are connected in the graph if they are close together, i.e. within some distance $r$ of each other, in the image.
 The weight of the edges between two pixels is determined by their distance apart and their similarity in brightness.
-We define the graph so that two similar pixels (i.e. with similar brightness and location) will be connected by a strong edge.
+We define the graph so that two similar pixels (i.e., with similar brightness and location) will be connected by a strong edge.
 	\item \textbf{Calculate the Laplacian.} 
 We calculate the adjacency and degree matrices of the graph representing the image, and use these to obtain the Laplacian.
 	\item \textbf{Choose the best cut.} 
@@ -398,7 +398,7 @@ We can ``cut'' an image multiple times to segment an image into more than two pi
 \subsection*{Defining the Graph and Adjacency Matrix}
 
 %New
-We now define the graph that represents an image. In our $M \times N$ image, the associated graph will have $M \times N$ nodes, one representing each pixel. We let $w_{ij}$ be the weight of the edge connecting pixels $i$ and $j$, and define
+We now define the graph that represents an image. In our $M \times N$ image, the associated graph will have $MN$ nodes, one representing each pixel. We let $w_{ij}$ be the weight of the edge connecting pixels $i$ and $j$, and define
 
  \begin{equation}
  \label{eq:adjacency}
@@ -411,14 +411,14 @@ where
 	\item $r$, $\sigma_I$ and $\sigma_d$ are constants that we choose
 \end{itemize}
 
-With this definition, pixels that are farther apart that $r$ will never be connected. 
-Pixels within $r$ will be strongly connected if they are a similar brightness ($|I(i) - I(j)|$ is small) and close together ($d(i,j)$ is small).
+With this definition, pixels that are farther apart than radius $r$ will never be connected. 
+Pixels within $r$ will be strongly connected if they are similar in brightness ($|I(i) - I(j)|$ is small) and close together ($d(i,j)$ is small).
 Highly contrasting pixels ($|I(i) - I(j)|$ is large) will be weakly connected. 
-This gives us a graph with the properties we intuitively want.
+This gives us a graph with the properties that we intuitively want.
 
-The adjacency matrix $W$ is $(M \times N) \times (M \times N)$ and has $w_{ij}$ as its $ij$th entry. 
+The adjacency matrix $W$ is $(MN) \times (MN)$ and has $w_{ij}$ as its $ij$th entry. 
 $W$ will be sparse as long as $r$ is small. 
-Figure \ref{fig:adjacency} shows what the adjacency matrix looks like for a $4x4$ image when $r=1.2$.
+Figure \ref{fig:adjacency} shows a visualization of the adjacency matrix for a $4 \times 4$ image when $r=1.2$.
 
 \begin{comment}
 Now let us define the adjacency matrix of the graph associated to an image. 
@@ -463,7 +463,7 @@ Figure \ref{fig:adjacency} shows what the adjacency matrix looks like for a $4x4
 
 \node[draw=none](image)at(4.5, -.5){$image$};
 \node[draw=none](flattened)at(7.25,-3){\textit{flattened image}};
-\node[draw=none](adjacency)at(12,-3){\textit{adjacency image}};
+\node[draw=none](adjacency)at(12,-3){\textit{adjacency matrix}};
 
 %dots within grid
 \foreach \x in {1,2,3,4}
@@ -517,90 +517,67 @@ Figure \ref{fig:adjacency} shows what the adjacency matrix looks like for a $4x4
 
 \end{tikzpicture}
 
-\caption{The grid at left represents a $4\times4$ (or $M \times N$) image, which has 16 pixels. Thus the adjacency matrix at right is $16 \times 16$ (or $(M \times N) \times (M \times N)$). We have not calculated the weights in the adjacency matrix, but we have shaded the nonzero entries. For example, the $6^{th}$ row corresponds to the $6^{th}$ pixel. Within that row, entries are nonzero if they correspond to pixels that are at most 1.2 away from pixel 6. (These nonzero elements correspond to the \li{indices} and \li{distances} returned by the \li{getNeighbors} function given the \li{pixel} 6 and \li{radius} 1.2.)}
+\caption{The grid on the left represents a $4\times4$ (or $M \times N$) image with 16 pixels. 
+At right is the corresponding $16 \times 16$ (or $(MN) \times (MN)$) adjacency matrix with all nonzero entries shaded.
+For example, in the $6^{th}$ row, entries 2, 5, 6, 7, and 10 are nonzero because those pixels are within radius $r$ of pixel 6 (here $r = 1.2$).}
+%For example, the $6^{th}$ row corresponds to the $6^{th}$ pixel. 
+%Within that row, entries are nonzero if they correspond to pixels that are within radius $r$ of pixel 6 ($r = 1.2$ was used here).}
 \label{fig:adjacency}
 \end{figure}
 
 
 \subsection*{Computing the Adjacency Matrix}
-In this section, we will write a function that accepts an image, and computes the adjacency and degree matrices of the corresponding graph.
-The function will also accept constants \li{radius}, \li{sigma_I}, and \li{sigma_d} to use in \ref{eq:adjacency}. 
-The function will return the adjacency matrix defined in (\ref{eq:adjacency}) and the diagonal of the corresponding degree matrix. 
+We will now write a function to compute the adjacency matrix for a given image.
+%The function will also accept constants \li{radius}, \li{sigma_I}, and \li{sigma_d} to use in \ref{eq:adjacency}. 
+The function will accept a filename and constants \li{radius}, \li{sigma_I}, and \li{sigma_d}, and return the adjacency matrix and the diagonal of the corresponding degree matrix. 
 
-First, we load a grayscale image and flatten it into a 1-D array of pixel values. To help handle color images, the helper function \li{getImage} is given. The input \li{filename} should be the filename of the image that you want to segment. The return value will be a 2-D array representing a grayscale image. Flatten this array using \li{img.flatten}.
+The basic approach is straightforward. 
+For each pixel in the image, compare it to every other pixel, use (\ref{eq:adjacency}) to calculate the weight of the edge between them, and fill in the weight in the adjacency matrix.
+This section will discuss how to implement this efficiently in Python.
+
+First, load an image and convert it to grayscale. 
+The included function \li{getImage} helps handle color images.
+It accepts a filename and returns a 2-D grayscale image.
+
+It will be useful to flatten the $M \times N$ image.
+This converts it into a 1-D array of pixels of length $MN$, essentially giving each pixel an index. 
+We can use \li{img.flatten} to flatten the array \li{img}.
 \begin{lstlisting}
 >>> A = np.array([[1,2],[3,4]])
 >>> A.flatten()                
 array([1,2,3,4])
 \end{lstlisting}
 
-\begin{comment}
-Here is the function definition, which includes some default values for the constants.
-\begin{lstlisting}
-1.	def adjacency(img, radius=5.0, sigma_I = .15, sigma_d = 1.7):
-\end{lstlisting}
-\begin{lstlisting}
-4.     W = spar.lil_matrix((flat_img.size, flat_img.size), dtype=float)
-5.     D = np.zeros((1, flat_img.size))
-\end{lstlisting}
+Next, initialize empty adjacency and degree matrices to fill in. 
+As in Figure \ref{fig:adjacency}, the adjacency matrix will be sparse, so initialize it as a sparse matrix \li{W}. 
+Use the sparse matrix type \li{lil_matrix}, which is optimized for filling in a matrix one entry at a time. 
+Since we only need to store the diagonal of the degree matrix, initialize this diagonal as a regular 1-dimensional NumPy array \li{D}.
 
-Later, our function will iterate through the rows of the adjacency matrix, initializing one row at a time. Each row corresponds to a pixel of the original image. Thus, we begin by flattening the image (see Figure \ref{fig:adjacency}). We also store the dimensions of \li{img} for later.
-\begin{lstlisting}
-2.     flat_img = img.flatten()
-3.     height, width = img.shape
-\end{lstlisting}
-\end{comment}
-
-Next, we initialize empty adjacency and degree matrices. As can be seen in Figure \ref{fig:adjacency}, the adjacency matrix will be sparse, so we initialize it as a sparse matrix \li{W}. The sparse matrix type \li{lil_matrix} is optimized for building a matrix one entry at a time, which is what we will do. On the other hand, we only need to store the diagonal of the degree matrix, so we initialize this diagonal as a regular 1-dimensional NumPy array \li{D}.
-
-We now fill in $W$ according to our definition in Equation \ref{eq:adjacency}.
-Each pixel in the image corresponds to one row in $W$.
+We now fill in \li{W} according to our definition in Equation \ref{eq:adjacency}.
+Each pixel in the image corresponds to one row in \li{W}.
 For each pixel:
 \begin{itemize}
-\item Find its neighbors (the pixels in the image which are within distance $r$ of it)
+\item Find its neighbors (the pixels in the image that are within distance $r$ of it)
 \item Use \ref{eq:adjacency} to calculate the weights connecting the pixel to each of its neighbors
-\item Fill in these weights in $W$, leaving the rest of the values in the row as zeros.
-\end{itemize}
-%Iterating through each pixel in the image, we initialize the corresponding row of the adjacency matrix according to our definition in 
-The sum of the entries of a row in $W$ will be the corresponding entry in \li{D}. 
+\item Fill in these weights in \li{W}, leaving the rest of the values in the row as zeros. \footnote{Note that \li{W} will be a symmetric matrix. We could potentially speed up this algorithm by taking advantage of this fact.}
+\end{itemize} 
+The sum of the entries of a row in \li{W} will be the corresponding entry in \li{D}. 
 
-The function \li{getNeighbors} returns two flat arrays: \li{indices} and \li{distances} (code is provided in the spec file). The array \li{indices} contains the indices of those pixels within \li{radius} of the input \li{pixel}. The array \li{distances} contains the corresponding distances of those pixels from the input \li{pixel} (all entries of \li{distances} will be at most \li{radius}). According to (\ref{eq:adjacency}), the array \li{indices} contains exactly the indices of the nonzero entries of the current row of \li{W}.  See Figure \ref{fig:adjacency} for an example. \footnote{Note that \li{W} will be a symmetric matrix. We could possibly speed up this function a lot by taking advantage of this fact.}
-
-\begin{comment}
-\begin{lstlisting}
-6.     for pixel in xrange(flat_img.size):
-7.         indices, distances = getNeighbors(pixel, radius, height, width)
-8.         weights = # weights[j] should be W[pixel, indices[j]]
-9.         W[pixel, indices] = weights
-10.        D[0,pixel] = weights.sum()
-\end{lstlisting}
-\end{comment}
-
-Finally, convert \li{W} to the sparse matrix type \li{csc_matrix}, which is faster for computations. Then return \li{W} and \li{D}.
-\begin{comment}
-\begin{lstlisting}
-11.    W = W.tocsc()
-12.    return W, D
-\end{lstlisting}
-\end{comment}
+You may choose to use the provided helper function \li{getNeighbors} to find the neighbors of a given pixel.
+The function accepts the index of a pixel in the flattened image, along with a value for $r$ and the original image dimensions. 
+It returns two flat arrays: \li{indices} and \li{distances}. 
+The array \li{indices} contains the indices of the neighbor pixels within distance $r$ of the input pixel. 
+The array \li{distances} contains the corresponding distances of those pixels from the input pixel.
+%According to (\ref{eq:adjacency}), the array \li{indices} contains exactly the indices of the nonzero entries of the current row of \li{W}.  
+Using Figure \ref{fig:adjacency} as an example, with the inputs 6, 1.2, 4, and 4 the outputs would be \li{indices = array([2,5,6,7,10])} and \li{distances = array([1,1,0,1,1])}. Look at the function definition and play with the function to build intuition about what it does.
 
 
 \begin{problem}
-Write the function \li{adjacency} described in this section.  Return the adjacency matrix and the diagonal matrix for the corresponding image.
-When computing each row of the adjacency matrix, your computation should use (\ref{eq:adjacency}) and take exactly one line.  Hint: Vectorize
-
-\begin{comment}
-\begin{lstlisting}
-8.         weights = # weights[j] should be W[pixel, indices[j]]
-\end{lstlisting}
-\begin{lstlisting}
-# read in the image
-img_color = plt.imread('dream.png')
-# convert to grayscale
-img = (img_color[:,:,0]+img_color[:,:,1]+img_color[:,:,2])/3.0
-\end{lstlisting}
-\end{comment}
-Test your function on the image \li{dream.png}.
+Write the function \li{adjacency} described in this section.
+Accept an image a filename and constants \li{radius}, \li{sigma_I}, and \li{sigma_d}.
+Return the corresponding sparse adjacency matrix \li{W} and the diagonal of the degree matrix \li{D}.
+Use (\ref{eq:adjacency}) to compute the weights in the adjacency matrix.
+For speed, try to compute an entire row of \li{W} at once, instead of filling in \li{W} entry by entry.
 
 
 %Notice that for each pixel you can save time by only checking the pixels $r$ rows and columns away.
@@ -697,6 +674,39 @@ Next we create a mask that is \li{True} wherever \li{eigvec} is positive and res
 \caption{Segments of \li{dream.png}}
 \label{fig:dream_solution}
 \end{figure}
+
+\begin{comment} %Old stuff from middle of lab
+Here is the function definition, which includes some default values for the constants.
+\begin{lstlisting}
+1.	def adjacency(img, radius=5.0, sigma_I = .15, sigma_d = 1.7):
+\end{lstlisting}
+\begin{lstlisting}
+4.     W = spar.lil_matrix((flat_img.size, flat_img.size), dtype=float)
+5.     D = np.zeros((1, flat_img.size))
+\end{lstlisting}
+
+Later, our function will iterate through the rows of the adjacency matrix, initializing one row at a time. Each row corresponds to a pixel of the original image. Thus, we begin by flattening the image (see Figure \ref{fig:adjacency}). We also store the dimensions of \li{img} for later.
+\begin{lstlisting}
+2.     flat_img = img.flatten()
+3.     height, width = img.shape
+\end{lstlisting}
+
+\begin{lstlisting}
+6.     for pixel in xrange(flat_img.size):
+7.         indices, distances = getNeighbors(pixel, radius, height, width)
+8.         weights = # weights[j] should be W[pixel, indices[j]]
+9.         W[pixel, indices] = weights
+10.        D[0,pixel] = weights.sum()
+\end{lstlisting}
+\end{comment}
+
+Finally, convert \li{W} to the sparse matrix type \li{csc_matrix}, which is faster for computations. Then return \li{W} and \li{D}.
+\begin{comment}
+\begin{lstlisting}
+11.    W = W.tocsc()
+12.    return W, D
+\end{lstlisting}
+\end{comment}
 
 \begin{comment}
 \section*{Appendix: helper code for Problem \ref{prob:adjacency_dream}}
