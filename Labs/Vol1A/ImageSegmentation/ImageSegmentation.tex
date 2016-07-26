@@ -307,8 +307,7 @@ In many applications, the Laplacian matrix is sparse, so by taking advantage of 
 
 \begin{problem}
 \leavevmode
-\begin{enumerate}
-\item Compute the number of connected components in a graph.
+Compute the number of connected components in a graph.
 Write a function that accepts the adjacency matrix of a graph and returns two arguments: the number of connected components, and the algebraic connectivity of the graph (second smallest eigenvalue of the Laplacian).
 
 Use the \li{scipy.linalg} package to compute the eigenvalues.
@@ -316,7 +315,9 @@ Note that this package will return complex eigenvalues (with negligible imaginar
 Your function should also accept a tolerance value, such that all eigenvalues less than this value are assumed to be zero.
 This should default to \li{tol=1e-8}.
 
-\item Here is a function that creates a random symmetric matrix of Boolean values with sparsity determined by the input \li{c}.
+\begin{comment}
+%Old part of problem, removed because no great way to evaluate it
+Here is a function that creates a random symmetric matrix of Boolean values with sparsity determined by the input \li{c}.
 \begin{lstlisting}
 def sparse_generator(n, c):
     ''' Return a symmetric nxn matrix with sparsity determined by c.
@@ -329,10 +330,11 @@ def sparse_generator(n, c):
     A = ( A > c**(.5) )
     return A.T.dot(A)
 \end{lstlisting}
-\end{enumerate}
 
 Test your function on matrices created by \li{sparse_generator} with inputs $n = 10, 100$ and $c = .25, .5, .95$. 
 What do you notice about the likelihood that a random graph is connected?
+\end{comment}
+
 \end{problem}
 
 
