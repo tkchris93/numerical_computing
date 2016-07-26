@@ -377,7 +377,7 @@ Dissimilar pixels will be connected by edges that have a low weight.
 We can split the graph into two connected components by ``cutting" it along the low-weight edges.
 These components are the image segments we are looking for.
 (We can also cut an image multiple times to segment it into more than two pieces.)
-As we will see later, Shi and Malik's algorithm uses spectral information (eigenvectors) of the Laplacian to determine the best edges to cut.
+As we will see later, Shi and Malik's algorithm uses spectral information (eigenvectors) of the Laplacian to minimize the weight of the cut edges.
 \end{enumerate}
 
 \begin{comment}
@@ -586,18 +586,24 @@ For speed, try to compute an entire row of \li{W} at once, instead of filling in
 \label{prob:adjacency_dream}
 \end{problem}
 
-\subsection*{Minimizing the 'Cut'}
-
-As was mentioned before, we are trying to minimize the `cut', or the total weight of the edges we remove to create segments. 
+\subsection*{Minimizing the `Cut'}
+As stated earlier, the goal is to split the image into two segments, while minimizing the weight of the edges that are `cut' in the corresponding graph.
 Let $L$ be the Laplacian of the adjacency matrix defined in \ref{eq:adjacency} and let $D$ be the degree matrix.
-Shi and Malik proved that we can minimize the `cut' by finding the second smallest eigenvalue of $D^{-1/2}LD^{-1/2}$.  Note that $D^{-1/2}$ refers not to matrix, but element-wise, exponentiation.
-Because both $D$ and $L$ will be symmetric matrices, all eigenvalues of $D^{-1/2}LD^{-1/2}$ will be real, and so it makes sense to ask for the second smallest one.
+Shi and Malik proved that using the second smallest eigenvalue of $D^{-1/2}LD^{-1/2}$, we can minimize the `cut' .
+Both $D$ and $L$ will be symmetric matrices, so all eigenvalues of $D^{-1/2}LD^{-1/2}$ will be real, therefore the second smallest one is well-defined.
+(Note that $D^{-1/2}$ refers not to matrix, but element-wise, exponentiation.)
 
-The eigenvector associated to the second smallest eigenvalue will have $M \times N$ entries, some positive and some negative. 
-Reshape this vector to be an $M \times N$ mask defining two segments, segments that correspond to the positive and negative values of the eigenvector.
-Shi and Malik proved that these are the segments we desire. 
+The eigenvector associated to the second smallest eigenvalue is the key to segmenting the image. 
+This eigenvector will have $MN$ entries.
+Shi and Malik proved that the indices of its \emph{positive} entries are the indices of the pixels in the flattened image which belong in one segment.
+Likewise, the indices of its \emph{negative} entries are the indices of the pixels which belong in the other segment.
 
-Once we have a mask of True-False values, we multiply it by the image entrywise. This zeros out the pixels in the matrix corresponding to the \li{False} entries in the mask and leaves the pixels corresponding to \li{True} entries unaffected. We can negate the mask using the tilde operator, which lets us compute the other segment of the image. Finally we return the two segments.
+To get the segments, reshape this eigenvector as an $M \times N$ array.
+Set its positive entries to True and negative entries to False.
+We can multiply this True-False mask by the image entry-wise. 
+This zeros out the pixels in the matrix corresponding to the \li{False} entries in the mask and leaves the pixels corresponding to \li{True} entries unaffected. 
+We can negate the mask using the tilde operator, which lets us compute the other segment of the image. 
+Finally we return the two segments.
 
 \begin{comment}
 Here is the definition of a function that will segment an image.
