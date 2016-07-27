@@ -345,7 +345,8 @@ Each bin has a bar whose height indicates the number of values that fall in the 
 Histograms are best for displaying distributions, relating data values to frequency.
 
 To create a histogram, use \li{plt.hist()} instead of \li{plt.plot()}.
-Specify the number of bins with the argument \li{bins} and the range of values with the argument \li{<<range>>} to control the precision of the plot.
+Use the argument \li{bins} to specify the edges of the bins, or to choose a number of bins.
+The \li{<<range>>} argument specifies the outer limits of the first and last bins.
 \end{itemize}
 
 \begin{lstlisting}
@@ -359,7 +360,8 @@ Specify the number of bins with the argument \li{bins} and the range of values w
 
 # Draw a histogram to display the distribution of the data in x.
 >>> plt.subplot(122)
->>> plt.hist(x, bins=9, <<range>>=[-4.5, 4.5])
+>>> plt.hist(x, bins=np.arange(-4.5, 5.5))      # Or, equivalently,
+#   plt.hist(x, bins=9, range=[-4.5, 4.5])
 
 >>> plt.show()
 \end{lstlisting}
@@ -378,13 +380,13 @@ Specify the number of bins with the argument \li{bins} and the range of values w
 \end{subfigure}
 \end{figure}
 
-On the histogram, specifying 9 bins in the range $[-4.5, 4.5]$ creates a bin centered over each integer from $-4$ to $4$.
+% On the histogram, specifying 9 bins in the range $[-4.5, 4.5]$ creates a bin centered over each integer from $-4$ to $4$.
 
 \begin{problem} % FARS data visualization.
-The Fatality Analysis Reporting System (FARS) is a nationwide census providing yearly data regarding fatal injuries suffered in motor vehicle traffic crashes (see \url{http://www.nhtsa.gov/FARS}).
+The Fatality Analysis Reporting System (FARS) is a nationwide census providing yearly data regarding fatal injuries suffered in motor vehicle traffic crashes.%
+\footnote{See \url{http://www.nhtsa.gov/FARS}.}
 The array contained in \texttt{FARS.npy} is a small subset of the FARS database from 2010--2014.
-Each of the 148,206 rows in the array represents a different car crash.
-The columns represent the hour of the crash (in military time, as an integer), the longitude of the crash, and the latitude of the crash, in that order.
+Each of the 148,206 rows in the array represents a different car crash; the columns represent the hour (in military time, as an integer), the longitude, and the latitude, in that order.
 
 Write a function to visualize the data in \texttt{FARS.npy}.
 Use \li{np.load()} to load the data, then create a single figure with two subplots:
@@ -394,7 +396,7 @@ Use \li{np.load()} to load the data, then create a single figure with two subplo
 Because of the large number of data points, use black pixel markers (use \li{"k,"} as the third argument to \li{plt.plot()}).
 Label both axes.
 \\
-(Hint: the command \li{plt.gca().set_aspect("equal")} fixes the scaling of the axes so the picture is not skewed.)
+(Hint: Use \li{plt.gca().set_aspect("equal")} to equalize the axes on the scatter plot).
 
 \item A histogram of the hours of the day, with one bin per hour.
 Set the limits of the $x$-axis appropriately.
@@ -402,10 +404,10 @@ Label the $x$-axis.
 \end{enumerate}
 \end{problem}
 
-Other kinds of plots for 1-dimensional data includes bar plots, box plots, and others.
-See Appendix \ref{mpltables} for examples and syntax.
+% Other kinds of plots for 1-dimensional data includes bar plots, box plots, and others.
+% See Appendix \ref{mpltables} for examples and syntax.
 
-\subsection*{Visualizing 2-D Data} % ------------------------------------------
+\subsection*{Visualizing 3-D Surfaces} % --------------------------------------
 
 To plot a function $f: \mathbb{R}^2 \rightarrow \mathbb{R}$, we must choose and construct a 2-dimensional domain, then calculate the function at each point of that domain.
 The standard tool for creating a 2-dimensional domain in the Cartesian plane is \li{np.meshgrid()}.
@@ -756,7 +758,7 @@ Consider the following example, TAKEN FROM THE MATPLOTLIB DOCS BASICALLY AHHH
 % =============================================================================
 
 \begin{comment}
-\begin{info} % IPython Notebook inline plotting (move to another lab!)
+\begin{info} % IPython Notebook inline plotting (move to notebook intro)
 If you are executing these Matplotlib commands in an IPython shell, executing the \li{plt.show()} method will open a new window with the plot.
 If you are using IPython Notebook, you have the option to display the plots within your notebook.
 You may opt into this feature by running \li{\%matplotlib inline} or \li{\%matplotlib notebook} in your IPython Notebook.
