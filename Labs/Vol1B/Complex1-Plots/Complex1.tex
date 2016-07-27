@@ -1,11 +1,11 @@
 \lab{Complex Numbers}{Complex Numbers}
 \label{Lab:complex_intro}
 
-\objective{Visualize complex functions to estimate their zeros and poles.}
+\objective{Create visualizations of complex functions. Visually estimate their zeros and poles, and gain intuition about their behavior in the complex plane.}
 
-\section*{Polar Representation of Complex Numbers}
+\section*{Representations of Complex Numbers}
 
-Any complex number $z = x+iy$ can be written in \emph{polar coordinates} as $re^{i\theta}$ where
+A complex number $z = x+iy$ can be written in \emph{polar coordinates} as $re^{i\theta}$ where
 \begin{itemize}
 \item $r=\sqrt{x^2+y^2}$ is the magnitude of $z$, and
 \item $\theta = \arctan(y/x)$ is the angle between $z$ and 0, as in Figure \ref{fig:polar_coords}.
@@ -39,22 +39,24 @@ Conversely, Euler's formula implies $re^{i\theta} = r\cos(\theta) + ir\sin(\thet
 \label{fig:polar_coords}
 \end{figure}
 
-It is easy to convert between coordinate systems in NumPy, which uses the symbol \li{1j} for the complex number $i=\sqrt{-1}$.
+NumPy makes it easy to work with complex numbers and convert between coordinate systems. 
+The function \li{np.angle()} returns the angle of a complex number (between $-\pi$ and $\pi$) and the function \li{np.absolute()} returns the magnitude.
+Use these to compute $\theta$ and $r$, respectively.
+These functions also operate elementwise on NumPy arrays.
+
+Note that in Python, \li{1j} is used for the complex number $i=\sqrt{-1}$.
+See the code below for an example.
+
 \begin{lstlisting}
 >>> import numpy as np
 >>> from matplotlib import pyplot as plt
+# Set z = 2 - 2i
 >>> z = 2 - 2*1j
-\end{lstlisting}
-Use \li{np.angle()}, which returns an angle between $-\pi$ and $\pi$, and \li{np.absolute()} to compute $\theta$ and $r$, respectively.
-These functions also operate elementwise on NumPy arrays.
-\begin{lstlisting}
 >>> theta = np.angle(z)
 >>> r = np.absolute(z)
-
-# The function np.absolute() returns a value between -pi and pi.
+# np.angle() returns a value between -pi and pi.
 >>> print r, theta
 (2.8284271247461903, -0.78539816339744828)
-
 # Check that z=re^(i*theta)
 >>> np.allclose(z, r*np.exp(1j*theta))
 True
@@ -84,8 +86,8 @@ We create the real and imaginary parts separately, and then use \li{np.meshgrid(
 >>> Z = X + 1j*Y
 \end{lstlisting}
 
-Now we compute the angles of the points in \li{Z} and plot these using \li{plt.pcolormesh()} with the colormap \li{'hsv'}. 
-This colormap is red at both ends, so that $0$ and $2 \pi$ will map to the same color.
+Now we compute the angles of the points in \li{Z} and plot them using \li{plt.pcolormesh()}. 
+We use the colormap \li{'hsv'}, which is red at both ends, so that $0$ and $2 \pi$ will map to the same color.
 
 \begin{lstlisting}
 >>> plt.pcolormesh(X, Y, np.angle(Z), cmap='hsv')
@@ -106,6 +108,7 @@ The color at each point $z$ represents the argument of $f(z)$.}
 
 \begin{problem}
 Write the following function to plot any function from $\mathbb{C}$ to $\mathbb{C}$.
+Plot the angle only, as above, ignoring the magnitude.
 \begin{lstlisting}
 def plot_complex(f, xbounds, ybounds, res=401):
     '''Plot the complex function f.
@@ -121,20 +124,48 @@ def plot_complex(f, xbounds, ybounds, res=401):
     			Defaults to 401.
     '''
 \end{lstlisting}
-When you call \li{plt.pcolormesh()} in this function, you should specify the keyword arguments \li{vmin} and \li{vmax}. 
-These define which numbers should map to each end of the color scale. 
-If you do not specify them, matplotlib will scale the colormap to fit your data exactly.
+Check your function on $f(z) = z$ (graphed in Figure \ref{fig:identity}) and on the function $f(z) = \sqrt{z^2+1}$, which is graphed in Figure \ref{fig:check_plot}.
 
+Hint: When you call \li{plt.pcolormesh()}, specify the keyword arguments \li{vmin} and \li{vmax}. 
+These define which values should map to each end of the color scale. 
+We want $-\pi$ to map to the low end of the color scale, and $\pi$ to map to the high end.
+If not specified, matplotlib will scale the colormap to fit your data exactly.
 
-Check your function on the identity (graphed in Figure \ref{fig:identity}) and on the function $f(z) = \sqrt{z^2+1}$, which is graphed in Figure \ref{fig:check_plot}.
+\label{prob:plot_complex}
+\end{problem}
+
 \begin{figure}[H]
-\includegraphics[width=.7\textwidth]{check_plot.png}
-\caption{Plot of $\sqrt{z^2+1}$ on the domain $\{x+iy \mid x \in [-3,3] , \; y \in [-3,3]\}$ created by \li{plot_complex()}.}
+\includegraphics[width=.6\textwidth]{check_plot.png}
+\caption{Plot of the angle of $\sqrt{z^2+1}$ on the domain $\{x+iy \mid x \in [-3,3] , \; y \in [-3,3]\}$ created by \li{plot_complex()}.}
 \label{fig:check_plot}
 \end{figure}
 
+The choice to ignore the magnitude may seem arbitrary. 
+We can also write a complex plotting function to ignore the angle and only plot the magnitude.
+This will give us some different intuition about the function, while losing some information that we would get from the angle plot.
+
+\begin{problem}
+Write a new complex plotting function called \li{plot_complex_magnitude} which ignores the angle and plots only the magnitude.
+This should resemble your answer to Problem \ref{prob:plot_complex}, with small modifications.
+Leave \li{vmin} and \li{vmax} unspecified when plotting.
+
+Check your function on $f(z) = \sqrt{z^2+1}$. Your plot should look like the right subplot in Figure \ref{fig:check_plot_2}.
+
+Hint: A wraparound colormap like \li{'hsv'} doesn't work well here. 
+Use any sequential colormap that makes it easy to distinguish between high and low values. See the matplotlib documentation for a list of colormaps.
+
 \end{problem}
 
+\begin{figure}[H]
+\includegraphics[width=\textwidth]{check_plot_magnitude.png}
+\caption{Plots of $\sqrt{z^2+1}$ on $\{x+iy \mid x \in [-3,3] , \; y \in [-3,3]\}$, showing the angle and the magnitude of the function.
+Notice how a discontinuity is clearly visible on the left, but disappears from the plot on the right.}
+\label{fig:check_plot_2}
+\end{figure}
+
+
+The angle plot is generally more useful than the magnitude plot for visualizing function behavior, zeros, and poles. 
+In the rest of the problems, we will only plot the angle and ignore the magnitude.
 
 \section*{Analyzing Complex Plots}
 

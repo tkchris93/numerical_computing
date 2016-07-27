@@ -1,127 +1,111 @@
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import pyplot as plt
 import numpy as np
-from solutions import get_vals
+import matplotlib.pyplot as plt
+from colorsys import hls_to_rgb
 
-cmap = plt.cm.coolwarm
-cmap_r = plt.cm.coolwarm_r
+def colorize(z):
+    zy=np.flipud(z)
+    r = np.abs(zy)
+    arg = np.angle(zy)
 
-
-def sqrt_riemann_surface_1():
-    """riemann surface for real part of sqrt(z)"""
-
-    fig = plt.figure()
-    ax = Axes3D(fig)
-    X = np.arange(-5, 5, 0.25)
-    Y = np.arange(-5, 5, 0.25)
-    X, Y = np.meshgrid(X, Y)
-    Z = np.real(np.sqrt(X+1j*Y))
-    ax.plot_surface(X, Y, Z, cstride=1, rstride=1, linewidth=0, cmap=cmap)
-    ax.plot_surface(X, Y, -Z, cstride=1, rstride=1, linewidth=0, cmap=cmap)
-    plt.savefig('sqrt_riemann_surface_1.pdf', bbox_inches='tight', pad_inches=0)
-
-
-def sqrt_riemann_surface_2():
-    """riemann surface for imaginary part of sqrt(z)"""
-
-    fig = plt.figure()
-    ax = Axes3D(fig)
-    X = np.arange(-5, 5, 0.25)
-    Y = np.arange(-5, 0, 0.25)
-    X, Y = np.meshgrid(X, Y)
-    Z = np.imag(np.sqrt(X+1j*Y))
-    ax.plot_surface(X, Y, Z, rstride=1, cstride=1, linewidth=0, cmap=cmap_r)
-    ax.plot_surface(X, Y, -Z, rstride=1, cstride=1, linewidth=0, cmap=cmap)
-    X = np.arange(-5, 5, 0.25)
-    Y = np.arange(0, 5, .25)
-    X, Y = np.meshgrid(X, Y)
-    Z = np.imag(np.sqrt(X+1j*Y))
-    ax.plot_surface(X, Y, -Z, rstride=1, cstride=1, linewidth=0, cmap=cmap_r)
-    ax.plot_surface(X, Y, Z, rstride=1, cstride=1, linewidth=0, cmap=cmap)
-    plt.savefig('sqrt_riemann_surface_2.pdf', bbox_inches='tight', pad_inches=0)
-
+    h = (arg + np.pi)  / (2 * np.pi) + 0.5
+    l = 1.0 - 1.0/(1.0 + r**.75)
+    s = .8
     
-def log_riemann_surface():
-    """riemann surface for imaginary part of ln(z)"""
+    c = np.vectorize(hls_to_rgb) (h,l,s) # --> tuple
+    c = np.array(c)  # -->  array of (3,n,m) shape, but need (n,m,3)
+    c = c.swapaxes(0,2)
+    c = c.swapaxes(0,1)
+    return c
     
-    fig = plt.figure()
-    ax = Axes3D(fig)
-    X = np.arange(-5, 5, 0.25)
-    Y = np.arange(-5, 0, 0.25)
-    X, Y = np.meshgrid(X, Y)
-    Z = np.imag(sp.log(X+1j*Y))
-    ax.plot_surface(X, Y, Z, rstride=1, cstride=1, linewidth=0, cmap=cmap_r)
-    ax.plot_surface(X, Y, Z+2*sp.pi, rstride=1, cstride=1, linewidth=0, cmap=cmap_r)
-    ax.plot_surface(X, Y, Z-2*sp.pi, rstride=1, cstride=1, linewidth=0, cmap=cmap_r)
-    X = np.arange(-5, 5, .25)
-    Y = np.arange(0, 5, .25)
-    X, Y = np.meshgrid(X, Y)
-    Z = np.imag(np.log(X+1j*Y))
-    ax.plot_surface(X, Y, Z, rstride=1, cstride=1, linewidth=0, cmap=cmap)
-    ax.plot_surface(X, Y, Z+2*sp.pi, rstride=1, cstride=1, linewidth=0, cmap=cmap)
-    ax.plot_surface(X, Y, Z-2*sp.pi, rstride=1, cstride=1, linewidth=0, cmap=cmap)
-    plt.savefig('log_riemann_surface.pdf', bbox_inches='tight', pad_inches=0)
-
+def plot_complex(f, xbounds, ybounds, res):
+    x = np.linspace(xbounds[0], xbounds[1], res)
+    y = np.linspace(ybounds[0], ybounds[1], res)
+    X,Y = np.meshgrid(x,y)
+    Z=f(X+Y*1j)
+    plt.pcolormesh(X, Y, np.angle(Z), cmap='hsv', vmin=-np.pi, vmax=np.pi)
+    plt.show()
     
-def arctan_riemann_surface():
-    """Riemann surface for real part of arctan(z)"""
+def plot_complex2(f, xbounds, ybounds, res):
+    x = np.linspace(xbounds[0],xbounds[1], res)
+    y = np.linspace(ybounds[0],ybounds[1], res)
+    X,Y = np.meshgrid(x,y)
+    Z=f(X+Y*1j)
+    Zc = colorize(Z)
+    plt.imshow(Zc, extent=(xbounds[0], xbounds[1], ybounds[0], ybounds[1]))
+    plt.show()
     
-    fig = plt.figure()
-    ax = Axes3D(fig)
-    Xres, Yres = .01, .2
-    ax.view_init(elev=11., azim=-56)
-    X = np.arange(-4, -.0001, Xres)
-    Y = np.arange(-4, 4, Yres)
-    X, Y = np.meshgrid(X, Y)
-    Z = np.real(sp.arctan(X+1j*Y))
-    ax.plot_surface(X, Y, Z, rstride=1, cstride=1, linewidth=0, cmap=cmap)
-    ax.plot_surface(X, Y, Z+sp.pi, rstride=1, cstride=1, linewidth=0, cmap=cmap)
-    ax.plot_surface(X, Y, Z-sp.pi, rstride=1, cstride=1, linewidth=0, cmap=cmap)
-    X = np.arange(.0001, 4, Xres)
-    Y = np.arange(-4, 4, Yres)
-    X, Y = np.meshgrid(X, Y)
-    Z = np.real(sp.arctan(X+1j*Y))
-    ax.plot_surface(X, Y, Z, rstride=1, cstride=1, linewidth=0, cmap=cmap)
-    ax.plot_surface(X, Y, Z + sp.pi, rstride=1, cstride=1, linewidth=0, cmap=cmap)
-    ax.plot_surface(X, Y, Z - sp.pi, rstride=1, cstride=1, linewidth=0, cmap=cmap)
-    plt.savefig('arctan_riemann_surface.pdf', bbox_inches='tight', pad_inches=0)
+################################################
+################################################
+# PLOTS
+
+def check_plot():
+    f = lambda x:np.sqrt(x**2+1)
+    x = np.linspace(-3, 3, 401)
+    y = np.linspace(-3, 3, 401)
+    X,Y = np.meshgrid(x,y)
+    Z=f(X+Y*1j)
+    plt.pcolormesh(X, Y, np.angle(Z), cmap='hsv', vmin=-np.pi, vmax=np.pi)
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.savefig('check_plot.png', bbox_inches='tight', pad_inches=0)
+    plt.close()
+
+def check_plot_2():
+    plt.subplot(1,2,1)
+    f = lambda x:np.sqrt(x**2+1)
+    x = np.linspace(-3, 3, 401)
+    y = np.linspace(-3, 3, 401)
+    X,Y = np.meshgrid(x,y)
+    Z=f(X+Y*1j)
+    plt.pcolormesh(X, Y, np.angle(Z), cmap='hsv', vmin=-np.pi, vmax=np.pi)
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.title('Angle Plot')
 
 
-def poly_color_plot_real(p, res=101):
-    X, Y, vals = get_vals(p, (-1, 1), (-1, 1), res=res)
-    plt.pcolormesh(X, Y, vals.real)
-    plt.savefig("poly_color_plot_real.pdf")
+    plt.subplot(1,2,2)
+    f = lambda x:np.sqrt(x**2+1)
+    x = np.linspace(-3, 3, 401)
+    y = np.linspace(-3, 3, 401)
+    X,Y = np.meshgrid(x,y)
+    Z=f(X+Y*1j)
+    plt.pcolormesh(X, Y, np.absolute(Z), cmap='gray')
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.title('Magnitude Plot')
 
-
-def poly_color_plot_imag(p, res=101):
-    X, Y, vals = get_vals(p, (-1, 1), (-1, 1), res=res)
-    plt.pcolormesh(X, Y, vals.imag)
-    plt.savefig("poly_color_plot_imag.pdf")
-
-
-def poly_surface_plot_real(p, res=101):
-    X, Y, vals = get_vals(p, (-1, 1), (-1, 1), res)
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
-    ax.plot_surface(X, Y, vals.real)
-    plt.savefig("poly_surface_plot_real.pdf")
-
-
-def poly_surface_plot_imag(p, res=101):
-    X, Y, vals = get_vals(p, (-1, 1), (-1, 1), res)
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
-    ax.plot_surface(X, Y, vals.imag)
-    plt.savefig("poly_surface_plot_imag.pdf")
+    plt.savefig('check_plot_magnitude.png', bbox_inches='tight', pad_inches=0)
+    plt.close()
+    
+def plot_id():
+    f = lambda x:x
+    x = np.linspace(-1, 1, 401)
+    y = np.linspace(-1, 1, 401)
+    X,Y = np.meshgrid(x,y)
+    Z=f(X+Y*1j)
+    plt.pcolormesh(X, Y, np.angle(Z), cmap='hsv', vmin=-np.pi, vmax=np.pi)
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.savefig('Identity.png', bbox_inches='tight', pad_inches=0)
+    plt.close()
+    
+def zeros():
+    f = lambda x:x**3-1j*x**4-3*x**6
+    x = np.linspace(-1, 1, 401)
+    y = np.linspace(-1, 1, 401)
+    X,Y = np.meshgrid(x,y)
+    Z=f(X+Y*1j)
+    plt.pcolormesh(X, Y, np.angle(Z), cmap='hsv', vmin=-np.pi, vmax=np.pi)
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.savefig('zeros.png', bbox_inches='tight', pad_inches=0)
+    plt.close()
+    
+def essential_pole():
+    f = lambda x : np.exp(1/x)
+    x = np.linspace(-1, 1, 803)
+    y = np.linspace(-1, 1, 803)
+    X,Y = np.meshgrid(x,y)
+    Z=f(X+Y*1j)
+    plt.pcolormesh(X, Y, np.angle(Z), cmap='hsv', vmin=-np.pi, vmax=np.pi)
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.savefig('essential_pole.png', bbox_inches='tight', pad_inches=0)
+    plt.close()
 
 if __name__=='__main__':
-    sqrt_riemann_surface_1()
-    sqrt_riemann_surface_2()
-    log_riemann_surface()
-    arctan_riemann_surface()
-    
-    p = np.poly1d([1, 0, -1])
-    poly_color_plot_real(p)
-    poly_color_plot_imag(p)
-    poly_surface_plot_real(p)
-    poly_surface_plot_imag(p)
+	check_plot_2()
