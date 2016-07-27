@@ -43,17 +43,44 @@ Each section of Anscombe's quartet the following statistical properties:
 \item The linear least squares regression line is $y=\frac{1}{2}x+3$.
 \end{itemize}
 
-Despite these similarities, each section is very different graphically.
+Despite these similarities, each section is quite different from the others.
 
 \begin{problem} % Describe Anscombe's quartet.
-\label{prob:anscombe}
 The file \texttt{anscombe.npy} contains Anscombe's quartet in the same format as displayed above.
 Plot each section of the quartet separately as a scatter plot.
 Also plot the regression line $y = \frac{1}{2}x + 3$ on the domain $x\in[0,20]$ over each scatter plot.
 
 Write a few sentences describing what makes each section unique.
 % How would you effectivly describe each section to another person?
+\label{prob:anscombes-quartet}
 \end{problem}
+
+\begin{comment}
+\section*{Principles of Good Data Visualization} % ============================
+
+Problem \ref{prob:anscombes-quartet} demonstrate how visualizations can describe data much more accurately than simple statistics.
+However, a poor or unethical visualizations can easily misrepresent data.
+
+\begin{enumerate}
+    \item \textbf{Clarity}: Use titles, label axes, and include a legend. Graphs should be self-explanatory.
+    Where appropriate, use words to carefully explain the insights represented
+    in the visualization.
+    \item \textbf{Simplicity}: Remove unnecessary elements of a graph.
+    Don't add 3D effects in for no reason.
+    \item \textbf{Integrity}. Tell the truth, the whole truth, and nothing but the truth.
+
+    Every visualization should be presented alongside all relevant information including who created it, where the data was obtained, how it was collected, whether it was cleaned or transformed, and whether there are conflicts of interest or possible biases present.
+
+    It is almost always very easy to manipulate a visualization so that it supports a desired interpretation.
+
+
+
+    As in any form of communication, integrity is important in data visualization.
+
+
+\end{enumerate}
+
+\end{comment}
 
 \section*{Choosing the Right Visualization} % =================================
 
@@ -151,6 +178,7 @@ A filled contour map is discretized version of a heat map.
 
 \subsection*{Scatter Plots} % -------------------------------------------------
 
+\begin{comment}
 % Example of using a marker and a line.
 Line plots and scatter plots are sometimes used together.
 A line connecting points implies a relationship or correlation between the points, while drawing point markers emphasizes that each point is a unique instance of data.
@@ -170,8 +198,33 @@ Use \li{plt.plot()} and specify a marker \emph{and} a line style in the third ar
 >>> plt.subplot(133)                # Line and scatter plot.
 >>> plt.plot(x, data, 'r.-', linewidth=2, markersize=15)
 \end{lstlisting}
+\end{comment}
 
-\begin{figure}[H] % Different coloring in a scatter plot.
+% Explain plt.scatter(), especially the 'c' and 's' keyword arguments.
+While \li{plt.plot()} is an easy way to create scatter plots, \li{plt.scatter()} provides a few extra tools.
+The keywords \li{s} and \li{c} correspond to marker size and marker color, respectively.
+Each keyword can either be a single entry, producing uniform markers, or an array, specifying the sizes or colors of the individual markers.
+This allows a scatter plot to have up to four dimensions of information.
+
+Consider again Anscombe's quartet.
+The pattern in section II can be made more pronounced by tying the size of the marker to the value of the $y$ coordinate.
+Since adjusting the size of the markers may lead to overlapping markers, we specify the \emph{alpha value} of the color to make the markers transparent.
+The keyword \li{alpha} accepts a value in the interval $[0,1]$; 0 makes the markers completely transparent, while a $1$ makes the markers completely opaque.
+
+\begin{lstlisting}
+>>> anscombe = np.load("anscombe.npy")
+>>> x2, y2 = anscombe[:,2], anscombe[:,3]
+
+>>> plt.subplot(121)
+>>> plt.scatter(x2, y2, c='b', s=500)
+
+>>> plt.subplot(122)
+>>> plt.scatter(x2, y2, c='b', s=.5*y**4, alpha=.8)
+
+>>> plt.show()
+\end{lstlisting}
+
+\begin{figure}[H] % Different sizing in a scatter plot.
 \captionsetup[subfigure]{justification=centering}
 \centering
 \begin{subfigure}{.49\textwidth}
@@ -185,7 +238,22 @@ Use \li{plt.plot()} and specify a marker \emph{and} a line style in the third ar
 \end{subfigure}
 \end{figure}
 
-\begin{figure}[H] % Different sizing in a scatter plot.
+Controlling the colors of the individual markers can also be illuminating. % TODO: The goal is to present 3-dimensional data, not show patterns...
+As with heat maps and contour plots, a color bar can be added to indicate the values that the colors represent.
+
+\begin{lstlisting}
+>>> x3, y3 = anscombe[:,4], anscombe[:,5]
+
+>>> plt.subplot(121)
+>>> plt.scatter(x3, y3, s=500, c='b')
+
+>>> plt.subplot(122)
+>>> plt.scatter(x, y, s=500, c=y, alpha=.8)
+>>> cbar = plt.colorbar()           # Draw and label the color bar.
+>>> cbar.set_label("y")
+\end{lstlisting}
+
+\begin{figure}[H] % Different coloring in a scatter plot.
 \captionsetup[subfigure]{justification=centering}
 \centering
 \begin{subfigure}{.49\textwidth}
@@ -199,8 +267,7 @@ Use \li{plt.plot()} and specify a marker \emph{and} a line style in the third ar
 \end{subfigure}
 \end{figure}
 
-
-% Explain plt.scatter(), especially the 'c' and 's' keyword arguments.
+% Talk about connecting the dots, then using a regression line instead.
 
 \begin{problem} % Scatter plots with visualizations.
 The file \texttt{MLB.npy} contains measurements from over 1,000 recent Major League Baseball players, compiled by UCLA.\footnote{See \url{http://wiki.stat.ucla.edu/socr/index.php/SOCR_Data_MLB_HeightsWeights}.}
@@ -216,6 +283,7 @@ Line plots should \emph{not} be used for data without a natural progression.
 For example, suppose we would like to make a large number of random draws from a distribution to visualize its probability density function.
 In this case, a plain line plot is completely useless, but the histogram provides an accurate picture of the statistical distribution.
 
+\begin{comment}
 \begin{lstlisting}
 >>> import numpy as np
 >>> from matplotlib import pyplot as plt
@@ -245,8 +313,30 @@ In this case, a plain line plot is completely useless, but the histogram provide
     \includegraphics[width=\linewidth]{figures/hist_1_good.pdf}
 \end{subfigure}
 \end{figure}
+\end{comment}
 
-% TODO: Less is more (cleaning up histograms)
+Less is more.
+In the case of a statistical distribution, all we really want to see is the general shape of the distribution.
+The lines separating the bins, axis tick marks, and even the labels on the $y$ axis are all unnecessary (and potentially distracting) details.
+
+Removing the lines between bins is easy: set the line width to $0$.
+To ensure the gaps where the lines used to be are filled, specify the \li{histtype} as \li{"stepfilled"} (using \li{histtype="step"} will draw the outline without filling it in).
+Finally, to get rid of extra markings on the axes, use \li{plt.tick_params()}.
+Some of this function's keyword arguments are summarized below.
+
+\begin{table}[H]
+\begin{tabular}{r|c|l}
+    \multicolumn{1}{c|}{Argument} & Options & \multicolumn{1}{|c}{Description}
+    \\ \hline
+    \li{axis} & \li{'x'}, \li{'y'}, \li{"both"} & Axis on which to operate. \\
+    \li{which} & \li{"major"}, \li{"minor"}, \li{"both"} & Operate on major or minor ticks.\\
+    \li{color} & Any Matplotlib color & Tick color. \\
+    \li{labelcolor} & Any Matplotlib color & Tick label color. \\
+    \li{bottom}, \li{top}, \li{left}, \li{right} & \li{"on"}, \li{"off"} & Turn ticks on or off. \\
+    \li{labelbottom}, \li{labeltop}, & \li{"on"}, \li{"off"} & Turn tick labels on or off. \\
+    \li{labelleft}, \li{labelright} & &
+\end{tabular}
+\end{table}
 
 \begin{lstlisting}
 # Get 10,000 random samples from the standard exponential distribution.
@@ -718,16 +808,17 @@ One Python library is Glue (see \cite{glue}).
 
 Some packages for making nicer looking plots include \li{Seaborn} and \li{prettyplotlib}.  TODO get refs
 
-For more about visualization of data, we highly recommend the following books:
+For more about visualization of data, we highly recommend the following books and websites:
 
-TODO get full refs for the follwoing
+% TODO get full refs for the follwoing
 
 \begin{itemize}
-\item \emph{How to lie with statistics}
-\item \emph{Envisioning Information} by Edward Tufte
-\item \emph{The visual display of quantitative information} by Edward Tufte (2nd edition)
-\item \emph{Beautiful Evidence} by Edward Tufte
-\item \emph{Now you see it} by Stephen Few
+    \item \emph{How to Lie with Statistics} by Darrell Huff (1954)
+    \item \emph{Envisioning Information} by Edward Tufte
+    \item \emph{The Visual Display of Quantitative Information} by Edward Tufte (2nd edition)
+    \item \emph{Beautiful Evidence} by Edward Tufte
+    \item \emph{Now you see it} by Stephen Few
+    \item \url{http://www.informationisbeautiful.net/}
 \end{itemize}
 
 \end{comment}
