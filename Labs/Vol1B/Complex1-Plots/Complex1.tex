@@ -209,7 +209,7 @@ In a small neighborhood of $z_0$, the quantity $|z-z_0|^{n+k}$ is much smaller t
 This explains why we can estimate the order of a zero by counting the number of times the colors circle a point (see Figure \ref{fig:zeros}).
 
 \begin{figure}
-\includegraphics[width=.7\textwidth]{zeros.png}
+\includegraphics[width=.6\textwidth]{zeros.png}
 \caption{Plot of $f(z)=z^3 - iz^4 - 3z^6$ on the domain $\{x+iy \mid x \in [-1,1] , \; y \in [-1,1]\}$.
 From this plot we see that $f(z)$ has a zero of order 3 at the origin, and 3 zeros of order 1 scattered around it. 
 This accounts for the 6 roots of $f(z)$ that are guaranteed to exist by the Fundamental Theorem of Algebra.}
@@ -219,7 +219,7 @@ This accounts for the 6 roots of $f(z)$ that are guaranteed to exist by the Fund
 
 \subsection*{Poles}
 
-The plots created by \li{plot_complex()} also contain information about the poles of a function.
+The plots created by \li{plot_complex()} also contain information about the poles of the function plotted.
 
 \begin{problem}\label{prob:poles}
 \leavevmode
@@ -256,7 +256,7 @@ The plot of $f(z) = e^{1/z}$ is in Figure \ref{fig:essential_singularity}.
 The colors cycle infinitely many times around an essential singularity.
 
 \begin{figure}
-\includegraphics[width=.7\textwidth]{essential_pole.png}
+\includegraphics[width=.6\textwidth]{essential_pole.png}
 \caption{Plot of $e^{1/z}$ on the domain $\{x+iy \mid x \in [-1,1] , \; y \in [-1,1]\}$.
 The colors circle clockwise around the origin because it is a singularity, not a zero.
 Because the singularity is essential, the colors repeat infinitely many times.}
@@ -289,7 +289,7 @@ One useful application of complex plots is to estimate the zeros of polynomials 
 Use complex plots to determine the multiplicity of the zeros of each of the following polynomials.
 Use the Fundamental Theorem of Algebra to ensure that you have found them all.
 \begin{enumerate}
-\item $-2z^7+2z^6-4z^5+2z^4-2z^3-4z^2+4z-4$
+\item $-4z^5+2z^4-2z^3-4z^2+4z-4$
 \item $z^7 + 6z^6 - 131z^5 - 419z^4 + 4906z^3 - 131z^2 - 420z + 4900$
 \end{enumerate}
 \end{problem}
@@ -494,8 +494,8 @@ This is intuitive after graphing $\sqrt{z}$ on the complex plane.
 \begin{enumerate}
 \item Use \li{plot_complex} to graph $f(z) = \sqrt{z}$.
 Use \li{np.sqrt()} to take the square root.
-What do you see?
-\item Now plot $f(z) = -\sqrt{z}$ to see the ``other square root'' of $z$. What do you see?
+\item Now plot $f(z) = -\sqrt{z}$ to see the ``other square root'' of $z$. 
+Describe why these two plots look the way they do.
 \end{enumerate}
 \end{problem}
 
