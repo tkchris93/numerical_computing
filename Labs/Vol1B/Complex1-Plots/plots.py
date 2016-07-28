@@ -67,7 +67,7 @@ def check_plot_2():
     y = np.linspace(-3, 3, 401)
     X,Y = np.meshgrid(x,y)
     Z=f(X+Y*1j)
-    plt.pcolormesh(X, Y, np.absolute(Z), cmap='gray')
+    plt.pcolormesh(X, Y, np.absolute(Z), cmap='YlGnBu_r')
     plt.gca().set_aspect('equal', adjustable='box')
     plt.title('Magnitude Plot')
 
