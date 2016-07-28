@@ -74,7 +74,7 @@ As an example, we have plotted the identity function $f(z)=z$ in Figure \ref{fig
 As $\theta$ goes from 0 to $2\pi$, the colors cycle smoothly counterclockwise from red to green to purple and back to red.
 
 This kind of plot uses rectangular coordinates in the domain and polar coordinates (or rather, just the $\theta$-coordinate) in the codomain.
-Note that this kind of plot tells you nothing about $|f(z)|$.
+Note that this kind of plot tells us nothing about $|f(z)|$.
 
 You can create the plot in Figure \ref{fig:identity} as follows.
 Begin by creating a grid of complex numbers.
@@ -149,7 +149,9 @@ Write a new complex plotting function called \li{plot_complex_magnitude} which i
 This should resemble your answer to Problem \ref{prob:plot_complex}, with small modifications.
 Leave \li{vmin} and \li{vmax} unspecified when plotting.
 
-Check your function on $f(z) = \sqrt{z^2+1}$. Your plot should look like the right subplot in Figure \ref{fig:check_plot_2}.
+Check your function on $f(z) = \sqrt{z^2+1}$. 
+Your plot should look like the right subplot in Figure \ref{fig:check_plot_2}.
+Note the difference between this plot and the one from the previous problem.
 
 Hint: A wraparound colormap like \li{'hsv'} doesn't work well here. 
 Use any sequential colormap that makes it easy to distinguish between high and low values. See the matplotlib documentation for a list of colormaps.
@@ -158,37 +160,41 @@ Use any sequential colormap that makes it easy to distinguish between high and l
 
 \begin{figure}[H]
 \includegraphics[width=\textwidth]{check_plot_magnitude.png}
-\caption{Plots of $\sqrt{z^2+1}$ on $\{x+iy \mid x \in [-3,3] , \; y \in [-3,3]\}$, showing the angle and the magnitude of the function.
+\caption{Plots of $\sqrt{z^2+1}$ on $\{x+iy \mid x \in [-3,3] , \; y \in [-3,3]\}$, visualizing the angle and the magnitude of the function.
 Notice how a discontinuity is clearly visible on the left, but disappears from the plot on the right.}
 \label{fig:check_plot_2}
 \end{figure}
 
 
-The angle plot is generally more useful than the magnitude plot for visualizing function behavior, zeros, and poles. 
-In the rest of the problems, we will only plot the angle and ignore the magnitude.
-
 \section*{Analyzing Complex Plots}
+
+The angle plot is generally more useful than the magnitude plot for visualizing function behavior, zeros, and poles. 
+Throughout the rest of the lab, use \li{plot_complex} to plot only the angle, and ignore the magnitude.
 
 \subsection*{Zeros}
 
-The plots created by your function \li{plot_complex()} are surprisingly informative.
+Complex plots can be surprisingly informative. 
+From an angle plot we can estimate not only a function's zeros, but also their multiplicities.
 
 \begin{problem}\label{prob:zeros}
 \leavevmode
 \begin{enumerate}
-\item Use \li{plot_complex()} to plot the functions $z^2$, $z^3$, and $z^4$. What do you notice?
+\item Use \li{plot_complex()} to plot the functions $z^2$, $z^3$, and $z^4$.
 \item Plot $z^3 - iz^4 - 3z^6$ on the domain $\{x+iy \mid x \in [-1,1] , \; y \in [-1,1]\}$ (this plot is Figure \ref{fig:zeros}). 
 Compare it to your plot of $z^3$, especially near the origin.
 Based on these plots, what can you learn about the zeros of a function from its graph?
 \end{enumerate}
 \end{problem}
 
-In Problem \ref{prob:zeros} you should have noticed when you plot $z^n$, the color circle around 0 repeats $n$ times. 
+In Problem \ref{prob:zeros} you should have noticed that in a plot $z^n$, the colors cycle $n$ times counterclockwise around 0. 
+(Note: For the remainder of this lab we will define red $\rightarrow$ yellow $\rightarrow$ green $\rightarrow$ blue $\rightarrow$ red to be the ``forward" direction, such that the colors are circling counterclockwise in Figure \ref{fig:identity}.)
+
 This is explained by looking at $z^n$ in polar coordinates:
 \[
 z^n = (re^{i \theta})^n = r^n e^{i(n\theta)}.
 \]
 Multiplying $\theta$ by a number greater than $1$ compresses the graph along the ``$\theta$-axis'' by a factor of $n$. 
+In other words, the output angle repeats itself $n$ times in one cycle of $\theta$.
 Compare this to replacing $f(x)$ with $f(nx)$ when $f$ is a function from $\mathbb{R}$ to $\mathbb{R}$.
 
 From Problem \ref{prob:zeros} you should also have noticed that the plot of $z^3 - iz^4 - 3z^6$ looks a lot like the plot of $z^3$ near the origin.
@@ -200,7 +206,7 @@ f(z) = \sum_{k=n}^{\infty} a_k(z-z_0)^k \qquad \text{with} \; a_n \neq 0.
 \]
 In other words, $f(z) = a_n(z-z_0)^n + a_{n+1}(z-z_0)^{n+1} + \ldots$. 
 In a small neighborhood of $z_0$, the quantity $|z-z_0|^{n+k}$ is much smaller than $|z-z_0|^n$, and so the function behaves like $a_n(z-z_0)^n$.
-This explains why you can estimate the order of a zero by counting the number of times the colors circle a point (see Figure \ref{fig:zeros}).
+This explains why we can estimate the order of a zero by counting the number of times the colors circle a point (see Figure \ref{fig:zeros}).
 
 \begin{figure}
 \includegraphics[width=.7\textwidth]{zeros.png}
@@ -213,26 +219,25 @@ This accounts for the 6 roots of $f(z)$ that are guaranteed to exist by the Fund
 
 \subsection*{Poles}
 
-The plots created by \li{plot_complex()} can also tell us about the poles of a function.
+The plots created by \li{plot_complex()} also contain information about the poles of a function.
 
 \begin{problem}\label{prob:poles}
 \leavevmode
 \begin{enumerate}
 \item Use \li{plot_complex()} to plot the function $f(z) = 1/z$. 
 Compare this to the plot of $f(z)=z$ in Figure \ref{fig:identity}.
-What is the difference?
 \item Plot $z^{-2}$, $z^{-3}$, and $z^2+iz^{-1}+z^{-3}$ on the domain $\{x+iy \mid x \in [-1,1] , \; y \in [-1,1]\}$. 
 Compare the plots of the last two functions near the origin.
 Based on these plots, what can you learn about the poles of a function from its graph?
 \end{enumerate}
 \end{problem}
 
-In Problem \ref{prob:poles} you should have noticed that in the graph of $1/z$, the colors cycle around 0 in the opposite direction from the graph of the identity map.
+In Problem \ref{prob:poles} you should have noticed that in the graph of $1/z^{n}$, the colors cycle $n$ times \emph{clockwise} around 0.
 Again this can be explained by looking at the polar representation:
 \[
 z^{-n} = (re^{i \theta})^{-n} = r^{-n} e^{i(-n\theta)}.
 \]
-The minus-sign on the $\theta$ reverses the direction of the colors, and the $n$ makes them repeat $n$ times.
+The minus-sign on the $\theta$ reverses the direction of the colors, and the $n$ makes them cycle $n$ times.
 
 In general, a function has a \emph{pole of order n} at $z_0$ if its Laurent series on a punctured neighborhood of $z_0$ is
 \[
@@ -240,7 +245,7 @@ f(z) = \sum_{k=-n}^\infty a_k(z-z_0)^k  \qquad \text{with} \; a_{-n} \neq 0.
 \]
 In other words, $f(z) = a_{-n}(z-z_0)^{-n}+a_{-n+1}(z-z_0)^{-n+1} + \ldots$.
 Since $|z-z_0|^{-n+k}$ is much smaller than $|z-z_0|^{-n}$ when $|z-z_0|$ is small, near $z_0$ the function behaves like $a_{-n}(z-z_0)^{-n}$.
-This explains why you can estimate the order of a pole by counting the number of times the colors circle a point in the ``backwards direction.''
+This explains why we can estimate the order of a pole by counting the number of times the colors circle a point in the clockwise direction.
 
 Finally, a function has an \emph{essential pole} at $z_0$ if its Laurent series in a punctured neighborhood of $z_0$ requires infinitely many terms with negative exponents.
 For example, 
@@ -248,7 +253,7 @@ For example,
 e^{1/z} = \sum_{k=0}^{\infty}\frac{1}{n! z^n} = 1+\frac{1}{z}+\frac{1}{2}\frac{1}{z^2}+\frac{1}{6}\frac{1}{z^3}+\ldots.
 \]
 The plot of $f(z) = e^{1/z}$ is in Figure \ref{fig:essential_singularity}. 
-Here, you can see that the colors circle around an essential singularity infinitely many times.
+The colors cycle infinitely many times around an essential singularity.
 
 \begin{figure}
 \includegraphics[width=.7\textwidth]{essential_pole.png}
@@ -259,15 +264,16 @@ Because the singularity is essential, the colors repeat infinitely many times.}
 \end{figure}
 
 \subsection*{Using Plots to Estimate Poles and Zeros}
-To summarize, you can use the plot of a complex function to estimate its poles and zeros with the following rules.
+To summarize, poles and zeros can be estimated from a complex plot with the following rules.
 \begin{itemize}
-\item Colors circle around zeros in the ``forwards direction''.
-\item Colors circle around poles in the ``backwards direction''.
-\item The number of times the colors repeat equals the order of the zero or pole.
+\item Colors circle counterclockwise around zeros.
+\item Colors circle clockwise around poles.
+\item The number of times the colors cycle equals the order of the zero or pole.
 \end{itemize}
 
 \begin{problem}\label{prob:findpz}
-Plot these functions on the domains given and estimate the number and order of their poles and zeros.
+Plot these functions on the domains given.
+Estimate the number and order of their poles and zeros.
 \begin{itemize}
 \item $f(z) = e^z$ on $\{ x+iy \mid x \in [-8,8], \; y \in [-8,8]\}$
 %\item $z^2-2z^7+2z^6-4z^5+2z^4-2z^3-5z^2+4z-4$ from $x \in [-2.5,2.5]$ and $y \in [-2.5,2.5]$ 
@@ -305,7 +311,7 @@ Now what do you conclude about the function?
 \begin{enumerate}
 \item Plot the function $f(z) = z+1000z^2$ on the domain $\{x+iy \mid x \in [-1,1], \; y \in [-1,1]\}$.
 What does this plot imply about the zeros of this function?
-\item Find the zeros of $f(z)$ using algebra.
+\item Calculate the true zeros of $f(z)$.
 \item Plot $f(z)$ on a domain that allows you to see the true nature of its zeros.
 \end{enumerate}
 \end{enumerate}
@@ -315,21 +321,7 @@ What does this plot imply about the zeros of this function?
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+%%% Long Comment: Old problems having to do with branch cuts and contour integration%%%
 \begin{comment}
 
 From these plots you can see the poles and zeros. The zeros are the black dots and the poles are the white dots on the plots. the order of the pole or zero can be read from the number of times the full set of colors show up around the pole or zero. As you can see from Figure \ref{fig:funcplot} $x^2-1$ has two zeros of order one at $1$ and $-1$. $x^4-\frac{1}{x^4}$ has eight zeros of order one and a pole of order four. 
@@ -362,9 +354,6 @@ Plot the following functions and look at the plots. Write a function that prints
 \end{itemize}
 
 \end{problem}
-
-
-
 
 \section*{Multi-Valued Functions}
 
@@ -489,6 +478,9 @@ This integral around a singularity has some useful properties.
 We will discuss these properties later on.
 
 \end{comment}
+%%%End of long comment%%%
+
+
 
 \subsection*{Multi-Valued Functions}
 Every complex number has two complex square roots, since if $w^2=z$, then also $(-w)^2=z$.
