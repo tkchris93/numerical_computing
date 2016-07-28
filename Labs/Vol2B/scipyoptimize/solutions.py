@@ -66,24 +66,20 @@ def prob2():
     the optimal solution.
     """
     # Set up the initial values
-    y_initial = 60*np.random.random_sample(2*89)
-    x = np.linspace(0,90,91)
+    y_initial = 30*np.random.random_sample(18)
+    x = np.linspace(0,40,20)
 
     # Plot the pre-graph
-    yplot1 = np.hstack((56,y_initial[:89],56))
-    yplot2 = np.hstack((56,y_initial[89:],56))
-    plt.plot(x, yplot1, '.-r', markersize=10)
-    plt.plot(x, yplot2, '.-r', markersize=10)
+    yplot = np.hstack((0,y_initial,30))
+    plt.plot(x, yplot, '.-r', markersize=10)
 
     # Minimize the blackbox() function using method="BFGS".
-    result = opt.minimize(blackbox, y_initial, tol=1e-2, method="BFGS") 
+    result = opt.minimize(blackbox, y_initial, tol=1e-4, method="BFGS") 
     if not result['success']:
         raise RuntimeError("didn't converge")
 
-    ypost1 = np.hstack((56,result['x'][:89],56))
-    ypost2 = np.hstack((56,result['x'][89:],56))
-    plt.plot(x, ypost1, '.-b', markersize=10)
-    plt.plot(x, ypost2, '.-b', markersize=10)
+    ypost = np.hstack((0,result['x'],30))
+    plt.plot(x, ypost, '.-b', markersize=10)
     plt.show()
     # The solution should plot the Batman symbol. 
     # Run blackbox_Batman.py to see original.
