@@ -4,26 +4,65 @@
 % If more content in the Problems is needed, in Problem 6, we could add:
 %    "edit count_files.py to exclude the files in the test directory"
 
-\objective{Introduce the basics of the Unix Shell commands the Vim text editor}
+\objective{Explore the basics of the Unix Shell. Understand how to navigate and manipulate file directories. Introduce the Vim text editor for easy writing and editing of text or other similar documents.}
 
 Unix was first developed by AT\&T Bell Labs in the 1970s. In the 1990s, Unix became the foundation of Linux and MacOSX. The majority of servers are written in Linux, so having a knowledge of Unix shell commands allows us to interact with these servers. 
 
-The more you learn about Unix, you will find it is easy to learn but difficult to master. We will build a foundation of simple file system management and a basic introduction to the vim text editor.  
+As you get into Unix, you will find it is easy to learn but difficult to master.
+We will build a foundation of simple file system management and a basic introduction to the Vim text editor.  
 We will address some of the basics in detail and also include lists of commands that interested learners are encouraged to research further.
 
+\begin{info} sary update so you will get the same functionality as these other systems.
+We will not cover the equivalent commands in Windows command line, but you could download a Unix-based shell such as Git Bash or Cygwin (you will lose out on certain commands still).
+\end{info}
+
 \section*{File System}
+
+\begin{warn}
+Because you are working with actual files on your computer, be very careful as you go through each problem and as you experiment on your own.
+Be sure you are in the right directories and subfolders before you start creating and deleting files; some things are irreversible.
+\end{warn}
+
 \subsection*{Navigation}
+Begin by opening the Terminal. The text you see in the upper left of the Terminal is called the \emph{prompt}.
+As you navigate through the file system you will want to know \emph{where} you are so that you know you aren't creating or deleting files in the wrong locations.
 
-Begin by opening the Terminal. The text you see in the upper left of the Terminal window is called the \emph{prompt}. We will begin using three very basic commands: \li{pwd}, \li{ls}, and \li{cd}. The \li{pwd} command stands for \textbf{p}rint \textbf{w}orking \textbf{d}irectory. The \li{ls} command lists the files and subdirectories within the working directory. The \li{cd} command stands for \textbf{c}hange \textbf{d}irectory.
+To see what directory you are currently working in, type \li{pwd} into the prompt.
+This command stands for \textbf{p}rint \textbf{w}orking \textbf{d}irectory, and as the name suggests it prints out the string of your current location.
 
-%The only reason this problem exists is to make sure it is VERY clear not to mess with the Shell-Lab directory
+Once you know where you are, you'll want to know where you can move.
+The \li{ls}, or \textbf{l}ist \textbf{s}egments, command will list all the files and directories in your current folder location.
+Try typing it in.
+
+When you know what's around you, you'll want to navigate to the appropriate directory.
+the \li{cd}, or \textbf{c}hange \textbf{d}irectory, command allows you to move through directories.
+To actually move somewhere, \li{cd} must be followed by a string representing the directory you want to move to (if you cd into a file, you will get an error).
+
+There are some special directories you can \li{cd} into.
+The \textbf{.} directory is your current location and the \textbf{..} directory is the directory one level above where you are currently located.
+The $\thicksim$ directory is the home directory.
+Typing in \li{cd} without anything will also take you to this directory.
+The last special directory is /, the root directory.
 
 \begin{problem}
-Using these commands, navigate to the \li{Shell-Lab} directory provided with this lab. We will use this directory for the remainder of the lab. Use the \li{ls} command to list the contents of this directory. NOTE: You will find a directory within this directory called \li{test} that is availabe for you to experiment with the concepts and commands found in this lab. The other files and directories are necessary for the exercises we will be doing, so take care not to modify them.
+Using these commands, navigate to the \li{Shell_Lab} directory provided with this lab. We will use this directory for the remainder of the lab. Use the \li{ls} command to list the contents of this directory. NOTE: You will find a directory within this directory called \li{Test} that is availabe for you to experiment with the concepts and commands found in this lab. The other files and directories are necessary for the exercises we will be doing, so take care not to modify them.
 \end{problem}
 
+\subsection*{Getting Help}
+As you go through this lab, you will come across many commands with functionality beyond what is taught here.
+You may even forget what a command does and don't want to try flipping through all the pages of the lab.
+The Terminal has two nice commands to help you with these commands.
+The first is \li{man <command>}, which opens the manual page for the command following \li{man}.
+Try typing in \li{man ls}; you will see a list of the name and description of the \li{ls} command, among other things.
+
+The second command is \li{apropos <keyword>} which will list all Unix commands that has the \li{<keyword>} contained somewhere in the manual page names and descriptions.
+For example, if you forget how to copy files, you can type in \li{apropos copy} and you'll get a list of all commands that have \li{copy} in their description.
+
 \subsection*{Flags}
-Most commands can be customized using flags. The \li{ls} command has dozens of optional flags. Table \ref{table:ls_flags} contains some of the most common flags for the \li{ls} command.
+When you typed in \li{man ls} up above, you may have noticed several options listed in the description, such as \li{-a}, \li{-A}, \li{--author} and so on.
+These are called flags and increase the functionality of commands.
+Most commands can be customized using flags.
+Table \ref{table:ls_flags} contains some of the most common flags for the \li{ls} command.
 
 \begin{table}
 \begin{tabular}{l|l} 
@@ -31,23 +70,43 @@ Flags & Description
 \\ \hline 
 \li{-a} & Do not ignore hidden files and folders \\ 
 \li{-l} & List files and folders in long format \\ 
-\li{-r} & reverse order while sorting \\
-\li{-s} & print item name and size \\
+\li{-r} & Reverse order while sorting \\
+\li{-R} & Print files and subdirectories recursively \\
+\li{-s} & Print item name and size \\
+\li{-S} & Sort by size \\
 \li{-t} & Sort output by date modified \\ 
-\li{-R} & Print files and subdirectories recursively \\ 
-\li{-S} & Sort by size \\ 
 \end{tabular} 
 \caption{Common flags of the \li{ls} command.}
 \label{table:ls_flags} 
 \end{table} 
 
-Multiple flags can be combined as one flag. For example, if we wanted to list all the files in a directory in long format sorted by date modified, we would use \li{ls -a -l -t} or \li{ls -alt}. To view the reference manual for any command, use \li{man}. For example, to view the reference manual for the \li{ls} command, use \li{man ls}.
+Multiple flags can be combined as one flag.
+For example, if we wanted to list all the files in a directory in long format sorted by date modified, we would use \li{ls -a -l -t} or \li{ls -alt}.
 
-\subsection*{Other Useful Commands}
-Table \ref{table:other_commands} contains a list of commonly-used commands and their uses. Many of these commands will be needed throughout this lab and in any typical session with the Unix shell. After some of the commands are flags listed in square brackets that are worth exploring using \li{man}. We highly recommend experimenting with all these commands to become familiar with them. Remember you may freely experiment with these commands in the \li{test} directory.
+\subsection*{Manipulating Files and Directories}
+Now that you can move around directories with ease, we will look at how to create, copy, move, and delete files and folders.
+Before you begin, \li{cd} into the \li{Test} directory in \li{Shell_Lab} so you don't accidentally mess up anything important.
 
+To create a text file, use \li{touch <filename>}.
+To create a new directory, use \li{mkdir <dir_name>}.
+
+To copy a file into a directory, use \li{cp <filename> <dir_name>}.
+If you want to copy a file in the same location and just rename it, use \li{cp <file1> <file2>}.
+When making a copy of a directory, the command is similar but must use the \li{-r}.
+This tag stands for recursively copying files in subdirectories, otherwise you will get an error when copying directories.
+The command looks like \li{cp -r <dir1> <dir2>}.
+
+Moving files and directories follows a similar format, except no \li{-r} flag is used when moving one directory into another.
+The command \li{mv <filename> <dir_name>} will move a file to a folder and \li{mv <dir1> <dir2>} will move the first directory into the second.
+If you want to rename a file, use \li{mv <file_old> <file_new>}; the same goes for directories.
+
+When deleting files, use \li{rm <filename>}, or \li{rm -r <dir_name>} when deleting a directory (again, \li{-r} will do it recursively and get to all the files and folders within the targeted directory).
+If you want to make sure your command is doing what you intend, add the \li{-v} flag to \li{rm}, \li{cp}, or \li{mkdir} to have the shell print strings of what it is doing.
+When your Terminal gets too cluttered, use \li{clear} to clean it up.
+
+Below is an example of all these commands in action.
 \begin{lstlisting}
-$ cd test
+$ cd Test
 $ touch data.txt				# create new empty file data.txt
 $ mkdir New						# create directory New
 $ ls							# list items in test directory
@@ -58,13 +117,16 @@ $ ls							# list items in New directory
 data.txt
 $ mv data.txt new_data.txt		# rename data.txt new_data.txt
 $ ls							# list items in New directory
- new_data.txt
+new_data.txt
 $ cd ..							# Return to test directory
 $ rm -rv New/					# Remove New directory and its contents
- removed 'New/data.txt'
- removed directory: 'New/'
+removed 'New/data.txt'
+removed directory: 'New/'
 $ clear							# Clear terminal screen
 \end{lstlisting}
+
+Table \ref{table:other_commands} contains all the above discussed commands.
+Notice the common flags are contained in square brackets; use \li{man} to see what these mean.
 
 \begin{table}
 \begin{tabular}{l|l} 
@@ -91,21 +153,15 @@ Commands & Description
 \end{table} 
 
 \begin{problem}
-Inside the \li{Shell-Lab} directory, delete the \li{Audio} folder along with all its contents. Create \li{Documents}, \li{Photos}, and \li{Python} directories.
+Inside the \li{Shell_Lab} directory, delete the \li{Audio} folder along with all its contents. Create \li{Documents}, \li{Photos}, and \li{Python} directories.
 \end{problem}
 
 \subsection*{Wildcards}
 As we are working in the file system, there will be times that we want to perform the same command to a group of similar files. For example, if you needed to move all text files within a directory to a new directory, the naive way to do this would be to move each text file individually. However, this same result can be achieved using \emph{wildcards}. We use wildcards as placeholder text.  We will use the \li{*} and \li{?} wildcards. The \li{*} wildcard represents any string and the \li{?} wildcard represents any single character. Though these wildcards can be used in almost every Unix command, they are particularly useful when dealing with files. See Table \ref{table:wildcards}
 
 \begin{problem}
-Within the \li{Shell-Lab} directory, there are many files. We will organize these files into directories. Using wildcards, move all the \li{.jpg} files to the \li{Photos} directory, all the \li{.txt} files to the \li{Documents} directory, and all the \li{.py} files to the \li{Python} directory. You will see a few other folders in the \li{Shell-Lab} directory. Do not move any of the files within these folders at this point.
+Within the \li{Shell_Lab} directory, there are many files. We will organize these files into directories. Using wildcards, move all the \li{.jpg} files to the \li{Photos} directory, all the \li{.txt} files to the \li{Documents} directory, and all the \li{.py} files to the \li{Python} directory. You will see a few other folders in the \li{Shell-Lab} directory. Do not move any of the files within these folders at this point.
 \end{problem}
-
-\subsection*{Pipes and Redirects}
-Unix becomes even more versatile and powerful when you chain multiple commands together. This is accomplished using \emph{pipes}. Rather than printing the output of a command, the output is passed, or \emph{piped}, to the next command. Two commands are piped together using the \li{|} operator. To demonstrate the power of pipes, we will first introduce a few commands that allow us to view the contents of a file in Table \ref{table:print}
-
-In the first example below, the \li{cat} command output is piped to \li{wc -l}. The \li{wc} command stands for word count. This command can be used to count words or lines. The \li{-l} flag tells the \li{wc} command to count lines. Therefore, this first example counts the number of lines in \li{assignments.txt}. 
-In the second example below, the command lists the files in the current directory sorted by size in descending order. For details on what the flags in this command do, consult \li{man sort}.
 
 \begin{table}
 \begin{tabular}{l|l} 
@@ -120,28 +176,17 @@ Command & Description
 \label{table:wildcards} 
 \end{table} 
 
+\subsection*{Displaying File Contents}
+When using the file system, you may be interested in checking file content to be sure you're looking at the right file.
+Several commands are made available for ease in reading file content.
 
-\begin{lstlisting}
-$ cd Shell-Lab/Files/Feb
-$ cat assignments.txt | wc -l
-9
+The \li{cat} command, followed by the filename, is the most straightforward; it will display all the contents of a file on the screen.
+If you are dealing with a large file, you may only want to view a certain number of lines at a time.
+Use \li{less <filename>} to restrict the number of lines that show up at a time.
+Use the arrow keys to navigate up and down.
+Press \textbf{q} to exit this mode.
 
-$ ls -s | sort -nr
-12 project3.py
-12 project2.py
-12 assignments.txt
- 4 pics
-total 40
-\end{lstlisting}
-%$
-
-In the previous example, we pipe the contents of \li{assignments.txt} to \li{wc -l} using \li{cat}. When working with files specifically, it is better to use \emph{redirects}. The same output from the first example above can be achieved by running the following command:
-
-\begin{lstlisting}
-$ wc -l < assignments.txt
-9
-\end{lstlisting}
-%$
+For other similar commands, look at table \ref{table:print}.
 
 \begin{table}
 \begin{tabular}{l|l} 
@@ -157,53 +202,98 @@ Command & Description
 \end{tabular} 
 \caption{Commands for printing contents of a file}
 \label{table:print} 
-\end{table} 
+\end{table}
 
-If you are wanting to save the resulting output of a command to a file, use \li{>} or \li{>>}. The \li{>} operator will overwrite anything that may exist in the output file whereas \li{>>} will append the output to the end of the output file. For example, if we want to append the number of lines in \li{assignments.txt} to \li{word_count.txt}, we would run the following commmand:
-
-\begin{lstlisting}
-$ wc -l < assignements.txt >> word_count.txt
-\end{lstlisting}
-%$
-
-Since \li{grep} is used to print lines matching a pattern, it is also very useful to use in conjunction with piping. For example, \li{ls -l | grep root} prints all files associated with the root user.
-
-\begin{problem}
-The \li{words.txt} file in the \li{Documents} directory contains a list of words that are not in alphabetical order. Write the number of words in \li{words.txt} and an alphabetically sorted list of words to \li{sortedwords.txt} using pipes and redirects. Save this file in the \li{Documents} directory. Try to accomplish this with a total of two commands or fewer.
-\end{problem}
-
-
-\section*{Searching the File System}
+\subsection*{Searching the File System}
 There are two powerful commands we use for searching through our directories. The \li{find} command is used to find files or directories in a directory hierarchy. The \li{grep} command is used to find lines matching a string. More specifically, we can use \li{grep} to find words inside files. We will provide a basic template in Table \ref{table:find} for using these two commands and leave it to you to explore the uses of the other flags.
 
 \begin{problem}
 In addition to the .jpg files you have already moved into the \li{Photots} folder, there are a few other .jpg files in a few other folders within the \li{Shell-Lab} directory. Find where these files are using the \li{find} command and move them to the \li{Photos} folder.
 \end{problem}
 
-\section*{Archiving and Compression}
-In file management, the terms archiving and compressing are commonly used interchangeably. However, these are quite different. To archive is to combine a certain number of files into one file. The resulting file will be the same size as the group of files that were archived.
-To compress is to take a file or group of files and shrink the file size as much as possible. The resulting compressed file will need to be extracted before being used.
-
-The \li{ZIP} file format is the most popular for archiving and compressing files. If by chance the \li{zip} Unix command is not installed on your system, you can download it by running \li{sudo apt-get install zip}. Note that you will need to have administrative rights to download this package. To unzip a file, use \li{unzip}.
-
 \begin{table}
 \begin{tabular}{l|l} 
 Command & Description
 \\ \hline 
-\li{find dir1 -type f -name "word"} &  Find all files in \li{dir1} with the name \li{"word"} \\ 
- & (\li{-type f} is for files \li{-type d} is for directories)\\
-\li{grep -nr "word" dir1} & Find all occurances of \li{"word"} within the files inside \li{dir1} \\ 
+\li{<<find dir1 -type f -name "word">>} &  Find all files in \li{dir1} with the name \li{<<"word">>} \\ 
+ & (\li{<<-type f>>} is for files \li{<<-type d>>} is for directories)\\
+\li{<<grep "word" filename>>} & Find all occurences of \li{<<"word">>} within \li{"filename''}\\
+\li{grep -nr <<"word" dir1>>} & Find all occurences of \li{<<"word">>} within the files inside \li{dir1} \\ 
  & (\li{-n} lists the line number and \li{-r} performs a recursive search)\\
 \end{tabular} 
 \caption{Commands using \li{find} and \li{grep}.}
 \label{table:find} 
 \end{table} 
 
+\subsection*{Pipes and Redirects}
+Unix becomes even more versatile and powerful when you chain multiple commands together. This is accomplished using \emph{pipes}. Rather than printing the output of a command, the output is passed, or \emph{piped}, to the next command. Two commands are piped together using the \li{|} operator. To demonstrate the power of pipes, we will first introduce a few commands that allow us to view the contents of a file in Table \ref{table:print}
+
+In the first example below, the \li{cat} command output is piped to \li{wc -l}. The \li{wc} command stands for word count. This command can be used to count words or lines. The \li{-l} flag tells the \li{wc} command to count lines. Therefore, this first example counts the number of lines in \li{assignments.txt}. 
+In the second example below, the command lists the files in the current directory sorted by size in descending order. For details on what the flags in this command do, consult \li{man sort}.
+
 \begin{lstlisting}
+$ cd Shell_Lab/Files/Feb
+$ cat assignments.txt | wc -l
+9
+
+$ ls -s | sort -nr
+12 project3.py
+12 project2.py
+12 assignments.txt
+ 4 pics
+total 40
+\end{lstlisting}
+%$
+
+In the previous example, we pipe the contents of \li{assignments.txt} to \li{wc -l} using \li{cat}.
+When working with files specifically, it is better to use \emph{redirects}.
+The same output from the first example above can be achieved by running the following command:
+
+\begin{lstlisting}
+$ wc -l < assignments.txt
+9
+\end{lstlisting}
+%$
+
+If you are wanting to save the resulting output of a command to a file, use \li{>} or \li{>>}.
+The \li{>} operator will overwrite anything that may exist in the output file whereas \li{>>} will append the output to the end of the output file.
+For example, if we want to append the number of lines in \li{assignments.txt} to \li{word_count.txt}, we would run the following commmand:
+
+\begin{lstlisting}
+$ wc -l < assignements.txt >> word_count.txt
+\end{lstlisting}
+%$
+
+Since \li{grep} is used to print lines matching a pattern, it is also very useful to use in conjunction with piping.
+For example, \li{ls -l | grep root} prints all files associated with the root user.
+
+\begin{problem}
+The \li{words.txt} file in the \li{Documents} directory contains a list of words that are not in alphabetical order.
+Write the number of words in \li{words.txt} and an alphabetically sorted list of words to \li{sortedwords.txt} using pipes and redirects.
+Save this file in the \li{Documents} directory.
+Try to accomplish this with a total of two commands or fewer.
+\end{problem}
+
+\section*{Archiving and Compression}
+In file management, the terms archiving and compressing are commonly used interchangeably.
+However, these are quite different.
+To archive is to combine a certain number of files into one file.
+The resulting file will be the same size as the group of files that were archived.
+To compress is to take a file or group of files and shrink the file size as much as possible.
+The resulting compressed file will need to be extracted before being used.
+
+The \li{ZIP} file format is the most popular for archiving and compressing files.
+If by chance the \li{zip} Unix command is not installed on your system, you can download it by running \li{sudo apt-get install zip}.
+Note that you will need to have administrative rights to download this package.
+To unzip a file, use \li{unzip}. 
+
+\begin{lstlisting}
+$cd Shell_Lab/Documents
 $ zip zipfile.zip doc?.txt
  adding: doc1.txt (deflated 87%)
  adding: doc2.txt (deflated 90%)
  adding: doc3.txt (deflated 85%)
+ adding: doc4.txt (deflated 97%)
 
 # use -l to view contents of zip file
 $ unzip -l zipfile.zip
@@ -211,8 +301,9 @@ Archive:  zipfile.zip
   Length     Date     Time    Name
 ---------  ---------- -----   ----
      5234  2015-08-26 21:21   doc1.txt
-     7213  2015-08-26 21:21   doc1.txt
-     3634  2015-08-26 21:21   doc1.txt
+     7213  2015-08-26 21:21   doc2.txt
+     3634  2015-08-26 21:21   doc3.txt
+     4516  2015-08-26 21:21   doc4.txt
 ---------                     -------
     16081                     3 files
     
@@ -220,6 +311,7 @@ $ unzip zipfile.zip
   inflating: doc1.txt                
   inflating: doc2.txt                
   inflating: doc3.txt
+  inflating: doc4.txt
 \end{lstlisting}
 %$
 
@@ -233,18 +325,21 @@ $ tar -zcvf docs.tar.gz doc?.txt
 doc1.txt
 doc2.txt
 doc3.txt
+doc4.txt
 
 # use -t to view contents
 $ tar -ztvf <archive>                    
 -rw-rw-r-- username/groupname 5119 2015-08-26 16:50 doc1.txt
 -rw-rw-r-- username/groupname 7253 2015-08-26 16:50 doc2.txt
 -rw-rw-r-- username/groupname 3524 2015-08-26 16:50 doc3.txt
+-rw-rw-r-- username/groupname 4516 2015-08-26 16:50 doc4.txt
 
 # use -x to extract
 $ tar -zxvf <archive>                   
 doc1.txt
 doc2.txt
 doc3.txt
+doc4.txt
 \end{lstlisting}
 %$
 
@@ -260,25 +355,40 @@ One of the major philosophies of vim is to be able to keep your fingers on the k
 
 In this section, we will go over the basics of navigation and a few of the most common commands. We will also provide a list of commands that interested readers are encouraged to research. 
 
-It has been said that at no point does somebody finish learning vim. You will find that you will constantly be able to add something new to your arsenal.
+It has been said that at no point does somebody finish learning Vim. You will find that you will constantly be able to add something new to your arsenal.
 
 \subsection*{Getting Started}
-We start vim with the following command:
+
+Start Vim with the following command:
 
 \begin{lstlisting}
 $ vim my_file.txt
 \end{lstlisting}
-%$
 
-When executing this command, if \li{my_file.txt} already exists, vim will open the file and we may begin editing the existing file. If \li{my_file.txt} does not exist, it will be created and we may begin editting the file. For our purposes, we want to create a new file.
+When executing this command, if \li{my_file.txt} already exists, vim will open the file and we may begin editing the existing file.
+If \li{my_file.txt} does not exist, it will be created and we may begin editing the file.
+For our purposes, we want to create a new file.
 
-You may notice if you start typing, the characters may or may not appear. This is because vim has multiple modes. When vim starts, we are placed in \emph{command mode}. We want to be in \emph{insert mode} to begin entering text. To enter insert mode from command mode, hit the \li{i} key. You should see \li{-- INSERT --} at the bottom of your terminal window. Now that we are in insert mode we may begin typing.
+You may notice if you start typing, the characters may or may not appear.
+This is because vim has multiple modes.
+When vim starts, we are placed in \emph{command mode}.
+We want to be in \emph{insert mode} to begin entering text.
+To enter insert mode from command mode, hit the \li{i} key.
+You should see \li{-- INSERT --} at the bottom of your terminal window.
+If you ever need to leave insert mode and return to command mode, hit the \li{Esc} key.
+
+\subsection*{Saving/Quitting Vim}
+To save or quit the current document, first enter last line mode.
+Do this by pressing the \textbf{:} key.
+To just save, type \textbf{w} and hit enter.
+To save and quit, type \textbf{wq}.
+To quit without saving, run \textbf{q!}
 
 \begin{problem}
-Create a new file in the \li{Documents} directory named \li{first_vim.txt}. Write at least multiple lines to this file. To return to command mode, hit the \li{Esc} key. 
+Using vim, create a new file in the \li{Documents} directory named \li{first_vim.txt}.
+Write least multiple lines to this file.
+Save and exit the file you have created.
 \end{problem}
-
-Insert mode should only be used for inserting text. It is not efficient to delete large portions of text while in insert mode. Try to get in the habit of leaving insert mode as soon as you are done adding the text you want to add.
 
 \subsection*{Navigation}
 We are accustomed to navigating GUI text editors using a mouse and arrow keys. In vim, we navigate using keyboard shortcuts while in command mode.
@@ -309,8 +419,8 @@ Become accustomed to navigating in command mode using the following keys:
 \item b - \textbf{b}eginning of previous word
 \item 0 - (zero) beginning of line
 \item \$ - end of line
-\item g10 - \textbf{g}o to line \textbf{10} 
 \item gg - beginning of file
+\item \#gg - go to line \#
 \item G - end of file
 \end{itemize}
 \end{problem}
@@ -318,67 +428,83 @@ Become accustomed to navigating in command mode using the following keys:
 
 \subsection*{Alternative Ways to Enter Insert Mode}
 Hitting the \li{i} key is not the only way to enter insert mode. 
-%As you have already seen, the \li{i} key enters insert mode at the current location. 
 Alternative methods are described in Table \ref{table:viminsert}.
 
 \subsection*{Visual Mode}
-Visual mode allows you to select multiple characters. Among other things, we can use this to replace words with the \li{s} command, and we can select text to cut or copy.
+Visual mode allows you to select multiple characters.
+Among other things, we can use this to replace words with the \li{s} command, and we can select text to cut or copy.
 
 \begin{problem}
-While in command mode, enter visual mode by pressing the \li{v} key. Using the navigation keys discussed earlier, move the cursor to select a few words. Copy this text using the \li{y} key (stands for \textbf{y}ank). Return to command mode by pressing \li{Esc}. Move the cursor to where you would like to paste the text and press the \li{p} key to paste. Similarly, select text in visual mode and hit \li{d} to \textbf{d}elete the text and paste it somewhere else with the \li{p} key.
+While in command mode, enter visual mode by pressing the \li{v} key.
+Using the navigation keys discussed earlier, move the cursor to select a few words.
+Copy this text using the \li{y} key (stands for \textbf{y}ank).
+Return to command mode by pressing \li{Esc}.
+Move the cursor to where you would like to paste the text and press the \li{p} key to paste.
+Similarly, select text in visual mode and hit \li{d} to \textbf{d}elete the text and paste it somewhere else with the \li{p} key.
 \end{problem}
 
 \subsection*{Deleting Text in Command Mode}
-As mentioned already, you should use insert mode only for adding new text. Deleting text is much more efficient and versatile in command mode. The \li{x} and \li{X} commands are used to delete single characters. The \li{d} command is always accompanied by another navigational command. See Table \ref{table:delete} for a few examples.
+Insert mode should only be used for inserting text.
+It is not efficient to delete large portions of text while in insert mode.
+Try to get in the habit of leaving insert mode as soon as you are done adding the text you want to add.
+Deleting text is much more efficient and versatile in command mode.
+The \li{x} and \li{X} commands are used to delete single characters.
+The \li{d} command is always accompanied by another navigational command.
+See Table \ref{table:delete} for a few examples.
 
 \begin{table}
 \begin{tabular}{l|l} 
 Command & Description
 \\ \hline 
+\li{x} & delete letter after cursor \\
+\li{X} & delete letter before cursor \\
 \li{dd} & delete line \\
 \li{dl} & \textbf{d}elete \textbf{l}etter \\
-\li{d4l} & \textbf{d}elete 4 \textbf{l}etters \\
+\li{<<d\#l>>} & \textbf{d}elete \# \textbf{l}etters \\
 \li{dw} & \textbf{d}elete \textbf{w}ord \\
-\li{d2w} & \textbf{d}elete 2 \textbf{w}ords \\
+\li{<<d\#w>>} & \textbf{d}elete \# \textbf{w}ords \\
 \end{tabular} 
 \caption{Commands for deleting in command mode}
 \label{table:delete} 
 \end{table}   
 
-\subsection*{Quitting Vim}
-We quit vim by first enter last line mode. We do this by pressing the \li{:} key. When exiting vim, we most will want to save and quit or quit without saving. To save and quit, run \li{:wq}. To save without quiting, run \li{:q!}.
-
-\begin{problem}
-Save and exit the file you have created.
-\end{problem}
-
-\subsection*{Customizing Vim}
-If you wish to customize vim commands, this is accomplished using the \li{:map} command. For example, if you plan on using vim extensively, we highly recommend you remap \li{Esc} to a more convenient key sequence like \li{jk}. This would be accomplished by running \li{:map jk <Esc>}. You can save these customizations in the \li{vimrc} file. 
-
 \subsection*{A Few Closing Remarks}
-In the next lab, we will introduce how to access another machine through the terminal. Vim will be essential in this situation since GUIs will not be an option.
+In the next lab, we will introduce how to access another machine through the terminal.
+Vim will be essential in this situation since GUIs will not be an option.
 
-If you are interested in continuing to use vim, you may be interested in checking out \emph{gvim}. Gvim is a GUI that uses vim commands in a more traditional text editor window.
+If you are interested in continuing to use vim, you may be interested in checking out \emph{gvim}.
+Gvim is a GUI that uses vim commands in a more traditional text editor window.
 
 Also, in Table \ref{table:vim}, we have listed a few more commands that are worth exploring.
-If you are interested in any of these features of vim, we encourage you to research these features further on the internet. Additionally, many people have published their \li{vimrc} file on the internet so other vim users can learn what options are worth exploring. It is also worth noting that we can use vim navigation commands in many other places in the shell. For example, try using the navigation commands when viewing the \li{man vim} page.
+If you are interested in any of these features of vim, we encourage you to research these features further on the internet.
+Additionally, many people have published their \li{vimrc} file on the internet so other vim users can learn what options are worth exploring.
+It is also worth noting that we can use vim navigation commands in many other places in the shell.
+For example, try using the navigation commands when viewing the \li{man vim} page.
 
 \begin{table}
 \begin{tabular}{l|l} 
 Command & Description
 \\ \hline 
-\li{:help} & view vim docs \\
+\li{<<:map>>} & customize \\
+\li{<<:help>>} & view vim docs \\
 \li{cw} & \textbf{c}hange \textbf{w}ord \\
 \li{u} & undo \\
 \li{Ctrl-R} & redo \\
 \li{.} & Repeat the previous command \\
 \li{*} & find next occurrence of word under cursor \\
-\li{#} & find previous occurrence of word under cursor \\
-\li{/str} & find \li{"str"} in file \\
+\li{<<#>>} & find previous occurrence of word under cursor \\
+\li{<</str>>} & find \li{<<"str">>} in file \\
 \li{n} & find next match \\
 \li{N} & find previous match \\
 \end{tabular} 
 \caption{Commands for entering insert mode}
 \label{table:vim} 
 \end{table}  
+
+
+
+
+
+
+
 
