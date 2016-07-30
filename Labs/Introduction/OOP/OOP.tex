@@ -273,7 +273,7 @@ Every Python object is automatically endowed with several magic methods, but the
 To see an object's magic methods, type an underscore before pressing tab.
 
 \begin{lstlisting}
-In [1]: from oop import Backpack
+In [1]: run oop.py                  # Load the names from oop.py.
 
 In [2]: b = Backpack("Oscar", "green")
 
@@ -325,7 +325,6 @@ Now, suppose we wanted to add two backpacks together.
 How should addition be defined for backpacks?
 A simple option is to add the number of contents.
 Then if backpack $A$ has $3$ items and backpack $B$ has $5$ items, $A + B$ should return $8$.
-%Magic methods can also potentially alter the objects themselves.
 
 \begin{lstlisting}
 class Backpack(object):
@@ -570,7 +569,8 @@ Thus if an object is unhashable, it cannot be put in a set or be used as a key i
 TypeError: unhashable type: 'dict'>>
 \end{lstlisting}
 
-Two objects that compare as equal via the \li{__eq__()} magic method must have the same hash value, and objects that are not equal should have different hash values.
+If the \li{__hash__()} method is not defined, the default hash value is the object's memory address (accessible via the built-in function \li{id()}) divided by $16$, rounded down to the nearest integer.
+However, two objects that compare as equal via the \li{__eq__()} magic method must have the same hash value.
 A simple \li{__hash__()} method for the \li{Backpack} class that conforms to this rule and returns an integer might be the following.
 
 \begin{lstlisting}
@@ -584,8 +584,6 @@ The caret operator \texttt{\^} is a bitwise XOR (exclusive or).
 The bitwise AND operator \li{&} and the bitwise OR operator \li{|} are also good choices to use.
 
 \begin{warn}
-If a class does not have an \li{__eq__()} method it should not have a \li{__hash__()} operation either; if it defines \li{__eq__()} but not \li{__hash__()}, its instances will not be usable in hashed collections like sets and dictionaries.
+If a class does not have an \li{__eq__()} method it should \textbf{not} have a \li{__hash__()} method either.
+Furthermore, if a class defines \li{__eq__()} but not \li{__hash__()}, its instances may be usable in hashed collections like sets and dictionaries (because of the default hash value), but two instances that compare as equal may or may not be recognized as distinct in the collection.
 \end{warn}
-
-% From the docs:
-% Custom classes have \li{__hash__()} methods by default; with them, all objects compare unequal (except with themselves) and \li{x.__hash__()} returns a result derived from \li{id(x)}.
