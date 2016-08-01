@@ -95,9 +95,8 @@ Instead, modify the matrix \emph{in place} (without making a copy), changing onl
 
 Note that the final row operation modifies only part of the third row to avoid spending the computation time of adding $0$ to $0$.
 
-% TODO: decide what to do with this.
 If a $0$ appears on the main diagonal during any part of row reduction, the approach given above tries to divide by $0$.
-When this happens, swap the current row with one below it that does not have a $0$ in the same column.
+Swapping the current row with one below it that does not have a $0$ in the same column solves this problem.
 This is equivalent to left-multiplying by a type II elementary matrix, also called a \emph{permutation matrix}.
 
 \begin{problem} % Program simple row reduction to REF.
@@ -112,7 +111,7 @@ Consider generating small random matrices as test cases with NumPy's \li{random}
 \begin{warn} % Gaussian Elimination is numerically unstable!
 Gaussian elimination is not always numerically stable.
 Suppose that, due to roundoff error, we have a matrix with a very small entry on the diagonal.
-
+%
 \begin{align*}
 A = \left[\begin{array}{cc}
 10^{-15} & 1 \\
@@ -122,7 +121,7 @@ A = \left[\begin{array}{cc}
 
 $10^{-15}$ is essentially zero, but instead of swapping the first and second rows to put the $A$ in REF, a computer might multiply the first row by $10^{15}$ and add it to the second row to eliminate the $-1$.
 The resulting matrix is far from what we would expect on paper.
-
+%
 \begin{align*}
 \left[\begin{array}{cc}
 10^{-15} & 1 \\
@@ -190,7 +189,7 @@ You may assume the decomposition exists and requires no row swaps.
 \subsection*{Forward and Backward Substitution} % -----------------------------
 
 If $A\x = \b$ and $PA = LU$, then $LU\x = PA\x = P\b$.
-This system can be soled by first solving $L\y = P\b$, then $U\x = \y$.
+This system can be solved by first solving $L\y = P\b$, then $U\x = \y$.
 Since $L$ and $U$ are both triangular, these systems can be solved with backward and forward substitution.
 We can thus compute the $LU$ factorization of $A$ once, then use substitution to efficiently solve $A\x=\b$ for various values of $\b$.
 
@@ -263,8 +262,9 @@ You may again assume that there are no row swaps (so $P = I$ in this case).
 SciPy is a powerful scientific computing library built upon NumPy.
 It includes high-level tools for linear algebra, statistics, signal processing, integration, optimization, machine learning, and more.
 
-SciPy is typically imported with the convention \li{import scipy as sp}, but SciPy is set up in a way that requires its submodules to be imported separately.\footnote{SciPy modules like \li{linalg} are really \emph{packages}, which need to be initialized separately.}
-% TODO: explain "so sp.linalg won't work."
+SciPy is typically imported with the convention \li{import scipy as sp}.
+However, SciPy is set up in a way that requires its submodules to be imported separately.%
+\footnote{SciPy modules like \li{linalg} are really \emph{packages}, which need to be initialized separately.}
 
 \subsection*{Linear Algebra} % ------------------------------------------------
 
@@ -790,7 +790,7 @@ As with the LU decomposition, SciPy's \li{linalg} module has optimized routines,
 
 \begin{comment} % This uses the decomposition A = LL^H.
 The entries of $L$ are calculated as follows.
-
+%
 \begin{align*}
 &L_{i,j} = \frac{1}{L_{j,j}}\left(A_{i,j} -\sum_{k=1}^{j-1}{L_{i,k}L_{j,k}}\right) \mbox{ for $i>j$} \\ \\
 &L_{i,i} = \sqrt{A_{i,i} - \sum_{k=1}^{i-1}{L_{i,k}L_{i,k}}}.
