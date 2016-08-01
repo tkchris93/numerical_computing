@@ -1,4 +1,4 @@
-# newplots.py
+# plots.py
 """Introductory Labs: Matploblib and Mayavi. Plotting file."""
 from __future__ import print_function
 import matplotlib
