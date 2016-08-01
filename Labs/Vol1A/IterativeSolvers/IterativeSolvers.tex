@@ -521,7 +521,11 @@ $\omega = $ (whatever is optimal).
 % TODO Plot the solution and describe what it means.
 \end{problem}
 
-\section*{Optional: Successive Over-Relaxation} % =============================
+\newpage
+
+\section*{Additional Material} % ==============================================
+
+\subsection*{Successive Over-Relaxation} % ------------------------------------
 
 There are some systems that meet the requirements for convergence in the
 Gauss-Seidel method that do not converge very quickly. A slightly altered version
@@ -543,7 +547,7 @@ equation becomes,
 x^{(k+1)}_i = x^{(k)}_i + \frac{\omega}{a_{ii}} \left ( b_i - \left < A_i, \mathbf{x}^{(k)} \right > \right )
 \end{equation}
 
-Equation \ref{eq:sor} follows be simplifying the full analytic equation in the
+Equation \ref{eq:sor} follows by simplifying the full analytic equation in the
 same way we simplified the Gauss-Seidel method. Notice that when $\omega = 1$,
 Successive Over-Relaxation is equivalent to Gauss-Seidel.
 
