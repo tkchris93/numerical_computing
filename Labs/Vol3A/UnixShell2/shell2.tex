@@ -4,13 +4,16 @@
 
 \objective{Introduce system management, calling Unix Shell commands within Python, and other advanced topics.}
 
-In this lab, we will build upon the foundation we built in the previous lab. As in the last lab, the majority of learning will not be had in finsihing the problems, but in following the examples. By the end of this lab, you will have a solid foundation in Unix. You will be able to understand enough to learn whatever else may be necessary to learn in the future.
+In this lab, we will build upon the foundation of the previous lab.
+As in the last lab, the majority of learning will not be had in finsihing the problems, but in following the examples.
+By the end of this lab, you will have a solid foundation in Unix.
+You will be able to understand enough to learn any additional topics you want.
 
 \section*{File Security}
-To begin, run the following command while inside the \li{Shell-Lab} directory:
+To begin, run the following command while inside the \li{Shell_Lab/Python} directory (created in the prvious lab).
+Notice your output will differ from that printed below; this is for learning purposes.
 
 \begin{lstlisting}
-$ cd Shell-Lab/Python
 $ ls -l 
 -rw-rw-r-- 1 username groupname 194 Aug  5 20:20 calc.py
 -rw-rw-r-- 1 username groupname 373 Aug  5 21:16 count_files.py
@@ -19,11 +22,22 @@ $ ls -l
 
 \end{lstlisting}
 
-Notice the first column of the output. The first character denotes the type of the item whether it be a normal file, a directory, a symbolic link, etc. The remaining nine characters denote the permissions associated with that file. 
-Specifically, these permissions deal with reading, wrtiting, and executing files. There are three categories of people associated with permissions. These are the user (the owner), group, and others. For example, look at the output for \li{mult.py}. The first character \li{-} denotes that \li{mult.py} is a normal file. 
-The next three characters, \li{rwx} tell us the owner can read, write, and execute the file. The next three characters \li{r-x} tell us members of the same group can read and execute the file. The final three characters \li{--x} tell us other users can execute the file and nothing more.
+Notice the first column of the output.
+The first character denotes the type of the item whether it be a normal file, a directory, a symbolic link, etc.
+The remaining nine characters denote the permissions associated with that file. 
+Specifically, these permissions deal with reading, wrtiting, and executing files.
+There are three categories of people associated with permissions.
+These are the user (the owner), group, and others.
+For example, look at the output for \li{mult.py}.
+The first character \li{-} denotes that \li{mult.py} is a normal file. 
+The next three characters, \li{rwx} tell us the owner can read, write, and execute the file.
+The next three characters \li{r-x} tell us members of the same group can read and execute the file.
+The final three characters \li{--x} tell us other users can execute the file and nothing more.
 
-Permissions can be modified using the \li{chmod} command. There are two different  ways to specify permissions, \emph{symbolic permissions} notation and \emph{octal permissions} notation. Symbolic permissions notation is easier to use when we want to make small modifications to a file's permissions.  See Table \ref{table:symbolic}.
+Permissions can be modified using the \li{chmod} command.
+There are two different ways to specify permissions, \emph{symbolic permissions} notation and \emph{octal permissions} notation.
+Symbolic permissions notation is easier to use when we want to make small modifications to a file's permissions.
+See Table \ref{table:symbolic}.
 
 \begin{table}
 \begin{tabular}{l|l} 
