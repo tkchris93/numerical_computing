@@ -232,7 +232,7 @@ class _testDriver(object):
         3. NumPy times are significantly lower than list times
         4. A legend with good labels is included
         (Titles unnecessary)
-        (NumPy lines may be less bumpy in the log-log plot)""")
+        (NumPy lines may be bumpy in the log-log plot)""")
         return self._grade(10, "prob4() does not match specifications")
         return points
 
