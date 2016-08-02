@@ -697,13 +697,12 @@ Assuming that at the $ij^{th}$ stage of the algorithm, $a_{ij}$ is nonzero, Algo
 \State $m, n \gets \shape{A}$
 \State $R \gets \makecopy{A}$
 \State $Q \gets I_{m}$
-\State $G \gets \allocate{2}{2}$
 \For{$j=0\ldots n-1$}
     \For{$i=m-1\ldots j+1$}
-      \State $a, b \gets R[i-1,j], R[i,j]$
+      \State $a, b \gets R_{i-1,j}, R_{i,j}$
       \State $G \gets [[a, b],[-b,a]]/\sqrt{a^2+b^2}$
-      \State $R[i-1:i+1, j:] \gets GR[i-1:i+1, j:]$
-      \State $Q[i-1:i+1,:] \gets GQ[i-1:i+1,:]$
+      \State $R_{i-1:i+1,j:} \gets GR_{i-1:i+1, j:}$
+      \State $Q{i-1:i+1,:} \gets GQ_{i-1:i+1,:}$
     \EndFor
 \EndFor
 \State \pseudoli{return} $Q\trp , R$

@@ -169,8 +169,8 @@ The entire process, only slightly different than row reduction, is summarized be
         \Comment{Store the dimensions of $A$.}
     \State $U \gets \makecopy{A}$
         \Comment{Make a copy of $A$ with \li{np.copy()}.}
-    \State $L \gets I$
-        \Comment{The $n\times n$ identity matrix.}
+    \State $L \gets I_m$
+        \Comment{The $m\times m$ identity matrix.}
     \For{$j=0 \ldots n-1$}
         \For{$i=j+1 \ldots m-1$}
             \State $L_{i,j} \gets U_{i, j}/U_{j, j}$
@@ -593,7 +593,7 @@ With a little vectorization, the process can be reduced to a single loop.
 \Procedure{Fast LU Decomposition}{$A$}
     \State $m, n \gets \shape{A}$
     \State $U \gets \makecopy{A}$
-    \State $L \gets I$
+    \State $L \gets I_m$
     \For{$k=0 \ldots n-1$}
         \State $L_{k+1:,k} \gets U_{k+1:,k}/U_{k,k}$
         \State $U_{k+1:,k:} \gets U_{k+1:,k:} - L_{k+1:,k}U_{k,k:}\trp$
@@ -674,7 +674,7 @@ The complete algorithm is given below.
 \Procedure{LU Decomposition with Partial Pivoting}{$A$}
     \State $m, n \gets \shape{A}$
     \State $U \gets \makecopy{A}$
-    \State $L \gets I$
+    \State $L \gets I_m$
     \State $P \gets [0,\ 1,\ \ldots,\ n-1]$
         \Comment{See tip \ref{tip:lu-decomposition-with-pivoting-P} below.}
     \For{$k=0 \ldots n-1$}
@@ -784,7 +784,8 @@ Because of its efficiency and stability, this decomposition is used when possibl
 \begin{algorithm}[H]
 \begin{algorithmic}[1]
 \Procedure{Cholesky Decomposition}{$A$}
-\State $U \gets A$ (copied if desired)
+\State $U \gets A$
+    \Comment{Copy $A$ if desired.}
 \For{$i=0 \ldots n-1$}
     \For{$j=i+1 \ldots n-1$}
         \State $U_{j,j:} \gets U_{j,j:} - U_{i,j:}\overline{U_{ij}}/U_{ii}$
