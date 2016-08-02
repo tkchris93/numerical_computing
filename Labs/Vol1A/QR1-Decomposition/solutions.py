@@ -1,18 +1,14 @@
-# spec.py
-"""Volume I Lab 6: QR Decomposition.
-Name: Ben Ehlert
-Date: 10/13/2015
-"""
+# solutions.py
+"""Volume I: QR 1 (Decomposition). Solutions file."""
 
 import numpy as np
 from scipy import linalg as la
 
 def QR(A):
-    '''
-    Compute the QR decomposition of a matrix.
-    Accept an m by n matrix A of rank n. 
+    """Compute the QR decomposition of a matrix.
+    Accept an m by n matrix A of rank n.
     Return Q, R
-    '''
+    """
     m,n = A.shape
     Q = np.copy(A)
     R = np.zeros((n,n))
@@ -23,14 +19,13 @@ def QR(A):
             R[i,j] = np.dot(Q[:,j].T,Q[:,i])
             Q[:,j] = Q[:,j] - R[i,j]*Q[:,i]
     return Q,R
-    
+
 def prob2(A):
-    '''
-    Use your QR decomposition from the previous problem to compute 
+    """Use your QR decomposition from the previous problem to compute
     the determinant of A.
     Accept a square matrix A of full rank.
     Return |det(A)|.
-    '''
+    """
     Q,R = QR(A)
     output = 1
     for r in np.diagonal(R):
@@ -38,12 +33,11 @@ def prob2(A):
     return output
 
 def householder(A):
-    '''
-    Use the Householder algorithm to compute the QR decomposition
+    """Use the Householder algorithm to compute the QR decomposition
     of a matrix.
-    Accept an m by n matrix A of rank n. 
+    Accept an m by n matrix A of rank n.
     Return Q, R
-    '''
+    """
     m,n = A.shape
     R = np.copy(A)
     Q = np.identity(m)
@@ -56,12 +50,11 @@ def householder(A):
     return Q.T,R
 
 def hessenberg(A):
-    '''
-    Compute the Hessenberg form of a matrix. Find orthogonal Q and upper
+    """Compute the Hessenberg form of a matrix. Find orthogonal Q and upper
     Hessenberg H such that A = QtHQ.
     Accept a non-singular square matrix A.
     Return Q, H
-    '''
+    """
     m,n = A.shape
     H = np.copy(A)
     Q = np.identity(m)
@@ -75,13 +68,12 @@ def hessenberg(A):
     return Q,H
 
 def givens(A):
-    '''
-    EXTRA 20% CREDIT
+    """EXTRA 20% CREDIT
     Compute the Givens triangularization of matrix A.
     Assume that at the ijth stage of the algorithm, a_ij will be nonzero.
     Accept A
     Return Q, R
-    '''
+    """
     m,n = A.shape
     R = np.copy(A)
     Q = np.identity(m)
@@ -95,12 +87,10 @@ def givens(A):
     return Q.T,R
 
 def prob6(H):
-    '''
-    EXTRA 20% CREDIT
+    """EXTRA 20% CREDIT
     Compute the Givens triangularization of an upper Hessenberg matrix.
     Accept upper Hessenberg H.
-    
-    '''
+    """
     m,n = A.shape
     R = np.copy(A)
     Q = np.identity(m)
@@ -135,23 +125,23 @@ def test_two():
     print np.allclose(np.abs(findDet(A)), np.abs(la.det(A)))
     A = np.random.rand(100,100)
     print np.allclose(np.abs(findDet(A)), np.abs(la.det(A)))
-    
+
 def test_three():
     # These matrices don't have to be square
     print "Testing problem 3"
     A = np.random.rand(10,10)
     Q,R = houseHolder(A)
     print np.allclose(Q.T.dot(Q), np.eye(10)) and np.allclose(Q.dot(R), A)
-    
+
     A = np.random.rand(1000,100)
     Q,R = houseHolder(A)
-    
+
     print np.allclose(Q.T.dot(Q), np.eye(1000)) and np.allclose(Q.dot(R), A)
-    
+
     A = np.random.rand(100,100)
     Q,R = houseHolder(A)
     print np.allclose(Q.T.dot(Q), np.eye(100)) and np.allclose(Q.dot(R), A)
-    
+
 def test_four():
     # These matrices must be square
     print "Testing problem 4"
@@ -183,7 +173,7 @@ def test_six():
     A[1:] = la.triu(A[1:])
     Q,R = GivensForHessenberg(A)
     print np.allclose(A,np.dot(Q,R)) and np.allclose(np.eye(5),Q.T.dot(Q))
-    
+
     A = np.random.rand(500,500)
     A[1:] = la.triu(A[1:])
     Q,R = GivensForHessenberg(A)

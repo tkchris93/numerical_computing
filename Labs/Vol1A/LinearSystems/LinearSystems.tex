@@ -1,7 +1,7 @@
 \lab{Linear Systems}{Linear Systems}
 \objective{The fundamental problem of linear algebra is solving the linear system $A\x = \b$, if it is even possible.
 There are many approaches to solving this problem, each with different pros and cons.
-In this lab we implement the LU Decomposition and use it to solve square linear systems.
+In this lab we implement the LU decomposition and use it to solve square linear systems.
 We also introduce SciPy, together with its libraries for linear algebra and working with sparse matrices.
 }
 
@@ -134,7 +134,7 @@ The resulting matrix is far from what we would expect on paper.
 \end{array}\right]
 \end{align*}
 
-Round-off error can propagate through many steps in a calculation, resulting in garbage output.
+Round-off error can propagate through many steps in a calculation. %, resulting in garbage output.
 NumPy's routines that employ row reduction use several tricks to minimize the impact of round-off errors, but beware that these tricks can't fix every matrix.
 \end{warn}
 
@@ -165,15 +165,19 @@ The entire process, only slightly different than row reduction, is summarized be
 \begin{algorithm}[H]
 \begin{algorithmic}[1]
 \Procedure{LU Decomposition}{$A$}
-\State $U \gets A$ (make a copy of $A$ with \li{np.copy()})
-\State $L \gets I$ (the $n\times n$ identity matrix)
-\For{$j=0 \ldots n-1$}
-    \For{$i=j+1 \ldots m-1$}
-        \State $L_{i,j} \gets U_{i, j}/U_{j, j}$
-        \State $U_{i,j:} \gets U_{i,j:} - L_{i,j}U_{j,j:}$
+    \State $m, n \gets \shape{A}$
+        \Comment{Store the dimensions of $A$.}
+    \State $U \gets \makecopy{A}$
+        \Comment{Make a copy of $A$ with \li{np.copy()}.}
+    \State $L \gets I_m$
+        \Comment{The $m\times m$ identity matrix.}
+    \For{$j=0 \ldots n-1$}
+        \For{$i=j+1 \ldots m-1$}
+            \State $L_{i,j} \gets U_{i, j}/U_{j, j}$
+            \State $U_{i,j:} \gets U_{i,j:} - L_{i,j}U_{j,j:}$
+        \EndFor
     \EndFor
-\EndFor
-\State \pseudoli{return} $L, U$
+    \State \pseudoli{return} $L, U$
 \EndProcedure
 \end{algorithmic}
 \caption{}
@@ -587,14 +591,15 @@ With a little vectorization, the process can be reduced to a single loop.
 \begin{algorithm}[H]
 \begin{algorithmic}[1]
 \Procedure{Fast LU Decomposition}{$A$}
-\State $U \gets A$
-\State $L \gets I$
-\For{$k=0 \ldots n-1$}
-    \State $L_{k+1:,k} \gets U_{k+1:,k}/U_{k,k}$
-    \State $U_{k+1:,k:} \gets U_{k+1:,k:} - L_{k+1:,k}U_{k,k:}\trp$
-    \label{state:outer-product}
-\EndFor
-\State \pseudoli{return} $L, U$
+    \State $m, n \gets \shape{A}$
+    \State $U \gets \makecopy{A}$
+    \State $L \gets I_m$
+    \For{$k=0 \ldots n-1$}
+        \State $L_{k+1:,k} \gets U_{k+1:,k}/U_{k,k}$
+        \State $U_{k+1:,k:} \gets U_{k+1:,k:} - L_{k+1:,k}U_{k,k:}\trp$
+        \label{state:outer-product}
+    \EndFor
+    \State \pseudoli{return} $L, U$
 \EndProcedure
 \end{algorithmic}
 \caption{}
@@ -607,7 +612,7 @@ Use \li{np.outer()} instead of \li{np.dot()} to get the desired result.
 
 Gaussian elimination iterates through the rows of a matrix, using the diagonal entry $x_{k,k}$ of the matrix at the $k$th iteration to zero out all of the entries in the column below $x_{k,k}$ ($x_{i,k}$ for $i\ge k$).
 This diagonal entry is called the \emph{pivot}.
-Unfortunately, Gaussian elimination, and hence the LU Decomposition, can be very numerically unstable if at any step the pivot is a very small number.
+Unfortunately, Gaussian elimination, and hence the LU decomposition, can be very numerically unstable if at any step the pivot is a very small number.
 Most professional row reduction algorithms avoid this problem via \emph{partial pivoting}.
 
 The idea is to choose the largest number (in magnitude) possible to be the pivot by swapping the pivot row\footnote{\emph{Complete pivoting} involves row and column swaps, but doing both operations is usually considered overkill.}
@@ -661,24 +666,29 @@ A row swap is equivalent to left-multiplying by a type II elementary matrix, als
 \end{array}\right]
 \end{align*}
 
-For the LU Decomposition, if the permutation matrix at step $k$ is $P_k$, then $P = P_k\ldots P_2P_1$ yields $PA = LU$.
+For the LU decomposition, if the permutation matrix at step $k$ is $P_k$, then $P = P_k\ldots P_2P_1$ yields $PA = LU$.
 The complete algorithm is given below.
 
 \begin{algorithm}[H]
 \begin{algorithmic}[1]
 \Procedure{LU Decomposition with Partial Pivoting}{$A$}
-\State $U \gets A$
-\State $L \gets I$
-\State $P \gets [0,\ 1,\ \ldots,\ n-1]$
-\For{$k=0 \ldots n-1$}
-    \State Select $i \ge k$ that maximizes $|U_{i,k}|$
-    \State $U_{k,k:} \leftrightarrow U_{i,k:}$ (swap the two rows)
-    \State $L_{k,:k} \leftrightarrow L_{i,:k}$
-    \State $P_{k} \leftrightarrow P_{i}$
-    \State $L_{k+1:,k} \gets U_{k+1:,k}/U_{k,k}$
-    \State $U_{k+1:,k:} \gets U_{k+1:,k:} - L_{k+1:,k}U_{k,k:}\trp$
-\EndFor
-\State \pseudoli{return} $L, U, P$
+    \State $m, n \gets \shape{A}$
+    \State $U \gets \makecopy{A}$
+    \State $L \gets I_m$
+    \State $P \gets [0,\ 1,\ \ldots,\ n-1]$
+        \Comment{See tip \ref{tip:lu-decomposition-with-pivoting-P} below.}
+    \For{$k=0 \ldots n-1$}
+        \State Select $i \ge k$ that maximizes $|U_{i,k}|$
+        \State $U_{k,k:} \leftrightarrow U_{i,k:}$
+            \Comment{Swap the two rows.}
+        \State $L_{k,:k} \leftrightarrow L_{i,:k}$
+            \Comment{Swap the two rows.}
+        \State $P_{k} \leftrightarrow P_{i}$
+            \Comment{Swap the two entries.}
+        \State $L_{k+1:,k} \gets U_{k+1:,k}/U_{k,k}$
+        \State $U_{k+1:,k:} \gets U_{k+1:,k:} - L_{k+1:,k}U_{k,k:}\trp$
+    \EndFor
+    \State \pseudoli{return} $L, U, P$
 \EndProcedure
 \end{algorithmic}
 \caption{}
@@ -691,6 +701,7 @@ The following tips may be helpful for implementing this algorithm:
     Initialize $P$ as the array $[0, 1, \ldots, n]$.
     After performing a row swap on $A$, perform the same operations on $P$.
     Then the matrix product $PA$ will be the same as \li{A[P]}.
+    \label{tip:lu-decomposition-with-pivoting-P}
 \end{enumerate}
 
 \begin{lstlisting}
@@ -773,7 +784,8 @@ Because of its efficiency and stability, this decomposition is used when possibl
 \begin{algorithm}[H]
 \begin{algorithmic}[1]
 \Procedure{Cholesky Decomposition}{$A$}
-\State $U \gets A$ (copied if desired)
+\State $U \gets A$
+    \Comment{Copy $A$ if desired.}
 \For{$i=0 \ldots n-1$}
     \For{$j=i+1 \ldots n-1$}
         \State $U_{j,j:} \gets U_{j,j:} - U_{i,j:}\overline{U_{ij}}/U_{ii}$
