@@ -13,7 +13,7 @@ triangular matrix of rank $n$.
 \end{theorem}
 
 In this lab we will only discuss real matrices.
-All of these results can be extended to the complex numbers by replacing ``orthogonal matrix'' with ``unitary matrix,'' ``transpose'' with ``hermitian conjugate,'' and ``symmetric matrix'' with ``hermitian matrix.''
+All of these results can be extended to the complex numbers by replacing ``transpose'' with ``hermitian conjugate'' and ``symmetric matrix'' with ``hermitian matrix.''
 
 \section*{Modified Gram-Schmidt} % ============================================
 
@@ -22,7 +22,7 @@ There are many methods for computing the QR decomposition.
 First we will discuss the algorithm that computes $Q$ by applying Gram-Schmidt to the columns of $A$.
 
 Let $\{\x_i\}_{i=1}^n$ be the columns of $A$ (the rank hypothesis implies that these are linearly independent vectors).
-Then the Gram-Schmidt algorithm computes an orthonormal basis $\{\q_i\}_{i=1}^n$ for the span of the $\x_i$.
+The Gram-Schmidt algorithm computes an orthonormal basis $\{\q_i\}_{i=1}^n$ for the span of the $\x_i$.
 The Gram-Schmidt algorithm defines  \[ \q_1 = \frac{\x_1}{\norm{\x_1}}.\]
 It recursively defines $\q_k$ for $k>1$ by
 \[
@@ -56,32 +56,35 @@ Next we define $\q_2 = \frac{\x_2}{\|\x_2\|}.$ Once again we make $\x_3, \ldots,
 \]
 (Each of these new vectors is a linear combination of vectors orthogonal to $\q_1$, and hence is orthogonal to $\q_1$ as well.)
 We continue this process until we have an orthonormal set $\q_1, \ldots, \q_k$.
-The entire modified Gram-Schmidt algorithm is described in Algorithm \ref{Alg:gram_schmidt}.
+The entire modified Gram-Schmidt algorithm is described in Algorithm \ref{Alg:modified-gram-schmidt}.
 
 \begin{algorithm}
 \begin{algorithmic}[1]
 \Procedure{Modified Gram-Schmidt}{$A$}
-\State Store the dimensions $(m,n)$ of $A$
-\State Initialize the $Q$ matrix as a copy of $A$
-\State Initialize the $R$ matrix as an $n\times n$ matrix of zeros
-\State Then create your matrices as follows:
-\For{$i=0\ldots n-1$}
-    \State Set every diagonal entry of $R$ to be $\norm{Q[:,i]}$
-    \State Set every column $i$ of $Q$ to be $ Q[:,i]/R[i,i]$
-    \For{$j=i+1\ldots n-1$}
-        \State Set every element of $R$ to be $Q[:,j]\trp  Q[:,i]$
-        \State Subtract $R[i,j]Q[:,i]$ from each column $j$
-	\EndFor
-\EndFor
-\State \pseudoli{return} $Q, R$
+    \State $m, n \gets \shape{A}$
+        \Comment{Store the dimensions of $A$.}
+    \State $Q \gets \makecopy{A}$
+        \Comment{Make a copy of $A$ with \li{np.copy()}.}
+    \State $R \gets \zeros{n}{n}$
+        \Comment{An $n\times n$ array of all zeros.}
+    \For{$i=0\ldots n-1$}
+        \State $R_{i,i} \gets \norm{Q_{:,i}}$
+        \State $Q_{:,i} \gets Q_{:,i}/R_{i,i}$
+            \Comment{Normalize the $i$th column of $Q$.}
+        \For{$j=i+1\ldots n-1$}
+            \State $R_{i,j} \gets Q_{:,j}\trp  Q_{:,i}$
+            \State $Q_{:,j} \gets Q_{:,j}-R_{i,j}Q_{:,i}$
+                \Comment{Orthogonalize the $j$th column of $Q$.}
+        \EndFor
+    \EndFor
+    \State \pseudoli{return} $Q, R$
 \EndProcedure
 \end{algorithmic}
-\caption{The modified Gram-Schmidt algorithm. This algorithm returns orthogonal $Q$ and upper triangular $R$ such that $A = QR$.}
-\label{Alg:gram_schmidt}
+\caption{}
+\label{Alg:modified-gram-schmidt}
 \end{algorithm}
 
-
-%TODO: put this section after the next? What algorithm does SciPy use?
+% TODO: put this section after the next? What algorithm does SciPy use?
 \section*{QR Decomposition in SciPy} % ========================================
 
 The linear algebra library in SciPy calculates the QR decomposition using a software package called LAPACK (Linear Algebra PACKage), which is incredibly efficient.
@@ -116,9 +119,10 @@ True
 
 \begin{problem} % Decomposition via Modified Gram Schmidt.
 Write a function that accepts as input a $m \times n$ matrix of rank $n$ and computes its QR decomposition, returning the matrices $Q$ and $R$.
-Your function should use Algorithm \ref{Alg:gram_schmidt}.
-Hint: Read about the function \li{np.inner()}.
-Another hint: Check that your function works by using \li{np.allclose()}.
+Your function should use Algorithm \ref{Alg:modified-gram-schmidt}.
+Generate test cases with \li{np.random.random()}, using \li{np.allclose()} to verify that $A = QR$.
+\\
+(Hint: Read about the function \li{np.inner()}.)
 \end{problem}
 
 \begin{problem} % Use the QR decomposition to solve Ax = b quickly.
@@ -323,7 +327,7 @@ A\\
 so to update $\prod Q_i$, we need only modify the bottom rows.
 These also change via matrix multiplication by $I-2\mathbf{u}_k\mathbf{u}_k\trp$.
 
-These arguments produce Algorithm \ref{Alg:Householder}.
+These arguments produce Algorithm \ref{Alg:QR-via-Householder}.
 
 %To find $Q_1$, we first identify an appropriate hyperplane to reflect $x$ into the span of $e_1$.
 %It turns out there are two hyperplanes that will work, as shown in figure \ref{fig:two reflectors}.
@@ -393,103 +397,39 @@ Reflecting about the hyperplane defined by $\v_i$ produces  $H_{\v_i}\x$.}
 \label{fig:two reflectors}
 \end{figure}
 
-% TODO: explain notation, fix algorithm
-\begin{algorithm}
-\caption{The Householder triangularization algorithm.
-This algorithm returns orthonormal $Q$ and upper triangular $R$ satisfying $A = QR$.}
-\label{Alg:Householder}
+\begin{algorithm} % QR Decomposition via Householder Reflections.
 \begin{algorithmic}[1]
 \Procedure{Householder}{$A$}
-\State Store the dimensions $(m,n)$ of $A$
-\State Initialize the $R$ matrix as a copy of $A$
-\State Initialize the $Q$ matrix as the $m\times m$ identity matrix
-\State Then create your matrices as follows:
-\For{$k=0\ldots n-1$}
-    \State Set $\u$ to $R[k:,k]$
-    \State Add sign$(\u[0])$ multiplied by the norm of $\u$ to $\u[0]$
-    \State Divide $\u$ by its norm
-    \State Set $R[k:,k:]$ to itself minus $2 \u \left(\u\trp R[k:,k:] \right)$
-    \State Set $Q[k:]$ to itself minus $2 \u \left( \u\trp Q[k:] \right)$
-\EndFor
-\State \pseudoli{return} $Q\trp, R$
+    \State $m, n \gets \shape{A}$
+    \State $R \gets \makecopy{A}$
+    \State $Q \gets I_{m}$
+        \Comment{The $m\times m$ identity matrix.}
+    \For{$k=0\ldots n-1$}
+        \State $\u \gets \makecopy{R_{k:,k}}$
+        \State $u_0 \gets u_0 + \sign(u_0)\|\u\|$
+            \Comment{$u_0$ is the first entry of $\u$.}
+        \State $\u \gets \u/\|\u\|$
+            \Comment{Normalize $\u$.}
+        \State $R_{k:,k:} \gets R_{k:,k:} - 2\u\left(\u\trp R_{k:,k:}\right)$
+            \Comment{Apply the reflection to $R$.}\label{step:HH-outer1}
+        \State $Q_{k:,:} \gets Q_{k:,:} - 2\u\left(\u\trp Q_{k:,:}\right)$
+            \Comment{Apply the reflection to $Q$.}\label{step:HH-outer2}
+    \EndFor
+    \State \pseudoli{return} $Q\trp, R$
 \EndProcedure
 \end{algorithmic}
+\caption{}
+\label{Alg:QR-via-Householder}
 \end{algorithm}
 
-
-\begin{problem} % QR via Householder Triangularization
-Write a function that accepts as input a $m \times n$ matrix of rank $n$ and computes its QR decomposition, returning the matrices $Q$ and $R$.
-Your function should use Algorithm \ref{Alg:Householder}.
-Hint: Read about the function \li{np.outer()}.  Another Hint: When defining $\u$, reshape the array to an $(m-k) \times 1$ array.
+\begin{problem} % QR Decomposition via Householder Triangularization
+Write a function that accepts as input a $m \times n$ matrix $A$ of rank $n$.
+Use Algorithm \ref{Alg:QR-via-Householder} to compute the QR decomposition of $A$.
+\\
+(Hint: In steps \ref{step:HH-outer1} and \ref{step:HH-outer2} of Algorithm \ref{Alg:QR-via-Householder}, the multiplication of $\u$ and $(\u\trp X)$ is an \emph{outer product}---$\x\y\trp$ instead of the usual $\x\trp\y$.
+Use \li{np.outer()} instead of \li{np.dot()} to handle this correctly.)
+% Hint: Read about the function \li{np.outer()}.  Another Hint: When defining $\u$, reshape the array to an $(m-k) \times 1$ array.
 \end{problem}
-
-\begin{comment} % Move this to Additional Material?
-\subsection*{Stability of the Householder QR algorithm} % ---------------------
-
-We will now examine the stability of the Householder QR algorithm.
-We will use SciPy's built in QR factorization which uses Householder reflections internally.
-
-Try the following.
-
-\begin{lstlisting}
->>> Q, X = la.qr(np.random.rand(500,500)) # create a random orthonormal matrix:
->>> R = np.triu(np.random.rand(500,500)) # create a random upper triangular matrix
->>> A = np.dot(Q,R) # Q and R are the exact QR decomposition of A
->>> Q1, R1 = la.qr(A) # compute QR decomposition of A
-\end{lstlisting}
-
-Observe:
-
-\begin{lstlisting}
->>> la.norm(Q1-Q)/la.norm(Q) # check error in Q
-0.282842955725
->>> la.norm(R1-R)/la.norm(R) # check error in R
-0.0428922016647
-\end{lstlisting}
-
-This is terrible!
-This algorithm works in $16$ decimal points of precision, but $Q_1$ and $R_1$ are only accurate to $0$ and $1$ decimal points, respectively.
-We've lost $16$ decimal points of precision!
-
-Don't lose hope.
-Check how close the product $Q_1 R_1$ is to $A$.
-
-\begin{lstlisting}
->>> A1 = Q1.dot(R1)
->>> np.absolute(A1 - A).max()
-3.9968028886505635e-15
-\end{lstlisting}
-
-We've now recovered $15$ digits of accuracy.
-Considering the error relative to the norm of $A$ (using the 2-norm for matrices), we see that this relative error is even smaller.
-
-\begin{lstlisting}
->>> la.norm(A1 - A, ord=2) / la.norm(A, ord=2)
-8.8655568331889288e-16
-\end{lstlisting}
-
-The errors in $Q_1$ and $R_1$ were somehow ``correlated," so that they canceled out in the product.
-The errors in $Q_1$ and $R_1$ are called \emph{forward errors}.
-The error in $A_1$ is the \emph{backward error}.
-
-In fact, the large errors in \li{Q1} and \li{R1} were not because the algorithm was bad, it was because $A$ was poorly conditioned.
-The condition number for randomly generated upper triangular matrices is generally very high, and this was the case here.
-This has, in turn, made the condition number of $A$ extremely large.
-
-Try the following to compute the condition number of $A$.
-In this case the condition number of $A$ and $R$ are computed to be different, though, in theory, they should be exactly the same.
-
-\begin{lstlisting}
->>> from numpy.linalg import cond
->>> cond(A)
-4.1426075832870472e+18
->>> cond(R)
-3.1767577244363792e+19
-\end{lstlisting}
-
-Householder QR factorization is more numerically stable than Gram-Schmidt or even Modified Gram-Schmidt (MGS).
-However, MGS is still useful for some types of iterative methods because it finds the orthonormal basis one vector at a time instead of all at once (for an example see Lab \ref{lab:EigSolve}).
-\end{comment}
 
 \section*{Upper Hessenberg Form} % ============================================
 
@@ -559,19 +499,19 @@ This algorithm returns orthogonal $Q$ and upper Hessenberg $H$ such that $A = Q\
 \label{Alg:Hessenberg}
 \begin{algorithmic}[1]
 \Procedure{Hessenberg}{$A$}
-\State Store the dimensions $(m,n)$ of $A$
-\State Initialize the $H$ matrix as a copy of $A$
-\State Initialize the $Q$ matrix as the $m\times m$ identity matrix
-\State Then create your matrices as follows:
-\For{$k=0 \ldots n-3$}
-    \State Set $\u$ to $H[k+1:, k]$ %Is this supposed to be the same syntax as the lines below?
-    \State Add sign$(\u[0])$ multiplied by the norm of $\u$ to $\u[0]$
-    \State Divide $u$ by its norm
-    \State $H[k+1:,k:] \gets H[k+1:,k:] - 2\u(\u\trp H[k+1:,k:])$
-    \State $H[:,k+1:] \gets H[:,k+1:] - 2(H[:,k+1:] \u) \u\trp$
-    \State $Q[k+1:] \gets Q[k+1:] - 2\u(\u\trp Q[k+1:])$
-\EndFor
-\State \pseudoli{return} $Q, H$
+    \State $m, n \gets \shape{A}$
+    \State $H \gets \makecopy{A}$
+    \State $Q \gets I_{m}$
+    \For{$k=0 \ldots n-3$}
+        \State $\u \gets \makecopy{H_{k+1:,k}}$
+        \State $u_0 \gets u_0 + \sign(u_0)\|\u\|$
+            \Comment{$u_0$ is the first entry of $\u$.}
+        \State $\u \gets \u/\|\u\|$
+        \State $H_{k+1:,k:} \gets H_{k+1:,k:} - 2\u(\u\trp H[k+1:,k:])$
+        \State $H_{:,k+1:} \gets H_{:,k+1:} - 2(H_{:,k+1:} \u) \u\trp$
+        \State $Q_{k+1:,:} \gets Q_{k+1:,:} - 2\u(\u\trp Q{k+1:,:})$
+    \EndFor
+    \State \pseudoli{return} $Q, H$
 \EndProcedure
 \end{algorithmic}
 \end{algorithm}
@@ -756,7 +696,7 @@ Assuming that at the $ij^{th}$ stage of the algorithm, $a_{ij}$ is nonzero, Algo
 \Procedure{Givens Triangularization}{$A$}
 \State $m, n \gets \shape{A}$
 \State $R \gets \makecopy{A}$
-\State $Q \gets \Id{m}$
+\State $Q \gets I_{m}$
 \State $G \gets \allocate{2}{2}$
 \For{$j=0\ldots n-1$}
     \For{$i=m-1\ldots j+1$}
@@ -876,6 +816,75 @@ For timing purposes, make a random upper Hessenberg matrix, compute its QR decom
 Note: the functions you just wrote can be used to perform right multiplication as well since $B Q = \left(Q\trp B\trp \right)\trp$ and $B Q\trp = \left( Q B\trp \right)\trp$.
 \end{problem}
 \end{comment}
+
+\begin{comment} % Move this to Additional Material?
+\subsection*{Stability of the Householder QR algorithm} % ---------------------
+
+We will now examine the stability of the Householder QR algorithm.
+We will use SciPy's built in QR factorization which uses Householder reflections internally.
+
+Try the following.
+
+\begin{lstlisting}
+>>> Q, X = la.qr(np.random.rand(500,500)) # create a random orthonormal matrix:
+>>> R = np.triu(np.random.rand(500,500)) # create a random upper triangular matrix
+>>> A = np.dot(Q,R) # Q and R are the exact QR decomposition of A
+>>> Q1, R1 = la.qr(A) # compute QR decomposition of A
+\end{lstlisting}
+
+Observe:
+
+\begin{lstlisting}
+>>> la.norm(Q1-Q)/la.norm(Q) # check error in Q
+0.282842955725
+>>> la.norm(R1-R)/la.norm(R) # check error in R
+0.0428922016647
+\end{lstlisting}
+
+This is terrible!
+This algorithm works in $16$ decimal points of precision, but $Q_1$ and $R_1$ are only accurate to $0$ and $1$ decimal points, respectively.
+We've lost $16$ decimal points of precision!
+
+Don't lose hope.
+Check how close the product $Q_1 R_1$ is to $A$.
+
+\begin{lstlisting}
+>>> A1 = Q1.dot(R1)
+>>> np.absolute(A1 - A).max()
+3.9968028886505635e-15
+\end{lstlisting}
+
+We've now recovered $15$ digits of accuracy.
+Considering the error relative to the norm of $A$ (using the 2-norm for matrices), we see that this relative error is even smaller.
+
+\begin{lstlisting}
+>>> la.norm(A1 - A, ord=2) / la.norm(A, ord=2)
+8.8655568331889288e-16
+\end{lstlisting}
+
+The errors in $Q_1$ and $R_1$ were somehow ``correlated," so that they canceled out in the product.
+The errors in $Q_1$ and $R_1$ are called \emph{forward errors}.
+The error in $A_1$ is the \emph{backward error}.
+
+In fact, the large errors in \li{Q1} and \li{R1} were not because the algorithm was bad, it was because $A$ was poorly conditioned.
+The condition number for randomly generated upper triangular matrices is generally very high, and this was the case here.
+This has, in turn, made the condition number of $A$ extremely large.
+
+Try the following to compute the condition number of $A$.
+In this case the condition number of $A$ and $R$ are computed to be different, though, in theory, they should be exactly the same.
+
+\begin{lstlisting}
+>>> from numpy.linalg import cond
+>>> cond(A)
+4.1426075832870472e+18
+>>> cond(R)
+3.1767577244363792e+19
+\end{lstlisting}
+
+Householder QR factorization is more numerically stable than Gram-Schmidt or even Modified Gram-Schmidt (MGS).
+However, MGS is still useful for some types of iterative methods because it finds the orthonormal basis one vector at a time instead of all at once (for an example see Lab \ref{lab:EigSolve}).
+\end{comment}
+
 
 %Sources: http://www.cs.unc.edu/~krishnas/eigen/node5.html
 % http://en.wikipedia.org/wiki/Givens_rotation
