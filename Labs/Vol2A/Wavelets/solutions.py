@@ -1,8 +1,5 @@
-# spec.py
-"""Volume II Lab 10: Fourier II (Filtering and Convolution)
-David Reber
-Math 321
-The end of the world
+# solutions.py
+"""Volume II: Wavelets
 """
 
 import sys
@@ -54,6 +51,15 @@ def plot(X, L, H, n):
         plt.plot(coeffs[i])
     plt.show()
 
+def test_prob1():
+    """Tests Problem 1 as per the instructions in the .tex file."""
+    L = np.ones(2)/np.sqrt(2)
+    H = np.array([-1,1])/np.sqrt(2)
+    n = 4
+    domain = np.linspace(0,4*np.pi, 1024)
+    noise = np.random.randn(1024)*.1
+    X = np.sin(domain) + noise
+    plot(X, L, H, n)
 
 # Problem 2: Implement this function.
 def idwt(coeffs, L, H):
@@ -78,89 +84,21 @@ def idwt(coeffs, L, H):
         print len(up_A),len(L),len(up_D),len(H)
         # now convolve and add, but discard last entry
         A = fftconvolve(up_A,L)[:-1] + fftconvolve(up_D,H)[:-1]
-
     return A
 
-def test():
+def test_prob2():
+    """Tests Problem 1 as per the instructions in the .tex file."""
+    L = np.ones(2)/np.sqrt(2)
+    H = np.array([-1,1])/np.sqrt(2)
+    n = 4
+    
+    domain = np.linspace(0,4*np.pi, 1024)
+    noise = np.random.randn(1024)*.1
+    X = np.sin(domain) + noise
+    coeffs = dwt(X, L, H, n)
 
-    print "this is a test! :)"
-
-    print sys.argv
-
-
-    if len(sys.argv) == 1:
-        return
-
-    if "0" in sys.argv:
-        print "Test all!"
-
-    if "1" in sys.argv or "0" in sys.argv:
-        print "Problem 1"
-        L = np.ones(2)/np.sqrt(2)
-        H = np.array([-1,1])/np.sqrt(2)
-        n = 4
-        
-        domain = np.linspace(0,4*np.pi, 1024)
-        noise = np.random.randn(1024)*.1
-        X = np.sin(domain) + noise
-
-        plot(X, L, H, n)
-        
-        print "success!"    
-
-    if "2" in sys.argv or "0" in sys.argv:
-        print "Problem 2"
-        L = np.ones(2)/np.sqrt(2)
-        H = np.array([-1,1])/np.sqrt(2)
-        n = 4
-        
-        domain = np.linspace(0,4*np.pi, 1024)
-        noise = np.random.randn(1024)*.1
-        X = np.sin(domain) + noise
-        coeffs = dwt(X, L, H, n)
-
-        Ln = [1/np.sqrt(2),1/np.sqrt(2)]
-        Hn = [1/np.sqrt(2),-1/np.sqrt(2)]
-        A = idwt(coeffs, Ln, Hn)
-        plt.plot(A)
-        print np.allclose(X, A)
-        print "success!"
-
-
-    if "3" in sys.argv or "0" in sys.argv:
-        print "Problem 3"
-        if "short" in sys.argv:
-            convolve('./SoundFiles/Fourier2/chopin.wav','./SoundFiles/Fourier2/balloon.wav')
-        if "long" in sys.argv:
-            convolve('./SoundFiles/Fourier2/chopin_full.wav','./SoundFiles/Fourier2/balloon.wav', 'simply_awesome')
-        print "success!"
-
-    if "4" in sys.argv or "0" in sys.argv:
-        print "Problem 4"
-        white_noise()
-        print "success!"  
-
-    if "5" in sys.argv or "0" in sys.argv:
-        print "Problem 5"
-        A = generate_note(440)
-        A.plot(True)
-        print "success!"  
-
-    if "6" in sys.argv or "0" in sys.argv:
-        print "Problem 6" 
-        generate_chord()
-        print "success!"  
-
-    if "7" in sys.argv or "0" in sys.argv:
-        print "Problem 7"
-        print "success!"  
-
-    print "Hooooooorrraaaaaaayyyyyy!!!!!!!!!!!!!!!"
-
-
-
-if __name__ == "__main__":
-    test()
-
-
-# ============================== END OF FILE ============================== #
+    Ln = [1/np.sqrt(2),1/np.sqrt(2)]
+    Hn = [1/np.sqrt(2),-1/np.sqrt(2)]
+    A = idwt(coeffs, Ln, Hn)
+    plt.plot(A)
+    return np.allclose(X, A)
