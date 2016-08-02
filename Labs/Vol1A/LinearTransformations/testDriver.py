@@ -66,7 +66,7 @@ def test(student_module):
         student_module: the imported module for the student's file.
 
     Returns:
-        score (int): the student's score, out of TOTAL.
+        score (int): the student's score, out of 40.
         feedback (str): a printout of test results for the student.
     """
     tester = _testDriver()
@@ -204,13 +204,12 @@ class _testDriver(object):
         (Title and legend unnecessary)
         (Aspect ratio may be stretched)""")
         return self._grade(10, "solar_system() does not match specifications")
-        return points
 
     @_autoclose
     def problem3(self, s):
         """Test prob3(). 10 points."""
 
-        print("Running prob3()... (60 second time limit)")
+        print("Running prob3()...(60 second time limit)")
         _timeout(60)(s.prob3)()
         print("""\nSpecifications:
         1. Two plots: matrix-vector times, matrix-matrix times
@@ -218,13 +217,12 @@ class _testDriver(object):
         3. Matrix-matrix times are much greater than matrix-vector times
         (Titles and legend unnecessary)""")
         return self._grade(10, "prob3() does not match specifications")
-        return points
 
     @_autoclose
     def problem4(self, s):
         """Test prob4(). 10 points."""
 
-        print("Running prob4()... (60 second time limit)")
+        print("Running prob4()...(60 second time limit)")
         _timeout(60)(s.prob4)()
         print("""\nSpecifications:
         1. Two plots: lin-lin scale, log-log scale
@@ -234,7 +232,6 @@ class _testDriver(object):
         (Titles unnecessary)
         (NumPy lines may be bumpy in the log-log plot)""")
         return self._grade(10, "prob4() does not match specifications")
-        return points
 
 # Validation ==================================================================
 if __name__ == '__main__':

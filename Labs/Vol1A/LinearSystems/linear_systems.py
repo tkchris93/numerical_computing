@@ -19,6 +19,10 @@ def ref(A):
 def lu(A):
     """Compute the LU decomposition of the square matrix A. You may assume the
     decomposition exists and requires no row swaps.
+
+    Returns:
+        L ((n,n) ndarray): The lower-triangular part of the decomposition.
+        U ((n,n) ndarray): The upper-triangular part of the decomposition.
     """
     raise NotImplementedError("Problem 2 Incomplete")
 
