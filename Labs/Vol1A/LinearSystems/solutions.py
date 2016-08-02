@@ -27,6 +27,10 @@ def ref(A):
 def lu(A):
     """Compute the LU decomposition of the square matrix A. You may assume the
     decomposition exists and requires no row swaps.
+
+    Returns:
+        L ((n,n) ndarray): The lower-triangular part of the decomposition.
+        U ((n,n) ndarray): The upper-triangular part of the decomposition.
     """
     m, n = A.shape
     U = np.array(A, dtype=np.float, copy=True)
@@ -43,11 +47,7 @@ def solve(A, b):
     """Use the LU decomposition and back substitution to solve the linear
     system Ax = b. You may assume that A is invertible (hence square).
     """
-    A, b = np.array(A), np.ravel(b)
     m, n = A.shape
-    assert m == n, "Matrix must be square."
-    assert b.size == m, "Bad shape!"
-
     L, U = lu(A)
 
     # First solve Ly = Pb (assume P = I).
@@ -64,7 +64,7 @@ def solve(A, b):
 
 
 # Problem 4
-def prob4(N=12):
+def prob4(N=11):
     """Time different scipy.linalg functions for solving square linear systems.
     Plot the system size versus the execution times. Use log scales if needed.
     """
@@ -96,7 +96,7 @@ def prob4(N=12):
     plt.plot(domain, inv, '.-', lw=2, label="la.inv()")
     plt.plot(domain, solve, '.-', lw=2, label="la.solve()")
     plt.plot(domain, lu_factor, '.-', lw=2,
-                                        label="la.lu_factor() + la.lu_solve()")
+                                    label="la.lu_factor() and la.lu_solve()")
     plt.plot(domain, lu_solve, '.-', lw=2, label="la.lu_solve() alone")
     plt.xlabel("n"); plt.ylabel("Seconds")
     plt.legend(loc="upper left")
@@ -158,32 +158,12 @@ def prob6(N=10):
 
 # Additional Material =========================================================
 
-def ref_with_swaps(A):
-    """Reduce an mxn matrix to REF, using row swaps if necessary.
-    This is only one of a few ways to do it.
-    """
-    A = np.array(A, dtype=float, copy=True)
-    m,n = A.shape
-    for j in xrange(min(m, n) - 1):
-        # Deal with 0's on the diagonal.
-        if np.allclose(A[j:,j], np.zeros(m-i)):
-            continue
-        while np.isclose(A[j,j], 0):
-            A[j:] = np.roll(A[j:], -1, axis=0)
-        # Zero out the rows below the current entry.
-        for i in xrange(j+1, m):
-            A[i,j:] -= A[j,j:] * A[i,j] / A[j,j]
-    # Set extra rows to zero.
-    if m > n:
-        A[n:] = 0
-    return A
-
-def ref2(A):
+def ref_fast(A):
     """Alternate REF using an outer product. Fast, but not very intuitive."""
     for i in xrange(A.shape[0]):
         A[i+1:,i:] -= np.outer(A[i+1:,i]/A[i,i], A[i,i:])
 
-def lu2(A):
+def lu2_fast(A):
     """Alternative LU decomposition using an outer product."""
     U = A.copy()
     L = np.eye(A.shape[0])
