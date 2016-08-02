@@ -5,11 +5,11 @@
 
 \section*{Least Squares} % ====================================================
 
-A linear system $A\x=\b$ is \emph{overdetermined} if it has no solutions.
-In this situation, the \emph{least squares solution}, denoted as $\widehat{\x}$, is ``closest'' to a solution.
+A linear system $A\x=\b$ is \emph{overdetermined} if it has more equations than unknowns.
+In this situation, the \emph{least squares solution}, denoted as $\widehat{\x}$, is ``closest'' vector to a solution.
 By definition, $\widehat{\x}$ is the vector such that $A\widehat{\x}$ will equal the projection of $\b$ onto the range of $A$.
-We can compute $\widehat{\x}$ by solving the \emph{Normal Equation} $A\trp A\widehat{\x} = A\trp \b$ (see Volume 1 Section 3.8). In this lab, we will be considering matrices in $M_{m \times n}(\Bbb{R})$. Therefore, we will use the transpose instead of the Hermitian.
-
+We can compute $\widehat{\x}$ by solving the \emph{normal equation} $A\trp A\widehat{\x} = A\trp \b$ (see Volume 1 Chapter 3).
+In this lab, we will be considering matrices in $M_{m \times n}(\mathbb{R})$. Therefore, we will use the transpose instead of the Hermitian.
 
 \subsection*{Solving the Normal Equation} % -----------------------------------
 
@@ -21,10 +21,10 @@ Let $A=QR$ be the QR decomposition of $A$, so $R = \left(\begin{array}{c}R_0\\
 where $R_0$ is $n \times n$, nonsingular, and upper triangular.
 It can be shown that $\widehat{\x}$ is the least squares solution to $A\x=\b$ if and only if $R_0\widehat{\x} = (Q\trp \b)[:n].$
 Here, $(Q\trp \b)[:n]$ refers to the first $n$ rows of $Q\trp \b$.
-Since $R$ is upper triangular, we can solve this equation quickly with back substitution (see Volume 1 Exercise 3.46).
+Since $R$ is upper triangular, we can solve this equation quickly with back substitution.
 
-\begin{problem}
-Write a function that accepts a matrix $A$ and a vector $b$ and returns the least squares solution to $Ax=b$.
+\begin{problem} % Solve the normal equations with QR.
+Write a function that accepts a matrix $A$ and a vector $\b$ and returns the least squares solution to $A\x=\b$.
 Use the QR decomposition as outlined above.
 Your function should use SciPy's functions for QR decomposition and for solving triangular systems, which are \li{la.qr()} and \li{la.solve_triangular()}, respectively. If you are unfamiliar with these functions, consult the documentation of these functions using object introspection.
 \end{problem}
