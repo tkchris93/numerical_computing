@@ -331,6 +331,13 @@ a wonderfully simple and effective solution, illustrating another application of
 This section contains some functions to help you code up the facial recognition class outlined in the problems of this lab.
 
 \begin{lstlisting}
+import numpy as np
+from scipy import linalg as la
+from os import walk
+from scipy.ndimage import imread
+from matplotlib import pyplot as plt
+from random import sample
+
 def getFaces(path="./faces94"):
     """Traverse the directory specified by 'path' and return an array containing
     one column vector per subdirectory.
@@ -375,14 +382,6 @@ def sampleFaces(n_tests,path = "./faces94")
 The following is the outline of the Facial Recognition class.
 
 \begin{lstlisting}
-import numpy as np
-from scipy import linalg as la
-from os import walk
-from scipy.ndimage import imread
-from matplotlib import pyplot as plt
-import matplotlib.cm as cm 
-from random import sample
-
 class FacialRec:
     ##########Members##########
     #   F, mu, Fbar, and U 
