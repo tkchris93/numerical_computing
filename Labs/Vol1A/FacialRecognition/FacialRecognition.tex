@@ -24,52 +24,25 @@ In this lab, we will store the images as $mn$-vectors by concatenating the rows 
 
 \begin{problem}
 \label{prob:getTrainingFaces}
-The problems in this lab will help you write a class \li{FacialRec} to perform facial recognition. 
-First we need to get a database of face images.
+This problem will make sure that you can load and display the images in the faces database.
 \begin{enumerate}
 \item Download the \li{faces94} face image database found at \url{http://cswww.essex.ac.uk/mv/allfaces/faces94.html} and extract the files.
 You should now have a directory named ``faces94" which contains photographs of many people, organized into folders by person.
-\end{enumerate}
-With this directory we can begin to write our \li{FacialRec} class. This class is outlined below.
-\begin{lstlisting}
-import numpy as np
-from scipy import linalg as la
-from os import walk
-from scipy.ndimage import imread
-from matplotlib import pyplot as plt
-import matplotlib.cm as cm 
-from random import sample
 
-class FacialRec:
-    ##########Members##########
-    #   F, mu, Fbar, and U 
-    ###########################
-    def __init__(self,path):
-        self.initFaces(path)
-        self.initMeanImage()
-        self.initDifferences()
-        self.initEigenfaces()
+\item The function \li{getFaces()} is given in the appendix. %or spec file?
+It constructs a database of face images by selecting exactly one face image for each person in the directory.
+It should return an array whose columns are flattened face images.
+Feel free to modify the given code.
+You may have to replace the parameter \li{\"./faces94\"} with the location of the directory \li{faces94} on your machine.
 
-    def initFaces(self, path):
-        self.F = getFaces(path)
-    def initMeanImage(self):
-        pass
-    def initDifferences(self):
-        pass
-    def initEigenfaces(self):
-        pass
-    def project(self, A, s=38):
-        pass
-    def findNearest(self, image, s=38):
-        pass
-\end{lstlisting}
+Test this function to make sure it runs without errors.
+Check that the return value \li{F} is a $36000 \times 153$ array. 
+The columns of this array are 153 flattened face images of 153 different people.
 
-The function \li{getFaces()} should construct a database of face images by selecting exactly one face image for each person in the directory.
-It should return an array whose columns are the selected face images.
-One implementation of this function is found at the end of this lab.
+\item Use \li{plt.imshow()} to display one of the faces.
+The original image dimensions are $200 \times 180$.
+You may find it useful to write a helper function that accepts a flattened image and displays it.
 
-\begin{enumerate}
-\item Initialize a \li{FacialRec} instance with the command \li{facialRec = FacialRec(\"./faces94\")}. You may have to replace the parameter \li{\"./faces94\"} with the location of the directory \li{faces94} on your machine. Check that \li{facialRec.F} is a $36000 \times 153$ array. The columns of this array are 153 face images of 153 different people.
 \end{enumerate}
 \end{problem}
 
@@ -91,17 +64,20 @@ Define the \emph{mean face} ${\boldsymbol \mu}$ to be the average of the $\f_i$:
 \begin{problem}
 \label{prob:meanFace}
 \leavevmode
-\begin{enumerate}
-\item Implement the method \li{FacialRec.initMeanImage()} as follows.
-\begin{lstlisting}
-def initMeanImage(self):
-    self.mu = # Compute the mean face of the images in self.F
-\end{lstlisting}
-This can be done in one line using \li{np.mean} and specifying the correct axis.
 
-\item Plot the mean face. 
-The function \li{show()} at the end of this lab will plot a flattened grayscale image.
-Your mean face should match Figure \ref{facialRecognition:meanFace}.
+The Facial Recognition program you will write in this lab will be structured as a class. 
+An outline of the \li{FacialRec} class is provided in the appendix. %or maybe in the spec file?
+You will write the methods of the class.
+
+When initialized, the \li{FacialRec} object first loads the face images using \li{getFaces} and stores the result.
+The next step is to compute the mean face.
+\begin{enumerate}
+\item Implement the method \li{FacialRec.initMeanImage()}.
+Compute the mean face as described above and store it as \li{self.mu}.
+This can be done in one line of code using NumPy.
+
+\item Display the mean face.
+Your result should match Figure \ref{facialRecognition:meanFace}.
 \end{enumerate}
 \end{problem}
 
@@ -131,14 +107,12 @@ Now form the $mn \times k$ matrix $\bar{F}$ whose columns are given by the mean-
 \begin{problem}
 \leavevmode
 \begin{enumerate}
-\item Implement the method \li{FacialRec.initDifferences()} to compute $\bar{F}$ as follows.
-\begin{lstlisting}
-def initDifferences(self):
-    self.Fbar = # Compute the mean-shifted face vectors Fbar
-\end{lstlisting}
+\item Implement the method \li{FacialRec.initDifferences()}.
+Compute $\bar{F}$ and store it as \li{self.Fbar}.
 This can be done in one line using array broadcasting.
 \item
-Plot a mean-shifted face. The output should be similar to the faces in Figure \ref{facialRecognition:differenceFaces}.
+Display one of the mean-shifted faces. 
+The output should be similar to the faces in Figure \ref{facialRecognition:differenceFaces}.
 \end{enumerate}
 \end{problem}
 
@@ -340,7 +314,7 @@ The functions \li{np.linalg.norm()} and \li{np.argmin()} will be useful for the 
 The function \li{sampleFaces(n_tests, path)} at the end of this lab will build an array of \li{n_tests} random faces from the \li{faces94} database.
 
 Plot the random face beside the face returned by your facial recognition code to see if your system is accurately recognizing faces.
-The function \li{show2()} at the end of this lab will plot two face vectors side-by-side.
+%The function \li{show2()} at the end of this lab will plot two face vectors side-by-side.
 
 \end{enumerate}
 \end{problem}
@@ -357,6 +331,13 @@ a wonderfully simple and effective solution, illustrating another application of
 This section contains some functions to help you code up the facial recognition class outlined in the problems of this lab.
 
 \begin{lstlisting}
+import numpy as np
+from scipy import linalg as la
+from os import walk
+from scipy.ndimage import imread
+from matplotlib import pyplot as plt
+from random import sample
+
 def getFaces(path="./faces94"):
     """Traverse the directory specified by 'path' and return an array containing
     one column vector per subdirectory.
@@ -380,14 +361,6 @@ def getFaces(path="./faces94"):
     return F
 
 
-def show(im, w=200, h=180):
-    """Plot the flattened grayscale image 'im' of width 'w' and height 'h'."""
-    
-    plt.imshow(im.reshape((w,h)), cmap=cm.Greys_r)
-    plt.show()
-    
-
-
 def sampleFaces(n_tests,path = "./faces94")
     """Return an array containing a sample of n_tests images contained 
     in the path as flattened images in the columns of the output.
@@ -404,16 +377,31 @@ def sampleFaces(n_tests,path = "./faces94")
     images = np.array([imread(f).mean(axis=2).ravel() for f in test_files]).T
     return images
     
+\end{lstlisting}
 
-def show2(im1, im2, w=200, h=180):
-    """Convenience function for plotting two flattened grayscale images of
-    the specified width and height side by side.
-    """
-    plt.subplot(121)
-    plt.imshow(im1.reshape((w,h)), cmap=cm.Greys_r)
-    plt.subplot(122)
-    plt.imshow(im2.reshape((w,h)), cmap=cm.Greys_r)
-    plt.show()
+The following is the outline of the Facial Recognition class.
 
+\begin{lstlisting}
+class FacialRec:
+    ##########Members##########
+    #   F, mu, Fbar, and U 
+    ###########################
+    def __init__(self,path):
+        self.initFaces(path)
+        self.initMeanImage()
+        self.initDifferences()
+        self.initEigenfaces()
 
+    def initFaces(self, path):
+        self.F = getFaces(path)
+    def initMeanImage(self):
+        pass
+    def initDifferences(self):
+        pass
+    def initEigenfaces(self):
+        pass
+    def project(self, A, s=38):
+        pass
+    def findNearest(self, image, s=38):
+        pass
 \end{lstlisting}
