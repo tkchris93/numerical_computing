@@ -37,7 +37,6 @@ def _timeout(seconds):
         print(message)
         raise TimeoutError(message)
 
-
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -93,8 +92,6 @@ class _testDriver(object):
     def __init__(self):
         """Initialize the feedback attribute."""
         self.feedback = ""
-
-    data_file = "horse.npy"
 
     # Main routine ------------------------------------------------------------
     def test_all(self, student_module, total=40):
@@ -206,9 +203,14 @@ class _testDriver(object):
             L1, U1 = lu(A)
             if not np.allclose(L1.dot(U1), A):
                 return _test(n)
-            L2, U2 = s.lu(A.copy())
+            stu = s.lu(A.copy())
+            try:
+                L2, U2 = stu
+            except(TypeError, ValueError):
+                raise ValueError("lu() failed to return two arrays")
 
-            if any(not np.allclose(*x) for x in [(np.tril(L2), L2),
+            pts = 5
+            if not all(np.allclose(*x) for x in [(np.tril(L2), L2),
                    (np.triu(U2), U2), (L1, L2), (U1, U2), (A, L2.dot(U2))]):
                 pts = 2
                 self.feedback += "\n\n{}\nA =\n{}".format('- '*20, A)
@@ -221,9 +223,7 @@ class _testDriver(object):
                 pts += self._eqTest(L1, L2, "lu() failed (L incorrect)")
                 pts += self._eqTest(U1, U2, "lu() failed (U incorrect)")
                 pts += self._eqTest(A, L2.dot(U2), "lu() failed (A != LU)")
-                return pts
-            else:
-                return 5
+            return pts
 
         return _test(4) + _test(6)
 

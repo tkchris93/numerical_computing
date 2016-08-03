@@ -1,5 +1,9 @@
-# solutions.py
-"""Volume I: QR 1 (Decomposition). Solutions file."""
+# qr_decomposition.py
+"""Volume I: QR 1 (Decomposition).
+<Name>
+<Class>
+<Date>
+"""
 
 import numpy as np
 from scipy import linalg as la
@@ -68,8 +72,8 @@ def hessenberg(A):
         A ((m,m) ndarray): An invertible matrix.
 
     Returns:
-        H ((m,m) ndarray): The upper hessenberg form of A.
         Q ((m,m) ndarray): An orthonormal matrix.
+        H ((m,m) ndarray): The upper hessenberg form of A.
     """
     raise NotImplementedError("Problem 5 Incomplete")
 

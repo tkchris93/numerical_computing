@@ -4,7 +4,6 @@
 import numpy as np
 from scipy import linalg as la
 
-
 # Problem 1
 def qr_gram_schmidt(A):
     """Compute the QR decomposition of A via the Modified Gram-Schmidt method.
@@ -17,7 +16,7 @@ def qr_gram_schmidt(A):
         R ((n,n) ndarray): An upper triangular matrix.
     """
     m,n = A.shape
-    Q = np.copy(A)
+    Q = np.copy(A).astype(np.float)
     R = np.zeros((n,n))
     for i in xrange(n):
         R[i,i] = la.norm(Q[:,i])
@@ -40,7 +39,7 @@ def abs_det(A):
         (float) the absolute value of the detetminant of A.
     """
     Q,R = la.qr(A)                 # or Q, R = qr_gram_schmidt(A)
-    return R.diagonal().prod()
+    return abs(R.diagonal().prod())
 
 
 # Problem 3
@@ -67,6 +66,8 @@ def solve(A, b):
 
     return x
 
+# Use this since np.sign(0) -> 0.
+sign = lambda x: 1 if x >= 0 else -1
 
 # Problem 4
 def qr_householder(A):
@@ -84,10 +85,10 @@ def qr_householder(A):
     Q = np.identity(m)
     for k in xrange(n):
         u = np.copy(R[k:,k])
-        u[0] += np.sign(u[0])*la.norm(u)
+        u[0] += sign(u[0])*la.norm(u)
         u /= la.norm(u)
-        R[k:,k:] = R[k:,k:] - 2*np.outer(u, np.dot(u.T, R[k:,k:]))
-        Q[k:] = Q[k:] - 2*np.outer(u, np.dot(u.T, Q[k:]))
+        R[k:,k:] -= 2*np.outer(u, np.dot(u, R[k:,k:]))
+        Q[k:] -= 2*np.outer(u, np.dot(u, Q[k:]))
     return Q.T, R
 
 
@@ -100,21 +101,20 @@ def hessenberg(A):
         A ((m,m) ndarray): An invertible matrix.
 
     Returns:
-        H ((m,m) ndarray): The upper hessenberg form of A.
         Q ((m,m) ndarray): An orthonormal matrix.
+        H ((m,m) ndarray): The upper hessenberg form of A.
     """
     m,n = A.shape
     H = np.copy(A)
     Q = np.identity(m)
     for k in xrange(n-2):
         u = np.copy(H[k+1:,k])
-        u[0] += np.sign(u[0])*la.norm(u)
+        u[0] += sign(u[0])*la.norm(u)
         u /= la.norm(u)
         H[k+1:,k:] -= 2*np.outer(u, np.dot(u, H[k+1:,k:]))
         H[:,k+1:] -= 2*np.outer(np.dot(H[:,k+1:], u), u)
         Q[k+1:] -= 2*np.outer(u, np.dot(u, Q[k+1:]))
-
-    return H, Q
+    return Q, H
 
 
 # Additional Material
