@@ -1,19 +1,15 @@
 \lab{QR 1: Decomposition}{The QR Decomposition}
 \label{lab:QRdecomp}
-\objective{Use the Gram-Schmidt algorithm and orthonormal transformations to perform the QR decomposition.}
+\objective{The QR decomposition is a fundamentally important matrix factorization.
+It is straightforward to implement, is numerically stable, and provides the basis of several important algorithms.
+In this lab, we explore several ways to produce the QR decomposition and implement a few immediate applications.
+}
 
-The QR decomposition of a matrix $A$ is a factorization $A=QR$, where $Q$ has orthonormal columns and $R$ is upper triangular.
-This decomposition is useful for computing least squares and finding eigenvalues.
-As stated in the following theorem, the QR decomposition of $A$ always exists when the rank of $A$ equals the number of columns of $A$.
-\begin{theorem}
-Let $A$ be an $m\times n$ matrix of rank $n$.  Then $A$ can be
-factored into a product $Q R$, where $Q$ is an $m\times n$ matrix
-with orthonormal columns and $R$ is a $n \times n$ upper
-triangular matrix of rank $n$.
-\end{theorem}
-
-In this lab we will only discuss real matrices.
-All of these results can be extended to the complex numbers by replacing ``transpose'' with ``hermitian conjugate'' and ``symmetric matrix'' with ``hermitian matrix.''
+The QR decomposition of an $m\times n$ matrix $A$ is a factorization $A=QR$, where $Q$ is  has orthonormal columns and $R$ is upper triangular.
+Every matrix $A \in M_{m\times n}$ of rank $n \le m$ has a QR factorization where $Q$ is $m\times m$ and $R$ is $m\times n$.
+%
+\footnote{In this lab we only discuss real matrices.
+All of these results can be extended to the complex numbers by replacing ``transpose'' with ``hermitian conjugate'' and ``symmetric matrix'' with ``hermitian matrix.''}
 
 \section*{Modified Gram-Schmidt} % ============================================
 
@@ -33,7 +29,6 @@ where
 \p_{k-1} = \sum_{i=1}^{k-1} \langle \q_i, \x_k\rangle \q_i, \,\,\,\, k=2, \ldots, n
 \]
 and $\p_0 = 0$.
-
 
 Let $Q$ be the matrix with columns $\{\q_i\}_{i=1}^n$.
 Let $R$ be the upper triangular matrix with entries $r_{jk}$ where $r_{kk} = \|\x_k-\p_{k-1}\|$ and $r_{j k} = \langle \q_j, \x_k\rangle$ when $j < k$.
@@ -69,6 +64,7 @@ The entire modified Gram-Schmidt algorithm is described in Algorithm \ref{Alg:mo
         \Comment{An $n\times n$ array of all zeros.}
     \For{$i=0\ldots n-1$}
         \State $R_{i,i} \gets \norm{Q_{:,i}}$
+            \Comment{(Hint: use \li{scipy.linalg.norm()}).}
         \State $Q_{:,i} \gets Q_{:,i}/R_{i,i}$
             \Comment{Normalize the $i$th column of $Q$.}
         \For{$j=i+1\ldots n-1$}
@@ -85,6 +81,7 @@ The entire modified Gram-Schmidt algorithm is described in Algorithm \ref{Alg:mo
 \end{algorithm}
 
 % TODO: put this section after the next? What algorithm does SciPy use?
+\begin{comment}
 \section*{QR Decomposition in SciPy} % ========================================
 
 The linear algebra library in SciPy calculates the QR decomposition using a software package called LAPACK (Linear Algebra PACKage), which is incredibly efficient.
@@ -100,35 +97,75 @@ Here is an example of using SciPy to compute the QR decomposition of a matrix.
 array([[ True, False, False],
        [ True, False, False],
        [ True,  True, False],
-       [ True,  True, False]], dtype=bool)
+       [ True,  True, False]], dtype=<<bool>>)
 \end{lstlisting}
- Note that \li{Q.dot(R)} does not equal \li{A} exactly because of rounding errors.
- However, we can check that the entries of \li{Q.dot(R)} are ``close'' to the entries of \li{A} with the NumPy method \li{np.allclose()}.
- This method checks that the elements of two arrays differ by less than a given tolerance, a tolerance specified by two keyword arguments \li{rtol} and \li{atol} that default to $10^{-5}$ and $10^{-8}$ respectively.
- You can read the documentation to learn how the tolerance is computed from these numbers.
+
+Note that \li{Q.dot(R)} does not equal \li{A} exactly because of small rounding errors.
+However, \li{np.allclose()} reveals that the entries of \li{Q.dot(R)} are all approximately equal to the entries of \li{A}.
+
 \begin{lstlisting}
 >>> np.allclose(Q.dot(R), A)
 True
 \end{lstlisting}
-We can use the same method to check that \li{Q} is ``very close'' to an orthogonal matrix.
+
+We can use the same method to check that \li{Q} is an orthogonal matrix.
+
 \begin{lstlisting}
 >>> np.allclose(Q.T.dot(Q), np.eye(3))
 True
 \end{lstlisting}
-
+\end{comment}
 
 \begin{problem} % Decomposition via Modified Gram Schmidt.
-Write a function that accepts as input a $m \times n$ matrix of rank $n$ and computes its QR decomposition, returning the matrices $Q$ and $R$.
-Your function should use Algorithm \ref{Alg:modified-gram-schmidt}.
-Generate test cases with \li{np.random.random()}, using \li{np.allclose()} to verify that $A = QR$.
-\\
-(Hint: Read about the function \li{np.inner()}.)
+Write a function that accepts an $m \times n$ matrix $A$ of rank $n$.
+Use Algorithm \ref{Alg:modified-gram-schmidt} to compute the reduced QR decomposition of $A$.
+
+To test the algorithm, generate test cases with NumPy's \li{np.random} module.
+Verify that $R$ is upper triangular, $Q$ is orthonormal, and $QR = A$.
+You may also want to compare your results to SciPy's QR factorization algorithm.
+
+\begin{lstlisting}
+>>> import numpy as np
+>>> from scipy import linalg as la
+>>> A = np.random.random((10,10))
+>>> Q,R = la.qr(A, mode="economic") # Specify 'economic' for reduced QR.
+>>> np.allclose(Q.dot(R), A)        # Verify that QR = A.
+True
+\end{lstlisting}
+\label{prob:qr-via-mgs}
 \end{problem}
 
+\subsection*{Consequences of the QR Decomposition} % --------------------------
+
+The special structures of $Q$ and $R$ immediately provide some simple applications.
+Since $Q$ is orthonormal and $R$ is upper-triangular,
+\begin{align*} \det(Q) = \pm 1 && \det(R) = \prod_{i=1}^n r_{i,i} \end{align*}
+Then since $\det(AB) = \det(A)\det(B)$, we have the following:
+\[\abs{\det(A)} = \abs{\det(QR)} = \abs{\det(Q)\det(R)} = \abs{\prod_{i=1}^n r_{i,i}}\]
+
+\begin{problem} % Use the QR decomposition to calculate |det(A)|.
+Write a function that accepts a square matrix $A$ of full rank.
+Use the QR decomposition of $A$ to calculate $\abs{\det(A)}$.
+
+You may use your QR decomposition algorithm from Problem \ref{prob:qr-via-mgs} or SciPy's QR routine.
+Can you implement this function in a single line?
+\end{problem}
+
+The LU decomposition is usually the matrix factorization of choice to solve the linear system $A\x = \b$ because the triangular structures of $L$ and $U$ facilitate forward and backward substitution.
+However, the QR decomposition avoids the potential numerical issues that come with Gaussian elimination.
+
+Since $Q$ is orthonormal, $Q^{-1}= Q\trp$, so solving $A\x = \b$ is equivalent to solving the system $R\x = Q\trp\b$.
+Since $R$ is upper-triangular, $R\x = Q\trp\b$ can be solved quickly with back substitution.%
+\footnote{See Problem 3 of the Linear Systems lab for a refresher on back substitution.}
+
 \begin{problem} % Use the QR decomposition to solve Ax = b quickly.
-Write a function that accepts a square matrix $A$ of full rank and returns $\abs{\det(A)}$.
-Use the QR decomposition of $A$ to perform this calculation.
-Hint: What is the determinant of an orthonormal matrix?
+Write a function that accepts an invertible $n \times n$ matrix $A$ and a vector $\b$ of length $n$.
+Use the QR decomposition to solve $A\x = \b$ in the following steps:
+\begin{enumerate}
+    \item Compute $Q$ and $R$.
+    \item Calculate $\y = Q\trp\b$.
+    \item Use back substitution to solve $R\x = \y$ for $\x$.
+\end{enumerate}
 \end{problem}
 
 \section*{Householder Triangularization} % ====================================
@@ -148,23 +185,22 @@ Then the Householder transformation that reflects about $H$ corresponds to the m
 You can check that $(I - 2 \mathbf{u}\mathbf{u}\trp)\trp(I - 2 \mathbf{u}\mathbf{u}\trp)=I$, so Householder transformations are orthogonal.
 
 %\newcommand{\ipt}[2]{\ensuremath{\left\langle #1,#2 \right\rangle}}
-\begin{figure}
+\begin{figure}[H]
 \begin{center}
 \begin{tikzpicture}
-%\draw[-, thick](0,-1.5)--(0,3); %x-axis
-%\draw[-,thick](-1,0)--(4,0); %y-axis
-%\node[draw, thick, minimum height=4.5cm, minimum width=5cm]()at(1.5,.75){};
-\draw[-,dashed, gray](-2,-1.333)--(3, 2); % hyperplane
-\draw[->, gray, >=stealth,ultra thick](0,0)--(.8,-1.2); % v
-\draw[->, >=stealth, thick](0,0)--(2.815, .777); % H x
-\draw[->, >=stealth, thick](0,0)--(1.8,2.3); % x
-\node[draw=none](v)at(.65,-.6){$\v$};
-\node[draw=none](x)at(.75,1.5){$\x$};
-\node[draw=none](Hx)at(3, .5){$H_{\v}\x$};
-\node[draw=none](H)at(-1.5,-.6){$H$};
-%\node[draw=none](bullet)at(2.31, 1.53){\textbullet};
-%\node[draw=none](vandx)at(4.0,1.5){$\x -
-%\left \langle \dfrac{\v}{\|\v\|}, \x \right \rangle \dfrac{\v}{\|\v\|}$};
+    %\draw[-, thick](0,-1.5)--(0,3); %x-axis
+    %\draw[-,thick](-1,0)--(4,0); %y-axis
+    \draw[-,dashed, gray](-2,-1.333)--(3, 2);               % hyperplane
+    \draw[->, gray, >=stealth,ultra thick](0,0)--(.8,-1.2); % v
+    \draw[->, >=stealth, thick](0,0)--(2.815, .777);        % H x
+    \draw[->, >=stealth, thick](0,0)--(1.8,2.3);            % x
+    \node[draw=none](v)at(.65,-.6){$\v$};
+    \node[draw=none](x)at(.75,1.5){$\x$};
+    \node[draw=none](Hx)at(3, .5){$H_{\v}\x$};
+    \node[draw=none](H)at(-1.5,-.6){$H$};
+    %\node[draw=none](bullet)at(2.31, 1.53){\textbullet};
+    %\node[draw=none](vandx)at(4.0,1.5){$\x -
+    %\left \langle \dfrac{\v}{\|\v\|}, \x \right \rangle \dfrac{\v}{\|\v\|}$};
 \end{tikzpicture}
 \end{center}
 \caption{This is a picture of a Householder transformation.
@@ -185,46 +221,28 @@ Let $e_1, \ldots, e_4$ be the standard basis of $\mathbb{R}^4$.
 First we find an orthonormal transformation $Q_1$ that maps the first column of A into the span of $e_1$.
 This is diagrammed below, where $*$ represents an arbitrary entry.
 
-\def\mc#1{\multicolumn{1}{c|}{#1}}
-\def\lc#1{\multicolumn{1}{|c}{#1}}
+\def\rvl#1{\multicolumn{1}{c|}{#1}}
+\def\lvl#1{\multicolumn{1}{|c}{#1}}
 \begin{equation*}
-\begin{pmatrix}
+\left[\begin{array}{ccc}
 * & * & * \\
 * & * & * \\
 * & * & * \\
 * & * & *
-\end{pmatrix}
+\end{array}\right]
 \underrightarrow{Q_1}
-\begin{pmatrix}
-
-* & * & * & \\ \cline{2-3}
-\mc{0} & * & \mc{*}& \\
-\mc{0} & * & \mc{*} & \\
-\mc{0}& * & \mc{*} & \\ \cline{2-3}
-\end{pmatrix}
+\left[\begin{array}{ccc}
+    *  & * &     *  \\
+\cline{2-3}
+\rvl{0} & * & \rvl{*} \\
+\rvl{0} & * & \rvl{*} \\
+\rvl{0} & * & \rvl{*} \\
+\cline{2-3}
+\end{array}\right]
 \end{equation*}
 Let $A_2 = Q_1A$ be the matrix on the right above.
 Now find an orthonormal transformation $Q_2$ that fixes $e_1$ and maps the second column of $A_2$ into the span of $e_1$ and $e_2$.
 Notice that since $Q_2$ fixes $e_1$, the top row of $A_2$ will be fixed by $Q_2$, and only entries in the boxed submatrix will change.
-
-%\def\mc#1{\multicolumn{1}{c|}{#1}}
-%\begin{equation*}
-%\begin{pmatrix}
-%* & * & * & \\ \cline{2-3}
-%\mc{0} & * & \mc{*}& \\
-%\mc{0} & * & \mc{*} & \\
-%\mc{0}& * & \mc{*} & \\ \cline{2-3}
-%\end{pmatrix}
-%
-%\underrightarrow{Q_1}
-%
-%\begin{pmatrix}
-%* & * & * & \\ \cline{2-3}
-%\mc{0} & 0 & \mc{*}& \\
-%\mc{0} & 0 & \mc{*} & \\
-%\mc{0}& 0 & \mc{*} & \\ \cline{2-3}
-%\end{pmatrix}
-%\end{equation*}
 
 Let $A_3 = Q_2Q_1A$ be the matrix on the right above.
 Finally, find an orthonormal transformation $Q_3$ that fixes $e_1$ and $e_2$ and maps the third column of $A_3$ into the span of $e_1$, $e_2$, and $e_3$.
@@ -232,33 +250,38 @@ The diagram below summarizes this process, where boxed entries indicate those af
 
 \begin{equation*}
 Q_3 Q_2 Q_1
-\begin{pmatrix}
+\left[\begin{array}{ccc}
 * & * & * \\
 * & * & * \\
 * & * & * \\
 * & * & *
-\end{pmatrix}
+\end{array}\right]
 = Q_3 Q_2
-\begin{pmatrix}  \cline{2-4}
-&\lc{*} & * & \mc{*} & \\
-&\lc{0} & * & \mc{*}& \\
-&\lc{0} & * & \mc{*} & \\
-&\lc{0}& * & \mc{*} & \\ \cline{2-4}
-\end{pmatrix}
+\left[\begin{array}{ccccc}
+\cline{2-4}
+& \lvl{*} & * & \rvl{*} & \\
+& \lvl{0} & * & \rvl{*}& \\
+& \lvl{0} & * & \rvl{*} & \\
+& \lvl{0} & * & \rvl{*} & \\ \cline{2-4}
+\end{array}\right]
 = Q_3
-\begin{pmatrix}
-* & * & * \\ \cline{2-3}
-\mc{0} & * & \mc{*} \\
-\mc{0} & 0 & \mc{*} \\
-\mc{0} & 0 & \mc{*} & \\ \cline{2-3}
-\end{pmatrix}
+\left[\begin{array}{ccc}
+     *  & * &      * \\
+\cline{2-3}
+\rvl{0} & * & \rvl{*} \\
+\rvl{0} & 0 & \rvl{*} \\
+\rvl{0} & 0 & \rvl{*} \\
+\cline{2-3}
+\end{array}\right]
 =
-\begin{pmatrix}
+\left[\begin{array}{ccc}
 * & * & * \\
-0 & * & * \\ \cline{3-3}
-0 & \mc{0} & \mc{*} \\
-0 & \mc{0} & \mc{0} & \\ \cline{3-3}
-\end{pmatrix}.
+0 & * & * \\
+\cline{3-3}
+0 & \rvl{0} & \rvl{*} \\
+0 & \rvl{0} & \rvl{0} \\
+\cline{3-3}
+\end{array}\right].
 \end{equation*}
 
 We've accomplished our goal, which was to triangularize $A$ using orthonormal transformations.
@@ -266,12 +289,15 @@ But how do we construct the matrices $Q_k$?
 
 It turns out that we can choose each $Q_k$ to be a Householder transformation.
 Suppose we have found Householder transformations $Q_1, \ldots, Q_{k-1}$ such that $Q_{k-1}\ldots Q_2Q_1 = A_k$ where
-\[
-A_k = \begin{pmatrix}
+%
+\begin{align*}
+A_k =
+\left[\begin{array}{cc}
 T & X' \\
 0 & X''
-\end{pmatrix}.
-\]
+\end{array}\right].
+\end{align*}
+
 Here, $T$ is a $(k-1) \times (k-1)$ upper triangular matrix.
 Let $\x$ be the $k^{th}$ column of $A_k$.
 Write $\x = \x' + \x''$ where $\x'$ is in the span of $e_1, \ldots, e_{k-1}$.
@@ -290,39 +316,50 @@ As we have already discussed, $Q_k$ fixes the first $k-1$ rows and columns of an
 In fact, if $\x'' = (0, \ldots, 0, x_k, x_{k+1}, \ldots, x_n)$ as above, then $\mathbf{v}_k = (0, \ldots, 0, v_{k_0}, x_{k+1}, \ldots, x_n)$ where $v_{k_0} = x_k + \sign(x_k) \| \x'' \|$.
 If $\mathbf{u}_k$ is the normalization of $(v_{k_0}, x_{k+1}, \ldots, x_n) \in \mathbb{R}^{n-(k-1)}$, then
 \[
-Q_k = I-\frac{2\x''(\x'')\trp}{\|\x''\|^2} =  \begin{pmatrix}
+Q_k = I-\frac{2\x''(\x'')\trp}{\|\x''\|^2} =
+\left[\begin{array}{cc}
 I & 0 \\
 0 & I-2\mathbf{u}_k\mathbf{u}_k\trp
-\end{pmatrix}.
+\end{array}{ccc}\right].
 \]
 This means that, using block multiplication,
 \[
-Q_kA_k =  \begin{pmatrix}
+Q_kA_k =
+\left[\begin{array}{cc}
 I & 0 \\
-0 & I-2\mathbf{u}_k\mathbf{u}_k\trp
-\end{pmatrix}\begin{pmatrix}
+0 & I-2\u_k\u_k\trp
+\end{array}\right]
+\left[\begin{array}{cc}
 T & X' \\
 0 & X''
-\end{pmatrix} = \begin{pmatrix}
+\end{array}\right]
+=
+\left[\begin{array}{cc}
 T & X' \\
 0 & ( I-2\mathbf{u}_k\mathbf{u}_k\trp)X''
-\end{pmatrix}.
+\end{array}\right].
 \]
-So at each stage of the algorithm, we only need to update the entries in the bottom right submatrix of $A_k$, and these change via matrix multiplication by $ I-2\mathbf{u}_k\mathbf{u}_k\trp$. Similarly,
+
+So at each stage of the algorithm, we only need to update the entries in the bottom right submatrix of $A_k$, and these change via matrix multiplication by
+
+$ I-2\mathbf{u}_k\mathbf{u}_k\trp$. Similarly,
 \[
-Q_kQ_{k-1}\ldots Q_1 = Q_k \begin{pmatrix}
-A\\
-B
-\end{pmatrix} = \begin{pmatrix}
+Q_kQ_{k-1}\ldots Q_1 = Q_k
+\left[\begin{array}{c}
+A \\ B
+\end{array}\right]
+=
+\left[\begin{array}{cc}
 I & 0 \\
-0 & I-2\mathbf{u}_k\mathbf{u}_k\trp
-\end{pmatrix}\begin{pmatrix}
-A\\
-B
-\end{pmatrix} = \begin{pmatrix}
-A\\
-(I-2\mathbf{u}_k\mathbf{u}_k\trp)B
-\end{pmatrix},
+0 & I-2\u_k\u_k\trp
+\end{array}\right]
+\left[\begin{array}{c}
+A \\ B
+\end{array}\right]
+=
+\left[\begin{array}{c}
+A \\ (I-2\u_k\u_k\trp)B
+\end{array}\right],
 \]
 so to update $\prod Q_i$, we need only modify the bottom rows.
 These also change via matrix multiplication by $I-2\mathbf{u}_k\mathbf{u}_k\trp$.
@@ -340,13 +377,13 @@ These arguments produce Algorithm \ref{Alg:QR-via-Householder}.
 %This means that $\left( I - 2 v v^\mathsf{H} \right) x = \pm \norm{x} e_1$, or, in other words,
 %
 %\[ 2 v v^\mathsf{H} x =
-%\begin{pmatrix}
+%\left[\begin{array}{cc}
 %x_1 \pm \norm{x} \\
 %x_2 \\
 %x_3 \\
 %\vdots \\
 %x_n
-%\end{pmatrix}\]
+%\end{array}\right]\]
 %
 %Let $u$ be the vector on the right hand side of this expression.
 %It can be shown that the vector  $\frac{u}{\norm{u}}$ is the proper choice for $v$.
@@ -407,7 +444,7 @@ Reflecting about the hyperplane defined by $\v_i$ produces  $H_{\v_i}\x$.}
     \For{$k=0\ldots n-1$}
         \State $\u \gets \makecopy{R_{k:,k}}$
         \State $u_0 \gets u_0 + \sign(u_0)\|\u\|$
-            \Comment{$u_0$ is the first entry of $\u$.}
+            \Comment{$u_0$ is the first entry of $\u$.}\label{step:HH-sign}
         \State $\u \gets \u/\|\u\|$
             \Comment{Normalize $\u$.}
         \State $R_{k:,k:} \gets R_{k:,k:} - 2\u\left(\u\trp R_{k:,k:}\right)$
@@ -424,11 +461,34 @@ Reflecting about the hyperplane defined by $\v_i$ produces  $H_{\v_i}\x$.}
 
 \begin{problem} % QR Decomposition via Householder Triangularization
 Write a function that accepts as input a $m \times n$ matrix $A$ of rank $n$.
-Use Algorithm \ref{Alg:QR-via-Householder} to compute the QR decomposition of $A$.
-\\
-(Hint: In steps \ref{step:HH-outer1} and \ref{step:HH-outer2} of Algorithm \ref{Alg:QR-via-Householder}, the multiplication of $\u$ and $(\u\trp X)$ is an \emph{outer product}---$\x\y\trp$ instead of the usual $\x\trp\y$.
+Use Algorithm \ref{Alg:QR-via-Householder} to compute the full QR decomposition of $A$.
+Consider the following implementation details.
+\begin{itemize}
+
+\item NumPy's \li{np.sign()} is an easy way to implement the $\sign()$ operation in step \ref{step:HH-sign}.
+However, \li{np.sign(0)} returns $0$, which will cause a problem in the rare case that $u_0 = 0$ (which is really only possible if the top left entry of $A$ is $0$ to begin with).
+The following code defines a function that returns the sign of a single number, counting $0$ as positive.
+
+\begin{lstlisting}
+sign = lambda x: 1 if x >= 0 else -1
+\end{lstlisting}
+
+\item In steps \ref{step:HH-outer1} and \ref{step:HH-outer2}, the multiplication of $\u$ and $(\u\trp X)$ is an \emph{outer product} ($\x\y\trp$ instead of the usual $\x\trp\y$).
 Use \li{np.outer()} instead of \li{np.dot()} to handle this correctly.)
-% Hint: Read about the function \li{np.outer()}.  Another Hint: When defining $\u$, reshape the array to an $(m-k) \times 1$ array.
+
+\end{itemize}
+
+As with Problem \ref{prob:qr-via-mgs}, use \li{scipy.linalg.qr()} and \li{np.allclose()} to test your answers.
+
+\begin{lstlisting}
+>>> A = np.random.randint(1, 10, (5, 3))
+>>> Q,R = la.qr(A)                  # Don't specify method="economic"
+>>> print A.shape, Q.shape, R.shape     # to get the full decomposition.
+(5,3) (5,5) (5,3)
+>>> np.allclose(Q.dot(R), A)
+True
+\end{lstlisting}
+\label{prob:qr-via-hessenberg}
 \end{problem}
 
 \section*{Upper Hessenberg Form} % ============================================
@@ -436,7 +496,8 @@ Use \li{np.outer()} instead of \li{np.dot()} to handle this correctly.)
 An upper Hessenberg matrix is a square matrix with zeros below the first subdiagonal.
 Every  $n \times n$ matrix $A$ can be written $A = Q\trp HQ$ where $Q$ is orthonormal and $H$ is an upper Hessenberg matrix, called the Hessenberg form of $A$.
 
-A fast algorithm for computing the QR decomposition of a Hessenberg matrix will be taught in Lab \ref{lab:givens}. This algorithm in turn leads to a fast algorithm for finding eigenvalues of a matrix.
+% A fast algorithm for computing the QR decomposition of a Hessenberg matrix will be taught in Lab \ref{lab:givens}. This algorithm in turn leads to a fast algorithm for finding eigenvalues of a matrix. % O RLY?
+% % This is refering to the next lab, btw.
 
 For now, we will outline an algorithm for computing the upper Hessenberg form of any matrix.
 Like Householder triangularization, this algorithm uses Householder transformations.
@@ -450,43 +511,43 @@ Because $Q_1$ fixes $e_1$, the product $Q_1A$ leaves the first row of $A$ alone,
 If $A$ is a $5 \times 5$ matrix, this looks like
 \[
 \begin{array}{ccccc}
-\begin{pmatrix}
+\left[\begin{array}{ccccc}
 * & * & * & * & * \\
 * & * & * & * & * \\
 * & * & * & * & * \\
 * & * & * & * & * \\
 * & * & * & * & *
-\end{pmatrix}
-&\underrightarrow{Q_1 \cdot }&
-\begin{pmatrix}
+\end{array}\right]
+&\underrightarrow{Q_1}&
+\left[\begin{array}{ccccc}
 * & * & * & * & * \\
 * & * & * & * & * \\
 0 & * & * & * & * \\
 0 & * & * & * & * \\
 0 & * & * & * & *
-\end{pmatrix}
-&\underrightarrow{\cdot Q_1\trp }&
-\begin{pmatrix}
+\end{array}\right]
+&\underrightarrow{Q_1\trp }&
+\left[\begin{array}{ccccc}
 * & * & * & * & * \\
 * & * & * & * & * \\
 0 & * & * & * & * \\
 0 & * & * & * & * \\
 0 & * & * & * & *
-\end{pmatrix}
+\end{array}\right]
 \\
 A & & Q_1A & & (Q_1 A) Q_1\trp
-  \end{array}
+\end{array}
 \]
 We now iterate through the matrix until we obtain
 \begin{equation*}
 Q_3 Q_2 Q_1 A Q_1\trp Q_2 \trp Q_3\trp =
-\begin{pmatrix}
+\left[\begin{array}{ccccc}
 * & * & * & * & * \\
 * & * & * & * & * \\
 0 & * & * & * & * \\
 0 & 0 & * & * & * \\
 0 & 0 & 0 & * & *
-\end{pmatrix}.
+\end{array}\right].
 \end{equation*}
 
 The pseudocode for computing the Hessenberg form of a matrix with Householder transformations is shown in Algorithm \ref{Alg:Hessenberg}.
@@ -522,13 +583,12 @@ Thus, the Hessenberg form of a symmetric matrix is especially useful, since as w
 
 % TODO: This doesn't work if A is singular
 \begin{problem} % Hessenberg form.
-Write a function that accepts as input a nonsingular square matrix $A$.
+Write a function that accepts a nonsingular $n \times n$ matrix $A$.
 Use Algorithm \ref{Alg:Hessenberg} to compute its Hessenberg form, returning orthogonal $Q$ and upper Hessenberg $H$ satisfying $A = Q\trp HQ$.
-\\
-(Hint: When defining $\u$, reshape the array to an $(m-k-1) \times 1$ array.)
+\end{problem}
 
 What happens when you compute the Hessenberg factorization of a symmetric matrix?
-\end{problem}
+Can you explain why?
 
 \newpage
 
@@ -541,12 +601,26 @@ We can use the same strategy to compute the QR decomposition with rotations inst
 
 Let us begin with Givens rotations in $\mathbb{R}^2$.
 An arbitrary vector $\x = (a, b)\trp$ can be rotated into the span of $e_1$ via an orthogonal transformation.
-In fact, the matrix $T_{\theta} = \begin{pmatrix}\cos \theta & - \sin \theta \\ \sin \theta & \cos \theta \end{pmatrix}$ rotates a vector counterclockwise by $\theta$.
+In fact, the matrix $T_{\theta} = \left[\begin{array}{cc}\cos \theta & - \sin \theta \\ \sin \theta & \cos \theta \end{array}\right]$ rotates a vector counterclockwise by $\theta$.
 Thus, if $\theta$ is the clockwise-angle between $\x$ and $e_1$, the vector $T_{-\theta}\x$ will be in the span of $e_1$.
 We can find $\sin \theta$ and $\cos \theta$ with the formulas $\sin = \frac{\text{opp}}{\text{hyp}}$ and $\cos = \frac{\text{adj}}{\text{hyp}}$, so $\sin \theta = \frac{b}{\sqrt{a^2+b^2}}$ and $\cos \theta =  \frac{a}{\sqrt{a^2+b^2}}$ (see Figure\ref{fig:angle}).
 Then
 \[
-T_{-\theta}\x = \begin{pmatrix}\cos \theta &  \sin \theta \\ -\sin \theta & \cos \theta \end{pmatrix} \begin{pmatrix} a \\ b \end{pmatrix} = \begin{pmatrix}\frac{a}{\sqrt{a^2+b^2}} & \frac{b}{\sqrt{a^2+b^2}} \\ -\frac{b}{\sqrt{a^2+b^2}} & \frac{a}{\sqrt{a^2+b^2}} \end{pmatrix}\begin{pmatrix} a \\ b \end{pmatrix} = \begin{pmatrix} \sqrt{a^2+b^2} \\ 0 \end{pmatrix}.
+T_{-\theta}\x
+=
+\left[\begin{array}{cc}
+\cos\theta  & \sin\theta \\
+-\sin\theta & \cos\theta \\
+\end{array}\right]
+\left[\begin{array}{c} a \\ b \end{array}\right]
+=
+\left[\begin{array}{cc}
+ \frac{a}{\sqrt{a^2+b^2}} & \frac{b}{\sqrt{a^2+b^2}} \\
+-\frac{b}{\sqrt{a^2+b^2}} & \frac{a}{\sqrt{a^2+b^2}} \\
+\end{array}\right]
+\left[\begin{array}{c} a \\ b \end{array}\right]
+=
+\left[\begin{array}{c} \sqrt{a^2+b^2} \\ 0 \end{array}\right].
 \]
 
 \begin{figure}
@@ -572,13 +646,14 @@ The matrix $T_{\theta}$ above is an example of a $2 \times 2$ Givens rotation ma
 In general, the Givens matrix $G(i,j,\theta)$ represents the orthonormal transformation that rotates the 2-dimensional span of $e_i$ and $e_j$ by $\theta$ radians.
 The matrix for this transformation is
 \begin{equation*}
-G(i,j,\theta) = \begin{pmatrix}
+G(i,j,\theta) =
+\left[\begin{array}{ccccc}
 I & 0 & 0 & 0 & 0 \\
 0 & c & 0 & -s & 0 \\
 0 & 0 & I & 0 & 0 \\
 0 & s & 0 & c & 0 \\
 0 & 0 & 0 & 0 & I
-\end{pmatrix}.
+\end{array}\right].
 \end{equation*}
 This matrix is in block form with $I$ representing the identity matrix, $c=\cos \theta$, and $s=\sin \theta$.
 The $c$'s appear on the $i^{th}$ and $j^{th}$ diagonal entries.
@@ -651,38 +726,36 @@ Entries should be zeroed out from bottom to top in each column, beginning with t
 \end{figure}
 
 For example, on a $2 \times 3$ matrix we may perform the following operations:
-
-\def\mc#1{\multicolumn{1}{c|}{#1}}
-\def\lc#1{\multicolumn{1}{|c}{#1}}
 \[
-\begin{array}{ccccccc}
-\begin{pmatrix}
-*&*\\
-*&*\\
-*&*
-\end{pmatrix}
-&
+\left[\begin{array}{cc}
+* & * \\
+* & * \\
+* & * \\
+\end{array}\right]
 \underrightarrow{G(2,3,\theta_1)}
-&\begin{pmatrix}
-&*&*&\\ \cline{2-3}
-&\lc{*}&\mc{*}&\\
-&\lc{0}&\mc{*}& \\ \cline{2-3}
-\end{pmatrix}
-&
+\left[\begin{array}{cccc}
+&      *  &      *  & \\
+\cline{2-3}
+& \lvl{*} & \rvl{*} & \\
+& \lvl{0} & \rvl{*} & \\
+\cline{2-3}
+\end{array}\right]
 \underrightarrow{G(1,2,\theta_2)}
-& \begin{pmatrix} \cline{2-3}
-&\lc{*}&\mc{*}&\\
-&\lc{0}&\mc{*}&\\ \cline{2-3}
-&0&*&
-\end{pmatrix}
-&
+\left[\begin{array}{cccc}
+\cline{2-3}
+& \lvl{*} & \rvl{*} & \\
+& \lvl{0} & \rvl{*} & \\
+\cline{2-3}
+&      0  &      *  & \\
+\end{array}\right]
 \underrightarrow{G(2,3,\theta_3)}
-&\begin{pmatrix}
-*&*&\\ \cline{2-2}
-\mc{0}&\mc{*}&\\
-\mc{0}&\mc{0}&\\ \cline{2-2}
-\end{pmatrix}
-\end{array}
+\left[\begin{array}{ccc}
+     * &       *  & \\
+\cline{2-2}
+\rvl{0} & \rvl{*} & \\
+\rvl{0} & \rvl{0} & \\
+\cline{2-2}
+\end{array}\right]
 \]
 At each stage, the boxed entries are those modified by the previous transformation.
 The final transformation $G(2,3,\theta_3)$ operates on the bottom two rows, but since the first two entries are zero, they are unaffected.

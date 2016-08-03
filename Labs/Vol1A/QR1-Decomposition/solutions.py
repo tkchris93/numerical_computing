@@ -6,7 +6,7 @@ from scipy import linalg as la
 
 # Problem 1
 def qr_gram_schmidt(A):
-    """Compute the QR decomposition of A via the Modified Gram-Schmidt method.
+    """Compute the reduced QR decomposition of A via Modified Gram-Schmidt.
 
     Inputs:
         A ((m,n) ndarray): A matrix of rank n.
@@ -71,14 +71,14 @@ sign = lambda x: 1 if x >= 0 else -1
 
 # Problem 4
 def qr_householder(A):
-    """Compute the QR decomposition of A via Householder reflections.
+    """Compute the full QR decomposition of A via Householder reflections.
 
     Inputs:
         A ((m,n) ndarray): A matrix of rank n.
 
     Returns:
-        Q ((m,n) ndarray): An orthonormal matrix.
-        R ((n,n) ndarray): An upper triangular matrix.
+        Q ((m,m) ndarray): An orthonormal matrix.
+        R ((m,n) ndarray): An upper triangular matrix.
     """
     m,n = A.shape
     R = np.copy(A)
@@ -98,11 +98,11 @@ def hessenberg(A):
     such that A = (Q^T)HQ.
 
     Inputs:
-        A ((m,m) ndarray): An invertible matrix.
+        A ((n,n) ndarray): An invertible matrix.
 
     Returns:
-        Q ((m,m) ndarray): An orthonormal matrix.
-        H ((m,m) ndarray): The upper hessenberg form of A.
+        Q ((n,n) ndarray): An orthonormal matrix.
+        H ((n,n) ndarray): The upper hessenberg form of A.
     """
     m,n = A.shape
     H = np.copy(A)
