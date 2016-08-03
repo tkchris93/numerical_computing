@@ -507,9 +507,9 @@ This algorithm returns orthogonal $Q$ and upper Hessenberg $H$ such that $A = Q\
         \State $u_0 \gets u_0 + \sign(u_0)\|\u\|$
             \Comment{$u_0$ is the first entry of $\u$.}
         \State $\u \gets \u/\|\u\|$
-        \State $H_{k+1:,k:} \gets H_{k+1:,k:} - 2\u(\u\trp H[k+1:,k:])$
+        \State $H_{k+1:,k:} \gets H_{k+1:,k:} - 2\u(\u\trp H_{k+1:,k:})$
         \State $H_{:,k+1:} \gets H_{:,k+1:} - 2(H_{:,k+1:} \u) \u\trp$
-        \State $Q_{k+1:,:} \gets Q_{k+1:,:} - 2\u(\u\trp Q{k+1:,:})$
+        \State $Q_{k+1:,:} \gets Q_{k+1:,:} - 2\u(\u\trp Q_{k+1:,:})$
     \EndFor
     \State \pseudoli{return} $Q, H$
 \EndProcedure
@@ -702,7 +702,7 @@ Assuming that at the $ij^{th}$ stage of the algorithm, $a_{ij}$ is nonzero, Algo
       \State $a, b \gets R_{i-1,j}, R_{i,j}$
       \State $G \gets [[a, b],[-b,a]]/\sqrt{a^2+b^2}$
       \State $R_{i-1:i+1,j:} \gets GR_{i-1:i+1, j:}$
-      \State $Q{i-1:i+1,:} \gets GQ_{i-1:i+1,:}$
+      \State $Q_{i-1:i+1,:} \gets GQ_{i-1:i+1,:}$
     \EndFor
 \EndFor
 \State \pseudoli{return} $Q\trp , R$
@@ -769,14 +769,14 @@ Assume that at the $ij^{th}$ stage of the algorithm, $a_{ij}$ will be nonzero.
 
 \begin{problem}[Optional]
 \label{prob:givens_hessenberg}
-(Optional)
 Modify your solution to Problem \ref{prob:Givens} to compute the Givens triangularization of an upper Hessenberg matrix, making the following changes:
 \begin{enumerate}
-\item Iterate through the first subdiagonal from left to right. (These are the only entries that need to be zeroed out.)
-\item Line 11 of Algorithm \ref{Alg:givens} updates $Q$ with the current Givens rotation $G$. Decrease the number of entries of $Q$ that are modified in this line. Do this by replacing $Q[i-1:i+1, :]$ with $Q[i-1:i+1, :k_i]$ where $k_i$ is some appropriately chosen number (dependent on $i$) such that $Q[i-1:i+1, k_i:]=0$.
+    \item Iterate through the first subdiagonal from left to right. (These are the only entries that need to be zeroed out.)
+    \item Line 11 of Algorithm \ref{Alg:givens} updates $Q$ with the current Givens rotation $G$. Decrease the number of entries of $Q$ that are modified in this line. Do this by replacing $Q_{i-1:i+1, :}$ with $Q_{i-1:i+1, :k_i}$ where $k_i$ (dependent on $i$) is chosen such that $Q_{i-1:i+1, k_i:}=0$. % k_i = i + 1.
 \end{enumerate}
 Hint: Here is how to generate a random upper Hessenberg matrix on which to test your function.
 The idea is to generate a random matrix and then zero out all entries below the first subdiagonal.
+
 \begin{lstlisting}
 import numpy as np
 import scipy.linalg as la

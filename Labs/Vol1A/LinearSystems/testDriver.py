@@ -37,7 +37,6 @@ def _timeout(seconds):
         print(message)
         raise TimeoutError(message)
 
-
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -55,7 +54,9 @@ def _timeout(seconds):
 import numpy as np
 from scipy import sparse
 from scipy.linalg import lu_factor, solve
+from inspect import getsourcelines
 from solutions import ref, lu, prob5
+
 
 np.set_printoptions(precision=3, suppress=True)
 
@@ -93,8 +94,6 @@ class _testDriver(object):
     def __init__(self):
         """Initialize the feedback attribute."""
         self.feedback = ""
-
-    data_file = "horse.npy"
 
     # Main routine ------------------------------------------------------------
     def test_all(self, student_module, total=40):
@@ -139,6 +138,18 @@ class _testDriver(object):
     def _errType(error):
         """Get just the name of the exception 'error' in string format."""
         return str(type(error).__name__)
+
+    def _checkCode(self, func, keyword):
+        """Check a function's source code for a key word. If the word is found,
+        print the code to the screen and prompt the grader to check the code.
+        Use this function to detect cheating. Returns a score out of 10.
+        """
+        code = getsourcelines(func)[0][len(func.__doc__.splitlines())+1 :]
+        if any([keyword in line for line in code]):
+            print("\nStudent {}() code:\n{}\nCheating? [OK=10, Bad=0]".format(
+                                                func.__name__, "".join(code)))
+            return self._grade(10)
+        return 10
 
     def _eqTest(self, correct, student, message):
         """Test to see if 'correct' and 'student' are equal.
@@ -185,30 +196,36 @@ class _testDriver(object):
         return P.dot(A).astype(np.float)
 
     # Problems ----------------------------------------------------------------
-    @_timeout(5)
     def problem1(self, s):
         """Test ref(). 5 points."""
 
+        @_timeout(2)
         def _test(n, p):
             """Do an nxn test case worth p points."""
             A = self._luTestCase(n)
             return p * self._eqTest(ref(A), s.ref(A), "ref() failed.")
 
-        return _test(3, 1) + _test(4, 2) + _test(5, 2)
+        points = _test(3, 1) + _test(4, 2) + _test(5, 2)
+        return int(points * self._checkCode(s.ref, "lu_factor") / 10.)
 
-    @_timeout(5)
     def problem2(self, s):
         """Test lu(). 10 points."""
 
+        @_timeout(2)
         def _test(n):
             """Do an nxn test case worth 5 points."""
             A = self._luTestCase(n)
             L1, U1 = lu(A)
             if not np.allclose(L1.dot(U1), A):
                 return _test(n)
-            L2, U2 = s.lu(A.copy())
+            stu = s.lu(A.copy())
+            try:
+                L2, U2 = stu
+            except(TypeError, ValueError):
+                raise ValueError("lu() failed to return two arrays")
 
-            if any(not np.allclose(*x) for x in [(np.tril(L2), L2),
+            pts = 5
+            if not all(np.allclose(*x) for x in [(np.tril(L2), L2),
                    (np.triu(U2), U2), (L1, L2), (U1, U2), (A, L2.dot(U2))]):
                 pts = 2
                 self.feedback += "\n\n{}\nA =\n{}".format('- '*20, A)
@@ -221,16 +238,16 @@ class _testDriver(object):
                 pts += self._eqTest(L1, L2, "lu() failed (L incorrect)")
                 pts += self._eqTest(U1, U2, "lu() failed (U incorrect)")
                 pts += self._eqTest(A, L2.dot(U2), "lu() failed (A != LU)")
-                return pts
-            else:
-                return 5
+            return pts
 
-        return _test(4) + _test(6)
+        points = _test(4) + _test(6)
+        return int(points * self._checkCode(s.lu, "lu_factor") / 10.)
 
-    @_timeout(5)
+
     def problem3(self, s):
         """Test solve(). 10 points."""
 
+        @_timeout(2)
         def _test(n, p):
             """Do an nxn test case worth p points."""
             A = self._luTestCase(n)
@@ -242,7 +259,8 @@ class _testDriver(object):
             else:
                 return p
 
-        return _test(3, 3) + _test(4, 3) + _test(5, 4)
+        points = _test(3, 3) + _test(4, 3) + _test(5, 4)
+        return int(points * self._checkCode(s.solve, "solve(") / 10.)
 
     @_autoclose
     def problem4(self, s):
@@ -262,7 +280,7 @@ class _testDriver(object):
         (Title and axis labels unnecessary)""")
         return self._grade(5, "prob4() does not match specifications")
 
-    @_timeout(5)
+    @_timeout(3)
     def problem5(self, s):
         """Test prob5(). 5 points."""
 
