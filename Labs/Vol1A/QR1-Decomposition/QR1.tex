@@ -1,15 +1,57 @@
 \lab{QR 1: Decomposition}{The QR Decomposition}
 \label{lab:QRdecomp}
+\def\lvl#1{\multicolumn{1}{|c}{#1}} % Left  Vertical Line in array cell.
+\def\rvl#1{\multicolumn{1}{c|}{#1}} % Right Vertical Line in array cell.
 \objective{The QR decomposition is a fundamentally important matrix factorization.
 It is straightforward to implement, is numerically stable, and provides the basis of several important algorithms.
 In this lab, we explore several ways to produce the QR decomposition and implement a few immediate applications.
 }
 
-The QR decomposition of an $m\times n$ matrix $A$ is a factorization $A=QR$, where $Q$ is  has orthonormal columns and $R$ is upper triangular.
-Every matrix $A \in M_{m\times n}$ of rank $n \le m$ has a QR factorization where $Q$ is $m\times m$ and $R$ is $m\times n$.
+The QR decomposition of a matrix $A$ is a factorization $A=QR$, where $Q$ is  has orthonormal columns and $R$ is upper triangular.
+Every $m \times n$ matrix $A$ of rank $n \le m$ has a QR decomposition, with two main forms.
 %
-\footnote{In this lab we only discuss real matrices.
-All of these results can be extended to the complex numbers by replacing ``transpose'' with ``hermitian conjugate'' and ``symmetric matrix'' with ``hermitian matrix.''}
+\begin{itemize}
+    \item \textbf{Reduced QR}: $Q$ is $m \times n$, $R$ is $n \times n$, and the columns of $Q$ $\left\{\q_j\right\}_{j=1}^n$ span the column space of $A$.
+    \item \textbf{Full QR}: $Q$ is $m \times m$ and $R$ is $m \times n$.
+    In this case, the columns of $Q$ $\left\{\q_j\right\}_{j=1}^m$ form an orthonormal basis for $\mathbb{F}^n$, and the last $m - n$ rows of $R$ only contain zeros.
+\end{itemize}
+We distinguish between these two forms by writing $\widehat{Q}$ and $\widehat{R}$ for the reduced decomposiiton and $Q$ and $R$ for the full decomposition.
+%
+\begin{align*} % Reduced and full QR decompositions.
+\begin{array}{ccc}
+\textcolor{red}{\widehat{Q}\ (m \times n)} & \textcolor{blue}{\widehat{R}\ (n \times n)} & \\
+\left[\begin{array}{cccccccc}
+\arrayrulecolor{red}
+\cline{2-4}
+& \lvl{}     &        & \rvl{}     &          &        &      & \\
+& \lvl{}     &        & \rvl{}     &          &        &      & \\
+& \lvl{}     &        & \rvl{}     &          &        &      & \\
+& \lvl{\q_1} & \cdots & \rvl{\q_n} & \q_{n+1} & \cdots & \q_m & \\
+& \lvl{}     &        & \rvl{}     &          &        &      & \\
+& \lvl{}     &        & \rvl{}     &          &        &      & \\
+& \lvl{}     &        & \rvl{}     &          &        &      & \\
+\cline{2-4}
+\end{array}\right]
+&
+\left[\begin{array}{ccccc}
+\arrayrulecolor{blue}
+\cline{2-4}
+& \lvl{r_{11}} & \cdots & \rvl{r_{1n}} & \\
+& \lvl{}       & \ddots & \rvl{\vdots} & \\
+& \lvl{}       &        & \rvl{r_{nn}} & \\
+\cline{2-4}
+& 0            & \cdots & 0            & \\
+& \vdots       &        & \vdots       & \\
+& 0            & \cdots & 0            & \\
+\end{array}\right]
+& =\ A\ (m \times n)
+\\
+Q\ (m \times m) & R\ (m \times n) & \\
+\end{array}
+\end{align*}
+
+We will assume throughout this lab that $A$ contains only real numbers.
+However, the results and algorithms presented here can be extended to complex matrices by replacing ``transpose'' with ``hermitian conjugate'' and ``symmetric matrix'' with ``hermitian matrix.''
 
 \section*{Modified Gram-Schmidt} % ============================================
 
@@ -53,7 +95,7 @@ Next we define $\q_2 = \frac{\x_2}{\|\x_2\|}.$ Once again we make $\x_3, \ldots,
 We continue this process until we have an orthonormal set $\q_1, \ldots, \q_k$.
 The entire modified Gram-Schmidt algorithm is described in Algorithm \ref{Alg:modified-gram-schmidt}.
 
-\begin{algorithm}
+\begin{algorithm}[H]
 \begin{algorithmic}[1]
 \Procedure{Modified Gram-Schmidt}{$A$}
     \State $m, n \gets \shape{A}$
@@ -221,8 +263,6 @@ Let $e_1, \ldots, e_4$ be the standard basis of $\mathbb{R}^4$.
 First we find an orthonormal transformation $Q_1$ that maps the first column of A into the span of $e_1$.
 This is diagrammed below, where $*$ represents an arbitrary entry.
 
-\def\rvl#1{\multicolumn{1}{c|}{#1}}
-\def\lvl#1{\multicolumn{1}{|c}{#1}}
 \begin{equation*}
 \left[\begin{array}{ccc}
 * & * & * \\
