@@ -42,6 +42,7 @@ def _timeout(seconds):
 
 import numpy as np
 from scipy import linalg as la
+from inspect import getsourcelines
 
 np.set_printoptions(precision=3, suppress=True)
 
@@ -122,6 +123,18 @@ class _testDriver(object):
         """Get just the name of the exception 'error' in string format."""
         return str(type(error).__name__)
 
+    def _checkCode(self, func, keyword):
+        """Check a function's source code for a key word. If the word is found,
+        print the code to the screen and prompt the grader to check the code.
+        Use this function to detect cheating. Returns a score out of 10.
+        """
+        code = getsourcelines(func)[0][len(func.__doc__.splitlines())+1 :]
+        if any([keyword in line for line in code]):
+            print("\nStudent {}() code:\n{}\nCheating? [OK=10, Bad=0]".format(
+                                                func.__name__, "".join(code)))
+            return self._grade(10)
+        return 10
+
     def _eqTest(self, correct, student, message):
         """Test to see if 'correct' and 'student' are equal.
         Report the given 'message' if they are not.
@@ -162,6 +175,7 @@ class _testDriver(object):
             return _testDriver._qrTestCase(m,n)
         return A[:,la.qr(A, pivoting=True)[-1]]
 
+    @_timeout(2)
     def _qrTest(self, m, n, func):
         """Do an mxn test of a QR factorization via func() worth 5 points."""
         A = self._qrTestCase(m,n)
@@ -186,35 +200,29 @@ class _testDriver(object):
         return pts
 
     # Problems ----------------------------------------------------------------
-    @_timeout(5)
     def problem1(self, s):
         """Test qr_gram_schmidt(). 10 points."""
+        points = sum([self._qrTest(4, 4, s.qr_gram_schmidt),
+                      self._qrTest(8, 6, s.qr_gram_schmidt)])
+        return int(points * self._checkCode(s.qr_gram_schmidt, "qr(") / 10.)
 
-        # Check for cheating.
-
-        return sum([self._qrTest(4, 4, s.qr_gram_schmidt),
-                    self._qrTest(8, 6, s.qr_gram_schmidt)])
-
-    @_timeout(5)
     def problem2(self, s):
         """Test abs_det(). 5 points."""
 
-        # Check for cheating.
-
+        @_timeout(2)
         def _test(n,p):
             """Do an nxn test case worth p points."""
             A = self._qrTestCase(n,n)
             return p * self._eqTest(abs(la.det(A)), s.abs_det(A),
                             "abs_det(A) failed for A =\n{}".format(A))
 
-        return _test(2, 1) + _test(5, 2) + _test(10, 2)
+        points = _test(2, 1) + _test(5, 2) + _test(10, 2)
+        return int(points * self._checkCode(s.abs_det, "det(") / 10.)
 
-    @_timeout(5)
     def problem3(self, s):
         """Test solve(). 5 points."""
 
-        # Check for cheating.
-
+        @_timeout(2)
         def _test(n,p):
             """Do an nxn test case worth p points."""
             A = self._qrTestCase(n,n)
@@ -222,18 +230,19 @@ class _testDriver(object):
             return p * self._eqTest(la.solve(A, b), s.solve(A, b),
                         "solve(A, b) failed for A =\n{}\nb=\n{}".format(A,b))
 
-        return _test(2, 1) + _test(5, 2) + _test(10, 2)
+        points = _test(2, 1) + _test(5, 2) + _test(10, 2)
+        return int(points * self._checkCode(s.abs_det, "solve(") / 10.)
 
-    @_timeout(5)
     def problem4(self, s):
         """Test qr_householder(). 10 points."""
-        return sum([self._qrTest( 5, 5, s.qr_householder),
-                    self._qrTest(10, 6, s.qr_householder)])
+        points =  sum([self._qrTest( 5, 5, s.qr_householder),
+                       self._qrTest(10, 6, s.qr_householder)])
+        return int(points * self._checkCode(s.qr_householder, "qr(") / 10.)
 
-    @_timeout(5)
     def problem5(self, s):
         """Test hessenberg(). 10 points."""
 
+        @_timeout(2)
         def _test(n):
             """Do an nxn test worth 5 points."""
             A = self._qrTestCase(n,n)
@@ -258,7 +267,8 @@ class _testDriver(object):
                 pts += 2*self._eqTest(A, np.dot(Q.T, H.dot(Q)), "A != (Q^T)HQ")
             return pts
 
-        return _test(4) + _test(10)
+        points = _test(4) + _test(10)
+        return int(points * self._checkCode(s.hessenberg, "hessenberg(") / 10.)
 
 # Validation ==================================================================
 if __name__ == '__main__':
