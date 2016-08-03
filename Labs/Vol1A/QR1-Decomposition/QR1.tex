@@ -64,6 +64,7 @@ The entire modified Gram-Schmidt algorithm is described in Algorithm \ref{Alg:mo
         \Comment{An $n\times n$ array of all zeros.}
     \For{$i=0\ldots n-1$}
         \State $R_{i,i} \gets \norm{Q_{:,i}}$
+            \Comment{(Hint: use \li{scipy.linalg.norm()}).}
         \State $Q_{:,i} \gets Q_{:,i}/R_{i,i}$
             \Comment{Normalize the $i$th column of $Q$.}
         \For{$j=i+1\ldots n-1$}
@@ -80,6 +81,7 @@ The entire modified Gram-Schmidt algorithm is described in Algorithm \ref{Alg:mo
 \end{algorithm}
 
 % TODO: put this section after the next? What algorithm does SciPy use?
+\begin{comment}
 \section*{QR Decomposition in SciPy} % ========================================
 
 The linear algebra library in SciPy calculates the QR decomposition using a software package called LAPACK (Linear Algebra PACKage), which is incredibly efficient.
@@ -95,38 +97,75 @@ Here is an example of using SciPy to compute the QR decomposition of a matrix.
 array([[ True, False, False],
        [ True, False, False],
        [ True,  True, False],
-       [ True,  True, False]], dtype=bool)
+       [ True,  True, False]], dtype=<<bool>>)
 \end{lstlisting}
- Note that \li{Q.dot(R)} does not equal \li{A} exactly because of rounding errors.
- However, we can check that the entries of \li{Q.dot(R)} are ``close'' to the entries of \li{A} with the NumPy method \li{np.allclose()}.
- This method checks that the elements of two arrays differ by less than a given tolerance, a tolerance specified by two keyword arguments \li{rtol} and \li{atol} that default to $10^{-5}$ and $10^{-8}$ respectively.
- You can read the documentation to learn how the tolerance is computed from these numbers.
+
+Note that \li{Q.dot(R)} does not equal \li{A} exactly because of small rounding errors.
+However, \li{np.allclose()} reveals that the entries of \li{Q.dot(R)} are all approximately equal to the entries of \li{A}.
 
 \begin{lstlisting}
 >>> np.allclose(Q.dot(R), A)
 True
 \end{lstlisting}
 
-We can use the same method to check that \li{Q} is ``very close'' to an orthogonal matrix.
+We can use the same method to check that \li{Q} is an orthogonal matrix.
 
 \begin{lstlisting}
 >>> np.allclose(Q.T.dot(Q), np.eye(3))
 True
 \end{lstlisting}
-
+\end{comment}
 
 \begin{problem} % Decomposition via Modified Gram Schmidt.
-Write a function that accepts as input a $m \times n$ matrix of rank $n$ and computes its QR decomposition, returning the matrices $Q$ and $R$.
-Your function should use Algorithm \ref{Alg:modified-gram-schmidt}.
-Generate test cases with \li{np.random.random()}, using \li{np.allclose()} to verify that $A = QR$.
-\\
-(Hint: Read about the function \li{np.inner()}.)
+Write a function that accepts an $m \times n$ matrix $A$ of rank $n$.
+Use Algorithm \ref{Alg:modified-gram-schmidt} to compute the reduced QR decomposition of $A$.
+
+To test the algorithm, generate test cases with NumPy's \li{np.random} module.
+Verify that $R$ is upper triangular, $Q$ is orthonormal, and $QR = A$.
+You may also want to compare your results to SciPy's QR factorization algorithm.
+
+\begin{lstlisting}
+>>> import numpy as np
+>>> from scipy import linalg as la
+>>> A = np.random.random((10,10))
+>>> Q,R = la.qr(A, mode="economic") # Specify 'economic' for reduced QR.
+>>> np.allclose(Q.dot(R), A)        # Verify that QR = A.
+True
+\end{lstlisting}
+\label{prob:qr-via-mgs}
 \end{problem}
 
+\subsection*{Consequences of the QR Decomposition} % --------------------------
+
+The special structures of $Q$ and $R$ immediately provide some simple applications.
+Since $Q$ is orthonormal and $R$ is upper-triangular,
+\begin{align*} \det(Q) = \pm 1 && \det(R) = \prod_{i=1}^n r_{i,i} \end{align*}
+Then since $\det(AB) = \det(A)\det(B)$, we have the following:
+\[\abs{\det(A)} = \abs{\det(QR)} = \abs{\det(Q)\det(R)} = \abs{\prod_{i=1}^n r_{i,i}}\]
+
+\begin{problem} % Use the QR decomposition to calculate |det(A)|.
+Write a function that accepts a square matrix $A$ of full rank.
+Use the QR decomposition of $A$ to calculate $\abs{\det(A)}$.
+
+You may use your QR decomposition algorithm from Problem \ref{prob:qr-via-mgs} or SciPy's QR routine.
+Can you implement this function in a single line?
+\end{problem}
+
+The LU decomposition is usually the matrix factorization of choice to solve the linear system $A\x = \b$ because the triangular structures of $L$ and $U$ facilitate forward and backward substitution.
+However, the QR decomposition avoids the potential numerical issues that come with Gaussian elimination.
+
+Since $Q$ is orthonormal, $Q^{-1}= Q\trp$, so solving $A\x = \b$ is equivalent to solving the system $R\x = Q\trp\b$.
+Since $R$ is upper-triangular, $R\x = Q\trp\b$ can be solved quickly with back substitution.%
+\footnote{See Problem 3 of the Linear Systems lab for a refresher on back substitution.}
+
 \begin{problem} % Use the QR decomposition to solve Ax = b quickly.
-Write a function that accepts a square matrix $A$ of full rank and returns $\abs{\det(A)}$.
-Use the QR decomposition of $A$ to perform this calculation.
-Hint: What is the determinant of an orthonormal matrix?
+Write a function that accepts an invertible $n \times n$ matrix $A$ and a vector $\b$ of length $n$.
+Use the QR decomposition to solve $A\x = \b$ in the following steps:
+\begin{enumerate}
+    \item Compute $Q$ and $R$.
+    \item Calculate $\y = Q\trp\b$.
+    \item Use back substitution to solve $R\x = \y$ for $\x$.
+\end{enumerate}
 \end{problem}
 
 \section*{Householder Triangularization} % ====================================
@@ -146,23 +185,22 @@ Then the Householder transformation that reflects about $H$ corresponds to the m
 You can check that $(I - 2 \mathbf{u}\mathbf{u}\trp)\trp(I - 2 \mathbf{u}\mathbf{u}\trp)=I$, so Householder transformations are orthogonal.
 
 %\newcommand{\ipt}[2]{\ensuremath{\left\langle #1,#2 \right\rangle}}
-\begin{figure}
+\begin{figure}[H]
 \begin{center}
 \begin{tikzpicture}
-%\draw[-, thick](0,-1.5)--(0,3); %x-axis
-%\draw[-,thick](-1,0)--(4,0); %y-axis
-%\node[draw, thick, minimum height=4.5cm, minimum width=5cm]()at(1.5,.75){};
-\draw[-,dashed, gray](-2,-1.333)--(3, 2); % hyperplane
-\draw[->, gray, >=stealth,ultra thick](0,0)--(.8,-1.2); % v
-\draw[->, >=stealth, thick](0,0)--(2.815, .777); % H x
-\draw[->, >=stealth, thick](0,0)--(1.8,2.3); % x
-\node[draw=none](v)at(.65,-.6){$\v$};
-\node[draw=none](x)at(.75,1.5){$\x$};
-\node[draw=none](Hx)at(3, .5){$H_{\v}\x$};
-\node[draw=none](H)at(-1.5,-.6){$H$};
-%\node[draw=none](bullet)at(2.31, 1.53){\textbullet};
-%\node[draw=none](vandx)at(4.0,1.5){$\x -
-%\left \langle \dfrac{\v}{\|\v\|}, \x \right \rangle \dfrac{\v}{\|\v\|}$};
+    %\draw[-, thick](0,-1.5)--(0,3); %x-axis
+    %\draw[-,thick](-1,0)--(4,0); %y-axis
+    \draw[-,dashed, gray](-2,-1.333)--(3, 2);               % hyperplane
+    \draw[->, gray, >=stealth,ultra thick](0,0)--(.8,-1.2); % v
+    \draw[->, >=stealth, thick](0,0)--(2.815, .777);        % H x
+    \draw[->, >=stealth, thick](0,0)--(1.8,2.3);            % x
+    \node[draw=none](v)at(.65,-.6){$\v$};
+    \node[draw=none](x)at(.75,1.5){$\x$};
+    \node[draw=none](Hx)at(3, .5){$H_{\v}\x$};
+    \node[draw=none](H)at(-1.5,-.6){$H$};
+    %\node[draw=none](bullet)at(2.31, 1.53){\textbullet};
+    %\node[draw=none](vandx)at(4.0,1.5){$\x -
+    %\left \langle \dfrac{\v}{\|\v\|}, \x \right \rangle \dfrac{\v}{\|\v\|}$};
 \end{tikzpicture}
 \end{center}
 \caption{This is a picture of a Householder transformation.
@@ -406,7 +444,7 @@ Reflecting about the hyperplane defined by $\v_i$ produces  $H_{\v_i}\x$.}
     \For{$k=0\ldots n-1$}
         \State $\u \gets \makecopy{R_{k:,k}}$
         \State $u_0 \gets u_0 + \sign(u_0)\|\u\|$
-            \Comment{$u_0$ is the first entry of $\u$.}
+            \Comment{$u_0$ is the first entry of $\u$.}\label{step:HH-sign}
         \State $\u \gets \u/\|\u\|$
             \Comment{Normalize $\u$.}
         \State $R_{k:,k:} \gets R_{k:,k:} - 2\u\left(\u\trp R_{k:,k:}\right)$
@@ -423,11 +461,34 @@ Reflecting about the hyperplane defined by $\v_i$ produces  $H_{\v_i}\x$.}
 
 \begin{problem} % QR Decomposition via Householder Triangularization
 Write a function that accepts as input a $m \times n$ matrix $A$ of rank $n$.
-Use Algorithm \ref{Alg:QR-via-Householder} to compute the QR decomposition of $A$.
-\\
-(Hint: In steps \ref{step:HH-outer1} and \ref{step:HH-outer2} of Algorithm \ref{Alg:QR-via-Householder}, the multiplication of $\u$ and $(\u\trp X)$ is an \emph{outer product}---$\x\y\trp$ instead of the usual $\x\trp\y$.
+Use Algorithm \ref{Alg:QR-via-Householder} to compute the full QR decomposition of $A$.
+Consider the following implementation details.
+\begin{itemize}
+
+\item NumPy's \li{np.sign()} is an easy way to implement the $\sign()$ operation in step \ref{step:HH-sign}.
+However, \li{np.sign(0)} returns $0$, which will cause a problem in the rare case that $u_0 = 0$ (which is really only possible if the top left entry of $A$ is $0$ to begin with).
+The following code defines a function that returns the sign of a single number, counting $0$ as positive.
+
+\begin{lstlisting}
+sign = lambda x: 1 if x >= 0 else -1
+\end{lstlisting}
+
+\item In steps \ref{step:HH-outer1} and \ref{step:HH-outer2}, the multiplication of $\u$ and $(\u\trp X)$ is an \emph{outer product} ($\x\y\trp$ instead of the usual $\x\trp\y$).
 Use \li{np.outer()} instead of \li{np.dot()} to handle this correctly.)
-% Hint: Read about the function \li{np.outer()}.  Another Hint: When defining $\u$, reshape the array to an $(m-k) \times 1$ array.
+
+\end{itemize}
+
+As with Problem \ref{prob:qr-via-mgs}, use \li{scipy.linalg.qr()} and \li{np.allclose()} to test your answers.
+
+\begin{lstlisting}
+>>> A = np.random.randint(1, 10, (5, 3))
+>>> Q,R = la.qr(A)                  # Don't specify method="economic"
+>>> print A.shape, Q.shape, R.shape     # to get the full decomposition.
+(5,3) (5,5) (5,3)
+>>> np.allclose(Q.dot(R), A)
+True
+\end{lstlisting}
+\label{prob:qr-via-hessenberg}
 \end{problem}
 
 \section*{Upper Hessenberg Form} % ============================================
@@ -435,7 +496,8 @@ Use \li{np.outer()} instead of \li{np.dot()} to handle this correctly.)
 An upper Hessenberg matrix is a square matrix with zeros below the first subdiagonal.
 Every  $n \times n$ matrix $A$ can be written $A = Q\trp HQ$ where $Q$ is orthonormal and $H$ is an upper Hessenberg matrix, called the Hessenberg form of $A$.
 
-A fast algorithm for computing the QR decomposition of a Hessenberg matrix will be taught in Lab \ref{lab:givens}. This algorithm in turn leads to a fast algorithm for finding eigenvalues of a matrix.
+% A fast algorithm for computing the QR decomposition of a Hessenberg matrix will be taught in Lab \ref{lab:givens}. This algorithm in turn leads to a fast algorithm for finding eigenvalues of a matrix. % O RLY?
+% % This is refering to the next lab, btw.
 
 For now, we will outline an algorithm for computing the upper Hessenberg form of any matrix.
 Like Householder triangularization, this algorithm uses Householder transformations.
@@ -521,13 +583,12 @@ Thus, the Hessenberg form of a symmetric matrix is especially useful, since as w
 
 % TODO: This doesn't work if A is singular
 \begin{problem} % Hessenberg form.
-Write a function that accepts as input a nonsingular square matrix $A$.
+Write a function that accepts a nonsingular $n \times n$ matrix $A$.
 Use Algorithm \ref{Alg:Hessenberg} to compute its Hessenberg form, returning orthogonal $Q$ and upper Hessenberg $H$ satisfying $A = Q\trp HQ$.
-\\
-(Hint: When defining $\u$, reshape the array to an $(m-k-1) \times 1$ array.)
+\end{problem}
 
 What happens when you compute the Hessenberg factorization of a symmetric matrix?
-\end{problem}
+Can you explain why?
 
 \newpage
 

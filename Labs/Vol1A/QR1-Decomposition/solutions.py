@@ -98,11 +98,11 @@ def hessenberg(A):
     such that A = (Q^T)HQ.
 
     Inputs:
-        A ((m,m) ndarray): An invertible matrix.
+        A ((n,n) ndarray): An invertible matrix.
 
     Returns:
-        Q ((m,m) ndarray): An orthonormal matrix.
-        H ((m,m) ndarray): The upper hessenberg form of A.
+        Q ((n,n) ndarray): An orthonormal matrix.
+        H ((n,n) ndarray): The upper hessenberg form of A.
     """
     m,n = A.shape
     H = np.copy(A)
