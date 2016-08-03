@@ -8,15 +8,21 @@ Regular expressions allow for quick searching and replacing of general patterns 
 While nearly all text editors have a feature that will find and replace exact strings of text, regular expressions are used to find text in a much more general way. For example, using a single regular expression, you can find every email address in a text file without having to sift through it by hand.
 % include email regex?
 % TODO add a cool example here... this will do for now:
-    % As an example, the following program will find and fill in missing colons after control statements in normally formatted python files: 
+    % As an example, the following program will find and fill in missing colons after control statements in normally formatted python files:
     % % ^((def|if|elif|else|while|for|with).*):\s*$
 
 \section*{Terminology and Basics}
-A ``regular expression'' is basically just a string of characters that follow a certain syntax. Computer programs can then interpret these expressions as instructions to search for certain kinds of text. We will often call regular expressions ``patterns'', and we will say that certain patterns ``match'' certain strings. The general idea is that a regular expression represents a large set of strings (for example, all valid email addresses), and if a specific string is in that set, we say that the regular expression matches that string.
+A ``regular expression'' is basically just a string of characters that follow a certain syntax.
+Computer programs can then interpret these expressions as instructions to search for certain kinds of text.
+We will often call regular expressions ``patterns'', and we will say that certain patterns ``match'' certain strings.
+The general idea is that a regular expression represents a large set of strings (for example, all valid email addresses), and if a specific string is in that set, we say that the regular expression matches that string.
 % TODO talk w. ryan about what they'll know at this point about DFSMs
 
 \begin{warn} %TODO why doesn't this work?
-Regular expression libraries have been implemented and are a part of the standard distribution of nearly every programming language, and many text editors have a find-and-replace mode that uses regular expressions. Unfortunately, the syntax for regular expressions may be slightly different in each implementation. There is no universal standard for all regular expressions across all platforms. However, the orginal syntax and a few variants are very widespread, so the basic regular expression techniques we learn in this lab should be virtually the same in almost every situation you will encounter them.
+Regular expression libraries have been implemented and are a part of the standard distribution of nearly every programming language, and many text editors have a find-and-replace mode that uses regular expressions. 
+Unfortunately, the syntax for regular expressions may be slightly different in each implementation.
+There is no universal standard for all regular expressions across all platforms.
+However, the orginal syntax and a few variants are very widespread, so the basic regular expression techniques we learn in this lab should be virtually the same in almost every situation you will encounter them.
 \end{warn}
 
 The simplest use of regular expressions is to match text literally.
@@ -298,7 +304,7 @@ False
 \end{lstlisting}
 Notice in the first line that \li{[abcA-C]} acts like \li{[a|b|c|(A-C)]} and \li{[0-27-9]} acts like \li{[(0-2)|(7-9)]}.
 
-Finally, there are some built-in shorthands for certain character classes: 
+Finally, there are some built-in shorthands for certain character classes:
 \begin{itemize}
     \item \li{'\\d'} (think ``digit'') matches any digit. It is equivalent to \li{"[0-9]"}.
     \item \li{'\\w'} (think ``word'') matches any alphanumeric character or underscore. It is equivalent to \li{"[a-zA-Z0-9_]"}.
@@ -352,7 +358,7 @@ print uses_line_anchors and solution_is_clever and matches_list
 \begin{problem}
 A \emph{valid python identifier} (aka a valid variable name) is defined as any string composed of an alphabetic character or underscore followed by any (possibly empty) sequence of alphanumeric characters and underscores.
 
-Define the variable \li{identifier_pattern_string} that defines a regular expression that matches valid python identifiers that are exactly five characters long. 
+Define the variable \li{identifier_pattern_string} that defines a regular expression that matches valid python identifiers that are exactly five characters long.
 
 To help you test your pattern, the following program should print \mbox{\li{True}.} (This is necessary but not sufficient to show your regular expression is correct):
 \begin{lstlisting}
@@ -529,7 +535,7 @@ A \emph{valid python function definition} is defined as the concatenation of the
 \end{itemize}
 with any number of spaces between each element of the above list.
 
-Define a variable \li{function_pattern_string} that defines a regular expression that matches valid python function definitions. Using 
+Define a variable \li{function_pattern_string} that defines a regular expression that matches valid python function definitions. Using
 \li{function_pattern_string}, write a program \texttt{match\_function\_definition.py}
 which repeatedly asks the user for a string and prints out whether that string is a valid python function definition, halting only if the inputted string is \li{"exit"}.
 
@@ -604,11 +610,11 @@ We can also use regular expressions when piping output to \li{grep}.
 \begin{lstlisting}
 # List details of directories within current directory.
 $ ls -l | grep ^d
-\end{lstlisting} 
+\end{lstlisting}
 %$
 
 \subsection*{Regular Expressions and awk}
-As in Lab 2, we will be using \li{awk} to format output. By incorporating regular expressions, \li{awk} becomes much more robust. Before GUI spreedsheet programs like Microsoft Excel, \li{awk} was commonly used to visualize and query data from a file.  
+As in Lab 2, we will be using \li{awk} to format output. By incorporating regular expressions, \li{awk} becomes much more robust. Before GUI spreedsheet programs like Microsoft Excel, \li{awk} was commonly used to visualize and query data from a file.
 
 Including \li{if} statements inside \li{awk} commands gives us the ability to perform actions on lines that match a given pattern. The following example prints the filenames of all files that are owned by \li{freddy}.
 \begin{lstlisting}
@@ -616,7 +622,7 @@ $ ls -l | awk ' {if ($3 ~ /freddy/) print $9} '
 \end{lstlisting}
 %$
 
-Because there is a lot going on in this command, we will break it down piece-by-piece. The output of \li{ls -l} is getting piped to \li{awk}. Then we have an \li{if} statement. The syntax here means if the condition inside the parenthesis holds, print field $9$ (the field with the filename). The condition is where we use regular expressions. The \li{\~} checks to see if the contents of field $3$ (the field with the username) matches the regular expression found inside the forward slashes. To clarify, \li{freddy} is the regular expression in this example and the expression must be surrounded by forward slashes.  
+Because there is a lot going on in this command, we will break it down piece-by-piece. The output of \li{ls -l} is getting piped to \li{awk}. Then we have an \li{if} statement. The syntax here means if the condition inside the parenthesis holds, print field $9$ (the field with the filename). The condition is where we use regular expressions. The \li{\~} checks to see if the contents of field $3$ (the field with the username) matches the regular expression found inside the forward slashes. To clarify, \li{freddy} is the regular expression in this example and the expression must be surrounded by forward slashes.
 
 Consider a similar example. In this example, we will list the names of the directories inside the current directory. (This replicates the behavior of the Unix command \li{ls -d */})
 
@@ -625,7 +631,7 @@ $ ls -l | awk ' {if ($1 ~ /^d/) print $9} '
 \end{lstlisting}
 %$
 
-Notice in this example, we printed the names of the directories, whereas in one of the example using \li{grep}, we printed all the details of the directories as well. 
+Notice in this example, we printed the names of the directories, whereas in one of the example using \li{grep}, we printed all the details of the directories as well.
 
 \begin{warn}
 Some of the definitions for character classes we used earlier in this lab will not work in the Unix Shell. For example, \li{\\w} and \li{\\d} are not defined. Instead of \li{\\w}, use \li{[[:alnum:]]}. Instead of \li{\\d}, use \li{[[:digit:]]}. For a complete list of similar character classes, search the internet for ``POSIX Character Classes'' or ``Bracket Character Classes.''
@@ -635,10 +641,10 @@ Some of the definitions for character classes we used earlier in this lab will n
 You have been given a list of transactions from a fictional start-up company. In the \li{transactions.txt} file, each line represents a transaction. Transactions are represented as follows:
 \begin{lstlisting}
 # Notice the semicolons delimiting the fields. Also, notice that in between the last and first name, that is a comma, not a semicolon.
-<ORDER_ID>;<YEAR><MONTH><DAY>;<LAST>,<FIRST>;<ITEM_ID> 
+<ORDER_ID>;<YEAR><MONTH><DAY>;<LAST>,<FIRST>;<ITEM_ID>
 \end{lstlisting}
 
-Using this set of transactions, produce the following information using regular expressions and the given command: 
+Using this set of transactions, produce the following information using regular expressions and the given command:
 \begin{itemize}
     \item Using \li{grep}, print all transactions by either Nicholas Ross or Zoey Ross.
     \item Using \li{awk}, print a sorted list of the names of individuls that bought item $3298$.
