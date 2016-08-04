@@ -11,9 +11,9 @@ The QR decomposition of a matrix $A$ is a factorization $A=QR$, where $Q$ is  ha
 Every $m \times n$ matrix $A$ of rank $n \le m$ has a QR decomposition, with two main forms.
 %
 \begin{itemize}
-    \item \textbf{Reduced QR}: $Q$ is $m \times n$, $R$ is $n \times n$, and the columns of $Q$ $\left\{\q_j\right\}_{j=1}^n$ span the column space of $A$.
+    \item \textbf{Reduced QR}: $Q$ is $m \times n$, $R$ is $n \times n$, and the columns of $Q$ $\{\q_j\}_{j=1}^n$ form an othonormal basis for the column space of $A$.
     \item \textbf{Full QR}: $Q$ is $m \times m$ and $R$ is $m \times n$.
-    In this case, the columns of $Q$ $\left\{\q_j\right\}_{j=1}^m$ form an orthonormal basis for $\mathbb{F}^n$, and the last $m - n$ rows of $R$ only contain zeros.
+    In this case, the columns of $Q$ $\{\q_j\}_{j=1}^m$ form an orthonormal basis for all of $\mathbb{F}^n$, and the last $m - n$ rows of $R$ only contain zeros.
 \end{itemize}
 We distinguish between these two forms by writing $\widehat{Q}$ and $\widehat{R}$ for the reduced decomposiiton and $Q$ and $R$ for the full decomposition.
 %
@@ -53,33 +53,42 @@ Q\ (m \times m) & R\ (m \times n) & \\
 We will assume throughout this lab that $A$ contains only real numbers.
 However, the results and algorithms presented here can be extended to complex matrices by replacing ``transpose'' with ``hermitian conjugate'' and ``symmetric matrix'' with ``hermitian matrix.''
 
-\section*{Modified Gram-Schmidt} % ============================================
+\section*{QR via Gram-Schmidt} % ==============================================
 
-Let $A$ be an $m \times n$ matrix of rank $n$.
-There are many methods for computing the QR decomposition.
-First we will discuss the algorithm that computes $Q$ by applying Gram-Schmidt to the columns of $A$.
+The \emph{Gram-Schmidt algorithm} takes a linearly independent set of vectors and constructs an orthonormal set of vectors with the same span.
+Applying Gram-Schmidt to the columns of $A$, which are linearly independent since $A$ has rank $n$, results in the columns of $Q$.
 
-Let $\{\x_i\}_{i=1}^n$ be the columns of $A$ (the rank hypothesis implies that these are linearly independent vectors).
-The Gram-Schmidt algorithm computes an orthonormal basis $\{\q_i\}_{i=1}^n$ for the span of the $\x_i$.
-The Gram-Schmidt algorithm defines  \[ \q_1 = \frac{\x_1}{\norm{\x_1}}.\]
-It recursively defines $\q_k$ for $k>1$ by
-\[
-\q_{k} = \frac{\x_k - \p_{k-1}}{\|\x_k - \p_{k-1}\|}, \,\,\,\, k=2,\ldots,n,
-\]
-where
-\[
-\p_{k-1} = \sum_{i=1}^{k-1} \langle \q_i, \x_k\rangle \q_i, \,\,\,\, k=2, \ldots, n
-\]
-and $\p_0 = 0$.
+Let $\{\x_j\}_{j=1}^n$ be the columns of $A$.
+Define
+\begin{align*}
+\q_1 = \frac{\x_1}{\norm{\x_1}},
+&&
+\q_{k} = \frac{\x_k - \p_{k-1}}{\|\x_k - \p_{k-1}\|},\ k=2,\ldots,n,
+\\
+\text{and}
+&&
+\p_{k-1} = \sum_{j=1}^{k-1} \langle \q_j, \x_k\rangle \q_j,\ k=2,\ldots, n.
+\end{align*}
 
-Let $Q$ be the matrix with columns $\{\q_i\}_{i=1}^n$.
-Let $R$ be the upper triangular matrix with entries $r_{jk}$ where $r_{kk} = \|\x_k-\p_{k-1}\|$ and $r_{j k} = \langle \q_j, \x_k\rangle$ when $j < k$.
-Then $QR=A$ and $R$ is nonsingular (see Chapter 3 of Volume 1 for a proof).
-Thus, if $A$ is square, the matrices $Q$ and $R$ are its QR decomposition.
+Each $\p_{k-1}$ is the projection of $\x_k$ onto the span of $\{\q_j\}_{j=1}^{k-1}$, so $\q_k^\prime = \x_k - \p_{k-1}$ is the residual vector of the projection.
+Thus $\q_k^\prime$ is orthogonal to each of the $\{\q_j\}_{j=1}^{k-1}$.
+Finally, normalizing each $\q_k^\prime$ produces an orthonormal set $\{\q_j\}_{j=1}^n$.
 
+To construct the reduced QR decomposition, let $\widehat{Q}$ be the matrix with columns $\{\q_j\}_{j=1}^n$, and let $\widehat{R}$ be the upper triangular matrix with the following entries:
+\begin{align*}
+r_{kk} = \|\x_k-\p_{k-1}\|,
+&&
+r_{jk} = \langle \q_j, \x_k\rangle = \q_j\trp\x_k,\ j < k.
+\end{align*}
+Here $\p_0 = \0$.
+This clever choice of entries for $\widehat{R}$ reverses the Gram-Schmidt process and ensures that $QR = A$.
+
+% TODO (?): equations in the proof of of Thm 3.3.8 or refer to the Theorem?
+
+\subsection*{Modified Gram-Schmidt} % -----------------------------------------
 
 When implemented with a computer, the Gram-Schmidt algorithm may produce a matrix $Q$ with columns that are not even close to orthonormal due to rounding errors.
-We now introduce the modified Gram-Schmidt algorithm, which consistently produces matrices $Q$ whose columns are ``very close'' to orthonormal.
+The \emph{Modified Gram-Schmidt algorithm} is a slight variant of the classical Gram-Schmidt algorithm which consistently produces matrices $Q$ whose columns are ``very close'' to orthonormal.
 
 In the modified Gram-Schmidt algorithm, $\q_1$ is the normalization of $\x_1$ as before.
 We then make each of the vectors $\x_2, \ldots, \x_n$ orthogonal to $\q_1$ by defining
