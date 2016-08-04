@@ -1,59 +1,109 @@
 \lab{QR 1: Decomposition}{The QR Decomposition}
 \label{lab:QRdecomp}
+\def\lvl#1{\multicolumn{1}{|c}{#1}} % Left  Vertical Line in array cell.
+\def\rvl#1{\multicolumn{1}{c|}{#1}} % Right Vertical Line in array cell.
 \objective{The QR decomposition is a fundamentally important matrix factorization.
 It is straightforward to implement, is numerically stable, and provides the basis of several important algorithms.
 In this lab, we explore several ways to produce the QR decomposition and implement a few immediate applications.
 }
 
-The QR decomposition of an $m\times n$ matrix $A$ is a factorization $A=QR$, where $Q$ is  has orthonormal columns and $R$ is upper triangular.
-Every matrix $A \in M_{m\times n}$ of rank $n \le m$ has a QR factorization where $Q$ is $m\times m$ and $R$ is $m\times n$.
+The QR decomposition of a matrix $A$ is a factorization $A=QR$, where $Q$ is  has orthonormal columns and $R$ is upper triangular.
+Every $m \times n$ matrix $A$ of rank $n \le m$ has a QR decomposition, with two main forms.
 %
-\footnote{In this lab we only discuss real matrices.
-All of these results can be extended to the complex numbers by replacing ``transpose'' with ``hermitian conjugate'' and ``symmetric matrix'' with ``hermitian matrix.''}
+\begin{itemize}
+    \item \textbf{Reduced QR}: $Q$ is $m \times n$, $R$ is $n \times n$, and the columns of $Q$ $\{\q_j\}_{j=1}^n$ form an orthonormal basis for the column space of $A$.
+    \item \textbf{Full QR}: $Q$ is $m \times m$ and $R$ is $m \times n$.
+    In this case, the columns of $Q$ $\{\q_j\}_{j=1}^m$ form an orthonormal basis for all of $\mathbb{F}^m$, and the last $m - n$ rows of $R$ only contain zeros.
+\end{itemize}
+We distinguish between these two forms by writing $\widehat{Q}$ and $\widehat{R}$ for the reduced decomposition and $Q$ and $R$ for the full decomposition.
+%
+\begin{align*} % Reduced and full QR decompositions.
+\begin{array}{ccc}
+\textcolor{red}{\widehat{Q}\ (m \times n)} & \textcolor{blue}{\widehat{R}\ (n \times n)} & \\
+\left[\begin{array}{cccccccc}
+\arrayrulecolor{red}
+\cline{2-4}
+& \lvl{}     &        & \rvl{}     &          &        &      & \\
+& \lvl{}     &        & \rvl{}     &          &        &      & \\
+& \lvl{}     &        & \rvl{}     &          &        &      & \\
+& \lvl{\q_1} & \cdots & \rvl{\q_n} & \q_{n+1} & \cdots & \q_m & \\
+& \lvl{}     &        & \rvl{}     &          &        &      & \\
+& \lvl{}     &        & \rvl{}     &          &        &      & \\
+& \lvl{}     &        & \rvl{}     &          &        &      & \\
+\cline{2-4}
+\end{array}\right]
+&
+\left[\begin{array}{ccccc}
+\arrayrulecolor{blue}
+\cline{2-4}
+& \lvl{r_{11}} & \cdots & \rvl{r_{1n}} & \\
+& \lvl{}       & \ddots & \rvl{\vdots} & \\
+& \lvl{}       &        & \rvl{r_{nn}} & \\
+\cline{2-4}
+& 0            & \cdots & 0            & \\
+& \vdots       &        & \vdots       & \\
+& 0            & \cdots & 0            & \\
+\end{array}\right]
+& =\ A\ (m \times n)
+\\
+Q\ (m \times m) & R\ (m \times n) & \\
+\end{array}
+\end{align*}
 
-\section*{Modified Gram-Schmidt} % ============================================
+We will assume throughout this lab that $A$ contains only real numbers.
+However, the results and algorithms presented here can be extended to complex matrices by replacing ``transpose'' with ``hermitian conjugate'' and ``symmetric matrix'' with ``hermitian matrix.''
 
-Let $A$ be an $m \times n$ matrix of rank $n$.
-There are many methods for computing the QR decomposition.
-First we will discuss the algorithm that computes $Q$ by applying Gram-Schmidt to the columns of $A$.
+\section*{QR via Gram-Schmidt} % ==============================================
 
-Let $\{\x_i\}_{i=1}^n$ be the columns of $A$ (the rank hypothesis implies that these are linearly independent vectors).
-The Gram-Schmidt algorithm computes an orthonormal basis $\{\q_i\}_{i=1}^n$ for the span of the $\x_i$.
-The Gram-Schmidt algorithm defines  \[ \q_1 = \frac{\x_1}{\norm{\x_1}}.\]
-It recursively defines $\q_k$ for $k>1$ by
-\[
-\q_{k} = \frac{\x_k - \p_{k-1}}{\|\x_k - \p_{k-1}\|}, \,\,\,\, k=2,\ldots,n,
-\]
-where
-\[
-\p_{k-1} = \sum_{i=1}^{k-1} \langle \q_i, \x_k\rangle \q_i, \,\,\,\, k=2, \ldots, n
-\]
-and $\p_0 = 0$.
+The \emph{classical Gram-Schmidt algorithm} takes a linearly independent set of vectors and constructs an orthonormal set of vectors with the same span.
+Applying Gram-Schmidt to the columns of $A$, which are linearly independent since $A$ has rank $n$, results in the columns of $Q$.
 
-Let $Q$ be the matrix with columns $\{\q_i\}_{i=1}^n$.
-Let $R$ be the upper triangular matrix with entries $r_{jk}$ where $r_{kk} = \|\x_k-\p_{k-1}\|$ and $r_{j k} = \langle \q_j, \x_k\rangle$ when $j < k$.
-Then $QR=A$ and $R$ is nonsingular (see Chapter 3 of Volume 1 for a proof).
-Thus, if $A$ is square, the matrices $Q$ and $R$ are its QR decomposition.
+Let $\{\x_j\}_{j=1}^n$ be the columns of $A$.
+Define
+%
+\begin{align*}
+\q_1 = \frac{\x_1}{\norm{\x_1}},
+&&
+\q_{k} = \frac{\x_k - \p_{k-1}}{\|\x_k - \p_{k-1}\|},\quad k=2,\ \ldots,\ n,
+\\
+\p_0 = \0,\ \text{and}
+&&
+\p_{k-1} = \sum_{j=1}^{k-1} \langle \q_j, \x_k\rangle \q_j,\quad k=2,\ \ldots,\ n.
+\end{align*}
 
+Each $\p_{k-1}$ is the projection of $\x_k$ onto the span of $\{\q_j\}_{j=1}^{k-1}$, so $\q_k^\prime = \x_k - \p_{k-1}$ is the residual vector of the projection.
+Thus $\q_k^\prime$ is orthogonal to each of the $\{\q_j\}_{j=1}^{k-1}$.
+Finally, normalizing each $\q_k^\prime$ produces an orthonormal set $\{\q_j\}_{j=1}^n$.
 
-When implemented with a computer, the Gram-Schmidt algorithm may produce a matrix $Q$ with columns that are not even close to orthonormal due to rounding errors.
-We now introduce the modified Gram-Schmidt algorithm, which consistently produces matrices $Q$ whose columns are ``very close'' to orthonormal.
+To construct the reduced QR decomposition, let $\widehat{Q}$ be the matrix with columns $\{\q_j\}_{j=1}^n$, and let $\widehat{R}$ be the upper triangular matrix with the following entries:
+%
+\begin{align*}
+r_{kk} = \|\x_k-\p_{k-1}\|,
+&&
+r_{jk} = \langle \q_j, \x_k\rangle = \q_j\trp\x_k,\ j < k.
+\end{align*}
+%
+This clever choice of entries for $\widehat{R}$ reverses the Gram-Schmidt process and ensures that $\widehat{Q}\widehat{R} = A$.
 
-In the modified Gram-Schmidt algorithm, $\q_1$ is the normalization of $\x_1$ as before.
-We then make each of the vectors $\x_2, \ldots, \x_n$ orthogonal to $\q_1$ by defining
-\[
-\x_k := \x_k - \langle \q_1,\x_{k} \rangle \q_1,\quad k=2,\ldots,n.
-\]
-(Compare this to the usual Gram-Schmidt algorithm, where we only made $\x_2$ orthogonal to $\q_1$.)
-Next we define $\q_2 = \frac{\x_2}{\|\x_2\|}.$ Once again we make $\x_3, \ldots, \x_n$ orthogonal to $\q_2$ by defining
-\[
-\x_k := \x_k - \langle \q_2,\x_{k} \rangle \q_2,\quad k=3,\ldots,n.
-\]
-(Each of these new vectors is a linear combination of vectors orthogonal to $\q_1$, and hence is orthogonal to $\q_1$ as well.)
-We continue this process until we have an orthonormal set $\q_1, \ldots, \q_k$.
-The entire modified Gram-Schmidt algorithm is described in Algorithm \ref{Alg:modified-gram-schmidt}.
+To construct the full QR decomposition, choose $m - n$ vectors $\{\x_j\}_{j=n+1}^m$ such that the entire set of original vectors $\{\x_j\}_{j=1}^m$ is linearly independent, then continue the Gram-Schmidt process to produce the additional columns of $Q$.
+Appending $m - n$ rows of zeros to $\widehat{R}$ results in $R$.
 
-\begin{algorithm}
+\subsection*{Modified Gram-Schmidt} % -----------------------------------------
+
+When implemented with a computer, the Gram-Schmidt algorithm may produce a set of vectors $\{q_j\}_{j=1}^n$ that are not even close to orthonormal due to rounding errors.
+The \emph{modified Gram-Schmidt algorithm} is a slight variant of the classical algorithm which consistently produces a set of vectors that are ``very close'' to orthonormal.
+
+Let $\q_1$ be the normalization of $\x_1$ as before.
+Instead of making just $\x_2$ orthogonal to $\q_1$, make \emph{each} of the vectors $\{\x_j\}_{j=2}^n$ orthogonal to $\q_1$:
+\[\x_k = \x_k - \langle \q_1,\x_{k} \rangle \q_1,\quad k=2,\ \ldots,\ n.\]
+Next, define $\q_2 = \frac{\x_2}{\|\x_2\|}$.
+Proceed by making each of $\{\x_j\}_{j=3}^n$ orthogonal to $\q_2$:
+\[\x_k = \x_k - \langle \q_2,\x_{k} \rangle \q_2,\quad k=3,\ldots,n.\]
+Since each of these new vectors is a linear combination of vectors orthogonal to $\q_1$, they are orthogonal to $\q_1$ as well.
+Continuing this process results in the desired orthonormal set $\{\q_j\}_{j=1}^n$.
+The entire modified Gram-Schmidt algorithm is described below in Algorithm \ref{Alg:modified-gram-schmidt}.
+
+\begin{algorithm}[H]
 \begin{algorithmic}[1]
 \Procedure{Modified Gram-Schmidt}{$A$}
     \State $m, n \gets \shape{A}$
@@ -91,7 +141,7 @@ Here is an example of using SciPy to compute the QR decomposition of a matrix.
 >>> import numpy as np
 >>> from scipy import linalg as la
 
->>> A = np.random.rand(4,3)
+>>> A = np.random.random((4,3))
 >>> Q, R = la.qr(A)
 >>> Q.dot(R) == A
 array([[ True, False, False],
@@ -127,34 +177,45 @@ You may also want to compare your results to SciPy's QR factorization algorithm.
 \begin{lstlisting}
 >>> import numpy as np
 >>> from scipy import linalg as la
->>> A = np.random.random((10,10))
->>> Q,R = la.qr(A, mode="economic") # Specify 'economic' for reduced QR.
->>> np.allclose(Q.dot(R), A)        # Verify that QR = A.
+
+# Generate a random matrix and get its reduced QR decomposition via SciPy.
+>>> A = np.random.random((6,4))
+>>> Q,R = la.qr(A, mode="economic") # Use mode="economic" for reduced QR.
+# Verify that that QR = A and that Q is orthonormal.
+>>> np.allclose(np.dot(Q, R), A)
+True
+>>> np.allclose(np.dot(Q.T, Q), np.identity(4))
 True
 \end{lstlisting}
 \label{prob:qr-via-mgs}
 \end{problem}
 
-\subsection*{Consequences of the QR Decomposition} % --------------------------
+\section*{Consequences of the QR Decomposition} % =============================
 
 The special structures of $Q$ and $R$ immediately provide some simple applications.
+
+\subsection*{Determinants} % --------------------------------------------------
+
 Since $Q$ is orthonormal and $R$ is upper-triangular,
 \begin{align*} \det(Q) = \pm 1 && \det(R) = \prod_{i=1}^n r_{i,i} \end{align*}
 Then since $\det(AB) = \det(A)\det(B)$, we have the following:
 \[\abs{\det(A)} = \abs{\det(QR)} = \abs{\det(Q)\det(R)} = \abs{\prod_{i=1}^n r_{i,i}}\]
 
 \begin{problem} % Use the QR decomposition to calculate |det(A)|.
-Write a function that accepts a square matrix $A$ of full rank.
+Write a function that accepts an invertible $n \times n$ matrix $A$.
 Use the QR decomposition of $A$ to calculate $\abs{\det(A)}$.
 
 You may use your QR decomposition algorithm from Problem \ref{prob:qr-via-mgs} or SciPy's QR routine.
 Can you implement this function in a single line?
 \end{problem}
 
+\subsection*{Linear Systems} % ------------------------------------------------
+
 The LU decomposition is usually the matrix factorization of choice to solve the linear system $A\x = \b$ because the triangular structures of $L$ and $U$ facilitate forward and backward substitution.
 However, the QR decomposition avoids the potential numerical issues that come with Gaussian elimination.
 
-Since $Q$ is orthonormal, $Q^{-1}= Q\trp$, so solving $A\x = \b$ is equivalent to solving the system $R\x = Q\trp\b$.
+Since $Q$ is orthonormal, $Q^{-1}= Q\trp$.
+Therefore, solving $A\x = \b$ is equivalent to solving the system $R\x = Q\trp\b$.
 Since $R$ is upper-triangular, $R\x = Q\trp\b$ can be solved quickly with back substitution.%
 \footnote{See Problem 3 of the Linear Systems lab for a refresher on back substitution.}
 
@@ -221,8 +282,6 @@ Let $e_1, \ldots, e_4$ be the standard basis of $\mathbb{R}^4$.
 First we find an orthonormal transformation $Q_1$ that maps the first column of A into the span of $e_1$.
 This is diagrammed below, where $*$ represents an arbitrary entry.
 
-\def\rvl#1{\multicolumn{1}{c|}{#1}}
-\def\lvl#1{\multicolumn{1}{|c}{#1}}
 \begin{equation*}
 \left[\begin{array}{ccc}
 * & * & * \\
