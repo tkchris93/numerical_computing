@@ -229,13 +229,22 @@ It should resemble the first eigenface shown in Figure \ref{facialRecognition:ei
 
 \section*{Change Basis}
 
+The projection matrix $P_s = U_s U_s^T$ projects a face vector into the $s$-dimensional subspace spanned by the eigenfaces, but still keeps it as a vector in $\mathbb{R}^{mn}$. 
+The change-of-basis matrix $U_s^T$ both projects the face vector and and changes the basis.
+The resulting vector has length $s$ and represents the face in terms of eigenfaces.
+
+To represent any face vector in terms of the first $s$ eigenfaces, multiply by $U_s^T$. 
+To change back to a full length-$mn$ projection, multiply again by $U_s$.
+
+\begin{comment}
 It does us no good to project all our vectors into an $s$-dimensional space if we still store them as vectors in $\mathbb{R}^{nm}$. 
 Instead, we must store our face vectors in terms of the columns of $U_s$.
 This way, each vector is a length-$s$ array in NumPy, instead of a length-$mn$ array.
 
-The change-of-basis matrix is $U_s^T$, so $U_s^T\widehat{P}_s = U_s^TU_sU_s^T = U_s^T$. 
+The change-of-basis matrix is $U_s^T$, so $U_s^TP_s = U_s^TU_sU_s^T = U_s^T$. 
 Thus we can project into the subspace and change basis by multiplying by $U_s^T$.
 To change back to the full $mn$-vector, multiply by $U_s$.
+\end{comment}
 
 
 \begin{figure}
@@ -258,14 +267,14 @@ To change back to the full $mn$-vector, multiply by $U_s$.
 \label{prob:top_n}
 \leavevmode
 \begin{enumerate}
-\item Implement the method  \li{FacialRec.project() in your class definition}.
+\item Implement the method  \li{FacialRec.project()} in your class definition.
 This should accept a flattened image or an array with flattened images as its columns.
 It should also accept a value for $s$. 
-The function should project the image or images into the appropriate $s$-dimensional subspace and return the result.
-\item (Optional) Let \li{face} be the first mean-shifted face (the first column of \li{facialRec.Fbar}). Do the following:
+The function should project the image or images into the appropriate $s$-dimensional subspace and change basis, then return the result.
+\item Let \li{face} be the first mean-shifted face (the first column of \li{facialRec.Fbar}). Do the following:
 \begin{enumerate}
-\item Project \li{face} onto the subspace spanned by the first 75 eigenfaces.
-\item Change basis back to the standard basis on $\mathbb{R}^{mn}$.
+\item Project \li{face} so that it is represented in terms of the first 19 eigenfaces.
+\item Change basis again back to the standard basis on $\mathbb{R}^{mn}$.
 \item Add back the mean face \li{facialRec.mu}.
 \item Plot the resulting image.
 \end{enumerate}
