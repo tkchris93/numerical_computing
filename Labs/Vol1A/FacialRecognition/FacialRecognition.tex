@@ -153,6 +153,8 @@ We can then use just $s$ values to store each face in terms of the basis vectors
 The ``best" subspace to project to is the one that is closest in the least squares sense, so that the sum of the squared errors between $\{\bar{\f}_1, \ldots \bar{\f}_k\}$ and their projections is minimized.
 Let $U \Sigma V^T$ be an SVD of $\bar{F}$, with $\u_i$ the columns of $U$. 
 As we will prove below, the $s$-dimensional subspace that minimizes the squared error is the span of $\u_1, \ldots, \u_s$.
+Note that $\u_1, \ldots, \u_s$ is an orthonormal basis for this subspace.
+
 The matrix for the projection is $P_s = U_s U_s^T$ where $U_s = [ \u_1\; \ldots \; \u_s]$. 
 %The matrix for the projection is $P_s = U_s U_s^T$ where $U_s$ is the first $s$ columns of $U$. 
 This matrix projects the original face vectors into the $s$-dimensional subspace. 
@@ -210,7 +212,7 @@ Since $P_s \bar{F}$ will always have rank $s$ or less, the projection $P_s =  \s
 If we let $U_s = [ \u_1\; \ldots \; \u_s]$, then we may write $P_s = U_sU_s^T$. Notice that $P_s$ is projection onto the subspace spanned by the columns of $U_s$.
 \end{proof}
 
-The $s$ basis vectors of the new subspace, $\u_1, \ldots, \u_s$, are eigenvectors of $\bar{F}\bar{F}^T$.
+The $s$ basis vectors $\u_1, \ldots, \u_s$ are eigenvectors of $\bar{F}\bar{F}^T$.
 They also resemble face images.
 Hence they are commonly called the ``eigenfaces." 
 
@@ -330,10 +332,10 @@ Note that we can approximately reconstruct $\bar{f}_i$ from the coordinate vecto
 See Figure \ref{facialRecognition:rebuiltImage} for examples of reconstructed face images giving different numbers of eigenfaces.
 \end{comment}
 
-\section*{Recognizing Faces}
+\section*{Match Faces}
 Finally, we are ready to identify which mean-shifted image $\bar{\f}_i$ is closest to an inputed image, $\bar{\g}$. 
-We begin by projecting all vectors to some $s$-dimensional subspace and writing them in terms of an orthonormal basis for that subspace. 
-This is accomplished with multiplication by $U_s^T$:
+We begin by projecting all vectors to some $s$-dimensional subspace and writing them in terms of the basis vectors, which are the eigenfaces. 
+This is done by multiplying by the change-of-basis matrix:
 \[
 \widehat{\f}_i = U_s^T(\f_i-{\boldsymbol \mu}) \qquad \widehat{\g} = U_s^T(\g-{\boldsymbol \mu}).
 \]
