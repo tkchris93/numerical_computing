@@ -109,9 +109,11 @@ For the truncated SVD, keep only the largest $k$.
 
 \begin{problem}
 Write a function \li{truncated_svd} that accepts a matrix $A$ and an optional integer \li{k = None}. 
-If \li{k} is \li{None}, calculate the compact SVD. If \li{k} is an integer, calculate the truncated SVD.
+If \li{k} is \li{None}, calculate the compact SVD. If \li{k} is an integer, calculate the truncated SVD, keeping only the \li{k} largest singular values.
 (Note: if there are fewer than \li{k} nonzero singular values, the truncated SVD will come out the same as the compact SVD.)
 Since the only difference between these two processes is the number of singular values we keep, we only need to write one function.
+
+Here's an outline to follow:
 
 \begin{enumerate}
 \item Find the eigenvalues and eigenvectors of $A^H A$.
@@ -206,6 +208,8 @@ This dataset contains a set of points on the unit circle and a set of unit vecto
 You can access the circle by loading the \li{"circle"} file. 
 You can access the unit vectors by loading the \li{"unit_vectors"} file. 
 These points are stored as a numpy array of points in $\mathbb{R}^2$ with the first row being all the x-coordinates and the second row being all the y-coordinates.
+
+Hint: If you want to force a plot to use the same scale on the x- and y-axes, consider using \li{plt.axis('equal')}.
 \end{problem}
 
 \begin{comment}
@@ -233,11 +237,9 @@ By only keeping the first $k$ singular values, we can create an approximation $\
 This requires storing only $mk+k+nk$ values.
 As we make $k$ small, we eventually require very little storage. This comes at the cost of losing information from the original matrix.
 
-The beauty of the SVD is that it keeps the information that is most important. 
-Larger singular values correspond to columns of $U$ and $V$ that contain more information, and so dropping the smallest singular values retains as much information as possible.
-When approximating a matrix at a lower rank, the truncated SVD is guaranteed to give the closest approximation possible.
-In mathematical terms, given a matrix $A$ and its SVD approximation $\widehat A_k = U_k\Sigma_k V_k^H$, the matrix $\widehat A_k$ is the \emph{best rank $k$ approximation} to $A$ (with respect to the induced 2-norm and Frobenius norm).
-
+The beauty of the SVD is that it makes it easy to only keep the information that is most important. 
+Larger singular values correspond to columns of $U$ and $V$ that contain more information, so dropping the smallest singular values retains as much information as possible.
+In mathematical terms, given a matrix $A$ and its rank-k truncated SVD approximation $\widehat A_k = U_k\Sigma_k V_k^H$, the matrix $\widehat A_k$ is the \emph{best rank $k$ approximation} to $A$ (with respect to the induced 2-norm and Frobenius norm).
 This is a very significant concept in applied mathematics, appearing in areas including signal processing, statistics, semantic indexing, and control theory.
 
 
@@ -250,7 +252,8 @@ Thus the modified $\Sigma$ would be
 Multiplying this matrix with the original $U$ and $V^H$ will give the same $\widehat A$ that was found by computing the truncated SVD directly.
 \end{comment}
 
-In practice, we can use SciPy's linear algebra module to create low-rank SVD approximations or a given matrix.
+\subsection*{Implementation}
+We can use SciPy's linear algebra module to create low-rank SVD approximations or a given matrix.
 The code below computes the SVD of \li{A}.
 \begin{lstlisting}
 >>> import numpy as np
@@ -281,8 +284,9 @@ Use \li{scipy.linalg.svd}.
 \label{prob:svd_approx}
 \end{problem}
 
-Recall that the error between the best rank $s$ approximation $\widehat{A_s}$ to $A$ with respect to the induced 
-2-norm is given by
+\subsection*{Error of Low-Rank Approximations}
+
+Recall that the error between the best rank $s$ approximation $\widehat{A_s}$ of $A$ with respect to the induced 2-norm is given by
 $$
 \|A - \widehat{A_s}\|_2 = \sigma_{s+1},
 $$
@@ -321,6 +325,7 @@ You might aim to reduce the amount of data being sent, while also minimizing the
 This can be done using the SVD.
 An image is just a matrix of pixel values, which means it has a singular value decomposition.
 Computing and sending a low-rank SVD approximation of the image can considerably reduce the amount of data sent, while retaining a high level of image detail.
+Additionally, successive levels of detail can be sent after the inital low-rank approximation by sending additional singular values and their corresponding columns of V and U.
 
 Examining the singular values of an image gives us an idea of how low-rank the approximation can be.
 Figure \ref{fig:hubble} presents an image and a log plot of its singular values from greatest to least.
@@ -378,14 +383,14 @@ By rank 40, the approximation visibly differs very little from the original.
 \label{fig:rankvalues}
 \end{figure}
 
-The code below reads in an image, converts it to black and white, and shows it.
+The following code demonstrates how to use \li{plt.imread} and \li{plt.imshow} to read in an image, convert it to black and white, and show it.
 The function from Problem \ref{prob:svd_approx} can then be used to calculate an approximation of \li{X}.
 %Enter the following into IPython (note that any image you might have will work):
 \begin{lstlisting}
 >>> import matplotlib.pyplot as plt
 >>> # Take only one layer (layer 0) of the image
 >>> X = plt.imread('hubble_image.jpg')[:,:,0].astype(float)
->>> X.nbytes     #number of bytes needed to store X
+% >>> X.nbytes     #number of bytes needed to store X  <---- this seems superfluous
 >>> plt.imshow(X, cmap="gray")
 >>> plt.show()
 \end{lstlisting}
@@ -412,6 +417,7 @@ Using the \li{svd_approx} function from Problem \ref{prob:svd_approx}, write a f
 
 While \li{svd_approx} worked for grayscale images, the \li{compress_img} function should work on color images. 
 You may split the image into its three RGB layers and approximate each layer separately, then recombine them.
+Test your function on \li{hubble_image.jpg}
 Your output should be similar to Figure \ref{fig:compressed_image}.
 
 Hints:
