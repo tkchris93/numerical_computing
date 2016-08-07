@@ -1,9 +1,10 @@
 \lab{Introduction to Matplotlib}{Matplotlib}
 \label{lab:Matplotlib}
-\objective{Data visualization is a key component of scientific computing.
-Python has several standard packages that work in conjunction with NumPy and SciPy to visualize data contained in arrays.
-In this lab we introduce Matplotlib, the most commonly-used visualization library in Python.
-The plotting techniques presented here will be used in the majority of the labs in this curriculum.}
+\objective{
+Matplotlib is the most commonly-used data visualization library in Python. Being able to visualize data helps to determine patterns, to communicate results, and is a key component of applied and computational mathematics.
+In this lab we introduce techniques for visualizing data in 1, 2, and 3 dimensions.
+The plotting techniques presented here will be used in the remainder of the labs in the manual.
+}
 
 \section*{Line Plots} % =======================================================
 
@@ -94,9 +95,11 @@ The resulting plot is shown in Figure \ref{fig:basic2}.
 Note that this time, the $x$-axis is correctly aligned with the $y$-axis.
 The resolution is also much better because \li{x} and \li{y} have $50$ entries each instead of only $10$.
 
-All calls to \li{plt} functions modify the same figure until \li{plt.show()} is executed, which displays the current figure and resets the system.
+All calls to \li{plt} functions modify the same figure until \li{plt.show()} is executed, which displays the current figure and resets the system.%
+\footnote{Use \li{plt.figure()} to manually create several figures at once.}
 The next time a \li{plt} function is called a new figure is created.
 This makes it possible to plot several lines in a single figure.
+
 
 \begin{problem} % Plot two lines (sin() and cos()).
 Write a function that plots the functions $\sin(x)$, $\cos(x)$, and $\arctan(x)$ on the domain $[-2\pi, 2\pi]$ (use \li{np.pi} for $\pi$).
@@ -106,9 +109,9 @@ Make sure the domain is refined enough to produce a figure with good resolution.
 
 \begin{info} % Interactive Mode.
 Plotting can seem a little mystical because the actual plot doesn't appear until \li{plt.show()} is executed.
-Matplotlib's \emph{interactive mode}, particularly useful in IPython, allows the user to see the plot be constructed one piece at a time.
+Matplotlib's \emph{interactive mode} allows the user to see the plot be constructed one piece at a time.
 Use \li{plt.ion()} to turn interactive mode on and \li{plt.ioff()} to turn it off.
-This is very useful for customizing a plot on the fly.
+This is very useful for quick experimentation.
 
 Try executing the following commands in IPython:
 
@@ -127,7 +130,8 @@ In [7]: plt.clf()
 In [8]: plt.ioff()
 \end{lstlisting}
 
-It is wise to use interactive mode \textbf{only} with IPython, as it exhibits erratic behavior when producing subplots or multiple figures.
+Use interactive mode \textbf{only} with IPython.
+Using interactive mode in a non-interactive setting may freeze the window or cause other problems.
 \end{info}
 
 \section*{Plot Customization} % ===============================================
@@ -337,7 +341,7 @@ Matplotlib provides several other easy ways to visualize data.
 Scatter plots are particularly useful for data that is not inherently correlated or ordered.
 
 To create a scatter plot, use \li{plt.plot()} and specify a point marker (such as \li{'o'} or \li{'+'}) for the line style.%
-\footnote{\li{plt.scatter()} can also be used to create scatter plots, but it accepts slightly different arguments than \li{plt.plot()} and is often less flexible.}
+\footnote{\li{plt.scatter()} can also be used to create scatter plots, but it accepts slightly different arguments than \li{plt.plot()}. We will explore the appropriate usage of this function in a later lab.}
 
 \item A \emph{histogram} groups entries of a 1-dimensional data set into a given number of intervals, called \emph{bins}.
 Each bin has a bar whose height indicates the number of values that fall in the range of the bin.
@@ -582,7 +586,7 @@ Follow these steps to create a Matplotlib animation:
 %
 \begin{enumerate}
     \item Calculate all data that is needed for the animation.
-    \item Define a figure explicitly with \li{plt.fig()} and set its window boundaries.
+    \item Define a figure explicitly with \li{plt.figure()} and set its window boundaries.
     \item Draw empty objects that can be altered dynamically.
     \item Define a function to update the drawing objects.
     \item Use \li{matplotlib.animation.FuncAnimation()}.
@@ -642,7 +646,7 @@ def sine_cosine_animation():
     def update(index):
         sin_drawing.set_data(x[:index], y1[:index])
         cos_drawing.set_data(x[:index], y2[:index])
-        return sin_drawing, cos_drawing,    # Note the comma!
+        return sin_drawing, cos_drawing,
 
     a = FuncAnimation(fig, update, frames=len(x), interval=10)
     plt.show()
@@ -691,8 +695,8 @@ z(\theta) = \frac{\theta}{10}
 \begin{lstlisting}
 def rose_animation_3D():
     theta = np.linspace(0, 2*np.pi, 200)
-    x = np.cos(theta)*np.cos(6*theta)
-    y = np.sin(theta)*np.cos(6*theta)
+    x = np.cos(theta) * np.cos(6*theta)
+    y = np.sin(theta) * np.cos(6*theta)
     z = theta / 10
 
     fig = plt.figure()
@@ -713,7 +717,7 @@ def rose_animation_3D():
     plt.show()
 \end{lstlisting}
 
-\begin{comment}
+\begin{comment} % TODO: An ORIGINAL example of using widgets
 \subsection*{Interactive Plots} % ---------------------------------------------
 
 Matplotlib plots can be made interactive by adding \emph{widgets}.

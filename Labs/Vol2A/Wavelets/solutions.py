@@ -1,201 +1,104 @@
-# Solutions to older version of the Wavelet lab, now defunct
+# solutions.py
+"""Volume II: Wavelets
+"""
+
+import sys
+from matplotlib import pyplot as plt
 import numpy as np
 import scipy as sp
 from scipy.signal import fftconvolve
-from scipy.misc import imread
-from matplotlib import pyplot as plt
-from matplotlib import cm
-import pywt
 
-############################################################################
-############################# PROBLEM 1 ####################################
-############################################################################
+# Problem 1: Implement this AND the following function.
+def dwt(X, L, H, n):
+    """Compute the Discrete Wavelet Transform of X using filters L and H.
 
-# calculate one level of the transform, LL, LH, HL, HH.
-# this is probably not the most efficient implementation, but it works.
-# due to reasons not completely clear to me, convolution returns an array that 
-# has one too many entries.
-# if you keep the odd-indexed elements, then you can go to the end.
-# parameters: array of size 2^n by 2^n image, 1d array lo_d, 1d array hi_d
-# lo_d and hi_d are the low-pass and hi-pass filters of the wavelet
-# returns a list of 4 coefficient arrays: [LL,LH,HL,HH]
-def dwt2_pass(image,lo_d,hi_d):
-	temp = sp.zeros([image.shape[0], image.shape[1]/2])
-
-    # Calculate LL and LH
-	LL = sp.zeros([image.shape[0]/2, image.shape[1]/2])
-    LH = sp.zeros([image.shape[0]/2, image.shape[1]/2])
-	for i in xrange(image.shape[0]):
-		temp[i] = sp.signal.fftconvolve(image[i], lo_d, mode='full')[1::2]
-	for i in xrange(image.shape[1]/2):
-		LL[:,i] = sp.signal.fftconvolve(temp[:,i],lo_d,mode='full')[1::2]
-        LH[:,i] = sp.signal.fftconvolve(temp[:,i],hi_d,mode='full')[1::2]
+    Parameters:
+        X (1D ndarray): The signal to be processed.
+        L (1D ndarray): The low-pass filter.
+        H (1D ndarray): The high-pass filter.
+        n (int > 0): Controls the degree of transformation.
     
-    # Calculate HL and HH
-	HL = sp.zeros([image.shape[0]/2, image.shape[1]/2])
-    HH = sp.zeros([image.shape[0]/2, image.shape[1]/2])
-	for i in xrange(image.shape[0]):
-		temp[i] = sp.signal.fftconvolve(image[i], hi_d, mode='full')[1::2]
-	for i in xrange(image.shape[1]/2):
-		HL[:,i] = sp.signal.fftconvolve(temp[:,i],lo_d,mode='full')[1::2]
-        HH[:,i] = sp.signal.fftconvolve(temp[:,i],hi_d,mode='full')[1::2]
-        
-	return [LL,LH,HL,HH]
+    Returns:
+        a list of the wavelet decomposition arrays.
+    """
+    i = 0                                  #Some initialization steps
+    A = X
+    D = []
+    while i < n:
+        D.append(fftconvolve(A, H)[1::2])    #High-pass filtering
+        A = (fftconvolve(A, L)[1::2])        #Low-pass filtering
+        i += 1
+    D.append(A)
+    D = D[::-1]
+    return D
 
-# to visualize one level of coefficients:
-#plt.imshow(np.vstack([np.hstack([LL,LH]), np.hstack([HL,HH])]),cmap=cm.Greys_r)
-#plt.imshow()
+def plot(X, L, H, n):
+    """Plot the results of dwt with the given inputs.
+    Your plot should be very similar to Figure 2.
 
-# to visualize two levels of coefficients:
-LL1,LH1,HL1,HH1 = dwt2_pass(image,lo_d,hi_d)
-LL2,LH2,HL2,HH2 = dwt2_pass(LL1,lo_d,hi_d)
-NW = np.vstack([np.hstack([LL2,LH2]),np.hstack([HL2,HH2])])
-#plt.imshow(np.vstack([np.hstack([NW,LH1]), np.hstack([HL1,HH1])]),cmap=cm.Greys_r)
-#plt.show()
+    Parameters:
+        X (1D ndarray): The signal to be processed.
+        L (1D ndarray): The low-pass filter.
+        H (1D ndarray): The high-pass filter.
+        n (int > 0): Controls the degree of transformation.
+    """
 
-# now let's try the whole decomposition:
-def dwt2(image, lo_d, hi_d, level=0):
-	max_level = np.floor(np.log2(image.shape[0]*1.0/len(lo_d))) + 1
-    if (level < 1 or level > max_level):
-        level = int(max_level)
-	result = []
-	sig = image
-    for i in xrange(level):
-		coeffs = dwt2_pass(sig,lo_d,hi_d)
-		result.append(coeffs[1:])
-		sig = coeffs[0]
-	result.append(sig)
-	result.reverse()
-	return result
-
-# Single level reconstruction
-# parameters: coeffs = [LL,LH,HL,HH], lo_r and hi_r the filters
-# returns: LL on the next level
-def idwt2_pass(coeffs, lo_r, hi_r):
-	LL, LH, HL, HH = coeffs
-    n = LL.shape[0]
-	temp1 = sp.zeros([2*n,n])
-	temp2 = sp.zeros([2*n,n])
-	up1 = sp.zeros(2*n)
-	up2 = sp.zeros(2*n) 
-	for i in xrange(n):
-		up1[1::2] = HH[:,i]
-		up2[1::2] = HL[:,i]
-		temp1[:,i] = fftconvolve(up1, hi_r)[1:] + fftconvolve(up2, lo_r)[1:]
-		up1[1::2] = LH[:,i]
-		up2[1::2] = LL[:,i]		
-		temp2[:,i] = fftconvolve(up1, hi_r)[1:] + fftconvolve(up2, lo_r)[1:]
-	result = sp.zeros([2*n,2*n])
-	for i in xrange(2*n):
-		up1[1::2] = temp1[i]
-		up2[1::2] = temp2[i]
-		result[i] = fftconvolve(up1, hi_r)[1:] + fftconvolve(up2, lo_r)[1:]
-	return result
-
-# now the whole reconstruction algorithm
-def idwt2(coeffs,lo_r,hi_r):
-	result = coeffs[0]
-	for i in xrange(len(coeffs)-1):
-		args = [result]
-		args.extend(coeffs[i+1])
-		result = idwt2_pass(args,lo_r,hi_r)
-	return result
-
-############################################################################
-############################# PROBLEM 2 ####################################
-############################################################################
-
-def plot(image):
-    plt.imshow(image,cmap=cm.Greys_r)
+    coeffs = dwt(X, L, H, n)
+    plt.subplot(n+2,1,1)
+    plt.plot(X)
+    for i in xrange(len(coeffs)):
+        plt.subplot(n+2,1,i+2)
+        plt.plot(coeffs[i])
     plt.show()
 
-lenna = np. array ( imread (" Lenna .png",flatten = True ),dtype =np. float32 )
+def test_prob1():
+    """Tests Problem 1 as per the instructions in the .tex file."""
+    L = np.ones(2)/np.sqrt(2)
+    H = np.array([-1,1])/np.sqrt(2)
+    n = 4
+    domain = np.linspace(0,4*np.pi, 1024)
+    noise = np.random.randn(1024)*.1
+    X = np.sin(domain) + noise
+    plot(X, L, H, n)
 
-wave = pywt.Wavelet('haar')
-lo_d = sp.array(wave.dec_lo)
-hi_d = sp.array(wave.dec_hi)
-lo_r = sp.array(wave.dec_lo)
-hi_r = sp.array(wave.dec_hi)
+# Problem 2: Implement this function.
+def idwt(coeffs, L, H):
+    """
+    Parameters:
+        coeffs (list): a list of wavelet decomposition arrays.
+        L (1D ndarray): The low-pass filter.
+        H (1D ndarray): The high-pass filter.
+    Returns:
+        The reconstructed signal (as a 1D ndarray).
+    """
+    n = len(coeffs) - 1
+    A = coeffs[0]
+    coeffs = coeffs[1:]
+    for i in xrange(n):
+        D = coeffs[i]
+        print len(D)
+        up_A = np.zeros(2*A.size)
+        up_A[::2] = A
+        up_D = np.zeros(2*D.size)
+        up_D[::2] = D
+        print len(up_A),len(L),len(up_D),len(H)
+        # now convolve and add, but discard last entry
+        A = fftconvolve(up_A,L)[:-1] + fftconvolve(up_D,H)[:-1]
+    return A
 
-coeffs = dwt2(lenna, lo_d, hi_d, 1)
-coeffs[0] *= 0 
-edges = idwt2(coeffs,lo_r,hi_r)
-plot(np.absolute(edges))
-plot(np.hstack([lenna,lenna+edges]))
+def test_prob2():
+    """Tests Problem 1 as per the instructions in the .tex file."""
+    L = np.ones(2)/np.sqrt(2)
+    H = np.array([-1,1])/np.sqrt(2)
+    n = 4
+    
+    domain = np.linspace(0,4*np.pi, 1024)
+    noise = np.random.randn(1024)*.1
+    X = np.sin(domain) + noise
+    coeffs = dwt(X, L, H, n)
 
-############################################################################
-############################# PROBLEM 3 ####################################
-############################################################################
-
-def hardThreshold(coeffs,thresh):
-	new_coeffs = []
-	for j in coeffs:
-		new_coeffs.append(sp.copy(j))
-	for j in xrange(1,len(new_coeffs)):
-		for i in new_coeffs[j]:
-			i *= sp.absolute(i) > thresh
-	return new_coeffs
-
-def softThreshold(coeffs,thresh):
-	new_coeffs = []
-	for j in coeffs:
-		new_coeffs.append(sp.copy(j))
-	for j in xrange(1,len(new_coeffs)):
-		for i in new_coeffs[j]:
-			i[sp.absolute(i)<thresh] = 0
-			i[sp.absolute(i)>=thresh] -= (sp.sign(i[sp.absolute(i)>=thresh]))*thresh
-	return new_coeffs
-
-############################################################################
-############################# PROBLEM 4 ####################################
-############################################################################
-
-def addGuassianNoise(image,deviation):
-	return image + sp.random.normal(0.0,deviation,image.shape)
-
-noisy = addGaussianNoise(lenna,20)
-coeffs = dwt2(noisy,lo_d,hi_d,4)
-denoised1 = idwt2(hardThreshold(coeffs,60),lo_r,hi_r)
-denoised2 = idwt2(softThreshold(coeffs,30),lo_r,hi_r)
-plot(np.hstack([noisy,denoised1,desnoised2]))
-
-############################################################################
-############################# PROBLEM 5 ####################################
-############################################################################
-
-def quantize(coeffs,step,t=2):
-	new_coeffs = []
-	for j in coeffs:
-		new_coeffs.append(sp.copy(j))
-	neg_indices = new_coeffs[0]<0
-	pos_indices = np.logical_not(neg_indices)
-	new_coeffs[0][neg_indices] = np.floor(new_coeffs[0][neg_indices]/step + 0.5*t)
-	new_coeffs[0][pos_indices] = np.ceil(new_coeffs[0][pos_indices]/step - 0.5*t)
-	for i in xrange(1,len(new_coeffs)-1):
-		for j in new_coeffs[i]:
-			neg_indices = j<0
-			pos_indices = np.logical_not(neg_indices)
-			j[neg_indices] = np.floor(j[neg_indices]/step + 0.5*t)
-			j[pos_indices] = np.floor(j[pos_indices]/step - 0.5*t)
-	return new_coeffs
-
-def dequantize(coeffs,step,t=2):
-	new_coeffs = []
-	for j in coeffs:
-		new_coeffs.append(sp.copy(j))
-	neg_indices = new_coeffs[0]<0
-	pos_indices = new_coeffs[0]>0
-	new_coeffs[0][neg_indices] = (new_coeffs[0][neg_indices] + 0.5 - 0.5*t)*step
-	new_coeffs[0][pos_indices] = (new_coeffs[0][pos_indices] - 0.5 + 0.5*t)*step
-	for i in xrange(1,len(new_coeffs)-1):
-		for j in new_coeffs[i]:
-			neg_indices = j<0
-			pos_indices = j>0
-			j[neg_indices] = (j[neg_indices]+ 0.5 - 0.5*t)*step
-			j[pos_indices] = (j[pos_indices]- 0.5 + 0.5*t)*step
-	return new_coeffs
-
-coeffs = dwt2(lenna,lo_d,hi_d)
-step = 1
-compressed = dequantize(quantize(coeffs,step),step)
-plot(np.hstack([lenna,compressed]))
+    Ln = [1/np.sqrt(2),1/np.sqrt(2)]
+    Hn = [1/np.sqrt(2),-1/np.sqrt(2)]
+    A = idwt(coeffs, Ln, Hn)
+    plt.plot(A)
+    return np.allclose(X, A)

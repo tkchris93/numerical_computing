@@ -1,39 +1,42 @@
-\lab{Least squares and Eigenvalues}{Least squares and Eigenvalues}
+\lab{QR 2: Applications}{Applications of the QR Decomposition}
 %TODO paragraph for the objective. Ask Mylan for a solid example.
 \objective{Use least squares to fit curves to data and use QR decomposition to find eigenvalues.}
 \label{lab:givens}
 
-\section*{Least Squares}
+\section*{Least Squares} % ====================================================
 
-A linear system $A\x=\b$ is \emph{overdetermined} if it has no solutions. 
-In this situation, the \emph{least squares solution}, denoted as $\widehat{\x}$, is ``closest'' to a solution. 
-By definition, $\widehat{\x}$ is the vector such that $A\widehat{\x}$ will equal the projection of $\b$ onto the range of $A$. 
-We can compute $\widehat{\x}$ by solving the \emph{Normal Equation} $A\trp A\widehat{\x} = A\trp \b$ (see Volume 1 Section 3.8). In this lab, we will be considering matrices in $M_{m \times n}(\Bbb{R})$. Therefore, we will use the transpose instead of the Hermitian.
+A linear system $A\x=\b$ is \emph{overdetermined} if it has more equations than unknowns.
+In this situation, the \emph{least squares solution}, denoted as $\widehat{\x}$, is ``closest'' vector to a solution.
+By definition, $\widehat{\x}$ is the vector such that $A\widehat{\x}$ will equal the projection of $\b$ onto the range of $A$.
+We can compute $\widehat{\x}$ by solving the \emph{normal equation} $A\trp A\widehat{\x} = A\trp \b$ (see Volume 1 Chapter 3).
+In this lab, we will be considering matrices in $M_{m \times n}(\mathbb{R})$. Therefore, we will use the transpose instead of the Hermitian.
 
+\subsection*{Solving the Normal Equation} % -----------------------------------
 
-\subsection*{Solving the Normal Equation}
-If $A$ is full rank, we can use its QR decomposition to solve the normal equation. 
+If $A$ is full rank, we can use its QR decomposition to solve the normal equation.
 In many applications, $A$ is usually full rank, including when least squares is used to fit curves to data.
 
 Let $A=QR$ be the QR decomposition of $A$, so $R = \left(\begin{array}{c}R_0\\
 0\\ \end{array} \right)$
-where $R_0$ is $n \times n$, nonsingular, and upper triangular. 
-It can be shown that $\widehat{\x}$ is the least squares solution to $A\x=\b$ if and only if $R_0\widehat{\x} = (Q\trp \b)[:n].$ 
+where $R_0$ is $n \times n$, nonsingular, and upper triangular.
+It can be shown that $\widehat{\x}$ is the least squares solution to $A\x=\b$ if and only if $R_0\widehat{\x} = (Q\trp \b)[:n].$
 Here, $(Q\trp \b)[:n]$ refers to the first $n$ rows of $Q\trp \b$.
-Since $R$ is upper triangular, we can solve this equation quickly with back substitution (see Volume 1 Exercise 3.46).
+Since $R$ is upper triangular, we can solve this equation quickly with back substitution.
 
-\begin{problem}
-Write a function that accepts a matrix $A$ and a vector $b$ and returns the least squares solution to $Ax=b$.
+\begin{problem} % Solve the normal equations with QR.
+Write a function that accepts a matrix $A$ and a vector $\b$ and returns the least squares solution to $A\x=\b$.
 Use the QR decomposition as outlined above.
 Your function should use SciPy's functions for QR decomposition and for solving triangular systems, which are \li{la.qr()} and \li{la.solve_triangular()}, respectively. If you are unfamiliar with these functions, consult the documentation of these functions using object introspection.
 \end{problem}
 
-\subsection*{Using Least Squares to Fit Curves to Data}
-The least squares solution can be used to find the curve of a chosen type that best fits a set of points. 
+\subsection*{Using Least Squares to Fit Curves to Data} % ---------------------
 
-\subsubsection*{Example 1: Fitting a Line}
-For example, suppose we wish to fit a general line $y=mx+b$ to the data set $\{(x_k, y_k)\}_{k=1}^n$. 
-When we plug the constants $(x_k, y_k)$ into the equation $y=mx+b$, we get a system of linear equations in the unknowns $m$ and $b$. 
+The least squares solution can be used to find the curve of a chosen type that best fits a set of points.
+
+\subsubsection*{Example 1: Fitting a Line} % - - - - - - - - - - - - - - - - -
+
+For example, suppose we wish to fit a general line $y=mx+b$ to the data set $\{(x_k, y_k)\}_{k=1}^n$.
+When we plug the constants $(x_k, y_k)$ into the equation $y=mx+b$, we get a system of linear equations in the unknowns $m$ and $b$.
 This system corresponds to the matrix equation
 \[
 \begin{pmatrix}
@@ -55,16 +58,16 @@ y_3\\
 y_n
 \end{pmatrix}.
 \]
-Because this system has two unknowns, it is guaranteed a solution if it has two or fewer equations. 
-In applications, there will usually be more than two data points, and these will probably not lie in a straight line, due to measurement error. 
-Then the system will be overdetermined. 
+Because this system has two unknowns, it is guaranteed a solution if it has two or fewer equations.
+In applications, there will usually be more than two data points, and these will probably not lie in a straight line, due to measurement error.
+Then the system will be overdetermined.
 The least squares solution to this equation will be a slope $\widehat{m}$ and $y$-intercept $\widehat{b}$ that produce a line $y = \widehat{m}x+\widehat{b}$ which best fits our data points.
 
 
-%DO: spring constant as an example of this
+% TODO: spring constant as an example of this
 % circle fit
 % mention in this situation A will usually be full rank.
-%todo: least squares and invertibiility.
+% TODO: least squares and invertibiility.
 
 
 
@@ -78,7 +81,7 @@ load (dyne) & 3.11&  6.01&  9.07&  11.99 &  15.02&  17.91&  21.12\\
 \end{table}
 \end{comment}
 
-Let's do an example with some actual data. 
+Let's do an example with some actual data.
 Hooke's law from physics says that the displacement $x$ should be proportional to the load $F$, or $F = kx$ for some constant $k$.
 The equation $F=kx$ describes a line with slope $k$ and $F$-intercept 0.
 So the setup is similar to the setup for the general line we discussed above, except we already know $b=0$.
@@ -107,8 +110,9 @@ When we plug our seven data points $(x,F)$ into the equation $F=kx$, we get seve
 We expect such a linear system to be overdetermined, and in fact it is: the equation is $1.04k = 3.11$ which implies $k=2.99$, but the second equation is $2.03k = 6.01$ which implies $k=2.96$.
 
 We can't solve this system, but its least squares solution is a ``best'' choice for $k$.
-We can find the least squares solution with the SciPy function \li{linalg.lstsq()}. We pass this function the matrix $A$ and the vector $b$ from the normal equation. 
+We can find the least squares solution with the SciPy function \li{linalg.lstsq()}. We pass this function the matrix $A$ and the vector $b$ from the normal equation.
 This function returns a tuple of several values, the first of which is the least squares solution, $\widehat{x}$.
+
 \begin{lstlisting}
 >>> A = np.vstack([1.04,2.03,2.95,3.92,5.06,6.00,7.07])
 >>> b = np.vstack([3.11,6.01,9.07,11.99,15.02,17.91,21.12])
@@ -116,6 +120,7 @@ This function returns a tuple of several values, the first of which is the least
 >>> k
 array([[2.99568294]])
 \end{lstlisting}
+
 Hence, to two decimal places, $k = 3.00$.
 We plot the data against the best-fit line with the following code, whose output is in Figure \ref{fig:spring_fit}
 
@@ -133,7 +138,7 @@ We plot the data against the best-fit line with the following code, whose output
 \label{fig:spring_fit}
 \end{figure}
 
-%TODO: find more interesting data and make a sample plot
+% TODO: find more interesting data and make a sample plot
 \begin{problem}
 Load the \li{linepts} array from the file \texttt{data.npz}. The following code stores this array as \li{linepts}.
 \begin{lstlisting}
@@ -145,11 +150,6 @@ The \li{linepts} array has two columns corresponding to the $x$ and $y$ coordina
 \item Plot the data and your line on the same graph.
 \end{enumerate}
 \end{problem}
-
-
-
-
-
 
 %
 %\section*{General Line Fitting}
@@ -193,7 +193,8 @@ The \li{linepts} array has two columns corresponding to the $x$ and $y$ coordina
 %$y = mx_k + b$ is as small as possible.
 
 
-\subsubsection*{Example 2: Fitting a Circle}
+\subsubsection*{Example 2: Fitting a Circle} % - - - - - - - - - - - - - - - -
+
 Now suppose we wish to fit a general circle to a data set $\{(x_k, y_k)\}_{k=1}^n$. Recall that the equation of a circle with radius $r$ and center $(c_1,c_2)$ is
 \begin{equation}
 \label{circle}
@@ -206,7 +207,7 @@ After expanding and rearranging this equation, we get
 2c_1x + 2c_2y + r^2 - c_1^2 - c_2^2 = x^2 + y^2.
 \end{equation*}
 
-To find $c_1$, $c_2$, and $r$ with least squares, we need \emph{linear} equations. 
+To find $c_1$, $c_2$, and $r$ with least squares, we need \emph{linear} equations.
 The equation above is not linear because of the $r^2$, $c_1^2$, and $c_2^2$ terms. Note that it is acceptable to have the $x^2$ and $y^2$ terms because the variables in this equation are $r$, $c_1$, and $c_2$, not $x$ and $y$.
 We can do a trick to make this equation linear: create a new variable $c_3$ defined by $c_3 = r^2-c_1^2-c_2^2$.
 
@@ -251,31 +252,36 @@ $y$& 11 & 35 & 139 & 170 & -7 &  87 & -24 &  64 & 131 \\
 \end{table}
 
 We enter them into Python as a $9\times 2$ array.
+
 \begin{lstlisting}
 >>> P = np.array([[5,11],[-53,35],[-45,139],[28,170],[74,-7],
                 [-51,87],[65,-24],[142,64],[120,131]])
 \end{lstlisting}
 
 We compute $A$ and $b$ according to Equation \ref{equ:circle_fit}.
+
 \begin{lstlisting}
 >>> A = np.hstack((2*P[:,:1], 2*P[:,1:], np.ones((9,1))))
 >>> b = P[:,:1]**2 + P[:,1:]**2
 \end{lstlisting}
 
 Then we use SciPy to find the least squares solution.
+
 \begin{lstlisting}
 >>> c1, c2, c3 = la.lstsq(A, b)[0]
 \end{lstlisting}
 
 We can solve for $r$ using the relation $r^2 = c_3+c_1^2+c_2^2$.
+
 \begin{lstlisting}
 >>> r = np.sqrt(c1**2 + c2**2 + c3)
 \end{lstlisting}
 
-A good way to plot a circle is to use polar coordinates. 
-Using the same variables as before, the equation for a general circle is $x=r\cos(\theta)+c_1$ and $y=r\sin(\theta)+c_2$. 
-With the following code we plot the data points and our best-fit circle using polar coordinates. 
+A good way to plot a circle is to use polar coordinates.
+Using the same variables as before, the equation for a general circle is $x=r\cos(\theta)+c_1$ and $y=r\sin(\theta)+c_2$.
+With the following code we plot the data points and our best-fit circle using polar coordinates.
 The resulting image is Figure \ref{fig:circle}.
+
 \begin{lstlisting}
 # In the polar equations for a circle, theta goes from 0 to 2*pi.
 >>> theta = np.linspace(0,2*np.pi,200)
@@ -304,7 +310,7 @@ The function should return nothing.
 \leavevmode
 \begin{enumerate}
 \item Load the \texttt{ellipsepts} array from \texttt{data.npz}. This array has two columns corresponding to the $x$ and $y$ coordinates of some data points.
-\item Use least squares to fit an ellipse to the data. 
+\item Use least squares to fit an ellipse to the data.
 The general equation for an ellipse is
 \[
 ax^2 + bx + cxy + dy + ey^2 = 1.
@@ -313,7 +319,7 @@ You should get  $0.087$, $-0.141$,  $0.159$, $-0.316$, $0.366$ for $a, b, c, d,$
 %\item Plot the data and your line on the same graph.
 \end{enumerate}
 
-We can plot our result using polar coordinates as we did when plotting the circle. Code for visualizing your best-fit ellipse is given below. Note this bit of code plots the curve and not the data points. 
+We can plot our result using polar coordinates as we did when plotting the circle. Code for visualizing your best-fit ellipse is given below. Note this bit of code plots the curve and not the data points.
 
 \begin{lstlisting}
     """Plots an ellipse of the form ax^2 + bx + cxy + dy + ey^2 = 1
@@ -321,7 +327,7 @@ We can plot our result using polar coordinates as we did when plotting the circl
     Input:
       X (array) - x-coordinates of all the data points.
       Y (array) - y-coordinates of all the data points.
-      a,b,c,d,e (float) - the coefficients from the equation of an 
+      a,b,c,d,e (float) - the coefficients from the equation of an
                     ellipse of the form ax^2 + bx + cxy + dy + ey^2 = 1.
     """
     def get_r(a, b, c, d, e):
@@ -330,7 +336,7 @@ We can plot our result using polar coordinates as we did when plotting the circl
         B = b*np.cos(theta) + d*np.sin(theta)
         r = (-B + np.sqrt(B**2 + 4*A))/(2*A)
         return r, theta
-        
+
     r,theta = get_r(a,b,c,d,e)
     plt.plot(r*np.cos(theta), r*np.sin(theta), color = "r")
     plt.plot(X,Y,".", color = "b")
@@ -340,8 +346,7 @@ We can plot our result using polar coordinates as we did when plotting the circl
 
 \end{problem}
 
-%TODO: keep this?
-\begin{comment}
+\begin{comment} % TODO: Move to Additional Material?
 In these Least Squares problems, we have found best fit lines and ellipses relative to the 2-norm.
 It is possible to generalize the idea of best fit curves relative to other norms.
 See Figure \ref{Fig:ellipse} for an illustration of this.
@@ -352,55 +357,32 @@ See Figure \ref{Fig:ellipse} for an illustration of this.
 \includegraphics[width=\textwidth]{ellipsefit.pdf}
 \caption{Fitting an ellipse using different norms.}
 \label{Fig:ellipse}
-\end{figure} 
+\end{figure}
 \end{comment}
 
-\begin{comment}
-\section*{Loading Data from .npz Files}
-For Least Squares problems as well as in many other contexts, loading data is often a necessary step before
-proceeding with further analysis. Here we briefly review another data format in Python and the commands used
-to load the data.
+\section*{Computing Eigenvalues} % ============================================
 
-A \li{.npz} file is a compressed binary file that contains an archive of NumPy data structures.
-A given file may therefore contain several arrays, each array associated with a unique string that identifies it.
-When you load a \li{.npz} file in Python, a dictionary-like object is returned, and you can access the data by
-providing the appropriate key. Note that when you load a \li{.npz} file, you must also be sure to close it when
-you are finished. This is taken care of automatically if you use the \li{with ... as} keywords.
-
-As an example, suppose that we have a file named \li{grades.npz} that contains several arrays, each giving the
-homework scores of a particular student in a particular class. Assuming that one of the arrays is associated with
-the key \li{'Abe'}, we can load this array in the following way:
-
-\begin{lstlisting}
->>> with np.load('grades.npz') as grades:
->>>     abe_grades = grades['Abe']
->>> abe_grades
-array([ 10.,  10.,  10.,  10.,  10.,  10.,  10.,  10.,  10.,  10.])
-\end{lstlisting}
-
-You will need to apply this technique in the next problem.
-
-\end{comment}
-
-\section*{Computing Eigenvalues}
-The eigenvalues of a matrix are the roots of its characteristic polynomial. 
-Thus, to find the eigenvalues of an $n \times n$ matrix, we must compute the roots of a degree-$n$ polynomial. 
-This is easy for small $n$. 
-For example, if $n=2$ the quadratic equation can be used to find the eigenvalues. 
+The eigenvalues of a matrix are the roots of its characteristic polynomial.
+Thus, to find the eigenvalues of an $n \times n$ matrix, we must compute the roots of a degree-$n$ polynomial.
+This is easy for small $n$.
+For example, if $n=2$ the quadratic equation can be used to find the eigenvalues.
 However, Abel's Impossibility Theorem says that no such formula exists for the roots of a polynomial of degree 5 or higher.
 
+% TODO: get rid of this formal statement, as we provide no proof.
 \begin{theorem}[Abel's Impossibility Theorem]
 There is no general algebraic solution for solving a polynomial equation of degree $n\geq5$.
 \label{thm:Abel}
 \end{theorem}
 
-Thus, it is impossible to write an algorithm that will exactly find the eigenvalues of an arbitrary matrix. 
-(If we could write such an algorithm, we could also use it to find the roots of polynomials, contradicting Abel's theorem.) 
-This is a significant result. 
+Thus, it is impossible to write an algorithm that will exactly find the eigenvalues of an arbitrary matrix.
+(If we could write such an algorithm, we could also use it to find the roots of polynomials, contradicting Abel's theorem.)
+This is a significant result.
 It means that we must find eigenvalues with \emph{iterative methods}, methods that generate sequences of approximate values converging to the true value.
 
-\subsection*{The Power Method}
-There are many iterative methods for finding eigenvalues. 
+% TODO: Decide whether or not to move this to Additional Material.
+\subsection*{The Power Method} % ----------------------------------------------
+
+There are many iterative methods for finding eigenvalues.
 The power method finds an eigenvector corresponding to the \emph{dominant} eigenvalue of a matrix, if such an eigenvalue exists.
 The dominant eigenvalue of a matrix is the unique eigenvalue of greatest magnitude.
 
@@ -408,15 +390,15 @@ To use the power method on a matrix $A$, begin by choosing a vector $\x_0$ such 
 \[
 x_{k+1}=\frac{Ax_k}{\norm{Ax_k}}.
 \]
-If 
+If
 \begin{itemize}
 \item $A$ has a dominant eigenvalue $\lambda$, and
 \item the projection of $\x_0$ into the subspace spanned by the eigenvectors corresponding to $\lambda$ is nonzero,
 \end{itemize}
-then the vectors $\x_0, \x_1, \x_2, \ldots$ will converge to an eigenvector of $A$ corresponding to $\lambda$. 
+then the vectors $\x_0, \x_1, \x_2, \ldots$ will converge to an eigenvector of $A$ corresponding to $\lambda$.
 (See [TODO: ref textbook] for a proof when $A$ is semisimple, or [TODO: ref something else] for a proof in the general case.)
 
-If all entries of $A$ are positive, then $A$ will always have a dominant eigenvalue (see [TODO: ref something!] for a proof). 
+If all entries of $A$ are positive, then $A$ will always have a dominant eigenvalue (see [TODO: ref something!] for a proof).
 There is no way to guarantee that the second condition is met, but if we choose $\x_0$ randomly, it will almost always satisfy this condition.
 
 Once you know that $\x$ is an eigenvector of $A$, the corresponding eigenvalue is equal to the \emph{Rayleigh quotient}
@@ -424,9 +406,7 @@ Once you know that $\x$ is an eigenvector of $A$, the corresponding eigenvalue i
 \lambda = \frac{\langle Ax, x \rangle}{\|\x\|^2}.
 \]
 
-
-
-\begin{problem}
+\begin{problem} % Implement the power method.
 Write a function that implements the power method to compute an eigenvector. Your function should
 \begin{enumerate}
 \item Accept a matrix and a tolerance \li{tol}.
@@ -434,23 +414,24 @@ Write a function that implements the power method to compute an eigenvector. You
 \item Use the 2-norm wherever a norm is needed (use \li{la.norm()}).
 \item Repeat the power method until the vector changes by less than the tolerance. In mathematical notation, you are defining $x_0, x_1, \ldots x_k$, and your function should stop when $\|x_{k+1}-x_k\| < \text{tol}$.
 \item Return the found eigenvector and the corresponding eigenvalue (use \li{np.inner()}).
-\end{enumerate} 
+\end{enumerate}
 Test your function on positive matrices.
 \end{problem}
 
 \begin{comment}
-An overview of the proof of the method is that you can write a matrix in Jordan Conical form $A=VJV^{-1}$ where $V$ is the matrix of the generalized eigenspaces. 
+An overview of the proof of the method is that you can write a matrix in Jordan Conical form $A=VJV^{-1}$ where $V$ is the matrix of the generalized eigenspaces.
 But the first column is is the eigenvector corresponding to largest eigenvalue and $J$ is a upper trianglar matrix of eigenvalues and ones.
-Note that $A^k=VJ^kV^{-1}$. The limit as $k \rightarrow \infty$ of $(\frac{1}{\lambda_1}J)^k$ is a matrix of all zeros except for a one in the upper right hand corner. 
+Note that $A^k=VJ^kV^{-1}$. The limit as $k \rightarrow \infty$ of $(\frac{1}{\lambda_1}J)^k$ is a matrix of all zeros except for a one in the upper right hand corner.
 So $(\frac{A}{\norm{A}})^k \approx VJ^kV^{-1}$ So the largest eigenvalue dominates.
 \end{comment}
 
-\subsection*{The QR Algorithm}
-The disadvantage of the power method is that it only finds the largest eigenvector and a corresponding eigenvalue. 
-To use the QR algorithm, let $A_0=A$. Then let $Q_kR_k$ be the QR decomposition of $A_k$, and recursively define 
+\subsection*{The QR Algorithm} % ----------------------------------------------
+
+The disadvantage of the power method is that it only finds the largest eigenvector and a corresponding eigenvalue.
+To use the QR algorithm, let $A_0=A$. Then let $Q_kR_k$ be the QR decomposition of $A_k$, and recursively define
 \[
 A_{k+1}=R_kQ_k.
-\] 
+\]
 Then $A_0, A_1, A_2, \ldots $ will converge to a matrix of the form
 \begin{equation*}
 \label{eq:Schur form}
@@ -462,53 +443,54 @@ S =
            0 & \cdots & 0 & S_m
     \end{pmatrix}
 \end{equation*}
-where $S_i$ is a $1\times1$ or $2\times2$ matrix.\footnote{If $S$ is upper triangular (i.e., all $S_i$ are $1\times1$ matrices), then $S$ is the \emph{Schur form} of $A$. 
-If some $S_i$ are $2\times2$ matrices, then $S$ is the \emph{real Schur form} of $A$.} 
+where $S_i$ is a $1\times1$ or $2\times2$ matrix.\footnote{If $S$ is upper triangular (i.e., all $S_i$ are $1\times1$ matrices), then $S$ is the \emph{Schur form} of $A$.
+If some $S_i$ are $2\times2$ matrices, then $S$ is the \emph{real Schur form} of $A$.}
 The eigenvalues of $A$ are the eigenvalues of the $S_i$.
 
-This algorithm works for three reasons. First, 
+This algorithm works for three reasons. First,
 \[
 Q_k^{-1}A_kQ_k = Q_k^{-1}(Q_kR_k)Q_k = (Q_k^{-1}Q_k)(R_kQ_k) = A_{k+1},
 \]
-so $A_k$ is similar to $A_{k+1}$. 
-Because similar matrices have the same eigenvalues, $A_k$ has the same eigenvalues as $A$. 
-Second, each iteration of the algorithm transfers some of the ``mass'' from the lower to the upper triangle. 
-This is what makes $A_0, A_1, A_2, \ldots$ converge to a matrix $S$ which has the described form. 
+so $A_k$ is similar to $A_{k+1}$.
+Because similar matrices have the same eigenvalues, $A_k$ has the same eigenvalues as $A$.
+Second, each iteration of the algorithm transfers some of the ``mass'' from the lower to the upper triangle.
+This is what makes $A_0, A_1, A_2, \ldots$ converge to a matrix $S$ which has the described form.
 Finally, since $S$ is block upper triangular, its eigenvalues are just the eigenvalues of its diagonal blocks (the $S_i$).
 
-A $2 \times 2$ block will occur in $S$ when $A$ is real but has complex eigenvalues. 
+A $2 \times 2$ block will occur in $S$ when $A$ is real but has complex eigenvalues.
 In this case, the complex eigenvalues occur in conjugate pairs, each pair corresponding to a $2 \times 2$ block on the diagonal of $S$.
 
+% TODO: Put the Hessenberg stuff from the last lab here?
+\subsubsection*{Hessenberg Preconditioning} % - - - - - - - - - - - - - - - - -
 
-\subsubsection*{Hessenberg Preconditioning}
-Often, we ``precondition'' a matrix by putting it in upper Hessenberg form before passing it to the QR algorithm. 
-This is always possible because every matrix is similar to an upper Hessenberg matrix (see Lab \ref{}). 
+Often, we ``precondition'' a matrix by putting it in upper Hessenberg form before passing it to the QR algorithm.
+This is always possible because every matrix is similar to an upper Hessenberg matrix (see Lab \ref{}).
 Hessenberg preconditioning is done for two reasons.
 
-First, the QR algorithm converges much faster on upper Hessenberg matrices because they are already close to triangular matrices. 
+First, the QR algorithm converges much faster on upper Hessenberg matrices because they are already close to triangular matrices.
 
-Second, an iteration of the QR algorithm can be computed in $\mathcal{O}(n^2)$ time on an upper Hessenberg matrix, as opposed to $\mathcal{O}(n^3)$ time on a regular matrix. 
+Second, an iteration of the QR algorithm can be computed in $\mathcal{O}(n^2)$ time on an upper Hessenberg matrix, as opposed to $\mathcal{O}(n^3)$ time on a regular matrix.
 This is because so many entries of an upper Hessenberg matrix are 0.
 If we apply the QR algorithm to an upper Hessenberg matrix $H$, then this speed-up happens in each iteration of the algorithm, since if $H = QR$ is the QR decomposition of $H$ then $RQ$ is also upper Hessenberg.
 
 
 \begin{problem}
-Write a function that implements the QR algorithm with Hessenberg preconditioning as described above. 
+Write a function that implements the QR algorithm with Hessenberg preconditioning as described above.
 Do this as follows.
 \begin{enumerate}
 \item Accept a matrix \li{A}, a number of iterations \li{niter}, and a tolerance \li{tol}.
 \item Put \li{A} in Hessenberg form using \li{la.hessenberg()}.
-\item Compute the matrix $S$ by performing the QR algorithm \li{niter} times. 
+\item Compute the matrix $S$ by performing the QR algorithm \li{niter} times.
 Use the function \li{la.qr()} to compute the QR decomposition.
-\item Iterate through the diagonal of $S$ from top to bottom to compute its eigenvalues. 
+\item Iterate through the diagonal of $S$ from top to bottom to compute its eigenvalues.
 For each diagonal entry,
 \begin{enumerate}
 \item If this is the last diagonal entry, then it is an eigenvalue.
-\item If the entry below this one has absolute value less than \li{tol}, assume this is a $1\times 1$ block. 
+\item If the entry below this one has absolute value less than \li{tol}, assume this is a $1\times 1$ block.
 Then the current entry is an eigenvalue.
-\item Otherwise, the current entry is at the top left corner of a $2 \times 2$ block. 
-Calculate the eigenvalues of this block. 
-Use the \li{sqrt} function from the scimath library to find the square root of a negative number. 
+\item Otherwise, the current entry is at the top left corner of a $2 \times 2$ block.
+Calculate the eigenvalues of this block.
+Use the \li{sqrt} function from the scimath library to find the square root of a negative number.
 You can import this library with the line \li{from numpy.lib import scimath}.
 \end{enumerate}
 \item Return the (approximate) eigenvalues of \li{A}.
@@ -556,9 +538,19 @@ How large can $A$ be?
 \end{problem}
 \end{comment}
 
-The QR algorithm as described in this lab is not often used. 
+The QR algorithm as described in this lab is not often used.
 Instead, modern computer packages use the implicit QR algorithm, which is an improved version of the QR algorithm.
 
 Lastly, iterative methods besides the power method and QR method are often used to find eigenvalues.
 Arnoldi iteration is similar to the QR algorithm but exploits sparsity.
 Other methods include the Jacobi method and the Rayleigh quotient method.
+
+\begin{comment}
+
+\newpage
+
+\section*{Additional Material} % ==============================================
+
+% TODO: What should go here?
+
+\end{comment}
