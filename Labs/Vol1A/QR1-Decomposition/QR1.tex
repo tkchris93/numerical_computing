@@ -65,7 +65,7 @@ Define
 \q_1 = \frac{\x_1}{\norm{\x_1}},
 &&
 \q_{k} = \frac{\x_k - \p_{k-1}}{\|\x_k - \p_{k-1}\|},\quad k=2,\ \ldots,\ n,
-\\
+\\ \\
 \p_0 = \0,\ \text{and}
 &&
 \p_{k-1} = \sum_{j=1}^{k-1} \langle \q_j, \x_k\rangle \q_j,\quad k=2,\ \ldots,\ n.
@@ -218,12 +218,15 @@ Use the QR decomposition to solve $A\x = \b$ in the following steps:
 
 % DONE TO HERE = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
-\section*{Householder Triangularization} % ====================================
+\section*{QR via Householder} % ===============================================
 
-Another way to compute the QR decomposition of a matrix is with a series of orthonormal transformations.
-Like the Modified Gram-Schmidt algorithm, orthonormal transformations are numerically stable, meaning that they are less susceptible to rounding errors.
+The best way to compute the full QR decomposition of a matrix is with a series of orthonormal transformations.
+Like the modified Gram-Schmidt algorithm, orthonormal transformations are numerically stable, meaning that they are less susceptible to rounding errors.
 
 \subsection*{Householder Transformations} % -----------------------------------
+
+The \emph{orthogonal complement} of a nonzero vector $\v \in \mathbb{R}^n$, denoted $\v^\perp$, is the set of all vectors $\x \in \mathbb{R}^n$ that or orthogonal to $\v$.
+In other words, $\v^\perp = \{ \x \in \mathbb{R}^n \mid \langle \x, \v \rangle = 0 \}$.
 
 The \emph{hyperplane} in $\mathbb{R}^n$ with normal vector $\mathbf{v}$ is the set $\{ \x \in \mathbb{R}^n \mid \langle \x, \mathbf{v} \rangle = 0 \}$.
 Equivalently, the hyperplane defined by $\mathbf{v}$ is just the orthogonal complement $\mathbf{v}^{\perp}$.
@@ -253,9 +256,8 @@ You can check that $(I - 2 \mathbf{u}\mathbf{u}\trp)\trp(I - 2 \mathbf{u}\mathbf
     %\left \langle \dfrac{\v}{\|\v\|}, \x \right \rangle \dfrac{\v}{\|\v\|}$};
 \end{tikzpicture}
 \end{center}
-\caption{This is a picture of a Householder transformation.
-The normal vector $\mathbf{v}$ defines the hyperplane $H$.
-The Householder transformation $H_{\mathbf{v}}$ of $\mathbf{x}$ is just the reflection of $\mathbf{x}$ across $H$.}
+\caption{The normal vector $\mathbf{v}$ defines the hyperplane $H$.
+The Householder transformation $H_{\mathbf{v}}$ of $\mathbf{x}$ is the reflection of $\mathbf{x}$ across $H$.}
 \label{fig:Householder_reflector}
 \end{figure}
 
