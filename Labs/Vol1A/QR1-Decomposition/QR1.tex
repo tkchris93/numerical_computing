@@ -85,12 +85,14 @@ r_{jk} = \langle \q_j, \x_k\rangle = \q_j\trp\x_k,\ j < k.
 %
 This clever choice of entries for $\widehat{R}$ reverses the Gram-Schmidt process and ensures that $\widehat{Q}\widehat{R} = A$.
 
+\begin{comment}
 To construct the full QR decomposition, choose $m - n$ vectors $\{\x_j\}_{j=n+1}^m$ such that the entire set of original vectors $\{\x_j\}_{j=1}^m$ is linearly independent, then continue the Gram-Schmidt process to produce the additional columns of $Q$.
 Appending $m - n$ rows of zeros to $\widehat{R}$ results in $R$.
+\end{comment}
 
 \subsection*{Modified Gram-Schmidt} % -----------------------------------------
 
-When implemented with a computer, the Gram-Schmidt algorithm may produce a set of vectors $\{q_j\}_{j=1}^n$ that are not even close to orthonormal due to rounding errors.
+When implemented with a computer, the Gram-Schmidt algorithm may produce a set of vectors $\{\q_j\}_{j=1}^n$ that are not even close to orthonormal due to rounding errors.
 The \emph{modified Gram-Schmidt algorithm} is a slight variant of the classical algorithm which consistently produces a set of vectors that are ``very close'' to orthonormal.
 
 Let $\q_1$ be the normalization of $\x_1$ as before.
@@ -113,13 +115,13 @@ The entire modified Gram-Schmidt algorithm is described below in Algorithm \ref{
     \State $R \gets \zeros{n}{n}$
         \Comment{An $n\times n$ array of all zeros.}
     \For{$i=0\ldots n-1$}
-        \State $R_{i,i} \gets \norm{Q_{:,i}}$
-            \Comment{(Hint: use \li{scipy.linalg.norm()}).}
-        \State $Q_{:,i} \gets Q_{:,i}/R_{i,i}$
+        \State $R_{i,i} \gets \norm{Q_{:,i}}$\label{step:mgs-normalize}
+            % \Comment{(Hint: use \li{scipy.linalg.norm()}).}
+        \State $Q_{:,i} \gets Q_{:,i}/R_{i,i}$\label{step:mgs-mult1}
             \Comment{Normalize the $i$th column of $Q$.}
         \For{$j=i+1\ldots n-1$}
-            \State $R_{i,j} \gets Q_{:,j}\trp  Q_{:,i}$
-            \State $Q_{:,j} \gets Q_{:,j}-R_{i,j}Q_{:,i}$
+            \State $R_{i,j} \gets Q_{:,j}\trp  Q_{:,i}$\label{step:mgs-mult2}
+            \State $Q_{:,j} \gets Q_{:,j}-R_{i,j}Q_{:,i}$\label{step:mgs-mult3}
                 \Comment{Orthogonalize the $j$th column of $Q$.}
         \EndFor
     \EndFor
@@ -130,47 +132,22 @@ The entire modified Gram-Schmidt algorithm is described below in Algorithm \ref{
 \label{Alg:modified-gram-schmidt}
 \end{algorithm}
 
-% TODO: put this section after the next? What algorithm does SciPy use?
-\begin{comment}
-\section*{QR Decomposition in SciPy} % ========================================
-
-The linear algebra library in SciPy calculates the QR decomposition using a software package called LAPACK (Linear Algebra PACKage), which is incredibly efficient.
-Here is an example of using SciPy to compute the QR decomposition of a matrix.
-
-\begin{lstlisting}
->>> import numpy as np
->>> from scipy import linalg as la
-
->>> A = np.random.random((4,3))
->>> Q, R = la.qr(A)
->>> Q.dot(R) == A
-array([[ True, False, False],
-       [ True, False, False],
-       [ True,  True, False],
-       [ True,  True, False]], dtype=<<bool>>)
-\end{lstlisting}
-
-Note that \li{Q.dot(R)} does not equal \li{A} exactly because of small rounding errors.
-However, \li{np.allclose()} reveals that the entries of \li{Q.dot(R)} are all approximately equal to the entries of \li{A}.
-
-\begin{lstlisting}
->>> np.allclose(Q.dot(R), A)
-True
-\end{lstlisting}
-
-We can use the same method to check that \li{Q} is an orthogonal matrix.
-
-\begin{lstlisting}
->>> np.allclose(Q.T.dot(Q), np.eye(3))
-True
-\end{lstlisting}
-\end{comment}
-
-\begin{problem} % Decomposition via Modified Gram Schmidt.
+\begin{problem} % QR via Modified Gram Schmidt.
 Write a function that accepts an $m \times n$ matrix $A$ of rank $n$.
 Use Algorithm \ref{Alg:modified-gram-schmidt} to compute the reduced QR decomposition of $A$.
 
-To test the algorithm, generate test cases with NumPy's \li{np.random} module.
+Consider the following tips for implementing the algorithm.
+\begin{itemize}
+
+\item In Python, the operation \li{a = a + b} can also be written as \li{a += b}.
+
+\item Use \li{scipy.linalg.norm()} to compute the norm of the vector in step \ref{step:mgs-normalize}.
+
+\item Note that steps \ref{step:mgs-mult1} and \ref{step:mgs-mult3} employ scalar multiplication or division, while step \ref{step:mgs-mult2} uses vector multiplication.
+
+\end{itemize}
+
+To test your function, generate test cases with NumPy's \li{np.random} module.
 Verify that $R$ is upper triangular, $Q$ is orthonormal, and $QR = A$.
 You may also want to compare your results to SciPy's QR factorization algorithm.
 
@@ -181,14 +158,21 @@ You may also want to compare your results to SciPy's QR factorization algorithm.
 # Generate a random matrix and get its reduced QR decomposition via SciPy.
 >>> A = np.random.random((6,4))
 >>> Q,R = la.qr(A, mode="economic") # Use mode="economic" for reduced QR.
-# Verify that that QR = A and that Q is orthonormal.
->>> np.allclose(np.dot(Q, R), A)
+>>> print A.shape, Q.shape, R.shape
+(6,4) (6,4) (4,4)
+
+# Verify that R is upper triangular, Q is orthonormal, and QR = A.
+>>> np.allclose(np.triu(R), R)
 True
 >>> np.allclose(np.dot(Q.T, Q), np.identity(4))
+True
+>>> np.allclose(np.dot(Q, R), A)
 True
 \end{lstlisting}
 \label{prob:qr-via-mgs}
 \end{problem}
+
+\newpage
 
 \section*{Consequences of the QR Decomposition} % =============================
 
@@ -196,10 +180,13 @@ The special structures of $Q$ and $R$ immediately provide some simple applicatio
 
 \subsection*{Determinants} % --------------------------------------------------
 
+Let $A$ be $n \times n$.
+Then $Q$ and $R$ are both $n \times n$ as well.%
+\footnote{An $n \times n$ orthonormal matrix is sometimes called \emph{unitary} in other texts.}
 Since $Q$ is orthonormal and $R$ is upper-triangular,
 \begin{align*} \det(Q) = \pm 1 && \det(R) = \prod_{i=1}^n r_{i,i} \end{align*}
 Then since $\det(AB) = \det(A)\det(B)$, we have the following:
-\[\abs{\det(A)} = \abs{\det(QR)} = \abs{\det(Q)\det(R)} = \abs{\prod_{i=1}^n r_{i,i}}\]
+\[\abs{\det(A)} = \abs{\det(QR)} = \abs{\det(Q)\det(R)} = \abs{\prod_{k=1}^n r_{kk}}\]
 
 \begin{problem} % Use the QR decomposition to calculate |det(A)|.
 Write a function that accepts an invertible $n \times n$ matrix $A$.
