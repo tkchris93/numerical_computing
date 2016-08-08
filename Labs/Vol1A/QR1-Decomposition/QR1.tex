@@ -225,17 +225,10 @@ Like the modified Gram-Schmidt algorithm, orthonormal transformations are numeri
 
 \subsection*{Householder Transformations} % -----------------------------------
 
-The \emph{orthogonal complement} of a nonzero vector $\v \in \mathbb{R}^n$, denoted $\v^\perp$, is the set of all vectors $\x \in \mathbb{R}^n$ that or orthogonal to $\v$.
-In other words, $\v^\perp = \{ \x \in \mathbb{R}^n \mid \langle \x, \v \rangle = 0 \}$.
-
-The \emph{hyperplane} in $\mathbb{R}^n$ with normal vector $\mathbf{v}$ is the set $\{ \x \in \mathbb{R}^n \mid \langle \x, \mathbf{v} \rangle = 0 \}$.
-Equivalently, the hyperplane defined by $\mathbf{v}$ is just the orthogonal complement $\mathbf{v}^{\perp}$.
-See Figure \ref{fig:Householder_reflector}.
-
-A \emph{Householder transformation} of $\mathbb{R}^n$ is a linear transformation that reflects about a hyperplane.
-If a hyperplane $H$ has normal vector $\mathbf{v}$, let $\mathbf{u} = \mathbf{v}/\|\mathbf{v}\|$.
-Then the Householder transformation that reflects about $H$ corresponds to the matrix $H_{\mathbf{u}} = I - 2 \mathbf{u}\mathbf{u}\trp$.
-You can check that $(I - 2 \mathbf{u}\mathbf{u}\trp)\trp(I - 2 \mathbf{u}\mathbf{u}\trp)=I$, so Householder transformations are orthogonal.
+The \emph{orthogonal complement} of a nonzero vector $\v \in \mathbb{R}^n$ is the set of all vectors $\x \in \mathbb{R}^n$ that are orthogonal to $\v$, denoted $\v^\perp = \{ \x \in \mathbb{R}^n \mid \langle \x, \v \rangle = 0 \}$.
+A \emph{Householder transformation} is a linear transformation that reflects a vector $\x$ across the orthogonal complement $\v^\perp$ for some specified $\v$.
+The matrix representation of the Householder transformation that reflects about $\v^\perp$ is given by $H_{\v} = I - 2\frac{\v\v\trp}{\v\trp\v}$.
+Since $H_{\v}\trp H_{\v} = I$, Householder transformations are orthonormal.
 
 %\newcommand{\ipt}[2]{\ensuremath{\left\langle #1,#2 \right\rangle}}
 \begin{figure}[H]
@@ -250,14 +243,14 @@ You can check that $(I - 2 \mathbf{u}\mathbf{u}\trp)\trp(I - 2 \mathbf{u}\mathbf
     \node[draw=none](v)at(.65,-.6){$\v$};
     \node[draw=none](x)at(.75,1.5){$\x$};
     \node[draw=none](Hx)at(3, .5){$H_{\v}\x$};
-    \node[draw=none](H)at(-1.5,-.6){$H$};
+    \node[draw=none](H)at(-1.5,-.6){$\v^\perp$};
     %\node[draw=none](bullet)at(2.31, 1.53){\textbullet};
     %\node[draw=none](vandx)at(4.0,1.5){$\x -
     %\left \langle \dfrac{\v}{\|\v\|}, \x \right \rangle \dfrac{\v}{\|\v\|}$};
 \end{tikzpicture}
 \end{center}
-\caption{The normal vector $\mathbf{v}$ defines the hyperplane $H$.
-The Householder transformation $H_{\mathbf{v}}$ of $\mathbf{x}$ is the reflection of $\mathbf{x}$ across $H$.}
+\caption{The vector $\v$ defines the orthogonal complement $\v^\perp$.
+The Householder transformation $H_{\mathbf{v}}$ of $\mathbf{x}$ is the reflection of $\mathbf{x}$ across $\v^\perp$.}
 \label{fig:Householder_reflector}
 \end{figure}
 
