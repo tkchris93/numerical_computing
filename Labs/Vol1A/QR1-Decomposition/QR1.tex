@@ -14,6 +14,7 @@ Every $m \times n$ matrix $A$ of rank $n \le m$ has a QR decomposition, with two
     \item \textbf{Reduced QR}: $Q$ is $m \times n$, $R$ is $n \times n$, and the columns of $Q$ $\{\q_j\}_{j=1}^n$ form an orthonormal basis for the column space of $A$.
     \item \textbf{Full QR}: $Q$ is $m \times m$ and $R$ is $m \times n$.
     In this case, the columns of $Q$ $\{\q_j\}_{j=1}^m$ form an orthonormal basis for all of $\mathbb{F}^m$, and the last $m - n$ rows of $R$ only contain zeros.
+    If $m = n$, this is the same as the reduced factorization.
 \end{itemize}
 We distinguish between these two forms by writing $\widehat{Q}$ and $\widehat{R}$ for the reduced decomposition and $Q$ and $R$ for the full decomposition.
 %
@@ -216,45 +217,12 @@ Use the QR decomposition to solve $A\x = \b$ in the following steps:
 \end{enumerate}
 \end{problem}
 
-% DONE TO HERE = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-
 \section*{QR via Householder} % ===============================================
 
-The best way to compute the full QR decomposition of a matrix is with a series of orthonormal transformations.
+The best way to compute the full QR decomposition of a matrix is through a series of orthonormal transformations.
 Like the modified Gram-Schmidt algorithm, orthonormal transformations are numerically stable, meaning that they are less susceptible to rounding errors.
 
-\subsection*{Householder Transformations} % -----------------------------------
-
-The \emph{orthogonal complement} of a nonzero vector $\v \in \mathbb{R}^n$ is the set of all vectors $\x \in \mathbb{R}^n$ that are orthogonal to $\v$, denoted $\v^\perp = \{ \x \in \mathbb{R}^n \mid \langle \x, \v \rangle = 0 \}$.
-A \emph{Householder transformation} is a linear transformation that reflects a vector $\x$ across the orthogonal complement $\v^\perp$ for some specified $\v$.
-The matrix representation of the Householder transformation that reflects about $\v^\perp$ is given by $H_{\v} = I - 2\frac{\v\v\trp}{\v\trp\v}$.
-Since $H_{\v}\trp H_{\v} = I$, Householder transformations are orthonormal.
-
-%\newcommand{\ipt}[2]{\ensuremath{\left\langle #1,#2 \right\rangle}}
-\begin{figure}[H]
-\begin{center}
-\begin{tikzpicture}
-    %\draw[-, thick](0,-1.5)--(0,3); %x-axis
-    %\draw[-,thick](-1,0)--(4,0); %y-axis
-    \draw[-,dashed, gray](-2,-1.333)--(3, 2);               % hyperplane
-    \draw[->, gray, >=stealth,ultra thick](0,0)--(.8,-1.2); % v
-    \draw[->, >=stealth, thick](0,0)--(2.815, .777);        % H x
-    \draw[->, >=stealth, thick](0,0)--(1.8,2.3);            % x
-    \node[draw=none](v)at(.65,-.6){$\v$};
-    \node[draw=none](x)at(.75,1.5){$\x$};
-    \node[draw=none](Hx)at(3, .5){$H_{\v}\x$};
-    \node[draw=none](H)at(-1.5,-.6){$\v^\perp$};
-    %\node[draw=none](bullet)at(2.31, 1.53){\textbullet};
-    %\node[draw=none](vandx)at(4.0,1.5){$\x -
-    %\left \langle \dfrac{\v}{\|\v\|}, \x \right \rangle \dfrac{\v}{\|\v\|}$};
-\end{tikzpicture}
-\end{center}
-\caption{The vector $\v$ defines the orthogonal complement $\v^\perp$.
-The Householder transformation $H_{\mathbf{v}}$ of $\mathbf{x}$ is the reflection of $\mathbf{x}$ across $\v^\perp$.}
-\label{fig:Householder_reflector}
-\end{figure}
-
-\subsection*{Householder Triangularization} % ---------------------------------
+% DONE TO HERE = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 The QR decomposition of an $m \times n$ matrix $A$ can also be computed with Householder transformations via the Householder triangularization.
 Whereas Gram-Schmidt makes $A$ \emph{orthonormal} using a series of transformations stored in an \emph{upper triangular} matrix, Householder triangularization makes $A$ \emph{triangular} by a series of \emph{orthonormal} transformations.
@@ -329,6 +297,43 @@ Q_3 Q_2 Q_1
 
 We've accomplished our goal, which was to triangularize $A$ using orthonormal transformations.
 But how do we construct the matrices $Q_k$?
+
+
+\subsection*{Householder Transformations} % -----------------------------------
+
+The \emph{orthogonal complement} of a nonzero vector $\v \in \mathbb{R}^n$ is the set of all vectors $\x \in \mathbb{R}^n$ that are orthogonal to $\v$, denoted $\v^\perp = \{ \x \in \mathbb{R}^n \mid \langle \x, \v \rangle = 0 \}$.
+A \emph{Householder transformation} is a linear transformation that reflects a vector $\x$ across the orthogonal complement $\v^\perp$ for some specified $\v$.
+
+The matrix representation of the Householder transformation corresponding to $\v$ is given by $H_{\v} = I - 2\frac{\v\v\trp}{\v\trp\v}$.
+Since $H_{\v}\trp H_{\v} = I$, Householder transformations are orthonormal.
+
+If $\u = \frac{\v}{\|\v\|}$, $H_{\u} = I - 2\u\u\trp$ since $\u\trp\u = 1$.
+
+%\newcommand{\ipt}[2]{\ensuremath{\left\langle #1,#2 \right\rangle}}
+\begin{figure}[H]
+\begin{center}
+\begin{tikzpicture}
+    %\draw[-, thick](0,-1.5)--(0,3); %x-axis
+    %\draw[-,thick](-1,0)--(4,0); %y-axis
+    \draw[-,dashed, gray](-2,-1.333)--(3, 2);               % hyperplane
+    \draw[->, gray, >=stealth,ultra thick](0,0)--(.8,-1.2); % v
+    \draw[->, >=stealth, thick](0,0)--(2.815, .777);        % H x
+    \draw[->, >=stealth, thick](0,0)--(1.8,2.3);            % x
+    \node[draw=none](v)at(.65,-.6){$\v$};
+    \node[draw=none](x)at(.75,1.5){$\x$};
+    \node[draw=none](Hx)at(3, .5){$H_{\v}\x$};
+    \node[draw=none](H)at(-1.5,-.6){$\v^\perp$};
+    %\node[draw=none](bullet)at(2.31, 1.53){\textbullet};
+    %\node[draw=none](vandx)at(4.0,1.5){$\x -
+    %\left \langle \dfrac{\v}{\|\v\|}, \x \right \rangle \dfrac{\v}{\|\v\|}$};
+\end{tikzpicture}
+\end{center}
+\caption{The vector $\v$ defines the orthogonal complement $\v^\perp$.
+The Householder transformation $H_{\mathbf{v}}$ of $\mathbf{x}$ is the reflection of $\mathbf{x}$ across $\v^\perp$.}
+\label{fig:Householder_reflector}
+\end{figure}
+
+\subsection*{Householder Triangularization} % ---------------------------------
 
 It turns out that we can choose each $Q_k$ to be a Householder transformation.
 Suppose we have found Householder transformations $Q_1, \ldots, Q_{k-1}$ such that $Q_{k-1}\ldots Q_2Q_1 = A_k$ where
