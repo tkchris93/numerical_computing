@@ -74,20 +74,6 @@ def segment(img_brightness):
     '''
     raise NotImplementedError("Problem 4 Incomplete")
 
-# Helper function used for testing connectivity in problem 2.
-def sparse_generator(n, c):
-    ''' Return a symmetric nxn matrix with sparsity determined by c.
-    Inputs:
-        n (int): dimension of matrix
-        c (float): a float in [0,1]. Larger values of c will produce
-            matrices with more entries equal to zero.
-    Returns:
-        sparseMatrix (array): a matrix defined according the n and c
-    '''
-    A = np.random.rand(n**2).reshape((n, n))
-    A = ( A > c**(.5) )
-    return A.T.dot(A)
-
 # Helper function used to convert the image into the correct format.
 def getImage(filename='dream.png'):
     '''
