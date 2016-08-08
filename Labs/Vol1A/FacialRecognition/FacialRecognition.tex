@@ -1,7 +1,7 @@
 \lab{Facial Recognition Using Eigenfaces}{Facial Recognition Using Eigenfaces}
 \label{lab:FacialRecognition}
 
-\objective{Use the singular value decomposition to build a facial recognition system.}
+\objective{Use the singular value decomposition to implement a simple facial recognition system.}
 
 Suppose we have a large database containing images of human faces.
 We would like to identify people by comparing their pictures to those in the database.
@@ -150,14 +150,14 @@ We can do this by projecting to a subspace.
 Mathematically, we want to choose $s$, $s \ll mn$, and project the face vectors to an $s$-dimensional subspace of the original $mn$-dimensional space of images.
 We can then use just $s$ values to store each face in terms of the basis vectors of the new subspace.
 
-The ``best" subspace to project to is the one that is closest in the least squares sense, so that the sum of the squared errors between $\{\bar{\f}_1, \ldots \bar{\f}_k\}$ and their projections is minimized.
+The ``best" subspace to project to is the one that is closest in the least squares sense (i.e., such that the sum of the squared errors between $\{\bar{\f}_1, \ldots \bar{\f}_k\}$ and their projections is minimized).
 Let $U \Sigma V^T$ be an SVD of $\bar{F}$, with $\u_i$ the columns of $U$. 
 As we will prove below, the $s$-dimensional subspace that minimizes the squared error is the span of $\u_1, \ldots, \u_s$.
 Note that $\u_1, \ldots, \u_s$ is an orthonormal basis for this subspace.
 
-The matrix for the projection is $P_s = U_s U_s^T$ where $U_s = [ \u_1\; \ldots \; \u_s]$. 
+The projection matrix is $P_s = U_s U_s^T$ where $U_s = [ \u_1\; \ldots \; \u_s]$. 
 %The matrix for the projection is $P_s = U_s U_s^T$ where $U_s$ is the first $s$ columns of $U$. 
-This matrix projects the original face vectors into the $s$-dimensional subspace. 
+This matrix projects the original face vectors into the optimal $s$-dimensional subspace. 
 
 \begin{comment}
 \section*{Project to a Subspace, Old Version}
