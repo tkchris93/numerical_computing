@@ -11,7 +11,7 @@ However, the integrand does not have a symbolic antiderivative.
 This means we must use numerical methods to evaluate this integral. The standard technique for numerically evaluating multivariable integrals is \emph{Monte Carlo Integration}. In the next lab, we will approximate this integral using a modified version of Monte Carlo Integration. In this lab, we address the basics of Monte Carlo Integration.
 
 Monte Carlo integration is radically different from techniques like Simpson's rule. Whereas Simpson's rule is purely computational and deterministic, Monte Carlo integration uses randomly chosen points  in the domain to calculate the integral.
-Although it converges slowly, Monte Carlo integration is frequently used to evaluate multivariable integrals because the higher-dimensional analogs of methods like Simpson's rule are inefficient. 
+Although it converges slowly, Monte Carlo integration is frequently used to evaluate multivariable integrals because the higher-dimensional analogs of methods like Simpson's rule are extremely inefficient. 
 
 \section*{A Motivating Example}
 Suppose we want to numerically compute the area of a circle of radius 1.
@@ -172,7 +172,7 @@ Test your function by estimating integrals that you can calculate by hand.
 \begin{problem}
 \label{prob:mc}
 Generalize Problem \ref{prob:mc_1d} to multiple dimensions. 
-Write a function that accepts another function $f$ to integrate, the bounds of the interval to integrate over, and the number of points to use. 
+Write a function that accepts a function handle $f$ to integrate, the bounds of the interval to integrate over, and the number of points to use. 
 Let the number of sample points default to $10^5$.
 Your implementation should be robust enough to integrate any function $f$ : $\mathbb{R}^n \mapsto \mathbb{R}$ over any interval in $\mathbb{R}^n$.
 
@@ -322,7 +322,7 @@ You should use at least 50 values of \li{N} in the interval ${[50,50000]}$.
 For each value of \li{N}: 
 \begin{enumerate}
 \item Estimate the volume of the unit sphere using Problem \ref{prob:sphere}, and use the true volume to calculate the relative error of the estimate.
-\item Repeat this several times to get several estimates of the relative error. Your function should accept a keyword argument \li{numEstimates} that defaults to 50.
+\item Repeat this multiple times to get an average estimate of the relative error. Your function should accept a keyword argument \li{numEstimates} that defaults to 50.
 \item Calculate and store the mean of the errors.
 \end{enumerate}
 
@@ -347,7 +347,7 @@ with Monte Carlo integragtion using the following code.
 
 Since this code returns a finite value, we could assume that this integral has a finite value.
 In fact, the integral is infinite.
-We could discover this empirically by using larger and larger values of $k$, and noting that Monte Carlo integration returns larger and larger values.
+We could discover this empirically by using larger and larger values of $k$, and noting that Monte Carlo integration fails to converge.
 
 \begin{comment}
 \begin{problem}
