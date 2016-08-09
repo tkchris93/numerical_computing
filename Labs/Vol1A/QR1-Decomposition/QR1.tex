@@ -63,7 +63,7 @@ Let $\{\x_j\}_{j=1}^n$ be the columns of $A$.
 Define
 %
 \begin{align*}
-\q_1 = \frac{\x_1}{\norm{\x_1}},
+\q_1 = \frac{\x_1}{\|\x_1\|},
 &&
 \q_{k} = \frac{\x_k - \p_{k-1}}{\|\x_k - \p_{k-1}\|},\quad k=2,\ \ldots,\ n,
 \\ \\
@@ -72,9 +72,9 @@ Define
 \p_{k-1} = \sum_{j=1}^{k-1} \langle \q_j, \x_k\rangle \q_j,\quad k=2,\ \ldots,\ n.
 \end{align*}
 
-Each $\p_{k-1}$ is the projection of $\x_k$ onto the span of $\{\q_j\}_{j=1}^{k-1}$, so $\q_k^\prime = \x_k - \p_{k-1}$ is the residual vector of the projection.
-Thus $\q_k^\prime$ is orthogonal to each of the $\{\q_j\}_{j=1}^{k-1}$.
-Finally, normalizing each $\q_k^\prime$ produces an orthonormal set $\{\q_j\}_{j=1}^n$.
+Each $\p_{k-1}$ is the projection of $\x_k$ onto the span of $\{\q_j\}_{j=1}^{k-1}$, so $\q_k' = \x_k - \p_{k-1}$ is the residual vector of the projection.
+Thus $\q_k'$ is orthogonal to each of the $\{\q_j\}_{j=1}^{k-1}$.
+Finally, normalizing each $\q_k'$ produces an orthonormal set $\{\q_j\}_{j=1}^n$.
 
 To construct the reduced QR decomposition, let $\widehat{Q}$ be the matrix with columns $\{\q_j\}_{j=1}^n$, and let $\widehat{R}$ be the upper triangular matrix with the following entries:
 %
@@ -116,7 +116,7 @@ The entire modified Gram-Schmidt algorithm is described below in Algorithm \ref{
     \State $R \gets \zeros{n}{n}$
         \Comment{An $n\times n$ array of all zeros.}
     \For{$i=0\ldots n-1$}
-        \State $R_{i,i} \gets \norm{Q_{:,i}}$\label{step:mgs-normalize}
+        \State $R_{i,i} \gets \|Q_{:,i}\|$\label{step:mgs-normalize}
             % \Comment{(Hint: use \li{scipy.linalg.norm()}).}
         \State $Q_{:,i} \gets Q_{:,i}/R_{i,i}$\label{step:mgs-mult1}
             \Comment{Normalize the $i$th column of $Q$.}
@@ -267,7 +267,8 @@ Q_3 Q_2 Q_1
 Thus $Q_3 Q_2 Q_1 A = R$, so that $A = Q_1\trp Q_2\trp Q_3\trp R$ since each $Q_k$ is orthonormal.
 Furthermore, the product of square orthonormal matrices is orthonormal, so setting $Q = Q_1\trp Q_2\trp Q_3\trp$ yields the full QR decomposition.
 
-The question that remains is how to choose the orthonormal matrices $Q_k$.
+How to correctly construct each $Q_k$ isn't immediately obvious.
+The ingenious solution lies in one of the basic types of linear transformations: reflections.
 
 \subsection*{Householder Transformations} % -----------------------------------
 
@@ -275,16 +276,13 @@ The \emph{orthogonal complement} of a nonzero vector $\v \in \mathbb{R}^n$ is th
 A \emph{Householder transformation} is a linear transformation that reflects a vector $\x$ across the orthogonal complement $\v^\perp$ for some specified $\v$.
 
 The matrix representation of the Householder transformation corresponding to $\v$ is given by $H_{\v} = I - 2\frac{\v\v\trp}{\v\trp\v}$.
-Since $H_{\v}\trp H_{\v} = I$, Householder transformations are orthonormal.
+Since $H_{\v}\trp H_{\v} = I$, Householder transformations are orthonormal (can you prove it?).
+%
+% If $\u = \frac{\v}{\|\v\|}$, $H_{\u} = I - 2\u\u\trp$ since $\u\trp\u = 1$.
 
-If $\u = \frac{\v}{\|\v\|}$, $H_{\u} = I - 2\u\u\trp$ since $\u\trp\u = 1$.
-
-%\newcommand{\ipt}[2]{\ensuremath{\left\langle #1,#2 \right\rangle}}
 \begin{figure}[H]
-\begin{center}
+\centering
 \begin{tikzpicture}
-    %\draw[-, thick](0,-1.5)--(0,3); %x-axis
-    %\draw[-,thick](-1,0)--(4,0); %y-axis
     \draw[-,dashed, gray](-2,-1.333)--(3, 2);               % hyperplane
     \draw[->, gray, >=stealth,ultra thick](0,0)--(.8,-1.2); % v
     \draw[->, >=stealth, thick](0,0)--(2.815, .777);        % H x
@@ -293,42 +291,96 @@ If $\u = \frac{\v}{\|\v\|}$, $H_{\u} = I - 2\u\u\trp$ since $\u\trp\u = 1$.
     \node[draw=none](x)at(.75,1.5){$\x$};
     \node[draw=none](Hx)at(3, .5){$H_{\v}\x$};
     \node[draw=none](H)at(-1.5,-.6){$\v^\perp$};
-    %\node[draw=none](bullet)at(2.31, 1.53){\textbullet};
-    %\node[draw=none](vandx)at(4.0,1.5){$\x -
-    %\left \langle \dfrac{\v}{\|\v\|}, \x \right \rangle \dfrac{\v}{\|\v\|}$};
+    % \node[draw=none](bullet)at(2.31, 1.53){\textbullet};
+    % \node[draw=none](vandx)at(4.0,1.5){$\x -
+    % \left \langle \dfrac{\v}{\|\v\|}, \x \right \rangle \dfrac{\v}{\|\v\|}$};
 \end{tikzpicture}
-\end{center}
 \caption{The vector $\v$ defines the orthogonal complement $\v^\perp$.
-The Householder transformation $H_{\mathbf{v}}$ of $\mathbf{x}$ is the reflection of $\mathbf{x}$ across $\v^\perp$.}
+Applying the Householder transformation $H_{\mathbf{v}}$ to $\x$ reflects $\x$ across $\v^\perp$.}
 \label{fig:Householder_reflector}
 \end{figure}
 
 \subsection*{Householder Triangularization} % ---------------------------------
 
-It turns out that we can choose each $Q_k$ to be a Householder transformation.
-Suppose we have found Householder transformations $Q_1, \ldots, Q_{k-1}$ such that $Q_{k-1}\ldots Q_2Q_1 = A_k$ where
+The \emph{Householder algorithm} uses Householder transformations for the orthonormal transformations in the QR decomposition process described on the previous page.
+The goal in choosing $Q_k$ is to send $\x_k$, the $k$th column of $A$, to the span of $\{\e_j\}_{j=1}^k$.
+In other words, if $Q_k\x_k = \y_k$, the last $m - k$ entries of $\y_k$ should be $0$.
 %
 \begin{align*}
-A_k =
-\left[\begin{array}{cc}
-T & X' \\
-0 & X''
-\end{array}\right].
+Q_k\x_k = Q_k
+\left[\begin{array}{c}
+z_1 \\ \vdots \\ z_k \\ z_{k+1} \\ \vdots \\ z_m
+\end{array}\right]
+=
+\left[\begin{array}{c}
+y_1 \\ \vdots \\ y_k \\ 0 \\ \vdots \\ 0
+\end{array}\right]
+= \y_k
 \end{align*}
 
-Here, $T$ is a $(k-1) \times (k-1)$ upper triangular matrix.
-Let $\x$ be the $k^{th}$ column of $A_k$.
-Write $\x = \x' + \x''$ where $\x'$ is in the span of $\e_1, \ldots, \e_{k-1}$.
-So $\x''$ looks like $k-1$ zeros followed by the first column of $X''$.
-The idea is to reflect $\x''$ about a hyperplane into the span of $\e_k$.
-It turns out that there are two choices that will work (see Figure \ref{fig:two reflectors}).
-These hyperplanes have normal vectors $\x'' + \| \x'' \|\e_k$ and $\x'' - \| \x'' \|\e_k$.
-In fact, the more numerically stable transformation is to reflect about the hyperplane with normal vector $\mathbf{v}_k = \x'' +\sign(x_k) \| \x'' \|\e_k$, where $x_k$ is the $k^{th}$ entry of $\x''$ (or the top left entry of $X''$).
-(You can check that $\mathbf{v}_k$ is orthonormal to $\e_1, \ldots, \e_{k-1}$, so the plane orthonormal to $\mathbf{v}_k$ contains $\e_1, \ldots, \e_{k-1}$, and reflecting about it fixes $\e_1, \ldots, \e_{k-1}$.)
-Thus, $Q_k$ is the Householder transformation $H_{\mathbf{v}_k}$.
+To begin, decompose $\x_k$ into $\x_k = \x_k' + \x_k''$, where $\x_k'$ and $\x_k''$ are of the form
+\[
+\x_k' = \left[z_1\quad \cdots\quad z_{k-1}\quad 0\quad \cdots\quad 0\right]\trp
+\qquad\text{and}\qquad
+\x_k'' = \left[0\quad \cdots\quad 0\quad z_k\quad \cdots\quad z_m\right]\trp.
+\]
+Because $\x_k'$ represents elements of $A$ that lie above the diagonal, only $\x_k''$ needs to be altered by a reflection.
 
-The final question is to find an efficient algorithm for computing $Q = Q_nQ_{n-1} \ldots Q_1$ and $R = Q_nQ_{n-1} \ldots Q_1A$.
-The idea is to start with $R=A$ and $Q = I$. Then we compute $Q_1$ and modify $R$ to be $Q_1A$ and $Q$ to be $Q_1$.
+The two vectors $\x_k''\ \pm\ \|\x_k''\|\e_k$ both yield Householder transformations that send $\x_k''$ to the span of $\e_k$ (see Figure \ref{fig:householder-two-possible-reflectors}).
+Between the two, the one that reflects $\x_k''$ further is more numerically stable.
+This reflection corresponds to \[\v_k = \x_k'' + \sign(z_k)\|\x_k''\| \e_k,\] where $z_k$ is the first nonzero component of $\x_k''$ (the $k$th component of $\x_k$).
+
+\begin{figure}[H] % Two possible reflections into the span of e_1.
+\begin{tikzpicture}
+
+\draw[-, dashed, gray](-3,-1)--(3,1);
+\draw[-, dashed, gray](-.8,2.4)--(.6,-1.8);
+\draw[-, gray, thick](-4,0)--(4,0);
+\draw[->, thick, >=stealth'](0,0)--(2,1.6);
+\draw[<->, thick, >=stealth'](-2.6,0)--(2.6,0);
+\draw[->, gray,  ultra thick, >=stealth](0,0)--(1.5,.5);
+\draw[->, gray, ultra thick, >=stealth](0,0)--(-.5,1.5);
+
+\node[draw=none, node distance=3.5cm]
+    (dummy)at(2.5,.2){};
+\node[draw=none, node distance=.5cm](Hvx)
+    [below of=dummy]{$H_{\v_1}\x$};
+\node[draw=none, node distance=2cm](x)
+    [above left of=Hvx]{$\x$};
+\node[draw=none](v1)[left of=x]{$\v_1$};
+\node[draw=none, node distance=.55cm](v2)[below of=x]{$\v_2$};
+\node[draw=none, node distance=4cm](hvx2)[left of=dummy]{$H_{\v_2}\x$};
+
+\end{tikzpicture}
+\caption{There are two possible reflections that map $\x$ into the span of $\e_1$, defined by the vectors $\v_1$ and $\v_2$.}
+\label{fig:householder-two-possible-reflectors}
+\end{figure}
+
+% DONE TO HERE = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+The important part of a Householder transformation is the orthogonal complement that it defines.
+The direction of the orthogonal vector $\v$ is important, but its length is technically not.
+For an efficient numerical algorithm, we normalize $\v$ before computing the corresponding Householder transform.
+More precisely, let $\u_k = \frac{\v_k}{\|\v_k\|}$.
+Then $Q_k$ is the block matrix
+%
+\begin{equation*}
+Q_k =
+\left[\begin{array}{cc}
+I_{k-1}  & \0 \\
+\0 & H_{\u_k} \\
+\end{array}\right] =
+\left[\begin{array}{cc}
+I_{k-1}  & \0 \\
+\0 & I - 2 \u_k\u_k\trp \\
+\end{array}\right],
+\end{equation*}
+where $I_{k-1}$ is the $(k-1) \times (k-1)$.
+
+\begin{comment}
+The final problem is to find an efficient algorithm for actually computing $Q$ and $R$.
+The idea is to start with $R=A$ and $Q = I$.
+Then we compute $Q_1$ and modify $R$ to be $Q_1A$ and $Q$ to be $Q_1$.
 Next we compute $Q_2$ and modify $R$ to be $Q_2Q_1A$ and $Q$ to be $Q_2Q_1$, and so forth.
 As we have already discussed, $Q_k$ fixes the first $k-1$ rows and columns of any matrix it acts on.
 In fact, if $\x'' = (0, \ldots, 0, x_k, x_{k+1}, \ldots, x_n)$ as above, then $\mathbf{v}_k = (0, \ldots, 0, v_{k_0}, x_{k+1}, \ldots, x_n)$ where $v_{k_0} = x_k + \sign(x_k) \| \x'' \|$.
@@ -381,15 +433,16 @@ A \\ (I-2\u_k\u_k\trp)B
 \]
 so to update $\prod Q_i$, we need only modify the bottom rows.
 These also change via matrix multiplication by $I-2\mathbf{u}_k\mathbf{u}_k\trp$.
+\end{comment}
 
 These arguments produce Algorithm \ref{Alg:QR-via-Householder}.
 
-% \begin{comment}
+\begin{comment}
 To find $Q_1$, we first identify an appropriate hyperplane to reflect $x$ into the span of $\e_1$.
 It turns out there are two hyperplanes that will work, as shown in figure \ref{fig:two reflectors}.
 (In the complex case, there are infinitely many such hyperplanes.)
 Between the two, the one that reflects $x$ further will be more numerically stable.
-This is the hyperplane perpendicular to $v = sign(x_1)\norm{x}_2 \e_1 + x$.
+This is the hyperplane perpendicular to $v = \sign(x_1)\norm{x}_2 \e_1 + x$.
 
 To see how this works, let $x$ be the first column of the submatrix that we want to project onto the span of $\e_1$.
 In order for this to be a unitary operation, this will need to preserve the norm of $x$.
@@ -424,35 +477,7 @@ So we have
 \end{align*}
 
 So $\frac{u}{\norm{u}}$ is a proper choice of $v$ that will project $x$ into the span of $\e_1$.
-% \end{comment}
-
-\begin{figure}[H]
-\begin{tikzpicture}
-
-\draw[-, dashed, gray](-3,-1)--(3,1);
-\draw[-, dashed, gray](-.8,2.4)--(.6,-1.8);
-\draw[-, gray, thick](-4,0)--(4,0);
-\draw[->, thick, >=stealth'](0,0)--(2,1.6);
-\draw[<->, thick, >=stealth'](-2.6,0)--(2.6,0);
-\draw[->, gray,  ultra thick, >=stealth](0,0)--(1.5,.5);
-\draw[->, gray, ultra thick, >=stealth](0,0)--(-.5,1.5);
-
-\node[draw=none, node distance=3.5cm]
-    (dummy)at(2.5,.2){};
-\node[draw=none, node distance=.5cm](Hvx)
-    [below of=dummy]{$H_{\v_1}\x$};
-\node[draw=none, node distance=2cm](x)
-    [above left of=Hvx]{$\x$};
-\node[draw=none](v1)[left of=x]{$\v_1$};
-\node[draw=none, node distance=.55cm](v2)[below of=x]{$\v_2$};
-\node[draw=none, node distance=4cm](hvx2)[left of=dummy]{$H_{\v_2}\x$};
-
-\end{tikzpicture}
-\caption{If we want to reflect $\x$ about a hyperplane into the span of $\e_1$, there are two hyperplanes that will work.
-The two choices are defined by the normal vectors $\v_1$ and $\v_2$.
-Reflecting about the hyperplane defined by $\v_i$ produces  $H_{\v_i}\x$.}
-\label{fig:two reflectors}
-\end{figure}
+\end{comment}
 
 \begin{algorithm}[H] % QR Decomposition via Householder Reflections.
 \begin{algorithmic}[1]
@@ -486,7 +511,7 @@ Consider the following implementation details.
 \begin{itemize}
 
 \item NumPy's \li{np.sign()} is an easy way to implement the $\sign()$ operation in step \ref{step:HH-sign}.
-However, \li{np.sign(0)} returns $0$, which will cause a problem in the rare case that $u_0 = 0$ (which is really only possible if the top left entry of $A$ is $0$ to begin with).
+However, \li{np.sign(0)} returns $0$, which will cause a problem in the rare case that $u_0 = 0$ (which is possible if the top left entry of $A$ is $0$ to begin with).
 The following code defines a function that returns the sign of a single number, counting $0$ as positive.
 
 \begin{lstlisting}
@@ -494,16 +519,16 @@ sign = lambda x: 1 if x >= 0 else -1
 \end{lstlisting}
 
 \item In steps \ref{step:HH-outer1} and \ref{step:HH-outer2}, the multiplication of $\u$ and $(\u\trp X)$ is an \emph{outer product} ($\x\y\trp$ instead of the usual $\x\trp\y$).
-Use \li{np.outer()} instead of \li{np.dot()} to handle this correctly.)
+Use \li{np.outer()} instead of \li{np.dot()} to handle this correctly.
 
 \end{itemize}
 
-As with Problem \ref{prob:qr-via-mgs}, use \li{scipy.linalg.qr()} and \li{np.allclose()} to test your answers.
+As with Problem \ref{prob:qr-via-mgs}, use NumPy and SciPy to generate test cases and validate your function.
 
 \begin{lstlisting}
->>> A = np.random.randint(1, 10, (5, 3))
->>> Q,R = la.qr(A)                  # Don't specify method="economic"
->>> print A.shape, Q.shape, R.shape     # to get the full decomposition.
+>>> A = np.random.random((5, 3))
+>>> Q,R = la.qr(A)                  # Get the full QR decomposition.
+>>> print A.shape, Q.shape, R.shape
 (5,3) (5,5) (5,3)
 >>> np.allclose(Q.dot(R), A)
 True
@@ -641,7 +666,7 @@ T_{-\theta}\x
 \left[\begin{array}{c} \sqrt{a^2+b^2} \\ 0 \end{array}\right].
 \]
 
-\begin{figure}
+\begin{figure}[H]
 \begin{center}
 \begin{tikzpicture}
 \draw[-, thick](-.5,0)--(3,0);
@@ -701,7 +726,7 @@ We zero out the $ij^{th}$ entry with a rotation in the plane spanned by $\e_{i-1
 This rotation is just multiplication by the Givens matrix $G(i-1,i,\theta)$, which can be computed as in the example at the start of the previous section.
 We just set $a=a_{i-1,j}$ and $b=a_{i,j}$, so $c = \cos \theta = a/\sqrt{a^2+b^2}$ and $s = \sin \theta = -b/\sqrt{a^2+b^2}$.
 
-\begin{figure}
+\begin{figure}[H]
 \begin{center}
 \begin{tikzpicture}[xscale=.7, yscale=.7]
 \draw[->, gray, thick](0,0)--(0,5.5);
@@ -736,7 +761,7 @@ We just set $a=a_{i-1,j}$ and $b=a_{i,j}$, so $c = \cos \theta = a/\sqrt{a^2+b^2
 %   end angle=-20, radius=4.5pt];
 %\node[draw=none](theta)at(.8, .15){$\theta$};
 \end{tikzpicture}
-\caption{This figure illustrates the order in which to zero out subdiagonal entries in the Givens triangularization algorithm.
+\caption{The order in which to zero out subdiagonal entries in the Givens triangularization algorithm.
 The heavy black line is the main diagonal of the matrix.
 Entries should be zeroed out from bottom to top in each column, beginning with the leftmost column.}
 \label{fig:givens}
