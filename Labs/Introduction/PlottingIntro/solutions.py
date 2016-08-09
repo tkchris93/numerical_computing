@@ -107,7 +107,7 @@ def prob5():
     plt.plot(data[:,1], data[:,2], 'k,')
     plt.xlabel("Longitude")
     plt.ylabel("Latitude")
-    plt.gca().set_aspect("equal")
+    plt.axis("equal")
 
     plt.subplot(212)
     plt.hist(data[:,0], bins=24, range=[-.5, 23.5])
