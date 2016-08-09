@@ -77,31 +77,3 @@ def hessenberg(A):
     """
     raise NotImplementedError("Problem 5 Incomplete")
 
-
-# Additional Material
-def qr_givens(A):
-    """Compute the QR decomposition of A via Givens triangularization,
-    assuming that at the ijth stage of the algorithm, a_ij will be nonzero.
-
-    Inputs:
-        A ((m,n) ndarray): A matrix of rank n.
-
-    Returns:
-        Q ((m,n) ndarray): An orthonormal matrix.
-        R ((n,n) ndarray): An upper triangular matrix.
-    """
-    pass
-
-
-def qr_givens_hessenberg(H):
-    """Compute the QR decomposition of the upper Hessenberg matrix H via
-    Givens triangularization.
-
-    Inputs:
-        H ((m,n) ndarray): A matrix of rank n in upper Hessenberg form.
-
-    Returns:
-        Q ((m,n) ndarray): An orthonormal matrix.
-        R ((n,n) ndarray): An upper triangular matrix.
-    """
-    pass

@@ -155,10 +155,8 @@ def qr_givens_hessenberg(H):
     m,n = H.shape
     R = np.copy(H).astype(np.float)
     Q = np.identity(m)
-    for j in xrange(n):
+    for j in xrange(min(n, m-1)):
         i = j+1
-        if i >= m:
-            break
         a,b = R[i-1,j],R[i,j]
         G = np.array([[a,b],[-b,a]]) / np.sqrt(a**2+b**2)
         R[i-1:i+1,j:] = np.dot(G, R[i-1:i+1,j:])
