@@ -277,8 +277,6 @@ A \emph{Householder transformation} is a linear transformation that reflects a v
 
 The matrix representation of the Householder transformation corresponding to $\v$ is given by $H_{\v} = I - 2\frac{\v\v\trp}{\v\trp\v}$.
 Since $H_{\v}\trp H_{\v} = I$, Householder transformations are orthonormal (can you prove it?).
-%
-% If $\u = \frac{\v}{\|\v\|}$, $H_{\u} = I - 2\u\u\trp$ since $\u\trp\u = 1$.
 
 \begin{figure}[H]
 \centering
@@ -324,7 +322,7 @@ To begin, decompose $\x_k$ into $\x_k = \x_k' + \x_k''$, where $\x_k'$ and $\x_k
 \qquad\text{and}\qquad
 \x_k'' = \left[0\quad \cdots\quad 0\quad z_k\quad \cdots\quad z_m\right]\trp.
 \]
-Because $\x_k'$ represents elements of $A$ that lie above the diagonal, only $\x_k''$ needs to be altered by a reflection.
+Because $\x_k'$ represents elements of $A$ that lie above the diagonal, only $\x_k''$ needs to be altered by the reflection.
 
 The two vectors $\x_k''\ \pm\ \|\x_k''\|\e_k$ both yield Householder transformations that send $\x_k''$ to the span of $\e_k$ (see Figure \ref{fig:householder-two-possible-reflectors}).
 Between the two, the one that reflects $\x_k''$ further is more numerically stable.
@@ -356,128 +354,26 @@ This reflection corresponds to \[\v_k = \x_k'' + \sign(z_k)\|\x_k''\| \e_k,\] wh
 \label{fig:householder-two-possible-reflectors}
 \end{figure}
 
-% DONE TO HERE = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-
-The important part of a Householder transformation is the orthogonal complement that it defines.
-The direction of the orthogonal vector $\v$ is important, but its length is technically not.
-For an efficient numerical algorithm, we normalize $\v$ before computing the corresponding Householder transform.
-More precisely, let $\u_k = \frac{\v_k}{\|\v_k\|}$.
-Then $Q_k$ is the block matrix
+After choosing $\v_k$, set $\u_k = \frac{\v_k}{\|\v_k\|}$.
+Then $H_{\v_k} = I - 2\frac{\v_k\v_k\trp}{\|\v_k\|^2} = I - 2\u_k\u_k\trp$, and hence $Q_k$ is given by the following block matrix.
 %
 \begin{equation*}
 Q_k =
 \left[\begin{array}{cc}
-I_{k-1}  & \0 \\
-\0 & H_{\u_k} \\
+I  & \0 \\
+\0 & H_{\v_k} \\
 \end{array}\right] =
 \left[\begin{array}{cc}
-I_{k-1}  & \0 \\
+I  & \0 \\
 \0 & I - 2 \u_k\u_k\trp \\
-\end{array}\right],
+\end{array}\right]
 \end{equation*}
-where $I_{k-1}$ is the $(k-1) \times (k-1)$.
 
-\begin{comment}
-The final problem is to find an efficient algorithm for actually computing $Q$ and $R$.
-The idea is to start with $R=A$ and $Q = I$.
-Then we compute $Q_1$ and modify $R$ to be $Q_1A$ and $Q$ to be $Q_1$.
-Next we compute $Q_2$ and modify $R$ to be $Q_2Q_1A$ and $Q$ to be $Q_2Q_1$, and so forth.
-As we have already discussed, $Q_k$ fixes the first $k-1$ rows and columns of any matrix it acts on.
-In fact, if $\x'' = (0, \ldots, 0, x_k, x_{k+1}, \ldots, x_n)$ as above, then $\mathbf{v}_k = (0, \ldots, 0, v_{k_0}, x_{k+1}, \ldots, x_n)$ where $v_{k_0} = x_k + \sign(x_k) \| \x'' \|$.
-If $\mathbf{u}_k$ is the normalization of $(v_{k_0}, x_{k+1}, \ldots, x_n) \in \mathbb{R}^{n-(k-1)}$, then
-\[
-Q_k = I-\frac{2\x''(\x'')\trp}{\|\x''\|^2} =
-\left[\begin{array}{cc}
-I & 0 \\
-0 & I-2\mathbf{u}_k\mathbf{u}_k\trp
-\end{array}\right].
-\]
-This means that, using block multiplication,
-\[
-Q_kA_k =
-\left[\begin{array}{cc}
-I & 0 \\
-0 & I-2\u_k\u_k\trp
-\end{array}\right]
-\left[\begin{array}{cc}
-T & X' \\
-0 & X''
-\end{array}\right]
-=
-\left[\begin{array}{cc}
-T & X' \\
-0 & ( I-2\mathbf{u}_k\mathbf{u}_k\trp)X''
-\end{array}\right].
-\]
+\newpage
 
-So at each stage of the algorithm, we only need to update the entries in the bottom right submatrix of $A_k$, and these change via matrix multiplication by
-
-$ I-2\mathbf{u}_k\mathbf{u}_k\trp$. Similarly,
-\[
-Q_kQ_{k-1}\ldots Q_1 = Q_k
-\left[\begin{array}{c}
-A \\ B
-\end{array}\right]
-=
-\left[\begin{array}{cc}
-I & 0 \\
-0 & I-2\u_k\u_k\trp
-\end{array}\right]
-\left[\begin{array}{c}
-A \\ B
-\end{array}\right]
-=
-\left[\begin{array}{c}
-A \\ (I-2\u_k\u_k\trp)B
-\end{array}\right],
-\]
-so to update $\prod Q_i$, we need only modify the bottom rows.
-These also change via matrix multiplication by $I-2\mathbf{u}_k\mathbf{u}_k\trp$.
-\end{comment}
-
-These arguments produce Algorithm \ref{Alg:QR-via-Householder}.
-
-\begin{comment}
-To find $Q_1$, we first identify an appropriate hyperplane to reflect $x$ into the span of $\e_1$.
-It turns out there are two hyperplanes that will work, as shown in figure \ref{fig:two reflectors}.
-(In the complex case, there are infinitely many such hyperplanes.)
-Between the two, the one that reflects $x$ further will be more numerically stable.
-This is the hyperplane perpendicular to $v = \sign(x_1)\norm{x}_2 \e_1 + x$.
-
-To see how this works, let $x$ be the first column of the submatrix that we want to project onto the span of $\e_1$.
-In order for this to be a unitary operation, this will need to preserve the norm of $x$.
-This means that $\left( I - 2 v v^\mathsf{H} \right) x = \pm \norm{x} \e_1$, or, in other words,
-
-\[ 2 v v^\mathsf{H} x =
-\left[\begin{array}{cc}
-x_1 \pm \norm{x} \\
-x_2 \\
-x_3 \\
-\vdots \\
-x_n
-\end{array}\right]\]
-
-Let $u$ be the vector on the right hand side of this expression.
-It can be shown that the vector  $\frac{u}{\norm{u}}$ is the proper choice for $v$.
-We will show that the vector $\frac{u}{\norm{u}}$ is the proper choice for $v$.
-Notice that:
-
-\[\norm{u}^2 = \norm{x}^2 \pm 2 \norm{x} x_1 + x_1^2 + x_2 + \dots + x_n^2 = 2 \norm{x}^2 \pm 2 \norm{x} x_1 \]
-
-and that
-
-\[\norm{x}^2 \pm \norm{x} x_1 = u^\mathsf{H} x \]
-
-So we have
-
-\begin{align*}
-2 v v^\mathsf{H} x &= 2 u \frac{\norm{x}^2 \pm x_1 \norm{x}}{\norm{u}^2} \\
-        &= 2 u \frac{u^\mathsf{H} x}{\norm{u}^2} \\
-        &= 2 \frac{u}{\norm{u}} \left( \frac{u}{\norm{u}} \right)^\mathsf{H} x
-\end{align*}
-
-So $\frac{u}{\norm{u}}$ is a proper choice of $v$ that will project $x$ into the span of $\e_1$.
-\end{comment}
+It is apparent from its form that $Q_k$ does not affect the first $k-1$ rows and columns of any matrix that it acts on.
+Then by starting with $R = A$ and $Q = I$, at each step of the algorithm we need only multiply the entries in the lower right submatrices of $R$ and $Q$ by $I-2\u_k\u_k\trp$.
+This completes the Householder algorithm, detailed below.
 
 \begin{algorithm}[H] % QR Decomposition via Householder Reflections.
 \begin{algorithmic}[1]
@@ -535,6 +431,8 @@ True
 \end{lstlisting}
 \label{prob:qr-via-hessenberg}
 \end{problem}
+
+% DONE TO HERE = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 \section*{Upper Hessenberg Form} % ============================================
 
