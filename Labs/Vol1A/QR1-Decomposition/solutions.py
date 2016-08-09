@@ -81,7 +81,7 @@ def qr_householder(A):
         R ((m,n) ndarray): An upper triangular matrix.
     """
     m,n = A.shape
-    R = np.copy(A)
+    R = np.copy(A).astype(np.float)
     Q = np.identity(m)
     for k in range(n):
         u = np.copy(R[k:,k])
@@ -95,17 +95,17 @@ def qr_householder(A):
 # Problem 5
 def hessenberg(A):
     """Compute the Hessenberg form H of A, along with the orthonormal matrix Q
-    such that A = (Q^T)HQ.
+    such that A = QHQ^T.
 
     Inputs:
         A ((n,n) ndarray): An invertible matrix.
 
     Returns:
+        H ((n,n) ndarray): The upper Hessenberg form of A.
         Q ((n,n) ndarray): An orthonormal matrix.
-        H ((n,n) ndarray): The upper hessenberg form of A.
     """
     m,n = A.shape
-    H = np.copy(A)
+    H = np.copy(A).astype(np.float)
     Q = np.identity(m)
     for k in range(n-2):
         u = np.copy(H[k+1:,k])
@@ -114,7 +114,7 @@ def hessenberg(A):
         H[k+1:,k:] -= 2*np.outer(u, np.dot(u, H[k+1:,k:]))
         H[:,k+1:] -= 2*np.outer(np.dot(H[:,k+1:], u), u)
         Q[k+1:] -= 2*np.outer(u, np.dot(u, Q[k+1:]))
-    return Q, H
+    return H, Q.T
 
 
 # Additional Material
@@ -130,7 +130,7 @@ def qr_givens(A):
         R ((n,n) ndarray): An upper triangular matrix.
     """
     m,n = A.shape
-    R = np.copy(A)
+    R = np.copy(A).astype(np.float)
     Q = np.identity(m)
     for j in range(n):
         for i in reversed(range(j+1,m)):
@@ -153,7 +153,7 @@ def qr_givens_hessenberg(H):
         R ((n,n) ndarray): An upper triangular matrix.
     """
     m,n = H.shape
-    R = np.copy(H)
+    R = np.copy(H).astype(np.float)
     Q = np.identity(m)
     for j in xrange(n):
         i = j+1
