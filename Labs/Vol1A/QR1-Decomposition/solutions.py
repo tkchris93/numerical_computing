@@ -81,7 +81,7 @@ def qr_householder(A):
         R ((m,n) ndarray): An upper triangular matrix.
     """
     m,n = A.shape
-    R = np.copy(A)
+    R = np.copy(A).astype(np.float)
     Q = np.identity(m)
     for k in range(n):
         u = np.copy(R[k:,k])
@@ -105,7 +105,7 @@ def hessenberg(A):
         H ((n,n) ndarray): The upper hessenberg form of A.
     """
     m,n = A.shape
-    H = np.copy(A)
+    H = np.copy(A).astype(np.float)
     Q = np.identity(m)
     for k in range(n-2):
         u = np.copy(H[k+1:,k])
@@ -130,7 +130,7 @@ def qr_givens(A):
         R ((n,n) ndarray): An upper triangular matrix.
     """
     m,n = A.shape
-    R = np.copy(A)
+    R = np.copy(A).astype(np.float)
     Q = np.identity(m)
     for j in range(n):
         for i in reversed(range(j+1,m)):
@@ -153,7 +153,7 @@ def qr_givens_hessenberg(H):
         R ((n,n) ndarray): An upper triangular matrix.
     """
     m,n = H.shape
-    R = np.copy(H)
+    R = np.copy(H).astype(np.float)
     Q = np.identity(m)
     for j in xrange(n):
         i = j+1

@@ -74,7 +74,7 @@ Define
 
 Each $\p_{k-1}$ is the projection of $\x_k$ onto the span of $\{\q_j\}_{j=1}^{k-1}$, so $\q_k' = \x_k - \p_{k-1}$ is the residual vector of the projection.
 Thus $\q_k'$ is orthogonal to each of the $\{\q_j\}_{j=1}^{k-1}$.
-Finally, normalizing each $\q_k'$ produces an orthonormal set $\{\q_j\}_{j=1}^n$.
+Therefore, normalizing each $\q_k'$ produces an orthonormal set $\{\q_j\}_{j=1}^n$.
 
 To construct the reduced QR decomposition, let $\widehat{Q}$ be the matrix with columns $\{\q_j\}_{j=1}^n$, and let $\widehat{R}$ be the upper triangular matrix with the following entries:
 %
@@ -435,16 +435,11 @@ True
 \label{prob:qr-via-hessenberg}
 \end{problem}
 
-% DONE TO HERE = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-
 \section*{Upper Hessenberg Form} % ============================================
 
 An \emph{upper Hessenberg matrix} is a square matrix that is nearly upper triangular, with zeros below the first subdiagonal.
 Every $n \times n$ matrix $A$ can be written $A = Q\trp HQ$ where $Q$ is orthonormal and $H$ is an upper Hessenberg matrix, called the \emph{Hessenberg form} of $A$.
 Putting a matrix in upper Hessenberg form is an important first step to computing its eigenvalues numerically.
-
-% A fast algorithm for computing the QR decomposition of a Hessenberg matrix will be taught in Lab \ref{lab:givens}. This algorithm in turn leads to a fast algorithm for finding eigenvalues of a matrix. % O RLY?
-% % This is refering to the next lab, maybe to the QR Algorithm?
 
 This algorithm also uses Householder transformations.
 To find orthogonal $Q$ and upper Hessenberg $H$ such that $A = Q\trp HQ$, it suffices to find such matrices that satisfy $Q A Q\trp = H$.
@@ -452,7 +447,7 @@ Thus, the strategy is to multiply $A$ on the left and right by a series of ortho
 Using the same $Q_k$ as in the $k$th step of the Householder algorithm introduces $n - k$ zeros in the $k$th column of $A$, but multiplying $Q_k A$ on the right by $Q_k\trp$ destroys all of those zeros.
 
 Instead, choose a $Q_1$ that fixes $\e_1$ and reflects the first column of $A$ into the span of $\e_1$ and $\e_2$.
-Because $Q_1$ fixes $\e_1$, the product $Q_1A$ leaves the first row of $A$ alone, and the product $(Q_1A)Q_1\trp$ leaves the first column of $(Q_1A)$ alone.
+The product $Q_1A$ then leaves the first row of $A$ alone, and the product $(Q_1A)Q_1\trp$ leaves the first column of $(Q_1A)$ alone.
 \[
 \begin{array}{ccccc}
 \left[\begin{array}{ccccc}
@@ -482,7 +477,7 @@ Because $Q_1$ fixes $\e_1$, the product $Q_1A$ leaves the first row of $A$ alone
 A & & Q_1A & & (Q_1 A) Q_1\trp
 \end{array}
 \]
-Continuing the process results in the desired upper Hessenberg form.
+Continuing the process results in the upper Hessenberg form of $A$.
 %
 \begin{equation*}
 Q_3 Q_2 Q_1 A Q_1\trp Q_2 \trp Q_3\trp =
@@ -492,17 +487,43 @@ Q_3 Q_2 Q_1 A Q_1\trp Q_2 \trp Q_3\trp =
 0 & * & * & * & * \\
 0 & 0 & * & * & * \\
 0 & 0 & 0 & * & *
-\end{array}\right].
+\end{array}\right]
 \end{equation*}
 
-Then $A = Q_1\trp Q_2\trp Q_3\trp H Q_3 Q_2 Q_1$, so setting $Q = Q_3 Q_2 Q_1$ results in the desired factorization $A = Q\trp H Q$.
-The complete algorithm is given below; note how similar it is to Algorithm \ref{Alg:QR-via-Householder}.
+This implies that $A = Q_1\trp Q_2\trp Q_3\trp H Q_3 Q_2 Q_1$, so setting $Q = Q_3 Q_2 Q_1$ results in the desired factorization $A = Q\trp H Q$.
 
-\begin{comment}
-The pseudocode for computing the Hessenberg form of a matrix with Householder transformations is shown in Algorithm \ref{Alg:Hessenberg}.
-Although the Hessenberg form exists for any square matrix, this algorithm only works for full-rank square matrices.
-Notice that this algorithm is very similar to Algorithm \ref{Alg:QR-via-Householder}.
-\end{comment}
+\subsection*{Constructing the Reflections} % ----------------------------------
+
+Constructing the $Q_k$ uses the same approach as in the Householder algorithm, but shifted down one element.
+Let $\x_k = \y_k' + \y_k''$ where $\y_k'$ and $\y_k''$ are of the form
+\[
+\y_k' = \left[z_1\quad \cdots\quad z_k\quad 0\quad \cdots\quad 0\right]\trp
+\qquad\text{and}\qquad
+\y_k'' = \left[0\quad\cdots\quad 0\quad z_{k+1}\quad\cdots\quad z_m\right]\trp.
+\]
+Because $\y_k'$ represents elements of $A$ that lie above the first subdiagonal, only $\y_k''$ needs to be altered.
+This suggests using the following reflection.
+%
+\begin{align*}
+\v_k = \y_k'' + \sign(z_k)\|\y_k''\| \e_k
+&&
+\u_k = \frac{\v_k}{\|\v_k\|}
+\end{align*}
+\[
+Q_k =
+\left[\begin{array}{cc}
+I_k & \0 \\
+\0      & H_{\v_k} \\
+\end{array}\right] =
+\left[\begin{array}{cc}
+I_k & \0 \\
+\0      & I_{m-k} - 2 \u_k\u_k\trp \\
+\end{array}\right]
+\]
+
+The complete algorithm is given below.
+Note how similar it is to Algorithm \ref{Alg:QR-via-Householder}.
+% Although the Hessenberg form exists for any square matrix, this algorithm only works for full-rank square matrices.
 
 \begin{algorithm}[H]
 \begin{algorithmic}[1]
@@ -513,7 +534,6 @@ Notice that this algorithm is very similar to Algorithm \ref{Alg:QR-via-Househol
     \For{$k=0 \ldots n-3$}
         \State $\u \gets \makecopy{H_{k+1:,k}}$
         \State $u_0 \gets u_0 + \sign(u_0)\|\u\|$
-            \Comment{$u_0$ is the first entry of $\u$.}
         \State $\u \gets \u/\|\u\|$
         \State $H_{k+1:,k:} \gets H_{k+1:,k:} - 2\u(\u\trp H_{k+1:,k:})$
             \Comment{Apply $Q_k$ to $H$.}
@@ -532,12 +552,26 @@ Notice that this algorithm is very similar to Algorithm \ref{Alg:QR-via-Househol
 \begin{problem} % Reduce a matrix to upper Hessenberg form.
 Write a function that accepts a nonsingular $n \times n$ matrix $A$.
 Use Algorithm \ref{Alg:Upper-Hessenberg-Form} to compute its upper Hessenberg form, returning orthogonal $Q$ and upper Hessenberg $H$ satisfying $A = Q\trp HQ$.
+
+Test your function and compare your results to \li{scipy.linalg.hessenberg()}.
+
+\begin{lstlisting}
+# Generate a random matrix and get its upper Hessenberg form via SciPy.
+>>> A = np.random.random((8,8))
+>>> H = la.hessenberg(A)
+
+# Verify that H has all zeros below the first subdiagonal.
+>>> np.allclose(np.triu(H, -1), H)
+True
+\end{lstlisting}
+
+\label{prob:hessenberg-via-householder}
 \end{problem}
 
 \begin{info}
 When $A$ is symmetric, its upper Hessenberg form is a tridiagonal matrix.
-This is because the $Q_i$'s zero out everything below the first subdiagonal of $A$ and the $Q_i\trp$'s zero out everything to the right of the first superdiagonal.
-Thus, the Hessenberg form of a symmetric matrix is especially useful, since tridiagonal matrices make computations fast.
+This is because the $Q_k$'s zero out everything below the first subdiagonal of $A$ and the $Q_k\trp$'s zero out everything to the right of the first superdiagonal.
+Tridiagonal matrices make computations fast, so the computing the Hessenberg form of a symmetric matrix is very useful.
 \end{info}
 
 \newpage
