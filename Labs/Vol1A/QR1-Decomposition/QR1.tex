@@ -51,7 +51,7 @@ Q\ (m \times m) & R\ (m \times n) & \\
 \end{array}
 \end{align*}
 
-We will assume throughout this lab that $A$ contains only real numbers.
+We assume throughout this lab that $A$ contains only real numbers.
 However, the results and algorithms presented here can be extended to complex matrices by replacing ``transpose'' with ``hermitian conjugate'' and ``symmetric matrix'' with ``hermitian matrix.''
 
 \section*{QR via Gram-Schmidt} % ==============================================
@@ -104,7 +104,7 @@ Proceed by making each of $\{\x_j\}_{j=3}^n$ orthogonal to $\q_2$:
 \[\x_k = \x_k - \langle \q_2,\x_{k} \rangle \q_2,\quad k=3,\ldots,n.\]
 Since each of these new vectors is a linear combination of vectors orthogonal to $\q_1$, they are orthogonal to $\q_1$ as well.
 Continuing this process results in the desired orthonormal set $\{\q_j\}_{j=1}^n$.
-The entire modified Gram-Schmidt algorithm is described below in Algorithm \ref{Alg:modified-gram-schmidt}.
+The entire modified Gram-Schmidt algorithm is described below in Algorithm \ref{Alg:modified-Gram-Schmidt}.
 
 \begin{algorithm}[H]
 \begin{algorithmic}[1]
@@ -130,12 +130,12 @@ The entire modified Gram-Schmidt algorithm is described below in Algorithm \ref{
 \EndProcedure
 \end{algorithmic}
 \caption{}
-\label{Alg:modified-gram-schmidt}
+\label{Alg:modified-Gram-Schmidt}
 \end{algorithm}
 
 \begin{problem} % QR via Modified Gram Schmidt.
 Write a function that accepts an $m \times n$ matrix $A$ of rank $n$.
-Use Algorithm \ref{Alg:modified-gram-schmidt} to compute the reduced QR decomposition of $A$.
+Use Algorithm \ref{Alg:modified-Gram-Schmidt} to compute the reduced QR decomposition of $A$.
 
 Consider the following tips for implementing the algorithm.
 \begin{itemize}
@@ -372,8 +372,6 @@ I_{k-1} & \0 \\
 
 Here $I_{p}$ denotes the $p \times p$ identity matrix, and thus each $Q_k$ is $m \times m$.
 
-\newpage
-
 It is apparent from its form that $Q_k$ does not affect the first $k-1$ rows and columns of any matrix that it acts on.
 Then by starting with $R = A$ and $Q = I$, at each step of the algorithm we need only multiply the entries in the lower right $(m-k+1) \times (m-k+1)$ submatrices of $R$ and $Q$ by $I-2\u_k\u_k\trp$.
 This completes the Householder algorithm, detailed below.
@@ -410,6 +408,7 @@ Use Algorithm \ref{Alg:QR-via-Householder} to compute the full QR decomposition 
 Consider the following implementation details.
 \begin{itemize}
 
+\item
 \item NumPy's \li{np.sign()} is an easy way to implement the $\sign()$ operation in step \ref{step:HH-sign}.
 However, \li{np.sign(0)} returns $0$, which will cause a problem in the rare case that $u_0 = 0$ (which is possible if the top left entry of $A$ is $0$ to begin with).
 The following code defines a function that returns the sign of a single number, counting $0$ as positive.
@@ -435,6 +434,13 @@ True
 \end{lstlisting}
 \label{prob:qr-via-hessenberg}
 \end{problem}
+
+\begin{comment}
+\begin{info}
+Householder QR factorization is more numerically stable than modified Gram-Schmidt.
+However, modified Gram-Schmidt is still useful for some types of iterative methods because it finds the orthonormal basis one vector at a time instead of all at once.
+\end{info}
+\end{comment}
 
 \section*{Upper Hessenberg Form} % ============================================
 
@@ -579,6 +585,96 @@ Tridiagonal matrices make computations fast, so the computing the Hessenberg for
 \newpage
 
 \section*{Additional Material} % ==============================================
+
+\subsection*{Complex QR Decomposition} % --------------------------------------
+
+The QR decomposition also exists for matrices with complex entries.
+The standard inner product in $\mathbb{R}^m$ is $\langle \x,\y \rangle = \x\trp \y$, but the (more general) standard inner product in $\mathbb{C}^m$ is $\langle \x,\y \rangle = \x\hrm \y$.
+The $\hrm$ stands for the \emph{Hermitian conjugate}, the conjugate of the transpose.
+Making a few small adjustments in the implementations of Algorithms \ref{Alg:modified-Gram-Schmidt} and \ref{Alg:QR-via-Householder} accounts for using the complex inner product.
+
+\begin{enumerate}
+
+\item Replace any transpose operations with the conjugate of the transpose.
+
+\begin{lstlisting}
+>>> A = np.reshape(np.arange(4) + 1j*np.arange(4), (2,2))
+>>> print(A)
+[[ 0.+0.j  1.+1.j]
+ [ 2.+2.j  3.+3.j]]
+
+>>> print(A.T)                      # Regular transpose.
+[[ 0.+0.j  2.+2.j]
+ [ 1.+1.j  3.+3.j]]
+
+>>> print(A.conj().T)               # Hermitian conjugate.
+[[ 0.-0.j  2.-2.j]
+ [ 1.-1.j  3.-3.j]]
+\end{lstlisting}
+
+\item Conjugate the first entry of vector or matrix multiplication before multiplying with \li{np.dot()}.
+
+\begin{lstlisting}
+>>> x = np.arange(2) + 1j*np.arange(2)
+>>> print(x)
+[ 0.+0.j  1.+1.j]
+
+>>> np.dot(x, x)                    # Standard real inner product.
+2j
+
+>>> np.dot(x.conj(), y)             # Standard complex inner product.
+(2 + 0j)
+\end{lstlisting}
+
+\item In the complex plane, there are infinitely many reflections that map a vector $\x$ into the span of $\e_k$, not just the two displayed in Figure \ref{fig:householder-two-possible-reflectors}.
+Using $\sign(z_k)$ to choose one is still a valid method, but it requires updating the \li{sign()} function so that it can handle complex numbers.
+
+\begin{lstlisting}
+sign = lambda x: 1 if np.real(x) >= 0 else -1
+\end{lstlisting}
+
+\end{enumerate}
+
+\subsection*{Stability of the QR Decomposition in SciPy} % --------------------
+
+SciPy's QR factorization routine uses Householder reflections.
+Though this routine is numerically stable, there are still potential numerical problems.
+Consider the following example.
+
+\begin{lstlisting}
+# Generate a random orthonormal matrix and a random upper-triangular matrix.
+>>> Q, _ = la.qr(np.random.normal(size=(500,500)))
+>>> R  = np.triu(np.random.normal(size=(500,500)))
+
+# Calculate A = QR, noting that Q and R are the EXACT QR decomposition of A.
+>>> A = np.dot(Q,R)
+
+# Use SciPy to rediscover the QR decomposition of A.
+>>> Q1, R1 = la.qr(A)
+
+# Compare the true Q and R to the computed Q1 and R1.
+>>> print la.norm(Q1-Q, <<ord>>=np.inf) / la.norm(Q, <<ord>>=np.inf)
+1.21169651649
+
+>>> print la.norm(R1-R, <<ord>>=np.inf) / la.norm(R, <<ord>>=np.inf)
+1.72312747194
+\end{lstlisting}
+
+This is terrible!
+This algorithm works in $16$ decimal points of precision, but $Q_1$ and $R_1$ are accurate to $0$ decimal points.
+These errors in $Q_1$ and $R_1$ are called \emph{forward errors}.
+Even so, miraculously, the product $Q_1 R_1$ is very close $A$.
+
+\begin{lstlisting}
+>>> A1 = Q1.dot(R1)
+>>> la.norm(A1 - A, <<ord>>=np.inf) / la.norm(A, <<ord>>=np.inf)
+3.353843164496928e-15
+\end{lstlisting}
+
+The error in $A_1$, called the \emph{backward error}, is very small.
+This shows that the errors in $Q_1$ and $R_1$ are somehow ``correlated,'' so that they cancel out in the product.
+In fact, the large errors in $Q_1$ and $R_1$ are not because the algorithm is bad, but rather because $A$ was \emph{poorly conditioned} to begin with.
+Conditioning and stability will be discussed more in depth later in the curriculum.
 
 \subsection*{Givens Rotations} % ----------------------------------------------
 
@@ -874,75 +970,6 @@ For timing purposes, make a random upper Hessenberg matrix, compute its QR decom
 Note: the functions you just wrote can be used to perform right multiplication as well since $B Q = \left(Q\trp B\trp \right)\trp$ and $B Q\trp = \left( Q B\trp \right)\trp$.
 \end{problem}
 \end{comment}
-
-\begin{comment} % Move this to Additional Material?
-\subsection*{Stability of the Householder QR algorithm} % ---------------------
-
-We will now examine the stability of the Householder QR algorithm.
-We will use SciPy's built in QR factorization which uses Householder reflections internally.
-
-Try the following.
-
-\begin{lstlisting}
->>> Q, X = la.qr(np.random.rand(500,500)) # create a random orthonormal matrix:
->>> R = np.triu(np.random.rand(500,500)) # create a random upper triangular matrix
->>> A = np.dot(Q,R) # Q and R are the exact QR decomposition of A
->>> Q1, R1 = la.qr(A) # compute QR decomposition of A
-\end{lstlisting}
-
-Observe:
-
-\begin{lstlisting}
->>> la.norm(Q1-Q)/la.norm(Q) # check error in Q
-0.282842955725
->>> la.norm(R1-R)/la.norm(R) # check error in R
-0.0428922016647
-\end{lstlisting}
-
-This is terrible!
-This algorithm works in $16$ decimal points of precision, but $Q_1$ and $R_1$ are only accurate to $0$ and $1$ decimal points, respectively.
-We've lost $16$ decimal points of precision!
-
-Don't lose hope.
-Check how close the product $Q_1 R_1$ is to $A$.
-
-\begin{lstlisting}
->>> A1 = Q1.dot(R1)
->>> np.absolute(A1 - A).max()
-3.9968028886505635e-15
-\end{lstlisting}
-
-We've now recovered $15$ digits of accuracy.
-Considering the error relative to the norm of $A$ (using the 2-norm for matrices), we see that this relative error is even smaller.
-
-\begin{lstlisting}
->>> la.norm(A1 - A, ord=2) / la.norm(A, ord=2)
-8.8655568331889288e-16
-\end{lstlisting}
-
-The errors in $Q_1$ and $R_1$ were somehow ``correlated," so that they canceled out in the product.
-The errors in $Q_1$ and $R_1$ are called \emph{forward errors}.
-The error in $A_1$ is the \emph{backward error}.
-
-In fact, the large errors in \li{Q1} and \li{R1} were not because the algorithm was bad, it was because $A$ was poorly conditioned.
-The condition number for randomly generated upper triangular matrices is generally very high, and this was the case here.
-This has, in turn, made the condition number of $A$ extremely large.
-
-Try the following to compute the condition number of $A$.
-In this case the condition number of $A$ and $R$ are computed to be different, though, in theory, they should be exactly the same.
-
-\begin{lstlisting}
->>> from numpy.linalg import cond
->>> cond(A)
-4.1426075832870472e+18
->>> cond(R)
-3.1767577244363792e+19
-\end{lstlisting}
-
-Householder QR factorization is more numerically stable than Gram-Schmidt or even Modified Gram-Schmidt (MGS).
-However, MGS is still useful for some types of iterative methods because it finds the orthonormal basis one vector at a time instead of all at once (for an example see Lab \ref{lab:EigSolve}).
-\end{comment}
-
 
 %Sources: http://www.cs.unc.edu/~krishnas/eigen/node5.html
 % http://en.wikipedia.org/wiki/Givens_rotation
