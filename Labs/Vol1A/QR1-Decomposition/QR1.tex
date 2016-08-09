@@ -406,6 +406,7 @@ This completes the Householder algorithm, detailed below.
 \begin{problem} % QR Decomposition via Householder Triangularization
 Write a function that accepts as input a $m \times n$ matrix $A$ of rank $n$.
 Use Algorithm \ref{Alg:QR-via-Householder} to compute the full QR decomposition of $A$.
+
 Consider the following implementation details.
 \begin{itemize}
 
@@ -438,14 +439,14 @@ True
 \section*{Upper Hessenberg Form} % ============================================
 
 An \emph{upper Hessenberg matrix} is a square matrix that is nearly upper triangular, with zeros below the first subdiagonal.
-Every $n \times n$ matrix $A$ can be written $A = Q\trp HQ$ where $Q$ is orthonormal and $H$ is an upper Hessenberg matrix, called the \emph{Hessenberg form} of $A$.
+Every $n \times n$ matrix $A$ can be written $A = QHQ\trp$ where $Q$ is orthonormal and $H$, called the \emph{Hessenberg form} of $A$, is an upper Hessenberg matrix.
 Putting a matrix in upper Hessenberg form is an important first step to computing its eigenvalues numerically.
 
 This algorithm also uses Householder transformations.
-To find orthogonal $Q$ and upper Hessenberg $H$ such that $A = Q\trp HQ$, it suffices to find such matrices that satisfy $Q A Q\trp = H$.
+To find orthogonal $Q$ and upper Hessenberg $H$ such that $A = QHQ\trp$, it suffices to find such matrices that satisfy $Q\trp A Q = H$.
 Thus, the strategy is to multiply $A$ on the left and right by a series of orthonormal matrices until it is in Hessenberg form.
-Using the same $Q_k$ as in the $k$th step of the Householder algorithm introduces $n - k$ zeros in the $k$th column of $A$, but multiplying $Q_k A$ on the right by $Q_k\trp$ destroys all of those zeros.
 
+Using the same $Q_k$ as in the $k$th step of the Householder algorithm introduces $n - k$ zeros in the $k$th column of $A$, but multiplying $Q_k A$ on the right by $Q_k\trp$ destroys all of those zeros.
 Instead, choose a $Q_1$ that fixes $\e_1$ and reflects the first column of $A$ into the span of $\e_1$ and $\e_2$.
 The product $Q_1A$ then leaves the first row of $A$ alone, and the product $(Q_1A)Q_1\trp$ leaves the first column of $(Q_1A)$ alone.
 \[
@@ -490,7 +491,7 @@ Q_3 Q_2 Q_1 A Q_1\trp Q_2 \trp Q_3\trp =
 \end{array}\right]
 \end{equation*}
 
-This implies that $A = Q_1\trp Q_2\trp Q_3\trp H Q_3 Q_2 Q_1$, so setting $Q = Q_3 Q_2 Q_1$ results in the desired factorization $A = Q\trp H Q$.
+This implies that $A = Q_1\trp Q_2\trp Q_3\trp H Q_3 Q_2 Q_1$, so setting $Q = Q_1\trp Q_2\trp Q_3\trp$ results in the desired factorization $A = QHQ\trp$.
 
 \subsection*{Constructing the Reflections} % ----------------------------------
 
@@ -542,7 +543,7 @@ Note how similar it is to Algorithm \ref{Alg:QR-via-Householder}.
         \State $Q_{k+1:,:} \gets Q_{k+1:,:} - 2\u(\u\trp Q_{k+1:,:})$
             \Comment{Apply $Q_k$ to $Q$.}
     \EndFor
-    \State \pseudoli{return} $Q, H$
+    \State \pseudoli{return} $H, Q\trp$
 \EndProcedure
 \end{algorithmic}
 \caption{}
@@ -551,20 +552,21 @@ Note how similar it is to Algorithm \ref{Alg:QR-via-Householder}.
 
 \begin{problem} % Reduce a matrix to upper Hessenberg form.
 Write a function that accepts a nonsingular $n \times n$ matrix $A$.
-Use Algorithm \ref{Alg:Upper-Hessenberg-Form} to compute its upper Hessenberg form, returning orthogonal $Q$ and upper Hessenberg $H$ satisfying $A = Q\trp HQ$.
+Use Algorithm \ref{Alg:Upper-Hessenberg-Form} to compute its upper Hessenberg form, upper Hessenberg $H$ and orthogonal $Q$ satisfying $A = QHQ\trp$.
 
 Test your function and compare your results to \li{scipy.linalg.hessenberg()}.
 
 \begin{lstlisting}
 # Generate a random matrix and get its upper Hessenberg form via SciPy.
 >>> A = np.random.random((8,8))
->>> H = la.hessenberg(A)
+>>> H, Q = la.hessenberg(A, calc_q=True)
 
-# Verify that H has all zeros below the first subdiagonal.
+# Verify that H has all zeros below the first subdiagonal and QHQ^T = A.
 >>> np.allclose(np.triu(H, -1), H)
 True
+>>> np.allclose(np.dot(np.dot(Q, H), Q.T), A)
+True
 \end{lstlisting}
-
 \label{prob:hessenberg-via-householder}
 \end{problem}
 

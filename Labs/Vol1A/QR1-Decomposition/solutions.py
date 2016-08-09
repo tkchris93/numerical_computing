@@ -95,14 +95,14 @@ def qr_householder(A):
 # Problem 5
 def hessenberg(A):
     """Compute the Hessenberg form H of A, along with the orthonormal matrix Q
-    such that A = (Q^T)HQ.
+    such that A = QHQ^T.
 
     Inputs:
         A ((n,n) ndarray): An invertible matrix.
 
     Returns:
+        H ((n,n) ndarray): The upper Hessenberg form of A.
         Q ((n,n) ndarray): An orthonormal matrix.
-        H ((n,n) ndarray): The upper hessenberg form of A.
     """
     m,n = A.shape
     H = np.copy(A).astype(np.float)
@@ -114,7 +114,7 @@ def hessenberg(A):
         H[k+1:,k:] -= 2*np.outer(u, np.dot(u, H[k+1:,k:]))
         H[:,k+1:] -= 2*np.outer(np.dot(H[:,k+1:], u), u)
         Q[k+1:] -= 2*np.outer(u, np.dot(u, Q[k+1:]))
-    return Q, H
+    return H, Q.T
 
 
 # Additional Material
