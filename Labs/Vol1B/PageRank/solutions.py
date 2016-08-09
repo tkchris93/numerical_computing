@@ -82,18 +82,59 @@ def eig_solve( adj, N=None, d=.85):
     d     - The damping factor, a float between 0 and 1.
             Defaults to .85.
     Returns:
-    Use the eigenvalue solver in \li{scipy.linalg} to calculate the steady
-    state of the PageRank algorithm.
+    The approximation to the steady state.
     '''
     if N is None:
         N = adj.shape[1]
     K = calculateK(adj,N)
     B = d*K + ((1.-d)/N)*np.ones((N,N))
     evalues,evectors = la.eig(B)
-    pt = (evectors[:,0].real)
+    i = np.argsort(evalues)[-1] #Find index of largest eigenvalue (which should be 1)
+    pt = (evectors[:,i].real)
     pt = pt*1/pt.sum()
     return pt
     
+def team_rank(filename='ncaa2013.csv'):
+    '''
+    Use your iterative PageRank solver to predict the rankings of the teams in
+    the given dataset of games.
+    The dataset should have two columns, representing winning and losing teams.
+    Each row represents a game, with the winner on the left, loser on the right.
+    Parse this data to create the adjacency matrix, and feed this into the
+    solver to predict the team ranks.
+    Inputs:
+    filename (optional) - The name of the dataset.
+    Returns:
+    ranks - A list of the ranks of the teams in order "best" to "worst"
+    teams - A list of the names of the teams, also in order "best" to "worst"
+    '''
+    # Create adj. matrix
+    teams = set()
+    wins = []
+    with open(filename, 'r') as f:
+        f.readline() #read the header
+        for line in f:
+            data = line.strip().split(',') #split on commas
+            teams.add(data[0])
+            teams.add(data[1])
+            wins.append(data)
+    n = len(teams)
+    team_list = list(teams)
+    team_number = dict()
+    for i, t in enumerate(team_list):
+        team_number[t] = i
+    adj = spar.dok_matrix((n,n)) #adjacency matrix
+    for match in wins:
+        win_number = team_number[match[0]]
+        lose_number = team_number[match[1]]
+        adj[lose_number,win_number] = 1
+    
+    # Solve for ranks
+    p = iter_solve(adj.todense(), d=0.7)
+    p = np.array(p).squeeze()
+    idx = np.argsort(p)[::-1]
+    n_out = 5
+    return [p[j] for j in idx[:n_out]], [team_list[j] for j in idx[:n_out]]
     
 def problemOne():
     print to_matrix('datafile.txt',8).todense()
@@ -122,4 +163,7 @@ if __name__ == '__main__':
     problemThree()
     print "Testing 4"
     problemFour()
-            
+    print "Testing team rank"
+    ranks, teams = team_rank()
+    print ranks
+    print teams

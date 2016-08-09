@@ -1,6 +1,7 @@
 \lab{PageRank Algorithm}{PageRank Algorithm}
 \label{lab:PageRank}
-\objective{Implement the PageRank Algorithm and understand the theory behind it.}
+\objective{Model a network as a graph and implement the PageRank algorithm based on this model. 
+Use PageRank to predict the rankings of sports teams. }
 
 \begin{comment}
 When you enter keywords into Google's search engine, Google finds every page containing your keywords and lists the pages in order of their \emph{rank}.
@@ -52,8 +53,8 @@ An example is illustrated in Figure \ref{fig:network1}.
 \label{fig:network1}
 \end{figure}
 
-The PageRank algorithm ranks pages based on how many other pages link to them.
-Moreover, a link from a more important page counts more than a link from a less important page.
+The PageRank algorithm ranks pages by how many others link to them.
+A link from a more important page counts more than one from a less important page.
 For example, in Figure \ref{fig:network1} we would expect node 0 to have a very high rank because every other node links to it. 
 Consequently, we would expect node 7 to have a fairly high rank because node 0 links to it, even though node 0 is the only node to do so.
 
@@ -72,16 +73,6 @@ For example, in Figure \ref{fig:network1} we have $N=8$, and
 \[
 p_6(t+1)=\frac{p_3(t)}{3}+\frac{p_4(t)}{3} + \frac{p_5(t)}{2}.
 \]
-
-\subsection*{Refining the Model: Adding Boredom}
-The equations in \eqref{equ:pr1} describe the surfer's habits as a Markov chain.
-However, the model is more realistic if we assume that the surfer sometimes gets bored and randomly picks a new starting page.
-We will denote the probability that a surfer stays interested at step $t$ by a constant $d$, called the \emph{damping factor}.
-Then the probability that the surfer gets bored at time $t$ is $1-d$.
-The formulas in \eqref{equ:pr1} then become
-\begin{equation}\label{equ:pr2}
-p_i(0)=\frac{1}{N} \qquad p_i(t+1) = d\sum_{j \in \In(i)} \frac{p_j(t)}{\abs{\Out(j)}}+\frac{1-d}{N} .
-\end{equation}
 
 \subsection*{Refining the Model: Pages with No Outbound Links}
 A node with no outbound links, such as node 2 in Figure \ref{fig:network1}, is called a \emph{sink}. 
@@ -130,12 +121,24 @@ This means we modify Figure \ref{fig:network1} (where node 2 is a sink) to look 
 \label{fig:network2}
 \end{figure}
 
+\subsection*{Refining the Model: Adding Boredom}
+The equations in \eqref{equ:pr1} assume that the current page must link to the next page.
+However, the model is more realistic if we assume that the surfer sometimes gets bored and randomly picks a new starting page.
+We will denote the probability that a surfer stays interested at step $t$ by a constant $d$, called the \emph{damping factor}.
+Then the probability that the surfer gets bored at time $t$ is $1-d$.
+The formulas in \eqref{equ:pr1} then become
+\begin{equation}\label{equ:pr2}
+p_i(0)=\frac{1}{N} \qquad p_i(t+1) = d\sum_{j \in \In(i)} \frac{p_j(t)}{\abs{\Out(j)}}+\frac{1-d}{N} .
+\end{equation}
+
 \subsection*{Matrix Form of the PageRank Algorithm}
 We can rewrite \eqref{equ:pr2} as the matrix equation
 \begin{equation}\label{equ:pr3}
 \mathbf{p}(0)=\frac{1}{N}\mathbf{1} \qquad \mathbf{p}(t+1) = dK\mathbf{p}(t) + \frac{1-d}{N}\mathbf{1}
 \end{equation}
-where $\mathbf{p}(t)=(p_1(t), p_2(t), \ldots, p_N(t))^T$, $\mathbf{1} = (1,\ldots, 1)^T$, and $K$ is defined by
+where $\mathbf{p}(t)=(p_1(t), p_2(t), \ldots, p_N(t))^T$, 
+$\mathbf{1}$ is a vector of $N$ ones, 
+and $K$ is defined by
 \[K_{ij} = \begin{cases} \frac{1}{\abs{\Out(j)}} & \mbox{ if j links to i} \\
 	0 & \mbox{ otherwise.} \end{cases}\]
 
@@ -236,8 +239,7 @@ Am = np.array([[ 0,  0,  0,  0,  0,  0,  0,  1],
 
 
 The matrix $D$ is easily obtained by summing the rows of $A$. 
-Although  $K=(D^{-1}A)^T$, it is a \emph{very} bad idea to invert $D$ and actually perform the matrix multiplication $D^{-1}A$.
-Instead, store only the diagonal entries of $D$ as a vector, and use array broadcasting to divide $A$ by $D$.
+Although  $K=(D^{-1}A)^T$, it is better practice to only store the diagonal entries of $D$ as a vector, and then use array broadcasting to divide $A$ by $D$.
 
 Notice that we need to transpose $D^{-1}A$ to get $K$. This is because $D^{-1}A$ is \emph{row stochastic} (meaning that  the rows sum to 1), but we need to multiply \emph{column stochastic} matrices (where the columns sum to 1) To make $K$ be column stochastic, we have to take a transpose.
 
@@ -287,12 +289,16 @@ This is because node 7's single in-edge comes from a node that has a very high r
 \subsubsection*{Iterative Method}
 Solving the system in \eqref{equ:matrix_solve} is feasible for our small working example, but this is not an efficient strategy for very large systems.
 
-One option for large systems is an iterative method. Starting with a guess for $\mathbf{p}(0)$, we iterate \eqref{equ:pr3} until $\norm{\mathbf{p}(t)-\mathbf{p}(t-1)}$ is sufficiently small. At this point we assume we have reached the steady state.
+One option for large systems is an iterative method. 
+Starting with a guess for $\mathbf{p}(0)$, we iterate on Equation \eqref{equ:pr3} until $\norm{\mathbf{p}(t)-\mathbf{p}(t-1)}$ is sufficiently small. 
+At this point we assume we have reached the steady state.
 
 
 \begin{problem}
 \label{prob:pagerank_dense_iter}
 Implement the function below, using the iterative method to find the steady state of the PageRank algorithm.
+When the argument \li{N} is not \li{None}, work with only the upper $N \times N$ portion of the array \li{adj}.
+Test your function against the example in the lab.
 \begin{lstlisting}
 def iter_solve( adj, N=None, d=.85, tol=1E-5):
     '''
@@ -314,10 +320,9 @@ def iter_solve( adj, N=None, d=.85, tol=1E-5):
 \end{lstlisting}
 Hints:
 \begin{enumerate}
-\item At each step, test your function against the example in this lab.
-\item Don't forget to eliminate sinks. 
-It is possible (but not necessary) to do this in a single line.
-\item When \li{N} is not \li{None}, you want to work with only the upper $N \times N$ portion of the array \li{adj}.
+\item Try making your initial guess for $\mathbf{p}(0)$ a random vector.
+\item NumPy can do unexpected things with the dimensions when performing matrix-vector multiplication.
+When debugging, check at each iteration that all arrays have the dimensions you expect.
 \end{enumerate}
 \end{problem}
 
@@ -331,7 +336,7 @@ Thus, the steady state $\mathbf{p}(t)$ is an eigenvector of $B$ corresponding to
 
 The columns of $B$ sum to 1, and the entries of $B$ are strictly positive (because the entries of $E$ are all positive).
 With these hypotheses, the Perron-Frobenius theorem says that 1 is the unique eigenvalue of B of largest magnitude, and the corresponding eigenvector is unique.
-In this case, the ``iterative method'' described above is just the power method for finding the eigenvector corresponding to a dominant eigenvalue, introduced in Lab \ref{lab:EigSolve}.
+In this case, the ``iterative method'' described above is just the power method for finding the eigenvector corresponding to a dominant eigenvalue, introduced in the lab on eigensolvers. %TODO: make sure the reference to another lab is accurate.
 
 We can also compute $\mathbf{p}$ using eigenvalue solvers in SciPy.
 
@@ -385,22 +390,21 @@ The first line is a header.
 After the header, each line represents a game and has the winning team followed by the losing team (there are no ties in basketball). 
 
 Load this file and use it to create the adjacency matrix $A$, where $A_{ij} = 1$ if team $j$ beat team $i$. 
-You will need some convenient way of mapping from team names to the integers and vice versa.
+Make sure to ignore the header line.
+You will need some way of mapping from team names to the integers and vice versa.
 \item Use the iterative method from Problem \ref{prob:pagerank_dense_iter} with $d = 0.7$ to find the steady state. 
 The steady-state solution is your vector of ranks. 
-\item This data is from before the 2013 playoffs. Look up online who made it to the Final Four that year. 
-According to your ranking, which of these four teams pulled the biggest upset?
 \item Return the ranks sorted from largest to smallest, and the corresponding list of teams sorted from ``best'' to ``worst''. 
 \end{enumerate}
 Hints:
 \begin{enumerate}
 \item The code below may be helpful for processing the .csv file:
 \begin{lstlisting}
-with open('./ncaa2013.csv', 'r') as ncaafile:
-    ncaafile.readline() #reads and ignores the header line
-    for line in ncaafile:
-        teams = line.strip().split(',') #split on commas
-        print teams
+>>> with open('./ncaa2013.csv', 'r') as ncaafile:
+>>>     ncaafile.readline() #reads and ignores the header line
+>>>     for line in ncaafile:
+>>>         teams = line.strip().split(',') #split on commas
+>>>         print teams
 >>> ['Middle Tenn St', 'Alabama St']
 >>> ...
 >>> ['Mississippi', 'Florida']
@@ -409,7 +413,7 @@ with open('./ncaa2013.csv', 'r') as ncaafile:
 Next, count the number of unique teams and initialize $A$ to be the right size.
 Try using dictionaries, lists, or both to map numbers to teams and teams to numbers and fill in $A$. 
 There is more than one right way to do this.
-\item The function \li{np.argsort} will be useful for sorting the ranks and teams.
+\item The function \li{np.argsort()} will be useful for sorting the ranks and teams.
 \item There should be 347 teams. PageRank should predict that the top five ranked teams are Duke, Butler, Louisville, Illinois, and Indiana (in that order). Use this to check your results.
 \end{enumerate}
 \end{problem}

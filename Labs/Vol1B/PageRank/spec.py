@@ -1,6 +1,9 @@
-# spec.py
+import numpy as np
+import scipy.sparse as spar
+import scipy.linalg as la
+from scipy.sparse import linalg as sla
 
-def to_matrix(datafile,n):
+def to_matrix(filename,n):
     '''
     Return the nxn adjacency matrix described by datafile.
     INPUTS:
@@ -11,8 +14,8 @@ def to_matrix(datafile,n):
     RETURN:
         Return a SciPy sparse `dok_matrix'.
     '''
-    raise NotImplementedError("Problem 1 incomplete")
-    
+    pass
+
 def calculateK(A,N):
     '''
     Compute the matrix K as described in the lab.
@@ -22,15 +25,14 @@ def calculateK(A,N):
     Return:
         K (array)
     '''
-    raise NotImplementedError("Problem 2 incomplete")
+    pass
 
-def iter_solve(data, datasize, N=None, d=.85, tol=1E-5):
+def iter_solve(adj, N=None, d=.85, tol=1E-5):
     '''
-    Return the page ranks of the network described by `data`. 
+    Return the page ranks of the network described by `adj`.
     Iterate through the PageRank algorithm until the error is less than `tol'.
     Inputs:
-    data - A NumPy array representing the adjacency matrix of a directed graph
-    datasize - An integer representing the size of the 'data' array.
+    adj - A NumPy array representing the adjacency matrix of a directed graph
     N (int) - Restrict the computation to the first `N` nodes of the graph.
             Defaults to N=None; in this case, the entire matrix is used.
     d     - The damping factor, a float between 0 and 1.
@@ -40,22 +42,36 @@ def iter_solve(data, datasize, N=None, d=.85, tol=1E-5):
     Returns:
     The approximation to the steady state.
     '''
-    raise NotImplementedError("Problem 3 incomplete")
+    pass
 
-def eig_solve( data, datasize, N=None, d=.85):
+def eig_solve( adj, N=None, d=.85):
     '''
-    Return the page ranks of the network described by `data`. Use the
+    Return the page ranks of the network described by `adj`. Use the
     eigenvalue solver in \li{scipy.linalg} to calculate the steady state
     of the PageRank algorithm
     Inputs:
-    data - A NumPy array representing the adjacency matrix of a directed graph
-    datasize - An integer representing the size of the 'data' array.
+    adj - A NumPy array representing the adjacency matrix of a directed graph
     N - Restrict the computation to the first `N` nodes of the graph.
             Defaults to N=None; in this case, the entire matrix is used.
     d     - The damping factor, a float between 0 and 1.
             Defaults to .85.
     Returns:
-    Use the eigenvalue solver in \li{scipy.linalg} to calculate the steady
-    state of the PageRank algorithm.
+    The approximation to the steady state.
     '''
-    raise NotImplementedError("Problem 4 incomplete")
+    pass
+    
+def team_rank(filename='ncaa2013.csv'):
+    '''
+    Use your iterative PageRank solver to predict the rankings of the teams in
+    the given dataset of games.
+    The dataset should have two columns, representing winning and losing teams.
+    Each row represents a game, with the winner on the left, loser on the right.
+    Parse this data to create the adjacency matrix, and feed this into the
+    solver to predict the team ranks.
+    Inputs:
+    filename (optional) - The name of the dataset.
+    Returns:
+    ranks - A list of the ranks of the teams in order "best" to "worst"
+    teams - A list of the names of the teams, also in order "best" to "worst"
+    '''
+    pass
