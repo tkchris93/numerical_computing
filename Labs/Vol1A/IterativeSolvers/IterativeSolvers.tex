@@ -598,22 +598,29 @@ u_{3,3} \\
 -100 \\
 \end{bmatrix}
 $$
-Notice that the matrix A can be expressed as,
+For any positive integer n, the corresponding system $A \mathbf{x} = b$ can be expressed as,
 $$
 A = \begin{bmatrix}
-B & I & 0 \\
-I & B & I \\
-0 & I & B \\
+B_1 & I &      &        & \\
+I & B_2 &  I   &        & \\
+  & I & \ddots & \ddots & \\
+  &   & \ddots & \ddots & I \\
+  &   &        &    I   & B_n
 \end{bmatrix}
 $$
-where,
+where $B_i$, is an $n \times n$ matrix,
 $$
-B = \begin{bmatrix}
--4 & 1  & 0 \\
- 1 & -4 & 1 \\
- 0 & 1  & -4 \\
-\end{bmatrix}
+B_i = \begin{bmatrix}
+-4 &  1 &      &        & \\
+ 1 & -4 &  1   &        & \\
+   &  1 & \ddots & \ddots & \\
+   &    & \ddots & \ddots & 1 \\
+   &    &        &    1   & -4
+\end{bmatrix}.
 $$
+So the resulting matrix $A$ ends up being of size $n^2 \times n^2$.
+
+For the vector $b$, all nonzero entries correspond to interior points that touch the left or right boundaries. The vector $b$ will be $n^2 \times 1$.
 
 For this problem, do the following:
 \begin{enumerate}
