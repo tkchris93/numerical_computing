@@ -15,7 +15,7 @@ In other words, $\widehat{\x}$ is the vector such that $A\widehat{\x}$ is projec
 \footnote{See Volume 1 Chapter 3 for a formal derivation of the normal equation.}
 \[A\trp A\widehat{\x} = A\trp \b\]
 
-If $A$ is full rank, which it usually is in applications, its QR decomposition provides an effecient way to solve the normal equation.
+If $A$ is full rank, which it usually is in applications, its QR decomposition provides an efficient way to solve the normal equation.
 Let $A = \widehat{Q}\widehat{R}$ be the reduced QR decomposition of $A$, so $\widehat{Q}$ is $m \times n$ with orthonormal columns and $\widehat{R}$ is $n \times n$, invertible, and upper triangular.
 Since $\widehat{Q}\trp \widehat{Q} = I$, and since $\widehat{R}\trp$ is invertible, the normal equation can be reduced as follows (we omit the hats on $\widehat{Q}$ and $\widehat{R}$ for clarity):
 %
@@ -41,176 +41,66 @@ Use the QR decomposition and Equation \ref{eq:normal-equation-via-qr} to solve t
 
 You may use either SciPy's QR routine or one of your own routines from the previous lab.
 In addition, you may use \li{la.solve_triangular()}, SciPy's optimized routine for solving triangular systems.
+
+\label{prob:lstsq-via-qr}
 \end{problem}
 
 \subsection*{Using Least Squares to Fit Curves to Data} % ---------------------
 
-The least squares solution can be used to find the curve of a chosen type that best fits a set of points.
+The least squares solution can be used to find the best-fit curve of a chosen type to a set of points.
+This is perhaps the most common application of least squares.
 
-\subsubsection*{Example 1: Fitting a Line} % - - - - - - - - - - - - - - - - -
+\subsubsection*{Fitting a Line} % - - - - - - - - - - - - - - - - - - - - - - -
 
-For example, suppose we wish to fit a general line $y=mx+b$ to the data set $\{(x_k, y_k)\}_{k=1}^n$.
-When we plug the constants $(x_k, y_k)$ into the equation $y=mx+b$, we get a system of linear equations in the unknowns $m$ and $b$.
-This system corresponds to the matrix equation
-\[
-\begin{pmatrix}
-x_1 & 1\\
-x_2 & 1\\
-x_3 & 1\\
-\vdots & \vdots\\
+Consider the problem of finding the line $y = mx + b$ that best fits a set of $n$ points $\{(x_k, y_k)\}_{k=1}^n$.
+Ideally, we seek $m$ and $b$ such that $y_k = mx_k + b$ for all $k$.
+The following linear system simultaneously represents all of these equations.
+%
+\begin{equation}
+\left[\begin{array}{cc}
+x_1 & 1 \\
+x_2 & 1 \\
+x_3 & 1 \\
+\vdots & \vdots \\
 x_n & 1
-\end{pmatrix}
-\begin{pmatrix}
-m\\
-b
-\end{pmatrix}=
-\begin{pmatrix}
-y_1\\
-y_2\\
-y_3\\
-\vdots\\
-y_n
-\end{pmatrix}.
-\]
-Because this system has two unknowns, it is guaranteed a solution if it has two or fewer equations.
-In applications, there will usually be more than two data points, and these will probably not lie in a straight line, due to measurement error.
-Then the system will be overdetermined.
-The least squares solution to this equation will be a slope $\widehat{m}$ and $y$-intercept $\widehat{b}$ that produce a line $y = \widehat{m}x+\widehat{b}$ which best fits our data points.
+\end{array}\right]
+\left[\begin{array}{c} m \\ b \end{array}\right]
+=
+\left[\begin{array}{c} y_1 \\ y_2 \\ y_3 \\ \vdots \\ y_n \end{array}\right]
+\label{eq:linear-least-squares}
+\end{equation}
+%
+Note that $A$ has rank $2$ as long as not all of the $x_k$ values are the same.
 
-% TODO: spring constant as an example of this
-% circle fit
-% mention in this situation A will usually be full rank.
-% TODO: least squares and invertibiility.
+Because this system has two unknowns, it is guaranteed to have a solution if it has two or fewer equations.
+However, if there are more that two data points, the system is overdetermined if any set of three points are not collinear.
+We therefore seek a least squares solution, which in this case means finding the slope $\widehat{m}$ and $y$-intercept $\widehat{b}$ such that the line $y = \widehat{m}x+\widehat{b}$ best fits the data.
 
-%TODO: get data points that are not so close to an actual line
-\begin{comment}
-\begin{table}
-\begin{tabular}{c|c|c|c|c|c|c|c}
-displacement (cm)& 1.04  &2.03  &2.95  &3.92  &5.06  &6.00  &7.07  \\ \hline
-load (dyne) & 3.11&  6.01&  9.07&  11.99 &  15.02&  17.91&  21.12\\
-\end{tabular}
-\end{table}
-\end{comment}
+The following figure is a typical example of this idea where $\widehat{m} \approx \frac{1}{2}$ and $\widehat{b} \approx -3$.
 
-Let's do an example with some actual data.
-Hooke's law from physics says that the displacement $x$ should be proportional to the load $F$, or $F = kx$ for some constant $k$.
-The equation $F=kx$ describes a line with slope $k$ and $F$-intercept 0.
-So the setup is similar to the setup for the general line we discussed above, except we already know $b=0$.
-When we plug our seven data points $(x,F)$ into the equation $F=kx$, we get seven linear equations in $k$, corresponding to the matrix equation
-\[
-\begin{pmatrix}
-1.04\\
-2.03\\
-2.95\\
-3.92\\
-5.06\\
-6.00\\
-7.07\\
-\end{pmatrix}
-\begin{pmatrix}k\end{pmatrix} =
-\begin{pmatrix}
-3.11\\
-6.01\\
-9.07\\
-11.99\\
-15.02\\
-17.91\\
-21.12\\
-\end{pmatrix}.
-\]
-We expect such a linear system to be overdetermined, and in fact it is: the equation is $1.04k = 3.11$ which implies $k=2.99$, but the second equation is $2.03k = 6.01$ which implies $k=2.96$.
-
-We can't solve this system, but its least squares solution is a ``best'' choice for $k$.
-We can find the least squares solution with the SciPy function \li{linalg.lstsq()}
-We pass this function the matrix $A$ and the vector $b$ from the normal equation.
-This function returns a tuple of several values, the first of which is the least squares solution, $\widehat{x}$.
-
-\begin{lstlisting}
->>> A = np.vstack([1.04,2.03,2.95,3.92,5.06,6.00,7.07])
->>> b = np.vstack([3.11,6.01,9.07,11.99,15.02,17.91,21.12])
->>> k = la.lstsq(A, b)[0]
->>> k
-array([[2.99568294]])
-\end{lstlisting}
-
-Hence, to two decimal places, $k = 3.00$.
-We plot the data against the best-fit line with the following code, whose output is in Figure \ref{fig:spring_fit}
-
-\begin{lstlisting}
->>> from matplotlib import pyplot as plt
->>> x0 = np.linspace(0,8,100)
->>> y0 = k[0]*x0
->>> plt.plot(A,b,'*',x0,y0)
->>> plt.show()
-\end{lstlisting}
-
-\begin{figure}
-\includegraphics[width=\textwidth]{figures/line_lstsq.pdf}
-\caption{The graph of the spring data together with its linear fit.}
-\label{fig:spring_fit}
+\begin{figure}[H] % Linear regression example (without code).
+    \includegraphics[width=.5\textwidth]{figures/line_fit_example.pdf}
 \end{figure}
 
-% TODO: find more interesting data and make a sample plot
-\begin{problem}
-Load the \li{linepts} array from the file \texttt{data.npz}
-The following code stores this array as \li{linepts}.
-\begin{lstlisting}
-linepts = np.load('data.npz')['linepts']
-\end{lstlisting}
-The \li{linepts} array has two columns corresponding to the $x$ and $y$ coordinates of some data points.
+\begin{problem} % Linear regression of height vs weight.
+The file \texttt{MLB.npy} contains measurements from over 1,000 recent Major League Baseball players, compiled by UCLA.\footnote{See \url{http://wiki.stat.ucla.edu/socr/index.php/SOCR_Data_MLB_HeightsWeights}.}
+Each row in the array represents a different player; the columns are the player's height (in inches), weight (in pounds), and age (in years), in that order.
+
+Find the least squares line that relates the height of the players to their weight (i.e., let height be the $x$ values and weight be the $y$ values).
+%
 \begin{enumerate}
-\item Use least squares to fit the line $y=mx+b$ to the data.
-\item Plot the data and your line on the same graph.
+    \item Construct the matrix $A$ and the vector $\b$ described by Equation \ref{eq:linear-least-squares}.\\
+    (Hint: the functions \li{np.vstack()}, \li{np.column_stack()}, and/or \li{np.ones()} may be helpful.)
+    \item Use your function from Problem \ref{prob:lstsq-via-qr} to find the least squares solution.
+    \item Plot the data points as a scatter plot.
+    \item Plot the least squares line with the scatter plot.\\
+    (Hint: Make a new domain of $x$ values with \li{np.linspace()}, and use this domain to calculate $y = \widehat{m}x + \widehat{b}$.)
 \end{enumerate}
 \end{problem}
 
-\begin{comment}
-\section*{General Line Fitting}
+% \subsection*{Fitting a Polynomial} % - - - - - - - - - - - - - - - - - - - - -
 
-Suppose that we wish to fit a general line, that is $y=m x+b$, to the data set
-$\{(x_k,y_k)\}^n_{k=1}$
-Assume that the line does not cross through the origin,
-as in the previous example
-Then we seek both a slope and a $y$-intercept.
-In this case, we set up the following linear system $A x = b$, or more precisely
-\[
-\begin{pmatrix}
-x_1 & 1\\
-x_2 & 1\\
-x_3 & 1\\
-\vdots & \vdots\\
-x_n & 1
-\end{pmatrix}
-\begin{pmatrix}
-m\\
-b
-\end{pmatrix}=
-\begin{pmatrix}
-y_1\\
-y_2\\
-y_3\\
-\vdots\\
-y_n
-\end{pmatrix}.
-\]
-Note that $A$ has rank $2$ as long as not all of the $x_k$ values are the same.
-Hence, the least squares solution
-is given by
-$$
-\widehat{x} = (A^HA)^{-1}A^Hb.
-$$
-In what sense does this solution give us the best fit line for the data? Recall that since $A$ is injective,
-the matrix $A(A^HA)^{-1}A^H$ is an orthogonal projector onto the range of $A$, which means that
-$A(A^HA)^{-1}A^Hb = A\widehat{x}$ is the closest vector (with respect to the 2-norm) to $b$ that lies in the
-range of $A$
-That is, $\widehat{x}$ minimizes the error between $Ax$ and $b$, where the error is given
-by the distance between these vectors, $\|b-Ax\|_2$
-Another way to say this is that $\widehat{x}$ gives the
-values $m$ and $b$ for which the sum of the squares of the distances from each data point $y_k$ to the value
-$y = mx_k + b$ is as small as possible.
-\end{comment}
-
-\subsubsection*{Example 2: Fitting a Circle} % - - - - - - - - - - - - - - - -
+\subsubsection*{Fitting a Circle} % - - - - - - - - - - - - - - - - - - - - - -
 
 Now suppose we wish to fit a general circle to a data set $\{(x_k, y_k)\}_{k=1}^n$
 Recall that the equation of a circle with radius $r$ and center $(c_1,c_2)$ is
