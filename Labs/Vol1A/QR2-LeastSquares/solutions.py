@@ -3,8 +3,9 @@
 
 import numpy as np
 from scipy import linalg as la
-from matplotlib import pyplot as plt
 from numpy.lib import scimath as sm
+from matplotlib import pyplot as plt
+
 
 # Problem 1
 def least_squares(A, b):
@@ -34,10 +35,10 @@ def least_squares(A, b):
 
 # Problem 2 with MLB DATA
 def line_fit():
-    """Load the data from MLB.npy. Calculate the least squares solution to the
-    line that relates height to weight.
+    """Load the data from MLB.npy. Use least squares to calculate the line
+    that best relates height to weight.
 
-    Plot the the original data points and the least squares line together.
+    Plot the original data points and the least squares line together.
     """
     height, weight, age = np.load("MLB.npy").T
     A = np.column_stack((height, np.ones_like(height)))
@@ -53,6 +54,30 @@ def line_fit():
     plt.plot(x, y, 'k-', lw=2)
     plt.show()
 
+
+def polynomial_fit():
+    """Load the data from polynomial_pts.npy. Use least squares to calculate
+    the polynomials of degree 3, 5, 7, and 19 that best fit the data.
+
+    Plot the original data points and each least squares polynomial together
+    in individual subplots.
+    """
+    x, y = np.load("polynomial_pts.npy").T
+    domain = np.linspace(x.min(), x.max(), 200)
+
+    for i,n in enumerate([3, 5, 7, 19]):
+        p_n = np.poly1d(np.polyfit(x, y, deg=n))
+        # Or use la.lstsq():
+        # p_n = np.poly1d(la.lstsq(np.vander(x, n+1), y)[0])
+
+        plt.subplot(2,2,i+1)
+        plt.plot(x, y, 'k*')
+        plt.plot(domain, p_n(domain), 'b-', lw=2)
+        plt.title(r"$n = {}$".format(n))
+        plt.axis([-6,6,-3,3])
+
+    plt.suptitle("Solution to Problem 3")
+    plt.show()
 
 def plot_ellipse(a, b, c, d, e):
     """Plot (and show) an ellipse of the form ax^2 + bx + cxy + dy + ey^2 = 1.
@@ -73,8 +98,8 @@ def plot_ellipse(a, b, c, d, e):
 
 # Problem 3
 def ellipse_fit():
-    """Load the data from ellipse_pts.npy. Calculate the least squares
-    solution to the ellipse that best fits the points.
+    """Load the data from ellipse_pts.npy. Use least squares to calculate the
+    ellipse that best fits the data.
 
     Plot the original data points and the least squares ellipse together.
     """
@@ -150,3 +175,28 @@ def QR_algorithm(A, niter, tol):
             i+=1
         i+=1
     return eigenvalues
+
+
+# Additional Material
+from matplotlib.animation import FuncAnimation
+
+def polynomial_fit_animation():
+
+    x, y = np.load("polynomial_pts.npy").T
+    domain = np.linspace(x.min(), x.max(), 200)
+    y_vals = np.array([np.poly1d(np.polyfit(x, y, deg=n))(domain)
+                                                    for n in xrange(20)])
+    plt.plot(x, y, 'k*')
+    plt.plot(domain, 2*np.sin(domain), 'k--', lw=1)
+
+    fig = plt.figure(1)
+    drawing, = plt.plot([],[], lw=2)
+    plt.axis([domain.min()-1, domain.max()+1, -8, 8])
+
+    def update(index):
+        drawing.set_data(domain, y_vals[index])
+        plt.title(r"$n = {}$".format(index))
+        return drawing,
+
+    a = FuncAnimation(fig, update, frames=y.shape[0], interval=1000)
+    plt.show()
