@@ -7,10 +7,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import linalg as la
 import scipy.sparse as spar
+import scipy.sparse.linalg as sparla
+from mpl_toolkits.mplot3d import Axes3D
 import time
 
 # Helper functions
-def diag_dom(n, vals=[-4,4], num_entries=None):
+def diag_dom(n, num_entries=None):
     """Generate a strictly diagonally dominant nxn matrix.
 
     Inputs:
@@ -18,16 +20,18 @@ def diag_dom(n, vals=[-4,4], num_entries=None):
         vals (list) - range of values for off-diagonal entries.
         num_entries (int) - number of nonzero values. If None, num_entries
                     defaults to n^(1.5) - n.
+
     Returns:
         A (array) - nxn strictly diagonally dominant matrix.
     """
     if num_entries is None:
         num_entries = int(n**1.5) - n
     A = np.zeros((n,n))
-    for _ in xrange(num_entries):
-        i = np.random.randint(0,n)
-        j = np.random.randint(0,n)
-        A[i,j] = np.random.randint(vals[0],vals[1])
+    rows = np.random.choice(np.arange(0,n), size=num_entries)
+    cols = np.random.choice(np.arange(0,n), size=num_entries)
+    data = np.random.randint(-4,4,size=num_entries)
+    for i in xrange(num_entries):
+        A[ rows[i], cols[i] ] = data[i]
     for i in xrange(n):
         A[i,i] = np.sum(np.abs(A[i,:])) + 1
     return A
@@ -41,21 +45,9 @@ def spar_diag_dom(n, num_entries=None):
                     defaults to n^(1.5) - n.
 
     Returns:
-        A (spar.coo_matrix) - strictly diagonally dominantn sparse nxn matrix.
+        A (spar.csr_matrix) - strictly diagonally dominantn sparse nxn matrix.
     """
-    if num_entries is None:
-        num_entries = int(n**1.5) - n
-
-    rows = np.random.random_integers(0,n-1,num_entries)
-    cols = np.random.random_integers(0,n-1,num_entries)
-    values = np.random.random_integers(-4,4,num_entries)
-    A = spar.coo_matrix((values, (rows,cols)), shape=(n, n))
-
-    A = A.todok()
-    Acsr = A.tocsr()
-    for i in xrange(n):
-        A[i,i] = np.abs(Acsr[i,:]).sum() + 1
-    return A.tocsr()
+    return spar.csr_matrix(diag_dom(n, num_entries=numm_entries))
 
 # Problem 1
 def jacobi_method(A,b,maxiters=100,tol=1e-8):
@@ -174,18 +166,21 @@ def sparse_gauss_seidel(A,b,maxiters=100,tol=1e-8):
         x_approx (list) - list of approximations at each iteration.
     """
 
-    if type(A) != spar.coo_matrix:
-        A = spar.coo_matrix(A)
-    Acsr = A.tocsr()
-    Adok = A.todok()
+    if type(A) != spar.csr_matrix:
+        A = spar.csr_matrix(A)
     n = A.shape[0]
     x0 = np.zeros(n)
     x = np.ones(n)
     x_approx = []
     for k in xrange(maxiters):
         x = x0.copy()
+        diag = A.diagonal()
         for i in xrange(n):
-            x[i] += (b[i] - Acsr[i,:].dot(x)[0])/Adok[i,i]
+            rowstart = A.indptr[i]
+            rowend = A.indptr[i+1]
+            Aix = np.dot(A.data[rowstart:rowend],
+                        x[A.indices[rowstart:rowend]])
+            x[i] += (b[i] - Aix)/diag[i]
         if np.max(np.abs(x0-x)) < tol:
             return x, x_approx
         x0 = x
@@ -194,10 +189,6 @@ def sparse_gauss_seidel(A,b,maxiters=100,tol=1e-8):
     return x, x_approx
 
 # Problem 6
-
-####### --- TO BE DETERMINED --- ########
-
-# Problem 7 (Optional)
 def sparse_sor(A,b,omega,maxiters=100, tol=1e-8):
     """Returns the solution to the system Ax = b using Successive Over-Relaxation.
 
@@ -209,25 +200,87 @@ def sparse_sor(A,b,omega,maxiters=100, tol=1e-8):
     Returns:
         x (array) - solution to system Ax = b.
         x_approx (list) - list of approximations at each iteration.
+
     """
-    if type(A) != spar.coo_matrix:
-        A = spar.coo_matrix(A)
-    Acsr = A.tocsr()
-    Adok = A.todok()
+    if type(A) != spar.csr_matrix:
+        A = spar.csr_matrix(A)
     n = A.shape[0]
     x0 = np.zeros(n)
     x = np.ones(n)
     x_approx = []
     for k in xrange(maxiters):
         x = x0.copy()
+        diag = A.diagonal()
         for i in xrange(n):
-            x[i] += (omega/Adok[i,i])*(b[i] - Acsr[i,:].dot(x)[0])
+            rowstart = A.indptr[i]
+            rowend = A.indptr[i+1]
+            Aix = np.dot(A.data[rowstart:rowend],
+                        x[A.indices[rowstart:rowend]])
+            x[i] += omega*(b[i] - Aix)/diag[i]
         if np.max(np.abs(x0-x)) < tol:
             return x, x_approx
         x0 = x
         x_approx.append(x)
     print "Maxiters hit!"
     return x, x_approx
+
+# Problem 6
+def finite_difference(n):
+    data = [[-4]*n, [1]*n, [1]*n]
+    diags = [0,1,-1]
+    subA = spar.spdiags(data, diags, n, n)
+    A = spar.block_diag((subA,)*n)
+    A.setdiag(1, n)
+    A.setdiag(1,-n)
+
+    # the vector b is still royally screwed up
+    b = np.zeros(n**2)
+    left_bound = np.arange(0,n**2, n)
+    right_bound = np.arange(n-1, n**2, n)
+
+    b[left_bound] = -100
+    b[right_bound] = -100
+
+    return A, b
+
+# TODO fix this function
+
+def compare_omega():
+    # Find an approximation for the optimal omega
+    n = 20
+    A,b = finite_difference(n)
+    timings = []
+    for o in np.arange(1,2,.05):
+        before = time.time()
+        x = sparse_sor(A,b,o,maxiters=10000,tol=10**-2)[0]
+        after = time.time()
+        timings.append(after - before)
+    plt.plot(np.arange(1,2,.05), timings)
+    plt.show()
+
+
+    """
+    timings = []
+    h_values = [.125, .25, .5, 1, 2]
+    dom = np.arange(1,2,.05)
+    for h in h_values:
+        h_timings = []
+        A,b = finite_difference(h)
+        for o in dom:
+            before = time.time()
+            sparse_sor(A,b,o,maxiters=10000,tol=10**-2)
+            after = time.time()
+            print o
+            h_timings.append(after-before)
+        timings.append(h_timings)
+
+    timings = np.array(timings)
+    for i in xrange(timings.shape[0]):
+        plt.subplot(1,5,i+1)
+        plt.plot(dom, timings[i,:])
+        plt.title(str(h_values[i]))
+    plt.show()
+    """
 
 # Testing solutions file.
 def test_jacobi():
@@ -300,5 +353,6 @@ def test_all():
 
     print "Passed All Tests!"
     return True
+
 if __name__ == "__main__":
-    test_all()
+    compare_omega()
