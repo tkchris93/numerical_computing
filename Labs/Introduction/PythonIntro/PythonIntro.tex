@@ -17,8 +17,8 @@ These Python basics are an essential part of almost every problem you will solve
 % TODO: Update to Python 3
 Python is quickly gaining momentum as a fundamental tool in scientific computing.
 It is simple, readable, and easy to learn.
-Anaconda is a free distribution service by Continuum Analytics, Inc., that includes the cross-platform Python \emph{interpreter} (the software that actually executes Python code) and many Python libraries that are commonly used for applied and computational mathematics.
-To install Python via Anaconda, go to \url{http://continuum.io/downloads}, download the installer corresponding to your operating system, and follow the on-screen instructions. 
+\emph{Anaconda} is a free distribution service by Continuum Analytics, Inc., that includes the cross-platform Python \emph{interpreter} (the software that actually executes Python code) and many Python libraries that are commonly used for applied and computational mathematics.
+To install Python via Anaconda, go to \url{http://continuum.io/downloads}, download the installer corresponding to your operating system, and follow the on-screen instructions.
 
 % TODO: Change this for Python 3
 Use the installer corresponding to \textbf{Python 2.7}.
@@ -47,7 +47,7 @@ The \li{#} character creates a single-line \emph{comment}.
 Comments are ignored by the interpreter and serve as annotations for the accompanying source code.
 A pair of three quotes, \li{""" """} or \li{''' '''}, creates a multi-line string literal, which may be used as a multi-line comment.
 % Comments on the very first line can be used to give the interpreter special instructions, which we will discuss briefly in Volume III.
-% For now, we put the name of the file on the first line. 
+% For now, we put the name of the file on the first line.
 
 A triple-quoted string literal at the top of the file serves as the \emph{header} for the file.
 The header typically includes the author, instructions on how to use the file, and so on.
@@ -78,13 +78,13 @@ $ cd Documents
 $ pwd
 /Users/Guest/Documents
 $ ls
-getting_started.py
+python_intro.py
 \end{lstlisting}
 
 Now that we are in the same directory as the Python file, we can execute it using the following command:
 
 \begin{lstlisting}
-$ python getting_started.py
+$ python python_intro.py
 \end{lstlisting}
 
 If ``Hello, world!'' is displayed on the screen, you have just successfully executed your first Python program!
@@ -114,7 +114,7 @@ $ ipython                           # Start IPython.
 In [1]: print("This is IPython!")   # Execute some code.
 <<This is IPython!>>
 
-In [2]: run getting_started.py      # Run a particular Python script.
+In [2]: run python_intro.py         # Run a particular Python script.
 Hello, world!
 \end{lstlisting}
 
@@ -153,14 +153,6 @@ Testing code in IPython \emph{before} putting it into a program helps you catch 
 If you cannot answer a coding question using these strategies, search the Internet.
 In particular, \href{http://stackoverflow.com/}{stackoverflow.com} is often a valuable resource for answering common programming questions.
 
-\begin{comment} % Overkill -- this will just confuse students.
-The Anaconda distribution also includes three additional interfaces: Notebook, QTConsole, and Spyder.
-IPython Notebook (also know as Jupyter) is displayed in a web browser and has many features that are particularly useful for presentations and for running separated blocks of code.
-The QTConsole is a console that communicates with Jupyter more fluidly than the regular IPython console.
-Spyder is a popular IDE built specifically for Python programming.
-To start IPython Notebook, QTConsole, or Spyder from the terminal, run \li{ipython notebook}, \li{ipython qtconsole}, or \li{spyder}, respectively.
-\end{comment}
-
 \section*{Python Basics} % ====================================================
 
 \subsection*{Arithmetic} % ----------------------------------------------------
@@ -174,7 +166,7 @@ Use \li{**} for exponentiation and \li{\%} for modular division.
 19
 
 >>> 13 % 3                          # The modulo operator % calculates the
-1                                   # remainder: 13 = (3*4) + 1. 
+1                                   # remainder: 13 = (3*4) + 1.
 \end{lstlisting}
 
 In most Python interpreters, the underscore character \li{\_} is a variable with the value of the previous command's output, like the ANS button on many calculators.
@@ -248,7 +240,7 @@ The values \li{2} and \li{5} are the arguments that are passed when calling the 
 \begin{lstlisting}
 >>> def area(width, height):
 ...     return width * height
-...         
+...
 >>> area(2, 5)
 10
 \end{lstlisting}
@@ -352,7 +344,7 @@ Run your file to see if your answer is what you expect it to be.
 
 \subsection*{Numerical Types} % -----------------------------------------------
 
-Python has four numerical data types: \li{int}, \li{long}, 
+Python has four numerical data types: \li{int}, \li{long},
 \li{float}, and \li{complex}.
 Each stores a different kind of number.
 The built-in function \li{type()} identifies an object's data type.
@@ -581,7 +573,7 @@ Dictionaries are initialized with curly braces, colons, and commas.
 Use \li{dict()} or \li{\{\}} to create an empty dictionary.
 
 \begin{lstlisting}
->>> my_dictionary = {"business": 4121, "math": 2061, "visual arts": 7321} 
+>>> my_dictionary = {"business": 4121, "math": 2061, "visual arts": 7321}
 >>> print(my_dictionary["math"])
 2061
 
@@ -642,18 +634,18 @@ Python supports the usual control flow statements including \li{if} statements, 
 \subsection*{The If Statement} % ----------------------------------------------
 
 An \li{if} statement executes the indented code \emph{if} (and only if) the given condition holds.
-The \li{elif} statement is short for ``else if'' and can be used multiple times following an if statement, or not at all. 
+The \li{elif} statement is short for ``else if'' and can be used multiple times following an if statement, or not at all.
 The \li{else} keyword may be used at most once at the end of a series of \li{if}/\li{elif} statements.
 
 \begin{lstlisting}
->>> food = "bagel"         
+>>> food = "bagel"
 >>> if food == "apple":             # As with functions, the colon denotes
 ...     print("72 calories")        # the start of each code block.
 ... elif food == "banana" or food == "carrot":
 ...     print("105 calories")
-... else: 
+... else:
 ...     print("calorie count unavailable")
-...     
+...
 calorie count unavailable
 \end{lstlisting}
 
@@ -667,14 +659,14 @@ Specifically, if \li{word} starts with a vowel, add ``hay'' to the end; if \li{w
 
 \subsection*{The While Loop} % ------------------------------------------------
 
-A \li{while} loop executes an indented block of code \emph{while} the given condition holds. 
+A \li{while} loop executes an indented block of code \emph{while} the given condition holds.
 
 \begin{lstlisting}
 >>> i = 0
->>> while i < 10:        
-...     print(i),            
+>>> while i < 10:
+...     print(i),
 ...     i = i+1
-...     
+...
 0 1 2 3 4 5 6 7 8 9
 \end{lstlisting}
 
@@ -737,7 +729,7 @@ In Python 2.7, we use \li{xrange()} more often because it is faster than \li{ran
 >>> colors = ["red", "yellow", "white", "blue", "purple"]
 >>> for i in xrange(5):
 ...     print i, vowels[i], colors[i]
-... 
+...
 0 a red
 1 e yellow
 2 i white
@@ -746,7 +738,7 @@ In Python 2.7, we use \li{xrange()} more often because it is faster than \li{ran
 
 >>> for letter, word in zip(vowels, colors):
 ...     print letter, word
-... 
+...
 a red
 e yellow
 i white
@@ -755,7 +747,7 @@ u purple
 
 >>> for i, color in enumerate(colors):
 ...     print i, color
-... 
+...
 0 red
 1 yellow
 2 white
@@ -824,7 +816,7 @@ Tuple, set, and dictionary comprehensions can be done in the same way as list co
 
 \begin{problem} % Problem: the alternating harmonic series.
 The alternating harmonic series is given by the following:
-\[\sum_{n=1}^\infty \frac{(-1)^{(n+1)}}{n} = 1 - \frac{1}{2} + \frac{1}{3} - \frac{1}{4} + \frac{1}{5} - ... = \ln(2)\]
+\[\sum_{n=1}^\infty \frac{(-1)^{(n+1)}}{n} = 1 - \frac{1}{2} + \frac{1}{3} - \frac{1}{4} + \frac{1}{5} - \ldots = \ln(2)\]
 
 Write a function called \li{alt_harmonic()}.
 Use a list comprehension to quickly compute the first $n$ terms of this series, given the parameter \li{n}.
@@ -844,3 +836,142 @@ As you continue your study of Python, we strongly recommend the following readin
 \item PEP8 - Python Style Guide \\
         (\url{http://www.python.org/dev/peps/pep-0008/}).
 \end{enumerate}
+
+\newpage
+
+\section*{Additional Material} % ==============================================
+
+\subsection*{Lambda Functions} % ----------------------------------------------
+
+The keyword \li{lambda} is a shortcut for creating one-line functions.
+For example, we can create Python functions for the polynomials $f(x) = 6x^3 + 4x^2 - x + 3$ and $g(x,y,z) = x + y^2 - z^3$ using only a single line for each definition.
+
+\begin{lstlisting}
+>>> f = lambda x: 6*x**3 + 4*x**2 - x + 3
+>>> g = lambda x, y, z: x + y**2 - z**3
+\end{lstlisting}
+
+\subsection*{Generalized Function Input} % ------------------------------------
+
+On rare occasion, it is necessary to define a function without knowing exactly what the parameters will be like or how many there will be.
+This is usually done by defining the function with the parameters \li{*args} and \li{**kwargs}.
+Here \li{*args} is a list of the positional arguments and \li{**kwargs} is a dictionary mapping the keywords to their argument.
+This is the most general form of a function definition.
+
+\begin{lstlisting}
+>>> def report(*args, **kwargs):
+...     for i, arg in enumerate(args):
+...         print "Argument " + str(i) + ":", arg
+...     for key in kwargs:
+...         print "Keyword", key, "->", kwargs[key]
+...
+>>> report("TK", 421, exceptional=False, missing=True)
+Argument 0: TK
+Argument 1: 421
+Keyword missing -> True
+Keyword exceptional -> False
+
+>>> average = lambda *args: sum(args) / float(len(args))
+>>> average(4, 5, 6)
+5.0
+>>> average(1, 2, 3, 4, 5, 6, 7, 8, 9)
+5.0
+\end{lstlisting}
+
+See \url{https://docs.python.org/2.7/tutorial/controlflow.html} for more on this topic.
+
+\subsection*{Function Decorators} % -------------------------------------------
+
+A \emph{function decorator} is a special function that ``wraps'' other functions.
+It takes in a function as input, then usually pre-processes its inputs or post-processes its outputs.
+
+\begin{lstlisting}
+>>> def typewriter(func):
+...     """Decorator for printing the type of output a function returns"""
+...     def wrapper(*args, **kwargs):
+...         output = func(*args, **kwargs)      # Call the decorated function.
+...         print "output type:", type(output)  # Do something before finishing.
+...         return output                       # Return the function output.
+...     return wrapper
+\end{lstlisting}
+
+The outer function, \li{typewriter()}, returns the new function \li{wrapper()}.
+Since \li{wrapper()} accepts \li{*args} and \li{**kwargs} as arguments, the input function \li{func()} could accepts any number of positional or keyword arguments.
+
+Apply a decorator to a function by tagging the function's definition with an \textbf{@} symbol and the decorator name.
+
+\begin{lstlisting}
+>>> @typewriter
+... def combine(a, b, c):
+...     return a*b/float(c)
+...
+\end{lstlisting}
+
+Placing the \textbf{@} tag above the definition is equivalent to adding the following line of code after the function definition:
+
+\begin{lstlisting}
+>>> combine = typewriter(combine)
+\end{lstlisting}
+
+Now when we call \li{combine()}, we are really calling \li{wrapper()}, which then calls the originally defined \li{combine()}.
+
+\begin{lstlisting}
+>>> combine(3, 4, 6)
+<<output type: <type 'float'>>>
+2.0
+\end{lstlisting}
+
+Function decorators can also accept arguments.
+This requires another level of nesting: the outermost function must define and return a decorator that defines and returns a wrapper.
+
+\begin{lstlisting}
+>>> def repeat(times=2):
+...     """Decorator for calling a function several times."""
+...     def decorator(func):
+...         def wrapper(*args, **kwargs):
+...             for _ in xrange(times):
+...                 output = func(*args, **kwargs)
+...             return output
+...         return wrapper
+...     return decorator
+...
+>>> @repeat(times=3)
+... def hello_world():
+...     print "Hello, world!"
+...
+>>> hello_world()
+Hello, world!
+Hello, world!
+Hello, world!
+\end{lstlisting}
+
+See \url{https://www.python.org/dev/peps/pep-0318/} for more details.
+
+\begin{comment} % Overkill, since they don't know how to import yet.
+Decorating a function can overwrite the original function's \emph{docstring}, the string directly below the \li{def} statement that gives a description of the function.
+To remedy this problem, the \li{functools} module includes a decorator for wrappers.
+
+\begin{lstlisting}
+>>> from functools import wraps
+
+>>> def typewriter(func):
+...     """Decorator for printing the type of output a function returns"""
+...     @wraps(func)                            # Add the @wraps tag.
+...     def wrapper(*args, **kwargs):
+...         output = func(*args, **kwargs)
+...         print "output type:", type(output)
+...         return output
+...     return wrapper
+...
+>>> def repeat(times=2):
+...     """Decorator for calling a function several times."""
+...     def decorator(func):
+...         @wraps(func)                        # Add the @wraps tag.
+...         def wrapper(*args, **kwargs):
+...             for _ in xrange(times):
+...                 output = func(*args, **kwargs)
+...             return output
+...         return wrapper
+...     return decorator
+\end{lstlisting}
+\end{comment}

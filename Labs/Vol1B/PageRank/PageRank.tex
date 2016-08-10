@@ -2,13 +2,17 @@
 \label{lab:PageRank}
 \objective{Implement the PageRank Algorithm and understand the theory behind it.}
 
+\begin{comment}
 When you enter keywords into Google's search engine, Google finds every page containing your keywords and lists the pages in order of their \emph{rank}.
 The rank of a page reflects many factors, including how often the page is visited and how connected it is to other pages.
-As of 2013, the PageRank algorithm is one of over 200 algorithms that Google uses to determine the rank of a website.
+\end{comment}
+As of 2013, the PageRank algorithm is one of over 200 algorithms that Google uses to determine the \emph{rank}, or relative importance, of a webpage.
 Named for Larry Page, cofounder of Google, this algorithm ranks pages based on how many other pages link to them.
 
+\begin{comment}
 The PageRank algorithm is also used in applications other than internet search engines.
 For example, it has been used to rank graduate institutions and the impact factor of journals, and it has been used in some biological applications.
+\end{comment}
 
 \section*{The Internet as a Graph}
 The PageRank algorithm models the internet with a directed graph. 
@@ -44,7 +48,7 @@ An example is illustrated in Figure \ref{fig:network1}.
 
 \end{tikzpicture}
 
-\caption{A directed graph can describe the links between webpages. In this example, the set of web pages linking to page 0 is $\In(0)=\{1,3,4,5,6,7\}$, and page 0 links to $\Out(0)=\{7\}$.}
+\caption{This directed graph describes the links between 8 webpages. In this example, $\In(0)=\{1,3,4,5,6,7\}$ and $\Out(0)=\{7\}$.}
 \label{fig:network1}
 \end{figure}
 
@@ -58,25 +62,34 @@ The PageRank algorithm assumes that a surfer chooses a starting webpage randomly
 Then, if the surfer is at page $i$, they randomly select a page from $\Out(i)$ to visit next.
 This means that the surfer's chance of being on page $i$ at time $t$ is determined by where they were at time $t-1$.
 
-Suppose the internet has $N$ webpages and let $p(i,t)$ be the likelihood that the surfer is on page $i$ at time $t$.
-Then the probabilities $p(i,t)$ are given by
+Suppose the internet has $N$ webpages, and let $p_i(t)$ be the likelihood that the surfer is on page $i$ at time $t$.
+Then the probabilities $p_i(t)$ are given by
 \begin{equation}\label{equ:pr1}
-p(i,0)=\frac{1}{N} \qquad p(i,t+1) = \sum_{j \in \In(i)} \frac{p(j,t)}{\abs{\Out(j)}}.
+p_i(0)=\frac{1}{N} \qquad p_i(t+1) = \sum_{j \in \In(i)} \frac{p_j(t)}{\abs{\Out(j)}}.
 \end{equation}
 
 For example, in Figure \ref{fig:network1} we have $N=8$, and 
 \[
-p(6, t+1)=\frac{p(3,t)}{3}+\frac{p(4,t)}{3} + \frac{p(5,t)}{2}.
+p_6(t+1)=\frac{p_3(t)}{3}+\frac{p_4(t)}{3} + \frac{p_5(t)}{2}.
 \]
 
+\subsection*{Refining the Model: Adding Boredom}
+The equations in \eqref{equ:pr1} describe the surfer's habits as a Markov chain.
+However, the model is more realistic if we assume that the surfer sometimes gets bored and randomly picks a new starting page.
+We will denote the probability that a surfer stays interested at step $t$ by a constant $d$, called the \emph{damping factor}.
+Then the probability that the surfer gets bored at time $t$ is $1-d$.
+The formulas in \eqref{equ:pr1} then become
+\begin{equation}\label{equ:pr2}
+p_i(0)=\frac{1}{N} \qquad p_i(t+1) = d\sum_{j \in \In(i)} \frac{p_j(t)}{\abs{\Out(j)}}+\frac{1-d}{N} .
+\end{equation}
+
 \subsection*{Refining the Model: Pages with No Outbound Links}
-A node with no outbound links is called a \emph{sink}. 
-For example, node 2 in Figure \ref{fig:network1} is a sink.
+A node with no outbound links, such as node 2 in Figure \ref{fig:network1}, is called a \emph{sink}. 
 According to our model, if the surfer ever visits a sink, they will stay there forever.
 
 This is not very realistic; in this situation, a person would likely select another webpage at random and begin surfing again.
 Hence, in our model we replace sinks with nodes linking to every other page. 
-For example, we replace Figure \ref{fig:network1} with Figure \ref{fig:network2}.
+This means we modify Figure \ref{fig:network1} (where node 2 is a sink) to look like Figure \ref{fig:network2}.
 
 \begin{figure}
 \centering
@@ -113,48 +126,32 @@ For example, we replace Figure \ref{fig:network1} with Figure \ref{fig:network2}
 
 \end{tikzpicture}
 
-\caption{This figure arises from Figure \ref{fig:network1} by adding a link from page 2 to every other page (the added links are grey). The new links guarantee that page 2 is no longer a sink, as required by the PageRank algorithm.}
+\caption{Here Figure \ref{fig:network1} has been modified to guarantee that page 2 is no longer a sink. A new link has been added from page 2 to every other page (the added links are grey).}
 \label{fig:network2}
 \end{figure}
-
-\subsection*{Refining the Model: Adding Boredom}
-The equations in \eqref{equ:pr1} describe the surfer's habits as a Markov chain.
-However, the model is more realistic if we add the assumption that the surfer sometimes gets bored and randomly picks a new starting page.
-We will denote the probability that a surfer stays interested at step $t$ by a constant $d$, called the \emph{damping factor}.
-Then the probability that the surfer gets bored at time $t$ is $1-d$.
-Accounting for boredom, the formulas in \eqref{equ:pr1} become
-\begin{equation}\label{equ:pr2}
-p(i,0)=\frac{1}{N} \qquad p(i,t+1) = d\sum_{j \in \In(i)} \frac{p(j,t)}{\abs{\Out(j)}}+\frac{1-d}{N} .
-\end{equation}
-
 
 \subsection*{Matrix Form of the PageRank Algorithm}
 We can rewrite \eqref{equ:pr2} as the matrix equation
 \begin{equation}\label{equ:pr3}
 \mathbf{p}(0)=\frac{1}{N}\mathbf{1} \qquad \mathbf{p}(t+1) = dK\mathbf{p}(t) + \frac{1-d}{N}\mathbf{1}
 \end{equation}
-where $\mathbf{p}(t)=(p(1,t), p(2,t), \ldots, p(N,t))^T$ and $\mathbf{1} = (1,\ldots, 1)^T$, and $K$ is defined by
+where $\mathbf{p}(t)=(p_1(t), p_2(t), \ldots, p_N(t))^T$, $\mathbf{1} = (1,\ldots, 1)^T$, and $K$ is defined by
 \[K_{ij} = \begin{cases} \frac{1}{\abs{\Out(j)}} & \mbox{ if j links to i} \\
 	0 & \mbox{ otherwise.} \end{cases}\]
 
 
 \subsection*{Defining Page Rank}
 As given by the PageRank algorithm, the \emph{rank} of page $i$ is
-\[p(i) = \lim_{t\to \infty} p(i,t).\]
+\[p_i = \lim_{t\to \infty} p_i(t).\]
 In other words, the page ranks are the steady state of the modified Markov chain defined in \eqref{equ:pr3}.
 
 
 
 \section*{Implementation in Python}
-A good strategy for computing $K$ comes from writing
-\[
-K = (D^{-1}A)^T
-\]
-where $A$ is the adjacency matrix of the directed graph representing the internet and $D$ is a diagonal matrix with $D_{jj}=\abs{\Out(j)}$.
-Since $\Out(j)$ can be computed from the adjacency matrix, we will begin by creating $A$.
+
 
 The adjacency matrix $A$ of a directed graph has $A_{ij}=1$ if there is an edge from node $i$ to node $j$, and $A_{ij}=0$ otherwise.
-For example, the adjacency matrix of the graph in Figure \ref{fig:network1} is defined below.
+The adjacency matrix of the graph in Figure \ref{fig:network1} is defined below.
 We use a code environment to describe $A$ so you can easily use this example to debug the problems in this lab.
 \begin{lstlisting}
 A = np.array([[ 0,  0,  0,  0,  0,  0,  0,  1],
@@ -167,19 +164,17 @@ A = np.array([[ 0,  0,  0,  0,  0,  0,  0,  1],
               [ 1,  0,  0,  0,  0,  0,  0,  0]])
 \end{lstlisting}
 
-
-
 \begin{problem}
-Write the following function that creates an adjacency matrix from a file.
+Write the following function that creates a sparse adjacency matrix from a file.
 \begin{lstlisting}
-def to_matrix( datafile, n ):
-    ''' Return the nxn adjacency matrix described by datafile.
+def to_matrix( filename, n ):
+    ''' Return the nxn adjacency matrix described by the file.
     
     INPUTS:
-    datafile - A .txt file describing a directed graph. Lines 
-    			describing edges should have the form 
-				'<from node>\t<to node>\n'. The file may also 
-				include comments.
+    filename - Name of a .txt file describing a directed graph. Lines 
+    		    describing edges should have the form 
+				'<from node>\t<to node>'. 
+				The file may also include comments.
     n		- The number of nodes in the graph described by datafile
     
     RETURN:
@@ -188,15 +183,15 @@ def to_matrix( datafile, n ):
 \end{lstlisting}
 Hints:
 \begin{enumerate}
-\item The file \texttt{data.txt} included with this lab describes the matrix in Figure \ref{fig:network1}. 
+\item The file \texttt{datafile.txt} included with this lab describes the matrix in Figure \ref{fig:network1} and has the adjacency matrix \li{A} given above. 
 You may use it to test your function.
 
 \item You can open a file in Python using the \li{with} syntax. 
 Then, you can iterate through the lines using a \li{for} loop.
 Here is an example.
 \begin{lstlisting}
-# Open `data.txt' for read-only
-with open('./data.txt', 'r') as myfile:
+# Open `datafile.txt' for read-only
+with open('./datafile.txt', 'r') as myfile:
     for line in myfile:
         print line
 \end{lstlisting}
@@ -210,13 +205,22 @@ with open('./data.txt', 'r') as myfile:
 ['0', '4']
 \end{lstlisting}
 
-\item Rather than testing for lines of \texttt{data.txt} that contain comments, put all your string operations in a \li{try} block with an \li{except} block following.
+\item Rather than testing for lines of \texttt{datafile.txt} that contain comments, put all your string operations in a \li{try} block with an \li{except} block following.
 \end{enumerate}
 \end{problem}
 
-The next step is to compute $K$. 
-The matrix $D$ is easily obtained from $A$ (how?). 
-Then, we can use $D$ to identify sinks.
+\begin{info}
+It makes sense to initialize $A$ as a sparse matrix, since $A$ is mostly zeros. To make the coding easier, throughout the rest of the lab the algorithms will be coded using non-sparse matrices. Don't forget, however, that in a real-world sparse adjacency matrices are generally much more time-efficient than dense matrices. 
+
+To convert from a sparse to a non-sparse matrix, use the syntax \li{A.todense()}.
+\end{info}
+
+The next step is to compute $K$ from \eqref{equ:pr3}. 
+A good strategy for computing $K$ comes from writing
+\[
+K = (D^{-1}A)^T
+\]
+where $A$ is the adjacency matrix of the directed graph representing the internet and $D$ is a diagonal matrix with $D_{jj}=\abs{\Out(j)}$.
 Modify $A$ so that rows corresponding to sinks have all ones instead of all zeros.
 For Figure \ref{fig:network2}, the modified adjacency matrix is defined below.
 \begin{lstlisting}
@@ -230,10 +234,14 @@ Am = np.array([[ 0,  0,  0,  0,  0,  0,  0,  1],
                [ 1,  0,  0,  0,  0,  0,  0,  0]])
 \end{lstlisting}
 
-Finally we compute $K$.
-It is a \emph{very} bad idea to invert $D$ and perform the matrix multiplication $D^{-1}A$.
-Rather, store the diagonal entries of $D$ in a vector and use array broadcasting to divide $A$ by $D$.
-For Figures \ref{fig:network1} and \ref{fig:network2}, the matrix $K$ is as follows.
+
+The matrix $D$ is easily obtained by summing the rows of $A$. 
+Although  $K=(D^{-1}A)^T$, it is a \emph{very} bad idea to invert $D$ and actually perform the matrix multiplication $D^{-1}A$.
+Instead, store only the diagonal entries of $D$ as a vector, and use array broadcasting to divide $A$ by $D$.
+
+Notice that we need to transpose $D^{-1}A$ to get $K$. This is because $D^{-1}A$ is \emph{row stochastic} (meaning that  the rows sum to 1), but we need to multiply \emph{column stochastic} matrices (where the columns sum to 1) To make $K$ be column stochastic, we have to take a transpose.
+
+For Figure \ref{fig:network2}, the matrix $K$ is as follows.
 
 \begin{lstlisting}
 K = np.array([[ 0   ,  1   ,  1./8,  1./3,  1./3,  1./2,  1   ,  1   ],
@@ -263,7 +271,7 @@ One possibility is to assume the modified Markov chain has a steady state $\math
 (I-dK)\mathbf{p} = \frac{1-d}{N} \mathbf{1}.
 \end{equation}
 
-We can implement this algorithm in SciPy to solve for the page ranks of the network in Figure \ref{fig:network2}.
+We can use SciPy's solver to find the page ranks of the network in Figure \ref{fig:network2}.
 \begin{lstlisting}
 >>> from scipy import linalg as la
 >>> I = np.eye(8)
@@ -272,38 +280,36 @@ We can implement this algorithm in SciPy to solve for the page ranks of the netw
 array([ 0.43869288,  0.02171029,  0.02786154,  0.02171029,  0.02171029,
         0.02786154,  0.04585394,  0.39459924])
 \end{lstlisting}
-As expected, node 0 has the highest rank, approximately equal to .43. 
-Node 7 has a much higher rank than node 6, even though $\In(7)=1$ and $\In(6)=3$. 
+As expected, node 0 has the highest rank, approximately equal to .44. 
+Node 7 has a higher rank than node 6, even though $\In(7)=1$ and $\In(6)=3$. 
 This is because node 7's single in-edge comes from a node that has a very high rank (node 0).
 
 \subsubsection*{Iterative Method}
 Solving the system in \eqref{equ:matrix_solve} is feasible for our small working example, but this is not an efficient strategy for very large systems.
 
-One option for large systems is to iterate the equation for $\mathbf{p}(t)$ until $\norm{\mathbf{p}(t)-\mathbf{p}(t-1)}$ is sufficiently small.
+One option for large systems is an iterative method. Starting with a guess for $\mathbf{p}(0)$, we iterate \eqref{equ:pr3} until $\norm{\mathbf{p}(t)-\mathbf{p}(t-1)}$ is sufficiently small. At this point we assume we have reached the steady state.
 
 
 \begin{problem}
 \label{prob:pagerank_dense_iter}
 Implement the function below, using the iterative method to find the steady state of the PageRank algorithm.
 \begin{lstlisting}
-def iter_solve( data, datasize, N=None, d=.85, tol=1E-5):
+def iter_solve( adj, N=None, d=.85, tol=1E-5):
     '''
-    Return the page ranks of the network described by `data`.
+    Return the page ranks of the network described by 'adj' using the iterative method.    
     
     INPUTS:
-    data - A NumPy array representing the adjacency matrix of a directed 
+    adj - A NumPy array representing the adjacency matrix of a directed 
             graph
-    datasize - An integer representing the size of the 'data' array.
     N     - Restrict the computation to the first `N` nodes of the graph. 
             Defaults to N=None; in this case, the entire matrix is used.
     d     - The damping factor, a float between 0 and 1. 
             Defaults to .85.
     tol  - Stop iterating when the change in approximations to the 
-            solution is less than `tol'. Defaults to 1E-5.
-    
+            solution is less than `tol'. Defaults to 1E-5.    
+            
     OUTPUTS:
-    Iterate through the PageRank algorithm until the error is less than 
-    `tol'. Return the approximation to the steady state.
+    Return the approximation to the steady state of p.
     '''
 \end{lstlisting}
 Hints:
@@ -311,7 +317,7 @@ Hints:
 \item At each step, test your function against the example in this lab.
 \item Don't forget to eliminate sinks. 
 It is possible (but not necessary) to do this in a single line.
-\item When \li{N} is not \li{None}, you want to work with only the upper $N \times N$ portion of the array \li{data}.
+\item When \li{N} is not \li{None}, you want to work with only the upper $N \times N$ portion of the array \li{adj}.
 \end{enumerate}
 \end{problem}
 
@@ -327,38 +333,95 @@ The columns of $B$ sum to 1, and the entries of $B$ are strictly positive (becau
 With these hypotheses, the Perron-Frobenius theorem says that 1 is the unique eigenvalue of B of largest magnitude, and the corresponding eigenvector is unique.
 In this case, the ``iterative method'' described above is just the power method for finding the eigenvector corresponding to a dominant eigenvalue, introduced in Lab \ref{lab:EigSolve}.
 
-We can also attempt to compute $\mathbf{p}$ using eigenvalue solvers in SciPy.
+We can also compute $\mathbf{p}$ using eigenvalue solvers in SciPy.
 
 %TODO: the output from scipy.linalg.eig is not very accurate, even for the small example in this lab.
 \begin{problem}
 Implement the function below, using the eigenvalue method to find the steady state of the PageRank algorithm.
 \begin{lstlisting}
-def eig_solve( data, datasize, N=None, d=.85):
+def eig_solve( adj, N=None, d=.85):
     '''
-    Return the page ranks of the network described by `data`.
+    Return the page ranks of the network described by `adj`.
     
     INPUTS:
-    data - A NumPy array representing the adjacency matrix of a directed 
+    adj - A NumPy array representing the adjacency matrix of a directed 
             graph
-    datasize - An integer representing the size of the 'data' array.
     N     - Restrict the computation to the first `N` nodes of the graph. 
             Defaults to N=None; in this case, the entire matrix is used.
     d     - The damping factor, a float between 0 and 1. 
             Defaults to .85.
     
     OUTPUTS:
-    Use the eigenvalue solver in scipy.linalg to calculate the steady 
-    state of the PageRank algorithm.
+    Return the approximation to the steady state of p.
     '''
 \end{lstlisting}
 Hint: Review the techniques from the Markov chain section of Lab \ref{lab:EigSolve}.
 \end{problem}
 
+\section*{Ranking Teams}
+This ranking algorithm can be applied not only to webpages, but to any problem with a directed graph structure. 
+One such application is ranking sports teams.
 
-\section*{SNAP Datasets}
+Suppose we have data about a collection of sports teams, including which teams played each other and who won each match. 
+We can model this as a directed graph. Each node in the graph represents a team.
+An edge between two nodes points from the losing team to the winning team. 
+If two teams never played each other, there is no edge between them.
+Wins and losses do not cancel out; if BYU and Boise played twice, and each team won once, then there is an edge from BYU to Boise and another edge from Boise to BYU. TODO: add a picture.
+
+To simplify our model, edges are not weighted. So if Duke ever beat Harvard, no matter whether they beat them once or 5 times, there is only one edge pointing from Harvard to Duke. 
+
+The key here is that edges tend to lead from worse teams to better teams. 
+So by starting with some team and randomly following edges, we should end up visiting better teams more often. 
+This is reminiscent of the PageRank algorithm! Given an appropriate dataset, we can use PageRank to estimate team rankings.  
+
+Note that in this scenario, the parameter $d$ no longer represents boredom. 
+It allows us to jump randomly from one team to another, so it could represent a surprise upset, or the random outcome of a game between two teams who have never played each other.
+
+\begin{problem}
+By applying the PageRank algorithm to win-loss data from the 2013 NCAA basketball season, produce a comparative ranking of the teams.
+\begin{enumerate}
+\item The file  \texttt{ncaa2013.csv} contains data on over 5000 basketball games. 
+The first line is a header.
+After the header, each line represents a game and has the winning team followed by the losing team (there are no ties in basketball). 
+
+Load this file and use it to create the adjacency matrix $A$, where $A_{ij} = 1$ if team $j$ beat team $i$. 
+You will need some convenient way of mapping from team names to the integers and vice versa.
+\item Use the iterative method from Problem \ref{prob:pagerank_dense_iter} with $d = 0.7$ to find the steady state. 
+The steady-state solution is your vector of ranks. 
+\item This data is from before the 2013 playoffs. Look up online who made it to the Final Four that year. 
+According to your ranking, which of these four teams pulled the biggest upset?
+\item Return the ranks sorted from largest to smallest, and the corresponding list of teams sorted from ``best'' to ``worst''. 
+\end{enumerate}
+Hints:
+\begin{enumerate}
+\item The code below may be helpful for processing the .csv file:
+\begin{lstlisting}
+with open('./ncaa2013.csv', 'r') as ncaafile:
+    ncaafile.readline() #reads and ignores the header line
+    for line in ncaafile:
+        teams = line.strip().split(',') #split on commas
+        print teams
+>>> ['Middle Tenn St', 'Alabama St']
+>>> ...
+>>> ['Mississippi', 'Florida']
+\end{lstlisting}
+\item Before creating the adjacency matrix, you can get all the unique teams by running through all the matches once and adding every team to a set. 
+Next, count the number of unique teams and initialize $A$ to be the right size.
+Try using dictionaries, lists, or both to map numbers to teams and teams to numbers and fill in $A$. 
+There is more than one right way to do this.
+\item The function \li{np.argsort} will be useful for sorting the ranks and teams.
+\item There should be 347 teams. PageRank should predict that the top five ranked teams are Duke, Butler, Louisville, Illinois, and Indiana (in that order). Use this to check your results.
+\end{enumerate}
+\end{problem}
+
+\section*{Optional: SNAP Datasets}
 The SNAP graph library, located at \url{http://snap.stanford.edu/data/index.html}, provides a variety of medium sized data sets for public use.
+These datasets have to do with networks, including road systems, social networks, and online communities. There are some interesting resources here for those wanting to experiment further with the PageRank algorithm on different datasets.
+\begin{comment}
 The \li{matplotlib.pyplot.spy} command on the adjacency matrix from a SNAP data set yielded the plot shown in Figure \ref{fig:WebSparse}
+\end{comment}
 
+\begin{comment}
 \begin{figure}
 \centering
 \includegraphics[width=\textwidth]{sparse_web.png}
@@ -366,6 +429,7 @@ The \li{matplotlib.pyplot.spy} command on the adjacency matrix from a SNAP data 
 Data was taken from the SNAP datasets.}
 \label{fig:WebSparse}
 \end{figure}
+\end{comment}
 
 \begin{problem}
 (Optional) Try running the functions you wrote in this lab on a data set downloaded from SNAP.

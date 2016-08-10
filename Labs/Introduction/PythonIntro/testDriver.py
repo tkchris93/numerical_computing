@@ -1,8 +1,7 @@
 # solutions.py
 """Introductory Labs: Getting Started. Test Driver."""
 
-from numpy.random import randint
-from solutions import *
+# Decorators ==================================================================
 
 import signal
 from functools import wraps
@@ -17,7 +16,7 @@ def _timeout(seconds):
         This decorator uses signal.SIGALRM, which is only available on Unix.
     """
     assert isinstance(seconds, int), "@timeout(sec) requires an int"
-    
+
     class TimeoutError(Exception):
         pass
 
@@ -37,21 +36,24 @@ def _timeout(seconds):
         return wraps(func)(wrapper)
     return decorator
 
+# Test Driver =================================================================
 
-# Test script        
+from numpy.random import randint
+from solutions import *
+
 def test(student_module):
     """Test script. Import the student's solutions file as a module.
-    
+
      5 points for problem 2
     10 points for problem 3
      5 points for problem 4
      5 points for problem 5
     10 points for problem 6
      5 points for problem 7
-    
+
     Parameters:
         student_module: the imported module for the student's file.
-    
+
     Returns:
         score (int): the student's score, out of 40.
         feedback (str): a printout of results for the student.
@@ -157,11 +159,9 @@ class _testDriver(object):
     @_timeout(5)
     def problem2(self, s):
         """Test sphere_volume(). 5 Points."""
-        if not hasattr(s, "sphere_volume"):
-            raise NotImplementedError("Problem 2 Incomplete")
         if s.sphere_volume(1) is None:
             raise NotImplementedError("sphere_volume() returned nothing")
-        
+
         points  = 2*self._eqTest(sphere_volume(5), s.sphere_volume(5),
                                             "sphere_volume(5) failed")
         points += 3*self._eqTest(sphere_volume(3.14), s.sphere_volume(3.14),
@@ -171,8 +171,6 @@ class _testDriver(object):
     @_timeout(5)
     def problem3(self, s):
         """Test first_half() and backward(). 10 points."""
-        if not hasattr(s, "first_half") or not hasattr(s, "backward"):
-            raise NotImplementedError("Problem 3 Incomplete")
         if s.first_half("abcde") is None:
             raise NotImplementedError("first_half() returned nothing")
         if s.backward("abcde") is None:
@@ -183,26 +181,22 @@ class _testDriver(object):
         points += 3*self._eqTest(first_half("TK421"), s.first_half("TK421"),
                                             "first_half('TK421') failed")
         points += 2*self._eqTest(backward("abcde"), s.backward("abcde"),
-                                            "first_half('abcde') failed")
+                                            "backward('abcde') failed")
         points += 3*self._eqTest(backward("TK421"), s.backward("TK421"),
-                                            "first_half('TK421') failed")
+                                            "backward('TK421') failed")
         return points
 
     @_timeout(5)
     def problem4(self, s):
         """Test list_ops(). 5 points."""
-        if not hasattr(s, "list_ops"):
-            raise NotImplementedError("Problem 4 Incomplete")
         if s.list_ops() is None:
             raise NotImplementedError("list_ops() returned nothing")
-        
+
         return 5*self._eqTest(list_ops(), s.list_ops(), "list_ops() failed")
 
     @_timeout(5)
     def problem5(self, s):
         """Test pig_latin(). 5 points."""
-        if not hasattr(s, "pig_latin"):
-            raise NotImplementedError("Problem 5 Incomplete")
         if s.pig_latin("piglatin") is None:
             raise NotImplementedError("pig_latin() returned nothing")
 
@@ -216,9 +210,7 @@ class _testDriver(object):
 
     @_timeout(10)
     def problem6(self, s):
-        """Test palindrome(). 5 points.""" 
-        if not hasattr(s, "palindrome"):
-            raise NotImplementedError("Problem 6 Incomplete")
+        """Test palindrome(). 5 points."""
         if s.palindrome() is None:
             raise NotImplementedError("palindrome() returned nothing")
 
@@ -226,16 +218,14 @@ class _testDriver(object):
         if correct > student:
             self.feedback += "\npalindrome() failed: {} is too low".format(
                                                                     student)
-        elif correct < student: 
+        elif correct < student:
             self.feedback += "\npalindrome() failed: {} is too high".format(
                                                                     student)
         return 10 if correct == student else 0
-        
+
     @_timeout(5)
     def problem7(self, s):
         """Test alt_harmonic(). 10 points."""
-        if not hasattr(s, "alt_harmonic"):
-            raise NotImplementedError("Problem 8 Incomplete")
         if s.alt_harmonic(10) is None:
             raise NotImplementedError("alt_harmonic() returned nothing")
 
@@ -244,6 +234,7 @@ class _testDriver(object):
         points += 3*self._eqTest(alt_harmonic(5000), s.alt_harmonic(5000),
                                             "alt_harmonic(5000) failed")
         return points
+
 
 if __name__ == '__main__':
     import solutions

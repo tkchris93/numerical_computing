@@ -1,20 +1,22 @@
 \lab{Plot Customization and Matplotlib Syntax Guide}{Matplotlib Customization}
 \label{mpltables}
 
-% \objective{Display relevant matplotlib information}
-
-The documentation for matplotlib can be frustrating to maneuver and relevant information is sometimes difficult to find. For this reason, we have supplied some of the more applicable and useful information here. 
-For a more general introduction to matplotlib, see lab \ref{lab:Matplotlib_and_Mayavi}.
-
-% TODO: Clean this up along with Matplotlib.
+\objective{
+The documentation for Matplotlib can be a little difficult to maneuver and basic information is sometimes difficult to find.
+This appendix condenses and demonstrates some of the more applicable and useful information on plot customizations.
+For an introduction to Matplotlib, see lab \ref{lab:Matplotlib}.
+}
 
 \section*{Colors} % ===========================================================
 
 By default, every plot is assigned a different color specified by the ``color cycle''.
-It can be overwritten by specifying what color is desired.
-Matplotlib recognizes some basic built-in colors. 
+It can be overwritten by specifying what color is desired in a few different ways.
+\begin{itemize}
+    \item \textbf{}
+\end{itemize}
+Matplotlib recognizes some basic built-in colors.
 
-\begin{table}[H] % Basic colors
+\begin{table}[H] % Basic colors.
 \centering
 \begin{tabular}{r|l}
     Code & Color \\
@@ -36,23 +38,23 @@ The result is displayed in Figure \ref{colors}.
 \lstinputlisting[style=fromfile]{colors.py}
 
 \begin{figure}  % Colors.
-\includegraphics[width=\textwidth]{colors.pdf}
-\caption{A display of all the built-in colors.}
-\label{colors} 
+    \includegraphics[width=\textwidth]{colors.pdf}
+    \caption{A display of all the built-in colors.}
+    \label{colors}
 \end{figure}
 
 There are many other ways to specific colors.
 A popular method to access colors that are not built-in is to use a \li{RGB} tuple.
-Another way is to specify the color using an html hex string or its associated html color name like \li{DarkOliveGreen, FireBrick, LemonChiffon, MidnightBlue, PapayaWhip,} or \li{SeaGreen}.
+Colors can also be specified using an html hex string or its associated html color name like \li{"DarkOliveGreen", "FireBrick", "LemonChiffon", "MidnightBlue", "PapayaWhip",} or \li{"SeaGreen"}.
 
-\section*{Axes} % =============================================================
+\section*{Window Limits} % ====================================================
 
-You may have noticed the use of \li{plt.ylim([ymin, ymax])} in the previous code. This explicitly sets the boundary of the y-axis. Similarily, \li{plt.xlim([xmin, xmax])} can be used to set the boundary of the x-axis. 
-Doing both commands simultaneously is possible with the \li{plt.axis([xmin, xmax, ymin, ymax])}. 
-Remember that these commands must be executed after the plot. 
+You may have noticed the use of \li{plt.ylim([ymin, ymax])} in the previous code. This explicitly sets the boundary of the y-axis. Similarily, \li{plt.xlim([xmin, xmax])} can be used to set the boundary of the x-axis.
+Doing both commands simultaneously is possible with the \li{plt.axis([xmin, xmax, ymin, ymax])}.
+Remember that these commands must be executed after the plot.
 
 \begin{comment} % pulled this in from matplotlib lab.
-\begin{table}[H] 
+\begin{table}[H]
 \centering
 \begin{tabular}{r|l}
     Function & Description\\
@@ -81,13 +83,13 @@ Remember that these commands must be executed after the plot.
 
 
 % BAD! plt.axis("tight") has a bug that messes with OS X on Macs.
-% Another popular command is \li{plt.axis("tight")} which adjusts the axes so all data is visible and centered. 
+% Another popular command is \li{plt.axis("tight")} which adjusts the axes so all data is visible and centered.
 
 \section*{Lines} % ============================================================
 
-\subsection*{Width} % ---------------------------------------------------------
+\subsection*{Thickness} % -----------------------------------------------------
 
-You may have noticed that the width of the lines above seemed thin considering we wanted to inspect the line color. \li{linewidth} is a keyword argument that is defaulted to be \li{None} but can be given any real number to adjust the line width. 
+You may have noticed that the width of the lines above seemed thin considering we wanted to inspect the line color. \li{linewidth} is a keyword argument that is defaulted to be \li{None} but can be given any real number to adjust the line width.
 
 The following displays how \li{linewidth} is implemented.
 It is displayed in Figure \ref{linewidth}.
@@ -97,8 +99,10 @@ It is displayed in Figure \ref{linewidth}.
 \begin{figure} % Line width results
 \includegraphics[width=\textwidth]{linewidth.pdf}
 \caption{plot of varying linewidths.}
-\label{linewidth} 
+\label{linewidth}
 \end{figure}
+
+% Talk about markersize and demonstrate markers of varying sizes.
 
 \subsection*{Style} % ---------------------------------------------------------
 
@@ -139,7 +143,7 @@ The following are accepted format string characters to indicate line style.
 \end{tabular}
 \end{table}
 
-The following displays how \li{linestyle} can be implemented. 
+The following displays how \li{linestyle} can be implemented.
 It is displayed in Figure \ref{linestyle}.
 
 \lstinputlisting[style=fromfile]{linestyle.py}
@@ -147,20 +151,20 @@ It is displayed in Figure \ref{linestyle}.
 \begin{figure} % Line styles
 \includegraphics[width=\textwidth]{linestyle.pdf}
 \caption{plot of varying linestyles.}
-\label{linestyle} 
+\label{linestyle}
 \end{figure}
 
 \section*{Text} % =============================================================
 
-It is also possible to add text to your plots. 
-To label your axes, the \li{plt.xlabel()} and the \li{plt.ylabel()} can both be used. 
+It is also possible to add text to your plots.
+To label your axes, the \li{plt.xlabel()} and the \li{plt.ylabel()} can both be used.
 The function \li{plt.title()} will add a title to a plot.
 If you are working with subplots, this command will add a title to the subplot you are currently modifying.
 To add a title above the entire figure, use \li{plt.suptitle()}.
 
-All of the \li{text()} commands can be customized with \li{fontsize} and \li{color} keyword arguments. 
+All of the \li{text()} commands can be customized with \li{fontsize} and \li{color} keyword arguments.
 
-We can add these elements to our previous example. 
+We can add these elements to our previous example.
 It is displayed in Figure \ref{text}.
 
 \lstinputlisting[style=fromfile]{text.py}
@@ -168,7 +172,7 @@ It is displayed in Figure \ref{text}.
 \begin{figure}
 \includegraphics[width=\textwidth]{text.pdf}
 \caption{plot of varying linestyles using text labels.}
-\label{text} 
+\label{text}
 \end{figure}
 
 \begin{comment} % PLOTTING COMMANDS
@@ -206,66 +210,4 @@ It is displayed in Figure \ref{text}.
 \end{table}
 \end{comment}
 
-\section*{Mayavi} % ===========================================================
-
-\begin{comment}
-\begin{table} % Mayavi plotting functions. Probably should put this back in.
-\begin{center}
-\begin{tabular}
-{|c|l|}
-\hline
-Function & Description \\
-\hline
-\li{barchart} & Produces 3D histogram-like plots\\
-\li{contour3d} & Plots level surfaces of functions of three variables\\
-\li{flow} & Creates a trajectory of particles following the flow of a vector field\\
-\li{imshow} & Use a colormap to view a 2D array as an image\\
-\li{mesh} & Plot a surface using \li{(x,y,z)} coordinates supplied as three 2D arrays\\
-\li{plot3d} & Draws lines between points\\
-\li{points3d} & Plots glyphs (like points) at the coordinates supplied\\
-\li{quiver3d} & Generate 3D vector fields\\
-\li{surf} & Plot a surface with a 2D array as elevation data\\
-\hline
-\end{tabular}
-\end{center}
-\caption{Some plotting functions in \li{mlab}.}
-\label{table:mlab_functions}
-\end{table}
-\end{comment}
-
-\begin{comment}
-All these functions can be ``tested" (which provides an example figure for the function) with the command:
-\begin{lstlisting}
-mlab.test_<plotting function>()
-mlab.show()
-\end{lstlisting}
-Note that pressing tab after typing \li{mlab.test_} will provide a list of available commands and that, like Matplotlib, we use the \li{show()} command to actually view our plot.
-
-For example, to test the \li{fancy_mesh()} function, we run the following:
-\begin{lstlisting}
-mlab.test_fancy_mesh()
-mlab.show()
-\end{lstlisting}
-
-The result should resemble Figure \ref{fig:fancymesh}.
-
-\begin{figure}
-\includegraphics[width=\textwidth]{fancymesh.png}
-\caption{An example of the fancy mesh plotting function}
-\label{fig:fancymesh}
-\end{figure}
-
-In this lab, we will focus our attention on introducing the \li{mesh}, \li{plot3d}, and \li{points3d} functions.
-
-Like matplotlib, \li{mlab} takes a set of data points and plots it.
-However, instead of passing just \li{x} and \li{y} coordinates as we did in Matplotlib, we also send \li{z} coordinates to produce a 3D plot.
-\end{comment}
-
-\section*{References}
-
 See \url{http://matplotlib.org} for Matplotlib documentation.
-
-% For information beyond what is found in this tutorial, see \url{http://docs.enthought.com/mayavi/mayavi/}.
-
-% We will introduce a few in this lab; for more see \url{http://docs.enthought.com/mayavi/mayavi/auto/mlab_helper_functions.html}.
-% You can also browse examples at \url{http://docs.enthought.com/mayavi/mayavi/auto/examples.html}.

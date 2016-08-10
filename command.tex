@@ -1,16 +1,19 @@
 %------------------------------------------------------------------------------%
-% command.tex                                                                  % 
+% command.tex                                                                  %
 % This file contains the various package imports, environment declarations,
 % and other misc. commands.
 %
 %------------------------------------------------------------------------------%
 
+\usepackage{pkgloader}
+
 \usepackage{algorithmicx}
 \usepackage{amsmath, amsfonts, amscd, amssymb}
 \usepackage{appendix}
-\usepackage{bbm}
-\usepackage{caption}
+\usepackage{array}
+\usepackage{blkarray}
 \usepackage{color}
+\usepackage{colortbl}
 \usepackage{epsfig}
 \usepackage{float}
 \usepackage{graphicx}
@@ -37,27 +40,28 @@
 \usepackage[customcolors]{hf-tikz}
 \usepackage[framemethod=tikz]{mdframed}
 
+\LoadPackagesNow
+
 \usetikzlibrary{arrows, automata, backgrounds, calendar, chains, decorations,
     matrix, mindmap, patterns, petri, positioning, shadows, shapes.geometric,
     trees, shapes, decorations.pathreplacing}
 
+% Document settings ===========================================================
+
 \hfsetfillcolor{red!02}
 \hfsetbordercolor{red}
 
-
-% Document settings ===========================================================
-
-%set lengths that are pleasing for screen display.
+% Set lengths that are pleasing for screen display.
 \setlength{\paperheight}{11in}
 \setlength{\paperwidth}{8.5in}
 
-%set paragraph skips and line spacing
+% Set paragraph skips and line spacing
 \linespread{1.05}
 \setlength{\parskip} {2pt plus1pt minus1pt}
 
 \makeatletter
 
-%Make all floats centered
+% Make all floats centered
 \g@addto@macro\@floatboxreset\centering
 
 % Reset footnote counter every chapter
@@ -140,7 +144,7 @@
   frametitlefont=\large\bfseries,
   frametitleaboveskip=1em,
   frametitlerule=true,
-  frametitle={\sc Warning}
+  frametitle={\sc Achtung!}
 ]{warn}
 
 
@@ -196,7 +200,8 @@
         captionpos=b,
         abovecaptionskip=-5pt,
         belowcaptionskip=-5pt,
-        moredelim=[is][\color{black}]{<<}{>>}
+        moredelim=[is][\color{black}]{<<}{>>},
+        moredelim=[is][\color{red}]{<r<}{>r>}
 }
 
 % \surroundwithmdframed[
@@ -272,8 +277,9 @@
 \providecommand{\norm}[1]{\left\lVert#1\right\rVert}
 \providecommand{\set}[1]{\lbrace#1\rbrace}
 \providecommand{\setconstruct}[2]{\lbrace#1:#2\rbrace}
-\providecommand{\Res}[1]{\underset{#1}{Res}}           % Residue
-\newcommand{\trp}{^{\mathsf T}} %matrix transpose
+\providecommand{\Res}[1]{\underset{#1}{Res}}            % Residue
+\newcommand{\trp}{^{\mathsf T}}                         % matrix transpose
+\newcommand{\hrm}{^{\mathsf H}}                         % hermitian conjugate
 
 \newcommand{\ipt}[2]{\langle #1,#2 \rangle}
 \newcommand{\ip}{\int_{-\infty}^{+\infty}}
@@ -281,31 +287,31 @@
 \renewcommand{\ker}[1]{\mathcal{N}(#1)}
 \newcommand{\ran}[1]{\mathcal{R}(#1)}
 
-%These commands are specifically for use in the pseudocode environment
+% These commands are specifically for use in the pseudocode environment.
 % Load the xparse package to use these commands
-\NewDocumentCommand\allocate{m+g}{		    % Empty array
+\NewDocumentCommand\allocate{m+g}{                      % Empty array
   \IfNoValueTF{#2}
-    {\mathrm{empty}(#1)}					% 1 dimension
-    {\mathrm{empty}(#1, #2)}				% 2 dimensions
+    {\mathrm{empty}(#1)}                                % 1 dimension
+    {\mathrm{empty}(#1, #2)}                            % 2 dimensions
 }
 
-\NewDocumentCommand\zeros{m+g}{		        % Zero array
+\NewDocumentCommand\zeros{m+g}{                         % Zero array
   \IfNoValueTF{#2}
     {\mathrm{zeros}(#1)}
     {\mathrm{zeros}(#1, #2)}%
 }
 
-\newcommand{\Id}[1]{\mathrm{Id}(#1)}		% Identity array
-\newcommand{\makecopy}[1]{\mathrm{copy}(#1)} % Copy an array
+\newcommand{\Id}[1]{\mathrm{Id}(#1)}                    % Identity array
+\newcommand{\makecopy}[1]{\mathrm{copy}(#1)}            % Copy an array
 \newcommand{\shape}[1]{\mathrm{shape}(#1)}
 \newcommand{\size}[1]{\mathrm{size}(#1)}
 
 
 % Math Operators ==============================================================
 
-% Many of these are for use in the pseudocode environments
+% Many of these are for use in the pseudocode environments.
 \DeclareMathOperator{\sign}{sign}
 \DeclareMathOperator{\sech}{sech}
-\DeclareMathOperator{\Out}{Out}	    % Used in PageRank lab
-\DeclareMathOperator{\In}{In}		% Used in PageRank lab
+\DeclareMathOperator{\Out}{Out}                         % Used in PageRank lab
+\DeclareMathOperator{\In}{In}                           % Used in PageRank lab
 \DeclareMathOperator\erf{erf}

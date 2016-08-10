@@ -1,15 +1,20 @@
+'''
+Solutions file for Volume 1 - SVD
+Edited by Jessica Morrise, 6/2016
+'''
+
 # solutions.py
 from scipy import linalg as la
 import numpy as np
 from matplotlib import pyplot as plt
 
 # Problem 1
-def truncated_svd(A,r=None,tol=10**-6):
+def truncated_svd(A,k=None,tol=10**-6):
     """Computes the truncated SVD of A. If r is None or equals the number 
         of nonzero singular values, it is the compact SVD.
     Parameters:
         A: the matrix
-        r: the number of singular values to use
+        k: the number of singular values to use
         tol: the tolerance for zero
     Returns:
         U - the matrix U in the SVD
@@ -20,19 +25,24 @@ def truncated_svd(A,r=None,tol=10**-6):
     eigs,evecs = la.eig(A.conj().T.dot(A))
 
     s = np.sqrt(eigs)
-    sort_indices = np.argsort(s)
+    sort_indices = np.argsort(s)[::-1] #Sort from greatest to least
+    # Sort singular values
     s = s[sort_indices]
+    # Sort eigenvectors the same way
     evecs = evecs[:,sort_indices]
-    if r is not None:
-        if r > len(s):
-            raise ValueError("r is too big")
+    if k is not None:
+        if k > len(s):
+            raise ValueError("k is too large")
         else:
-            s = s[:r]
+            # Keep only the largest k singular values
+            s = s[:k] 
+    # Remove all zero singular values
+    s = s[s>tol]
 
-    V = np.empty((n,len(s)))
-    for i in xrange(len(evecs)):
-        V[:,i] = evecs[:,i]
+    #calculate V
+    V = evecs[:,:len(s)]
 
+    #calculate U
     U = np.empty((m,len(s)))
     for i in xrange(len(s)):
         U[:,i] = (1./s[i])*A.dot(V[:,i])
@@ -108,8 +118,12 @@ def lowest_rank_approx(A,e):
     Ahat - the lowest rank approximation of A with error less than e.
     """
     U,s,Vt = la.svd(A, full_matrices=False)
+    if e<=s[-1]:
+        print "Warning: Matrix cannot be approximated below this error bound"
+        return A
     k = np.where(s<e)[0][0]
-    return svd_approx(A,k)
+    Ahat = U[:,:k].dot(S).dot(Vt[:k,:])
+    return Ahat
     
 # Problem 5
 def compress_image(filename,k):

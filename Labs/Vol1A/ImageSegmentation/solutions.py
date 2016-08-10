@@ -1,5 +1,6 @@
 '''
-Solutions file for Volume 1 Lab 16
+Solutions file for Volume 1 - Image Segmentation
+Edited by Jessica Morrise, 6/2016
 '''
 
 # Remember to include all necessary imports here
@@ -8,7 +9,6 @@ import scipy.sparse as spar
 from scipy import linalg as la
 from scipy.sparse import linalg as sparla
 import matplotlib.pyplot as plt
-from getNeighbors import getNeighbors
 
 def laplacian(A):
     '''
@@ -25,10 +25,29 @@ def laplacian(A):
     D = A.sum(axis=1)
     # calculate the laplacian matrix
     L = np.diag(D) - A
-    # calculate the eigenvalues, sort them
-    e = np.real(la.eig(L, right=False))
+    return L
+
+def n_components(A,tol=1e-8):
+    '''
+    Compute the number of connected components in a graph
+    and its algebraic connectivity, given its adjacency matrix.
+    Inputs:
+        A -- adjacency matrix for undirected weighted graph,
+             shape (n,n)
+        tol -- tolerance value
+    Returns:
+        n_components -- the number of connected components
+        lambda -- the algebraic connectivity
+    '''
+    # calculate the Laplacian
+    L = laplacian(A)
+    # Find the eigenvalues
+    e = np.real(la.eigvals(L))
     e.sort()
-    return L, e[1]
+    # Count the zero eigenvalues
+    e[e<tol] = 0
+    n_components = np.sum(e==0)
+    return n_components, e[1]
 
 def adjacency(img, radius=5.0, sigmaI = .02, sigmaX = 3.0):
     '''
@@ -144,7 +163,7 @@ def segment(img):
     # calculate the eigenvector. Use the eigs function in sparla. 
     # Be sure to set the appropriate keyword argument so that you 
     # compute the two eigenvalues with the smallest real part.
-    e = sparla.eigs(P, k=2, which="SR")
+    e = sparla.eigsh(P, k=2, which="SR")
     eigvec = e[1][:,1]
     
     # create a mask array that is True wherever the eigenvector is positive.
@@ -161,28 +180,3 @@ def segment(img):
     
     # return the two segments (positive first)
     return pos, neg
-    
-def passoff():
-    '''
-    I will run this function to pass you off. It calls your
-    other functions to generate and plot the segments
-    of the image dream.png.
-    '''
-    print 'in passoff'
-    # import the image dream.png, then convert it to grayscale
-    img_color = plt.imread('dream.png')
-    img = (img_color[:,:,0]+img_color[:,:,1]+img_color[:,:,2])/3.0
-
-    # now calculate and plot the two segments.
-    print 'segmenting'
-    pos, neg = segment(img)
-    print 'plotting...'
-    # plot the two segments together with the original.
-    plt.subplot(131)
-    plt.imshow(neg)
-    plt.subplot(132)
-    plt.imshow(pos)
-    plt.subplot(133)
-    plt.imshow(img_color)
-    plt.show()
-    plt.clf()

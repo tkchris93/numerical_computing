@@ -117,9 +117,12 @@ The idea of the GMRES algorithm is that instead of solving $A\x = \b$ directly, 
 The algorithm returns when this residual is sufficiently small.
 In good circumstances, this will happen when $n$ is still much less than $m$.
 
-The GMRES algorithm is implemented with the Arnoldi iteration for numerical stability.  The Arnoldi iteration produces $H_n$, an $(n+1)\times n$ upper Hessenberg matrix; and $Q_n$, the matrix containing the basis vectors of $\mathcal{K}_n(A, \b)$.  Since the columns of $Q$ are orthonormal, and $AQ_n = Q_{n+1}H_n$, we can compute the residual equivalently as
+The GMRES algorithm is implemented with the Arnoldi iteration for numerical stability.  
+The Arnoldi iteration produces $H_n$, an $(n+1)\times n$ upper Hessenberg matrix, and $Q_n$, the matrix containing the basis vectors of $\mathcal{K}_n(A, \b)$, such that $AQ_n = Q_{n+1}H_n$.  
+We are looking for $\x_n = Q_n \y_n  + \x_0$ for some $\y_n \in \mathbb{R}^n$ which minimizes the norm of $\b - A\x_n$.
+Since the columns of $Q$ are orthonormal, we can compute the residual equivalently as
 \begin{equation}
-\qquad \|\b - A\x_n\|_2 = \|H_n \y_n - \beta e_1\|_2.
+\qquad \|\b - A\x_n\|_2 = \|Q_{n+1}(\beta e_1 - H_n \y_n)\|_2 = \|H_n \y_n - \beta e_1\|_2.
 \label{eq:GMRES_lstsq1}
 \end{equation}
 
