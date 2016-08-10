@@ -98,6 +98,33 @@ Find the least squares line that relates the height of the players to their weig
 \end{enumerate}
 \end{problem}
 
+\begin{info} % scipy.stats.linregress().
+The least squares problem of fitting a line to a set of points is often called \emph{linear regression}, and the resulting line is called the \emph{linear regression line}.
+SciPy's specialized tool for linear regression is \li{scipy.stats.linregress()}.
+This function takes in an array of $x$-coordinates and a corresponding array of $y$-coordinates, and returns the slope and intercept of the regression line, along with a few other statistical measurements.
+
+For example, the following code produces the figure on the previous page.
+
+\begin{lstlisting}
+>>> import numpy as np
+>>> from scipy.stats import linregress
+
+# Generate some random data close to the line y = .5x - 3.
+>>> x = np.linspace(0, 10, 20)
+>>> y = .5*x -3 + np.random.randn(20)
+
+# Use linregress() to calculate m and b, as well as the correlation
+# coefficient, p-value, and standard error. See the documentation for
+# details on each of these extra return values.
+>>> m, b, rvalue, pvalue, stderr = linregress(x, y)
+
+>>> plt.plot(x, y, 'k*', label="Data Points")
+>>> plt.plot(x, m*x + b, 'b-', lw=2, label="Least Squares Fit")
+>>> plt.legend(loc="upper left")
+>>> plt.show()
+\end{lstlisting}
+\end{info}
+
 % \subsection*{Fitting a Polynomial} % - - - - - - - - - - - - - - - - - - - - -
 
 \subsubsection*{Fitting a Circle} % - - - - - - - - - - - - - - - - - - - - - -
@@ -151,7 +178,8 @@ If the least squares solution is $\widehat{c_1}, \widehat{c_2}$, $\widehat{c_3}$
 \]
 
 As an example, we use least squares to find the circle that best fits the nine points found in Table \ref{table:circlepts}:
-\begin{table}
+
+\begin{table}[H]
 \begin{tabular}{c||c|c|c|c|c|c|c|c|c}
 $x$& 5  &-53 & -45 &  28 & 74 & -51 &  65 & 142 & 120 \\ \hline
 $y$& 11 & 35 & 139 & 170 & -7 &  87 & -24 &  64 & 131 \\
