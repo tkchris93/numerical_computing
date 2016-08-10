@@ -5,6 +5,8 @@
 \objective{The QR decomposition is a fundamentally important matrix factorization.
 It is straightforward to implement, is numerically stable, and provides the basis of several important algorithms.
 In this lab, we explore several ways to produce the QR decomposition and implement a few immediate applications.
+\\ \indent We restrict our discussion to real matrices.
+However, the results and algorithms presented here can be extended to complex matrices by replacing ``transpose'' with ``hermitian conjugate'' and ``symmetric matrix'' with ``hermitian matrix.''
 }
 
 The QR decomposition of a matrix $A$ is a factorization $A=QR$, where $Q$ is  has orthonormal columns and $R$ is upper triangular.
@@ -50,9 +52,6 @@ We distinguish between these two forms by writing $\widehat{Q}$ and $\widehat{R}
 Q\ (m \times m) & R\ (m \times n) & \\
 \end{array}
 \end{align*}
-
-We assume throughout this lab that $A$ contains only real numbers.
-However, the results and algorithms presented here can be extended to complex matrices by replacing ``transpose'' with ``hermitian conjugate'' and ``symmetric matrix'' with ``hermitian matrix.''
 
 \section*{QR via Gram-Schmidt} % ==============================================
 
@@ -408,7 +407,6 @@ Use Algorithm \ref{Alg:QR-via-Householder} to compute the full QR decomposition 
 Consider the following implementation details.
 \begin{itemize}
 
-\item
 \item NumPy's \li{np.sign()} is an easy way to implement the $\sign()$ operation in step \ref{step:HH-sign}.
 However, \li{np.sign(0)} returns $0$, which will cause a problem in the rare case that $u_0 = 0$ (which is possible if the top left entry of $A$ is $0$ to begin with).
 The following code defines a function that returns the sign of a single number, counting $0$ as positive.
