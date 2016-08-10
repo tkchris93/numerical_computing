@@ -243,8 +243,6 @@ def finite_difference(n):
 
     return A, b
 
-# TODO fix this function
-
 def compare_omega():
     # Find an approximation for the optimal omega
     n = 20
@@ -257,30 +255,6 @@ def compare_omega():
         timings.append(after - before)
     plt.plot(np.arange(1,2,.05), timings)
     plt.show()
-
-
-    """
-    timings = []
-    h_values = [.125, .25, .5, 1, 2]
-    dom = np.arange(1,2,.05)
-    for h in h_values:
-        h_timings = []
-        A,b = finite_difference(h)
-        for o in dom:
-            before = time.time()
-            sparse_sor(A,b,o,maxiters=10000,tol=10**-2)
-            after = time.time()
-            print o
-            h_timings.append(after-before)
-        timings.append(h_timings)
-
-    timings = np.array(timings)
-    for i in xrange(timings.shape[0]):
-        plt.subplot(1,5,i+1)
-        plt.plot(dom, timings[i,:])
-        plt.title(str(h_values[i]))
-    plt.show()
-    """
 
 # Testing solutions file.
 def test_jacobi():
@@ -355,4 +329,4 @@ def test_all():
     return True
 
 if __name__ == "__main__":
-    compare_omega()
+    test_all()
