@@ -47,7 +47,7 @@ from scipy.stats import linregress
 @_save("line_fit_example.pdf")
 def line():
     x = np.linspace(0, 10, 20)
-    y = .5*x -3 + np.random.randn(20)
+    y = .5*x - 3 + np.random.randn(20)
     m, b = linregress(x, y)[:2]
 
     plt.plot(x, y, 'k*', label="Data Points")

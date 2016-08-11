@@ -743,25 +743,12 @@ Many scalar functions from the Python standard library have a corresponding univ
 If you have a simple operation to perform element-wise on an array, check if NumPy has a universal function for it (it probably does).
 See \url{http://docs.scipy.org/doc/numpy/reference/ufuncs.html#available-ufuncs} for a more comprehensive list of universal functions.
 
-\begin{comment} % Unnecessary detail.
-Most universal functions also allow you to specify an output array, which must have the same shape as the input array.
-Doing so can reduce memory allocation.
-
-\begin{lstlisting}
->>> ex7 = np.arange(3, dtype=float)
-
-# Take exp(ex7) and store the result in ex7.
->>> np.exp(ex7, out=ex7)
->>> ex7
-array([ 1.        ,  2.71828183,  7.3890561 ])
-\end{lstlisting}
-
-% Warning? Or just delete it...
+\begin{comment} % Warning? Or just delete it...
 Although universal functions also accept scalar inputs, they can be much slower than the corresponding standard library function.
 Thus, use standard library functions on scalars and universal functions on arrays.
 \end{comment}
 
-\subsection*{Other Array Methods}
+\subsection*{Other Array Methods} % -------------------------------------------
 
 Often the easiest way to compute information is by using methods of the \li{np.ndarray} class on existing arrays.
 

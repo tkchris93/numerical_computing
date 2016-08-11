@@ -82,6 +82,8 @@ The following figure is a typical example of this idea where $\widehat{m} \appro
     \includegraphics[width=.5\textwidth]{figures/line_fit_example.pdf}
 \end{figure}
 
+% TODO: Consider replacing this data set with something with less variance.
+% This data set is also used in the Data Visualization lab.
 \begin{problem} % Linear regression of height vs weight.
 The file \texttt{MLB.npy} contains measurements from over 1,000 recent Major League Baseball players, compiled by UCLA.\footnote{See \url{http://wiki.stat.ucla.edu/socr/index.php/SOCR_Data_MLB_HeightsWeights}.}
 Each row in the array represents a different player; the columns are the player's height (in inches), weight (in pounds), and age (in years), in that order.
@@ -111,7 +113,7 @@ For example, the following code produces the figure on the previous page.
 
 # Generate some random data close to the line y = .5x - 3.
 >>> x = np.linspace(0, 10, 20)
->>> y = .5*x -3 + np.random.randn(20)
+>>> y = .5*x - 3 + np.random.randn(20)
 
 # Use linregress() to calculate m and b, as well as the correlation
 # coefficient, p-value, and standard error. See the documentation for
@@ -125,7 +127,86 @@ For example, the following code produces the figure on the previous page.
 \end{lstlisting}
 \end{info}
 
-% \subsection*{Fitting a Polynomial} % - - - - - - - - - - - - - - - - - - - - -
+\subsection*{Fitting a Polynomial} % - - - - - - - - - - - - - - - - - - - - -
+
+
+\begin{lstlisting}
+
+# Create a function for the polynomial f(x) = x^2 - 3x + 2.
+>>> f = np.poly1d([1, -3, 2])
+>>> print(f)
+   2
+1 x - 3 x + 2
+
+# Evaluate f one value at a time or several values at a time.
+>>> f(1)
+0
+>>> f(np.array([1, 2, 3, 4]))
+array([0, 0, 2, 6])
+
+\end{lstlisting}
+
+\begin{comment}
+The \li{np.poly1d} object represents a polynomial in NumPy.
+The constructor is called with the coefficients of the desired polynomial.
+
+\begin{lstlisting}
+>>> poly = np.poly1d([3, 5, 1, 2, 0, 1])
+>>> print(poly)
+   5     4     3     2
+3 x + 5 x + 1 x + 2 x + 1
+\end{lstlisting}
+
+The object \li{poly} represents the polynomial $3x^5+5x^4+x^3+2x^2+1$.
+NumPy provides many functions to operate on \li{poly1d} objects (see \url{http://docs.scipy.org/doc/numpy/reference/routines.polynomials.polynomial.html}).
+
+Recall that
+\[
+e^x = \sum_{n=0}^{\infty} \frac{x^n}{n!}.
+\]
+The following function evaluates the $n^{th}$ partial sum of this series at the value $a$.
+
+\begin{lstlisting}
+>>> from scipy.misc import factorial
+>>> def exp(a, n = 25):
+...     """Construct an array in reverse order from n to 0."""
+...     integers = np.arange(n, -1, -1)
+...     # Use broadcasting to compute coefficients
+...     coefficients = 1. / factorial(integers)
+...     poly = np.poly1d(coefficients) # make polynomial object
+...     return poly(a)
+...
+\end{lstlisting}
+
+The last two lines can be condensed by using the following command:
+
+\begin{lstlisting}
+np.polyval(p, a)
+\end{lstlisting}
+
+\begin{problem}
+\leavevmode
+\begin{enumerate}
+\item Use NumPy's polynomial objects to approximate the following series.
+\[
+\arcsin x = \sum_{n=0}^{\infty} \frac{\left[2 n\right] ! x^{2 n + 1}}{\left[2 n + 1\right]\left[n!\right]^2 4^n}
+\]
+This series converges on $(-1, 1)$. Use your series approximation to approximate $\pi$. Hint: think of the powers of $x$ that
+are not included in the series as having zero coefficients.
+
+\item The lambert W function is the inverse of $x e^x$.
+Its Taylor series is below (note the index starts at 1).
+\[
+W(x) = \sum_{n=1}^{\infty} \frac{\left[-n\right]^{n-1} x^n}{n!}
+\]
+This series has a radius of convergence of $\frac{1}{e}$.
+Use the series to approximate a number $x$ such that $x e^x = \frac{1}{4}$.
+Verify that your approximation is close.
+\end{enumerate}
+\end{problem}
+\end{comment}
+
+
 
 \subsubsection*{Fitting a Circle} % - - - - - - - - - - - - - - - - - - - - - -
 
