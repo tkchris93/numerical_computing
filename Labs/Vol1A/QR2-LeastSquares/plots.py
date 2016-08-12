@@ -48,10 +48,10 @@ from scipy.stats import linregress
 def line():
     x = np.linspace(0, 10, 20)
     y = .5*x - 3 + np.random.randn(20)
-    m, b = linregress(x, y)[:2]
+    a, b = linregress(x, y)[:2]
 
     plt.plot(x, y, 'k*', label="Data Points")
-    plt.plot(x, m*x + b, 'b-', lw=2, label="Least Squares Fit")
+    plt.plot(x, a*x + b, 'b-', lw=2, label="Least Squares Fit")
     plt.legend(loc="upper left")
 
 # =============================================================================

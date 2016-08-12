@@ -66,13 +66,12 @@ def polynomial_fit():
     domain = np.linspace(x.min(), x.max(), 200)
 
     for i,n in enumerate([3, 5, 7, 19]):
-        p_n = np.poly1d(np.polyfit(x, y, deg=n))
-        # Or use la.lstsq():
-        # p_n = np.poly1d(la.lstsq(np.vander(x, n+1), y)[0])
+        coeffs = la.lstsq(np.vander(x, n+1), y)[0]
+        # coeffs = np.polyfit(x, y, deg=n)
 
         plt.subplot(2,2,i+1)
         plt.plot(x, y, 'k*')
-        plt.plot(domain, p_n(domain), 'b-', lw=2)
+        plt.plot(domain, np.polyval(coeffs, domain), 'b-', lw=2)
         plt.title(r"$n = {}$".format(n))
         plt.axis([-6,6,-3,3])
 

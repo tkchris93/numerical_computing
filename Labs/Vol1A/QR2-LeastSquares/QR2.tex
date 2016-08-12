@@ -45,28 +45,26 @@ In addition, you may use \li{la.solve_triangular()}, SciPy's optimized routine f
 \label{prob:lstsq-via-qr}
 \end{problem}
 
-\subsection*{Using Least Squares to Fit Curves to Data} % ---------------------
+\subsection*{Fitting a Line} % ------------------------------------------------
 
 The least squares solution can be used to find the best-fit curve of a chosen type to a set of points.
-This is perhaps the most common application of least squares.
-
-\subsubsection*{Fitting a Line} % - - - - - - - - - - - - - - - - - - - - - - -
-
-Consider the problem of finding the line $y = mx + b$ that best fits a set of $n$ points $\{(x_k, y_k)\}_{k=1}^n$.
-Ideally, we seek $m$ and $b$ such that $y_k = mx_k + b$ for all $k$.
+Consider the problem of finding the line $y = ax + b$ that best fits a set of $m$ points $\{(x_k, y_k)\}_{k=1}^m$.
+Ideally, we seek $a$ and $b$ such that $y_k = ax_k + b$ for all $k$.
 The following linear system simultaneously represents all of these equations.
 %
 \begin{equation}
+A\x =
 \left[\begin{array}{cc}
 x_1 & 1 \\
 x_2 & 1 \\
 x_3 & 1 \\
 \vdots & \vdots \\
-x_n & 1
+x_m & 1
 \end{array}\right]
-\left[\begin{array}{c} m \\ b \end{array}\right]
+\left[\begin{array}{c} a \\ b \end{array}\right]
 =
-\left[\begin{array}{c} y_1 \\ y_2 \\ y_3 \\ \vdots \\ y_n \end{array}\right]
+\left[\begin{array}{c} y_1 \\ y_2 \\ y_3 \\ \vdots \\ y_m \end{array}\right]
+= \b
 \label{eq:linear-least-squares}
 \end{equation}
 %
@@ -74,12 +72,14 @@ Note that $A$ has rank $2$ as long as not all of the $x_k$ values are the same.
 
 Because this system has two unknowns, it is guaranteed to have a solution if it has two or fewer equations.
 However, if there are more that two data points, the system is overdetermined if any set of three points are not collinear.
-We therefore seek a least squares solution, which in this case means finding the slope $\widehat{m}$ and $y$-intercept $\widehat{b}$ such that the line $y = \widehat{m}x+\widehat{b}$ best fits the data.
+We therefore seek a least squares solution, which in this case means finding the slope $\widehat{a}$ and $y$-intercept $\widehat{b}$ such that the line $y = \widehat{a}x+\widehat{b}$ best fits the data.
 
-The following figure is a typical example of this idea where $\widehat{m} \approx \frac{1}{2}$ and $\widehat{b} \approx -3$.
+Figure \ref{fig:line-fit-example} is a typical example of this idea where $\widehat{a} \approx \frac{1}{2}$ and $\widehat{b} \approx -3$.
 
 \begin{figure}[H] % Linear regression example (without code).
-    \includegraphics[width=.5\textwidth]{figures/line_fit_example.pdf}
+    \includegraphics[width=.59\textwidth]{figures/line_fit_example.pdf}
+    \caption{}
+    \label{fig:line-fit-example}
 \end{figure}
 
 % TODO: Consider replacing this data set with something with less variance.
@@ -96,7 +96,7 @@ Find the least squares line that relates the height of the players to their weig
     \item Use your function from Problem \ref{prob:lstsq-via-qr} to find the least squares solution.
     \item Plot the data points as a scatter plot.
     \item Plot the least squares line with the scatter plot.\\
-    (Hint: Make a new domain of $x$ values with \li{np.linspace()}, and use this domain to calculate $y = \widehat{m}x + \widehat{b}$.)
+    (Hint: Make a new domain of $x$ values with \li{np.linspace()}, and use this domain to calculate $y = \widehat{a}x + \widehat{b}$.)
 \end{enumerate}
 \end{problem}
 
@@ -105,7 +105,7 @@ The least squares problem of fitting a line to a set of points is often called \
 SciPy's specialized tool for linear regression is \li{scipy.stats.linregress()}.
 This function takes in an array of $x$-coordinates and a corresponding array of $y$-coordinates, and returns the slope and intercept of the regression line, along with a few other statistical measurements.
 
-For example, the following code produces the figure on the previous page.
+For example, the following code produces Figure \ref{fig:line-fit-example}.
 
 \begin{lstlisting}
 >>> import numpy as np
@@ -118,97 +118,165 @@ For example, the following code produces the figure on the previous page.
 # Use linregress() to calculate m and b, as well as the correlation
 # coefficient, p-value, and standard error. See the documentation for
 # details on each of these extra return values.
->>> m, b, rvalue, pvalue, stderr = linregress(x, y)
+>>> a, b, rvalue, pvalue, stderr = linregress(x, y)
 
 >>> plt.plot(x, y, 'k*', label="Data Points")
->>> plt.plot(x, m*x + b, 'b-', lw=2, label="Least Squares Fit")
+>>> plt.plot(x, a*x + b, 'b-', lw=2, label="Least Squares Fit")
 >>> plt.legend(loc="upper left")
 >>> plt.show()
 \end{lstlisting}
 \end{info}
 
-\subsection*{Fitting a Polynomial} % - - - - - - - - - - - - - - - - - - - - -
+\subsection*{Fitting a Polynomial} % ------------------------------------------
 
+Least squares can also be used to fit a set of data to the best-fit polynomial of a specified degree.
+Let $\{(x_k, y_k)\}_{k=1}^m$ be the set of $m$ data points in question.
+The general form for a polynomial of degree $n$ is as follows:
+\[
+p_n(x) = c_n x^n + c_{n-1} x^{n-1} + \cdots + c_2 x^2 + c_1 x + c_0
+\]
+Note that the polynomial is completely determined by its $n+1$ coefficients $\{c_k\}_{k=0}^n$.
+Ideally, then, we seek the set of coefficients $\{c_k\}_{k=0}^n$ such that
+\[
+y_k = c_n x_k^n + c_{n-1} x_k^{n-1} + \cdots + c_2 x_k^2 + c_1 x_k + c_0
+\]
+for all values of $k$.
+These $m$ linear equations yield the following linear system:
+\begin{equation}
+A\x =
+\left[\begin{array}{cccccc}
+x_1^n & x_1^{n-1} & \cdots & x_1^2 & x_1 & 1 \\
+x_2^n & x_2^{n-1} & \cdots & x_2^2 & x_2 & 1 \\
+x_3^n & x_3^{n-1} & \cdots & x_3^2 & x_3 & 1 \\
+\vdots & \vdots & & \vdots & \vdots & \vdots \\
+x_m^n & x_m^{n-1} & \cdots & x_m^2 & x_m & 1 \\
+\end{array}\right]
+\left[\begin{array}{c}
+c_n \\ c_{n-1} \\ \vdots \\ c_2 \\ c_1 \\ c_0
+\end{array}\right]
+=
+\left[\begin{array}{c} y_1 \\ y_2 \\ y_3 \\ \vdots \\ y_m \end{array}\right]
+= \b
+\label{eq:polynomial-least-squares}
+\end{equation}
+%
+If $m > n+1$ this system is overdetermined, requiring a least squares solution.
+
+\subsubsection*{Working with Polynomials in NumPy} % - - - - - - - - - - - - -
+
+The $m \times (n+1)$ matrix $A$ of Equation \ref{eq:polynomial-least-squares} is called a \emph{Vandermonde matrix}.%
+\footnote{Vandermonde matrices have many special properties and are useful for many applications, including polynomial interpolation and discrete Fourier analysis.}
+% a matrix with entries $a_{ij} = x_i^{n-j+1}$.
+NumPy's \li{np.vander()} is a convenient tool for quickly constructing a Vandermonde matrix, given the values $\{x_k\}_{k=1}^m$ and the number of desired columns.
 
 \begin{lstlisting}
+>>> print(np.vander([2, 3, 5], 2))
+[[2 1]
+ [3 1]
+ [5 1]]
 
-# Create a function for the polynomial f(x) = x^2 - 3x + 2.
+>>> print(np.vander([2, 3, 5, 4], 3))
+[[ 4  2  1]
+ [ 9  3  1]
+ [25  5  1]
+ [16  4  1]]
+\end{lstlisting}
+
+NumPy also has powerful tools for working efficiently with polynomials.
+The class \li{np.poly1d} represents a 1-dimensional polynomial.
+Instances of this class are callable like a function.%
+\footnote{Class instances can be made callable by implementing the \li{__call__()} magic method.}
+The constructor accepts the polynomial's coefficients, from largest degree to smallest.
+
+Table \ref{table:numpy-poly1d} lists the attributes and methods of the \li{np.poly1d} class.
+See \url{http://docs.scipy.org/doc/numpy/reference/routines.polynomials.html} for a list of NumPy's polynomial routines.
+
+\begin{table}[H]
+\begin{tabular}{r|l}
+    Attribute & Description \\
+    \hline
+    coeffs & The $n+1$ coefficients, from greatest degree to least. \\
+    order & The polynomial degree ($n$). \\
+    roots & The $n-1$ roots. \\
+    \\
+    Method & Returns \\
+    \hline
+    deriv() & The coefficients of the polynomial after being differentiated. \\
+    integ() & The coefficients of the polynomial after being integrated (with $c_0 = 0$).
+\end{tabular}
+\caption{Attributes and methods of the \li{np.poly1d} class.}
+\label{table:numpy-poly1d}
+\end{table}
+%
+\begin{lstlisting}
+# Create a function for the polynomial f(x) = (x-1)(x-2) = x^2 - 3x + 2.
+>>> f = lambda x: x**2 - 3*x + 2
+>>> f(np.array([1, 2, 3, 4]))
+array([0, 0, 2, 6])
+
+# Use NumPy to create an equivalent callable polynomial object.
 >>> f = np.poly1d([1, -3, 2])
 >>> print(f)
    2
 1 x - 3 x + 2
-
-# Evaluate f one value at a time or several values at a time.
->>> f(1)
-0
->>> f(np.array([1, 2, 3, 4]))
+>>> f([1, 2, 3, 4]))
 array([0, 0, 2, 6])
 
+# Evaluate f(x) at 1, 2, 3, and 4, without creating f(x) explicitly.
+>>> np.polyval([1, -3, 2], [1, 2, 3, 4])
+array([0, 0, 2, 6])
 \end{lstlisting}
 
-\begin{comment}
-The \li{np.poly1d} object represents a polynomial in NumPy.
-The constructor is called with the coefficients of the desired polynomial.
+\begin{problem} % Polynomial fitting.
+The file \texttt{polynomial.npy} contains an array of $20$ $(x,y)$ coordinate pairs.
+Each row of the array is a different coordinate pair, with $x$ values in the first column and $y$ values in the second.
+
+Write a function that uses Equation \ref{eq:polynomial-least-squares} to calculate the polynomials of degree $3$, $5$, $7$, and $19$ that best fit the data.
+Plot the original data points and each least squares polynomial together in individual subplots.\\
+(Hint: set the window limits to be the same on each subplot to get an accurate picture of what's happening with the degree $19$ polynomial).
+
+Instead of using Problem \ref{prob:lstsq-via-qr} to solve the normal equation, you may use \li{scipy.linalg.lstsq()}, demonstrated below.
 
 \begin{lstlisting}
->>> poly = np.poly1d([3, 5, 1, 2, 0, 1])
->>> print(poly)
-   5     4     3     2
-3 x + 5 x + 1 x + 2 x + 1
+>>> from scipy import linalg as la
+
+# Define A and b appropriately.
+
+# Solve the normal equation using SciPy's least squares routine.
+# The least squares solution is the first of four return values.
+>>> x = la.lstsq(A, b)[0]
 \end{lstlisting}
 
-The object \li{poly} represents the polynomial $3x^5+5x^4+x^3+2x^2+1$.
-NumPy provides many functions to operate on \li{poly1d} objects (see \url{http://docs.scipy.org/doc/numpy/reference/routines.polynomials.polynomial.html}).
-
-Recall that
-\[
-e^x = \sum_{n=0}^{\infty} \frac{x^n}{n!}.
-\]
-The following function evaluates the $n^{th}$ partial sum of this series at the value $a$.
-
-\begin{lstlisting}
->>> from scipy.misc import factorial
->>> def exp(a, n = 25):
-...     """Construct an array in reverse order from n to 0."""
-...     integers = np.arange(n, -1, -1)
-...     # Use broadcasting to compute coefficients
-...     coefficients = 1. / factorial(integers)
-...     poly = np.poly1d(coefficients) # make polynomial object
-...     return poly(a)
-...
-\end{lstlisting}
-
-The last two lines can be condensed by using the following command:
-
-\begin{lstlisting}
-np.polyval(p, a)
-\end{lstlisting}
-
-\begin{problem}
-\leavevmode
-\begin{enumerate}
-\item Use NumPy's polynomial objects to approximate the following series.
-\[
-\arcsin x = \sum_{n=0}^{\infty} \frac{\left[2 n\right] ! x^{2 n + 1}}{\left[2 n + 1\right]\left[n!\right]^2 4^n}
-\]
-This series converges on $(-1, 1)$. Use your series approximation to approximate $\pi$. Hint: think of the powers of $x$ that
-are not included in the series as having zero coefficients.
-
-\item The lambert W function is the inverse of $x e^x$.
-Its Taylor series is below (note the index starts at 1).
-\[
-W(x) = \sum_{n=1}^{\infty} \frac{\left[-n\right]^{n-1} x^n}{n!}
-\]
-This series has a radius of convergence of $\frac{1}{e}$.
-Use the series to approximate a number $x$ such that $x e^x = \frac{1}{4}$.
-Verify that your approximation is close.
-\end{enumerate}
+\label{prob:polynomial-least-squares}
 \end{problem}
+
+\begin{warn} % Overfitting
+Problem \ref{prob:polynomial-least-squares} demonstrates that having more parameters in a least squares model is not always better.
+The polynomial of degree 19 actually \emph{interpolates} the data set, meaning that $p_{19}(x_k) = y_k$ exactly for each $k$, because there are enough unknowns that the system is no longer overdetermined.
+
+Using too many unknowns in a fitting problem is called \emph{overfitting}, and is an important issue to avoid in any statistical model.
+\end{warn}
+
+\begin{comment} % This just gives them a little too much example code . . .
+\begin{info} % np.polyfit()
+The fastest way to do least squares polynomial fitting with NumPy is with \li{np.polyfit()}.
+This function receives an array of $x$ values, an array of $y$ values, and an integer for the polynomial degree; uses \li{np.vander()} to construct Equation \ref{eq:polynomial-least-squares}; and returns the coefficients of the best-fit polynomial, which can then be used with \li{np.poly1d()} or \li{np.polyval()}.%
+\footnote{You may use \li{np.polyfit()} for Problem 3 if you're feeling lazy.}
+
+\begin{lstlisting}
+>>> x = np.linspace(-2, 4, 20)
+>>> y = x**2 - 3*x + 1 + np.random.randn(20)
+
+>>> coeffs = np.polyfit(x, y, deg=2)
+>>> domain = np.linspace(-2, 4, 200)
+>>> plt.plot(x, y, 'k*')
+>>> plt.plot(domain, np.polyval(coeffs, domain), lw=2)
+>>> plt.show()
+\end{lstlisting}
+\end{info}
 \end{comment}
 
-
-
-\subsubsection*{Fitting a Circle} % - - - - - - - - - - - - - - - - - - - - - -
+\subsection*{Fitting a Circle} % ----------------------------------------------
 
 Now suppose we wish to fit a general circle to a data set $\{(x_k, y_k)\}_{k=1}^n$
 Recall that the equation of a circle with radius $r$ and center $(c_1,c_2)$ is
@@ -317,7 +385,7 @@ The resulting image is Figure \ref{fig:circle}.
 \begin{comment}
 \begin{problem}
 Write a function \li{fitCircle} that does the following.
-Load the \texttt{circlepts} array from \texttt{data.npz}.
+Load the data in \texttt{circle.npy}.
 This consists of two columns corresponding to the $x$ and $y$ values of a given
 data set.
 Use least squares to find the center and radius of the circle that best
@@ -330,7 +398,7 @@ The function should return nothing.
 \begin{problem}
 \leavevmode
 \begin{enumerate}
-\item Load the \texttt{ellipsepts} array from \texttt{data.npz}
+\item Load the data in \texttt{ellipse.npy}.
 This array has two columns corresponding to the $x$ and $y$ coordinates of some data points.
 \item Use least squares to fit an ellipse to the data.
 The general equation for an ellipse is
@@ -347,25 +415,21 @@ Code for visualizing your best-fit ellipse is given below
 Note this bit of code plots the curve and not the data points.
 
 \begin{lstlisting}
-    """Plots an ellipse of the form ax^2 + bx + cxy + dy + ey^2 = 1
+def plot_ellipse(a, b, c, d, e):
+    """Plot (and show) an ellipse of the form ax^2 + bx + cxy + dy + ey^2 = 1.
 
-    Input:
-      X (array) - x-coordinates of all the data points.
-      Y (array) - y-coordinates of all the data points.
-      a,b,c,d,e (float) - the coefficients from the equation of an
-                    ellipse of the form ax^2 + bx + cxy + dy + ey^2 = 1.
+    Parameters:
+        a, b, c, d, e (floats): Coefficients from the equation of an ellipse
+                                of the form ax^2 + bx + cxy + dy + ey^2 = 1.
     """
-    def get_r(a, b, c, d, e):
-        theta = np.linspace(0,2*np.pi,200)
-        A = a*(np.cos(theta)**2) + c*np.cos(theta)*np.sin(theta) + e*(np.sin(theta)**2)
-        B = b*np.cos(theta) + d*np.sin(theta)
-        r = (-B + np.sqrt(B**2 + 4*A))/(2*A)
-        return r, theta
+    theta = np.linspace(0, 2*np.pi, 200)
+    cos_t, sin_t = np.cos(theta), np.sin(theta)
+    A = a*(cos_t**2) + c*cos_t*sin_t + e*(sin_t**2)
+    B = b*cos_t + d*sin_t
+    r = (-B + np.sqrt(B**2 + 4*A))/(2*A)
 
-    r,theta = get_r(a,b,c,d,e)
-    plt.plot(r*np.cos(theta), r*np.sin(theta), color = "r")
-    plt.plot(X,Y,".", color = "b")
-    plt.axes().set_aspect('equal', 'datalim')
+    plt.plot(r*cos_t, r*sin_t)
+    plt.gca().set_aspect("equal", "datalim")
     plt.show()
 \end{lstlisting}
 
@@ -390,7 +454,6 @@ Thus, it is impossible to write an algorithm that will exactly find the eigenval
 This is a significant result.
 It means that we must find eigenvalues with \emph{iterative methods}, methods that generate sequences of approximate values converging to the true value.
 
-% TODO: Decide whether or not to move this to Additional Material.
 \subsection*{The Power Method} % ----------------------------------------------
 
 There are many iterative methods for finding eigenvalues.
