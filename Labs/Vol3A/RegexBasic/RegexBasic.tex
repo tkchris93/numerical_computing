@@ -19,7 +19,7 @@ The general idea is that a regular expression represents a large set of strings 
 % TODO talk w. ryan about what they'll know at this point about DFSMs
 
 \begin{warn} %TODO why doesn't this work?
-Regular expression libraries have been implemented and are a part of the standard distribution of nearly every programming language, and many text editors have a find-and-replace mode that uses regular expressions. 
+Regular expression libraries have been implemented and are a part of the standard distribution of nearly every programming language, and many text editors have a find-and-replace mode that uses regular expressions.
 Unfortunately, the syntax for regular expressions may be slightly different in each implementation.
 There is no universal standard for all regular expressions across all platforms.
 However, the orginal syntax and a few variants are very widespread, so the basic regular expression techniques we learn in this lab should be virtually the same in almost every situation you will encounter them.
@@ -508,6 +508,7 @@ Modify your definition of \li{identifier_pattern_string} from the previous probl
 %     err*r(), and
 %     sleep()()
 
+\begin{comment}
 \begin{problem}
 A \emph{valid python parameter definition} is defined as the concatenation of the following strings:
 \begin{itemize}
@@ -520,6 +521,8 @@ Define a variable \li{parameter_pattern_string} that defines a regular expressio
 
 For example, each element of \li{["max=4.2", "string= ''", "num_guesses", "msg ='\\\\'", "volume_fn=_CALC_VOLUME"]} is a valid python parameter definition, while each element of \li{["300", "no spaces", "is_4=(value==4)", "pattern = r'^one|two fish$'", 'string="these last two are actually valid in python, but they should not be matched by your pattern"']} is not. % TODO add more negative examples maybe?
 \end{problem}
+\end{comment}
+
 
 \begin{comment}
 \begin{problem*}
@@ -593,6 +596,33 @@ For reference, I used about ten lines to define \li{function_pattern_string} and
 \label{prob:match_function_definition}
 \end{problem*}
 \end{comment}
+
+
+
+
+
+\section*{Cleaning Dirty Data with Regular Expressions}
+A common consensus among data scientists is that the majority of your time will be spent cleaning data. Throughout the remainder of this volume, you will have multiple opportunities to practice cleaning data.
+
+Often times, cleaning data is as simple as changing the format of your data or filling missing values. However, with text-based data, additional work is often necessary. Using regular expressions to clean text-based data is often a good option.
+
+\begin{problem}
+The provided file \li{contacts.txt} contains poorly formatted contact data for 5000 (fictitious) individuals. This dataset contains birthdays, email addresses, and phone numbers for the individuals.
+
+You will notice that much of this data is missing. To make things more complicated, the format of the data isn't consistent. For example, some birthdays are in the format \li{1/1/99}, some in the format \li{01/01/1999}, and some in the format \li{1/1/1999}. The formatting for phone numbers is not consistent either. Some phone numbers are of the form \li{(123)456-7890} while others are of the form \li{123-456-7890}.
+
+Using regular expressions, create a Python dictionary where the key is the name of the individual and the value is a dictionary of data. For example, the resulting dictionary should look something like this:
+\begin{lstlisting}
+{"John Doe":{"bday":"1/1/1990",
+             "email":"john_doe90@gmail.com",
+             "phone":"(123)456-7890"}}
+\end{lstlisting}
+
+\end{problem}
+
+\newpage
+
+\section*{Additional Material}
 
 \section*{Regular Expressions in the Unix Shell}
 As we have seen thusfar, regular expressions are very useful when we want to match patterns. Regular expressions can be used when matching patterns in the Unix Shell. Though there are many Unix commands that take advantage of regular expressions, we will focus on \li{grep} and \li{awk}.
