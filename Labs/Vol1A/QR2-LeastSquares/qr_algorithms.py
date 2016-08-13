@@ -1,4 +1,4 @@
-# qr_algorithms.py
+# qr_applications.py
 """Volume 1: QR 2 (Least Squares and Eigenvalues)
 <Name>
 <Class>
