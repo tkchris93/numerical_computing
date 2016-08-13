@@ -56,13 +56,13 @@ def line_fit():
 
 
 def polynomial_fit():
-    """Load the data from polynomial_pts.npy. Use least squares to calculate
+    """Load the data from polynomial.npy. Use least squares to calculate
     the polynomials of degree 3, 5, 7, and 19 that best fit the data.
 
     Plot the original data points and each least squares polynomial together
     in individual subplots.
     """
-    x, y = np.load("polynomial_pts.npy").T
+    x, y = np.load("polynomial.npy").T
     domain = np.linspace(x.min(), x.max(), 200)
 
     for i,n in enumerate([3, 5, 7, 19]):
@@ -72,6 +72,7 @@ def polynomial_fit():
         plt.subplot(2,2,i+1)
         plt.plot(x, y, 'k*')
         plt.plot(domain, np.polyval(coeffs, domain), 'b-', lw=2)
+        plt.plot(domain, 2*np.sin(domain), 'k--')
         plt.title(r"$n = {}$".format(n))
         plt.axis([-6,6,-3,3])
 
@@ -97,12 +98,12 @@ def plot_ellipse(a, b, c, d, e):
 
 # Problem 3
 def ellipse_fit():
-    """Load the data from ellipse_pts.npy. Use least squares to calculate the
+    """Load the data from ellipse.npy. Use least squares to calculate the
     ellipse that best fits the data.
 
     Plot the original data points and the least squares ellipse together.
     """
-    ellipsepts = np.load("ellipse_pts.npy")#'data.npz')['ellipsepts']
+    ellipsepts = np.load("ellipse.npy")#'data.npz')['ellipsepts']
     x_pts = ellipsepts[:,:1]
     y_pts = ellipsepts[:,1:]
     A = np.hstack((x_pts**2, x_pts, x_pts*y_pts, y_pts, y_pts**2))
@@ -181,7 +182,7 @@ from matplotlib.animation import FuncAnimation
 
 def polynomial_fit_animation():
 
-    x, y = np.load("polynomial_pts.npy").T
+    x, y = np.load("polynomial.npy").T
     domain = np.linspace(x.min(), x.max(), 200)
     y_vals = np.array([np.poly1d(np.polyfit(x, y, deg=n))(domain)
                                                     for n in xrange(20)])

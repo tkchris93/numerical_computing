@@ -68,7 +68,7 @@ x_m & 1
 \label{eq:linear-least-squares}
 \end{equation}
 %
-Note that $A$ has rank $2$ as long as not all of the $x_k$ values are the same.
+Note that $A$ has full column rank as long as not all of the $x_k$ values are the same.
 
 Because this system has two unknowns, it is guaranteed to have a solution if it has two or fewer equations.
 However, if there are more that two data points, the system is overdetermined if any set of three points are not collinear.
@@ -209,33 +209,32 @@ See \url{http://docs.scipy.org/doc/numpy/reference/routines.polynomials.html} fo
 \end{table}
 %
 \begin{lstlisting}
-# Create a function for the polynomial f(x) = (x-1)(x-2) = x^2 - 3x + 2.
->>> f = lambda x: x**2 - 3*x + 2
->>> f(np.array([1, 2, 3, 4]))
-array([0, 0, 2, 6])
-
-# Use NumPy to create an equivalent callable polynomial object.
+# Create a callable object for the polynomial f(x) = (x-1)(x-2) = x^2 - 3x + 2.
 >>> f = np.poly1d([1, -3, 2])
 >>> print(f)
    2
 1 x - 3 x + 2
->>> f([1, 2, 3, 4]))
+
+# Evaluate f(x) for several values of x in a single function call.
+>>> f([1, 2, 3, 4])
 array([0, 0, 2, 6])
 
-# Evaluate f(x) at 1, 2, 3, and 4, without creating f(x) explicitly.
+# Evaluate f(x) at 1, 2, 3, and 4 without creating f(x) explicitly.
 >>> np.polyval([1, -3, 2], [1, 2, 3, 4])
 array([0, 0, 2, 6])
 \end{lstlisting}
 
 \begin{problem} % Polynomial fitting.
 The file \texttt{polynomial.npy} contains an array of $20$ $(x,y)$ coordinate pairs.
-Each row of the array is a different coordinate pair, with $x$ values in the first column and $y$ values in the second.
+Each row of the array is a different coordinate pair, with $x$ values in the first column and $y$ values in the second column.
 
 Write a function that uses Equation \ref{eq:polynomial-least-squares} to calculate the polynomials of degree $3$, $5$, $7$, and $19$ that best fit the data.
 Plot the original data points and each least squares polynomial together in individual subplots.\\
 (Hint: set the window limits to be the same on each subplot to get an accurate picture of what's happening with the degree $19$ polynomial).
 
 Instead of using Problem \ref{prob:lstsq-via-qr} to solve the normal equation, you may use \li{scipy.linalg.lstsq()}, demonstrated below.
+% Compare your results to \li{np.polyfit()}.
+% This function receives arrays of $x$ and $y$ values and an integer for the degree, and returns the coefficients of the best-fit polynomial of that degree.
 
 \begin{lstlisting}
 >>> from scipy import linalg as la
@@ -246,6 +245,9 @@ Instead of using Problem \ref{prob:lstsq-via-qr} to solve the normal equation, y
 # The least squares solution is the first of four return values.
 >>> x = la.lstsq(A, b)[0]
 \end{lstlisting}
+
+Compare your results to \li{np.polyfit()}.
+This function receives an array of $x$ values, an array of $y$ values, and an integer for the polynomial degree, and returns the coefficients of the best-fit polynomial of that degree.
 
 \label{prob:polynomial-least-squares}
 \end{problem}
@@ -278,12 +280,24 @@ This function receives an array of $x$ values, an array of $y$ values, and an in
 
 \subsection*{Fitting a Circle} % ----------------------------------------------
 
-Now suppose we wish to fit a general circle to a data set $\{(x_k, y_k)\}_{k=1}^n$
-Recall that the equation of a circle with radius $r$ and center $(c_1,c_2)$ is
+As a final example, consider a set of $m$ points $\{(x_k, y_k)\}_{k=1}^m$ that are arranged in a nearly circular pattern.
+The equation of a circle with radius $r$ and center $(c_1,c_2)$ is as follows:
 \begin{equation}
-\label{circle}
 (x-c_1)^2 + (y-c_2)^2 = r^2.
+\label{eq:standard-circle}
 \end{equation}
+
+The circle is completely determined by $r$, $c_1$, and $c_2$, so these are the parameters that should be the in $\x$ of the least squares formulation of the problem.
+However, Equation \ref{eq:standard-circle} is not linear in any of these variables.
+We can do a trick to make this equation linear: create a new variable $c_3$ defined by $c_3 = r^2-c_1^2-c_2^2$.
+Expanding and rearranging Equation \ref{eq:standard-circle} gives the following:
+
+\begin{align*}
+(x-c_1)^2 + (y-c_2)^2 &= r^2 \\
+x^2 - 2c_1x + c_1^2 + y^2 - 2c_2x + c_2^2 &= r^2 \\
+x^2 + y^2 & = 2c_1x + 2c_2y + r^2 - c_1^2 - c_2^2 \\
+x^2 + y^2 & = 2c_1x + 2c_2 y + c_3
+\end{align*}
 
 After expanding and rearranging this equation, we get
 \begin{equation*}
@@ -291,10 +305,7 @@ After expanding and rearranging this equation, we get
 2c_1x + 2c_2y + r^2 - c_1^2 - c_2^2 = x^2 + y^2.
 \end{equation*}
 
-To find $c_1$, $c_2$, and $r$ with least squares, we need \emph{linear} equations.
-The equation above is not linear because of the $r^2$, $c_1^2$, and $c_2^2$ terms
 Note that it is acceptable to have the $x^2$ and $y^2$ terms because the variables in this equation are $r$, $c_1$, and $c_2$, not $x$ and $y$.
-We can do a trick to make this equation linear: create a new variable $c_3$ defined by $c_3 = r^2-c_1^2-c_2^2$.
 
 For a general data point $(x_k, y_k)$, we get the linear equation
 \begin{equation*}
@@ -302,24 +313,22 @@ For a general data point $(x_k, y_k)$, we get the linear equation
 \end{equation*}
 Thus, we can find the best-fit circle from the least squares solution to the matrix equation
 
-\begin{equation}\label{equ:circle_fit}
-\begin{pmatrix}
-2 x_1 & 2 y_1 & 1\\
-2 x_2 & 2 y_2 & 1\\
+\begin{equation}
+\left[\begin{array}{ccc}
+2 x_1 & 2 y_1 & 1 \\
+2 x_2 & 2 y_2 & 1 \\
 \vdots & \vdots & \vdots \\
 2 x_n & 2 y_n & 1
-\end{pmatrix}
-\begin{pmatrix}
-c_1\\
-c_2\\
-c_3
-\end{pmatrix}=
-\begin{pmatrix}
-x_1^2 + y_1^2\\
-x_2^2 + y_2^2\\
-\vdots\\
+\end{array}\right]
+\left[\begin{array}{c} c_1 \\ c_2 \\ c_3 \end{array}\right]
+=
+\left[\begin{array}{c}
+x_1^2 + y_1^2 \\
+x_2^2 + y_2^2 \\
+\vdots \\
 x_n^2 + y_n^2
-\end{pmatrix}.
+\end{array}\right]
+\label{eq:circle-least-squares}
 \end{equation}
 If the least squares solution is $\widehat{c_1}, \widehat{c_2}$, $\widehat{c_3}$, then the best-fit circle is
 \[
@@ -377,7 +386,7 @@ The resulting image is Figure \ref{fig:circle}.
 \end{lstlisting}
 
 \begin{figure}[H]
-    \includegraphics[width=\textwidth]{figures/circle.pdf}
+    \includegraphics[width=.7\textwidth]{figures/circle.pdf}
     \caption{The graph of some data and its best-fit circle.}
     \label{fig:circle}
 \end{figure}
