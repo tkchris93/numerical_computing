@@ -252,7 +252,7 @@ PyWavelets, a Python library for Wavelet Analysis.
 It provides convenient and efficient methods to calculate the one- and two-dimensional discrete Wavelet
 transform, as well as much more.
 
-If you have the Anaconda distribution, then you can install PyWavelets simply from your command prompt with the command:
+If you have the Anaconda distribution, then you can install PyWavelets simply with the command:
 \begin{lstlisting}
 $ conda install -c ioos pywavelets=0.4.0
 \end{lstlisting}
@@ -317,7 +317,7 @@ rather than just one.
 More specifically, if the two-dimensional array $X$ is the input to the filterbank, we obtain arrays $LL$, $LH$, $HL$, and $HH$,
 where $LL$ is a smoothed approximation of $X$ and the other three arrays contain wavelet coefficients capturing high-frequency
 oscillations in vertical, horizontal, and diagonal directions.
-In the parlance of signal processing, the arrays $LL$, $LH$, $HL$, and $HH$ are called \emph{subbands}.
+In the jargon of signal processing, the arrays $LL$, $LH$, $HL$, and $HH$ are called \emph{subbands}.
 By recursively feeding any or all of the subbands back into the filterbank, we can decompose an input array into a collection
 of many subbands.
 This decomposition can be represented schematically by a dyadic partition of a rectangle, called a \emph{subband pattern}.
@@ -395,7 +395,13 @@ Plot these subbands as follows:
 >>> plt.imshow(np.abs(lw[1][2]), cmap=plt.cm.Greys_r, interpolation='none')
 >>> plt.show()
 \end{lstlisting}
-Compare this with the subbands (of a different image) shown in Figure \ref{fig:dwt2D}.
+
+\begin{problem}
+Plot the subbands of the file \li{swan_lake_polluted.png} as described above.
+Compare this with the subbands the mandrill image shown in Figure \ref{fig:dwt2D}.
+\end{problem}
+
+\subsection*{Image Processing}
 
 \section*{Image Compression}
 We now turn to the topic of image compression.
