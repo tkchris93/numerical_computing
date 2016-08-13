@@ -55,6 +55,7 @@ def line_fit():
     plt.show()
 
 
+# Problem 3
 def polynomial_fit():
     """Load the data from polynomial.npy. Use least squares to calculate
     the polynomials of degree 3, 5, 7, and 19 that best fit the data.
@@ -62,13 +63,17 @@ def polynomial_fit():
     Plot the original data points and each least squares polynomial together
     in individual subplots.
     """
+    # Load the data and define a more refined domain for plotting.
     x, y = np.load("polynomial.npy").T
     domain = np.linspace(x.min(), x.max(), 200)
 
     for i,n in enumerate([3, 5, 7, 19]):
+
+        # Use least squares to compute the coefficients of the polynomial.
         coeffs = la.lstsq(np.vander(x, n+1), y)[0]
         # coeffs = np.polyfit(x, y, deg=n)
 
+        # Plot the polynomial and the data points in an individual subplot.
         plt.subplot(2,2,i+1)
         plt.plot(x, y, 'k*')
         plt.plot(domain, np.polyval(coeffs, domain), 'b-', lw=2)
@@ -81,40 +86,38 @@ def polynomial_fit():
 
 
 def plot_ellipse(a, b, c, d, e):
-    """Plot (and show) an ellipse of the form ax^2 + bx + cxy + dy + ey^2 = 1.
-
-    Parameters:
-        a, b, c, d, e (floats): Coefficients from the equation of an ellipse
-                                of the form ax^2 + bx + cxy + dy + ey^2 = 1.
-    """
+    """Plot an ellipse of the form ax^2 + bx + cxy + dy + ey^2 = 1."""
     theta = np.linspace(0, 2*np.pi, 200)
     cos_t, sin_t = np.cos(theta), np.sin(theta)
     A = a*(cos_t**2) + c*cos_t*sin_t + e*(sin_t**2)
     B = b*cos_t + d*sin_t
     r = (-B + np.sqrt(B**2 + 4*A))/(2*A)
 
-    plt.plot(r*cos_t, r*sin_t)
+    plt.plot(r*cos_t, r*sin_t, lw=2)
     plt.gca().set_aspect("equal", "datalim")
-    plt.show()
 
-# Problem 3
+# Problem 4
 def ellipse_fit():
     """Load the data from ellipse.npy. Use least squares to calculate the
     ellipse that best fits the data.
 
     Plot the original data points and the least squares ellipse together.
     """
-    ellipsepts = np.load("ellipse.npy")#'data.npz')['ellipsepts']
-    x_pts = ellipsepts[:,:1]
-    y_pts = ellipsepts[:,1:]
-    A = np.hstack((x_pts**2, x_pts, x_pts*y_pts, y_pts, y_pts**2))
-    b = np.vstack((np.ones(len(ellipsepts))))
-    a, b, c, d, e = la.lstsq(A,b)[0]
-    plt.plot(x_pts, y_pts, 'k*')
+    # Load the data and construct the matrix A and the vector b.
+    x, y = np.load("ellipse.npy").T
+    A = np.column_stack((x**2, x, x*y, y, y**2))
+    b = np.ones_like(x)
+
+    # Use least squares to calculate the ellipse parameters.
+    a, b, c, d, e = la.lstsq(A, b)[0]
+
+    # Plot the results.
+    plt.plot(x, y, 'k*')
     plot_ellipse(a, b, c, d, e)
+    plt.show()
 
 
-# Problem 4
+# Problem 5
 def power_method(A, tol):
     """Compute the dominant eigenvalue of A and its corresponding eigenvector.
 
@@ -145,7 +148,7 @@ def power_method(A, tol):
     eigenvalue = np.inner(np.dot(A,eigenvector),eigenvector)/la.norm(eigenvector)
     return eigenvalue, eigenvector
 
-# Problem 5
+# Problem 6
 def QR_algorithm(A, niter, tol):
     """Return the eigenvalues of A using the QR algorithm."""
     H = la.hessenberg(A)
