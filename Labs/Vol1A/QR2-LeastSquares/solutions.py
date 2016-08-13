@@ -79,6 +79,7 @@ def polynomial_fit():
     plt.suptitle("Solution to Problem 3")
     plt.show()
 
+
 def plot_ellipse(a, b, c, d, e):
     """Plot (and show) an ellipse of the form ax^2 + bx + cxy + dy + ey^2 = 1.
 

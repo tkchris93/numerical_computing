@@ -135,7 +135,7 @@ The general form for a polynomial of degree $n$ is as follows:
 \[
 p_n(x) = c_n x^n + c_{n-1} x^{n-1} + \cdots + c_2 x^2 + c_1 x + c_0
 \]
-Note that the polynomial is completely determined by its $n+1$ coefficients $\{c_k\}_{k=0}^n$.
+Note that the polynomial is uniquely determined by its $n+1$ coefficients $\{c_k\}_{k=0}^n$.
 Ideally, then, we seek the set of coefficients $\{c_k\}_{k=0}^n$ such that
 \[
 y_k = c_n x_k^n + c_{n-1} x_k^{n-1} + \cdots + c_2 x_k^2 + c_1 x_k + c_0
@@ -256,69 +256,40 @@ This function receives an array of $x$ values, an array of $y$ values, and an in
 Problem \ref{prob:polynomial-least-squares} demonstrates that having more parameters in a least squares model is not always better.
 The polynomial of degree 19 actually \emph{interpolates} the data set, meaning that $p_{19}(x_k) = y_k$ exactly for each $k$, because there are enough unknowns that the system is no longer overdetermined.
 
-Using too many unknowns in a fitting problem is called \emph{overfitting}, and is an important issue to avoid in any statistical model.
+Choosing to have too many unknowns in a fitting problem is (fittingly) called \emph{overfitting}, and is an important issue to avoid in any statistical model.
 \end{warn}
-
-\begin{comment} % This just gives them a little too much example code . . .
-\begin{info} % np.polyfit()
-The fastest way to do least squares polynomial fitting with NumPy is with \li{np.polyfit()}.
-This function receives an array of $x$ values, an array of $y$ values, and an integer for the polynomial degree; uses \li{np.vander()} to construct Equation \ref{eq:polynomial-least-squares}; and returns the coefficients of the best-fit polynomial, which can then be used with \li{np.poly1d()} or \li{np.polyval()}.%
-\footnote{You may use \li{np.polyfit()} for Problem 3 if you're feeling lazy.}
-
-\begin{lstlisting}
->>> x = np.linspace(-2, 4, 20)
->>> y = x**2 - 3*x + 1 + np.random.randn(20)
-
->>> coeffs = np.polyfit(x, y, deg=2)
->>> domain = np.linspace(-2, 4, 200)
->>> plt.plot(x, y, 'k*')
->>> plt.plot(domain, np.polyval(coeffs, domain), lw=2)
->>> plt.show()
-\end{lstlisting}
-\end{info}
-\end{comment}
 
 \subsection*{Fitting a Circle} % ----------------------------------------------
 
-As a final example, consider a set of $m$ points $\{(x_k, y_k)\}_{k=1}^m$ that are arranged in a nearly circular pattern.
-The equation of a circle with radius $r$ and center $(c_1,c_2)$ is as follows:
+Suppose the set of $m$ points $\{(x_k, y_k)\}_{k=1}^m$ are arranged in a nearly circular pattern.
+The general equation of a circle with radius $r$ and center $(c_1, c_2)$ is as follows:
 \begin{equation}
 (x-c_1)^2 + (y-c_2)^2 = r^2.
 \label{eq:standard-circle}
 \end{equation}
 
-The circle is completely determined by $r$, $c_1$, and $c_2$, so these are the parameters that should be the in $\x$ of the least squares formulation of the problem.
+The circle is uniquely determined  by $r$, $c_1$, and $c_2$, so these are the parameters that should be solved for in a least squares formulation of the problem.
 However, Equation \ref{eq:standard-circle} is not linear in any of these variables.
-We can do a trick to make this equation linear: create a new variable $c_3$ defined by $c_3 = r^2-c_1^2-c_2^2$.
-Expanding and rearranging Equation \ref{eq:standard-circle} gives the following:
+%
+\begin{align}
+\nonumber (x - c_1)^2 + (y - c_2)^2 &= r^2 \\
+\nonumber x^2 - 2c_1 x + c_1^2 + y^2 - 2c_2y + c_2^2 &= r^2 \\
+x^2 + y^2 & = 2c_1 x + 2c_2 y + \textcolor{red}{r^2 - c_1^2 - c_2^2}
+\label{eq:circle-expanded}
+\end{align}
 
-\begin{align*}
-(x-c_1)^2 + (y-c_2)^2 &= r^2 \\
-x^2 - 2c_1x + c_1^2 + y^2 - 2c_2x + c_2^2 &= r^2 \\
-x^2 + y^2 & = 2c_1x + 2c_2y + r^2 - c_1^2 - c_2^2 \\
-x^2 + y^2 & = 2c_1x + 2c_2 y + c_3
-\end{align*}
-
-After expanding and rearranging this equation, we get
-\begin{equation*}
-\label{circle2}
-2c_1x + 2c_2y + r^2 - c_1^2 - c_2^2 = x^2 + y^2.
-\end{equation*}
-
-Note that it is acceptable to have the $x^2$ and $y^2$ terms because the variables in this equation are $r$, $c_1$, and $c_2$, not $x$ and $y$.
-
-For a general data point $(x_k, y_k)$, we get the linear equation
-\begin{equation*}
-2c_1x_k+2c_2y_k+c_3=x_k^2+y_k^2.
-\end{equation*}
-Thus, we can find the best-fit circle from the least squares solution to the matrix equation
+The quadratic terms $x^2$ and $y^2$ are acceptable because the points $\{(x_k, y_k)\}_{k=1}^m$ are given.
+To eliminate the nonlinear terms in the unknown parameters $r$, $c_1$, and $c_2$, define a new variable $c_3 = r^2 - c_1^2 - c_2^2$.
+Then for each point $(x_k, y_k)$, Equation \ref{eq:circle-expanded} becomes the following:
+\[2c_1x_k + 2c_2y_k + \textcolor{red}{c_3} = x_k^2 + y_k^2\]
+These $m$ equations are linear in $c_1$, $c_2$, and $c_3$, and can be written as a linear system.
 
 \begin{equation}
 \left[\begin{array}{ccc}
 2 x_1 & 2 y_1 & 1 \\
 2 x_2 & 2 y_2 & 1 \\
 \vdots & \vdots & \vdots \\
-2 x_n & 2 y_n & 1
+2 x_m & 2 y_m & 1
 \end{array}\right]
 \left[\begin{array}{c} c_1 \\ c_2 \\ c_3 \end{array}\right]
 =
@@ -326,122 +297,59 @@ Thus, we can find the best-fit circle from the least squares solution to the mat
 x_1^2 + y_1^2 \\
 x_2^2 + y_2^2 \\
 \vdots \\
-x_n^2 + y_n^2
+x_m^2 + y_m^2
 \end{array}\right]
 \label{eq:circle-least-squares}
 \end{equation}
-If the least squares solution is $\widehat{c_1}, \widehat{c_2}$, $\widehat{c_3}$, then the best-fit circle is
-\[
-(x-\widehat{c_1})^2 + (y-\widehat{c_2})^2 = \widehat{c_3}+\widehat{c_1}^2+\widehat{c_2}^2.
-\]
 
-As an example, we use least squares to find the circle that best fits the nine points found in Table \ref{table:circlepts}:
-
-\begin{table}[H]
-\begin{tabular}{c||c|c|c|c|c|c|c|c|c}
-$x$& 5  &-53 & -45 &  28 & 74 & -51 &  65 & 142 & 120 \\ \hline
-$y$& 11 & 35 & 139 & 170 & -7 &  87 & -24 &  64 & 131 \\
-\end{tabular}
-\caption{Points used in example of fitting to a circle using least squares.}
-\label{table:circlepts}
-\end{table}
-
-We enter them into Python as a $9\times 2$ array.
+After solving for the least squares solution, $r$ can be recovered with the relation $r = \sqrt{c_1^2 + c_2^2 + c_3}$.
+Finally, plotting a circle is best done with polar coordinates.
+Using the same variables as before, the circle can be represented in polar equations with the following equations:
+\begin{align*}
+x = r\cos(\theta) + c_1 && y = r\sin(\theta) + c_2,
+\end{align*}
+where $\theta \in [0, 2\pi]$.
 
 \begin{lstlisting}
->>> P = np.array([[5,11],[-53,35],[-45,139],[28,170],[74,-7],
-                [-51,87],[65,-24],[142,64],[120,131]])
-\end{lstlisting}
+# Load some data and construct the matrix A and the vector b.
+>>> xk, yk = np.load("circle.npy").T
+>>> A = np.column_stack((2*x, 2*y, np.ones_like(x)))
+>>> b = xk**2 + yk**2
 
-We compute $A$ and $b$ according to Equation \ref{equ:circle_fit}.
-
-\begin{lstlisting}
->>> A = np.hstack((2*P[:,:1], 2*P[:,1:], np.ones((9,1))))
->>> b = P[:,:1]**2 + P[:,1:]**2
-\end{lstlisting}
-
-Then we use SciPy to find the least squares solution.
-
-\begin{lstlisting}
+# Calculate the least squares solution and calculate the radius.
 >>> c1, c2, c3 = la.lstsq(A, b)[0]
-\end{lstlisting}
-
-We can solve for $r$ using the relation $r^2 = c_3+c_1^2+c_2^2$.
-
-\begin{lstlisting}
 >>> r = np.sqrt(c1**2 + c2**2 + c3)
-\end{lstlisting}
 
-A good way to plot a circle is to use polar coordinates.
-Using the same variables as before, the equation for a general circle is $x=r\cos(\theta)+c_1$ and $y=r\sin(\theta)+c_2$.
-With the following code we plot the data points and our best-fit circle using polar coordinates.
-The resulting image is Figure \ref{fig:circle}.
-
-\begin{lstlisting}
-# In the polar equations for a circle, theta goes from 0 to 2*pi.
+# Plot the circle using polar coordinates.
 >>> theta = np.linspace(0, 2*np.pi, 200)
->>> plt.plot(r*np.cos(theta)+c1, r*np.sin(theta)+c2, '-')
->>> plt.plot(P[:,0], P[:,1], '*')
->>> plt.show()
+>>> x = r*np.cos(theta) + c1
+>>> y = r*np.sin(theta) + c2
+>>> plt.plot(x, y, '-', lw=2)
+>>> plt.plot(xk, yk, 'k*')
+>>> plt.axis("equal")
 \end{lstlisting}
-
+%
 \begin{figure}[H]
-    \includegraphics[width=.7\textwidth]{figures/circle.pdf}
-    \caption{The graph of some data and its best-fit circle.}
-    \label{fig:circle}
+    \includegraphics[width=.5\textwidth]{figures/circle_fit_example.pdf}
 \end{figure}
-
-\begin{comment}
+%
 \begin{problem}
-Write a function \li{fitCircle} that does the following.
-Load the data in \texttt{circle.npy}.
-This consists of two columns corresponding to the $x$ and $y$ values of a given
-data set.
-Use least squares to find the center and radius of the circle that best
-fits the data.
-Then plot the data points and the circle on the same graph.
-The function should return nothing.
-\end{problem}
-\end{comment}
-
-\begin{problem}
-\leavevmode
-\begin{enumerate}
-\item Load the data in \texttt{ellipse.npy}.
-This array has two columns corresponding to the $x$ and $y$ coordinates of some data points.
-\item Use least squares to fit an ellipse to the data.
-The general equation for an ellipse is
-\[
-ax^2 + bx + cxy + dy + ey^2 = 1.
-\]
-You should get  $0.087$, $-0.141$,  $0.159$, $-0.316$, $0.366$ for $a, b, c, d,$ and $e$ respectively
-Generate a plot of the resulting curve and the data points used to produce the curve.
-%\item Plot the data and your line on the same graph.
-\end{enumerate}
-
-We can plot our result using polar coordinates as we did when plotting the circle
-Code for visualizing your best-fit ellipse is given below
-Note this bit of code plots the curve and not the data points.
+The general equation for an ellipse is \[ax^2 + bx + cxy + dy + ey^2 = 1.\]
+Write a function that calculates the parameters for the ellipse that best fits the data in the file \texttt{ellipse.npy}.
+Plot the original data points and the ellipse together, using the following function to plot the ellipse.
 
 \begin{lstlisting}
 def plot_ellipse(a, b, c, d, e):
-    """Plot (and show) an ellipse of the form ax^2 + bx + cxy + dy + ey^2 = 1.
-
-    Parameters:
-        a, b, c, d, e (floats): Coefficients from the equation of an ellipse
-                                of the form ax^2 + bx + cxy + dy + ey^2 = 1.
-    """
+    """Plot an ellipse of the form ax^2 + bx + cxy + dy + ey^2 = 1."""
     theta = np.linspace(0, 2*np.pi, 200)
     cos_t, sin_t = np.cos(theta), np.sin(theta)
     A = a*(cos_t**2) + c*cos_t*sin_t + e*(sin_t**2)
     B = b*cos_t + d*sin_t
     r = (-B + np.sqrt(B**2 + 4*A))/(2*A)
 
-    plt.plot(r*cos_t, r*sin_t)
+    plt.plot(r*cos_t, r*sin_t, lw=2)
     plt.gca().set_aspect("equal", "datalim")
-    plt.show()
 \end{lstlisting}
-
 \end{problem}
 
 \section*{Computing Eigenvalues} % ============================================

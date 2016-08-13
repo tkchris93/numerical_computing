@@ -42,6 +42,7 @@ def _save(filename):
 # Figures =====================================================================
 
 import numpy as np
+from scipy import linalg as la
 from scipy.stats import linregress
 
 @_save("line_fit_example.pdf")
@@ -54,10 +55,29 @@ def line():
     plt.plot(x, a*x + b, 'b-', lw=2, label="Least Squares Fit")
     plt.legend(loc="upper left")
 
+@_save("circle_fit_example.pdf")
+def circle():
+    """Load the data from circle.npy. Use least squares to calculate the circle
+    that best fits the data.
+
+    Plot the original data points the least squares circle together.
+    """
+    x, y = np.load("circle.npy").T
+    A = np.column_stack((2*x, 2*y, np.ones_like(x)))
+    b = x**2 + y**2
+    c1, c2, c3 = la.lstsq(A, b)[0]
+    r = np.sqrt(c1**2 + c2**2 + c3)
+
+    theta = np.linspace(0, 2*np.pi, 200)
+    plt.plot(r*np.cos(theta)+c1, r*np.sin(theta)+c2, '-', lw=2)
+    plt.plot(x, y, 'k*')
+    plt.axis("equal")
+
 # =============================================================================
 
 def draw_all():
     line()
+    circle()
 
 if __name__ == "__main__":
     draw_all()
