@@ -16,5 +16,5 @@ def noise_image(filename, noisename):
     image += np.random.normal(0, noiseSigma, size=image.shape)
     plt.imsave(noisename, image, cmap='gray')
 
-# grey_image("swanlake.jpg","swanlake_gray.png")
-# noise_image("swanlake_gray.png","swanlake_polluted.png")
+grey_image("swanlake.jpg","swanlake_gray.jpg")
+noise_image("swanlake_gray.jpg","swanlake_polluted.jpg")
