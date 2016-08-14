@@ -103,7 +103,7 @@ def subbands(filename):
     plt.show()
 
 # Problem 4.
-def dwt2(filename):
+def clean_image(filename):
     """ Clean the high-frequency noise out of the grayscale image contained 
     in filename using the PyWavelets implementation of the 2-D Wavelet 
     Transform.
@@ -114,13 +114,13 @@ def dwt2(filename):
         The cleaned image (as an ndarray).
     """
     image = misc.imread(filename,True)
-    plt.imshow(image, cmap='gray')
-    plt.show()
+    # plt.imshow(image, cmap='gray')  # visualize noisy image
+    # plt.show()
     wavelet = pywt.Wavelet('haar')
     WaveletCoeffs = pywt.wavedec2(image,wavelet)
     new_image = pywt.waverec2(WaveletCoeffs[:-1], wavelet)
-    plt.imshow(new_image, cmap='gray')
-    plt.show()
+    # plt.imshow(new_image, cmap='gray')  # visualize clean image
+    # plt.show()
     return new_image
 
 
