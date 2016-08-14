@@ -354,51 +354,37 @@ def plot_ellipse(a, b, c, d, e):
 
 \section*{Computing Eigenvalues} % ============================================
 
-The eigenvalues of a matrix are the roots of its characteristic polynomial.
-Thus, to find the eigenvalues of an $n \times n$ matrix, we must compute the roots of a degree-$n$ polynomial.
-This is easy for small $n$.
-For example, if $n=2$ the quadratic equation can be used to find the eigenvalues.
-However, Abel's Impossibility Theorem says that no such formula exists for the roots of a polynomial of degree 5 or higher.
-
-% TODO: get rid of this formal statement, as we provide no proof.
-\begin{theorem}[Abel's Impossibility Theorem]
-There is no general algebraic solution for solving a polynomial equation of degree $n\geq5$.
-\label{thm:Abel}
-\end{theorem}
-
-Thus, it is impossible to write an algorithm that will exactly find the eigenvalues of an arbitrary matrix.
-(If we could write such an algorithm, we could also use it to find the roots of polynomials, contradicting Abel's theorem.)
-This is a significant result.
-It means that we must find eigenvalues with \emph{iterative methods}, methods that generate sequences of approximate values converging to the true value.
+The eigenvalues of an $n \times n$ matrix $A$ are the roots of its characteristic polynomial $\det(A - \lambda I)$.
+Thus, finding the eigenvalues of $A$ amounts to computing the roots of a polynomial of degree $n$.
+However, for $n \ge 5$, it is provably impossible to find an algebraic closed-form solution to this problem.%
+\footnote{See Abel's Impossibility Theorem.} % TODO: improve this footnote. Reference to proof in the book or the date when Abel first proved it?
+In addition, numerically computing the roots of a polynomial is a famously ill-conditioned problem, meaning that small changes in the coefficients of the polynomial (brought about by small changes in the entries of $A$) may yield wildly different results.
+Instead, eigenvalues must be computed with iterative methods.
 
 \subsection*{The Power Method} % ----------------------------------------------
 
-There are many iterative methods for finding eigenvalues.
-The power method finds an eigenvector corresponding to the \emph{dominant} eigenvalue of a matrix, if such an eigenvalue exists.
-The dominant eigenvalue of a matrix is the unique eigenvalue of greatest magnitude.
+The \emph{dominant eigenvalue} of the $n \times n$ matrix $A$ is the unique eigenvalue of greatest magnitude, if such an eigenvalue exists.
+The \emph{power method} iteratively computes the dominant eigenvalue of $A$ and its corresponding eigenvector.
 
-To use the power method on a matrix $A$, begin by choosing a vector $\x_0$ such that $\|\x_0\|=1$
-Then recursively define
-\[
-x_{k+1}=\frac{Ax_k}{\norm{Ax_k}}.
-\]
-If
-\begin{itemize}
-\item $A$ has a dominant eigenvalue $\lambda$, and
-\item the projection of $\x_0$ into the subspace spanned by the eigenvectors corresponding to $\lambda$ is nonzero,
-\end{itemize}
-then the vectors $\x_0, \x_1, \x_2, \ldots$ will converge to an eigenvector of $A$ corresponding to $\lambda$.
-(See [TODO: ref textbook] for a proof when $A$ is semisimple, or [TODO: ref something else] for a proof in the general case.)
+Begin by choosing a vector $\x_0$ such that $\|\x_0\|=1$, and define the following:
+\[\x_{k+1}=\frac{A\x_k}{\|A\x_k\|}\]
+If $A$ has a dominant eigenvalue $\lambda$, and if the projection of $\x_0$ onto the subspace spanned by the eigenvectors corresponding to $\lambda$ is nonzero, then the sequence of vectors $\x_0, \x_1, \x_2, \ldots$ converges
+% \footnote{Reference proof in the text}
+to an eigenvector $\x$ of $A$ corresponding to $\lambda$.
 
-If all entries of $A$ are positive, then $A$ will always have a dominant eigenvalue (see [TODO: ref something!] for a proof).
-There is no way to guarantee that the second condition is met, but if we choose $\x_0$ randomly, it will almost always satisfy this condition.
+Since $\x$ is an eigenvector of $A$, $A\x = \lambda \x$.
+Left multiplying by $\x\trp$ on each side gives $\x\trp A\x = \lambda \x\trp\x$, and hence $\lambda = \frac{\x\trp A\x}{\x\trp\x}$.
+This ratio is called the \emph{Rayleigh quotient}.
 
-Once you know that $\x$ is an eigenvector of $A$, the corresponding eigenvalue is equal to the \emph{Rayleigh quotient}
-\[
-\lambda = \frac{\langle Ax, x \rangle}{\|\x\|^2}.
-\]
+% If all entries of $A$ are positive, then $A$ will always have a dominant eigenvalue.%\footnote{Proof?}
+% There is no way to guarantee that the second condition is met, but if we choose $\x_0$ randomly, it will almost always satisfy this condition.
+% WHUT??
+
+% TODO: Algorithm box for the Power Method.
 
 \begin{problem} % Implement the power method.
+% Write a function that accepts an $n \times n$ matrix $A$, an error tolerance, and a number of maximum iterations.
+% Use Algorithm \ref{} to compute the dominant eigenvalue and a corresponding eigenvector.
 Write a function that implements the power method to compute an eigenvector
 Your function should
 \begin{enumerate}
@@ -406,8 +392,8 @@ Your function should
 \item Start with a random vector.
 \item Use the 2-norm wherever a norm is needed (use \li{la.norm()}).
 \item Repeat the power method until the vector changes by less than the tolerance
-In mathematical notation, you are defining $x_0, x_1, \ldots x_k$, and your function should stop when $\|x_{k+1}-x_k\| < \text{tol}$.
-\item Return the found eigenvector and the corresponding eigenvalue (use \li{np.inner()}).
+In mathematical notation, you are defining $x_0, x_1, \ldots x_k$, and your function should stop when $\|x_{k+1}-x_k\|$ is less than the tolerance.
+\item Return the found eigenvector and the corresponding eigenvalue.
 \end{enumerate}
 Test your function on positive matrices.
 \end{problem}

@@ -118,7 +118,7 @@ def ellipse_fit():
 
 
 # Problem 5
-def power_method(A, tol):
+def power_method(A, tol=1e-12, max_iters=20):
     """Compute the dominant eigenvalue of A and its corresponding eigenvector.
 
     Inputs:
@@ -129,24 +129,22 @@ def power_method(A, tol):
         eigval (foat): The dominant eigenvalue of A.
         eigvec ((n, ) ndarray): The eigenvector corresponding to 'eigval'.
     """
-    size = A.shape[0]
-    random_vector = []
-    for i in xrange(size):
-        random_vector.append(np.random.randint(10))
-    norm = la.norm(random_vector)
-    random_vector = np.array(random_vector, dtype = np.float)
-    random_vector /= norm
+    # Choose a random x_0 with norm 1.
+    x = np.random.random(A.shape[0])
+    x /= la.norm(x)
 
-    while True:
-        product = np.dot(A,random_vector)
-        new_vector = product / la.norm(product)
-        if (la.norm(new_vector - random_vector) < tol):
+    for _ in xrange(max_iters):
+        # x_{k+1} = Ax_k / ||Ax_k||
+        w = np.dot(A, x)
+        x_new = w / la.norm(w)
+        # Check for convergence.
+        if la.norm(x_new - x) < tol:
             break
-        random_vector = new_vector
+        x = x_new
 
-    eigenvector = random_vector
-    eigenvalue = np.inner(np.dot(A,eigenvector),eigenvector)/la.norm(eigenvector)
-    return eigenvalue, eigenvector
+    eigval = np.dot(np.conj(x), np.dot(A,x)) / np.dot(np.conj(x),x)
+    return eigval, x
+
 
 # Problem 6
 def QR_algorithm(A, niter, tol):
@@ -180,6 +178,34 @@ def QR_algorithm(A, niter, tol):
         i+=1
     return eigenvalues
 
+'''
+def qralg(T, shift=True):
+    """Run the QR algorithm on the real tridiagonal matrix 'T'."""
+
+    Tnew = np.array(T, dtype=np.float64, copy=True)
+    m,n = Tnew.shape
+    errs = [T[-1,-1]]
+    if m == 1:
+        return Tnew, errs
+
+    while abs(Tnew[-1,-2]) > 1e-12:
+        if shift:
+            a, b = Tnew[-1,-1], Tnew[-1,-2]
+            d = (Tnew[-2,-2] - a)/2.
+            s = np.sign(d)
+            if s == 0: s = 1
+            mu = a - s*b**2/(np.abs(d) + np.sqrt(d**2 + b**2))
+            Mu = np.eye(m)*mu
+            Q,R = la.qr(Tnew - Mu)
+            Tnew = R.dot(Q) + Mu
+        else:
+            Q,R = la.qr(Tnew)
+            Tnew = R.dot(Q)
+        Tnew = _perfect_symmetry(Tnew)
+        errs.append(Tnew[-1,-2])
+
+    return Tnew, errs
+'''
 
 # Additional Material
 from matplotlib.animation import FuncAnimation
