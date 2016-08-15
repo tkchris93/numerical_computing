@@ -251,7 +251,12 @@ Having implemented our own version of the basic 1-dimensional wavelet transform,
 PyWavelets, a Python library for Wavelet Analysis.
 It provides convenient and efficient methods to calculate the one- and two-dimensional discrete Wavelet
 transform, as well as much more.
-Assuming that the package has been installed on your machine, type the following to get started:
+
+If you have the Anaconda distribution, then you can install PyWavelets simply with the command:
+\begin{lstlisting}
+$ conda install -c ioos pywavelets=0.4.0
+\end{lstlisting}
+Once the package has been installed on your machine, type the following to get started:
 \begin{lstlisting}
 >>> import pywt
 \end{lstlisting}
@@ -312,7 +317,7 @@ rather than just one.
 More specifically, if the two-dimensional array $X$ is the input to the filterbank, we obtain arrays $LL$, $LH$, $HL$, and $HH$,
 where $LL$ is a smoothed approximation of $X$ and the other three arrays contain wavelet coefficients capturing high-frequency
 oscillations in vertical, horizontal, and diagonal directions.
-In the parlance of signal processing, the arrays $LL$, $LH$, $HL$, and $HH$ are called \emph{subbands}.
+In the jargon of signal processing, the arrays $LL$, $LH$, $HL$, and $HH$ are called \emph{subbands}.
 By recursively feeding any or all of the subbands back into the filterbank, we can decompose an input array into a collection
 of many subbands.
 This decomposition can be represented schematically by a dyadic partition of a rectangle, called a \emph{subband pattern}.
@@ -370,7 +375,7 @@ This is the key fact for wavelet-based image compression.
 PyWavelets provides a simple way to calculate the subbands resulting from one pass through the filterbank.
 \begin{lstlisting}
 >>> from scipy.misc import imread
->>> fingerprint = imread('finger.pgm')
+>>> fingerprint = imread(filename, True)  # flag True produces a grayscale image
 >>> # use the db4 wavelet with periodic extension
 >>> lw = pywt.dwt2(fingerprint, 'db4', mode='per')
 \end{lstlisting}
@@ -390,9 +395,34 @@ Plot these subbands as follows:
 >>> plt.imshow(np.abs(lw[1][2]), cmap=plt.cm.Greys_r, interpolation='none')
 >>> plt.show()
 \end{lstlisting}
-Compare this with the subbands (of a different image) shown in Figure \ref{fig:dwt2D}.
 
-\section*{Image Compression}
+\begin{problem}
+Plot the subbands of the file \li{swan_lake_polluted.png} as described above.
+Compare this with the subbands the mandrill image shown in Figure \ref{fig:dwt2D}.
+\end{problem}
+
+\section*{Image Processing}
+We are now ready to use the two-dimensional wavelet transform for image processing.
+Wavelets are especially good at filtering out high-frequency noise from an image.
+Just as we were able to pinpoint the noise added to the sin wave in Figure \ref{fig:dwt1D}, the majority of the noise added to an image will be contained in the final $LH$, $HL$, and $HH$ detail subbands of our wavelet decomposition.
+If we decompose our image and reconstruct it with all subbands except these final subbands, we will eliminate most of the troublesome noise while preserving the primary aspects of the image.
+
+We perform this cleaning as follows:
+\begin{lstlisting}
+image = imread(filename,True)
+wavelet = pywt.Wavelet('haar')
+WaveletCoeffs = pywt.wavedec2(image,wavelet)
+new_image = pywt.waverec2(WaveletCoeffs[:-1], wavelet)
+\end{lstlisting}
+
+\begin{problem}
+Write a function called \li{clean-image()} which accepts the name of a grayscale image file, and cleans high-frequency noise out of the image.
+Load the image as an ndarray, and perform a wavelet decomposition using PyWavelets. 
+Reconstruct the image using all subbands except the last set of detail coefficients, and return this cleaned image as an ndarray.
+\end{problem}
+
+\section*{Additional Material}
+\subsection*{Image Compression}
 We now turn to the topic of image compression.
 Numerous image compression techniques
 have been developed over the years to reduce the cost of storing large quantities of images.
@@ -406,16 +436,12 @@ take the wavelet approach.
 The general framework for compression is fairly straightforward. First,
 the image to be compressed undergoes some form of preprocessing,
 depending on the particular application.
-Next, the discrete wavelet transform is used to calculate
-the wavelet coefficients, and these are then \textit{quantized},
+Next, the discrete wavelet transform is used to calculate the wavelet coefficients, and these are then \textit{quantized},
 i.e. mapped to a set of discrete values (for example, rounding to the nearest integer).
-The quantized coefficients are
-then passed through an entropy encoder (such as Huffman Encoding), which reduces
-the number of bits required to store the coefficients.
-What remains is a compact stream of bits
-that can then be saved or transmitted much more efficiently than the
-original image. All of the above steps are invertible, allowing us to
-reconstruct the image from the compressed bitstream. See Diagram
+The quantized coefficients are then passed through an entropy encoder (such as Huffman Encoding), which reduces the number of bits required to store the coefficients.
+What remains is a compact stream of bits that can then be saved or transmitted much more efficiently than the original image. 
+The steps above are nearly all invertible (the only exception being rounding), allowing us to almost perfectly reconstruct the image from the compressed bitstream. 
+See Diagram
 \ref{tikz:wsqscheme}.
 
 \begin{figure}
