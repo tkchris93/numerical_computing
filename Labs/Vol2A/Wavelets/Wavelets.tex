@@ -307,10 +307,10 @@ Different wavelets have different properties; the most suitable wavelet is depen
 See Figure \ref{fig:more_wavelets} for the plots of a couple of additional wavelets.
 \begin{figure}[H]
 \begin{subfigure}[b]{0.45\textwidth}
-    \includegraphics[width=\textwidth]{mexicanHat}
+    \includegraphics[width=\textwidth]{figures/mexicanHat}
 \end{subfigure}
 \begin{subfigure}[b]{0.45\textwidth}
-    \includegraphics[width=\textwidth]{db5_3}
+    \includegraphics[width=\textwidth]{figures/db5_3}
 \end{subfigure}
 \caption{Examples of different mother wavelets.}
 \label{fig:more_wavelets}
@@ -355,19 +355,19 @@ The subband pattern for one pass of the filterbank is shown in Figure \ref{fig:2
 % the Mandrill image used to compute these images is found at http://homepages.cae.wisc.edu/~ece533/images/ (baboon.png)
 \centering
         \begin{subfigure}{0.4\textwidth}\centering
-                    \includegraphics[width=\linewidth]{mandrill1.png}
+                    \includegraphics[width=\linewidth]{figures/mandrill1.png}
        \end{subfigure}%
 %    \hfill
         \begin{subfigure}{0.4\textwidth}\centering
-                    \includegraphics[width=\linewidth]{mandrill2.png}
+                    \includegraphics[width=\linewidth]{figures/mandrill2.png}
        \end{subfigure}%
     \hfill
         \begin{subfigure}{0.4\textwidth}\centering
-                    \includegraphics[width=\linewidth]{mandrill3.png}
+                    \includegraphics[width=\linewidth]{figures/mandrill3.png}
        \end{subfigure}%
  %   \hfill
         \begin{subfigure}{0.4\textwidth}\centering
-                    \includegraphics[width=\linewidth]{mandrill4.png}
+                    \includegraphics[width=\linewidth]{figures/mandrill4.png}
        \end{subfigure}
     \caption{Subbands for the Mandrill image after one pass through the filterbank.
     Note how the upper left subband ($LL$) is an approximation of the original Mandrill image, while the other
@@ -547,19 +547,19 @@ in the input image, and store this number in the class attribute \li{_pixels}.
 \centering
 \begin{subfigure}{.32\textwidth}
   \centering
-  \includegraphics[width=.7\linewidth]{uncompressed_finger.png}
+  \includegraphics[width=.7\linewidth]{figures/uncompressed_finger.png}
   \caption{Uncompressed}
   \label{fig:sub1}
 \end{subfigure}%
 \begin{subfigure}{.32\textwidth}
   \centering
-  \includegraphics[width=.7\linewidth]{compressed_finger(30comp).png}
+  \includegraphics[width=.7\linewidth]{figures/compressed_finger(30comp).png}
   \caption{12:1 compressed}
   \label{fig:sub1}
 \end{subfigure}%
 \begin{subfigure}{.32\textwidth}
   \centering
-  \includegraphics[width=.7\linewidth]{compressed_finger(60comp).png}
+  \includegraphics[width=.7\linewidth]{figures/compressed_finger(60comp).png}
   \caption{26:1 compressed}
   \label{fig:sub2}
 \end{subfigure}
@@ -1680,15 +1680,15 @@ $W_j := \text{span}\{\psi_{j,k}\}_{k \in \mathbb{Z}}$. This fact justifies
 our hope to approximate and analyze functions using wavelets.
 \begin{figure}[t]
 \minipage{0.32\textwidth}
-    \includegraphics[width=\linewidth]{sinecurve}
+    \includegraphics[width=\linewidth]{figures/sinecurve}
     \caption{$f(x) = \sin (x)$}
 \endminipage\hfill
 \minipage{0.32\textwidth}
-    \includegraphics[width=\linewidth]{discreteSineCurve.pdf}
+    \includegraphics[width=\linewidth]{figures/discreteSineCurve.pdf}
     \caption{$f_4$}
 \endminipage\hfill
 \minipage{0.32\textwidth}
-    \includegraphics[width=\linewidth]{sineCurveDetail}
+    \includegraphics[width=\linewidth]{figures/sineCurveDetail}
     \caption{$d_4$}
 \endminipage
 \end{figure}
@@ -1734,7 +1734,7 @@ transform in many applications. See Figure \ref{fig:dwt1D} for an example of the
 
 \begin{figure}[H]
 \centering
-\includegraphics[width = 0.5\textwidth]{dwt1D}
+\includegraphics[width = 0.5\textwidth]{figures/dwt1D}
 \caption{A level 4 wavelet decomposition of a signal. The top panel is the original signal,
 the next panel down is the approximation, and the remaining panels are the detail coefficients.
 Notice how the approximation resembles a smoothed version of the original signal, while the
@@ -1907,12 +1907,12 @@ focus on reducing a particular type of random noise in images, called
 
 \begin{figure}[t]
 \minipage{0.49\textwidth}
-    \includegraphics[width=\linewidth]{phantom_random.pdf}
+    \includegraphics[width=\linewidth]{figures/phantom_random.pdf}
     \caption{The Phantom image with incoherent noise}
     \label{fig:incoherent}
 \endminipage\hfill
 \minipage{0.49\textwidth}
-    \includegraphics[width=\linewidth]{phantom_coherent.pdf}
+    \includegraphics[width=\linewidth]{figures/phantom_coherent.pdf}
     \caption{The Phantom image with coherent noise}
     \label{fig:coherent}
 \endminipage
@@ -1977,7 +1977,7 @@ right, but this goes beyond the scope of this lab, and so we will
 assume that we already have a decent estimate of the variance.
 
 \begin{figure}[t]
-    \includegraphics[width=\linewidth]{denoise.pdf}
+    \includegraphics[width=\linewidth]{figures/denoise.pdf}
     \caption{Noisy Lena (left), denoised using hard thresholding (center),
     and denoised using soft thresholding (right).}
     \label{fig:denoise}
