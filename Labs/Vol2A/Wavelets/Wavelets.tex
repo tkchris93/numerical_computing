@@ -1,11 +1,11 @@
 \lab{Introduction to Wavelets}{Intro to Wavelets}
-
 \objective{In the context of Fourier analysis, one seeks to represent a function as a sum of sinusoids.
 A drawback to this approach is that the Fourier transform only captures global frequency information, and local information is lost; we can know which frequencies are the most prevalent, but not when or where they occur.
 The Wavelet transform provides an alternative approach that avoids this shortcoming and is often a superior analysis technique for many types of signals and images.
 }
 
-\subsection*{The Discrete Wavelet Transform}
+\section*{The Discrete Wavelet Transform} % ===================================
+
 In wavelet analysis, we seek to analyze a function by considering its \emph{wavelet decomposition}.
 The wavelet decomposition of a function is a way of expressing the function as a linear combination
 of a particular family of basis functions.
@@ -20,12 +20,10 @@ of basis functions. In Wavelet analysis, we determine the family of basis functi
 off with a function $\psi$ called the \emph{wavelet} and a function $\phi$ called the \emph{scaling function}
 (these functions are also called the mother and father wavelets, respectively). We then generate
 countably many basis functions (sometimes called baby wavelets) from these two functions:
-\begin{equation*}
-\psi_{m,k}(x) = \psi(2^mx - k)
-\end{equation*}
-\begin{equation*}
-\phi_{m,k}(x) = \phi(2^mx - k),
-\end{equation*}
+\begin{align*}
+\psi_{m,k}(x) &= \psi(2^mx - k)\\
+\phi_{m,k}(x) &= \phi(2^mx - k),
+\end{align*}
 where $m,k \in \mathbb{Z}$.
 The historically first, and most basic, wavelet is called the \emph{Haar Wavelet},
 given by
@@ -182,25 +180,18 @@ The main body of your function should be a loop in which you calculate two array
 and detail coefficients. Append the detail coefficients array to your list, and feed the approximation array
 back into the loop. When the loop is finished, append the approximation array. Finally, reverse the order of your list
 to adhere to the required return format.
-\end{problem}
+
 Test your function by calculating the Haar wavelet coefficients of a noisy sine signal for $n=4$:
+
 \begin{lstlisting}
 >>> domain = np.linspace(0,4*np.pi, 1024)
 >>> noise =  np.random.randn(1024)*.1
 >>> noisysin = np.sin(domain) + noise
 >>> coeffs = dwt(noisysin, L, H, 4)
 \end{lstlisting}
-Plot your results and verify that they match the plots in Figure \ref{fig:dwt1D}.
 
-\begin{figure}
-\centering
-\includegraphics[width = 0.5\textwidth]{dwt1D}
-\caption{A level 4 wavelet decomposition of a signal. The top panel is the original signal,
-the next panel down is the approximation, and the remaining panels are the detail coefficients.
-Notice how the approximation resembles a smoothed version of the original signal, while the
-details capture the high-frequency oscillations and noise.}
-\label{fig:dwt1D}
-\end{figure}
+Plot your results and verify that they match the plots in Figure \ref{fig:dwt1D}.
+\end{problem}
 
 We can now transform a one-dimensional signal into its wavelet coefficients,
 but the reverse transformation is just as important.
@@ -217,7 +208,10 @@ Suppose we have the wavelet coefficients $A_n$ and $D_n$. Consulting Figure \ref
 we can recreate $A_{n-1}$ by tracing the schematic backwards: $A_n$ and $D_n$ are first
 \emph{up-sampled}, then they are convolved with $L$ and $H$, respectively, and finally
 added together to obtain $A_{n-1}$. Up-sampling means doubling the length of an array
-by inserting a 0 at every other position. In Python, this whole process looks like:
+by inserting a 0 at every other position.
+
+\newpage
+
 \begin{lstlisting}
 >>> # up-sample the coefficient arrays A, D
 >>> up_A = np.zeros(2*A.size)
@@ -227,12 +221,14 @@ by inserting a 0 at every other position. In Python, this whole process looks li
 >>> # now convolve and add, but discard last entry
 >>> A = fftconvolve(up_A,L)[:-1] + fftconvolve(up_D,H)[:-1]
 \end{lstlisting}
+
 Now that we have $A_{n-1}$, we repeat the process with $A_{n-1}$ and $D_{n-1}$ to obtain
 $A_{n-2}$. Proceed for a total of $n$ steps (one for each $D_n, D_{n-1},\ldots ,D_1$) until we have obtained $A_0$.
 Since $A_0$ is defined to be the original
 signal, we have finished the inverse transformation.
-% proof that this works, perhaps in an appendix...
-\begin{problem}
+% TODO: proof that this works, perhaps in an appendix...
+
+\begin{problem} % Inverse wavelet transform
 Write a function that calculates the inverse wavelet transform as described above.
 The inputs should be a list of arrays (of the same form as the output of your discrete
 wavelet transform function), the low-pass filter, and the high-pass filter.
@@ -246,45 +242,58 @@ the discrete wavelet transform of a random array for different values of $n$, th
 transform.
 Compare the original signal with the recovered signal using \li{np.allclose}.
 \end{problem}
-\section*{The PyWavelets Module}
+
+\section*{The PyWavelets Module} % ============================================
+
 Having implemented our own version of the basic 1-dimensional wavelet transform, we now turn to
 PyWavelets, a Python library for Wavelet Analysis.
 It provides convenient and efficient methods to calculate the one- and two-dimensional discrete Wavelet
 transform, as well as much more.
 
 If you have the Anaconda distribution, then you can install PyWavelets simply with the command:
+
 \begin{lstlisting}
 $ conda install -c ioos pywavelets=0.4.0
 \end{lstlisting}
+
 Once the package has been installed on your machine, type the following to get started:
+
 \begin{lstlisting}
 >>> import pywt
 \end{lstlisting}
+
 Performing the discrete Wavelet transform is very simple.
 Below, we compute the one-dimensional transform for a sinusoidal signal.
+
 \begin{lstlisting}
 >>> import numpy as np
 >>> f = np.sin(np.linspace(0,8*np.pi, 256)) # build the sine wave
 >>> fw = pywt.wavedec(f, 'haar') # compute the wavelet coefficients of f
 \end{lstlisting}
+
 The variable \li{fw} is now a list of arrays, starting with the final approximation
 frame, followed by the various levels of detail coefficients, just like the output
 of the wavelet transform function that you already coded.
 Plot the level 2 detail and verify that it resembles a blocky sinusoid.
+
 \begin{lstlisting}
 >>> from matplotlib import pyplot as plt
 >>> plt.plot(fw[-2], linestyle='steps')
 >>> plt.show()
 \end{lstlisting}
+
 To reconstruct the signal, we simply call the function \li{waverec}:
+
 \begin{lstlisting}
 >>> f_prime = pywt.waverec(fw, 'haar') # reconstruct the signal
 >>> np.allclose(f_prime, f) # compare with the original
 True
 \end{lstlisting}
+
 The second positional argument, as you will notice, is a string that gives the name of the wavelet to be used.
 We first used the Haar wavelet, with which you are already familiar.
 PyWavelets supports a number of different Wavelets, however, which you can list by executing the following code:
+
 \begin{lstlisting}
 >>> # list the available Wavelet families
 >>> print pywt.families()
@@ -292,21 +301,23 @@ PyWavelets supports a number of different Wavelets, however, which you can list 
 >>> # list the available wavelets in the coif family
 >>> print pywt.wavelist('coif')
 ['coif1', 'coif2', 'coif3', 'coif4', 'coif5']
+
 \end{lstlisting}
 Different wavelets have different properties; the most suitable wavelet is dependent on the specific application.
 See Figure \ref{fig:more_wavelets} for the plots of a couple of additional wavelets.
 \begin{figure}[H]
 \begin{subfigure}[b]{0.45\textwidth}
-    \includegraphics[width=\textwidth]{mexicanHat}
+    \includegraphics[width=\textwidth]{figures/mexicanHat}
 \end{subfigure}
 \begin{subfigure}[b]{0.45\textwidth}
-    \includegraphics[width=\textwidth]{db5_3}
+    \includegraphics[width=\textwidth]{figures/db5_3}
 \end{subfigure}
 \caption{Examples of different mother wavelets.}
 \label{fig:more_wavelets}
 \end{figure}
 
-\section*{The 2-dimensional Wavelet Transform}
+\section*{The 2-dimensional Wavelet Transform} % ==============================
+
 We can generalize the wavelet transform for two dimensions much as we generalized the fourier transform.
 This allows us to perform wavelet analysis on, for example, digital images.
 In particular, we can calculate the wavelet transform of a two-dimensional
@@ -344,19 +355,19 @@ The subband pattern for one pass of the filterbank is shown in Figure \ref{fig:2
 % the Mandrill image used to compute these images is found at http://homepages.cae.wisc.edu/~ece533/images/ (baboon.png)
 \centering
         \begin{subfigure}{0.4\textwidth}\centering
-                    \includegraphics[width=\linewidth]{mandrill1.png}
+                    \includegraphics[width=\linewidth]{figures/mandrill1.png}
        \end{subfigure}%
 %    \hfill
         \begin{subfigure}{0.4\textwidth}\centering
-                    \includegraphics[width=\linewidth]{mandrill2.png}
+                    \includegraphics[width=\linewidth]{figures/mandrill2.png}
        \end{subfigure}%
     \hfill
         \begin{subfigure}{0.4\textwidth}\centering
-                    \includegraphics[width=\linewidth]{mandrill3.png}
+                    \includegraphics[width=\linewidth]{figures/mandrill3.png}
        \end{subfigure}%
  %   \hfill
         \begin{subfigure}{0.4\textwidth}\centering
-                    \includegraphics[width=\linewidth]{mandrill4.png}
+                    \includegraphics[width=\linewidth]{figures/mandrill4.png}
        \end{subfigure}
     \caption{Subbands for the Mandrill image after one pass through the filterbank.
     Note how the upper left subband ($LL$) is an approximation of the original Mandrill image, while the other
@@ -416,35 +427,31 @@ new_image = pywt.waverec2(WaveletCoeffs[:-1], wavelet)
 \end{lstlisting}
 
 \begin{problem}
-Write a function called \li{clean-image()} which accepts the name of a grayscale image file, and cleans high-frequency noise out of the image.
-Load the image as an ndarray, and perform a wavelet decomposition using PyWavelets. 
+Write a function called \li{clean_image()} which accepts the name of a grayscale image file, and cleans high-frequency noise out of the image.
+Load the image as an ndarray, and perform a wavelet decomposition using PyWavelets.
 Reconstruct the image using all subbands except the last set of detail coefficients, and return this cleaned image as an ndarray.
 \end{problem}
 
+\newpage
+
 \section*{Additional Material}
-\subsection*{Image Compression}
-We now turn to the topic of image compression.
-Numerous image compression techniques
-have been developed over the years to reduce the cost of storing large quantities of images.
-Transform methods based on Fourier and Wavelet analysis
-have long played an important role in these techniques;
-for example, the popular JPEG image compression standard is based on
-the discrete cosine transform.
-The JPEG2000 compression standard and the FBI Fingerprint Image database, along with other systems,
-take the wavelet approach.
 
-The general framework for compression is fairly straightforward. First,
-the image to be compressed undergoes some form of preprocessing,
+\subsection*{Image Compression} % ---------------------------------------------
+
+Numerous image compression techniques have been developed over the years to reduce the cost of storing large quantities of images.
+Transform methods based on Fourier and Wavelet analysis have long played an important role in these techniques; for example, the popular JPEG image compression standard is based on the discrete cosine transform.
+The JPEG2000 compression standard and the FBI Fingerprint Image database, along with other systems, take the wavelet approach.
+
+The general framework for compression is fairly straightforward.
+First, the image to be compressed undergoes some form of preprocessing,
 depending on the particular application.
-Next, the discrete wavelet transform is used to calculate the wavelet coefficients, and these are then \textit{quantized},
-i.e. mapped to a set of discrete values (for example, rounding to the nearest integer).
+Next, the discrete wavelet transform is used to calculate the wavelet coefficients, and these are then \textit{quantized}, i.e. mapped to a set of discrete values (for example, rounding to the nearest integer).
 The quantized coefficients are then passed through an entropy encoder (such as Huffman Encoding), which reduces the number of bits required to store the coefficients.
-What remains is a compact stream of bits that can then be saved or transmitted much more efficiently than the original image. 
-The steps above are nearly all invertible (the only exception being rounding), allowing us to almost perfectly reconstruct the image from the compressed bitstream. 
-See Diagram
-\ref{tikz:wsqscheme}.
+What remains is a compact stream of bits that can then be saved or transmitted much more efficiently than the original image.
+The steps above are nearly all invertible (the only exception being rounding), allowing us to almost perfectly reconstruct the image from the compressed bitstream.
+See Figure \ref{tikz:wsqscheme}.
 
-\begin{figure}
+\begin{figure}[H]
 \centering
 \begin{tikzpicture}[rect/.style= {draw=none, node distance = 3cm},
 	rect2/.style = {draw, thick, minimum width=3cm, minimum
@@ -474,7 +481,8 @@ See Diagram
 
 \begin{comment}
 
-\subsection*{WSQ: The FBI Fingerprint Image Compression Algorithm}
+\subsection*{WSQ: The FBI Fingerprint Image Compression Algorithm} % ----------
+
 The Wavelet Scalar Quantization (WSQ) algorithm is among the first successful wavelet-based image compression algorithms.
 It solves the problem of storing millions of fingerprint scans efficiently while meeting the law enforcement requirements for high image quality.
 This algorithm is capable of achieving compression ratios in excess of 10-to-1 while retaining excellent image quality;
@@ -527,6 +535,7 @@ class WSQ:
         """
         pass
 \end{lstlisting}
+
 As we go through each step of the compression process throughout the remainder of the lab,
 you will be adding methods and attributes to the class as directed.
 You will also be implementing the \li{compress} method along the way.
@@ -538,19 +547,19 @@ in the input image, and store this number in the class attribute \li{_pixels}.
 \centering
 \begin{subfigure}{.32\textwidth}
   \centering
-  \includegraphics[width=.7\linewidth]{uncompressed_finger.png}
+  \includegraphics[width=.7\linewidth]{figures/uncompressed_finger.png}
   \caption{Uncompressed}
   \label{fig:sub1}
 \end{subfigure}%
 \begin{subfigure}{.32\textwidth}
   \centering
-  \includegraphics[width=.7\linewidth]{compressed_finger(30comp).png}
+  \includegraphics[width=.7\linewidth]{figures/compressed_finger(30comp).png}
   \caption{12:1 compressed}
   \label{fig:sub1}
 \end{subfigure}%
 \begin{subfigure}{.32\textwidth}
   \centering
-  \includegraphics[width=.7\linewidth]{compressed_finger(60comp).png}
+  \includegraphics[width=.7\linewidth]{figures/compressed_finger(60comp).png}
   \caption{26:1 compressed}
   \label{fig:sub2}
 \end{subfigure}
@@ -1671,15 +1680,15 @@ $W_j := \text{span}\{\psi_{j,k}\}_{k \in \mathbb{Z}}$. This fact justifies
 our hope to approximate and analyze functions using wavelets.
 \begin{figure}[t]
 \minipage{0.32\textwidth}
-    \includegraphics[width=\linewidth]{sinecurve}
+    \includegraphics[width=\linewidth]{figures/sinecurve}
     \caption{$f(x) = \sin (x)$}
 \endminipage\hfill
 \minipage{0.32\textwidth}
-    \includegraphics[width=\linewidth]{discreteSineCurve.pdf}
+    \includegraphics[width=\linewidth]{figures/discreteSineCurve.pdf}
     \caption{$f_4$}
 \endminipage\hfill
 \minipage{0.32\textwidth}
-    \includegraphics[width=\linewidth]{sineCurveDetail}
+    \includegraphics[width=\linewidth]{figures/sineCurveDetail}
     \caption{$d_4$}
 \endminipage
 \end{figure}
@@ -1722,6 +1731,16 @@ also study just those frequencies of the signal that fall within a certain range
 sub-band) by examining the detail coefficients at a particular level. These
 properties make the discrete wavelet transform an attractive alternative to the Fourier
 transform in many applications. See Figure \ref{fig:dwt1D} for an example of the discrete Wavelet transform.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth]{figures/dwt1D}
+\caption{A level 4 wavelet decomposition of a signal. The top panel is the original signal,
+the next panel down is the approximation, and the remaining panels are the detail coefficients.
+Notice how the approximation resembles a smoothed version of the original signal, while the
+details capture the high-frequency oscillations and noise.}
+\label{fig:dwt1D}
+\end{figure}
 
 In practice, we are often interested in analyzing discrete signals with compact support (that is,
 finite-time signals that we have sampled at a finite number of points). If wavelet analysis is
@@ -1808,7 +1827,7 @@ for i in xrange(n):
 	up2[1::2] = HL[:,i]
 	temp1[:,i] = fftconvolve(up1, hi_r)[1:] + fftconvolve(up2, lo_r)[1:]
 	up1[1::2] = LH[:,i]
-	up2[1::2] = LL[:,i]		
+	up2[1::2] = LL[:,i]
 	temp2[:,i] = fftconvolve(up1, hi_r)[1:] + fftconvolve(up2, lo_r)[1:]
 
 # upsample and filter the rows, then add results together
@@ -1888,12 +1907,12 @@ focus on reducing a particular type of random noise in images, called
 
 \begin{figure}[t]
 \minipage{0.49\textwidth}
-    \includegraphics[width=\linewidth]{phantom_random.pdf}
+    \includegraphics[width=\linewidth]{figures/phantom_random.pdf}
     \caption{The Phantom image with incoherent noise}
     \label{fig:incoherent}
 \endminipage\hfill
 \minipage{0.49\textwidth}
-    \includegraphics[width=\linewidth]{phantom_coherent.pdf}
+    \includegraphics[width=\linewidth]{figures/phantom_coherent.pdf}
     \caption{The Phantom image with coherent noise}
     \label{fig:coherent}
 \endminipage
@@ -1958,7 +1977,7 @@ right, but this goes beyond the scope of this lab, and so we will
 assume that we already have a decent estimate of the variance.
 
 \begin{figure}[t]
-    \includegraphics[width=\linewidth]{denoise.pdf}
+    \includegraphics[width=\linewidth]{figures/denoise.pdf}
     \caption{Noisy Lena (left), denoised using hard thresholding (center),
     and denoised using soft thresholding (right).}
     \label{fig:denoise}
