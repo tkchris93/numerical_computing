@@ -1,4 +1,4 @@
-\lab{QR 2: Applications}{Applications of the QR Decomposition}
+\lab{QR 2: Least Squares and Computing Eigenvalues}{Least Squares and Computing Eigenvalues}
 \label{lab:qr-applications}
 \objective{Because of its numerical stability and convenient structure, the QR decomposition is the basis of many important and practical algorithms.
 In this lab, we introduce linear least squares problems, tools in Python for computing least squares solutions, and two fundamental eigenvalue algorithms.
@@ -357,7 +357,7 @@ def plot_ellipse(a, b, c, d, e):
 The eigenvalues of an $n \times n$ matrix $A$ are the roots of its characteristic polynomial $\det(A - \lambda I)$.
 Thus, finding the eigenvalues of $A$ amounts to computing the roots of a polynomial of degree $n$.
 However, for $n \ge 5$, it is provably impossible to find an algebraic closed-form solution to this problem.%
-\footnote{See Abel's Impossibility Theorem.} % TODO: improve this footnote. Reference to proof in the book or the date when Abel first proved it?
+\footnote{This result, called \emph{Abel's impossibility theorem}, was first proven by Niels Heinrik Abel in 1824.}
 In addition, numerically computing the roots of a polynomial is a famously ill-conditioned problem, meaning that small changes in the coefficients of the polynomial (brought about by small changes in the entries of $A$) may yield wildly different results.
 Instead, eigenvalues must be computed with iterative methods.
 
@@ -368,132 +368,203 @@ The \emph{power method} iteratively computes the dominant eigenvalue of $A$ and 
 
 Begin by choosing a vector $\x_0$ such that $\|\x_0\|=1$, and define the following:
 \[\x_{k+1}=\frac{A\x_k}{\|A\x_k\|}\]
-If $A$ has a dominant eigenvalue $\lambda$, and if the projection of $\x_0$ onto the subspace spanned by the eigenvectors corresponding to $\lambda$ is nonzero, then the sequence of vectors $\x_0, \x_1, \x_2, \ldots$ converges
+If $A$ has a dominant eigenvalue $\lambda$, and if the projection of $\x_0$ onto the subspace spanned by the eigenvectors corresponding to $\lambda$ is nonzero, then the sequence of vectors $\{\x_k\}_{k=0}^\infty$ converges
 % \footnote{Reference proof in the text}
 to an eigenvector $\x$ of $A$ corresponding to $\lambda$.
 
 Since $\x$ is an eigenvector of $A$, $A\x = \lambda \x$.
 Left multiplying by $\x\trp$ on each side gives $\x\trp A\x = \lambda \x\trp\x$, and hence $\lambda = \frac{\x\trp A\x}{\x\trp\x}$.
 This ratio is called the \emph{Rayleigh quotient}.
+However, since each $\x_k$ is normalized, $\x\trp\x = \|\x\|^2 = 1$, so $\lambda = \x\trp A\x$.
 
-% If all entries of $A$ are positive, then $A$ will always have a dominant eigenvalue.%\footnote{Proof?}
-% There is no way to guarantee that the second condition is met, but if we choose $\x_0$ randomly, it will almost always satisfy this condition.
-% WHUT??
+The entire algorithm is summarized below.
 
-% TODO: Algorithm box for the Power Method.
+\begin{algorithm}[H] % The Power Method
+\begin{algorithmic}[1]
+\Procedure{Power Method}{$A$}
+    \State $m, n \gets \shape{A}$
+        \Comment{Store the dimensions of $A$.}
+    \State $\x_0 \gets \text{random}(n)$
+        \Comment{A random vector of length $n$}
+    \State $\x_0 \gets \x_0/\|\x_0\|$
+        \Comment{Normalize $\x_0$}
+    \For{$k = 1,\ 2,\ \ldots,\ N-1$}
+        \label{step:power-method-stopping-criterion}
+        \State $\x_{k+1} \gets A\x_k$
+        \State $\x_{k+1} \gets \x_{k+1}/\|\x_{k+1}\|$
+    \EndFor
+    \State \pseudoli{return} $\x_N\trp A \x_N,\ \x_N$
+\EndProcedure
+\end{algorithmic}
+\caption{}
+\label{Alg:power-method}
+\end{algorithm}
+
+The power method is limited by a few assumptions.
+First, not all square matrices $A$ have a dominant eigenvalue.
+For testing purposes, the Perron-Frobenius theorem%
+\footnote{See Chapter ?? of the Volume I text for a careful proof of the theorem.}
+guarantees that if all entries of $A$ are positive, then $A$ has a dominant eigenvalue.
+Second, there is no way to choose an $\x_0$ that is guaranteed to have a nonzero projection onto the span of the eigenvectors corresponding to $\lambda$.
+However, a random $\x_0$ will almost surely satisfy this condition.
+
+% TODO: Footnote about the proof of the power method?
 
 \begin{problem} % Implement the power method.
-% Write a function that accepts an $n \times n$ matrix $A$, an error tolerance, and a number of maximum iterations.
-% Use Algorithm \ref{} to compute the dominant eigenvalue and a corresponding eigenvector.
-Write a function that implements the power method to compute an eigenvector
-Your function should
-\begin{enumerate}
-\item Accept a matrix and a tolerance \li{tol}.
-\item Start with a random vector.
-\item Use the 2-norm wherever a norm is needed (use \li{la.norm()}).
-\item Repeat the power method until the vector changes by less than the tolerance
-In mathematical notation, you are defining $x_0, x_1, \ldots x_k$, and your function should stop when $\|x_{k+1}-x_k\|$ is less than the tolerance.
-\item Return the found eigenvector and the corresponding eigenvalue.
-\end{enumerate}
-Test your function on positive matrices.
+Write a function that accepts an $n \times n$ matrix $A$, a float \li{tol}, and a maximum number of iterations $N$.
+Use Algorithm \ref{Alg:power-method} to compute the dominant eigenvalue of $A$ and a corresponding eigenvector.
+
+Continue the loop in step \ref{step:power-method-stopping-criterion} until either $\|\x_{k+1} - \x_k\|$ is less than the tolerance \li{tol}, or until iterating the maximum number of times $N$.
+
+Test your function on square matrices with all positive entries, verifying that $A\x = \lambda\x$.
+Use SciPy's eigenvalue solver, \li{scipy.linalg.eig()}, to compute all of the eigenvalues and corresponding eigenvectors of $A$ and check that $\lambda$ is the dominant eigenvalue of $A$.
+
+\begin{lstlisting}
+# Construct a random matrix with positive entries.
+>>> A = np.random.random((10,10))
+
+# Compute the eigenvalues and eigenvectors of A via SciPy.
+>>> eigs, vecs = la.eig(A)
+
+# Get the dominant eigenvalue and eigenvector of A.
+# The eigenvector of the kth eigenvalue is the kth column of 'vecs'.
+>>> loc = np.argmax(eigs)
+>>> lamb, x = eigs[loc], vecs[:,loc]
+
+# Verify that Ax = lambda x.
+>>> np.allclose(A.dot(x), lamb*x)
+True
+\end{lstlisting}
 \end{problem}
 
-\begin{comment}
-An overview of the proof of the method is that you can write a matrix in Jordan Conical form $A=VJV^{-1}$ where $V$ is the matrix of the generalized eigenspaces.
-But the first column is is the eigenvector corresponding to largest eigenvalue and $J$ is a upper trianglar matrix of eigenvalues and ones.
+% TODO: A note about the convergence of the power method?
+
+\begin{comment} % TODO: eliminate
+The matrix $A$ can be written in Jordan Conical form $A=VJV^{-1}$ where $V$ is the matrix of the generalized eigenspaces.
+But the first column is is the eigenvector corresponding to largest eigenvalue and $J$ is an upper triangular matrix of eigenvalues and ones.
 Note that $A^k=VJ^kV^{-1}$
 The limit as $k \rightarrow \infty$ of $(\frac{1}{\lambda_1}J)^k$ is a matrix of all zeros except for a one in the upper right hand corner.
-So $(\frac{A}{\norm{A}})^k \approx VJ^kV^{-1}$ So the largest eigenvalue dominates.
+So $(\frac{A}{\norm{A}})^k \approx VJ^kV^{-1}$, and the largest eigenvalue dominates.
 \end{comment}
 
 \subsection*{The QR Algorithm} % ----------------------------------------------
 
-The disadvantage of the power method is that it only finds the largest eigenvector and a corresponding eigenvalue.
-To use the QR algorithm, let $A_0=A$
-Then let $Q_kR_k$ be the QR decomposition of $A_k$, and recursively define
+An obvious shortcoming of the power method is that it only computes the largest eigenvalue and a corresponding eigenvector.
+The QR algorithm, on the other hand, attempts to find all eigenvalues of $A$.
+
+Let $A_0 = A$, and for arbitrary $k$ let $Q_kR_k$ be the QR decomposition of $A_k$.
+Since $A$ is square, so are $Q_k$ and $R_k$, so they can be recombined in reverse order.
+\[A_{k+1}=R_kQ_k\]
+This recursive definition establishes an important relation.
+\[Q_k^{-1}A_kQ_k = Q_k^{-1}(Q_kR_k)Q_k = (Q_k^{-1}Q_k)(R_kQ_k) = A_{k+1}\]
+Thus $A_k$ is similar to $A_{k+1}$, and similar matrices have the same eigenvalues.
+% Furthermore, since each of the $Q_k$ are orthonormal, the computation is numerically stable.
+The series of matrices $\{A_k\}_{k=0}^\infty$ converges to the following block matrix.
 \[
-A_{k+1}=R_kQ_k.
-\]
-Then $A_0, A_1, A_2, \ldots $ will converge to a matrix of the form
-\begin{equation*}
-\label{eq:Schur form}
 S =
-     \begin{pmatrix}
-          S_1 &* & \cdots & * \\
-           0     &S_2  &  \ddots & \vdots \\
-           \vdots  & \ddots & \ddots & *  \\
-           0 & \cdots & 0 & S_m
-    \end{pmatrix}
-\end{equation*}
-where $S_i$ is a $1\times1$ or $2\times2$ matrix.\footnote{If $S$ is upper triangular (i.e., all $S_i$ are $1\times1$ matrices), then $S$ is the \emph{Schur form} of $A$.
-If some $S_i$ are $2\times2$ matrices, then $S$ is the \emph{real Schur form} of $A$.}
-The eigenvalues of $A$ are the eigenvalues of the $S_i$.
-
-This algorithm works for three reasons
-First,
-\[
-Q_k^{-1}A_kQ_k = Q_k^{-1}(Q_kR_k)Q_k = (Q_k^{-1}Q_k)(R_kQ_k) = A_{k+1},
+\left[\begin{array}{cccc}
+S_1    & *      & \cdots & *      \\
+\0     & S_2    & \ddots & \vdots \\
+\vdots & \ddots & \ddots & *      \\
+\0     & \cdots &     \0 & S_m
+\end{array}\right]
 \]
-so $A_k$ is similar to $A_{k+1}$.
-Because similar matrices have the same eigenvalues, $A_k$ has the same eigenvalues as $A$.
-Second, each iteration of the algorithm transfers some of the ``mass'' from the lower to the upper triangle.
-This is what makes $A_0, A_1, A_2, \ldots$ converge to a matrix $S$ which has the described form.
-Finally, since $S$ is block upper triangular, its eigenvalues are just the eigenvalues of its diagonal blocks (the $S_i$).
 
-A $2 \times 2$ block will occur in $S$ when $A$ is real but has complex eigenvalues.
-In this case, the complex eigenvalues occur in conjugate pairs, each pair corresponding to a $2 \times 2$ block on the diagonal of $S$.
+Each $S_i$ is either a $1\times1$ or $2\times2$ matrix.%
+\footnote{If all of the $S_i$ are $1\times1$ matrices, then the upper triangular $S$ is called the \emph{Schur form} of $A$.
+If some of the $S_i$ are $2\times2$ matrices, then $S$ is called the \emph{real Schur form} of $A$.}
+Since $S$ is block upper triangular, its eigenvalues are the eigenvalues of its diagonal $S_i$ blocks.
+Then because $A$ is similar to each $A_k$, those eigenvalues of $S$ are the eigenvalues of $A$.
 
-% TODO: Put the Hessenberg stuff from the last lab here?
+% Second, each iteration of the algorithm transfers some of the ``mass'' from the lower to the upper triangle.
+% This is what makes $A_0, A_1, A_2, \ldots$ converge to a matrix $S$ which has the described form.
+
+When $A$ has real entries but complex eigenvalues, $2 \times 2$ $S_i$ blocks appear in $S$.
+Finding eigenvalues of a $2 \times 2$ matrix is equivalent to finding the roots of a 2nd degree polynomial.
+%
+\begin{align}
+\nonumber \det(S_i - \lambda I) =
+\left|\begin{array}{cc}
+a - \lambda & b           \\
+c           & d - \lambda
+\end{array}\right|
+&= (a - \lambda)(d - \lambda) - bc \\
+&= \lambda^2 - ad\lambda + (ad - bc) \label{eq:qr-algorithm-roots}
+\end{align}
+
+The quadratic equation is the closed-form algebraic solution for the roots of Equation \ref{eq:qr-algorithm-roots}.
+Using $A = 1$, $B = -ad$, and $C = ad - bc$,
+\[\lambda = \frac{-B \pm \sqrt{B^2 - 4AC}}{2A}.\]
+
 \subsubsection*{Hessenberg Preconditioning} % - - - - - - - - - - - - - - - - -
 
-Often, we ``precondition'' a matrix by putting it in upper Hessenberg form before passing it to the QR algorithm.
-This is always possible because every matrix is similar to an upper Hessenberg matrix (see Lab \ref{}).
-Hessenberg preconditioning is done for two reasons.
+The QR algorithm works more accurately and efficiently on matrices that are in upper Hessenberg form, as upper Hessenberg matrices are already close to triangular.
+Furthermore, if $H = QR$ is the QR decomposition of upper Hessenberg $H$ then $RQ$ is also upper Hessenberg.
+Putting a matrix in upper Hessenberg form before applying the QR algorithm is called \emph{Hessenberg preconditioning}.
 
-First, the QR algorithm converges much faster on upper Hessenberg matrices because they are already close to triangular matrices.
+% Second, an iteration of the QR algorithm can be computed in $\mathcal{O}(n^2)$ time on an upper Hessenberg matrix, as opposed to $\mathcal{O}(n^3)$ time on a regular matrix.
+% This is because so many entries of an upper Hessenberg matrix are 0.
+% If we apply the QR algorithm to an upper Hessenberg matrix $H$, then this speed-up happens in each iteration of the algorithm, since if $H = QR$ is the QR decomposition of $H$ then $RQ$ is also upper Hessenberg.
 
-Second, an iteration of the QR algorithm can be computed in $\mathcal{O}(n^2)$ time on an upper Hessenberg matrix, as opposed to $\mathcal{O}(n^3)$ time on a regular matrix.
-This is because so many entries of an upper Hessenberg matrix are 0.
-If we apply the QR algorithm to an upper Hessenberg matrix $H$, then this speed-up happens in each iteration of the algorithm, since if $H = QR$ is the QR decomposition of $H$ then $RQ$ is also upper Hessenberg.
+\begin{comment}
+With preconditioning in mind, the entire QR algorithm is as follows.
 
+\begin{algorithm}[H] % The Power Method
+\begin{algorithmic}[1]
+\Procedure{Power Method}{$A$}
+    \State $m, n \gets \shape{A}$
+        \Comment{Store the dimensions of $A$.}
+    \State $\x_0 \gets \text{random}(n)$
+        \Comment{A random vector of length $n$}
+    \State $\x_0 \gets \x_0/\|\x_0\|$
+        \Comment{Normalize $\x_0$}
+    \For{$k = 1,\ 2,\ \ldots,\ N-1$}
+        \label{step:power-method-stopping-criterion}
+        \State $\x_{k+1} \gets A\x_k$
+        \State $\x_{k+1} \gets \x_{k+1}/\|\x_{k+1}\|$
+    \EndFor
+    \State \pseudoli{return} $\x_N\trp A \x_N,\ \x_N$
+\EndProcedure
+\end{algorithmic}
+\caption{}
+\label{Alg:power-method}
+\end{algorithm}
+\end{comment}
 
 \begin{problem}
+Write a function that accepts an $n \times n$ matrix $A$.
 Write a function that implements the QR algorithm with Hessenberg preconditioning as described above.
 Do this as follows.
 \begin{enumerate}
-\item Accept a matrix \li{A}, a number of iterations \li{niter}, and a tolerance \li{tol}.
-\item Put \li{A} in Hessenberg form using \li{la.hessenberg()}.
-\item Compute the matrix $S$ by performing the QR algorithm \li{niter} times.
-Use the function \li{la.qr()} to compute the QR decomposition.
-\item Iterate through the diagonal of $S$ from top to bottom to compute its eigenvalues.
-For each diagonal entry,
-\begin{enumerate}
-\item If this is the last diagonal entry, then it is an eigenvalue.
-\item If the entry below this one has absolute value less than \li{tol}, assume this is a $1\times 1$ block.
-Then the current entry is an eigenvalue.
-\item Otherwise, the current entry is at the top left corner of a $2 \times 2$ block.
-Calculate the eigenvalues of this block.
-Use the \li{sqrt} function from the scimath library to find the square root of a negative number.
-You can import this library with the line \li{from numpy.lib import scimath}.
-\end{enumerate}
-\item Return the (approximate) eigenvalues of \li{A}.
+    \item Accept a matrix \li{A}, a number of iterations \li{niter}, and a tolerance \li{tol}.
+    \item Put \li{A} in Hessenberg form using \li{la.hessenberg()}.
+    \item Compute the matrix $S$ by performing the QR algorithm \li{niter} times.
+    Use the function \li{la.qr()} to compute the QR decomposition.
+    \item Iterate through the diagonal of $S$ from top to bottom to compute its eigenvalues.
+    For each diagonal entry,
+    \begin{enumerate}
+        \item If this is the last diagonal entry, then it is an eigenvalue.
+        \item If the entry below this one has absolute value less than \li{tol}, assume this is a $1\times 1$ block.
+        Then the current entry is an eigenvalue.
+        \item Otherwise, the current entry is at the top left corner of a $2 \times 2$ block.
+        Calculate the eigenvalues of this block.
+        Use \li{numpy.lib.scimath.sqrt()} to compute the square root of a negative number.
+    \end{enumerate}
+    \item Return the (approximate) eigenvalues of \li{A}.
 \end{enumerate}
 You can check your function on the matrix
 \[
-\begin{pmatrix}
- 4 &  12 & 17 &  -2 \\
--5.5& -30.5 & -45.5 &  9.5\\
- 3
-&  20
-& 30
-&  -6
-\\
-1.5 &  1.5&   1.5&   1.5
-       \end{pmatrix},
+\left[\begin{array}{cccc}
+ 4   &  12   &  17   & -2   \\
+-5.5 & -30.5 & -45.5 &  9.5 \\
+ 3   &  20   &  30   & -6   \\
+ 1.5 &  1.5  &  1.5  &  1.5
+\end{array}\right],
 \]
-which has eigenvalues $1+2i, 1-2i, 3$, and 0
+which has eigenvalues $1+2i, 1-2i, 3$, and $0$.
 You can also check your function on random matrices against \li{la.eig()}.
 \label{prob:qr_solver}
+% TODO: la.eig()
 \end{problem}
 
 

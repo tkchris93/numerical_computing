@@ -118,64 +118,67 @@ def ellipse_fit():
 
 
 # Problem 5
-def power_method(A, tol=1e-12, max_iters=20):
+def power_method(A, tol=1e-12, N=20):
     """Compute the dominant eigenvalue of A and its corresponding eigenvector.
 
     Inputs:
         A ((n,n) ndarray): A square matrix.
         tol (float): The stopping tolerance.
+        N (int): The maximum number of iterations.
 
     Returns:
-        eigval (foat): The dominant eigenvalue of A.
-        eigvec ((n, ) ndarray): The eigenvector corresponding to 'eigval'.
+        (foat): The dominant eigenvalue of A.
+        ((n, ) ndarray): An eigenvector corresponding to the dominant
+            eigenvalue of A.
     """
     # Choose a random x_0 with norm 1.
     x = np.random.random(A.shape[0])
     x /= la.norm(x)
 
-    for _ in xrange(max_iters):
+    for _ in xrange(N):
         # x_{k+1} = Ax_k / ||Ax_k||
-        w = np.dot(A, x)
-        x_new = w / la.norm(w)
+        y = np.dot(A, x)
+        x_new = y / la.norm(y)
+
         # Check for convergence.
         if la.norm(x_new - x) < tol:
+            x = x_new
             break
+
+        # Move to the next iteration.
         x = x_new
 
-    eigval = np.dot(np.conj(x), np.dot(A,x)) / np.dot(np.conj(x),x)
-    return eigval, x
+    return np.dot(x, np.dot(A, x)), x
 
 
 # Problem 6
 def QR_algorithm(A, niter, tol):
     """Return the eigenvalues of A using the QR algorithm."""
-    H = la.hessenberg(A)
+    S = la.hessenberg(A)
     for i in xrange(niter):
-        Q,R = la.qr(H)
-        H = np.dot(R,Q)
-    S = H
-    print S
-    eigenvalues = []
+        Q,R = la.qr(S)
+        S = np.dot(R,Q)
+
+    eigs = []
+
+    # Get the eigenvalues of the S_i.
     i = 0
     while i < S.shape[0]:
         if i == S.shape[0]-1:
-            eigenvalues.append(S[i,i])
+            eigs.append(S[i,i])
         elif abs(S[i+1,i]) < tol:
-            eigenvalues.append(S[i,i])
+            # 1 x 1 S_i block.
+            eigs.append(S[i,i])
         else:
-            a = S[i,i]
-            b = S[i,i+1]
-            c = S[i+1,i]
-            d = S[i+1,i+1]
+            # 2 x 2 S_i block. Use the quadratic equation.
+            a, b, c, d = S[i:i+2,i:i+2].ravel()
             B = -1*(a+d)
             C = a*d-b*c
-            eigen_plus = (-B + sm.sqrt(B**2 - 4*C))/2.
-            eigen_minus = (-B - sm.sqrt(B**2 - 4*C))/2.
-
-            eigenvalues.append(eigen_plus)
-            eigenvalues.append(eigen_minus)
-            i+=1
-        i+=1
+            D = sm.sqrt(B**2 - 4*C)
+            eigs.append((-B + D)/2.)
+            eigs.append((-B - D)/2.)
+            i += 1
+        i += 1
     return eigenvalues
 
 '''
