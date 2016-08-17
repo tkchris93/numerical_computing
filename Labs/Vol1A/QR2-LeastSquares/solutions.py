@@ -33,7 +33,7 @@ def least_squares(A, b):
     return x
 
 
-# Problem 2 with MLB DATA
+# Problem 2
 def line_fit():
     """Load the data from MLB.npy. Use least squares to calculate the line
     that best relates height to weight.
