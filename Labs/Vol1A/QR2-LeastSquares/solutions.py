@@ -2,8 +2,8 @@
 """Volume I: QR 2 (Applications). Solutions file."""
 
 import numpy as np
+from cmath import sqrt
 from scipy import linalg as la
-from numpy.lib import scimath as sm
 from matplotlib import pyplot as plt
 
 
@@ -33,7 +33,7 @@ def least_squares(A, b):
     return x
 
 
-# Problem 2 with MLB DATA
+# Problem 2
 def line_fit():
     """Load the data from MLB.npy. Use least squares to calculate the line
     that best relates height to weight.
@@ -118,67 +118,79 @@ def ellipse_fit():
 
 
 # Problem 5
-def power_method(A, tol):
-    """Compute the dominant eigenvalue of A and its corresponding eigenvector.
+def power_method(A, N=20, tol=1e-12):
+    """Compute the dominant eigenvalue of A and a corresponding eigenvector
+    via the power method.
 
     Inputs:
         A ((n,n) ndarray): A square matrix.
+        N (int): The maximum number of iterations.
         tol (float): The stopping tolerance.
 
     Returns:
-        eigval (foat): The dominant eigenvalue of A.
-        eigvec ((n, ) ndarray): The eigenvector corresponding to 'eigval'.
+        (foat): The dominant eigenvalue of A.
+        ((n, ) ndarray): An eigenvector corresponding to the dominant
+            eigenvalue of A.
     """
-    size = A.shape[0]
-    random_vector = []
-    for i in xrange(size):
-        random_vector.append(np.random.randint(10))
-    norm = la.norm(random_vector)
-    random_vector = np.array(random_vector, dtype = np.float)
-    random_vector /= norm
+    # Choose a random x_0 with norm 1.
+    x = np.random.random(A.shape[0])
+    x /= la.norm(x)
 
-    while True:
-        product = np.dot(A,random_vector)
-        new_vector = product / la.norm(product)
-        if (la.norm(new_vector - random_vector) < tol):
+    for _ in xrange(N):
+        # x_{k+1} = Ax_k / ||Ax_k||
+        y = np.dot(A, x)
+        x_new = y / la.norm(y)
+
+        # Check for convergence.
+        if la.norm(x_new - x) < tol:
+            x = x_new
             break
-        random_vector = new_vector
 
-    eigenvector = random_vector
-    eigenvalue = np.inner(np.dot(A,eigenvector),eigenvector)/la.norm(eigenvector)
-    return eigenvalue, eigenvector
+        # Move to the next iteration.
+        x = x_new
+
+    return np.dot(x, np.dot(A, x)), x
+
 
 # Problem 6
-def QR_algorithm(A, niter, tol):
-    """Return the eigenvalues of A using the QR algorithm."""
-    H = la.hessenberg(A)
-    for i in xrange(niter):
-        Q,R = la.qr(H)
-        H = np.dot(R,Q)
-    S = H
-    print S
-    eigenvalues = []
+def QR_algorithm(A, N=50, tol=1e-12):
+    """Compute the eigenvalues of A via the QR algorithm.
+
+    Inputs:
+        A ((n,n) ndarray): A square matrix.
+        N (int): The number of iterations to run the QR algorithm.
+        tol (float): The threshold value for determining if a diagonal block
+            is 1x1 or 2x2.
+
+    Returns:
+        ((n, ) ndarray): The eigenvalues of A.
+    """
+    m,n = A.shape
+    S = la.hessenberg(A)
+    for i in xrange(N):
+        Q,R = la.qr(S)
+        S = np.dot(R,Q)
+
+    eigs = []
     i = 0
-    while i < S.shape[0]:
-        if i == S.shape[0]-1:
-            eigenvalues.append(S[i,i])
-        elif abs(S[i+1,i]) < tol:
-            eigenvalues.append(S[i,i])
-        else:
-            a = S[i,i]
-            b = S[i,i+1]
-            c = S[i+1,i]
-            d = S[i+1,i+1]
+
+    # Get the eigenvalues of each S_i.
+    while i < n:
+        if i == n-1:                # 1 x 1 block (final diagonal entry).
+            eigs.append(S[i,i])
+        elif abs(S[i+1,i]) < tol:   # 1 x 1 block.
+            eigs.append(S[i,i])
+        else:                       # 2 x 2 block.
+            print "2 x 2 block at i = {}".format(i)
+            a, b, c, d = S[i:i+2,i:i+2].ravel()
+            # Use the quadratic formula.
             B = -1*(a+d)
             C = a*d-b*c
-            eigen_plus = (-B + sm.sqrt(B**2 - 4*C))/2.
-            eigen_minus = (-B - sm.sqrt(B**2 - 4*C))/2.
-
-            eigenvalues.append(eigen_plus)
-            eigenvalues.append(eigen_minus)
-            i+=1
-        i+=1
-    return eigenvalues
+            D = sqrt(B**2 - 4*C)
+            eigs += [(-B + D)/2., (-B - D)/2.]
+            i += 1
+        i += 1
+    return np.array(eigs)
 
 
 # Additional Material
