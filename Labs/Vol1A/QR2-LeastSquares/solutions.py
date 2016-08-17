@@ -2,8 +2,8 @@
 """Volume I: QR 2 (Applications). Solutions file."""
 
 import numpy as np
+from cmath import sqrt
 from scipy import linalg as la
-from numpy.lib import scimath as sm
 from matplotlib import pyplot as plt
 
 
@@ -118,13 +118,14 @@ def ellipse_fit():
 
 
 # Problem 5
-def power_method(A, tol=1e-12, N=20):
-    """Compute the dominant eigenvalue of A and its corresponding eigenvector.
+def power_method(A, N=20, tol=1e-12):
+    """Compute the dominant eigenvalue of A and a corresponding eigenvector
+    via the power method.
 
     Inputs:
         A ((n,n) ndarray): A square matrix.
-        tol (float): The stopping tolerance.
         N (int): The maximum number of iterations.
+        tol (float): The stopping tolerance.
 
     Returns:
         (foat): The dominant eigenvalue of A.
@@ -152,63 +153,45 @@ def power_method(A, tol=1e-12, N=20):
 
 
 # Problem 6
-def QR_algorithm(A, niter, tol):
-    """Return the eigenvalues of A using the QR algorithm."""
+def QR_algorithm(A, N=50, tol=1e-12):
+    """Compute the eigenvalues of A via the QR algorithm.
+
+    Inputs:
+        A ((n,n) ndarray): A square matrix.
+        N (int): The number of iterations to run the QR algorithm.
+        tol (float): The threshold value for determining if a diagonal block
+            is 1x1 or 2x2.
+
+    Returns:
+        ((n, ) ndarray): The eigenvalues of A.
+    """
+    m,n = A.shape
     S = la.hessenberg(A)
-    for i in xrange(niter):
+    for i in xrange(N):
         Q,R = la.qr(S)
         S = np.dot(R,Q)
 
     eigs = []
-
-    # Get the eigenvalues of the S_i.
     i = 0
-    while i < S.shape[0]:
-        if i == S.shape[0]-1:
+
+    # Get the eigenvalues of each S_i.
+    while i < n:
+        if i == n-1:                # 1 x 1 block (final diagonal entry).
             eigs.append(S[i,i])
-        elif abs(S[i+1,i]) < tol:
-            # 1 x 1 S_i block.
+        elif abs(S[i+1,i]) < tol:   # 1 x 1 block.
             eigs.append(S[i,i])
-        else:
-            # 2 x 2 S_i block. Use the quadratic equation.
+        else:                       # 2 x 2 block.
+            print "2 x 2 block at i = {}".format(i)
             a, b, c, d = S[i:i+2,i:i+2].ravel()
+            # Use the quadratic formula.
             B = -1*(a+d)
             C = a*d-b*c
-            D = sm.sqrt(B**2 - 4*C)
-            eigs.append((-B + D)/2.)
-            eigs.append((-B - D)/2.)
+            D = sqrt(B**2 - 4*C)
+            eigs += [(-B + D)/2., (-B - D)/2.]
             i += 1
         i += 1
-    return eigenvalues
+    return np.array(eigs)
 
-'''
-def qralg(T, shift=True):
-    """Run the QR algorithm on the real tridiagonal matrix 'T'."""
-
-    Tnew = np.array(T, dtype=np.float64, copy=True)
-    m,n = Tnew.shape
-    errs = [T[-1,-1]]
-    if m == 1:
-        return Tnew, errs
-
-    while abs(Tnew[-1,-2]) > 1e-12:
-        if shift:
-            a, b = Tnew[-1,-1], Tnew[-1,-2]
-            d = (Tnew[-2,-2] - a)/2.
-            s = np.sign(d)
-            if s == 0: s = 1
-            mu = a - s*b**2/(np.abs(d) + np.sqrt(d**2 + b**2))
-            Mu = np.eye(m)*mu
-            Q,R = la.qr(Tnew - Mu)
-            Tnew = R.dot(Q) + Mu
-        else:
-            Q,R = la.qr(Tnew)
-            Tnew = R.dot(Q)
-        Tnew = _perfect_symmetry(Tnew)
-        errs.append(Tnew[-1,-2])
-
-    return Tnew, errs
-'''
 
 # Additional Material
 from matplotlib.animation import FuncAnimation
