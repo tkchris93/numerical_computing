@@ -167,6 +167,9 @@ def QR_algorithm(A, N=50, tol=1e-12):
     """
     m,n = A.shape
     S = la.hessenberg(A)
+
+    # TODO: introduce shifts.
+
     for i in xrange(N):
         Q,R = la.qr(S)
         S = np.dot(R,Q)
@@ -181,7 +184,6 @@ def QR_algorithm(A, N=50, tol=1e-12):
         elif abs(S[i+1,i]) < tol:   # 1 x 1 block.
             eigs.append(S[i,i])
         else:                       # 2 x 2 block.
-            print "2 x 2 block at i = {}".format(i)
             a, b, c, d = S[i:i+2,i:i+2].ravel()
             # Use the quadratic formula.
             B = -1*(a+d)
@@ -190,10 +192,10 @@ def QR_algorithm(A, N=50, tol=1e-12):
             eigs += [(-B + D)/2., (-B - D)/2.]
             i += 1
         i += 1
-    return np.array(eigs)
+    return np.sort(eigs)
 
 
-# Additional Material
+# Additional Material?
 from matplotlib.animation import FuncAnimation
 
 def polynomial_fit_animation():

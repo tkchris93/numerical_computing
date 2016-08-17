@@ -560,15 +560,55 @@ Most modern computer packages instead use the \emph{implicit QR algorithm}, an i
 
 For large matrices, there are other iterative methods besides the power method and the QR algorithm for efficiently computing eigenvalues.
 They include the Arnoldi iteration, the Jacobi method, the Rayleigh quotient method, and others.
-We will return to this subject after studying spectral calculus.
+We will return to this subject after studying spectral calculus and Krylov subspaces.
 \end{info}
 
-\begin{comment}
+\begin{comment} % TODO: WLS, other norms?, QR alg improvements
 \newpage
 
 \section*{Additional Material} % ==============================================
 
 \subsection*{Weighted Least Squares} % ----------------------------------------
+
+A \emph{weighted 2-norm} $\|\cdot\|_W$ is defined by the nonsingular matrix $W$ as follows.
+\[\|\x\|_W = \|W\x\|_2 = \sqrt{\x\trp W\trp W\x}\]
+Typically $W$ is chosen to be a diagonal matrix, in which case the product $W\trp W$ is also diagonal.
+Given the overdetermined system $A\x = \b$, the problem of choosing $\widehat\x$ to minimize $\|A\widehat\x - \b\|_W$ is called a \emph{weighted least squares} problem.
+This problem has a slightly different normal equation.
+\[A\trp W\trp W A \widehat{\x} = A\trp W\trp W \b\]
+
+Letting $C = W A$ and $\z = W \b$, this equation reduces to the usual normal equation.
+\[C\trp C \widehat{\x} = C\trp \z\]
+
+Left multiplying $A$ by the diagonal matrix $W$ multiplies the rows of $A$ by the diagonal entries of $W$.
+Thus the weighted least squares problem can be solved efficiently by representing $W$ as a 1-D array of its diagonal entries and using array broadcasting.
+
+\begin{lstlisting}
+>>> C = np.vstack(w) * A
+>>> z = w * b
+>>> x = la.lstsq(C, z)[0]
+\end{lstlisting}
+
+Weighted least squares is useful when some points in a data set are considered more important than others.
+Consider the problem of fitting data to an exponential curve $y = e^{ax} + b$ where points $(x_k,y_k)$ are known.
+Taking the natural log of both sides gives $\log(y) = a\log(x) + \log(b)$, so the least squares problem is as follows.
+\[
+A\x =
+\left[\begin{array}{cc}
+\log(x_1) & 1 \\
+\log(x_2) & 1 \\
+\vdots & \vdots \\
+\log(x_m) & 1
+\end{array}\right]
+\left[\begin{array}{c} a \\ \log(b) \end{array}\right]
+=
+\left[\begin{array}{c}
+\log(y_1) \\ \log(y_2) \\ \vdots \\ \log(y_m)
+\end{array}\right]
+= \b
+\]
+
+\subsection*{Using other Norms} % ---------------------------------------------
 
 In these Least Squares problems, we have found best fit lines and ellipses relative to the 2-norm.
 It is possible to generalize the idea of best fit curves relative to other norms.
