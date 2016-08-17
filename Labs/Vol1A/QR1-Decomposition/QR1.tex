@@ -633,6 +633,27 @@ sign = lambda x: 1 if np.real(x) >= 0 else -1
 
 \end{enumerate}
 
+\subsection*{QR with Pivoting} % ----------------------------------------------
+
+The LU decomposition can be improved by employing Gaussian elimination with partial pivoting, where the rows of $A$ are strategically permuted at each iteration.
+The QR factorization can be similarly improved by permuting the columns of $A$ at each iteration.
+The result is the factorization $AP = QR$, where $P$ is a permutation matrix that encodes the column swaps.
+SciPy's \li{scipy.linalg.qr()} can compute the pivoted QR decomposition.
+
+\begin{lstlisting}
+# Get the decomposition AP = QR for a random matrix A.
+>>> A = np.random.random((8,10))
+>>> Q,R,P = la.qr(A, pivoting=True)
+
+# P is returned as a 1-D array that encodes column ordering,
+# so A can be reconstructed with fancy indexing.
+>>> np.allclose(Q.dot(R), A[:,P])
+True
+\end{lstlisting}
+
+The QR factorization with pivoting is the basis for several rank-revealing algorithms and for handling rank-deficient least matrices problems (solving $Ax = b$ where $A$ is $m \times n$ with $m < n$).
+
+\begin{comment}
 \subsection*{Stability of the QR Decomposition in SciPy} % --------------------
 
 SciPy's QR factorization routine uses Householder reflections.
@@ -673,6 +694,7 @@ The error in $A_1$, called the \emph{backward error}, is very small.
 This shows that the errors in $Q_1$ and $R_1$ are somehow ``correlated,'' so that they cancel out in the product.
 In fact, the large errors in $Q_1$ and $R_1$ are not because the algorithm is bad, but rather because $A$ was \emph{poorly conditioned} to begin with.
 Conditioning and stability will be discussed more in depth later in the curriculum.
+\end{comment}
 
 \subsection*{QR via Givens} % -------------------------------------------------
 
