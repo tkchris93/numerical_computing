@@ -153,7 +153,7 @@ def power_method(A, N=20, tol=1e-12):
 
 
 # Problem 6
-def QR_algorithm(A, N=50, tol=1e-12):
+def qr_algorithm(A, N=50, tol=1e-12):
     """Compute the eigenvalues of A via the QR algorithm.
 
     Inputs:

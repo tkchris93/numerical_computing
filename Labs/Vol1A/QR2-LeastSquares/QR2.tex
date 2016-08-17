@@ -548,7 +548,8 @@ Consider the following implementation details.
     Use the function \li{cmath.sqrt()} to correctly compute the square root of a negative number.
 \end{itemize}
 
-Test your function on small random matrices, using \li{scipy.linalg.eig()} to compare your solutions to the actual eigenvalues.
+Test your function on small random symmetric matrices, comparing your results to \li{scipy.linalg.eig()}.
+To construct a random symmetric matrix, note that $A + A\trp$ is always symmetric.
 % How many iterations are necessary?
 % How small does \li{tol} have to be?
 % How large can $A$ be?
