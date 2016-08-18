@@ -353,7 +353,7 @@ plot is about 2. Further, the log of the errors for the order 2 approximations
 are much lower than the log of the errors of the order 1 approximations.
 
 \begin{figure}[t]
-    \includegraphics[width=0.8\textwidth]{convergence.pdf}
+    \includegraphics[width=0.8\textwidth]{figures/convergence.pdf}
     \caption{Convergence plots for our numerical derivative approximations.
     The left plot shows the convergence for order 1 approximations.
     The right plot shows the convergence for order 2 approximations.}
@@ -417,7 +417,7 @@ Return the approximate Jacobian matrix of \li{f} at \li{pt} using the centered d
 %
 \begin{equation*}
 f(x, y) =
-\left[\begin{array}
+\left[\begin{array}{c}
 e^{x} \sin(y) + y^3 \\
 3y - \cos(x)
 \end{array}\right]
@@ -428,12 +428,11 @@ You may apply your Jacobian function to the points one at a time using a double 
 What is the maximum error of your Jacobian function over all points in the square?
 
 Hint: The following code defines the function
-$f(x,y) = \left[\begin{array} x^2 \\ x+y \end{array}\right]$.
+$f(x,y) = \left[\begin{array}{c} x^2 \\ x+y \end{array}\right]$.
 
 \begin{lstlisting}
 # f accepts a length-2 NumPy array
 >>> f = lambda x: np.array([x[0]**2, x[0]+x[1]])
-
 \end{lstlisting}
 \end{problem}
 
@@ -467,7 +466,7 @@ This function is known as the Rosenbrock Banana function, or Rosenbrock's Valley
 \end{problem}
 \begin{figure}
 \begin{center}
-\includegraphics[width = \textwidth]{Rosenbrock}
+\includegraphics[width = \textwidth]{figures/Rosenbrock.pdf}
 \caption{The Rosenbrock Banana Function, a common test function in optimization algorithms}
 \label{Fig:Rosenbrock}
 \end{center}
@@ -612,19 +611,19 @@ Finish writing the function \li{Filter} by filling in lines 5, 6, and 10.  Hint:
 \centering
 \begin{subfigure}[b]{.49\textwidth}
 \centering
-\includegraphics[width=\textwidth]{cameraman.jpg}
+\includegraphics[width=\textwidth]{figures/cameraman.jpg}
 \caption{Unfiltered image.}
 \label{fig:cameraman}
 \end{subfigure}
 \begin{subfigure}[b]{.49\textwidth}
 \centering
-\includegraphics[width=\textwidth]{cameramanBlur.pdf}
+\includegraphics[width=\textwidth]{figures/cameramanBlur.pdf}
 \caption{Image after Gaussian blur is applied.}
 \label{fig:cameraman_blur}
 \end{subfigure}
 \begin{subfigure}[b]{.49\textwidth}
 \centering
-\includegraphics[width=\textwidth]{edges.pdf}
+\includegraphics[width=\textwidth]{figures/edges.pdf}
 \caption{Image after the Sobel filter is applied.}
 \label{fig:cameraman_edges}
 \end{subfigure}
@@ -654,11 +653,12 @@ That is, we define the derivative in the $x$-direction at the $ij^{th}$ pixel to
 We can use a convolution to create a matrix $A_x$ whose $ij^{th}$ entry is the derivative of $A$ at the $ij^{th}$ entry, in the $x$-direction.
 In fact, $A_x = A \ast S$, where
 \[
-S = \frac{1}{8} \begin{pmatrix}
+S = \frac{1}{8}
+\left[\begin{array}{ccc}
 -1 & 0 & 1\\
 -2 & 0 & 2\\
 -1 & 0 & 1
-\end{pmatrix}.
+\end{array}\right].
 \]
 
 Note that this convolution takes a weighted average of the $x$-derivatives at $(i, j)$, $(i, j+1)$, and $(i, j-1)$.
