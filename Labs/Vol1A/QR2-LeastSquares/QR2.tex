@@ -89,7 +89,7 @@ The file \texttt{housing.npy} contains the purchase-only housing price index, a 
 Each row in the array is a separate measurement; the columns are the year and the price index, in that order.
 To avoid large numerical computations, the year measurements start at 0 instead of 2000.
 
-Find the least squares line that relates the year to the housing price index (i.e., let year be the $x$ axis and index the $y$ axis).
+Find the least squares line that relates the year to the housing price index (i.e., let year be the $x$-axis and index the $y$-axis).
 
 \begin{enumerate}
     \item Construct the matrix $A$ and the vector $\b$ described by Equation \ref{eq:linear-least-squares}.\\
@@ -225,9 +225,9 @@ array([0, 0, 2, 6])
 \end{lstlisting}
 
 \begin{problem} % Polynomial fitting.
-The data in \texttt{housing.npy} is nonlinear, and might be better fit by a polynomial.
+The data in \texttt{housing.npy} is nonlinear, and might be better fit by a polynomial than a line.
 
-Write a function that uses Equation \ref{eq:polynomial-least-squares} to calculate the polynomials of degree $3$, $6$, $9$, and $32$ that best fit the data.
+Write a function that uses Equation \ref{eq:polynomial-least-squares} to calculate the polynomials of degree $3$, $6$, $9$, and $12$ that best fit the data.
 Plot the original data points and each least squares polynomial together in individual subplots.
 \\(Hint: define a separate, more refined domain with \li{np.linspace()} and use this domain to smoothly plot the polynomials.)
 
@@ -269,7 +269,7 @@ This function receives an array of $x$ values, an array of $y$ values, and an in
 Having more parameters in a least squares model is not always better.
 For a set of $m$ points, the best fit polynomial of degree $m-1$ \emph{interpolates} the data set, meaning that $p(x_k) = y_k$ exactly for each $k$.
 In this case there are enough unknowns that the system is no longer overdetermined.
-However, such a polynomial is subject to numerical errors and conditioning problems.
+However, such polynomials are highly subject to numerical errors and are unlikely to accurately represent true patterns in the data.
 
 Choosing to have too many unknowns in a fitting problem is (fittingly) called \emph{overfitting}, and is an important issue to avoid in any statistical model.
 \end{warn}
@@ -415,8 +415,7 @@ The entire algorithm is summarized below.
 
 The power method is limited by a few assumptions.
 First, not all square matrices $A$ have a dominant eigenvalue.
-However, the Perron-Frobenius theorem%
-guarantees that if all entries of $A$ are positive, then $A$ has a dominant eigenvalue.
+However, the Perron-Frobenius theorem guarantees that if all entries of $A$ are positive, then $A$ has a dominant eigenvalue.
 Second, there is no way to choose an $\x_0$ that is guaranteed to have a nonzero projection onto the span of the eigenvectors corresponding to $\lambda$, though a random $\x_0$ will almost surely satisfy this condition.
 Even with these assumptions, a rigorous proof of that the power method converges requires tools from spectral calculus.
 See Chapter ?? of the Volume I text for details. % TODO: which chapter?
