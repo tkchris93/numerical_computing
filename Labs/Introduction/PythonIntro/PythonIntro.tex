@@ -216,22 +216,20 @@ False
 \subsection*{Functions} % -----------------------------------------------------
 
 To define a function, use the \li{def} keyword followed by the function name, a parenthesized list of formal parameters, and a colon.
-Then indent the function body.
-Many other languages use the curly braces \{ and \} to delimit blocks, but Python uses whitespace indentation.
-This should be done using exactly \textbf{four} spaces.
-Most text editors will allow you to set the indentation type to spaces so you can use the tab key on your keyboard to insert four spaces.
+Then indent the function body using exactly \textbf{four} spaces.
 
 \begin{lstlisting}
-# No indentation leads to an error.
->>> def add(x, y):
-...result = x + y
-<<IndentationError: expected an indented block>>
-
-# Instead, indent all lines that should be included in the function.
+# Indent the lines of a function with four spaces.
 >>> def add(x, y):
 ...    result = x + y
 ...    return result
 \end{lstlisting}
+
+\begin{warn} % Python is picky about whitespace.
+Many other languages use curly braces to delimit blocks, but Python uses whitespace indentation.
+Mixing tabs and spaces confuses the interpreter and causes problems.
+Most text editors will allow you to set the indentation type to spaces so you can use the tab key on your keyboard to insert four spaces.
+\end{warn}
 
 Functions are defined with \emph{parameters} and called with \emph{arguments}, though the terms are often used interchangeably.
 Below, \li{width} and \li{height} are parameters for the function \li{area()}.

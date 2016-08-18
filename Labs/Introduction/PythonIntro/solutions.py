@@ -29,10 +29,10 @@ def first_half(my_string):
         'ipy'
     """
     return my_string[:len(my_string)//2]
-    
+
 def backward(my_string):
     """Return the reverse of the string 'my_string'.
-    
+
     Examples:
         >>> backward("python")
         'nohtyp'
@@ -58,8 +58,8 @@ def list_ops():
     """
     my_list = ["bear", "ant", "dog", "cat"]
     my_list.append("eagle")
-    my_list.pop(1)                  # or my_list.remove(my_list[1])
     my_list[2] = "fox"
+    my_list.pop(1)                  # or my_list.remove(my_list[1])
     my_list.sort()
     my_list = my_list[::-1]         # or my_list.reverse()
     return my_list
@@ -68,7 +68,7 @@ def list_ops():
 # Problem 5
 def pig_latin(word):
     """Translate the string 'word' into Pig Latin
-    
+
     Examples:
         >>> pig_latin("apple")
         'applehay'
@@ -99,5 +99,5 @@ def alt_harmonic(n):
     """Return the partial sum of the first n terms of the alternating
     harmonic series. Use this function to approximate ln(2).
     """
-    return sum([(-1)**(i+1)/float(i) for i in xrange(1,n)])
+    return sum([(-1)**(i+1)/float(i) for i in xrange(1,n+1)])
 
