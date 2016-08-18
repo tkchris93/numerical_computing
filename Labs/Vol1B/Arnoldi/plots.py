@@ -1,9 +1,14 @@
-import numpy as np
-from numpy.random import rand
-from cmath import sqrt
-from scipy.linalg import eig, inv
+# plots.py
+"""Volume 1B: Arnoldi Iteration. Plotting file."""
+
 import matplotlib
-#matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
+matplotlib.rcParams = matplotlib.rc_params_from_file('../../../matplotlibrc')
+
+
+import numpy as np
+from cmath import sqrt
+from numpy.random import rand
+from scipy.linalg import eig, inv
 from matplotlib import pyplot as plt
 from solutions import arnoldi
 
@@ -32,5 +37,5 @@ if __name__=='__main__':
     np.fill_diagonal(A, rand(m))
     A[:] = X.dot(A).dot(inv(X))
     b = rand(m)
-    arnoldi_convergence_plot(A, b, 300, 15, 'rand_eigs_conv.pdf')
-    arnoldi_convergence_plot(X, b, 200, 15, 'rand_vals_conv.pdf')
+    arnoldi_convergence_plot(A, b, 300, 15, 'figures/rand_eigs_conv.pdf')
+    arnoldi_convergence_plot(X, b, 200, 15, 'figures/rand_vals_conv.pdf')

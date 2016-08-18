@@ -1,7 +1,10 @@
+# plots.py
+"""Volume 1B: Conditioning. Plotting file."""
 import matplotlib
-matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
+matplotlib.rcParams = matplotlib.rc_params_from_file('../../../matplotlibrc')
 
 import numpy as np
+from scipy import linalg as la
 from matplotlib import pyplot as plt
 
 def wilkinson_poly():
@@ -15,17 +18,17 @@ def wilkinson_poly():
                     -3599979517947607200, 8037811822645051776,
                     -12870931245150988800, 13803759753640704000,
                     -8752948036761600000, 2432902008176640000])
-                    
+
     perturb = np.zeros(21)
     perturb[1]=1e-7
     rootsp = np.roots(np.poly1d(w_coeffs+perturb))
 
     # Plot original roots
     plt.scatter(range(1,21), np.zeros(20), s=30)
-    
+
     # Plot roots of the perturbed polynomial
     plt.scatter(np.real(rootsp), np.imag(rootsp), s=60, c='red', marker='x')
-    plt.savefig('wilkinsonpolynomial.pdf', bbox_inches='tight')
+    plt.savefig('figures/wilkinsonpolynomial.pdf', bbox_inches='tight')
     plt.close()
 
 def plot_eig_condit():
@@ -46,9 +49,9 @@ def plot_eig_condit():
             J[i,j] = k*la.norm(M)/la.norm(eigs)
     plt.pcolormesh(X,Y,J, cmap='Greys')
     plt.colorbar()
-    plt.savefig('eigenvalue_conditioning.png', bbox_inches='tight')
+    plt.savefig('figures/eigenvalue_conditioning.png', bbox_inches='tight')
     plt.close()
-    
+
 def wilkinson_many():
     roots = np.arange(1,21)
     w_coeffs = np.array([1, -210, 20615, -1256850, 53327946, -1672280820,
@@ -69,7 +72,7 @@ def wilkinson_many():
     # Plot original roots
     plt.scatter(range(1,21), np.zeros(20), s=30)
     plt.xlim(0, 23)
-    plt.savefig('wilkinsonpolynomial_many.pdf', bbox_inches='tight')
+    plt.savefig('figures/wilkinsonpolynomial_many.pdf', bbox_inches='tight')
     plt.close()
 
 if __name__ == "__main__":

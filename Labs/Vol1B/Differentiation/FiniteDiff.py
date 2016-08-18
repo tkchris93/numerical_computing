@@ -1,10 +1,10 @@
 import numpy as np
 
 
-def der(fc, x, h=.0001, degree=1, type='centered', accuracy=2):
+def der(fc, x, h=.0001, degree=1, mode='centered', accuracy=2):
     """ Computes the numerical of the callable function 'fc at all the
     points in array 'x'. 'degree' is the degree of the derivative to be
-    computed. 'type' can be 'centered', 'forward', or 'backward'.
+    computed. 'mode' can be 'centered', 'forward', or 'backward'.
     'accuracy' is the desired order of accuracy. For forward and backward
     differences it can take a value of 1, 2, or 3. For centered differences
     it can take a value of 2, 4, or 6."""
@@ -21,7 +21,7 @@ def der(fc, x, h=.0001, degree=1, type='centered', accuracy=2):
                   [[1., -2., 1., 0., 0.],
                    [2., -5., 4., -1., 0.],
                    [35/12., -26/3., 19/2., -14/3., 11/12.]]])
-    if type == "centered":
+    if mode == "centered":
         acc = int(accuracy/2) - 1
     else:
         acc = int(accuracy) - 1
@@ -29,17 +29,17 @@ def der(fc, x, h=.0001, degree=1, type='centered', accuracy=2):
         raise ValueError("Only first and second derivatives are supported")
     if acc not in [0, 1, 2]:
         raise ValueError("Invalid accuracy")
-    if type == 'centered':
+    if mode == 'centered':
         xdifs = np.array([fc(x+i*h) for i in xrange(-3, 4)])
         return np.inner(A[degree-1,acc], xdifs.T) / h**degree
-    elif type == 'forward':
+    elif mode == 'forward':
         xdifs = np.array([fc(x+i*h) for i in xrange(5)])
         return np.inner(B[degree-1,acc], xdifs.T) / h**degree
-    elif type == 'backward':
+    elif mode == 'backward':
         xdifs = np.array([fc(x-i*h) for i in xrange(5)])
         return np.inner(B[degree-1,acc], xdifs.T) / (-h)**degree
     else:
-        raise ValueError("invalid type")
+        raise ValueError("invalid mode")
 
 
 def partial(fc, x, i, h=.0001, ty="centered", ac=2):
@@ -99,7 +99,7 @@ def Jacobian(f, m, n, pt, mode='centered', o=2, h=1e-5):
              [2,4,6], otherwise should take values in [1,2,3]
         h -- the size of the difference step
     Returns:
-        jac -- array the same shape as pts, giving the approximate Jacobian at 
+        jac -- array the same shape as pts, giving the approximate Jacobian at
                each point in pts.
     '''
     jac = np.empty((m, n))
@@ -112,7 +112,7 @@ def Jacobian(f, m, n, pt, mode='centered', o=2, h=1e-5):
             if o == 4:
                 jac[:, i] = (f(pt-2*off)/12 - 2*f(pt-off)/3 + 2*f(pt+off)/3 - f(pt+2*off)/12)/h
             if o == 6:
-                jac[:, i] = (-f(pt-3*off)/60 + 3*f(pt-2*off)/20 - 3*f(pt-off)/4 + 
+                jac[:, i] = (-f(pt-3*off)/60 + 3*f(pt-2*off)/20 - 3*f(pt-off)/4 +
                              f(pt+3*off)/60 - 3*f(pt+2*off)/20 + 3*f(pt+off)/4)/h
         if mode == 'forward':
             if o == 1:
