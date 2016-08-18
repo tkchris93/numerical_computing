@@ -1,5 +1,5 @@
 # montecarlo_integration.py
-"""Volume 1B: Monte Carlo Integration
+"""Volume 1B: Monte Carlo 1 (Integration).
 <Name>
 <Class>
 <Date>
