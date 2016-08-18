@@ -151,35 +151,36 @@ Using Algorithm \ref{alg:arnoldi_iteration}, complete the following Python funct
 Write this function so that it can run on complex arrays.
 
 \begin{lstlisting}
-def arnoldi(b, Amul, k, tol=1E-8):
-    '''Perform `k' steps of the Arnoldi iteration on the linear operator
+def arnoldi(b, Amul, k, tol=1e-8):
+    """Perform `k' steps of the Arnoldi iteration on the linear operator
     defined by `Amul', starting with the vector 'b'.
 
-    INPUTS:
-    b    - A NumPy array. The starting vector for the Arnoldi iteration.
-    Amul - A function handle. Should describe a linear operator.
-    k    - Number of times to perform the Arnoldi iteration.
-    tol  - Stop iterating if the next vector in the Arnoldi iteration has
-          norm less than `tol'. Defaults to 1E-8.
+    Inputs:
+        b (ndarray): The starting vector for the iteration.
+        Amul (function): A function handle that describes a linear operator.
+        k (int): The number of times to perform the iteration.
+        tol (float): Stop iterating if the next vector in the iteration has
+            norm less than `tol'. Defaults to 1e-8.
 
-    RETURN:
-    Return the matrices H_n and Q_n defined by the Arnoldi iteration. The
-    number n will equal k, unless the algorithm terminated early, in which
-    case n will be less than k.
+    Returns:
+        H_n (ndarray)
+        Q_n (ndarray)
+            The number n will equal k, unless the algorithm terminated early,
+            in which case n will be less than k.
 
     Examples:
-    >>> A = np.array([[1,0,0],[0,2,0],[0,0,3]])
-    >>> Amul = lambda x: A.dot(x)
-    >>> H, Q = arnoldi(np.array([1,1,1]), Amul, 3)
-    >>> np.allclose(H, np.conjugate(Q.T).dot(A).dot(Q) )
-    True
+        >>> A = np.array([[1,0,0],[0,2,0],[0,0,3]])
+        >>> Amul = lambda x: A.dot(x)
+        >>> H, Q = arnoldi(np.array([1,1,1]), Amul, 3)
+        >>> np.allclose(H, np.conjugate(Q.T).dot(A).dot(Q) )
+        True
 
-    >>> H, Q = arnoldi(np.array([1,0,0]), Amul, 3)
-    >>> H
-    array([[ 1.+0.j]])
-    >>> np.conjugate(Q.T).dot(A).dot(Q)
-    array([[ 1.+0.j]])
-    '''
+        >>> H, Q = arnoldi(np.array([1,0,0]), Amul, 3)
+        >>> H
+        array([[ 1.+0.j]])
+        >>> np.conjugate(Q.T).dot(A).dot(Q)
+        array([[ 1.+0.j]])
+    """
 \end{lstlisting}
 
 Hints:
@@ -208,19 +209,18 @@ Finish the following function that computes the Ritz values of a matrix.
 
 \begin{lstlisting}
 def ritz(Amul, dim, k, iters):
-    ''' Find `k' Ritz values of the linear operator defined by `Amul'.
+    """Find `k' Ritz values of the linear operator defined by `Amul'.
 
-    INPUTS:
-    Amul    - A function handle. Should describe a linear operator on
-              R^(dim).
-    dim     - The dimension of the space on which `Amul' acts.
-    k 	    - The number of Ritz values to return.
-    iters   - The number of times to perform the Arnoldi iteration. Must
-              be between `k' and `dim'.
+    Inputs:
+        Amul (function): A function describing a linear operator on R^(dim).
+        dim (int): The dimension of the space on which `Amul' acts.
+        k (int): The number of Ritz values to return.
+        iters (int): The number of times to perform the Arnoldi iteration.
+            Must be between `k' and `dim'.
 
-    RETURN:
-    Return `k' Ritz values of the operator defined by `Amul.'
-    '''
+    Returns:
+        ((k,) ndarray): `k' Ritz values of the operator defined by `Amul.'
+    """
 \end{lstlisting}
 \end{problem}
 
@@ -288,18 +288,15 @@ Finish the following function to visualize the convergence of the Ritz values.
 
 \begin{lstlisting}
 def plot_ritz(A, n, iters):
-    ''' Plot the relative error of the Ritz values of `A'.
+    """Plot the relative error of the Ritz values of `A'. Use the number of
+    iterations as the x-axis and the relative error of the Ritz values of H_k
+    a approximations to the eigenvalues of A as the y-axis.
 
-    INPUTS:
-    A    - A NumPy array.
-    n - The number of Ritz values to plot.
-    iters   - The number of times to perform the Arnoldi iteration.
-
-    Create the following plot:
-    - The x-axis is the number k of Arnoldi iterations on the x-axis
-    - The y-axis is the relative error of the Ritz values of H_k as
-    approximations to the eigenvalues of A.
-    '''
+    Inputs:
+        A (ndarray)
+        n (int): The number of Ritz values to plot.
+        iters (int): The number of times to perform the Arnoldi iteration.
+    """
     \end{lstlisting}
 
 If $\tilde{\x}$ is an an approximation to $\x$, then the \emph{absolute error} in the approximation is
