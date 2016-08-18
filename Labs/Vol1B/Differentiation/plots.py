@@ -1,3 +1,6 @@
+# plots.py
+"""Volume 1B: Differentiation. Plotting file."""
+
 import matplotlib
 matplotlib.rcParams = matplotlib.rc_params_from_file('../../../matplotlibrc')
 
@@ -43,17 +46,15 @@ def edges():
 
 
 def convergence():
-    '''
-    Plot the convergence of the derivative approximation.
-    '''
+    """Plot the convergence of the derivative approximation."""
     f = np.cos
     actual = -np.sin(3.0)
     hvals = np.linspace(1e-5, 1e-1)
     err1 = np.zeros(hvals.shape)
     err2 = np.zeros(hvals.shape)
     for i in xrange(len(hvals)):
-        err1[i] = np.abs(actual - FiniteDiff.der(f, np.array([3.0]), mode='forward', h=hvals[i], o=1))
-        err2[i] = np.abs(actual - FiniteDiff.der(f, np.array([3.0]), mode='forward', h=hvals[i], o=2))
+        err1[i] = np.abs(actual - FiniteDiff.der(f, np.array([3.0]), mode='forward', h=hvals[i], degree=1))
+        err2[i] = np.abs(actual - FiniteDiff.der(f, np.array([3.0]), mode='forward', h=hvals[i], degree=2))
     plt.subplot(121)
     plt.loglog(hvals, err1)
     plt.ylim((1e-11, 1e-1))
