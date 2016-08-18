@@ -1,12 +1,9 @@
-# qr_lstsq_eigs.py
-"""Volume I: QR 2 (Least Squares and Computing Eigenvalues).
-<Name>
-<Class>
-<Date>
-"""
-
+# solutions.py
+"""Volume I: QR 2 (Least Squares and Computing Eigenvalues). Solutions file."""
 
 import numpy as np
+from cmath import sqrt
+from scipy import linalg as la
 from matplotlib import pyplot as plt
 
 
@@ -26,7 +23,7 @@ def least_squares(A, b):
 
 # Problem 2
 def line_fit():
-    """Load the data from MLB.npy. Use least squares to calculate the line
+    """Load the data from housing.npy. Use least squares to calculate the line
     that best relates height to weight.
 
     Plot the original data points and the least squares line together.
@@ -36,8 +33,8 @@ def line_fit():
 
 # Problem 3
 def polynomial_fit():
-    """Load the data from polynomial.npy. Use least squares to calculate
-    the polynomials of degree 3, 5, 7, and 19 that best fit the data.
+    """Load the data from housing.npy. Use least squares to calculate
+    the polynomials of degree 3, 6, 9, and 12 that best fit the data.
 
     Plot the original data points and each least squares polynomial together
     in individual subplots.
@@ -85,7 +82,7 @@ def power_method(A, N=20, tol=1e-12):
 
 
 # Problem 6
-def QR_algorithm(A, N=50, tol=1e-12):
+def qr_algorithm(A, N=50, tol=1e-12):
     """Compute the eigenvalues of A via the QR algorithm.
 
     Inputs:
@@ -98,4 +95,3 @@ def QR_algorithm(A, N=50, tol=1e-12):
         ((n, ) ndarray): The eigenvalues of A.
     """
     raise NotImplementedError("Problem 6 Incomplete")
-
