@@ -4,6 +4,7 @@ import matplotlib
 matplotlib.rcParams = matplotlib.rc_params_from_file('../../../matplotlibrc')
 
 import numpy as np
+from scipy import linalg as la
 from matplotlib import pyplot as plt
 
 def wilkinson_poly():
