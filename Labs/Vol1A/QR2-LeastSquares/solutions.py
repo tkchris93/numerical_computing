@@ -35,51 +35,46 @@ def least_squares(A, b):
 
 # Problem 2
 def line_fit():
-    """Load the data from MLB.npy. Use least squares to calculate the line
+    """Load the data from housing.npy. Use least squares to calculate the line
     that best relates height to weight.
 
     Plot the original data points and the least squares line together.
     """
-    height, weight, age = np.load("MLB.npy").T
-    A = np.column_stack((height, np.ones_like(height)))
+    year, index = np.load("housing.npy").T
+    A = np.column_stack((year, np.ones_like(year)))
     # Or use slicing:
     # A = np.ones((len(height), 2))
     # A[:,0] = height
-    slope, intercept = least_squares(A, weight)
+    slope, intercept = least_squares(A, index)
 
-    x = np.linspace(height.min()-2, height.max()+2, 20)
-    y = x*slope + intercept
-
-    plt.plot(height, weight, '.')
-    plt.plot(x, y, 'k-', lw=2)
+    plt.plot(year, index, 'k*')
+    plt.plot(year, year*slope + intercept, 'b-', lw=2)
     plt.show()
 
 
 # Problem 3
 def polynomial_fit():
-    """Load the data from polynomial.npy. Use least squares to calculate
-    the polynomials of degree 3, 5, 7, and 19 that best fit the data.
+    """Load the data from housing.npy. Use least squares to calculate
+    the polynomials of degree 3, 6, 9, and 12 that best fit the data.
 
     Plot the original data points and each least squares polynomial together
     in individual subplots.
     """
     # Load the data and define a more refined domain for plotting.
-    x, y = np.load("polynomial.npy").T
-    domain = np.linspace(x.min(), x.max(), 200)
+    year, index = np.load("housing.npy").T
+    domain = np.linspace(year.min(), year.max(), 200)
 
-    for i,n in enumerate([3, 5, 7, 19]):
-
+    for i,n in enumerate([3, 6, 9, 12]):
         # Use least squares to compute the coefficients of the polynomial.
-        coeffs = la.lstsq(np.vander(x, n+1), y)[0]
+        coeffs = la.lstsq(np.vander(year, n+1), index)[0]
         # coeffs = np.polyfit(x, y, deg=n)
 
         # Plot the polynomial and the data points in an individual subplot.
         plt.subplot(2,2,i+1)
-        plt.plot(x, y, 'k*')
+        plt.plot(year, index, 'k*')
         plt.plot(domain, np.polyval(coeffs, domain), 'b-', lw=2)
-        plt.plot(domain, 2*np.sin(domain), 'k--')
         plt.title(r"$n = {}$".format(n))
-        plt.axis([-6,6,-3,3])
+        # plt.axis([x.min(),x.max(),y.min(),y.max()])
 
     plt.suptitle("Solution to Problem 3")
     plt.show()
@@ -197,24 +192,28 @@ def qr_algorithm(A, N=50, tol=1e-12):
 
 # Additional Material?
 from matplotlib.animation import FuncAnimation
+import warnings
 
 def polynomial_fit_animation():
 
-    x, y = np.load("polynomial.npy").T
+    warnings.simplefilter("ignore", np.RankWarning)
+    x,y = np.load("housing.npy").T
     domain = np.linspace(x.min(), x.max(), 200)
-    y_vals = np.array([np.poly1d(np.polyfit(x, y, deg=n))(domain)
-                                                    for n in xrange(20)])
+    y_vals = np.array([np.polyval(np.polyfit(x, y, deg=n), domain)
+                                                    for n in xrange(len(y))])
+    warnings.simplefilter("default", np.RankWarning)
+
     plt.plot(x, y, 'k*')
     plt.plot(domain, 2*np.sin(domain), 'k--', lw=1)
 
     fig = plt.figure(1)
     drawing, = plt.plot([],[], lw=2)
-    plt.axis([domain.min()-1, domain.max()+1, -8, 8])
+    plt.axis([x.min()-1, x.max()+1, y.min()-1, y.max()+1])
 
     def update(index):
         drawing.set_data(domain, y_vals[index])
         plt.title(r"$n = {}$".format(index))
         return drawing,
 
-    a = FuncAnimation(fig, update, frames=y.shape[0], interval=1000)
+    a = FuncAnimation(fig, update, frames=y_vals.shape[0], interval=1000)
     plt.show()

@@ -205,7 +205,7 @@ class _testDriver(object):
 
         s.line_fit()
         print("""\nSpecifications:
-        1. Scatter plot of age versus weight            (2 points)
+        1. Scatter plot of year versus price index      (2 points)
         2. Positive-slope regression line               (3 points)
         (Title and legend unnecessary)""")
         points = self._grade(5, "line_fit() plot incorrect")
@@ -219,9 +219,8 @@ class _testDriver(object):
         print("""\nSpecifications:
         1. 4 subplots, clearly labeled                  (1 point)
         2. Scatter plot of data on each subplot         (1 point)
-        3. First polynomial isn't a great fit           (1 point)
-        4. Second and third polynomials are good fits   (1 point)
-        5. Final polynomial interpolates (bad fit)      (1 point)
+        3. 1st polynomial isn't a great fit             (1 point)
+        4. 2nd, 3rd, and 4th polynomials are good fits  (2 points)
         (Title and legend unnecessary)""")
         points = self._grade(5, "polynomial_fit() plot incorrect")
         return int(points * self._checkCode(s.polynomial_fit, "polyfit(") /10.)

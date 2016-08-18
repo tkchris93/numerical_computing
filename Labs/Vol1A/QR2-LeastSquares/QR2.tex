@@ -47,7 +47,7 @@ In addition, you may use \li{la.solve_triangular()}, SciPy's optimized routine f
 
 \subsection*{Fitting a Line} % ------------------------------------------------
 
-The least squares solution can be used to find the best-fit curve of a chosen type to a set of points.
+The least squares solution can be used to find the best fit curve of a chosen type to a set of points.
 Consider the problem of finding the line $y = ax + b$ that best fits a set of $m$ points $\{(x_k, y_k)\}_{k=1}^m$.
 Ideally, we seek $a$ and $b$ such that $y_k = ax_k + b$ for all $k$.
 The following linear system simultaneously represents all of these equations.
@@ -82,21 +82,21 @@ Figure \ref{fig:line-fit-example} is a typical example of this idea where $\wide
     \label{fig:line-fit-example}
 \end{figure}
 
-% TODO: Consider replacing this data set with something with less variance.
-% This data set is also used in the Data Visualization lab.
-\begin{problem} % Linear regression of height vs weight.
-The file \texttt{MLB.npy} contains measurements from over 1,000 recent Major League Baseball players, compiled by UCLA.\footnote{See \url{http://wiki.stat.ucla.edu/socr/index.php/SOCR_Data_MLB_HeightsWeights}.}
-Each row in the array represents a different player; the columns are the player's height (in inches), weight (in pounds), and age (in years), in that order.
+% TODO: Replacing this data set housing_prices.npy (average housing prices since 2000).
+\begin{problem}
+The file \texttt{housing.npy} contains the purchase-only housing price index, a measure of how housing prices are changing, for the United States from 2000 to 2010.%
+\footnote{See \url{http://www.fhfa.gov/DataTools/Downloads/Pages/House-Price-Index.aspx}.}
+Each row in the array is a separate measurement; the columns are the year and the price index, in that order.
+To avoid large numerical computations, the year measurements start at 0 instead of 2000.
 
-Find the least squares line that relates the height of the players to their weight (i.e., let height be the $x$ values and weight be the $y$ values).
-%
+Find the least squares line that relates the year to the housing price index (i.e., let year be the $x$ axis and index the $y$ axis).
+
 \begin{enumerate}
     \item Construct the matrix $A$ and the vector $\b$ described by Equation \ref{eq:linear-least-squares}.\\
     (Hint: the functions \li{np.vstack()}, \li{np.column_stack()}, and/or \li{np.ones()} may be helpful.)
     \item Use your function from Problem \ref{prob:lstsq-via-qr} to find the least squares solution.
     \item Plot the data points as a scatter plot.
     \item Plot the least squares line with the scatter plot.\\
-    (Hint: Make a new domain of $x$ values with \li{np.linspace()}, and use this domain to calculate $y = \widehat{a}x + \widehat{b}$.)
 \end{enumerate}
 \end{problem}
 
@@ -129,7 +129,7 @@ For example, the following code produces Figure \ref{fig:line-fit-example}.
 
 \subsection*{Fitting a Polynomial} % ------------------------------------------
 
-Least squares can also be used to fit a set of data to the best-fit polynomial of a specified degree.
+Least squares can also be used to fit a set of data to the best fit polynomial of a specified degree.
 Let $\{(x_k, y_k)\}_{k=1}^m$ be the set of $m$ data points in question.
 The general form for a polynomial of degree $n$ is as follows:
 \[
@@ -225,16 +225,13 @@ array([0, 0, 2, 6])
 \end{lstlisting}
 
 \begin{problem} % Polynomial fitting.
-The file \texttt{polynomial.npy} contains an array of $20$ $(x,y)$ coordinate pairs.
-Each row of the array is a different coordinate pair, with $x$ values in the first column and $y$ values in the second column.
+The data in \texttt{housing.npy} is nonlinear, and might be better fit by a polynomial.
 
-Write a function that uses Equation \ref{eq:polynomial-least-squares} to calculate the polynomials of degree $3$, $5$, $7$, and $19$ that best fit the data.
-Plot the original data points and each least squares polynomial together in individual subplots.\\
-(Hint: set the window limits to be the same on each subplot to get an accurate picture of what's happening with the degree $19$ polynomial).
+Write a function that uses Equation \ref{eq:polynomial-least-squares} to calculate the polynomials of degree $3$, $6$, $9$, and $32$ that best fit the data.
+Plot the original data points and each least squares polynomial together in individual subplots.
+\\(Hint: define a separate, more refined domain with \li{np.linspace()} and use this domain to smoothly plot the polynomials.)
 
 Instead of using Problem \ref{prob:lstsq-via-qr} to solve the normal equation, you may use \li{scipy.linalg.lstsq()}, demonstrated below.
-% Compare your results to \li{np.polyfit()}.
-% This function receives arrays of $x$ and $y$ values and an integer for the degree, and returns the coefficients of the best-fit polynomial of that degree.
 
 \begin{lstlisting}
 >>> from scipy import linalg as la
@@ -247,14 +244,32 @@ Instead of using Problem \ref{prob:lstsq-via-qr} to solve the normal equation, y
 \end{lstlisting}
 
 Compare your results to \li{np.polyfit()}.
-This function receives an array of $x$ values, an array of $y$ values, and an integer for the polynomial degree, and returns the coefficients of the best-fit polynomial of that degree.
+This function receives an array of $x$ values, an array of $y$ values, and an integer for the polynomial degree, and returns the coefficients of the best fit polynomial of that degree.
+
+\begin{comment}
+\begin{lstlisting}
+# Generate some random data close to the line y = x^2 - 3x + 2.
+>>> x = np.linspace(0, 10, 20)
+>>> y = x**2 - 3*x + 2 + np.random.randn(20)
+
+# Use np.polyfit() to calculate the best fit 2nd degree polynomial.
+>>> coeffs = np.polyfit(x, y, 2)
+
+>>> domain = np.linspace(0, 10, 200)
+>>> plt.plot(x, y, 'k*')
+>>> plt.plot(domain, np.polyval(coeffs, domain))
+>>> plt.show()
+\end{lstlisting}
+\end{comment}
 
 \label{prob:polynomial-least-squares}
 \end{problem}
 
 \begin{warn} % Overfitting
-Problem \ref{prob:polynomial-least-squares} demonstrates that having more parameters in a least squares model is not always better.
-The polynomial of degree 19 actually \emph{interpolates} the data set, meaning that $p_{19}(x_k) = y_k$ exactly for each $k$, because there are enough unknowns that the system is no longer overdetermined.
+Having more parameters in a least squares model is not always better.
+For a set of $m$ points, the best fit polynomial of degree $m-1$ \emph{interpolates} the data set, meaning that $p(x_k) = y_k$ exactly for each $k$.
+In this case there are enough unknowns that the system is no longer overdetermined.
+However, such a polynomial is subject to numerical errors and conditioning problems.
 
 Choosing to have too many unknowns in a fitting problem is (fittingly) called \emph{overfitting}, and is an important issue to avoid in any statistical model.
 \end{warn}
