@@ -92,8 +92,8 @@ Appending $m - n$ rows of zeros to $\widehat{R}$ results in $R$.
 
 \subsection*{Modified Gram-Schmidt} % -----------------------------------------
 
-When implemented with a computer, the Gram-Schmidt algorithm may produce a set of vectors $\{\q_j\}_{j=1}^n$ that are not even close to orthonormal due to rounding errors.
-The \emph{modified Gram-Schmidt algorithm} is a slight variant of the classical algorithm which consistently produces a set of vectors that are ``very close'' to orthonormal.
+If the columns of $A$ are close to being linearly dependent, the classical Gram-Schmidt algorithm often produces a set of vectors $\{\q_j\}_{j=1}^n$ that are not even close to orthonormal due to rounding errors.
+The \emph{modified Gram-Schmidt algorithm} is a slight variant of the classical algorithm which more consistently produces a set of vectors that are ``very close'' to orthonormal.
 
 Let $\q_1$ be the normalization of $\x_1$ as before.
 Instead of making just $\x_2$ orthogonal to $\q_1$, make \emph{each} of the vectors $\{\x_j\}_{j=2}^n$ orthogonal to $\q_1$:
@@ -275,7 +275,7 @@ The \emph{orthogonal complement} of a nonzero vector $\v \in \mathbb{R}^n$ is th
 A \emph{Householder transformation} is a linear transformation that reflects a vector $\x$ across the orthogonal complement $\v^\perp$ for some specified $\v$.
 
 The matrix representation of the Householder transformation corresponding to $\v$ is given by $H_{\v} = I - 2\frac{\v\v\trp}{\v\trp\v}$.
-Since $H_{\v}\trp H_{\v} = I$, Householder transformations are orthonormal (can you prove it?).
+Since $H_{\v}\trp H_{\v} = I$, Householder transformations are orthonormal.
 
 \begin{figure}[H]
 \centering
@@ -651,8 +651,6 @@ SciPy's \li{scipy.linalg.qr()} can compute the pivoted QR decomposition.
 True
 \end{lstlisting}
 
-The QR factorization with pivoting is the basis for several rank-revealing algorithms and for handling rank-deficient least matrices problems (solving $Ax = b$ where $A$ is $m \times n$ with $m < n$).
-
 \begin{comment}
 \subsection*{Stability of the QR Decomposition in SciPy} % --------------------
 
@@ -709,7 +707,7 @@ R_\theta =
 \end{array}\right]
 \]
 
-This transformation is orthonormal (can you prove it?).
+This transformation is orthonormal.
 Given $\x = \left[a, b\right]\trp$, if $\theta$ is the angle between $\x$ and $\e_1$, then $R_{-\theta}$ maps $\x$ to the span of $\e_1$.
 
 \begin{figure}[H]
