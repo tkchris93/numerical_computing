@@ -1,5 +1,5 @@
 # linear_transformations.py
-"""Volume I: Linear Transformations.
+"""Volume 1A: Linear Transformations.
 <Name>
 <Class>
 <Date>

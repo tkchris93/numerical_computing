@@ -1,5 +1,5 @@
 # solutions.py
-"""Volume I: Linear Transformations. Solutions file."""
+"""Volume 1A: Linear Transformations. Solutions file."""
 
 import time
 import timeit

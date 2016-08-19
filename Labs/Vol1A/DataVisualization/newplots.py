@@ -1,5 +1,5 @@
 # newplots.py
-"""Volume I: Data Visualization. Plotting file."""
+"""Volume 1A: Data Visualization. Plotting file."""
 
 from __future__ import print_function
 import matplotlib

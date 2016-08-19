@@ -1,5 +1,5 @@
 # svd_image_compression.py
-"""Volume I: SVD
+"""Volume 1A: SVD and Image Compression.
 <Name>
 <Class>
 <Date>

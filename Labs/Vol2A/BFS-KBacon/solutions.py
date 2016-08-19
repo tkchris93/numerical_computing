@@ -1,5 +1,5 @@
 # solutions.py
-"""Volume II: Breadth-First Search (Kevin Bacon). Solutions file."""
+"""Volume 2A: Breadth-First Search (Kevin Bacon). Solutions file."""
 
 from collections import deque
 import networkx as nx
@@ -19,7 +19,7 @@ class Graph(object):
     # Problem 1
     def __str__(self):
         """String representation: a sorted view of the adjacency dictionary.
-        
+
         Example:
             >>> test = {'A':['D', 'C', 'B'], 'D':['A', 'C'],
             ...         'C':['B', 'A', 'D'], 'B':['A', 'C']}
@@ -149,7 +149,7 @@ class Graph(object):
             ['A', 'F', 'G']
         """
         if start not in self.dictionary:
-            raise ValueError("Starting point " + str(start) 
+            raise ValueError("Starting point " + str(start)
                                     + " is not in the graph.")
         # if target not in self.dictionary: raise ValueError
 
@@ -222,7 +222,7 @@ def parse(filename="movieData.txt"):
         for actor in names[1:]:
             graph[movie].append(actor)
 
-    return graph 
+    return graph
 
 
 # Problems 6-8: Implement the following class
@@ -238,7 +238,7 @@ class BaconSolver(object):
         # Get the adjacency dictionary from the file
         movie_to_actors = parse(filename)
 
-        # Extract the actors from the adjacency dictionary (values) 
+        # Extract the actors from the adjacency dictionary (values)
         self.actors = set()
         for movie in movie_to_actors:
             for actor in movie_to_actors[movie]:
@@ -277,7 +277,7 @@ class BaconSolver(object):
                 connected += 1
             except nx.NetworkXNoPath:
                 isolated += 1
-    
+
         return float(total)/connected, isolated
 
     # Problem 8 (Optional)
