@@ -335,6 +335,7 @@ This insight means that given a training set of scanned images along with correc
 The \li{sklearn} module contains powerful tools for solving the nearest neighbor problem.
 To start nearest neighbors classification, we import the neighbors module from sklearn.
 This module has a class for setting up a k-nearest neighbors classifier.
+
 \begin{lstlisting}
 # Import the neighbors module
 >>> from sklearn import neighbors
@@ -367,12 +368,14 @@ The second method, \li{predict}, will do a k-nearest neighbor search on the $k$-
 \end{lstlisting}
 
 \begin{problem} % Postal data problem.
-The United States Postal Service has made a collection of labelled hand written digits available to the public, provided in \li{PostalData.npz}.
+The United States Postal Service has made a collection of labeled hand written digits available to the public, provided in \texttt{PostalData.npz}.
 We will use this data for k-nearest neighbor classification.
 This data set may be loaded by using the following command:
+
 \begin{lstlisting}
 labels, points, testlabels, testpoints = np.load('PostalData.npz').items()
 \end{lstlisting}
+
 This contains a training set and a test set.
 The first entry of each array is a name, so \li{points[1]} and \li{labels[1]} are the actual points and labels to use.
 Each point is an image that is represented by a flattened $28 \times 28$ matrix of pixels.
