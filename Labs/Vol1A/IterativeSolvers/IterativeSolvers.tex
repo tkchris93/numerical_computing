@@ -625,8 +625,13 @@ For the vector $b$, all nonzero entries correspond to interior points that touch
 For this problem, do the following:
 \begin{enumerate}
     \item Write a function \li{finite_difference()} that accepts an integer $n$ for the number of interior gridlines. Your function should return the corresponding sparse matrix $A$ and NumPy array $b$. For example, a value of $n = 3$ should result in the matrix $A$ and vector $b$ described above. HINT: Consider using \li{scipy.sparse.block_diag} and the \li{setdiag()} method of scipy sparse matrices for dynamically creating the matrix $A$.
-    \item To demonstrate how convergence is affected by the value of $\omega$, time your \li{sparse_sor()} function for values of $\omega = [1, 1.05, 1.1, \dots , 1.9, 1.95 ]$. Plot your timings as a function of $\omega$. Generate the system $A \mathbf{x} = b$ using your \li{finite_difference()} function and a value of $n = 20$. Remember that $\omega = 1$ corresponds to the Gauss-Seidel method. How does Gauss-Seidel compare to SOR with the optimal $\omega$? NOTE: Notice that the matrix $A$ is not strictly diagonally dominant. However, this matrix is positive definite, so the algorithm will converge. Unfortunately, convergence for these kinds of systems require many more iterations. When using the \li{sparse_sor()} function in this problem, set \li{maxiters = 10000} and \li{tol=10**-2}.
+    \item To demonstrate how convergence is affected by the value of $\omega$, time your \li{sparse_sor()} function for values of $\omega = [1, 1.05, 1.1, \dots , 1.9, 1.95 ]$. Plot your timings as a function of $\omega$. Generate the system $A \mathbf{x} = b$ using your \li{finite_difference()} function and a value of $n = 20$. Remember that $\omega = 1$ corresponds to the Gauss-Seidel method. How does Gauss-Seidel compare to SOR with the optimal $\omega$?
+
+    NOTE: Notice that the matrix $A$ is not strictly diagonally dominant. However, this matrix is positive definite, so the algorithm will converge. Unfortunately, convergence for these kinds of systems require many more iterations. When using the \li{sparse_sor()} function in this problem, set \li{maxiters = 10000} and \li{tol=10**-2}.
+    \item Using \li{plt.pcolormesh}, create a heatmap to visualize your solution. The solution vector you get from your \li{sparse_sor()} function will need to be reshaped to properly visualize the result.
 \end{enumerate}
+
+\begin{comment}
 The following code generates a heatmap to help you visualize the steady-state heat flow across the interior of the plate:
 
 \begin{lstlisting}
@@ -643,6 +648,8 @@ X,Y = np.meshgrid(x,y)
 plt.pcolormesh(X,Y,U,cmap='RdBu_r')
 plt.show()
 \end{lstlisting}
+\end{comment}
+
 
 \end{problem}
 
