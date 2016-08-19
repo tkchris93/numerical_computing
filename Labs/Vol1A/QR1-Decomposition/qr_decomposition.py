@@ -1,5 +1,5 @@
 # qr_decomposition.py
-"""Volume I: QR 1 (Decomposition).
+"""Volume 1A: QR 1 (Decomposition).
 <Name>
 <Class>
 <Date>

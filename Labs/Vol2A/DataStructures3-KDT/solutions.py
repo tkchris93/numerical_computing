@@ -1,5 +1,5 @@
-# new_solutions.py
-"""Volume II Lab 7: Nearest Neighbor Search. Solutions file."""
+# solutions.py
+"""Volume 2A: Data Structures 3 (K-d Trees). Solutions file."""
 
 # BSTNode / BST Classes from Data Structures II Lab ========================= #
 class BSTNode(object):
@@ -12,13 +12,13 @@ class BSTNode(object):
 class BST(object):
     def __init__(self):
         self.root = None
-    
+
     def __str__(self):
         if self.root is None:
             return "[]"
         str_tree = [list() for i in xrange(_height(self.root) + 1)]
         visited = set()
-        
+
         def _visit(current, depth):
             str_tree[depth].append(current.value)
             visited.add(current)
@@ -26,7 +26,7 @@ class BST(object):
                 _visit(current.left, depth+1)
             if current.right and current.right not in visited:
                 _visit(current.right, depth+1)
-        
+
         _visit(self.root, 0)
         out = ""
         for level in str_tree:
@@ -47,14 +47,13 @@ import numpy as np
 from sklearn import neighbors
 from scipy.spatial import KDTree
 
-
-# Problem 1: Implement this function.
+# Problem 1
 def metric(x, y):
     """Return the euclidean distance between the 1-D arrays 'x' and 'y'.
 
     Raises:
         ValueError: if 'x' and 'y' have different lengths.
-    
+
     Example:
         >>> metric([1,2],[2,2])
         1.0
@@ -64,7 +63,7 @@ def metric(x, y):
     if len(x) != len(y):
         raise ValueError("Incompatible dimensions")
     return np.linalg.norm(x - y)
-    
+
     # Or a slightly longer way:
     return np.sqrt(np.sum((x - y)**2))
     # Or the longest/worst way:
@@ -76,19 +75,19 @@ def metric(x, y):
     return total
 
 
-# Problem 2: Implement this function.
+# Problem 2
 def exhaustive_search(data_set, target):
     """Solve the nearest neighbor search problem exhaustively.
     Check the distances between 'target' and each point in 'data_set'.
     Use the Euclidean metric to calculate distances.
-    
+
     Inputs:
-        data_set (mxk ndarray): An array of m k-dimensional points.
-        target (1xk ndarray): A k-dimensional point to compare to 'dataset'.
-        
+        data_set ((m,k) ndarray): An array of m k-dimensional points.
+        target ((k,) ndarray): A k-dimensional point to compare to 'dataset'.
+
     Returns:
-        the member of 'data_set' that is nearest to 'target' (1xk ndarray).
-        The distance from the nearest neighbor to 'target' (float).
+        ((k,) ndarray) the member of 'data_set' that is nearest to 'target'.
+        (float) The distance from the nearest neighbor to 'target'.
     """
 
     # Initialize the outputs.
@@ -163,7 +162,7 @@ class KDT(BST):
         self.k = data_set.shape[1]
         for point in data_set:
             self.insert(point)
-    
+
     def find(self, data):
         """Return the node containing 'data'. If there is no such node
         in the tree, or if the tree is empty, raise a ValueError.
@@ -182,10 +181,10 @@ class KDT(BST):
                 return _step(current.left)          # Recursively search left.
             else:
                 return _step(current.right)         # Recursively search right.
-        
+
         # Start the recursion on the root of the tree.
         return _step(self.root)
-    
+
     def insert(self, data):
         """Insert a new node containing 'data' at the appropriate location.
         Return the new node. This method should be similar to BST.insert().
@@ -194,10 +193,10 @@ class KDT(BST):
         # Check that the data matches the dimension of the tree.
         if len(data) != self.k:
             raise ValueError("data must have {} entries".format(self.k))
-        
+
         # Create the node to be inserted.
         new_node = KDTNode(data)
-        
+
         def _find_parent(current):
             """Recursively descend through the tree to find the node that
             should be the parent of the new node. Do not allow for duplicates.
@@ -206,7 +205,7 @@ class KDT(BST):
             # Base case: error (shouldn't happen).
             assert current is not None, "_find_parent() error"
             # Base case: duplicate values.
-            if np.allclose(data, current.value):  
+            if np.allclose(data, current.value):
                 raise ValueError("{} is already in the tree".format(data))
             # Look to the left.
             elif data[current.axis] < current.value[current.axis]:
@@ -222,10 +221,10 @@ class KDT(BST):
                 if current.right is not None:
                     return _find_parent(current.right)
                 # Base case: insert the node on the right.
-                else:       
+                else:
                     current.right = new_node
             return current
-        
+
         # Case 1: The tree is empty. Assign the root and axis appropriately.
         if self.root is None:
             self.root = new_node
@@ -239,14 +238,14 @@ class KDT(BST):
             # Double-link the child to its parent and set its axis attribute.
             new_node.prev = parent
             new_node.axis = (parent.axis + 1) % self.k
-    
+
     def remove(*args, **kwargs):
         raise NotImplementedError("'remove()' has been disabled.")
 
 
 # Problem 5: Implement this function
 def nearest_neighbor(data_set, target):
-    """Use your KDTree class to solve the nearest neighbor problem.
+    """Use your KDT class to solve the nearest neighbor problem.
 
     Inputs:
         data_set ((m,k) ndarray): An array of m k-dimensional points.
@@ -256,10 +255,10 @@ def nearest_neighbor(data_set, target):
         The point in the tree that is nearest to 'target' ((k,) ndarray).
         The distance from the nearest neighbor to 'target' (float).
     """
-    
+
     def KDsearch(current, neighbor, distance):
         """The actual nearest neighbor search algorithm.
-        
+
         Inputs:
             current (KDTNode): the node to examine.
             neighbor (KDTNode): the current nearest neighbor.
@@ -269,7 +268,7 @@ def nearest_neighbor(data_set, target):
             neighbor (KDTNode): The new nearest neighbor in the tree.
             distance (float): the new minimum distance.
         """
-        
+
         # Base case. Return the distance and the nearest neighbor.
         if current is None:
             return neighbor, distance
@@ -292,9 +291,9 @@ def nearest_neighbor(data_set, target):
             if target[index] - distance <= current.value[index]: # (?)
                 neighbor, distance = KDsearch(
                     current.left, neighbor, distance)
-    
+
         return neighbor, distance
-    
+
     # Load and search the KD-Tree.
     tree = KDT(data_set)
     start_distance = metric(tree.root.value, target)
@@ -336,45 +335,3 @@ def postal_problem(grading=False):
     print "n_neighbors =  4, weights = 'uniform' :\t", trial(4, 'uniform')
     print "n_neighbors = 10, weights = 'distance':\t", trial(10, 'distance')
     print "n_neighbors = 10, weights = 'uniform' :\t", trial(10, 'uniform')
-
-# ============================= END OF SOLUTIONS ============================ #
-
-'''
-from matplotlib import pyplot as plt
-
-def makeplots():
-    fig = plt.figure()
-    ax = fig.add_subplot(111, autoscale_on=False, xlim=(0,10), ylim=(0,10))
-
-    point_list = [(5,5), (8,4), (3,2), (7,7), (2,6), (9,2), (4,7)]
-    x = [5, 8, 3, 7, 2, 9, 4]
-    y = [5, 4, 2, 7, 6, 2, 7]
-    ax.axvline(5, 0, 1)
-    ax.axhline(4, .5, 1, color='r')
-    ax.axhline(2, 0, .5, color='r')
-    ax.axvline(7, .4, 1)
-    ax.axvline(2, .2, 1)
-    ax.axvline(9, 0, .4)
-    ax.axhline(7, .2, .5, color="r")
-    #plt.annotate("root", xy=(5,5), xytext=(5.2,5))
-    #plt.annotate("root.right", xy=(8,4), xytext=(7.65,4.35))
-    #plt.annotate("root.right.left", xy=(9,2), xytext=(7,2))
-    #plt.annotate("root.left", xy=(3,2), xytext=(2.65,1.6))
-    #plt.annotate("root.left.right", xy=(1,6), xytext=(.2,6.1))
-    #plt.annotate("root.left.right.right\n     (new node)", xy=(4,7),
-    #                                        xytext=(2.35,7.3))
-
-    ax.plot(x, y, 'ok')
-    ax.plot([8], [4.45], '*k')
-    mid = plt.Circle(xy=(8,4), radius=.5, color="green", alpha=.3)
-    upp = plt.Circle(xy=(7,7), radius=.5, color="purple", alpha=.3)
-    ax.add_artist(mid)
-    ax.add_artist(upp)
-    plt.annotate("target", xy=(8,4.5), xytext=(8.2,4.5))
-    plt.show()
-
-if __name__ == '__main__':
-    makeplots()
-'''
-
-# =============================== END OF FILE =============================== #

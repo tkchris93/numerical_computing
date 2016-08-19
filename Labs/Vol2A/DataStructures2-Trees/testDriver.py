@@ -348,7 +348,7 @@ class _testDriver(object):
 
         print("Running prob4()...")
         stdout.flush()
-        s.prob4("English.txt")
+        s.prob4()
         return self._grade(10)
 
 

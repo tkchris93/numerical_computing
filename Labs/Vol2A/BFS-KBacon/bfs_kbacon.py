@@ -1,8 +1,8 @@
 # bfs_kbacon.py
-"""Volume II Lab 7: Breadth-First Search (Kevin Bacon)
-<name>
-<class>
-<date>
+"""Volume 2A: Breadth-First Search (Kevin Bacon).
+<Name>
+<Class>
+<Date>
 """
 
 

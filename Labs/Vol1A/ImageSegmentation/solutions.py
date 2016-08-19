@@ -1,7 +1,5 @@
-'''
-Solutions file for Volume 1 - Image Segmentation
-Edited by Jessica Morrise, 6/2016
-'''
+# solutions.py
+"""Volume 1A: Image Segmentation. Solutions file."""
 
 # Remember to include all necessary imports here
 import numpy as np
@@ -78,17 +76,17 @@ def adjacency(img, radius=5.0, sigmaI = .02, sigmaX = 3.0):
     # For each pixel, initialize the entries of the corresponding row in the adjacency matrix
     # Sum these entries to get the corresponding entry in the degree matrix
     for pixel in xrange(nodes.size):
-    
-        # find the indices and distancess of the pixels that are within 
+
+        # find the indices and distancess of the pixels that are within
         # distance r of the current pixel by calling getNeighbors
         nbrs = getNeighbors(pixel, radius, height, width)
-        
+
         # calculate the weights corresponding to each pixel and the current
         # pixel. This may be done in a vectorized fashion.
         weights = np.exp(-np.abs(nodes[nbrs[0]] - nodes[pixel])/sigmaI - nbrs[1]/sigmaX)
         W[pixel, nbrs[0]] = weights
         D[0,pixel] = weights.sum()
-   
+
     # Convert W into csc format using the command below.
     # this format is better for computations, while the lil format is better for
     # building the matrix.
@@ -102,14 +100,14 @@ def getNeighbors(index, radius, height, width):
     array. The returned indices are with respect to the flattened version of the
     array. This is a helper function for adjacency.
     Inputs:
-        index -- denotes the index in the flattened array of the pixel we are 
+        index -- denotes the index in the flattened array of the pixel we are
                 looking at
         radius -- radius of the circular region centered at pixel (row, col)
         height, width -- the height and width of the original image, in pixels
     Returns:
         indices -- a flat array of indices of pixels that are within distance r
                    of the pixel at (row, col)
-        distances -- a flat array giving the respective distances from these 
+        distances -- a flat array giving the respective distances from these
                      pixels to the center pixel.
     '''
     row, col = index/width, index%width
@@ -142,41 +140,41 @@ def segment(img):
                 segment.
     '''
     # call the function adjacency to obtain the adjacency matrix W
-    # and the degree array D. 
+    # and the degree array D.
     W,D = adjacency(img)
-    
+
     # calculate D^(-1/2)
     Dsq = np.sqrt(1.0/D)
-    
+
     # convert D and D^(-1/2) into diagonal sparse matrices (format = 'csc')
     Ds = spar.spdiags(D, 0, D.shape[1], D.shape[1], format = 'csc')
     Dsqs = spar.spdiags(Dsq, 0, D.shape[1], D.shape[1], format = 'csc')
-    
+
     # calculate the Laplacian, L
     L = Ds - W
-    
+
     # calculate the matrix whose eigenvalues we will compute, D^(-1/2)LD^(-1/2)
     # np.dot will not work on sparse arrays. Instead, if P and Q are sparse
     # matrices that we would like to multiply, use P.dot(Q)
     P = Dsqs.dot(L.dot(Dsqs))
-    
-    # calculate the eigenvector. Use the eigs function in sparla. 
-    # Be sure to set the appropriate keyword argument so that you 
+
+    # calculate the eigenvector. Use the eigs function in sparla.
+    # Be sure to set the appropriate keyword argument so that you
     # compute the two eigenvalues with the smallest real part.
     e = sparla.eigsh(P, k=2, which="SR")
     eigvec = e[1][:,1]
-    
+
     # create a mask array that is True wherever the eigenvector is positive.
     # reshape it to be the size of img.
     mask = (eigvec>0).reshape(img.shape)
-    
-    # create the positive segment by masking out the pixels in img 
+
+    # create the positive segment by masking out the pixels in img
     # belonging to the negative segment.
     pos = img*mask
-    
-    # create the negative segment by masking out the pixels in img 
+
+    # create the negative segment by masking out the pixels in img
     # belonging to the posative segment.
     neg = img*~mask
-    
+
     # return the two segments (positive first)
     return pos, neg

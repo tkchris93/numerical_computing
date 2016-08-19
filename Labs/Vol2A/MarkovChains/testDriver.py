@@ -16,7 +16,7 @@ def _timeout(seconds):
         This decorator uses signal.SIGALRM, which is only available on Unix.
     """
     assert isinstance(seconds, int), "@timeout(sec) requires an int"
-    
+
     class TimeoutError(Exception):
         pass
 
@@ -39,18 +39,19 @@ def _timeout(seconds):
 # Test Script and Class =======================================================
 
 import numpy as np
+from os import remove as rm
 from solutions import analyze_simulation, SentenceGenerator
 
 def test(student_module):
     """Grade a student's entire solutions file.
-    
+
     5  points for problem 1
     15 points for problems 2-4
     20 points for problems 5-6
-    
+
     Inputs:
         student_module: the imported module for the student's file.
-    
+
     Returns:
         score (int): the student's score, out of 40.
         feedback (str): a printout of test results for the student.
@@ -107,7 +108,7 @@ class _testDriver(object):
         comments = str(raw_input("Comments: "))
         if len(comments) > 0:
             self.feedback += '\n\n\nComments:\n\t{}'.format(comments)
-    
+
     # Helper Functions --------------------------------------------------------
     @staticmethod
     def _errType(error):
@@ -151,12 +152,11 @@ class _testDriver(object):
     def problem1(self, s):
         """Test random_markov(). 5 points."""
         def test_chain(m):
-            for column in m.T:
-                if not np.allclose(column.sum(), 1.):
+            for row in m:
+                if not np.allclose(row.sum(), 1.):
                     self.feedback += "\nInvalid Markov chain."
-                    self.feedback += "\n\tColumn doesn't sum to one:\n\t"
-                    self.feedback += str(column)
-                    print column.sum()
+                    self.feedback += "\n\tRow doesn't sum to one:\n\t"
+                    self.feedback += str(row)
                     return 0
             return 1
         points  =   test_chain(s.random_markov(  3))
@@ -198,8 +198,37 @@ class _testDriver(object):
     def problem6(self, s):
         """Test the SentenceGenerator class. 20 points."""
 
+        with open("__test1__.txt", 'w') as f:
+            f.write("a b c d e f g h i j k l m n o p q r s t u v w x y z")
+        with open("__test2__.txt", 'w') as f:
+            f.write("I am Sam Sam I am.\n"
+                    "Do you like green eggs and ham?\n"
+                    "I do not like them, Sam I am.\n"
+                    "I do not like green eggs and ham.")
+        with open("__test3__.txt", 'w') as f:
+            f.write("Love is patient Love is kind\n"
+                    "It does not envy It does not boast\n"
+                    "It is not proud It is not rude\n"
+                    "It is not self-seeking It is not easily angered\n"
+                    "It keeps no record of wrongs\n"
+                    "Love does not delight in evil\n"
+                    "but rejoices with the truth\n"
+                    "It always protects always trusts\n"
+                    "always hopes always perseveres\n"
+                    "Love never fails")
+        with open("__test4__.txt", 'w') as f:
+            f.write("the quick brown fox jumped over the lazy dog\n"
+                    "the slow brown snake slithered over the brown patch\n"
+                    "the slow green snake slithered under the green leaves\n"
+                    "the quick green fox doesnt exist since foxes are orange\n"
+                    "the quick orange fox out foxed the fox in disguise\n"
+                    "the sneaky orange duck quacked at the brown fox\n"
+                    "what does the fox say\n"
+                    "what doesnt the fox say")
+
         def test_sentences(filename, num_sentences):
 
+            filename = "__{}__.txt".format(filename)
             print("\n{}\nSource file:".format('-'*80))
             with open(filename, 'r') as training_set:
                 print(training_set.read().strip())
@@ -215,10 +244,13 @@ class _testDriver(object):
 
             return self._grade(5)
 
-        points  = test_sentences("markov_test1.txt", 2)
-        points += test_sentences("markov_test2.txt", 3)
-        points += test_sentences("markov_test3.txt", 5)
-        points += test_sentences("markov_test4.txt", 5)
+        points  = test_sentences("test1", 2)
+        points += test_sentences("test2", 3)
+        points += test_sentences("test3", 5)
+        points += test_sentences("test4", 5)
+
+        for i in xrange(1,5):
+            rm("__test{}__.txt".format(i))
 
         return points
 

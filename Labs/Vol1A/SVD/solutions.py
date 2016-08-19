@@ -1,7 +1,5 @@
-'''
-Solutions file for Volume 1 - SVD
-Edited by Jessica Morrise, 6/2016
-'''
+# solutions.py
+"""Volume 1A: SVD and Image Compression. Solutions file."""
 
 # solutions.py
 from scipy import linalg as la
@@ -10,7 +8,7 @@ from matplotlib import pyplot as plt
 
 # Problem 1
 def truncated_svd(A,k=None,tol=10**-6):
-    """Computes the truncated SVD of A. If r is None or equals the number 
+    """Computes the truncated SVD of A. If r is None or equals the number
         of nonzero singular values, it is the compact SVD.
     Parameters:
         A: the matrix
@@ -35,7 +33,7 @@ def truncated_svd(A,k=None,tol=10**-6):
             raise ValueError("k is too large")
         else:
             # Keep only the largest k singular values
-            s = s[:k] 
+            s = s[:k]
     # Remove all zero singular values
     s = s[s>tol]
 
@@ -53,14 +51,14 @@ def truncated_svd(A,k=None,tol=10**-6):
 def visualize_svd():
     S = np.load("circle.npz")["circle"]
     vec = np.load("circle.npz")["unit_vectors"]
-    
+
     A = np.array([3,1,1,3]).reshape((2,2))
     U,s,Vh = la.svd(A)
-    
+
     VhS = Vh.dot(S)
     SigVhS = np.diag(s).dot(VhS)
     USigVhS = U.dot(SigVhS)
-    
+
     Vhvec = Vh.dot(vec)
     SigVhvec = np.diag(s).dot(Vhvec)
     USigVhvec = U.dot(SigVhvec)
@@ -88,11 +86,11 @@ def visualize_svd():
 # Problem 3
 def svd_approx(A, k):
     """Returns best rank k approximation to A with respect to the induced 2-norm.
-    
+
     Inputs:
     A - np.ndarray of size mxn
-    k - rank 
-    
+    k - rank
+
     Return:
     Ahat - the best rank k approximation
     """
@@ -104,16 +102,16 @@ def svd_approx(A, k):
         print "WARNING: Given parameters do not result in compressed data."
     Ahat = U[:,:k].dot(S).dot(Vt[:k,:])
     return Ahat
-    
+
 # Problem 4
 def lowest_rank_approx(A,e):
-    """Returns the lowest rank approximation of A with error less than e 
+    """Returns the lowest rank approximation of A with error less than e
     with respect to the induced 2-norm.
-    
+
     Inputs:
     A - np.ndarray of size mxn
     e - error
-    
+
     Return:
     Ahat - the lowest rank approximation of A with error less than e.
     """
@@ -124,12 +122,12 @@ def lowest_rank_approx(A,e):
     k = np.where(s<e)[0][0]
     Ahat = U[:,:k].dot(S).dot(Vt[:k,:])
     return Ahat
-    
+
 # Problem 5
 def compress_image(filename,k):
     """Plot the original image found at 'filename' and the rank k approximation
     of the image found at 'filename.'
-    
+
     filename - jpg image file path
     k - rank
     """
@@ -137,19 +135,19 @@ def compress_image(filename,k):
     red = orig_img[:,:,0]
     green = orig_img[:,:,1]
     blue = orig_img[:,:,2]
-    
+
     img = np.zeros(orig_img.shape)
     img[:,:,0] = svd_approx(red,k)
     img[:,:,1] = svd_approx(green,k)
     img[:,:,2] = svd_approx(blue,k)
-    
+
     img = np.round(img)/255.
     orig_img = np.round(orig_img)/255.
     img[img<0] = 0.
     img[img>1] = 1.
-    
+
     plt.subplot(1,2,1)
-    plt.title("Original Image")    
+    plt.title("Original Image")
     plt.imshow(orig_img)
     plt.subplot(1,2,2)
     plt.title("Rank " + str(k) + " Approximation")

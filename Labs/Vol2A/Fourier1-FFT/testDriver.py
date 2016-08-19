@@ -1,5 +1,10 @@
 # testDriver.py
-"""Volume 1A: Linear Transformations. Test driver."""
+"""Volume 2A: Fouier I (Discrete Fourier Transform). Test driver.
+This lab should be turned in as a Jupyter Notebook, so this file
+shouldn't be necessary.
+"""
+
+# Decorators ==================================================================
 
 import signal
 from functools import wraps
@@ -52,27 +57,27 @@ def _timeout(seconds):
 
 # Test Driver =================================================================
 
-from solutions import *
+from os import system
+from sys import stdout
+from scipy.io import wavfile
 
+# Test script
 def test(student_module):
-    """Grade a student's entire solutions file.
+    """Test script. Import the student's solutions file as a module.
 
-    10 points for problem 1
-    10 points for problem 2
-    10 points for problem 3
-    10 points for problem 4
+    20 points for Signal class
+    10 points for generate_chord()
 
     Inputs:
         student_module: the imported module for the student's file.
 
     Returns:
-        score (int): the student's score, out of 40.
+        score (int): the student's score, out of TOTAL.
         feedback (str): a printout of test results for the student.
     """
     tester = _testDriver()
     tester.test_all(student_module)
     return tester.score, tester.feedback
-
 
 class _testDriver(object):
     """Class for testing a student's work.
@@ -87,10 +92,8 @@ class _testDriver(object):
         """Initialize the feedback attribute."""
         self.feedback = ""
 
-    data_file = "horse.npy"
-
     # Main routine ------------------------------------------------------------
-    def test_all(self, student_module, total=40):
+    def test_all(self, student_module, total=30):
         """Grade the provided module on each problem and compile feedback."""
         # Reset feedback and score.
         self.feedback = ""
@@ -107,10 +110,8 @@ class _testDriver(object):
                 self.feedback += "\n{}: {}".format(self._errType(e), e)
 
         # Grade each problem.
-        test_one(self.problem1, "Problem 1", 10)   # Problem 1: 10 points.
-        test_one(self.problem2, "Problem 2", 10)   # Problem 2: 10 points.
-        test_one(self.problem3, "Problem 3", 10)   # Problem 3: 10 points.
-        test_one(self.problem4, "Problem 4", 10)   # Problem 4: 10 points.
+        test_one(self.problem5, "Signal Class", 15)   # Class: 15 points.
+        test_one(self.problem6, "Problem 6", 15)   # Problem 6: 15 points.
 
         # Report final score.
         percentage = (100. * self.score) / total
@@ -130,19 +131,6 @@ class _testDriver(object):
     def _errType(error):
         """Get just the name of the exception 'error' in string format."""
         return str(type(error).__name__)
-
-    def _eqTest(self, correct, student, message, compare=True):
-        """Test to see if 'correct' and 'student' are equal.
-        Report the given 'message' if they are not.
-        """
-        if np.allclose(correct, student):
-            return 1
-        else:
-            self.feedback += "\n{}".format(message)
-            if compare:
-                self.feedback += "\n\tCorrect response: {}".format(correct)
-                self.feedback += "\n\tStudent response: {}".format(student)
-            return 0
 
     def _grade(self, points, message=None):
         """Manually grade a problem worth 'points'. Return the score.
@@ -165,76 +153,37 @@ class _testDriver(object):
         return credit
 
     # Problems ----------------------------------------------------------------
-    @_timeout(5)
-    def problem1(self, s):
-        """Test stretch(), shear(), reflect(), and rotate(). 10 points."""
-        points = 0
-        data = np.load(self.data_file)
+    @_autoclose
+    def problem5(self, s):
+        """Test the Signal Class. 15 points."""
+        if not hasattr(s, "Signal"):
+            raise NotImplementedError("Signal class not found")
 
-        # stretch() (2 points).
-        a, b = np.random.randint(1,11,2)
-        points += 2 * self._eqTest(stretch(data, a, b), s.stretch(data, a, b),
-                                                    "stretch() failed", False)
+        rate, sig = wavfile.read("tada.wav")
+        signal = s.Signal(rate, sig)
+        signal.plot()
+        return self._grade(15)
 
-        # shear() (2 points).
-        a, b = np.random.randint(1,11,2)
-        points += 2 * self._eqTest(shear(data, a, b), s.shear(data, a, b),
-                                                    "shear() failed", False)
+    @_autoclose
+    def problem6(self, s):
+        """Test generate_chord(). 15 points."""
+        if not hasattr(s, "generate_chord"):
+            raise NotImplementedError("Problem 6 Incomplete")
 
-        # reflect() (3 points).
-        a, b = np.random.randint(1,11,2)
-        points += 3 * self._eqTest(reflect(data, a, b), s.reflect(data, a, b),
-                                                    "reflect() failed", False)
+        s.generate_chord()
 
-        # rotate() (3 points).
-        theta = np.random.uniform(.1, 2*np.pi-.1)
-        points += 3 * self._eqTest(rotate(data, theta), s.rotate(data, theta),
-                                                    "rotate() failed", False)
+        print("chord1.wav\t"),; stdout.flush()
+        system("afplay chord1.wav")
+        points  = self._grade(5, "chord1.wav failed")
+        system("rm chord1.wav")
+
+        print("chord2.wav\t"),; stdout.flush()
+        system("afplay chord2.wav")
+        points += self._grade(10, "chord2.wav failed")
+        system("rm chord2.wav")
 
         return points
 
-    @_autoclose
-    def problem2(self, s):
-        """Test solar_system(). 10 points."""
-
-        s.solar_system(np.pi, 1, 13)
-        print("""\nSpecifications:
-        1. Blue semicircle from 0 to pi
-        2. Green line rotates around blue line 6 times
-        (Title and legend unnecessary)
-        (Aspect ratio may be stretched)""")
-        return self._grade(10, "solar_system() does not match specifications")
-
-    @_autoclose
-    def problem3(self, s):
-        """Test prob3(). 10 points."""
-
-        print("Running prob3()...(60 second time limit)")
-        _timeout(60)(s.prob3)()
-        print("""\nSpecifications:
-        1. Two plots: matrix-vector times, matrix-matrix times
-        2. Both plots are quadratically increasing
-        3. Matrix-matrix times are much greater than matrix-vector times
-        (Titles and legend unnecessary)""")
-        return self._grade(10, "prob3() does not match specifications")
-
-    @_autoclose
-    def problem4(self, s):
-        """Test prob4(). 10 points."""
-
-        print("Running prob4()...(60 second time limit)")
-        _timeout(60)(s.prob4)()
-        print("""\nSpecifications:
-        1. Two plots: lin-lin scale, log-log scale
-        2. All lines are quadratically increasing (at different rates)
-        3. NumPy times are significantly lower than list times
-        4. A legend with good labels is included
-        (Titles unnecessary)
-        (NumPy lines may be bumpy in the log-log plot)""")
-        return self._grade(10, "prob4() does not match specifications")
-
-# Validation ==================================================================
 if __name__ == '__main__':
-    """Validate the test driver by testing the solutions file."""
     import solutions
     test(solutions)

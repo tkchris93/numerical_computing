@@ -1,5 +1,5 @@
-# Name this file 'solutions.py'.
-"""Volume II: Nearest Neighbor Search.
+# kdtrees.py
+"""Volume 2A: Data Structures 3 (K-d Trees).
 <Name>
 <Class>
 <Date>
@@ -7,61 +7,37 @@
 
 import numpy as np
 
-# Problem 1: Implement this function.
+# Problem 1
 def metric(x, y):
     """Return the euclidean distance between the 1-D arrays 'x' and 'y'.
 
     Raises:
         ValueError: if 'x' and 'y' have different lengths.
-    
+
     Example:
         >>> metric([1,2],[2,2])
         1.0
         >>> metric([1,2,1],[2,2])
         ValueError: Incompatible dimensions.
     """
-    if len(x) != len(y):
-        raise ValueError("Incompatible dimensions")
-    return np.linalg.norm(x - y)
-    
-    # Or a slightly longer way:
-    return np.sqrt(np.sum((x - y)**2))
-    # Or the longest/worst way:
-    total = 0
-    for i in xrange(len(x)):
-        term = x[i] - y[i]
-        total += term**2
-    total = np.sqrt(total)
-    return total
+    raise NotImplementedError("Problem 1 Incomplete")
 
 
-# Problem 2: Implement this function.
+# Problem 2
 def exhaustive_search(data_set, target):
     """Solve the nearest neighbor search problem exhaustively.
     Check the distances between 'target' and each point in 'data_set'.
     Use the Euclidean metric to calculate distances.
-    
+
     Inputs:
-        data_set (mxk ndarray): An array of m k-dimensional points.
-        target (1xk ndarray): A k-dimensional point to compare to 'dataset'.
-        
+        data_set ((m,k) ndarray): An array of m k-dimensional points.
+        target ((k,) ndarray): A k-dimensional point to compare to 'dataset'.
+
     Returns:
-        the member of 'data_set' that is nearest to 'target' (1xk ndarray).
-        The distance from the nearest neighbor to 'target' (float).
+        ((k,) ndarray) the member of 'data_set' that is nearest to 'target'.
+        (float) The distance from the nearest neighbor to 'target'.
     """
-
-    # Initialize the outputs.
-    minimum_distance = float("inf")
-    nearest_neighbor = None
-
-    # Search through the entire data set for the nearest neighbor.
-    for point in data_set:
-        distance = metric(target, point)
-        if distance < minimum_distance:
-            nearest_neighbor = point
-            minimum_distance = distance
-
-    return nearest_neighbor, minimum_distance
+    raise NotImplementedError("Problem 2 Incomplete")
 
 
 # Problem 3: Write a KDTNode class.
@@ -78,7 +54,7 @@ class KDT(BST):
             nodes in the tree, the root houses data as a NumPy array.
         k (int): the dimension of the tree (the 'k' of the k-d tree).
     """
-    
+
     def find(self, data):
         """Return the node containing 'data'. If there is no such node
         in the tree, or if the tree is empty, raise a ValueError.
@@ -97,10 +73,10 @@ class KDT(BST):
                 return _step(current.left)          # Recursively search left.
             else:
                 return _step(current.right)         # Recursively search right.
-        
+
         # Start the recursion on the root of the tree.
         return _step(self.root)
-    
+
     def insert(self, data):
         """Insert a new node containing 'data' at the appropriate location.
         Return the new node. This method should be similar to BST.insert().
@@ -108,9 +84,9 @@ class KDT(BST):
         raise NotImplementedError("Problem 4 Incomplete")
 
 
-# Problem 5: Implement this function
+# Problem 5
 def nearest_neighbor(data_set, target):
-    """Use your KDTree class to solve the nearest neighbor problem.
+    """Use your KDT class to solve the nearest neighbor problem.
 
     Inputs:
         data_set ((m,k) ndarray): An array of m k-dimensional points.
@@ -120,10 +96,10 @@ def nearest_neighbor(data_set, target):
         The point in the tree that is nearest to 'target' ((k,) ndarray).
         The distance from the nearest neighbor to 'target' (float).
     """
-    
+
     def KDTsearch(current, neighbor, distance):
         """The actual nearest neighbor search algorithm.
-        
+
         Inputs:
             current (KDTNode): the node to examine.
             neighbor (KDTNode): the current nearest neighbor.
@@ -138,6 +114,7 @@ def nearest_neighbor(data_set, target):
     raise NotImplementedError("Problem 5 Incomplete")
 
 
+# Problem 6
 def postal_problem():
     """Use the neighbors module in sklearn to classify the Postal data set
     provided in 'PostalData.npz'. Classify the testpoints with 'n_neighbors'
@@ -151,6 +128,3 @@ def postal_problem():
     n_neighbors = 1, weights =  'uniform':  0.903       (...and so on.)
     """
     raise NotImplementedError("Problem 6 Incomplete")
-
-
-# End of File =================================================================
