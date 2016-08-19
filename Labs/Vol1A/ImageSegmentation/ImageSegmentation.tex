@@ -1,6 +1,6 @@
 \lab{Image Segmentation}{Image Segmentation}
 
-\objective{Understand some basic applications of eigenvalues to graph theory.  Learn how to calculate Laplacian matrix of a graph.  Apply the Laplacian matrix to determine connectivity of a graph and to segment an image.}
+\objective{Understand some basic applications of eigenvalues to graph theory.  Learn how to calculate the Laplacian matrix of a graph.  Apply the Laplacian matrix to determine connectivity of a graph and segment an image.}
 \label{lab:ImgSeg_eigenvalues}
 
 \section*{Graph Theory}
@@ -79,18 +79,18 @@
 
 
 
-Graphs represent relationships between objects.
+Graph theory is a branch of mathematics dealing with mathematical structures called graphs.  Graphs represent relationships between objects.
 %For example, the transition diagram in Figure \ref{fig:markov1} in Lab \ref{lab:EigSolve} shows the relationship between states in a Markov chain.
 An \emph{undirected graph} is a set of nodes (or vertices) and edges, where each edge connects exactly two nodes (see Figure \ref{fig:example_graph}).
-In a \emph{directed graph}, edges are directional. Each edge only goes one way, usually visualized as an arrow connecting two nodes.
-In this lab we will only consider undirected graphs, which we will simply call graphs (unless we wish to emphasize the fact that they are undirected).
+In a \emph{directed graph}, edges are directional. Each edge only goes one way, usually visualized as an arrow pointing from one node to another.
+In this lab, we will only consider undirected graphs, which we will simply call graphs (unless we wish to emphasize the fact that they are undirected).
 
 %A graph is \emph{simple} if no edge connects a node to itself. 
 %The graph in Figure [TODO!] is simple, but the graph in Figure [TODO!] is not.
 
 A \emph{weighted} graph is a graph with a weight attached to each edge.
 For example, a weighted graph could represent a collection of cities with roads connecting them.
-The vertices would be cities, the edges roads, and weight of an edge would be the length of a road.
+The vertices would be cities, the edges would be roads, and weight of an edge would be the length of a road.
 Such a graph is depicted in Figure \ref{fig:example_graph2}.
 
 Any unweighted graph can be thought of as a weighted graph by assigning a weight of 1 to each edge.
@@ -255,7 +255,7 @@ While the Laplacian matrix seems simple, we can learn surprising things from its
 Write a function that accepts the adjacency matrix of a graph as an argument and returns the Laplacian matrix. 
 Test your function on the graphs in Figures \ref{fig:example_graph} and \ref{fig:example_graph2}.
 
-Hint: You can compute the diagonal of the degree matrix in one line by summing over an axis (see Lab \ref{lab:NumPyArrays}).
+Hint: You can compute the diagonal of the degree matrix in one line by summing over an axis (see Lab \ref{lab:NumpyIntro}).
 \label{prob:laplacian}
 \end{problem}
 
@@ -273,11 +273,12 @@ Instead of the naive approach, we can use an interesting result from algebraic g
 This result relates the connectivity of a graph to its Laplacian.
 
 The Laplacian of any graph always has at least one zero eigenvalue.
-Let $L$ be a Laplacian matrix.
-Clearly the rows of $L$ must sum to 0 (why?), which implies that $\lambda = 0$ is an eigenvalue of $L$ (corresponding to a constant eigenvector). 
+Why is this true?  If $L$ is the Laplacian matrix of a graph, then the rows of $L$ must sum to 0.
+(Think about how L was created.)
+Since this is true, L cannot have full rank, so $\lambda = 0$ must be an eigenvalue of $L$. 
 
 Furthermore, if $L$ represents a graph that is \textit{not} connected, more than one of the eigenvalues of $L$ will be zero. 
-Specifically, let $J \subset \{1 \dots N\}$ such that the vertices $\{v_j\}_{j \in J}$ form a connected component of the graph. 
+To see this, let $J \subset \{1 \dots N\}$ such that the vertices $\{v_j\}_{j \in J}$ form a connected component of the graph. 
 Define a vector $\x$ such that
  \[
     \x_j = \begin{cases}
@@ -287,7 +288,7 @@ Define a vector $\x$ such that
   \]
 
 Then $\x$ is an eigenvector of $L$ corresponding to the eigenvalue $\lambda = 0$. 
-(Look at the Laplacian matrix in Figure \ref{fig:example_graph2} and try to build intuition about why this is true). 
+(Look at the Laplacian matrix in Figure \ref{fig:example_graph2} and consider the product $L_2 \x$.) 
 In other words, for each connected component, 0 appears at least once as an eigenvalue.
 
 In fact, it can be rigorously proven that the number of zero eigenvalues of the Laplacian exactly \textit{equals} the number of connected components. 
