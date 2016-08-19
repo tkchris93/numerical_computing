@@ -1,4 +1,4 @@
-\lab{Data Structures III: K-D Trees and Nearest Neighbor Searches}{Data Structures III}
+\lab{Data Structures III: K-D Trees}{K-D Trees}
 \label{lab:DS3}
 
 \objective{Nearest neighbor search is an optimization problem that arises in applications such as computer vision, pattern recognition, internet marketing, and data compression.
@@ -72,7 +72,7 @@ The \li{axis} attribute tells us which dimension of $\mathbb{R}^k$ to split on.
 % TODO: A figure actually depicting the resulting KDT, like the BST figures of the Data Structures II lab.
 
 \begin{figure}[H]
-\includegraphics[width=\textwidth]{kdpic1.png}
+\includegraphics[width=\textwidth]{figures/kdpic1.png}
 \caption{A regular binary search tree partitions $\mathbb{R}$, but a $k$-d tree partitions $\mathbb{R}^{k}$. The above graph illustrates the partition for a $k$-d tree loaded with the points (5, 5), (8, 4), (3, 2), (7, 7), (2, 6), and (9, 2), in that order. To find the point (9, 2), we start at the root. Since the $x$-coordinate of (9, 2) is greater than the $x$-coordinate of (5, 5), we move into the region to the right of the middle blue line, thus excluding all points ($x$, $y$) with $x < 5$. Next we compare (9, 2) to the root's right child, (8, 4). Since the $y$-coordinate of (9, 2) is less than the $y$-coordinate of (8, 4), we move below the red line on the right, thus excluding all points ($x$, $y$) with $y > 4$. We have now found (9, 2), since it is the left child of (8, 4).}
 \label{fig:k-binary-search}
 \end{figure}
@@ -118,14 +118,14 @@ For example,
 \begin{lstlisting}
 >>> x = KDTNode(np.array([1,2]))
 >>> y = KDTNode(np.array([3,1]))
->>> y.axis = 0			# Compare the '0th' entry of the data
->>> x < y				# True, since 1 < 3
+>>> y.axis = 0            # Compare the '0th' entry of the data
+>>> x < y                # True, since 1 < 3
 True
 >>> x > y
 False
 
->>> y.axis = 1			# Compare the '1st' entry of the data
->>> x < y				# False, since 2 > 1
+>>> y.axis = 1            # Compare the '1st' entry of the data
+>>> x < y                # False, since 2 > 1
 False
 >>> x > y
 True
@@ -134,7 +134,6 @@ True
 \end{problem}
 
 % Now we construct the $k$-d tree class.
-%The constructor accepts a set of data as an $m \times k$ NumPy array and inserts each $1 \times k$ point into the tree.
 % For an optimal $k$-d tree, the data needs to be inserted in a very particular order.
 % However, inserting at random still usually produces a good tree.
 % Here we simply insert the data in the order that it is given.
@@ -147,31 +146,8 @@ Though we don't need to use a \li{find()} method in solving the nearest neighbor
 In the \li{find()} method, every comparison in the recursive \li{_step()} function compares the data of \li{target} and \li{current} based on the \li{axis} attribute of \li{current}.
 This way if each existing node in the tree has the correct \li{axis}, the correct comparisons are made as we descend through the tree.
 
-\begin{comment}
 \begin{lstlisting}
-    def __init__(self, data_set):
-        """Set the k attribute and fill the tree with the points in 'data_set'.
-
-        Raises:
-            TypeError: 'data_set' is not a NumPy array (of type np.ndarray).
-        """
-
-        # Validate the input type.
-        if not isinstance(data_set, np.ndarray):
-            raise TypeError("data_set must be a NumPy array.")
-
-        # Set the root and dimension attributes.
-        BST.__init__(self)
-        self.k = data_set.shape[1]
-
-        # Load the data in one point at a time.
-        for point in data_set:
-            self.insert(point)
-\end{lstlisting}
-\end{comment}
-
-\begin{lstlisting}
-# Copy the BST class from the previous lab.
+# Copy or import the BST class from the previous lab.
 
 class KDT(BST):
     """A k-dimensional binary search tree object.
@@ -224,7 +200,7 @@ Raise a \li{NotImplementedError} if the method is called, and allow it to receiv
 \end{problem}
 
 \begin{figure}[H]
-\includegraphics[width=\textwidth]{kdpic2.png}
+\includegraphics[width=\textwidth]{figures/kdpic2.png}
 \caption{To insert the point (4, 7) into the $k$-d tree of figure \ref{fig:k-binary-search}, we find the node that will be the new node's parent. Start at the root, (5, 5). Since the $x$-coordinate of (4, 7) is less than the $x$-coordinate of (5, 5), we move into the region to the left of the middle blue line, to the root's left child, (3, 2). The $y$-coordinate of (4, 7) is greater than the $y$-coordinate of (3, 2), so we move above the red line on the left, to the right child (2, 6). Now we return to comparing the $x$-coordinates, and since $4 > 2$ and (2, 6) has no right child, we install (4, 7) as the right child of (2, 6).}
 \label{fig:k-insert}
 \end{figure}
@@ -245,7 +221,7 @@ One way to ensure that we have arrived at the correct point is to draw a hypersp
 If this hypersphere does not intersect any of the hyperplanes that split the $k$-d tree, then we know that have found a best point.
 
 \begin{figure}[H]
-\includegraphics[width=\textwidth]{kdpic3.png}
+\includegraphics[width=\textwidth]{figures/kdpic3.png}
 \caption{Suppose we want to find the point in the $k$-d tree of figure \ref{fig:k-insert} that is closest to (8, 4.5). First we record the distance from the root to the target as the current minimum distance (about 3.04), then travel down the tree to the right. The right child, (8, 4), is only .5 units away from the target (the green circle), so we update the minimum distance. Since (8, 4) is not a leaf in the tree, we could continue down to the left child, (7, 7). However, this leaf node is much further from the target (the purple circle). To ensure that we terminate the algorithm correctly we check to see if the hypersphere of radius .5 around the current node (the green circle) intersects with any other hyperplanes. Since it does not, we stop descending down the tree and conclude (correctly) that (8, 4) is the nearest neighbor.}
 \label{fig:bad-search}
 \end{figure}
@@ -266,35 +242,38 @@ We summarize the algorithm below.
 
 \begin{algorithm}[h] % K-d search algorithm.
 \begin{algorithmic}[1]
-\State (Given a set of data and a target)
-\State Build a $k$-d tree out of the data set.
-\Procedure{KDTSearch}{current, neighbor, distance}
-\If {current is None (Base Case)}
-    \State return neighbor, distance
+\State Given a set of data and a \texttt{target}, build a $k$-d tree out of the data set.
+\Procedure{Search}{\texttt{current, neighbor, dist}}
+\If {\texttt{current} is \texttt{None}}
+    \Comment{Base case.}
+    \State \pseudoli{return} \texttt{neighbor, dist}
 \EndIf
-	\If {distance between current and target $<$ distance (Update)}
-		\State neighbor = current
-		\State distance = distance between current and target
-	\EndIf
-    \If {target[current axis] $<$ current.value[current axis] (Recurse Left)}
-    	\State neighbor, distance = KDTSearch(current.left, neighbor, distance)
-    	\If {target[current axis] + distance $\geq$ current.value[current axis]}
-    		\State neighbor, distance = KDTSearch(current.right, neighbor, distance)
-    	\EndIf
-    \Else { (Recurse Right)}
-    	\State neighbor, distance = KDTSearch(current.right, neighbor, distance)
-    	\If {target[current axis] - distance $\leq$ current.value[current axis]}
-    		\State neighbor, distance = KDTSearch(current.left, neighbor, distance)
-    	\EndIf
+\State \texttt{index} $\gets$ \texttt{current.axis}
+\If {metric(\texttt{current, target}) $<$ \texttt{dist}}
+    \State \texttt{neighbor} $\gets$ \texttt{current}
+        \Comment{Update the best estimate.}
+    \State \texttt{dist} $\gets$ metric(\texttt{current, target})
+\EndIf
+\If {\texttt{target[index]} $<$ \texttt{current.value[index]}}
+    \Comment{Recurse left.}
+    \State \texttt{neighbor, dist} $\gets$ Search(\texttt{current.left, neighbor, dist})
+    \If {\texttt{target[index]} + \texttt{dist} $\geq$ \texttt{current.value[index]}}
+        \State \texttt{neighbor, dist} $\gets$ Search(\texttt{current.right, neighbor, dist})
     \EndIf
-\State return neighbor, distance
+\Else
+    \Comment{Recurse right.}
+    \State \texttt{neighbor, dist} $\gets$ Search(\texttt{current.right, neighbor, dist})
+    \If{\texttt{target[index]} - \texttt{dist} $\leq$ \texttt{current.value[index]}}
+        \State \texttt{neighbor, dist} $\gets$ Search(\texttt{current.left, neighbor, dist})
+    \EndIf
+\EndIf
+\State \pseudoli{return} \texttt{neighbor, dist}
 \EndProcedure
-\State Start KDTSearch at the root of the tree to get the nearest neighbor and the corresponding minimum distance.
+\State Start \textsc{Search()} at the root of the tree.
 \end{algorithmic}
 \caption{$k$-d tree nearest neighbor search}
 \label{alg:kdneighborz}
 \end{algorithm}
-
 
 \begin{problem} % K-d nearest neighbor search algorithm.
 Use Algorithm \ref{alg:kdneighborz} to write a function that solves the nearest neighbor search problem by searching through a $k$-d tree (your \li{KDT} object).
@@ -407,7 +386,7 @@ Which combination gives the most correct classifications?
 A similar classification process is used by the United States Postal Service to automatically determine the zip code to send a letter to.
 
 \begin{figure}[H]
-\includegraphics[width=.25\textwidth]{Example.png}
+\includegraphics[width=.25\textwidth]{figures/Example.png}
 \caption{An example of the number 6 taken from the data set}
 \end{figure}
 \end{problem}
@@ -417,6 +396,7 @@ A similar classification process is used by the United States Postal Service to 
 
 \section*{Additional Material} % ==============================================
 
+% TODO (there's already some material on this in the oldLab/ folder)
 \subsection*{The Curse of Dimensionality} % -----------------------------------
 
 \end{comment}
