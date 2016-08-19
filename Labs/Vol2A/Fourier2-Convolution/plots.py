@@ -2,7 +2,7 @@
 #This file generates the plots for the 1d fft algorithms
 # lab
 import matplotlib
-matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
+matplotlib.rcParams = matplotlib.rc_params_from_file('../../../matplotlibrc')
 
 import matplotlib.pyplot as plt
 
