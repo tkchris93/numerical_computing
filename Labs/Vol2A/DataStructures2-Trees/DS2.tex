@@ -691,12 +691,12 @@ The AVL's balancing algorithm is beyond the scope of this project, but details a
 \begin{problem} % Compare build and search times.
 Write a function to compare the build and search times of the data structures we have implemented so far.
 
-Accept a file name to read from.
-Read the file, adding the contents of each line to a list of data.
+Read the file \texttt{english.txt}, adding the contents of each line to a list of data.
 For various values of $n$, repeat the following:
 %
 \begin{enumerate}
-\item Get a subset of $n$ \textbf{ramdom} items from the data set.
+\item Get a subset of $n$ \textbf{random} items from the data set.
+\\(Hint: use a function from the \li{random} or \li{np.random} modules.)
 \item Time (separately) how long it takes to load a new \li{SinglyLinkedList}, a \li{BST}, and an \li{AVL} with the $n$ items.
 \item Choose 5 \textbf{random} items from the subset, and time how long it takes to find all 5 items in each data structure.
 Use the \li{find()} method for the trees, but to avoid exceeding the maximum recursion depth, use the provided \li{iterative_search()} function from Problem \ref{prob:recursion} to search the \li{SinglyLinkedList}.
@@ -704,6 +704,7 @@ Use the \li{find()} method for the trees, but to avoid exceeding the maximum rec
 
 Report your findings in a single figure with two subplots: one for build times, and one for search times.
 Use log scales if appropriate.
+
 \begin{comment} % TODO: Decide whether or not to show them these plots.
 Your figure should resemble the following plots, though your results may be less smooth.
 %
@@ -753,15 +754,19 @@ Consider writing classes for the following structures.
 %
 \begin{enumerate}
 \item A \href{https://en.wikipedia.org/wiki/B-tree}{\emph{B-Tree}} is a tree whose nodes can contain more than one piece of data and point to more than one other node.
-See the Volume II text for details.
+See Chapter 2 of the Volume II text for details.
+
 \item The nodes of a \href{https://en.wikipedia.org/wiki/Red%E2%80%93black_tree}{\emph{Red-Black Tree}} are labeled either red or black.
 The tree satisfies the following rules.
+%
 \begin{enumerate}
     \item Every leaf node is black.
     \item Red nodes only have black children.
     \item Every (directed) path from a node to any of its descendent leaf nodes contains the same number of black nodes.
 \end{enumerate}
+%
 When a node is added that violates one of these constraints, the tree is rebalanced and recolored.
+
 \item A \href{https://en.wikipedia.org/wiki/Splay_tree}{\emph{Splay Tree}} includes an additional operation, called splaying, that makes a specified node the root of the tree.
 Splaying several nodes of interest makes them easier to access because they will be close to the root.
 \end{enumerate}
