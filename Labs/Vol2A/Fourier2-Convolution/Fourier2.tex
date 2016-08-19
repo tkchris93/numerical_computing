@@ -13,7 +13,7 @@ See Figure \ref{fig:noisysignal}.
 
 \begin{figure}
 \centering
-\includegraphics[width=\textwidth]{noisy}
+\includegraphics[width=\textwidth]{figures/noisy}
 \caption{The plot of \texttt{Noisysignal1.wav}.}
 \label{fig:noisysignal}
 \end{figure}
@@ -24,7 +24,7 @@ See Figure \ref{fig:noisyspec}.
 
 \begin{figure}
 \centering
-\includegraphics[width=\textwidth]{noisyspec}
+\includegraphics[width=\textwidth]{figures/noisyspec}
 \caption{Spectrum of \li{Noisysignal1.wav}}
 \label{fig:noisyspec}
 \end{figure}
@@ -59,7 +59,7 @@ See Figure \ref{fig:cleansignal}.
 
 \begin{figure}
 \centering
-\includegraphics[width=\textwidth]{Cleanedsignal}
+\includegraphics[width=\textwidth]{figures/Cleanedsignal}
 \caption{The plot of \texttt{Noisysignal1.wav} after being cleaned.}
 \label{fig:cleansignal}
 \end{figure}
@@ -132,9 +132,9 @@ Describe the resulting sound.
 To summarize:
 \begin{enumerate}
 
-\item Read in \li{chopin.wav} and the impulse response with \li{wavfile}, 
-\item Add several seconds of silence to the signal from \li{chopin.wav},
-\item Insert zeros into the middle of the impulse response transform so that it is the same length as, 
+\item Read in \texttt{chopin.wav} and the impulse response with \li{wavfile},
+\item Add several seconds of silence to the signal from \texttt{chopin.wav},
+\item Insert zeros into the middle of the impulse response transform so that it is the same length as,
 \item Calculate the convolution of the signals,
 \item And finally, calculate the inverse Fourier transform.
 \end{enumerate}
@@ -152,7 +152,7 @@ noise = sp.int16(sp.random.randint(-32767, 32767, samplerate * 10))
 
 % Problem 4: White noise.
 \begin{problem}
-Create white noise and listen to the resulting sound (\textbf{CAUTION:} Turn your volume way down. It may be very very loud). 
+Create white noise and listen to the resulting sound (\textbf{CAUTION:} Turn your volume way down. It may be very very loud).
 This kind of noise is called ``white" because it contains all frequencies with the same strength, or rather, with the same expected strength (since the amplitude of a specific frequency is a matter of chance).
 In order to see this, plot the spectrum of the noise.
 \end{problem}

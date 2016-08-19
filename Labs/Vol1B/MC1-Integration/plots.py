@@ -22,8 +22,8 @@ def mc_circle():
 
     plt.axes().set_aspect('equal')
     plt.axis([-2, 2, -2, 2])
-    
-    plt.savefig("MC_Circle.pdf")
+
+    plt.savefig("figures/MC_Circle.pdf")
     plt.clf()
 
 def prob1(N=10000):
@@ -33,7 +33,7 @@ def prob1(N=10000):
     Input:
         N (int, optional) - The number of points to sample. Defaults
             to 10000.
-    
+
     """
     points = np.random.rand(3, N)
     points = points*2 - 1
@@ -44,11 +44,11 @@ def prob1(N=10000):
 
 def mc_error_plot(numIters=50):
     actual = 4.1887902047863905
-    
+
     N = [i*1000 for i in xrange(1,51)]
     N = [50,100,500] + N
-    errors = []    
-    
+    errors = []
+
     for n in N:
         meanErr = 0.
         for i in xrange(numIters):
@@ -56,7 +56,7 @@ def mc_error_plot(numIters=50):
             err = np.abs(I - actual)/actual
             meanErr += err
         errors.append(meanErr/float(numIters))
-    
+
     plt.plot(N,errors,label='Error')
     plt.plot(N,[1./n**0.5 for n in N],'r--',label=r'$1/\sqrt{N}$')
     plt.ylim([0,max(errors)])
@@ -64,11 +64,11 @@ def mc_error_plot(numIters=50):
     plt.xlabel(r'$N$')
     plt.ylabel('Relative error')
     plt.legend()
-    
-    plt.savefig("MC_error_2.pdf")
+
+    plt.savefig("figures/MC_error_2.pdf")
     plt.clf()
-    
-    
+
+
 if __name__ == "__main__":
     #mc_circle()
     mc_error_plot()

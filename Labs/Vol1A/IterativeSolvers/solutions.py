@@ -1,7 +1,5 @@
 # solutions.py
-"""Volume I: Iterative Solvers. Solutions File.
-Written by Tanner Christenen, Spring 2016.
-"""
+"""Volume 1A: Iterative Solvers. Solutions File."""
 from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt

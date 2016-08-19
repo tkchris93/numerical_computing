@@ -1,4 +1,4 @@
-\lab{Data Structures I: Linked Lists}{Data Structures I}
+\lab{Data Structures I: Linked Lists}{Linked Lists}
 \label{lab:Python_DataStructures}
 
 \objective{Analyzing and manipulating data are essential skills in scientific computing.
@@ -485,8 +485,8 @@ Note that since \li{insert()} places a new node before an existing node, it is n
 \label{fig:insert}
 \end{figure}
 
-\begin{info} % Big-O rates for Linked Lists.
-The temporal complexity for inserting to the beginning or end of a linked list is $O(1)$, but inserting anywhere else is $O(n)$, where $n$ is the number of nodes in the list (why?).
+\begin{info} % Big-O rates for linked lists.
+The temporal complexity for inserting to the beginning or end of a linked list is $O(1)$, but inserting anywhere else is $O(n)$, where $n$ is the number of nodes in the list.
 This is quite slow compared other data structures.
 In the next lab we turn our attention to \emph{trees}, special kinds of linked lists that allow for much quicker sorting and data retrieval.
 \end{info}
@@ -555,10 +555,21 @@ This is an excellent object to use in practice instead of a Python list when spe
 
 \begin{problem} % Reverse a file using a stack/deque.
 Write a function that accepts the name of a file to be read and a file to write to.
-Read the first file, adding each line to a deque (use a Python \li{list}, your \li{Deque} class, or \li{collections.deque}. Which one is fastest?).
-After reading the entire file, pop each entry off the stack one at a time and write it to the second file.
-% Try using a regular Python list instead of a deque.
-% Which data structure works faster?
+Read the first file, adding each line to the end a deque.
+After reading the entire file, pop each entry off of the end of the deque one at a time, writing the result to a line of the second file.
+
+For example, if the file to be read has the list of words on the left, the resulting file should have the list of words on the right.
+
+\begin{lstlisting}
+<<My homework is too hard for me.         I am a mathematician.
+I do not believe that                   Programming is hard, but
+I can solve these problems              I can solve these problems
+Programming is hard, but                I do not believe that
+I am a mathematician.                   My homework is too hard for me.
+\end{lstlisting}
+
+You may use a Python list, your \li{Deque} class, or \li{collections.deque} for the deque.
+Test your function on the file \texttt{english.txt}, which contains a list of over 58,000 English words in alphabetical order.
 \end{problem}
 
 \newpage
@@ -567,13 +578,9 @@ After reading the entire file, pop each entry off the stack one at a time and wr
 
 \subsection*{Improvements to the Linked List Class} % -------------------------
 
-The \li{LinkedList} class is still somewhat plain.
-Below are some ideas for improving it.
-
 \begin{enumerate}
 \item Add a keyword argument to the constructor so that if an iterable is input, each element of the iterable is immediately added to the list.
-This makes it possible to cast other iterables as a \li{LinkedList}, like
-Python's standard data structures.
+This makes it possible to cast an iterable as a \li{LinkedList} the same way that an iterable can be cast as one of Python's standard data structures.
 
 \begin{lstlisting}
 >>> my_list = [1, 2, 3, 4, 5]
@@ -601,21 +608,15 @@ Python's standard data structures.
 
 \subsection*{Other Linked List} % ---------------------------------------------
 
-In practice, a deque can also be used as a stack or a queue.
-If we restrict our usage to \li{append()} and \li{pop()} (or to \li{appendleft()} and \li{popleft()}), we effectively have a stack.
-Similarly, if we are restricted to \li{append()} and \li{popleft()} (or to \li{appendleft()} and \li{pop()}), we effectively have a queue.
-Consider writing \li{Stack} and \li{Queue} classes that inherit from the \li{Deque} class.
-Add a \li{push()} method and overload the \li{pop()} method in each class.
-Disable any other methods that add or remove nodes.
-
 The \li{LinkedList} class can also be used as the backbone for other data structures.
 %
 \begin{enumerate}
-\item A \emph{Sorted List} adds new nodes strategically so that the data is always kept in order.
+\item A \emph{sorted list} adds new nodes strategically so that the data is always kept in order.
 A \li{SortedLinkedList} class that inherits from the \li{LinkedList} class should have a method called \li{add(self, data)} that inserts a new node containing \li{data} before the first node in the list that has a \li{value} that is greater or equal to \li{data} (thereby preserving the ordering).
 Other methods for adding nodes should be disabled.
-How efficient is this data structure in the worst case scenario?
 
-\item In a \emph{Circular Linked List}, the ``last'' node connects back to the ``first'' node.
+A linked list is \textbf{not} an ideal implementation for a sorted list (try sorting \texttt{english.txt}).
+
+\item In a \emph{circular linked list}, the ``last'' node connects back to the ``first'' node.
 Thus a reference to the tail is unnecessary.
 \end{enumerate}

@@ -2,7 +2,7 @@
 #This file generates the plots for the 1d fft algorithms
 # lab
 import matplotlib
-matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
+matplotlib.rcParams = matplotlib.rc_params_from_file('../../../matplotlibrc')
 
 import matplotlib.pyplot as plt
 
@@ -18,20 +18,20 @@ def noise():
     plt.close('all')
     rate, sig = wavfile.read('Noisysignal1.wav')
     plt.plot(sig[0:sig.shape[0]/2])
-    plt.savefig('noisy.png')
+    plt.savefig('figures/noisy.png')
     plt.clf()
-    
-#plots lect half of spectrum of 
-#Noisysignal1.wav    
+
+#plots lect half of spectrum of
+#Noisysignal1.wav
 def noise_spec():
     rate, sig = wavfile.read('Noisysignal1.wav')
     sig = sig.astype('float32')
     fsig = ft.fft(sig.T).T
     f =  np.absolute(fsig)
     plt.plot(f[0:f.shape[0]/2])
-    plt.savefig('noisyspec.png')
+    plt.savefig('figures/noisyspec.png')
     plt.clf()
-    
+
 #plots cleaned noisy signal
 def cleaned_signal():
     rate,data = wavfile.read('Noisysignal1.wav')
@@ -44,7 +44,7 @@ def cleaned_signal():
     newsig = newsig.real
     newsig = (newsig/np.absolute(newsig).max()*32767).astype('int16')
     plt.plot(newsig[0:newsig.shape[0]/2])
-    plt.savefig('Cleanedsignal.png')
+    plt.savefig('figures/Cleanedsignal.png')
     plt.clf()
 
 if __name__ == '__main__':

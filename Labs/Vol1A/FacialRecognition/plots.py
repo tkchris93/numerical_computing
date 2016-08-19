@@ -1,3 +1,6 @@
+# plots.py
+"""Volume 1A: Facial Recognition. Plotting file."""
+
 import matplotlib
 matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
 import numpy as np
@@ -10,17 +13,17 @@ def getFaces(path="./faces94"):
     # these are the dimensions of the images
     w = 200
     h = 180
-    
+
     # traverse the directory, get one image per subdirectory
     faces = []
     for (dirpath, dirnames, filenames) in walk(path):
         for f in filenames:
             if f[-3:]=="jpg": # only get jpg images
                 # load image, convert to grayscale, flatten into vector
-                face = imread(dirpath+"/"+f).mean(axis=2).ravel() 
+                face = imread(dirpath+"/"+f).mean(axis=2).ravel()
                 faces.append(face)
                 break
-                
+
     # put all the face vectors column-wise into a matrix
     F = np.array(faces).T
     return F
@@ -49,8 +52,8 @@ def plotReconstructed(U, A, mu):
     imsave("rebuiltEighth.png", r3.reshape((200,180)))
     imsave("rebuiltSixteenth.png", r4.reshape((200,180)))
     imsave("rebuiltThirtySecond.png", r5.reshape((200,180)))
-  
-    
+
+
 if __name__ == "__main__":
     F = getFaces(path="../../../faces94")
     print F.shape

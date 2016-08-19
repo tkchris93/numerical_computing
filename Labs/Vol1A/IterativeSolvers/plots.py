@@ -1,5 +1,5 @@
 # plots.py
-"""Vol I: Iterative Solvers. Plotting file."""
+"""Volume 1A: Iterative Solvers. Plotting file."""
 from __future__ import print_function
 import matplotlib
 matplotlib.rcParams = matplotlib.rc_params_from_file('../../../matplotlibrc')

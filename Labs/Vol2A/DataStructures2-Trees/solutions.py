@@ -420,15 +420,12 @@ def _height(current):
 
 
 # Problem 4
-def prob4(filename):
+def prob4():
     """Compare the build and search speeds of the SinglyLinkedList, BST, and
     AVL classes. For search times, use iterative_search(), BST.find(), and
     AVL.find() to search for 5 random elements in each structure. Plot the
     number of elements in the structure versus the build and search times.
     Use log scales if appropriate.
-
-    Inputs:
-        filename (str): the name of a file to read from.
     """
     N = 11
 
@@ -437,7 +434,7 @@ def prob4(filename):
     bst_build, bst_search = [], []
     avl_build, avl_search = [], []
 
-    with open(filename, 'r') as infile:
+    with open("english.txt", 'r') as infile:
         data = infile.readlines()
     domain = 2**np.arange(3,N+1)
 
