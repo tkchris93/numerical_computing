@@ -1,6 +1,8 @@
-import numpy as np
+# plots.py
 import matplotlib
 matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
+
+import numpy as np
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from mayavi import mlab as ml
