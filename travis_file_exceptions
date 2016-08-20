@@ -7,10 +7,10 @@ Labs/Vol1B/Complex1-Plots/arctan_riemann_surface.pdf
 Labs/Vol1B/Complex1-Plots/poly_color_plot_imag.pdf
 Labs/Vol1B/Complex1-Plots/poly_color_plot_real.pdf
 Labs/Vol1B/GMRES/figures/LeastSquares.pdf
-Labs/Vol2A/Wavelets/Archived/Haar.tex
-Labs/Vol2B/scipyoptimize/ManyMinima.pdf
-Labs/Vol2B/scipyoptimize/Rosenbrock.pdf
+Vol2A/Wavelets/Archived/Haar.tex
+Vol2B/scipyoptimize/ManyMinima.pdf
+Vol2B/scipyoptimize/Rosenbrock.pdf
 Labs/Vol3A/PandasII/plotting_demos.ipynb
 Labs/Vol3A/PandasIII/industry_return_data.csv
 Labs/Vol3A/Bokeh/BokehFigs/color_states.png
-Labs/Vol4A/AnisotropicDiffusion/baloons_resized_noisy.png
+Vol4A/AnisotropicDiffusion/baloons_resized_noisy.png
