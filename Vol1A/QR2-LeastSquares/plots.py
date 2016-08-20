@@ -2,7 +2,7 @@
 """Volume 1A: QR 2 (Least Squares and Computing Eigenvalues). Plotting file."""
 from __future__ import print_function
 import matplotlib
-matplotlib.rcParams = matplotlib.rc_params_from_file('../../../matplotlibrc')
+matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
 
 from matplotlib import pyplot as plt
 from functools import wraps

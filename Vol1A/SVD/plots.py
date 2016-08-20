@@ -1,7 +1,7 @@
 # plots.py
 """Volume 1A: SVD and Image Compression. Plotting file."""
 import matplotlib
-matplotlib.rcParams = matplotlib.rc_params_from_file("../../../matplotlibrc")
+matplotlib.rcParams = matplotlib.rc_params_from_file("../../matplotlibrc")
 
 import matplotlib.pyplot as plt
 from scipy.linalg import svd
