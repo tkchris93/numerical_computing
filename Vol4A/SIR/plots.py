@@ -1,7 +1,9 @@
+# plots.py
+
 from __future__ import division
 
-# import matplotlib
-# matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
+import matplotlib
+matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
 
 from scipy.integrate import ode
 import numpy as np
@@ -191,7 +193,7 @@ def Exercise4():   # measles
 	plt.clf()
 
 
-if __name__ == "__main__":	  
+if __name__ == "__main__":
 	Example()
 	# Exercise1()
 	# Exercise2()
