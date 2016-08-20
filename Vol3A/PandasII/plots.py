@@ -1,4 +1,6 @@
 # plots.py
+import matplotlib
+matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
 
 import pandas as pd
 import numpy as np

@@ -1,3 +1,4 @@
+# plots.py
 import matplotlib
 matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
 
@@ -50,7 +51,7 @@ def dfPlot():
 def histogram():
     """Creat histogram of columns in DataFrame."""
     col1 = pd.Series(np.random.randn(1000))   #normal distribution
-    col2 = pd.Series(np.random.gamma(5, size=1000)) #gamma distribution 
+    col2 = pd.Series(np.random.gamma(5, size=1000)) #gamma distribution
     df = pd.DataFrame({'normal':col1, 'gamma':col2})
     df.hist()
     plt.savefig("histogram.pdf")
