@@ -2,7 +2,7 @@
 """Introductory Labs: Matploblib and Mayavi. Plotting file."""
 from __future__ import print_function
 import matplotlib
-matplotlib.rcParams = matplotlib.rc_params_from_file('../../../matplotlibrc')
+matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
 
 # Decorator ===================================================================
 
