@@ -76,15 +76,15 @@ Table \ref{table:ls_flags} contains some of the most common flags for the \li{ls
 
 \begin{table}
 \begin{tabular}{l|l}
-Flags & Description
-\\ \hline
-\li{-a} & Do not ignore hidden files and folders \\
-\li{-l} & List files and folders in long format \\
-\li{-r} & Reverse order while sorting \\
-\li{-R} & Print files and subdirectories recursively \\
-\li{-s} & Print item name and size \\
-\li{-S} & Sort by size \\
-\li{-t} & Sort output by date modified \\
+    Flags & Description
+    \\ \hline
+    \li{-a} & Do not ignore hidden files and folders \\
+    \li{-l} & List files and folders in long format \\
+    \li{-r} & Reverse order while sorting \\
+    \li{-R} & Print files and subdirectories recursively \\
+    \li{-s} & Print item name and size \\
+    \li{-S} & Sort by size \\
+    \li{-t} & Sort output by date modified \\
 \end{tabular}
 \caption{Common flags of the \li{ls} command.}
 \label{table:ls_flags}
@@ -192,12 +192,12 @@ See Table \ref{table:wildcards} for examples of common wildcard usuage.
 
 \begin{table}
 \begin{tabular}{l|l}
-Command & Description
-\\ \hline
-\li{*.txt} & All files that end with \texttt{.txt}. \\
-\li{image*} & All files that have \texttt{image} as the first 5 characters. \\
-\li{*py*} & All files that contain \texttt{py} in the name. \\
-\li{doc*.txt} & All files of the form \texttt{doc1.txt}, \texttt{doc2.txt}, \texttt{docA.txt}, etc. \\
+    Command & Description
+    \\ \hline
+    \li{*.txt} & All files that end with \texttt{.txt}. \\
+    \li{image*} & All files that have \texttt{image} as the first 5 characters. \\
+    \li{*py*} & All files that contain \texttt{py} in the name. \\
+    \li{doc*.txt} & All files of the form \texttt{doc1.txt}, \texttt{doc2.txt}, \texttt{docA.txt}, etc. \\
 \end{tabular}
 \caption{Common uses for wildcards.}
 \label{table:wildcards}
@@ -466,13 +466,13 @@ We are accustomed to navigating GUI text editors using a mouse and arrow keys. I
 
 \begin{table}
 \begin{tabular}{l|l}
-Command & Description
-\\ \hline
-\li{a} & \textbf{a}ppend text after cursor \\
-\li{A} & \textbf{A}ppend text to end of line \\
-\li{o} & Begin a new line below the cursor \\
-\li{O} & Begin a new line above the cursor \\
-\li{s} & Substitute characters under cursor \\
+    Command & Description
+    \\ \hline
+    \li{a} & \textbf{a}ppend text after cursor \\
+    \li{A} & \textbf{A}ppend text to end of line \\
+    \li{o} & Begin a new line below the cursor \\
+    \li{O} & Begin a new line above the cursor \\
+    \li{s} & Substitute characters under cursor \\
 \end{tabular}
 \caption{Commands for entering insert mode}
 \label{table:viminsert}
@@ -481,20 +481,24 @@ Command & Description
 % TODO: turn this into a table.
 \begin{problem}
 Become accustomed to navigating in command mode using the following keys:
-\begin{itemize}
-\item k - up
-\item j - down
-\item h - left
-\item l - right
-\item w - beginning of next \textbf{w}ord
-\item e - \textbf{e}nd of next word
-\item b - \textbf{b}eginning of previous word
-\item 0 - (zero) beginning of line
-\item \$ - end of line
-\item gg - beginning of file
-\item \#gg - go to line \#
-\item G - end of file
-\end{itemize}
+\begin{table}[H]
+\begin{tabular}{r|l}
+    Command & Description
+    \\ \hline
+    \li{k} & up \\
+    \li{j} & down \\
+    \li{h} & left \\
+    \li{l} & right \\
+    \li{w} & beginning of next \textbf{w}ord \\
+    \li{e} & \textbf{e}nd of next word \\
+    \li{b} & \textbf{b}eginning of previous word \\
+    \li{0} & (zero) beginning of line \\
+    \li{\$} & end of line \\
+    \li{gg} & beginning of file \\
+    \li{<<\#gg>>} & go to line \li{<<\#>>} \\
+    \li{G} & end of file
+\end{tabular}
+\end{table}
 \end{problem}
 
 \subsection*{Alternative Ways to Enter Insert Mode} % -------------------------
@@ -528,15 +532,15 @@ See Table \ref{table:delete} for a few examples.
 
 \begin{table}
 \begin{tabular}{l|l}
-Command & Description
-\\ \hline
-\li{x} & delete letter after cursor \\
-\li{X} & delete letter before cursor \\
-\li{dd} & delete line \\
-\li{dl} & \textbf{d}elete \textbf{l}etter \\
-\li{<<d\#l>>} & \textbf{d}elete \# \textbf{l}etters \\
-\li{dw} & \textbf{d}elete \textbf{w}ord \\
-\li{<<d\#w>>} & \textbf{d}elete \# \textbf{w}ords \\
+    Command & Description
+    \\ \hline
+    \li{x} & delete letter after cursor \\
+    \li{X} & delete letter before cursor \\
+    \li{dd} & delete line \\
+    \li{dl} & \textbf{d}elete \textbf{l}etter \\
+    \li{<<d\#l>>} & \textbf{d}elete \# \textbf{l}etters \\
+    \li{dw} & \textbf{d}elete \textbf{w}ord \\
+    \li{<<d\#w>>} & \textbf{d}elete \# \textbf{w}ords \\
 \end{tabular}
 \caption{Commands for deleting in command mode}
 \label{table:delete}
@@ -557,7 +561,7 @@ It is also worth noting that we can use vim navigation commands in many other pl
 For example, try using the navigation commands when viewing the \li{man vim} page.
 
 \begin{table}
-\begin{tabular}{l|l}
+\begin{tabular}{r|l}
     Command & Description
     \\ \hline
     \li{<<:map>>} & customize \\
