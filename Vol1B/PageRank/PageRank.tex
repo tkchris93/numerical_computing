@@ -146,8 +146,7 @@ and $K$ is defined by
 \subsection*{Defining Page Rank}
 As given by the PageRank algorithm, the \emph{rank} of page $i$ is
 \[p_i = \lim_{t\to \infty} p_i(t).\]
-In other words, the page ranks are the steady state of the modified Markov chain defined in \eqref{equ:pr3}.
-
+For those familiar with Markov Chains, Equation \ref{equ:pr3} defines a Markov chain. Page ranks are simply the steady state of this Markov chain.
 
 
 \section*{Implementation in Python}
@@ -266,7 +265,7 @@ Write a function that computes the K matrix given an adjacency matrix.
 \subsection*{Solving for the Page Ranks}
 There are several ways to solve for $\lim_{t \to \infty} \mathbf{p}(t)$.
 \subsubsection*{Algebraic Method}
-One possibility is to assume the modified Markov chain has a steady state $\mathbf{p}$ and solve for it algebraically:
+Again, for those familiar with Markov chains, one possibility is to assume the modified Markov chain has a steady state $\mathbf{p}$ and solve for it algebraically:
 \begin{equation}\label{equ:matrix_solve}
 (I-dK)\mathbf{p} = \frac{1-d}{N} \mathbf{1}.
 \end{equation}
@@ -358,7 +357,6 @@ def eig_solve( adj, N=None, d=.85):
     Return the approximation to the steady state of p.
     '''
 \end{lstlisting}
-Hint: Review the techniques from the Markov chain section of Lab \ref{lab:EigSolve}.
 \end{problem}
 
 \section*{Ranking Teams}
@@ -437,7 +435,7 @@ Data was taken from the SNAP datasets.}
 (Optional) Try running the functions you wrote in this lab on a data set downloaded from SNAP.
 \begin{enumerate}
 \item Begin by running your methods on the first 100 nodes of the data set.
-\item Modify your solution to Problem \ref{prob:pagerank_dense_iter} so that it uses only sparse matrices. 
+\item Modify your solution to Problem \ref{prob:pagerank_dense_iter} so that it uses only sparse matrices.
 With this modification, you should be able to run the function on more nodes.
 Hint: Convert the adjacency matrix to a \li{csc_matrix} or a \li{csr_matrix} to perform the computations.
 \end{enumerate}
