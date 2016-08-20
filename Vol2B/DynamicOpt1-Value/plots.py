@@ -1,8 +1,10 @@
+# plots.py
+import matplotlib
+matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
+
 #================================================
 #Plots for the Value Function Iteration Lab
 #================================================
-import matplotlib
-matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
 import numpy as np
 import math
 from scipy import stats as st
@@ -29,13 +31,13 @@ def diff_policies():
             for j, consumption_amount in enumerate(policy[1:]):
                 total_utility[j+1] = total_utility[j] + beta**(j+1)*utility_function(policy[j+1])
 
-            l, = plt.plot(np.arange(len(policy)), total_utility, label='Policy ' + str(i+1) 
+            l, = plt.plot(np.arange(len(policy)), total_utility, label='Policy ' + str(i+1)
                           + ', Utility = ' + str(total_utility[-1])[:3])
 
             print("Total Utility: \t" + str(total_utility[-1]))
         plt.legend(loc='upper left')
         plt.savefig('./diff_policies.pdf')
-    
+
     policy1 = np.array([1.0, 0, 0, 0, 0])
     policy2 = np.array([0, 0, 0, 0, 1.0])
     policy3 = np.array([0.2, 0.2, 0.2, 0.2, 0.2])
@@ -43,7 +45,7 @@ def diff_policies():
 
     policies = [policy1, policy2, policy3, policy4]
     graph_policy(policies)
-    
+
 
 def eatCake(beta, N, Wmax=1., T=None, finite=True, plot=False):
     """
@@ -76,7 +78,7 @@ def eatCake(beta, N, Wmax=1., T=None, finite=True, plot=False):
             values[:,i] = (rewards + beta*values[:,i+1].reshape(1,N))[n_range,argmaxs]
             psi[:,i] = states[argmaxs]
             x=np.arange(0,N)
-        
+
         if plot:
             x=np.arange(0,N)
             y=np.arange(0,T+2)
@@ -85,8 +87,8 @@ def eatCake(beta, N, Wmax=1., T=None, finite=True, plot=False):
             ax1= Axes3D(fig1)
             ax1.plot_surface(states[X],Y,values.T, cmap=cm.coolwarm)
             plt.show ()
-            
-            fig2 = plt.figure() 
+
+            fig2 = plt.figure()
             ax2 = Axes3D(fig2)
             y = np.arange(0,T+1)
             X,Y=np.meshgrid(x,y)
@@ -105,7 +107,7 @@ def eatCake(beta, N, Wmax=1., T=None, finite=True, plot=False):
         if plot:
             plt.plot(states, psi)
             plt.show()
-            
+
     return values, psi
 
 def finite_horiz():
@@ -123,25 +125,25 @@ def finite_horiz():
     util_grid[index] = -10**10;
     V = np.zeros((N,T+2));
     psi = np.zeros((N,T+1));
-    
-    
+
+
     for k in xrange(T,-1,-1):
         val = util_grid + beta*np.tile(V[:,k+1].T,(N,1));
         vt = np.amax(val, axis = 1);
         psi_ind = np.argmax(val,axis = 1)
         V[:,k]    = vt;
         psi[:,k]    = W[psi_ind];
-    
+
     #now create plots
     #fixed time plot
-    
+
     plt.figure()
     plt.plot(V[:,5])
     plt.title(r'Value function for $t = 5$')
     plt.ylabel(r'$V$')
     plt.xlabel(r'$W$')
-    plt.savefig('fixed_time.pdf')   
-    
+    plt.savefig('fixed_time.pdf')
+
     #fixed W plot
     plt.figure()
     plt.plot(V[50,:])
@@ -150,9 +152,9 @@ def finite_horiz():
     plt.xlabel(r'$t$')
     plt.savefig('fixed_w.pdf')
     plt.clf()
-    
-#plot delta -> 0    
-def delta():     
+
+#plot delta -> 0
+def delta():
     beta = 0.99
     N = 1000
     u = lambda c: np.sqrt(c)
@@ -163,13 +165,13 @@ def delta():
     Wdiff[index] = 0
     util_grid = u(Wdiff)
     util_grid[index] = -10**10
-    
+
     Vprime = np.zeros((N,1))
     delta = np.ones(1)
     tol = 10**-9
     it = 0
     max_iter = 500
-    
+
     while (delta[-1] >= tol) and (it < max_iter):
         V = Vprime
         it += 1;
@@ -177,7 +179,7 @@ def delta():
         Vprime = np.amax(val, axis = 1)
         Vprime = Vprime.reshape((N,1))
         delta = np.append(delta,np.dot((Vprime-V).T,Vprime-V))
-        
+
     plt.figure()
     plt.plot(delta[1:])
     plt.ylabel(r'$\delta_k$')
@@ -204,9 +206,9 @@ def disc_norm():
     y = st.norm.pdf(x,0,1)
     fig, ax = plt.subplots()
     fig.canvas.draw()
-    
+
     ax.plot(x,y)
-    
+
     fill1_x = np.linspace(-2,-1.5,100)
     fill1_y = st.norm.pdf(fill1_x,0,1)
     fill2_x = np.linspace(-1.5,-1,100)
@@ -219,7 +221,7 @@ def disc_norm():
         tick.set_visible(False)
     for tick in ax.get_yticklines():
         tick.set_visible(False)
-    
+
     plt.rc("font", size = 16)
     plt.xticks([-2,-1.5,-1])
     labels = [item.get_text() for item in ax.get_xticklabels()]
@@ -229,37 +231,37 @@ def disc_norm():
     ax.set_xticklabels(labels)
     plt.ylim([0, .45])
 
-    
+
     plt.savefig('discnorm.pdf')
     plt.clf()
-    
-def stoch_value():    
+
+def stoch_value():
     #Compute Solution==========================================================
     sigma = .5
     mu = 4*sigma
     K = 7
     Gamma, eps = discretenorm.discretenorm(K,mu,sigma)
-    
+
     N = 100
     W = np.linspace(0,1,N)
     V = np.zeros((N,K))
-    
+
     u = lambda c: np.sqrt(c)
     beta = 0.99
-    
+
     X,Y= np.meshgrid(W,W)
     Wdiff = Y-X
     index = Wdiff < 0
     Wdiff[index] = 0
-    
+
     util_grid = u(Wdiff)
-    
+
     util3 = np.tile(util_grid[:,:,np.newaxis],(1,1,K))
     eps_grid = eps[np.newaxis,np.newaxis,:]
     eps_util = eps_grid*util3
-    
+
     Gamma_grid = Gamma[np.newaxis,:]
-    
+
     delta = 1
     Vprime = V
     z = 0
@@ -275,9 +277,9 @@ def stoch_value():
         psi_ind = np.argmax(arg,1)
         psi = W[psi_ind]
         delta = np.linalg.norm(Vprime - V)
-    
-    #============================================================    
-    #Plot 3D    
+
+    #============================================================
+    #Plot 3D
     x=np.arange(0,N)
     y=np.arange(0,K)
     X,Y=np.meshgrid(x,y)
@@ -289,8 +291,8 @@ def stoch_value():
     ax1.plot_surface(W[X],Y,np.transpose(Vprime), cmap=cm.coolwarm)
     plt.savefig('stoch_value.pdf')
     plt.clf()
-    
-    
+
+
 if __name__ == "__main__":
     disc_norm()
     stoch_value()

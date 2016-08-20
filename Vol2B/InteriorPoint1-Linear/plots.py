@@ -1,7 +1,9 @@
-# import matplotlib
-# matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
-from matplotlib import pyplot as plt
+# plots.py
+import matplotlib
+matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
 
+
+from matplotlib import pyplot as plt
 import numpy as np
 from scipy import linalg as la
 import solutions as sol

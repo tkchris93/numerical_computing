@@ -1,7 +1,8 @@
+# plots.py
 import matplotlib
 matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
-from matplotlib import pyplot as plt
 
+from matplotlib import pyplot as plt
 import numpy as np
 from cvxopt import matrix, solvers
 from scipy import linalg as la
@@ -17,28 +18,28 @@ def tent():
     Plot the tent.
     """
     n=20
-    
+
     #create lower bound for the tent surface
     L = np.zeros((n,n))
     L[n/2-1:n/2+1,n/2-1:n/2+1] = .5
     m = [n/6-1, n/6, int(5*(n/6.))-1, int(5*(n/6.))]
     mask1, mask2 = np.meshgrid(m, m)
     L[mask1, mask2] = .3
-    
+
     #solve the quadratic program:
     # min c^T x + .5 x^T Hx
     # st x >= L
     c = -1.*np.ones(n**2)/((n-1)**2)
     H = sol.laplacian(n)
     A = np.eye(n**2)
-    
+
     #initial guess
     x = np.ones((n,n))
     x = x.ravel()
     y = np.ones(n**2)
     l = np.ones(n**2)
     z = sol.qInteriorPoint(H, c, A, L.ravel(), (x,y,l), niter=10, verbose=False).reshape((n,n))
-    
+
     #plot solution surface
     dom = np.arange(n)
     X, Y = np.meshgrid(dom, dom)
@@ -96,8 +97,8 @@ def frontier():
     plt.text(.06, 1.09,'Inefficient Portfolios')
     plt.savefig('frontier.pdf')
     plt.clf()
-    
-    
+
+
 if __name__ == "__main__":
     tent()
     frontier()

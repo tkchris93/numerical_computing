@@ -1,7 +1,8 @@
+# plots.py
 import matplotlib
 matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
-from matplotlib import pyplot as plt
 
+from matplotlib import pyplot as plt
 import numpy as np
 from scipy.optimize import fmin_cg
 
@@ -88,14 +89,14 @@ def linReg():
     # Do a simple linear regression with one predictor variable
     x = np.random.random(10)*10
     y = 2.5*x + np.random.randn(10)
-    
+
     A = np.ones((10,2))
     A[:,1] = x
     Q = A.T.dot(A)
     b = A.T.dot(y)
     x0 = np.array([1, 1.])
     x1 = conjugateGradient(Q,b,x0,allpts=False)
-    
+
     dom = np.linspace(0,10,2)
     plt.plot(dom, x1[0]+x1[1]*dom)
     plt.scatter(x,y)
@@ -107,7 +108,7 @@ def logReg():
     def objective(b):
         '''Return -1*l(b[0], b[1]), where l is the log likelihood.'''
         return np.log(1+np.exp(b[0]+b[1]*x)).sum() - (y*(b[0]+b[1]*x)).sum()
-    
+
     y = np.array([0, 0, 0, 0, 1, 0, 1, 0, 1, 1])
     x = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
     guess = np.array([1., 1.])

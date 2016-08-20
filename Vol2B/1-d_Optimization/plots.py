@@ -1,7 +1,8 @@
+# plots.py
 import matplotlib
-matplotlib.rcParams = matplotlib.rc_params_from_file('../../../matplotlibrc')
-from matplotlib import pyplot as plt
+matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
 
+from matplotlib import pyplot as plt
 import numpy as np
 from scipy import linalg as la
 from scipy import optimize as opt

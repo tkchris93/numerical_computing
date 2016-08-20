@@ -1,7 +1,8 @@
+# plots.py
 import matplotlib
 matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
-from matplotlib import pyplot as plt
 
+from matplotlib import pyplot as plt
 import numpy as np
 
 def feasibleRegion():
@@ -20,6 +21,6 @@ def feasibleRegion():
     plt.ylim([-1, 5])
     plt.savefig('feasiblePolytope.pdf')
     plt.clf()
-    
+
 if __name__ == "__main__":
     feasibleRegion()
