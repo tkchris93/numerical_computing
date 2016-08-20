@@ -14,6 +14,13 @@ else                                # Delete the specified git branch.
     git checkout develop
     git branch -d $1
     git push origin :$1
+    # Clean up the repository by removing auxiliary files.
+    set +e
+    find . -name "*.pyc" -exec rm -f {} +
+    rm -f Vol?.[^tex]* Vol?.toc
+    rm -f ExtraLabs.[^tex]* ExtraLabs.toc
+    rm -f InstructorNotes.[^tex]* InstructorNotes.toc
+
     echo -e "\nDone\n"
     git status
     git branch
