@@ -1,46 +1,44 @@
 \lab{Data Visualization}{Data Visualization}
 \label{lab:DataVis}
-\objective{Correctly presenting and interpreting data with visualizations is a fundamental skills for all scientists.
+\objective{Correctly presenting and interpreting data with visualizations is both a science and an art.
 In this lab we discuss and demonstrate the principles of good data visualization, including the key characteristics of good graphs, common mistakes, and how to avoid unethical visualizations.}
 
 \section*{The Importance of Visualizations} % =================================
 
-Using visualizations to understand data often reveals insights that may not immediately obvious from simple statistics.
+Visualizations of data often reveal insights that may not immediately obvious from simple statistics.
 The following data set, known as \emph{Anscombe's quartet}, is a famous example of the importance of graphing data.
 
-% \begin{comment} % TODO: change the paragraph before this to account for taking the table out.
 \begin{table}[H]
 \small{
 \begin{tabular}{rr|rr|rr|rr}
-
-\multicolumn{2}{c|}{I}    & \multicolumn{2}{|c|}{II} &
-\multicolumn{2}{|c|}{III} & \multicolumn{2}{|c}{IV} \\
-\multicolumn{1}{c}{$x$}   & \multicolumn{1}{c|}{$y$} &
-\multicolumn{1}{|c}{$x$}  & \multicolumn{1}{c|}{$y$} &
-\multicolumn{1}{|c}{$x$}  & \multicolumn{1}{c|}{$y$} &
-\multicolumn{1}{|c}{$x$}  & \multicolumn{1}{c}{$y$} \\
-\hline
-10.0 & 8.04  & 10.0 & 9.14 & 10.0 & 7.46  & 8.0  & 6.58  \\
-8.0  & 6.95  & 8.0  & 8.14 & 8.0  & 6.77  & 8.0  & 5.76  \\
-13.0 & 7.58  & 13.0 & 8.74 & 13.0 & 12.74 & 8.0  & 7.71  \\
-9.0  & 8.81  & 9.0  & 8.77 & 9.0  & 7.11  & 8.0  & 8.84  \\
-11.0 & 8.33  & 11.0 & 9.26 & 11.0 & 7.81  & 8.0  & 8.47  \\
-14.0 & 9.96  & 14.0 & 8.10 & 14.0 & 8.84  & 8.0  & 7.04  \\
-6.0  & 7.24  & 6.0  & 6.13 & 6.0  & 6.08  & 8.0  & 5.25  \\
-4.0  & 4.26  & 4.0  & 3.10 & 4.0  & 5.39  & 19.0 & 12.50 \\
-12.0 & 10.84 & 12.0 & 9.13 & 12.0 & 8.15  & 8.0  & 5.56  \\
-7.0  & 4.82  & 7.0  & 7.26 & 7.0  & 6.42  & 8.0  & 7.91  \\
-5.0  & 5.68  & 5.0  & 4.74 & 5.0  & 5.73  & 8.0  & 6.89  \\
+    \multicolumn{2}{c|}{I}    & \multicolumn{2}{|c|}{II} &
+    \multicolumn{2}{|c|}{III} & \multicolumn{2}{|c}{IV} \\
+    \multicolumn{1}{c}{$x$}   & \multicolumn{1}{c|}{$y$} &
+    \multicolumn{1}{|c}{$x$}  & \multicolumn{1}{c|}{$y$} &
+    \multicolumn{1}{|c}{$x$}  & \multicolumn{1}{c|}{$y$} &
+    \multicolumn{1}{|c}{$x$}  & \multicolumn{1}{c}{$y$} \\
+    \hline
+    10.0 & 8.04  & 10.0 & 9.14 & 10.0 & 7.46  & 8.0  & 6.58  \\
+    8.0  & 6.95  & 8.0  & 8.14 & 8.0  & 6.77  & 8.0  & 5.76  \\
+    13.0 & 7.58  & 13.0 & 8.74 & 13.0 & 12.74 & 8.0  & 7.71  \\
+    9.0  & 8.81  & 9.0  & 8.77 & 9.0  & 7.11  & 8.0  & 8.84  \\
+    11.0 & 8.33  & 11.0 & 9.26 & 11.0 & 7.81  & 8.0  & 8.47  \\
+    14.0 & 9.96  & 14.0 & 8.10 & 14.0 & 8.84  & 8.0  & 7.04  \\
+    6.0  & 7.24  & 6.0  & 6.13 & 6.0  & 6.08  & 8.0  & 5.25  \\
+    4.0  & 4.26  & 4.0  & 3.10 & 4.0  & 5.39  & 19.0 & 12.50 \\
+    12.0 & 10.84 & 12.0 & 9.13 & 12.0 & 8.15  & 8.0  & 5.56  \\
+    7.0  & 4.82  & 7.0  & 7.26 & 7.0  & 6.42  & 8.0  & 7.91  \\
+    5.0  & 5.68  & 5.0  & 4.74 & 5.0  & 5.73  & 8.0  & 6.89  \\
 \end{tabular}}
 \end{table}
 
-Each section of Anscombe's quartet the following statistical properties:
+Each section of Anscombe's quartet shares the following statistical properties:
 \begin{itemize}
 \setlength\itemsep{0em}
-\item The means are $9$ for $x$ and $7.5$ for $y$.
-\item The sample variances are $11$ for $x$ and $3.75$ for $y$.
-\item The correlation between $x$ and $y$ is $.816$.
-\item The linear least squares regression line is $y=\frac{1}{2}x+3$.
+    \item The means are $9$ for $x$ and $7.5$ for $y$.
+    \item The sample variances are $11$ for $x$ and $3.75$ for $y$.
+    \item The correlation between $x$ and $y$ is $.816$.
+    \item The linear least squares regression line is $y=\frac{1}{2}x+3$.
 \end{itemize}
 
 Despite these similarities, each section is quite different from the others.
@@ -55,37 +53,37 @@ Write a few sentences describing what makes each section unique.
 \label{prob:anscombes-quartet}
 \end{problem}
 
-\begin{comment}
 \section*{Principles of Good Data Visualization} % ============================
 
-Problem \ref{prob:anscombes-quartet} demonstrate how visualizations can describe data much more accurately than simple statistics.
-However, a poor or unethical visualizations can easily misrepresent data.
+Most data sets can be visualized in many forms and styles.
+There is usually no ``best'' or inherently correct way to visualize data, but there are several good principles to follow (and several practices to avoid).
 
 \begin{enumerate}
-    \item \textbf{Clarity}: Use titles, label axes, and include a legend. Graphs should be self-explanatory.
-    Where appropriate, use words to carefully explain the insights represented
-    in the visualization.
-    \item \textbf{Simplicity}: Remove unnecessary elements of a graph.
-    Don't add 3D effects in for no reason.
-    \item \textbf{Integrity}. Tell the truth, the whole truth, and nothing but the truth.
+    \item \textbf{Clarity}.
+    Visualizations should be self-explanatory.
+    Always use specific titles and axis labels, and include units of measure.
+    Use a legend for plots with more than one piece of information.
 
-    Every visualization should be presented alongside all relevant information including who created it, where the data was obtained, how it was collected, whether it was cleaned or transformed, and whether there are conflicts of interest or possible biases present.
+    % Where appropriate, use text annotations to carefully explain the major insights represented in the visualization.
 
+    \item \textbf{Simplicity}.
+    A good visualization communicates everything that it needs to, but nothing more.
+    Unnecessary elements of a graph should be removed.
+    % Don't add 3D effects in for no reason.
+
+    \item \textbf{Integrity}.
+    Tell the truth, the whole truth, and nothing but the truth.
     It is almost always very easy to manipulate a visualization so that it supports a desired interpretation.
+    Resist the temptation to twist a picture into what you personally want it to be.
 
-
-
-    As in any form of communication, integrity is important in data visualization.
-
-
+    Finally, every visualization should be presented alongside all relevant information including who created it, where the data was obtained, how it was collected, whether it was cleaned or transformed, and whether there are conflicts of interest or possible biases present.
+    In short, cite your sources.
 \end{enumerate}
-
-\end{comment}
 
 \section*{Choosing the Right Visualization} % =================================
 
 Most data sets are more naturally described with one type of visualization than another.
-Below we review several common visualizations, their standard usages, and questions to consider during their construction.
+% Below we review several common visualizations, their standard usages, and questions to consider during their construction.
 
 \small{ % Get this section to fit on one page.
 \begin{itemize}
