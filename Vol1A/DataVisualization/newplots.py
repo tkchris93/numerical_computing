@@ -3,7 +3,7 @@
 
 from __future__ import print_function
 import matplotlib
-matplotlib.rcParams = matplotlib.rc_params_from_file('../../../matplotlibrc')
+matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
 
 # Decorator ===================================================================
 
@@ -67,22 +67,32 @@ def anscombe_data(save=False):
 
 # Problem 2 -------------------------------------------------------------------
 
-# Line Plots - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Line Plots / Small Multiples (Chebyshev Polynomials) - - - - - - - - - - - -
 
-@_save("line_vs_scatter_line.pdf")
-def line_vs_scatter_line():
-    x = np.linspace(0, 4, 8)
-    data = x**2
-    plt.plot(x, data, 'b-', linewidth=2)
-    return x, data
+@_save("chebyshev_bad.pdf")
+def line_bad():
+    x = np.linspace(-1, 1, 200)
+    for n in range(9):
+        plt.plot(x, np.polynomial.Chebyshev.basis(n)(x), lw=1,
+                                                label=r"$n = {}$".format(n))
+    plt.axis([-1.1, 1.1, -1.1, 1.1])
+    plt.legend()
 
-@_save("line_vs_scatter_scat.pdf")
-def line_vs_scatter_scat(x, data):
-    plt.plot(x, data, 'g.', markersize=15)
+@_save("chebyshev_good.pdf")
+def line_good():
+    x = np.linspace(-1, 1, 200)
+    for n in range(9):
+        plt.subplot(3,3,n+1)
+        plt.plot(x, np.polynomial.Chebyshev.basis(n)(x))
+        plt.axis([-1.1, 1.1, -1.1, 1.1])
 
-@_save("line_vs_scatter_both.pdf")
-def line_vs_scatter_both(x, data):
-    plt.plot(x, data, 'r.-', linewidth=2, markersize=15)
+        # Turn off extra tick marks and axis labels.
+        plt.tick_params(which="both", top="off", right="off")
+        if n < 6:
+            plt.tick_params(labelbottom="off")
+        if n % 3:
+            plt.tick_params(labelleft="off")
+        plt.title(r"$T_{}$".format(n))
 
 # Scatter Plots - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -112,10 +122,8 @@ def scat_2_good(x, y):
     cbar.set_label("y")
 
 def prob2():
-    # x, data = line_vs_scatter_line()
-    # line_vs_scatter_scat(x, data)
-    # line_vs_scatter_both(x, data)
-
+    line_bad()
+    line_good()
     scat_1_good(*scat_1_bad())
     scat_2_good(*scat_2_bad())
 
@@ -192,9 +200,8 @@ def rosenbrock():
 
 def save_all():
     prob2()
-    prob3()
-    rosenbrock()
+    # prob3()
+    # rosenbrock()
 
 if __name__ == '__main__':
-    # prob2()
     save_all()

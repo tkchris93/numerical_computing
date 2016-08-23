@@ -1,46 +1,46 @@
 \lab{Data Visualization}{Data Visualization}
 \label{lab:DataVis}
-\objective{Correctly presenting and interpreting data with visualizations is a fundamental skills for all scientists.
+\objective{Correctly presenting and interpreting data with visualizations is both a science and an art.
+% Indeed, effectively communicating complex relationships through data visualization is crucial to gaining the understanding needed to make important and difficult decisions.
 In this lab we discuss and demonstrate the principles of good data visualization, including the key characteristics of good graphs, common mistakes, and how to avoid unethical visualizations.}
+
 
 \section*{The Importance of Visualizations} % =================================
 
-Using visualizations to understand data often reveals insights that may not immediately obvious from simple statistics.
+Visualizations of data often reveal insights that may not immediately obvious from simple statistics.
 The following data set, known as \emph{Anscombe's quartet}, is a famous example of the importance of graphing data.
 
-% \begin{comment} % TODO: change the paragraph before this to account for taking the table out.
 \begin{table}[H]
 \small{
 \begin{tabular}{rr|rr|rr|rr}
-
-\multicolumn{2}{c|}{I}    & \multicolumn{2}{|c|}{II} &
-\multicolumn{2}{|c|}{III} & \multicolumn{2}{|c}{IV} \\
-\multicolumn{1}{c}{$x$}   & \multicolumn{1}{c|}{$y$} &
-\multicolumn{1}{|c}{$x$}  & \multicolumn{1}{c|}{$y$} &
-\multicolumn{1}{|c}{$x$}  & \multicolumn{1}{c|}{$y$} &
-\multicolumn{1}{|c}{$x$}  & \multicolumn{1}{c}{$y$} \\
-\hline
-10.0 & 8.04  & 10.0 & 9.14 & 10.0 & 7.46  & 8.0  & 6.58  \\
-8.0  & 6.95  & 8.0  & 8.14 & 8.0  & 6.77  & 8.0  & 5.76  \\
-13.0 & 7.58  & 13.0 & 8.74 & 13.0 & 12.74 & 8.0  & 7.71  \\
-9.0  & 8.81  & 9.0  & 8.77 & 9.0  & 7.11  & 8.0  & 8.84  \\
-11.0 & 8.33  & 11.0 & 9.26 & 11.0 & 7.81  & 8.0  & 8.47  \\
-14.0 & 9.96  & 14.0 & 8.10 & 14.0 & 8.84  & 8.0  & 7.04  \\
-6.0  & 7.24  & 6.0  & 6.13 & 6.0  & 6.08  & 8.0  & 5.25  \\
-4.0  & 4.26  & 4.0  & 3.10 & 4.0  & 5.39  & 19.0 & 12.50 \\
-12.0 & 10.84 & 12.0 & 9.13 & 12.0 & 8.15  & 8.0  & 5.56  \\
-7.0  & 4.82  & 7.0  & 7.26 & 7.0  & 6.42  & 8.0  & 7.91  \\
-5.0  & 5.68  & 5.0  & 4.74 & 5.0  & 5.73  & 8.0  & 6.89  \\
+    \multicolumn{2}{c|}{I}    & \multicolumn{2}{|c|}{II} &
+    \multicolumn{2}{|c|}{III} & \multicolumn{2}{|c}{IV} \\
+    \multicolumn{1}{c}{$x$}   & \multicolumn{1}{c|}{$y$} &
+    \multicolumn{1}{|c}{$x$}  & \multicolumn{1}{c|}{$y$} &
+    \multicolumn{1}{|c}{$x$}  & \multicolumn{1}{c|}{$y$} &
+    \multicolumn{1}{|c}{$x$}  & \multicolumn{1}{c}{$y$} \\
+    \hline
+    10.0 & 8.04  & 10.0 & 9.14 & 10.0 & 7.46  & 8.0  & 6.58  \\
+    8.0  & 6.95  & 8.0  & 8.14 & 8.0  & 6.77  & 8.0  & 5.76  \\
+    13.0 & 7.58  & 13.0 & 8.74 & 13.0 & 12.74 & 8.0  & 7.71  \\
+    9.0  & 8.81  & 9.0  & 8.77 & 9.0  & 7.11  & 8.0  & 8.84  \\
+    11.0 & 8.33  & 11.0 & 9.26 & 11.0 & 7.81  & 8.0  & 8.47  \\
+    14.0 & 9.96  & 14.0 & 8.10 & 14.0 & 8.84  & 8.0  & 7.04  \\
+    6.0  & 7.24  & 6.0  & 6.13 & 6.0  & 6.08  & 8.0  & 5.25  \\
+    4.0  & 4.26  & 4.0  & 3.10 & 4.0  & 5.39  & 19.0 & 12.50 \\
+    12.0 & 10.84 & 12.0 & 9.13 & 12.0 & 8.15  & 8.0  & 5.56  \\
+    7.0  & 4.82  & 7.0  & 7.26 & 7.0  & 6.42  & 8.0  & 7.91  \\
+    5.0  & 5.68  & 5.0  & 4.74 & 5.0  & 5.73  & 8.0  & 6.89  \\
 \end{tabular}}
 \end{table}
 
-Each section of Anscombe's quartet the following statistical properties:
+Each section of Anscombe's quartet shares the following statistical properties:
 \begin{itemize}
 \setlength\itemsep{0em}
-\item The means are $9$ for $x$ and $7.5$ for $y$.
-\item The sample variances are $11$ for $x$ and $3.75$ for $y$.
-\item The correlation between $x$ and $y$ is $.816$.
-\item The linear least squares regression line is $y=\frac{1}{2}x+3$.
+    \item The means are $9$ for $x$ and $7.5$ for $y$.
+    \item The sample variances are $11$ for $x$ and $3.75$ for $y$.
+    \item The correlation between $x$ and $y$ is $.816$.
+    \item The linear least squares regression line is $y=\frac{1}{2}x+3$.
 \end{itemize}
 
 Despite these similarities, each section is quite different from the others.
@@ -55,53 +55,145 @@ Write a few sentences describing what makes each section unique.
 \label{prob:anscombes-quartet}
 \end{problem}
 
-\begin{comment}
 \section*{Principles of Good Data Visualization} % ============================
 
-Problem \ref{prob:anscombes-quartet} demonstrate how visualizations can describe data much more accurately than simple statistics.
-However, a poor or unethical visualizations can easily misrepresent data.
+Creating an effective data visualization involves technical expertise combined with design knowledge.
+No visualization is perfect, but there are several essential elements that every good visualization must contain in order to be effective.
 
 \begin{enumerate}
-    \item \textbf{Clarity}: Use titles, label axes, and include a legend. Graphs should be self-explanatory.
-    Where appropriate, use words to carefully explain the insights represented
-    in the visualization.
-    \item \textbf{Simplicity}: Remove unnecessary elements of a graph.
-    Don't add 3D effects in for no reason.
-    \item \textbf{Integrity}. Tell the truth, the whole truth, and nothing but the truth.
+    \item \textbf{Clarity}.
+    Visualizations should be self-explanatory.
+    Always use specific titles and axis labels, and include units of measure.
+    Use a legend or annotations where appropriate.
 
-    Every visualization should be presented alongside all relevant information including who created it, where the data was obtained, how it was collected, whether it was cleaned or transformed, and whether there are conflicts of interest or possible biases present.
+    \item \textbf{Simplicity}.
+    A good visualization communicates everything that it needs to, but nothing more.
+    Remove unnecessary or distracting elements of a graph, including 3-D effects or overly flashy colors.
 
+    \item \textbf{Integrity}.
+    Tell the truth, the whole truth, and nothing but the truth.
     It is almost always very easy to manipulate a visualization so that it supports a desired interpretation.
+    Resist the temptation to morph a visualization into something that misrepresents the true nature of the data, even if that misrepresentation supports your hypotheses about the data.
 
-
-
-    As in any form of communication, integrity is important in data visualization.
-
-
+    Every visualization should be presented together with information on who created it, where the data was obtained, how it was collected, whether it was cleaned or transformed, and whether there are conflicts of interest or possible biases present.
+    Cite your sources.
 \end{enumerate}
 
-\end{comment}
+This list could be expanded, but virtually every good data visualization principle fits into these three categories in one way or another.
 
-\section*{Choosing the Right Visualization} % =================================
+\section*{Improving Specific Types of Visualizations} % =======================
 
-Most data sets are more naturally described with one type of visualization than another.
-Below we review several common visualizations, their standard usages, and questions to consider during their construction.
+Data can be visualized in many forms and styles.
+However, Most data sets are more naturally described with one type of visualization than another.
+In the following sections, we explore how the plots we commonly use can be improved and refined.
 
-\small{ % Get this section to fit on one page.
-\begin{itemize}
-\item \textbf{Line Plot}: Connects ordered $(x,y)$ points with straight lines.
+\subsection*{Line Plots} % ----------------------------------------------------
 
-Used to visualize one or two ordered arrays, such as functional outputs over an ordered domain or a sequence of values over time.
+A line plot connects ordered $(x,y)$ points with straight lines, and is therefore best for visualizing one or two ordered arrays, such as functional outputs over an ordered domain or a sequence of values over time.
+When creating a line plot, consider the following details.
 %
 \begin{itemize}
-    % \item What do the axes represent? How should they be labeled?
-    \item Are linear or logarithmic scales more effective?
+    \item What do the axes represent? How should they be labeled?
+    \item Are linear or logarithmic scales more appropriate?
     \item Is the line an appropriate thickness and color?
+    \item Should the lines be in the same plot, or in separate subplots?
 \end{itemize}
 
-% Use \li{plt.plot()} to create a line plot.
+The \emph{Chebyshev polynomials} are a family of orthogonal polynomials that are recursively defined as follows.
+\[T_0(x) = 1 \qquad T_1(x) = x \qquad\qquad T_{n+1} = 2xT_n(x) - T_{n-1}(x)\]
+NumPy's \li{polynomial} module has a convenient tool for constructing these and other important polynomials.%
+\footnote{\li{numpy.polynomial} also has tools for computing other polynomial families, including the Legendre, Hermite, and Laguerre polynomials.}
+However, plotting several the polynomials on top of each other, especially with a legend, results in a very cluttered visual.
 
-\item \textbf{Scatter Plot}: Draws $(x,y)$ points without connecting them.
+\begin{lstlisting}
+>>> import numpy as np
+>>> from matplotlib import pyplot as plt
+>>> T = np.polynomial.Chebyshev.basis
+
+# Plot the first 9 Chebyshev polynomials in the same plot.
+>>> x = np.linspace(-1, 1, 200)
+>>> for n in range(9):
+...     plt.plot(x, T(n)(x), label=r"$n = {}$".format(n))
+...
+>>> plt.axis([-1.1, 1.1, -1.1, 1.1])        # Set the window limits.
+>>> plt.legend()
+>>> plt.show()
+\end{lstlisting}
+
+\begin{figure}[H] % Chebyshev polynomials (bad example).
+    \centering
+    \includegraphics[width=.7\linewidth]{figures/chebyshev_bad.pdf}
+\end{figure}
+
+This line plot can be improved in several easy ways.
+%
+\begin{enumerate}
+    \item
+    Use subplots to split the visualization into smaller, comparable pieces.
+    Instead of using a legend, give each subplot a title.
+    This method, called \emph{small multiples}, was made famous by Edward Tufte.
+    \item Increase the line thicknesses to 2 or 3 (the default is 1).
+    \item Remove extra tick marks and axis labels.
+\end{enumerate}
+
+Matplotlib's \li{plt.tick_params()} function controls which tick marks and labels are displayed.
+Its options are summarized below.
+
+\begin{table}[H]
+\begin{tabular}{r|c|l}
+    Argument & Options & Description
+    \\ \hline
+    \li{axis} & \li{'x'}, \li{'y'}, \li{"both"} & Axis on which to operate. \\
+    \li{which} & \li{"major"}, \li{"minor"}, \li{"both"} & Operate on major or minor ticks.\\
+    \li{color} & Any Matplotlib color & Tick color. \\
+    \li{labelcolor} & Any Matplotlib color & Tick label color. \\
+    \li{bottom}, \li{top}, \li{left}, \li{right} & \li{"on"}, \li{"off"} & Turn ticks on or off. \\
+    \li{labelbottom}, \li{labeltop}, & \li{"on"}, \li{"off"} & Turn tick labels on or off. \\
+    \li{labelleft}, \li{labelright} & &
+\end{tabular}
+\end{table}
+
+\begin{lstlisting}
+>>> for n in range(9):
+...     plt.subplot(3, 3, n+1)
+...     plt.plot(x, T(n)(x), lw=2)
+...     plt.axis([-1.1, 1.1, -1.1, 1.1])
+...
+...     # Turn off extra tick marks and axis labels.
+...     plt.tick_params(which="both", top="off", right="off")
+...     if n < 6:                   # Remove x-axis label on upper plots.
+...         plt.tick_params(labelbottom="off")
+...     if n % 3:                   # Remove y-axis label on right plots.
+...         plt.tick_params(labelleft="off")
+...     plt.title(r"$T_{}$".<<format>>(n))
+...
+>>> plt.show()
+\end{lstlisting}
+
+\begin{figure}[H] % Chebyshev polynomials (bad example).
+    \centering
+    \includegraphics[width=.7\linewidth]{figures/chebyshev_good.pdf}
+\end{figure}
+
+The small multiples approach makes it much easier to compare the successive Chebyshev polynomials.
+
+% TODO: Note about using LaTex with Matplotlib text.
+
+\begin{problem} % Plot the Bernstein polynomials.
+The $n+1$ Bernstein basis polynomials of degree $n$ are defined as follows.
+\[b_{v,n} = {{n} \choose {v}} x^v (1-x)^{n-v},\qquad v = 0,\ 1,\ \ldots,\ n\]
+
+Plot at least the first $10$ Bernstein basis polynomials ($n = 0,\ 1,\ 2,\ 3$) as small multiples on the domain $[0,1] \times [0,1]$.
+Label the subplots for clarity, adjust tick marks and labels for simplicity, and set the window limits of each plot to be the same.
+Consider arranging the subplots so that the rows correspond with $n$ and the columns with $v$.
+\\(Hint: The constant ${{n} \choose {v}} = \frac{n!}{v!(n-v)!}$ is called the \emph{binomial coefficient} and can be efficiently computed with \li{scipy.special.binom()} or \li{scipy.misc.comb()}.)
+\end{problem}
+
+\subsection*{Scatter Plots} % -------------------------------------------------
+
+\begin{comment}
+
+\textbf{Scatter Plot}: Draws $(x,y)$ points without connecting them.
 
 Best for displaying points without a natural order or where each point is an individual instance and not inherently related to the other points in the set.
 %
@@ -113,14 +205,13 @@ Best for displaying points without a natural order or where each point is an ind
 
 % Use \li{plt.plot()} with a point marker (\li{'.'}, \li{','}, \li{'o'}, etc.) or \li{plt.scatter()} to draw a scatter plot.
 
-\begin{comment} % Window size, also should go later (with ethics).
+% Window size, also should go later (with ethics).
 Figure \ref{fig:scatter_correlation} displays two scatter plots.
 The first appears to have a weak correlation and the second appears to have a strong correlation.
 However, the same data is being plotted and the only difference is the scale and window size.
 Manipulating these can change your interpretation and should be done with careful consideration.
-\end{comment}
 
-\item \textbf{Histogram}: Partitions an interval into a number of bins and counts the number of values that fall into each bin.
+\textbf{Histogram}: Partitions an interval into a number of bins and counts the number of values that fall into each bin.
 
 Best for visualizing a single unordered array, such as draws from a probability distribution.
 %
@@ -133,14 +224,13 @@ Best for visualizing a single unordered array, such as draws from a probability 
 % Use \li{plt.hist()} to create a histogram.
 % The arguments \li{bins} and \li{<<range>>} specify the number of bins to draw and over what domain.
 
-\begin{comment} % Details for later.
+% Details for later.
 A histogram with only a few bins or too many bins will fail to give a clear view of the distribution of the data, therefore it is important to choose the number of bins that gives the best view of the distribution of the data.
 
 Similarly, reference lines are distracting and focus on unnecessary details instead of the shape of the distribution.
 If more precise details are desired, exact figures can be presented alongside the histogram in a table.
-\end{comment}
 
-\item \textbf{Heat Map}: Assigns a color to each point on a 2-D domain, providing a 2-D picture representing a 3-D surface.
+\textbf{Heat Map}: Assigns a color to each point on a 2-D domain, providing a 2-D picture representing a 3-D surface.
 
 Best for visualizing functions $f:\mathbb{R}^2\rightarrow\mathbb{R}$, usually over a domain constructed with \li{np.meshgrid()}.
 %
@@ -150,7 +240,7 @@ Best for visualizing functions $f:\mathbb{R}^2\rightarrow\mathbb{R}$, usually ov
     \item Is a linear or a logarithmic scale more appropriate for the color?
 \end{itemize}
 
-\item \textbf{Contour Map}: Draws level curves of a function $f:\mathbb{R}^2\rightarrow\mathbb{R}$.
+\textbf{Contour Map}: Draws level curves of a function $f:\mathbb{R}^2\rightarrow\mathbb{R}$.
 
 A filled contour map is discretized version of a heat map.
 %
@@ -160,7 +250,7 @@ A filled contour map is discretized version of a heat map.
     \item Is a linear or a logarithmic scale more appropriate for the color?
 \end{itemize}
 
-\end{itemize}}
+\end{comment}
 %
 % \begin{table}[H]
 % \begin{tabular}{rcc}
@@ -176,7 +266,6 @@ A filled contour map is discretized version of a heat map.
 % \end{tabular}
 % \end{table}
 
-\subsection*{Scatter Plots} % -------------------------------------------------
 
 \begin{comment}
 % Example of using a marker and a line.
@@ -322,21 +411,6 @@ The lines separating the bins, axis tick marks, and even the labels on the $y$ a
 Removing the lines between bins is easy: set the line width to $0$.
 To ensure the gaps where the lines used to be are filled, specify the \li{histtype} as \li{"stepfilled"} (using \li{histtype="step"} will draw the outline without filling it in).
 Finally, to get rid of extra markings on the axes, use \li{plt.tick_params()}.
-Some of this function's keyword arguments are summarized below.
-
-\begin{table}[H]
-\begin{tabular}{r|c|l}
-    \multicolumn{1}{c|}{Argument} & Options & \multicolumn{1}{|c}{Description}
-    \\ \hline
-    \li{axis} & \li{'x'}, \li{'y'}, \li{"both"} & Axis on which to operate. \\
-    \li{which} & \li{"major"}, \li{"minor"}, \li{"both"} & Operate on major or minor ticks.\\
-    \li{color} & Any Matplotlib color & Tick color. \\
-    \li{labelcolor} & Any Matplotlib color & Tick label color. \\
-    \li{bottom}, \li{top}, \li{left}, \li{right} & \li{"on"}, \li{"off"} & Turn ticks on or off. \\
-    \li{labelbottom}, \li{labeltop}, & \li{"on"}, \li{"off"} & Turn tick labels on or off. \\
-    \li{labelleft}, \li{labelright} & &
-\end{tabular}
-\end{table}
 
 \begin{lstlisting}
 # Get 10,000 random samples from the standard exponential distribution.
@@ -710,14 +784,6 @@ Regraph the pie chart in Figure \ref{fig:pievsbar} as a horizontal bar chart usi
 Spam: 21, Eggs: 20, Ham: 22, Sausage: 21, Bacon: 20, Baked Beans: 11, Lobster Thermidor: 10
 \end{problem}
 
-% TODO: WHY IS THIS PROBLEM WAY DOWN HERE??? Shouldn't this be part of the histogram section?
-\begin{problem} % Problem: histogram of earthquake magnitudes.
-Plot a histogram of earthquake magnitudes using the data in the file \li{earthquake.txt}.
-Remove reference lines, tick marks and bar lines.
-Use the numpy function \li{np.loadtxt()} to read in the data.
-Is the data distributed normally or exponentially?
-\end{problem}
-
 \begin{figure} % Stacked v unstacked bar charts
 \centering
 \begin{subfigure}{.45\textwidth}
@@ -731,73 +797,6 @@ Is the data distributed normally or exponentially?
 \caption{Stacked Bar Chart. The relative values are harder to compare when stacked (left) instead of adjacent (right).}
 \label{fig:stacked}
 \end{figure}
-
-\subsection*{Small Multiples} % -----------------------------------------------
-
-When we have too much information to display cleanly in one chart, we can split the visualization into many smaller visualizations and place them near each other so they can be easily compared.
-This method is called \emph{small multiples} and was made famous by Edward Tufte.
-
-As an example, consider the first six Chebyshev polynomials.
-Plotting them all on the same graph makes the visualization cluttered.
-Instead, each polynomial can be given its own graph and laid out in a way that makes them easy to compare, (see Figure \ref{fig:PoT}).
-
-% add more reference material??
-
-\begin{figure} % Chebyshev polynomials
-\centering
-\begin{subfigure}{.45\textwidth}
-  \centering
-  \includegraphics[width=\textwidth]{PoT.png}
-\end{subfigure}
-\begin{subfigure}{.45\textwidth}
-\centering
-  \includegraphics[width=\textwidth]{PoT_separate.png}
-\end{subfigure}
-\caption{Chebyshev polynomials graphed together on the left and in small multiples on the right.
-The small multiples are much easier to interpret.}
-\label{fig:PoT}
-\end{figure}
-
-To make small multiples, use the Matplotlib command \li{ax = plt.subplot()} which sets up multiple plots one at a time.
-% Some example code is provided below.
-
-\begin{lstlisting}
-import numpy as np
-from matplotlib import pyplot as plt
-from numpy.polynomial import Chebyshev as T
-
-def Chebyshev_subplots():
-    fig = plt.figure(dpi=100)
-    fig.set_size_inches(10,10)
-    fig.suptitle('Chebyshev Polynomials', fontsize=20)
-
-    x = np.linspace(-1,1,500)
-
-    for i in range(9):
-        ax = plt.subplot(3,3,i+1)
-        ax.plot(x, T.basis(i)(x), lw=2, label="$T_%d$"%i)
-        plt.xlim(-1.1,1.1)
-        plt.ylim(-1.1,1.1)
-        ax.set_title('$T_%d$'%i)
-        if i%3:
-            # remove the inner y-ticks and labels.
-            ax.set_yticklabels([])
-            ax.yaxis.set_ticks_position('none')
-        if i<6:
-            # remove the inner x-ticks and labels.
-            ax.xaxis.set_ticks_position('none')
-            ax.set_xticklabels([])
-
-    plt.show()
-\end{lstlisting}
-
-\begin{problem} % Problem: plot the Bernstein polynomials.
-The $n+1$ Bernstein basis polynomials of degree $n$ are defined as
-
-$$b_{v,n} = {{n} \choose {v}} x^v (1-x)^{n-v}, v = 0, 1,..., n.$$
-
-Plot the Bernstein basis polynomials for $v,n$ in [0,3] as small multiples and compare that to the cluttered version of plotting them on top of each other.
-\end{problem}
 
 \begin{comment}
 

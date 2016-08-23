@@ -1,6 +1,6 @@
 from matplotlib import pyplot as plt
 from numpy.random import normal
-from scipy.misc import comb as comb
+from scipy.misc import comb
 import numpy as np
 
 #Implement this function
@@ -77,7 +77,7 @@ def problemFour():
     country = 'Austria', 'Bolivia', 'England', 'Finland', 'Germany', 'Hungary', 'Japan','North Korea', 'South Korea', 'Montenegro', 'Norway', 'Peru','Sri Lanka', 'Switzerland', 'Turkey', 'U.S.', 'Vietnam'
     plt.scatter(female,male)
     plt.show()
-    
+
 # Implement this function
 def problemFive():
     '''
@@ -90,7 +90,7 @@ def problemFive():
     Z = np.sin(X)+np.sin(Y)
     plt.contourf(X,Y,Z,cmap=plt.get_cmap('afmhot'))
     plt.show()
-    
+
 # Implement this function
 def problemSix():
     '''
@@ -148,7 +148,7 @@ def problemNine():
     axis = plt.gca()
     axis.spines['right'].set_visible(False)
     axis.spines['top'].set_visible(False)
-    
+
     axis.yaxis.set_ticks_position('left')
     axis.xaxis.set_ticks_position('bottom')
 
@@ -164,19 +164,19 @@ def problemTen():
     '''
     fig = plt.figure(dpi=100)
     fig.suptitle('Bernstein Polynomials', fontsize=20)
-    v = range(4)
-    n = range(4)
+
     x = np.linspace(0,1,num=100)
     for v in range(4):
         for n in range(4):
             y = comb(n,v)*x**v*(1-x)**(n-v)
             ax = plt.subplot(4,4,4*v+n+1)
-            ax.plot(x,y , lw=2)
+            plt.plot(x, y, lw=2)
     plt.show()
+
     for v in range(4):
         for n in range(4):
             y = comb(n,v)*x**v*(1-x)**(n-v)
-            plt.plot(x,y , lw=2)
+            plt.plot(x, y, lw=2)
     plt.show()
 
 if __name__ == '__main__':
@@ -200,4 +200,4 @@ if __name__ == '__main__':
     problemNine()
     print "10"
     problemTen()
-    
+
