@@ -47,7 +47,7 @@ def _save(filename):
 
 import numpy as np
 
-# Problem 1 -------------------------------------------------------------------
+# Problem 1 (Anscombe's Quartet) ----------------------------------------------
 
 def anscombe_data(save=False):
     data = np.array([[10.0,  8.04, 10.0, 9.14, 10.0,  7.46,  8.0,  6.58],
@@ -65,16 +65,14 @@ def anscombe_data(save=False):
         np.save("anscombe.npy", data)
     return data
 
-# Problem 2 -------------------------------------------------------------------
-
-# Line Plots / Small Multiples (Chebyshev Polynomials) - - - - - - - - - - - -
+# Problem 2 (Line Plots / Small Multiples) ------------------------------------
 
 @_save("chebyshev_bad.pdf")
 def line_bad():
     x = np.linspace(-1, 1, 200)
     for n in range(9):
         plt.plot(x, np.polynomial.Chebyshev.basis(n)(x), lw=1,
-                                                label=r"$n = {}$".format(n))
+                                                label= "n = {}".format(n))
     plt.axis([-1.1, 1.1, -1.1, 1.1])
     plt.legend()
 
@@ -92,42 +90,61 @@ def line_good():
             plt.tick_params(labelbottom="off")
         if n % 3:
             plt.tick_params(labelleft="off")
-        plt.title(r"$T_{}$".format(n))
+        plt.title("n = {}".format(n))
 
-# Scatter Plots - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Problem 3 (Scatter Plots) ---------------------------------------------------
 
-@_save("scatter_1_bad.pdf")
-def scat_1_bad():
-    data = anscombe_data()
-    x, y = data[:,2], data[:,3]
-    plt.scatter(x, y, c='b', s=500)
-    return x, y
+@_save("scatter_1.pdf")
+def scatter_1():
+    length, width, height = np.random.randint(1, 20, (3,50))
+    plt.scatter(length, width, s=100)
 
-@_save("scatter_1_good.pdf")
-def scat_1_good(x, y):
-    plt.scatter(x, y, s=.5*y**4, alpha=.8)
-    return x, y
+    plt.grid()
+    plt.xlabel("Length (inches)", fontsize=18, color="white")
+    plt.ylabel("Width (inches)", fontsize=18)
+    plt.tick_params(labelbottom="off")
 
-@_save("scatter_2_bad.pdf")
-def scat_2_bad():
-    data = anscombe_data()
-    x, y = data[:,4], data[:,5]
-    plt.scatter(x, y, c='b', s=500)
-    return x, y
+    return length, width, height
 
-@_save("scatter_2_good.pdf")
-def scat_2_good(x, y):
-    plt.scatter(x, y, s=500, c=y, alpha=.8)
+@_save("scatter_2.pdf")
+def scatter_2(length, width, height):
+    plt.scatter(length, width, c=height, s=100)
+
+    plt.grid()
+    plt.xlabel("Length (inches)", fontsize=18, color="white")
+    plt.ylabel("Width (inches)", fontsize=18, color="white")
+    plt.tick_params(labelbottom="off", labelleft="off")
     cbar = plt.colorbar()
-    cbar.set_label("y")
+    cbar.set_label("Height (inches)", fontsize=18)
+
+@_save("scatter_3.pdf")
+def scatter_3(length, width, height):
+    plt.scatter(length, width, s=length*width*height/2., alpha=.7)
+
+    plt.grid()
+    plt.xlabel("Length (inches)", fontsize=18)
+    plt.ylabel("Width (inches)", fontsize=18)
+
+@_save("scatter_4.pdf")
+def scatter_4(length, width, height):
+    plt.scatter(length, width, c=height, s=length*width*height/2., alpha=.7)
+
+    plt.grid()
+    plt.xlabel("Length (inches)", fontsize=18)
+    plt.ylabel("Width (inches)", fontsize=18, color="white")
+    plt.tick_params(labelleft="off")
+    cbar = plt.colorbar()
+    cbar.set_label("Height (inches)", fontsize=18)
 
 def prob2():
-    line_bad()
-    line_good()
-    scat_1_good(*scat_1_bad())
-    scat_2_good(*scat_2_bad())
+    # line_bad()
+    # line_good()
+    l,w,h = scatter_1()
+    scatter_2(l,w,h)
+    scatter_3(l,w,h)
+    scatter_4(l,w,h)
 
-# Problem 3 -------------------------------------------------------------------
+# Problem 4 (Histograms) ------------------------------------------------------
 
 @_save("hist_1_bad.pdf")
 def hist_1_bad(N):
@@ -200,8 +217,9 @@ def rosenbrock():
 
 def save_all():
     prob2()
-    # prob3()
-    # rosenbrock()
+    prob3()
+    rosenbrock()
 
 if __name__ == '__main__':
-    save_all()
+    prob2()
+    # save_all()

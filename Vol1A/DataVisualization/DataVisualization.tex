@@ -51,14 +51,13 @@ Plot each section of the quartet separately as a scatter plot.
 Also plot the regression line $y = \frac{1}{2}x + 3$ on the domain $x\in[0,20]$ over each scatter plot.
 
 Write a few sentences describing what makes each section unique.
-% How would you effectivly describe each section to another person?
 \label{prob:anscombes-quartet}
 \end{problem}
 
 \section*{Principles of Good Data Visualization} % ============================
 
-Creating an effective data visualization involves technical expertise combined with design knowledge.
-No visualization is perfect, but there are several essential elements that every good visualization must contain in order to be effective.
+Effectively visualizing data involves technical expertise combined with design knowledge.
+No visualization is perfect, but every good visualization must contains the following essential elements.
 
 \begin{enumerate}
     \item \textbf{Clarity}.
@@ -73,7 +72,7 @@ No visualization is perfect, but there are several essential elements that every
     \item \textbf{Integrity}.
     Tell the truth, the whole truth, and nothing but the truth.
     It is almost always very easy to manipulate a visualization so that it supports a desired interpretation.
-    Resist the temptation to morph a visualization into something that misrepresents the true nature of the data, even if that misrepresentation supports your hypotheses about the data.
+    Resist the temptation to morph a visualization into something that misrepresents the true nature of the data, even though that misrepresentation might support your hypotheses about the data.
 
     Every visualization should be presented together with information on who created it, where the data was obtained, how it was collected, whether it was cleaned or transformed, and whether there are conflicts of interest or possible biases present.
     Cite your sources.
@@ -90,13 +89,16 @@ In the following sections, we explore how the plots we commonly use can be impro
 \subsection*{Line Plots} % ----------------------------------------------------
 
 A line plot connects ordered $(x,y)$ points with straight lines, and is therefore best for visualizing one or two ordered arrays, such as functional outputs over an ordered domain or a sequence of values over time.
+
 When creating a line plot, consider the following details.
 %
 \begin{itemize}
     \item What do the axes represent? How should they be labeled?
-    \item Are linear or logarithmic scales more appropriate?
+    \item Would a linear scale or a logarithmic scale most clearly reveal patterns?
+    \item What should the window limits be?
     \item Is the line an appropriate thickness and color?
-    \item Should the lines be in the same plot, or in separate subplots?
+    \item Should each point be distinctly marked, or is a smooth line preferable?
+    \item Should multiple lines be in the same plot, or in separate subplots?
 \end{itemize}
 
 The \emph{Chebyshev polynomials} are a family of orthogonal polynomials that are recursively defined as follows.
@@ -108,22 +110,24 @@ However, plotting several the polynomials on top of each other, especially with 
 \begin{lstlisting}
 >>> import numpy as np
 >>> from matplotlib import pyplot as plt
->>> T = np.polynomial.Chebyshev.basis
+>>> % matplotlib inline                     # Display notebook plots inline.
 
 # Plot the first 9 Chebyshev polynomials in the same plot.
+>>> T = np.polynomial.Chebyshev.basis
 >>> x = np.linspace(-1, 1, 200)
 >>> for n in range(9):
-...     plt.plot(x, T(n)(x), label=r"$n = {}$".format(n))
+...     plt.plot(x, T(n)(x), label="n = "+str(n))
 ...
 >>> plt.axis([-1.1, 1.1, -1.1, 1.1])        # Set the window limits.
 >>> plt.legend()
->>> plt.show()
 \end{lstlisting}
 
 \begin{figure}[H] % Chebyshev polynomials (bad example).
     \centering
     \includegraphics[width=.7\linewidth]{figures/chebyshev_bad.pdf}
 \end{figure}
+
+\newpage
 
 This line plot can be improved in several easy ways.
 %
@@ -136,9 +140,8 @@ This line plot can be improved in several easy ways.
     \item Remove extra tick marks and axis labels.
 \end{enumerate}
 
-Matplotlib's \li{plt.tick_params()} function controls which tick marks and labels are displayed.
-Its options are summarized below.
-
+Matplotlib's \li{plt.tick_params()}, summarized below, controls which tick marks and labels are displayed.
+%
 \begin{table}[H]
 \begin{tabular}{r|c|l}
     Argument & Options & Description
@@ -165,9 +168,7 @@ Its options are summarized below.
 ...         plt.tick_params(labelbottom="off")
 ...     if n % 3:                   # Remove y-axis label on right plots.
 ...         plt.tick_params(labelleft="off")
-...     plt.title(r"$T_{}$".<<format>>(n))
-...
->>> plt.show()
+...     plt.title("n = "+str(n))
 \end{lstlisting}
 
 \begin{figure}[H] % Chebyshev polynomials (bad example).
@@ -175,9 +176,23 @@ Its options are summarized below.
     \includegraphics[width=.7\linewidth]{figures/chebyshev_good.pdf}
 \end{figure}
 
-The small multiples approach makes it much easier to compare the successive Chebyshev polynomials.
+\begin{info} % LaTex with Matplotlib text.
+Matplotlib titles and annotations can be formatted with \LaTeX, a system designed for creating technical and scientific documents%
+\footnote{See \url{http://www.latex-project.org/} for more information.}
+(this lab manual, for example, is written in \LaTeX).
+To do so, use an `r' before the string quotation mark) and surround the text with dollar signs.
 
-% TODO: Note about using LaTex with Matplotlib text.
+For example, try replacing the final line of code in the previous example with the following line.
+
+\begin{lstlisting}
+...     plt.title(r"$T_{}(x)$".<<format>>(n))
+\end{lstlisting}
+
+The string's \li{<<format>>()} method inserts the input $n$ at the curly braces.
+The title of the sixth subplot, instead of being ``n = 5,'' will then be ``$T_5$.''
+\end{info}
+
+% TODO: Make sure the Bernstein polynomial notation is consistent with the book (it is consistent with Wikipedia currently)
 
 \begin{problem} % Plot the Bernstein polynomials.
 The $n+1$ Bernstein basis polynomials of degree $n$ are defined as follows.
@@ -191,25 +206,120 @@ Consider arranging the subplots so that the rows correspond with $n$ and the col
 
 \subsection*{Scatter Plots} % -------------------------------------------------
 
-\begin{comment}
+A scatter plot draws $(x,y)$ points without connecting them.
+Connecting the points would imply an order or relation between the points, so scatter plots are best for displaying data sets without a natural order, or where each point is a distinct, individual instance.
 
-\textbf{Scatter Plot}: Draws $(x,y)$ points without connecting them.
-
-Best for displaying points without a natural order or where each point is an individual instance and not inherently related to the other points in the set.
+Consider the following questions when making a scatter plot.
+Note that some of them are the same questions that should be asked when creating a line plot.
 %
 \begin{itemize}
-    % \item What do the axes represent? How should they be labeled?
-    \item Which marker is most appropriate?
-    \item Are the markers an appropriate size and color?
+    \item What do the axes represent? How should they be labeled?
+    \item Would a linear scale or a logarithmic scale most clearly reveal patterns?
+    \item What should the window limits be?
+    \item Which marker is best? Are the markers an appropriate size and color?
 \end{itemize}
 
-% Use \li{plt.plot()} with a point marker (\li{'.'}, \li{','}, \li{'o'}, etc.) or \li{plt.scatter()} to draw a scatter plot.
+A scatter plot can be drawn with either \li{plt.plot()} (specify a point marker such as \li{'.'}, \li{','}, \li{'o'}, or \li{'+'}) or \li{plt.scatter()}.
+While \li{plt.plot()} is the more flexible function in general, \li{plt.scatter()} provides a few extra tools.
+Most useful are the keywords \li{s} and \li{c}, which correspond to marker size and marker color, respectively.
+Each keyword can either be a single entry or an array.
+Using an array specifies the sizes or colors of each individual marker, allowing a scatter plot to have up to four dimensions of information.
 
-% Window size, also should go later (with ethics).
+\begin{comment}
+% Window size, also should go later.
 Figure \ref{fig:scatter_correlation} displays two scatter plots.
 The first appears to have a weak correlation and the second appears to have a strong correlation.
 However, the same data is being plotted and the only difference is the scale and window size.
 Manipulating these can change your interpretation and should be done with careful consideration.
+\end{comment}
+
+Consider a collection of rectangular boxes where the lengths, widths, and heights are given.
+A scatter plot of length against width mostly describes the sizes of the boxes; tying the third dimension (height) to the color of the points can provide the additional information.
+Setting the marker size of the marker as the volume of the boxes also adds some depth to the visualization, though modifying both the color and the size might be considered overkill.
+
+Since adjusting the marker size may lead to overlapping points, we specify the \emph{alpha value} of the color to make the markers slightly transparent.
+The keyword \li{alpha} accepts a value in the interval $[0,1]$; 0 makes the markers completely transparent, while a $1$ makes the markers completely opaque.
+
+Finally, as with heat maps and contour plots, a color bar can be added with \li{plt.colorbar()} to indicate the values that the colors represent.
+This color bar can be given a label as well.
+
+\begin{lstlisting}
+>>> length, width, height = np.random.randint(1, 20, (3,50))
+
+>>> plt.subplot(221)                # Plot length against width.
+>>> plt.scatter(length, width, s=100)
+>>> plt.grid()
+>>> plt.ylabel("Width (inches)")
+>>> plt.tick_params(labelbottom="off")
+>>> plt.axis([0, 20, 0, 20])
+
+>>> plt.subplot(222)                # Set the marker color to the height.
+>>> plt.scatter(length, width, c=height, s=100)
+>>> cbar = plt.colorbar()
+>>> cbar.set_label("Height (inches)")
+>>> plt.grid()
+>>> plt.tick_params(labelbottom="off", labelleft="off")
+>>> plt.axis([0, 20, 0, 20])
+
+>>> plt.subplot(223)                # Set the marker size to half the volume.
+>>> plt.scatter(length, width, s=length*width*height/2., alpha=.7)
+>>> plt.grid()
+>>> plt.xlabel("Length (inches)")
+>>> plt.ylabel("Width (inches)")
+>>> plt.axis([0, 20, 0, 20])
+
+>>> plt.subplot(224)                # Use color and marker size together.
+>>> plt.scatter(length, width, c=height, s=length*width*height/2., alpha=.7)
+>>> cbar = plt.colorbar()
+>>> cbar.set_label("Height (inches)")
+>>> plt.grid()
+>>> plt.tick_params(labelleft="off")
+>>> plt.xlabel("Length (inches)")
+>>> plt.axis([0, 20, 0, 20])
+\end{lstlisting}
+
+\begin{figure}[H] % Scatter plots.
+\captionsetup[subfigure]{justification=centering}
+\centering
+\begin{subfigure}{.495\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/scatter_1.pdf}
+\end{subfigure}
+%
+\begin{subfigure}{.495\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/scatter_2.pdf}
+\end{subfigure}
+\\
+\begin{subfigure}{.495\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/scatter_3.pdf}
+\end{subfigure}
+%
+\begin{subfigure}{.495\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/scatter_4.pdf}
+\end{subfigure}
+\end{figure}
+
+In scatter plots, connecting the points into a line plot usual results in extreme clutter.
+A regression line, however, highlights a pattern in the data without overshadowing the actual data points.%
+\footnote{See the Least Squares lab (QR 2), especially Problems 2–--4, for a refresher on regression lines.}
+
+\begin{problem} % Scatter plots with visualizations.
+The file \texttt{MLB.npy} contains measurements from over 1,000 recent Major League Baseball players, compiled by UCLA.\footnote{See \url{http://wiki.stat.ucla.edu/socr/index.php/SOCR_Data_MLB_HeightsWeights}.}
+Each row in the array represents a different player; the columns are the player's height (in inches), weight (in pounds), and age (in years), in that order.
+
+Describe the data with at least one scatter plot.
+Your graph(s) should demonstrate whether height, weight, or age correlated with each other in the MLB.
+Consider plotting the linear regression line to indicate trends.
+\end{problem}
+
+% DONE TO HERE = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+\subsection*{Histograms} % ----------------------------------------------------
+
+\begin{comment}
 
 \textbf{Histogram}: Partitions an interval into a number of bins and counts the number of values that fall into each bin.
 
@@ -266,107 +376,6 @@ A filled contour map is discretized version of a heat map.
 % \end{tabular}
 % \end{table}
 
-
-\begin{comment}
-% Example of using a marker and a line.
-Line plots and scatter plots are sometimes used together.
-A line connecting points implies a relationship or correlation between the points, while drawing point markers emphasizes that each point is a unique instance of data.
-Use \li{plt.plot()} and specify a marker \emph{and} a line style in the third argument to do both at once.
-% The keywords \li{linewidth} (or \li{ls}) and \li{markersize} (or \li{ms}) control the thickness of the line and the size of the markers, respectively.
-
-\begin{lstlisting}
->>> x = np.linspace(0, 4, 8)
->>> data = x**2
-
->>> plt.subplot(131)                # Regular line plot of the data.
->>> plt.plot(x, data, 'b-', linewidth=2)
-
->>> plt.subplot(132)                # Scatter plot of the data.
->>> plt.plot(x, data, 'g.', markersize=15)
-
->>> plt.subplot(133)                # Line and scatter plot.
->>> plt.plot(x, data, 'r.-', linewidth=2, markersize=15)
-\end{lstlisting}
-\end{comment}
-
-% Explain plt.scatter(), especially the 'c' and 's' keyword arguments.
-While \li{plt.plot()} is an easy way to create scatter plots, \li{plt.scatter()} provides a few extra tools.
-The keywords \li{s} and \li{c} correspond to marker size and marker color, respectively.
-Each keyword can either be a single entry, producing uniform markers, or an array, specifying the sizes or colors of the individual markers.
-This allows a scatter plot to have up to four dimensions of information.
-
-Consider again Anscombe's quartet.
-The pattern in section II can be made more pronounced by tying the size of the marker to the value of the $y$ coordinate.
-Since adjusting the size of the markers may lead to overlapping markers, we specify the \emph{alpha value} of the color to make the markers transparent.
-The keyword \li{alpha} accepts a value in the interval $[0,1]$; 0 makes the markers completely transparent, while a $1$ makes the markers completely opaque.
-
-\begin{lstlisting}
->>> anscombe = np.load("anscombe.npy")
->>> x2, y2 = anscombe[:,2], anscombe[:,3]
-
->>> plt.subplot(121)
->>> plt.scatter(x2, y2, c='b', s=500)
-
->>> plt.subplot(122)
->>> plt.scatter(x2, y2, c='b', s=.5*y**4, alpha=.8)
-
->>> plt.show()
-\end{lstlisting}
-
-\begin{figure}[H] % Different sizing in a scatter plot.
-\captionsetup[subfigure]{justification=centering}
-\centering
-\begin{subfigure}{.49\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{figures/scatter_1_bad.pdf}
-\end{subfigure}
-%
-\begin{subfigure}{.49\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{figures/scatter_1_good.pdf}
-\end{subfigure}
-\end{figure}
-
-Controlling the colors of the individual markers can also be illuminating. % TODO: The goal is to present 3-dimensional data, not show patterns...
-As with heat maps and contour plots, a color bar can be added to indicate the values that the colors represent.
-
-\begin{lstlisting}
->>> x3, y3 = anscombe[:,4], anscombe[:,5]
-
->>> plt.subplot(121)
->>> plt.scatter(x3, y3, s=500, c='b')
-
->>> plt.subplot(122)
->>> plt.scatter(x, y, s=500, c=y, alpha=.8)
->>> cbar = plt.colorbar()           # Draw and label the color bar.
->>> cbar.set_label("y")
-\end{lstlisting}
-
-\begin{figure}[H] % Different coloring in a scatter plot.
-\captionsetup[subfigure]{justification=centering}
-\centering
-\begin{subfigure}{.49\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{figures/scatter_2_bad.pdf}
-\end{subfigure}
-%
-\begin{subfigure}{.49\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{figures/scatter_2_good.pdf}
-\end{subfigure}
-\end{figure}
-
-% Talk about connecting the dots, then using a regression line instead.
-
-\begin{problem} % Scatter plots with visualizations.
-The file \texttt{MLB.npy} contains measurements from over 1,000 recent Major League Baseball players, compiled by UCLA.\footnote{See \url{http://wiki.stat.ucla.edu/socr/index.php/SOCR_Data_MLB_HeightsWeights}.}
-Each row in the array represents a different player; the columns are the player's height (in inches), weight (in pounds), and age (in years), in that order.
-
-Describe the data with at least one visualization.
-Your graph(s) should demonstrate whether height, weight, or age correlated with each other in the MLB.
-\end{problem}
-
-\subsection*{Histograms} % ----------------------------------------------------
 
 Line plots should \emph{not} be used for data without a natural progression.
 For example, suppose we would like to make a large number of random draws from a distribution to visualize its probability density function.
