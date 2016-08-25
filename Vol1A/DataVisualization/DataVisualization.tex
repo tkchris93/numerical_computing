@@ -460,28 +460,14 @@ Consider the following questions when plotting a heat map or contour plot:
     \item Is a linear or a logarithmic scale more appropriate for the color?
 \end{itemize}
 
-% DONE TO HERE = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-
-% usually over a domain constructed with \li{np.meshgrid()}.
-
-Heat maps work best when only one or two colors are used.
-
-% TODO: Reword (awkward).
-A good default colormap is Matplotlib's \li{viridis}.
-Other colormaps that are appropriate for the data can be selected using the argument \li{cmap='NAME\_OF\_COLORMAP'}, where \li{NAME\_OF\_COLORMAP} is one of Matplotlib's sequential or diverging colormaps.
-Two sequential colormaps are \li{afmhot} and \li{cool}. Two diverging colormaps are \li{seismic} and \li{bwr}.
-These colormaps along with their color scheme can be found on
-\url{http://matplotlib.org/examples/color/colormaps_reference.html}.
-Although three-dimensional data can be plotted as a surface in 3-space, it is often difficult to find a view where none of the important features of the data are obscured.
-
-You can create a contour plot in Matplotlib with \li{plt.contour()}.
-You can also create a pseudocolor plot in Matplotlib with the \li{plt.pcolormesh()} command.
-
-$f(x,y) = y^2 - x^3 + x^2$
-
-% This is similar to choosing the right number of bins on a histogram to get the right picture.
+It is often sufficient to choose a fixed number of level curves, then let Matplotlib space the curves out evenly.
+However, it is sometimes better to strategically specify the curves.
+Consider, for example, the function $f(x,y) = y^2 - x^3 + x^2$ on the domain $[-\frac{3}{2}, \frac{3}{2}] \times [-\frac{3}{2}, \frac{3}{2}]$.
+This function has a large basin around the origin.
+Since $f(0,0) = 0$, plotting several level curves close to $0$ reveals the topography of the basin.
 
 \begin{lstlisting}
+# Construct a 2-D domain with np.meshgrid() and calculate f on the domain.
 >>> x = np.linspace(-1.5, 1.5, 200)
 >>> X, Y = np.meshgrid(x, x.copy())
 >>> Z = Y**2 - X**3 + X**2
@@ -498,7 +484,7 @@ $f(x,y) = y^2 - x^3 + x^2$
 >>> plt.contourf(X, Y, Z, 12, cmap="viridis")
 >>> plt.colorbar()
 
->>> plt.subplot(224)                # Plot level curves on top of a heat map.
+>>> plt.subplot(224)                # Plot specific level curves and a heat map.
 >>> plt.contour(X, Y, Z, [-1, -.25, 0, .25, 1, 4], colors="white")
 >>> plt.pcolormesh(X, Y, Z, cmap="viridis")
 >>> plt.colorbar()
@@ -527,22 +513,21 @@ $f(x,y) = y^2 - x^3 + x^2$
 \end{subfigure}
 \end{figure}
 
-% TODO: revise these paragraphs.
+There are two main kinds of color maps: sequential and diverging.
+Sequential color maps, like \li{"hot"} and \li{"cool"}, transition very gradually between two colors; diverging color maps, like \li{"seismic"} and \li{"coolwarm"}, transition very rapidly from one color to another at the mean value.
+When in doubt, use \li{"viridis"} or \li{"plasma"}, two specialized sequential color schemes.
+For the complete list of Matplotlib color maps, see \url{http://matplotlib.org/examples/color/colormaps_reference.html}.
 
-A potential weakness of heat maps and contour plots is that if some of the values of $f$ are very large, it becomes difficult to see the differences between the highs and the lows of $f$.
-The color bar can be log scaled, just as an axis can be scaled in line plots, scatter plots, and histograms.
-In this case we use the key word \li{norm=matplotlib.colors.LogNorm()} in \li{plt.pcolormesh()}, \li{plt.contour()}, or \li{plt.contourf()} (it works for \li{plt.scatter()} as well).
-
+The color map can also be changed to a log scale with the keyword argument \li{norm=matplotlib.colors.LogNorm()} (this works for \li{plt.scatter()} as well).
 As an example, consider the same $f$ defined above on the larger domain $[-6,6]\times [-6,6]$.
-Log scaling can only be done on arrays of all positive values, as the log of a negative number is undefined.
-Instead, examine $|f|$.
+Log scaling can only be done on arrays of all positive values, so we visualize $|f|$.
 
 \begin{lstlisting}
 >>> from matplotlib.colors import LogNorm
 
 >>> x = np.linspace(-6, 6, 200)
 >>> X, Y = np.meshgrid(x, x.copy())
->>> Z = np.abs(Y**2 - X**3 + X**2)
+>>> Z = np.<<abs>>(Y**2 - X**3 + X**2)
 
 >>> plt.subplot(121)              # Plot a regular heat map of |f|.
 >>> plt.pcolormesh(X, Y, Z, cmap="viridis")
@@ -572,7 +557,7 @@ The \emph{Rosenbrock function} is defined as follows.
 The minimum value of $f$ is $0$, which occurs at the point $(1,1)$ at the bottom of a steep, banana-shaped valley of the function.
 
 Use heat maps and contour plots to visualize the Rosenbrock function in such a way that the minimum value, and the valley that it lies in, is apparent.
-Consider plotting the actual minimizer $(1,1)$ on top of the contour plot as well.
+Consider plotting the minimizer $(1,1)$ on top of the plot as well.
 \end{problem}
 
 
@@ -598,7 +583,6 @@ Consider plotting the actual minimizer $(1,1)$ on top of the contour plot as wel
 correlation in the first plot compared to the second.}
 \label{fig:scatter_correlation}
 \end{figure}
-\end{comment}
 
 Scatter plots may reveal insights other than correlation.
 Consider Figure \ref{fig:scatterquake} which plots earthquake data from the United States Geological Survey (USGS).
