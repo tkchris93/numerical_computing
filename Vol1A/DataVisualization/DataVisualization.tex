@@ -467,7 +467,8 @@ Your plots should clearly answer the following questions:
 \subsection*{Heat Maps and Contour Plots} % -----------------------------------
 
 Let $f:\mathbb{R}^2\rightarrow\mathbb{R}$ be a scalar-valued function on a 2-dimensional domain.
-A heat map of $f$ assigns a color to each $(x,y)$ point in the domain based on the value of $f(x,y)$, while a contour plot is a drawing of the level curves of $f$. % TODO: recap level curves (there's space to do it now).
+A heat map of $f$ assigns a color to each $(x,y)$ point in the domain based on the value of $f(x,y)$, while a contour plot is a drawing of the \emph{level curves} of $f$.
+The level curve corresponding to the constant $c$ is the set $\left\{(x,y)\mid c = f(x,y)\right\}$.
 A filled contour plot, which colors in the sections between the level curves, is a discretized version of a heat map.
 
 Consider the following questions when plotting a heat map or contour plot:
@@ -480,10 +481,13 @@ Consider the following questions when plotting a heat map or contour plot:
 \end{itemize}
 
 It is often sufficient to choose a fixed number of level curves.
-However, it is sometimes better to strategically specify the curves.
-Consider, for example, the function $f(x,y) = y^2 - x^3 + x^2$ on the domain $[-\frac{3}{2}, \frac{3}{2}] \times [-\frac{3}{2}, \frac{3}{2}]$.
-This function has a large basin around the origin.
-Since $f(0,0) = 0$, plotting several level curves close to $0$ reveals the topography of the basin.
+In this case, the values of $c$ corresponding to the level curves are automatically chosen to be evenly spaced over the range of values of $f$ on the domain.
+However, it is sometimes better to strategically specify the curves by providing a list of $c$ constants.
+
+Consider the function $f(x,y) = y^2 - x^3 + x^2$ on the domain $[-\frac{3}{2}, \frac{3}{2}] \times [-\frac{3}{2}, \frac{3}{2}]$.
+A heat map of $f$ reveals that it has a large basin around the origin.
+Then since $f(0,0) = 0$, choosing several level curves close to $0$ more closely describes the topography of the basin.
+The fourth subplot in the following example uses the curves with $c = -1,\ -\frac{1}{4},\ 0,\ \frac{1}{4},\ 1,$ and $4$.
 
 \begin{lstlisting}
 # Construct a 2-D domain with np.meshgrid() and calculate f on the domain.
@@ -537,7 +541,7 @@ Sequential color maps, like \li{"hot"} and \li{"cool"}, transition very graduall
 When in doubt, use \li{"viridis"} or \li{"plasma"}, two specialized sequential color schemes.
 For the complete list of Matplotlib color maps, see \url{http://matplotlib.org/examples/color/colormaps_reference.html}.
 
-The color map can also be changed to a log scale by using the keyword argument \li{norm=matplotlib.colors.LogNorm()} (this works for \li{plt.scatter()} as well).
+The color map can be changed to a logarithmic scale by using the keyword argument \li{norm=matplotlib.colors.LogNorm()} (this works for \li{plt.scatter()} as well).
 As an example, consider the same $f$ defined above on the larger domain $[-6,6]\times [-6,6]$.
 Log scaling can only be done on arrays of all positive values, so we visualize $|f|$.
 
@@ -549,11 +553,11 @@ Log scaling can only be done on arrays of all positive values, so we visualize $
 >>> Z = np.<<abs>>(Y**2 - X**3 + X**2)
 
 >>> plt.subplot(121)              # Plot a regular heat map of |f|.
->>> plt.pcolormesh(X, Y, Z, cmap="viridis")
+>>> plt.pcolormesh(X, Y, Z, cmap="plasma")
 >>> plt.colorbar()
 
 >>> plt.subplot(122)              # Plot a filled contour plot with log scaling.
->>> plt.contourf(X, Y, Z, 6, cmap="viridis", norm=LogNorm())
+>>> plt.contourf(X, Y, Z, 6, cmap="plasma", norm=LogNorm())
 >>> plt.colorbar()
 \end{lstlisting}
 
@@ -584,7 +588,15 @@ Consider plotting the minimizer $(1,1)$ on top of the plot as well.
 A bar chart plots categorical data in a sequence of bars.
 They are best for small, discrete, one-dimensional data sets.
 Use \li{plt.bar()} (vertical) or \li{plt.barh()} (horizontal) to create a bar chart in Matplotlib.
-These functions receive the locations of each bar, then the height of each bar.
+These functions receive the locations of each bar, then the height of each bar (as lists or arrays).
+
+Consider the following questions when making a bar chart.
+
+\begin{itemize}
+    \item What are the different categories in the data?
+    \item How should the data be sorted?
+    \item Should the value axis have a linear or a logarithmic scale?
+\end{itemize}
 
 Horizontal bar charts are usually preferable to vertical bar charts because horizontal labels are easier to read than vertical labels.
 Data in a bar chart should also be sorted in a logical way, either by bar size or by alphabetizing the labels.
@@ -639,7 +651,7 @@ By the same logic, a stacked bar chart is almost always inferior to a side-by-si
 \end{figure}
 
 \begin{problem}
-The file \texttt{countries.npy} contains information about 20 countries.
+The file \texttt{countries.npy} contains information from 20 different countries.
 Each row in the array represents a different country; the columns are the 2015 population (in millions of people), the 2015 GDP (in billions of US dollars), the average male height (in centimeters), and the average female height (in centimeters), in that order.%
 \footnote{
 See \url{https://en.wikipedia.org/wiki/List_of_countries_by_GDP_(nominal)}, \url{http://www.averageheight.co/}, and \url{https://en.wikipedia.org/wiki/List_of_countries_and_dependencies_by_population}.}

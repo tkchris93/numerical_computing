@@ -231,14 +231,14 @@ def heatmap_3(N):
     X, Y = np.meshgrid(x, x.copy())
     Z = np.abs(Y**2 - X**3 + X**2)
 
-    plt.pcolormesh(X, Y, Z, cmap="viridis")
+    plt.pcolormesh(X, Y, Z, cmap="plasma")
     plt.colorbar()
 
     return X, Y, Z
 
 @_save("contour_3.pdf")
 def contour_3(X, Y, Z):
-    plt.contourf(X, Y, Z, 6, cmap="viridis", norm=colors.LogNorm())
+    plt.contourf(X, Y, Z, 6, cmap="plasma", norm=colors.LogNorm())
     plt.colorbar()
 
 def prob5():
@@ -287,6 +287,7 @@ def save_all():
     # prob2()
     # prob3()
     # prob4()
+    prob5()
     pass
 
 
