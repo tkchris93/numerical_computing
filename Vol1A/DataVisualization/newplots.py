@@ -192,31 +192,87 @@ def prob3():
     histogram_3(data)
     histogram_4(data)
 
-    # earthquake()
+    earthquake()
 
 # Problem 4 -------------------------------------------------------------------
+
+@_save("heatmap_1.png")
+def heatmap_1(N):
+    x = np.linspace(-1.5, 1.5, N)
+    X, Y = np.meshgrid(x, x.copy())
+    Z = Y**2 - X**3 + X**2
+
+    plt.pcolormesh(X, Y, Z, cmap="viridis")
+    plt.colorbar()
+
+    return X, Y, Z
+
+@_save("heatmap_2.png")
+def heatmap_2(X, Y, Z):
+    plt.contour(X, Y, Z, [-1, -.25, 0, .25, 1, 4], colors="white")
+    plt.pcolormesh(X, Y, Z, cmap="viridis")
+    plt.colorbar()
+
+@_save("contour_1.pdf")
+def contour_1(X, Y, Z):
+    plt.contour(X, Y, Z, 6, cmap="viridis")
+    plt.colorbar()
+
+@_save("contour_2.pdf")
+def contour_2(X, Y, Z):
+    plt.contourf(X, Y, Z, 12, cmap="viridis")
+    plt.colorbar()
+
+@_save("heatmap_3.png")
+def heatmap_3(N):
+    x = np.linspace(-6, 6, N)
+    X, Y = np.meshgrid(x, x.copy())
+    Z = np.abs(Y**2 - X**3 + X**2)
+
+    plt.pcolormesh(X, Y, Z, cmap="viridis")
+    plt.colorbar()
+
+    return X, Y, Z
+
+@_save("contour_3.pdf")
+def contour_3(X, Y, Z):
+    plt.contourf(X, Y, Z, 6, cmap="viridis", norm=colors.LogNorm())
+    plt.colorbar()
+
 
 @_save("rosenbrock.pdf")
 def rosenbrock():
     fig = plt.figure()
     ax = Axes3D(fig, azim = -128, elev = 43)
+
     x = np.linspace(-2, 2, 50)
     y = np.linspace(-1, 3, 50)
     X, Y = np.meshgrid(x, y)
     Z = (1.-X)**2 + 100.*(Y-X**2)**2
+
     ax.plot_surface(X, Y, Z, rstride = 1, cstride = 1, cmap="viridis", linewidth=0, edgecolor='none', norm=colors.LogNorm())
 
     ax.set_xlim([-2, 2.0])
     ax.set_ylim([-1, 3.0])
     ax.set_zlim([0, 2500])
+    plt.xlabel(r"$x$")
+    plt.ylabel(r"$y$")
 
-    plt.xlabel("x")
-    plt.ylabel("y")
+def prob4():
+    x,y,z = heatmap_1(200)
+    heatmap_2(x,y,z)
+    contour_1(x,y,z)
+    contour_2(x,y,z)
+
+    x,y,z = heatmap_3(200)
+    contour_3(x,y,z)
+    # rosenbrock()
 
 def save_all():
     # prob2()
-    prob3()
-    # rosenbrock()
+    # prob3()
+    prob4()
+
 
 if __name__ == '__main__':
     save_all()

@@ -2,7 +2,8 @@
 \label{lab:DataVis}
 \objective{Correctly presenting and interpreting data with visualizations is both a science and an art.
 % Indeed, effectively communicating complex relationships through data visualization is crucial to gaining the understanding needed to make important and difficult decisions.
-In this lab we discuss and demonstrate the principles of good data visualization, including the key characteristics of good graphs, common mistakes, and how to avoid unethical visualizations.}
+In this lab we discuss and demonstrate the principles of good data visualization, including the key characteristics of good graphs, common mistakes, and how to avoid unethical visualizations.
+\\ \indent We strongly recommend completing this lab as a Jupyter Notebook.}
 
 
 \section*{The Importance of Visualizations} % =================================
@@ -57,7 +58,7 @@ Write a few sentences describing what makes each section unique.
 \section*{Principles of Good Data Visualization} % ============================
 
 Effectively visualizing data involves technical expertise combined with design knowledge.
-No visualization is perfect, but every good visualization must contains the following essential elements.
+No visualization is perfect, but every good visualization must contain the following essential elements.
 
 \begin{enumerate}
     \item \textbf{Clarity}.
@@ -235,7 +236,7 @@ Manipulating these can change your interpretation and should be done with carefu
 
 Consider a collection of rectangular boxes where the lengths, widths, and heights are given.
 A scatter plot of length against width mostly describes the sizes of the boxes; tying the third dimension (height) to the color of the points can provide the additional information.
-Setting the marker size of the marker as the volume of the boxes also adds some depth to the visualization, though modifying both the color and the size might be considered overkill.
+Setting the marker size as the volume of the boxes also adds some depth to the visualization, though modifying both the color and the size might be considered overkill.
 
 Since adjusting the marker size may lead to overlapping points, we specify the \emph{alpha value} of the color to make the markers slightly transparent.
 The keyword \li{alpha} accepts a value in the interval $[0,1]$; 0 makes the markers completely transparent, while a $1$ makes the markers completely opaque.
@@ -314,8 +315,6 @@ Your graph(s) should demonstrate whether height, weight, or age correlated with 
 Consider plotting linear regression lines to indicate trends.
 \end{problem}
 
-% DONE TO HERE = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-
 \subsection*{Histograms} % ----------------------------------------------------
 
 A histogram partitions an interval into a number of bins and counts the number of values that fall into each bin.
@@ -357,7 +356,7 @@ Use the edges of the bins to calculate the center of the bins, then plot the bin
 >>> plt.hist(data, bins=30, lw=0, histtype="stepfilled")
 >>> plt.tick_params(left="off", top="off", right="off", labelleft="off")
 
->>> plt.subplot(133)                # Draw a line plot over the bins.
+>>> plt.subplot(133)                # Convert the histogram to a line plot.
 >>> freq, bin_edges = np.histogram(data, bins=30)
 >>> bin_centers = (bin_edges[:-1] + bin_edges[1:])/2.
 >>> plt.plot(bin_centers, freq, 'k-', lw=4)
@@ -387,7 +386,7 @@ This is the histogram equivalent of using \li{plt.semilogy()} for line or scatte
 
 \begin{warn} % Line plots versus histograms.
 Line plots should \textbf{not} be used for data that has no natural progression.
-For example, suppose we have a large number of random draws from a statistical distribution.
+For example, consider a collection of random draws from a statistical distribution.
 In this case, a plain line plot is completely useless, because consecutive random draws are completely unrelated.
 A histogram, on the other hand, provides an approximation of the distribution's probability density function.
 
@@ -442,103 +441,31 @@ Your plots should clearly answer the following questions:
     \item How many earthquakes happened every year?
     \item How often do stronger earthquakes happen compared to weaker ones?
     \item Where do earthquakes happen? Where do the strongest earthquakes happen?
+    \\(Hint: Use \li{plt.axis("equal")} to fix the aspect ratio, which may improve comparisons between longitude and latitude.)
 \end{enumerate}
-% (Hint: \li{plt.gca().set_aspect("equal")} fixes the aspect ratio, which may improve comparisons between longitude and latitude.)
 \end{problem}
 
-% Consider Figure \ref{fig:logexample} which shows data about large earthquakes from the United States Geological Survey.
-% It appears to be somewhat random however, when transformed, the frequency of the magnitudes on a logarithmic scale show a fairly strong linear relationship between the variables.
+\subsection*{Heat Maps and Contour Plots} % -----------------------------------
 
-\subsection*{Heat and Contour Maps} % -----------------------------------------
+Let $f:\mathbb{R}^2\rightarrow\mathbb{R}$ be a scalar-valued function on a 2-dimensional domain.
+A heat map of $f$ assigns a color to each $(x,y)$ point in the domain based on the value of $f(x,y)$, while a contour plot is a drawing of the level curves of $f$.
+A filled contour plot, which colors in the sections between the level curves, is a discretized version of a heat map.
 
-\begin{comment}
-
-\textbf{Heat Map}: Assigns a color to each point on a 2-D domain, providing a 2-D picture representing a 3-D surface.
-
-Best for visualizing functions $f:\mathbb{R}^2\rightarrow\mathbb{R}$, usually over a domain constructed with \li{np.meshgrid()}.
+Consider the following questions when plotting a heat map or contour plot:
 %
 \begin{itemize}
     \item Is the domain sufficiently refined?
     \item Which color scheme is most clear and effective?
+    \item How many / which contour lines should be drawn, if any?
     \item Is a linear or a logarithmic scale more appropriate for the color?
 \end{itemize}
 
-\textbf{Contour Map}: Draws level curves of a function $f:\mathbb{R}^2\rightarrow\mathbb{R}$.
+% DONE TO HERE = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
-A filled contour map is discretized version of a heat map.
-%
-\begin{itemize}
-    \item How many / which contour lines should be drawn?
-    % \item Is the color scheme clear and effective?
-    \item Is a linear or a logarithmic scale more appropriate for the color?
-\end{itemize}
+% usually over a domain constructed with \li{np.meshgrid()}.
 
-\end{comment}
-%
-% \begin{table}[H]
-% \begin{tabular}{rcc}
-% & \textbf{One Array} & \textbf{Two Arrays} \\
-% \cline{2-3}
-% \textbf{Ordered Data} &
-% \multicolumn{1}{|c|}{Line Plot} & \multicolumn{1}{|c|}{Line Plot} \\
-% \cline{2-3}
-% \textbf{Unordered Data} &
-% \multicolumn{1}{|c|}{Histogram} & \multicolumn{1}{|c|}{Scatter Plot} \\
-% \cline{2-3}
-% % \textbf{Categorical Data} & \multicolumn{1}{|c|}{Bar Chart} & \multicolumn{1}{|c|}{Scatter Plot} \\ \cline{2-3}
-% \end{tabular}
-% \end{table}
-
-
-\begin{figure}[h]
-\centering
-\begin{subfigure}{.45\textwidth}
-\centering
-\includegraphics[width=\textwidth]{contour_map.png}
-\end{subfigure}
-\begin{subfigure}{.45\textwidth}
-\centering
-\includegraphics[width=\textwidth]{contour_map_filled.png}
-\end{subfigure}
-\begin{subfigure}{.45\textwidth}
-\centering
-\includegraphics[width=\textwidth]{contour_map_rainbow_filled.png}
-\end{subfigure}
-\begin{subfigure}{.45\textwidth}
-\centering
-\includegraphics[width=\textwidth]{contour_map_rainbow.png}
-\end{subfigure}
-\caption{Contour Maps.  A contour map (top left) and a heat map (top right).
-The color choices of the bottom row are less intuitive and make the visualization harder to interpret.}
-\label{fig:contour}
-\end{figure}
-
-Three-dimensional data can be displayed with a contour plot.
-This draws lines in the plane where the third value is constant---like a topographical map.
-Coloring the space between the contour lines produces a heat map.
 Heat maps work best when only one or two colors are used.
 
-\begin{figure}[h]
-\centering
-\begin{subfigure}{.5\textwidth}
-  \centering
-  \includegraphics[width=\textwidth]{heatmap_color.png}
-\end{subfigure}%
-\begin{subfigure}{.5\textwidth}
-  \centering
-  \includegraphics[width=\textwidth]{heatmap_hot.png}
-\end{subfigure}
-%\includegraphics[width=\textwidth]{heatmap.png}
-\caption{Both of these pseudocolor plots depict the function
-    $z = \sin(x)\sin(y)$ on the domain $[-1,4] \times [-4,1]$.
-The plot on the left uses a rainbow gradient, which has no meaningful relationship to the data.
-The plot on the right uses the colormap \li{afmhot}.  The lighter and darker colors are a more intuitive
-representation of higher and lower values.}
-
-\label{fig:heatmap}
-\end{figure}
-
-% TODO: In the next release of Matplotlib (version 2.0) viridis is the default.
 % TODO: Reword (awkward).
 A good default colormap is Matplotlib's \li{viridis}.
 Other colormaps that are appropriate for the data can be selected using the argument \li{cmap='NAME\_OF\_COLORMAP'}, where \li{NAME\_OF\_COLORMAP} is one of Matplotlib's sequential or diverging colormaps.
@@ -546,87 +473,115 @@ Two sequential colormaps are \li{afmhot} and \li{cool}. Two diverging colormaps 
 These colormaps along with their color scheme can be found on
 \url{http://matplotlib.org/examples/color/colormaps_reference.html}.
 Although three-dimensional data can be plotted as a surface in 3-space, it is often difficult to find a view where none of the important features of the data are obscured.
-A heatmap avoids this problem and is easier to understand.
 
 You can create a contour plot in Matplotlib with \li{plt.contour()}.
-
 You can also create a pseudocolor plot in Matplotlib with the \li{plt.pcolormesh()} command.
 
-% # This code corresponds to the figure on the top right of the contour maps.
-\begin{lstlisting}
-import numpy as np
-from matplotlib import pyplot as plt
+$f(x,y) = y^2 - x^3 + x^2$
 
-n=400
-xran = np.linspace(-1.5,1.5,n)
-yran = np.linspace(-1.5,1.5,n)
-X, Y = np.meshgrid(xran,yran)
-F = Y**2 - X**3 + X**2
-plt.contourf(X, Y, F, [-2,-1,0.0001,1,2,3,4,5] ,cmap=plt.get_cmap('afmhot'))
+% This is similar to choosing the right number of bins on a histogram to get the right picture.
+
+\begin{lstlisting}
+>>> x = np.linspace(-1.5, 1.5, 200)
+>>> X, Y = np.meshgrid(x, x.copy())
+>>> Z = Y**2 - X**3 + X**2
+
+>>> plt.subplot(221)                # Plot a heat map of f.
+>>> plt.pcolormesh(X, Y, Z, cmap="viridis")
+>>> plt.colorbar()
+
+>>> plt.subplot(222)                # Plot a contour map with 6 level curves.
+>>> plt.contour(X, Y, Z, 6, cmap="viridis")
+>>> plt.colorbar()
+
+>>> plt.subplot(223)                # Plot a filled contour map with 12 levels.
+>>> plt.contourf(X, Y, Z, 12, cmap="viridis")
+>>> plt.colorbar()
+
+>>> plt.subplot(224)                # Plot level curves on top of a heat map.
+>>> plt.contour(X, Y, Z, [-1, -.25, 0, .25, 1, 4], colors="white")
+>>> plt.pcolormesh(X, Y, Z, cmap="viridis")
+>>> plt.colorbar()
 \end{lstlisting}
 
-\begin{problem} % Contour map problem. TODO: don't specify number of intervals?
-Using 400 intervals, plot a filled contour map of the function \[f(x,y) = \sin(x) + \sin(y)\] over the domain $[0,12\pi]\times[0,12\pi]$.
+\begin{figure}[H] % Heat maps and contour plots.
+\centering
+\begin{subfigure}{.495\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/heatmap_1.png}
+\end{subfigure}
+%
+\begin{subfigure}{.495\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/contour_1.pdf}
+\end{subfigure}
+\\
+\begin{subfigure}{.495\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/contour_2.pdf}
+\end{subfigure}
+%
+\begin{subfigure}{.495\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/heatmap_2.png}
+\end{subfigure}
+\end{figure}
 
-Be sure to use an appropriate color map.
+% TODO: revise these paragraphs.
+
+A potential weakness of heat maps and contour plots is that if some of the values of $f$ are very large, it becomes difficult to see the differences between the highs and the lows of $f$.
+The color bar can be log scaled, just as an axis can be scaled in line plots, scatter plots, and histograms.
+In this case we use the key word \li{norm=matplotlib.colors.LogNorm()} in \li{plt.pcolormesh()}, \li{plt.contour()}, or \li{plt.contourf()} (it works for \li{plt.scatter()} as well).
+
+As an example, consider the same $f$ defined above on the larger domain $[-6,6]\times [-6,6]$.
+Log scaling can only be done on arrays of all positive values, as the log of a negative number is undefined.
+Instead, examine $|f|$.
+
+\begin{lstlisting}
+>>> from matplotlib.colors import LogNorm
+
+>>> x = np.linspace(-6, 6, 200)
+>>> X, Y = np.meshgrid(x, x.copy())
+>>> Z = np.abs(Y**2 - X**3 + X**2)
+
+>>> plt.subplot(121)              # Plot a regular heat map of |f|.
+>>> plt.pcolormesh(X, Y, Z, cmap="viridis")
+>>> plt.colorbar()
+
+>>> plt.subplot(122)              # Plot a filled contour plot with log scaling.
+>>> plt.contourf(X, Y, Z, 6, cmap="viridis", norm=LogNorm())
+>>> plt.colorbar()
+\end{lstlisting}
+
+\begin{figure}[H] % Heat maps and contour plots.
+\centering
+\begin{subfigure}{.495\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/heatmap_3.png}
+\end{subfigure}
+%
+\begin{subfigure}{.495\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/contour_3.pdf}
+\end{subfigure}
+\end{figure}
+
+\begin{problem} % Contour map problem. TODO: ROSENBROCK!!!
+The \emph{Rosenbrock function} is defined as follows.
+\[f(x,y) = (1-x)^2 + 100(y-x^2)^2\]
+The minimum value of $f$ is $0$, which occurs at the point $(1,1)$ at the bottom of a steep, banana-shaped valley of the function.
+
+Use heat maps and contour plots to visualize the Rosenbrock function in such a way that the minimum value, and the valley that it lies in, is apparent.
+Consider plotting the actual minimizer $(1,1)$ on top of the contour plot as well.
 \end{problem}
 
-\section*{Communicating Insights with Visualizations} % =======================
 
-\begin{comment} % USE THIS AS AN EXAMPLE LATER.
-\begin{figure}[H] % Histogram with and without busy information.
-\centering
-\begin{subfigure}{.45\textwidth}
-\centering
-\includegraphics[width=\textwidth]{good_hist_example.png}
-\end{subfigure}
-\centering
-\begin{subfigure}{.45\textwidth}
-\centering
-\includegraphics[width=\textwidth]{hist_reference_grid.png}
-\end{subfigure}
-\caption{Histogram with and without reference lines. It is harder to see the shape of the distribution in the histogram with reference lines.}
-\label{fig:histogram}
-\end{figure}
 
-Plot two histograms with data drawn randomly from a normal and exponential distribution.
 
-\begin{lstlisting}
-from numpy.random import normal
-from numpy.random import exponential
-normal_data = normal(size=1000)
-exp_data = exponential(size=1000)
-\end{lstlisting}
+% =============================================================================
 
-For each distribution, plot a histogram using 30 bins, 15 bins and 5 bins.
-Does this change how we interpret the distribution of the data?
-\end{comment}
 
-\begin{comment}
-\begin{figure}[h] % Line plots.
-\centering
-\begin{subfigure}{.45\textwidth}
-\centering
-\includegraphics[width=\textwidth]{line_plot_bad_thin.png}
-\end{subfigure}
-\begin{subfigure}{.45\textwidth}
-\centering
-\includegraphics[width=\textwidth]{line_plot_good.png}
-\end{subfigure}
-\caption{Line Plot.  The left plot is plotted with \li{lw=1} whereas the right plot is plotted with \li{lw=2}.  Notice that the right plot is better because it is easier to see the line.} % Irrelevant for right here.
-\label{fig:lineplot_bad}
-\end{figure}
 
-\begin{figure}[h]
-\centering
-\begin{subfigure}{.5\textwidth}
-\centering
-\includegraphics[width=\textwidth]{line_plot_bad_X.png}
-\end{subfigure}
-\caption{Line plot. Notice that this graph appears to show that the x-values are ordered. However, in reality, they are unordered. This is a bad practice and misrepresents the data.}
-\label{fig:lineplotbadX}
-\end{figure}
-\end{comment}
 
 \begin{comment} % MOVE BELOW.
 \begin{figure}[h] % Choose an ethical scale and window.
@@ -645,47 +600,11 @@ correlation in the first plot compared to the second.}
 \end{figure}
 \end{comment}
 
-\begin{comment}
-\begin{figure}[h]
-\centering
-\begin{subfigure}{.45\textwidth}
-\centering
-\includegraphics[width=\textwidth]{earthquake_zoomed.png}
-\end{subfigure}
-\begin{subfigure}{.45\textwidth}
-\centering
-\includegraphics[width=\textwidth]{earthquake_data.png}
-\end{subfigure}
-\caption{USGS Earthquake data. The scatter plot on the left only plots earthquakes with
-magnitude 7.5 or greater from 1980-2010 and appears to have a correlation.
-However, the plot on the right shows all recorded earthquakes from 1900-2010 and shows that the correlation
-is not a true correlation.}
-\label{fig:scatterquake}
-\end{figure}
-
 Scatter plots may reveal insights other than correlation.
 Consider Figure \ref{fig:scatterquake} which plots earthquake data from the United States Geological Survey (USGS).
 The USGS data began including earthquakes with magnitude 6.5 or greater; this is clearly seen
 in the scatter plot of the entire dataset.
 Plots like this may also reveal errors in the dataset that are harder to detect in a table of values.
-\end{comment}
-
-\begin{comment}
-\begin{figure}[h] % Bad visualization: earthquake data, year vs magnitude.
-\captionsetup[subfigure]{justification=centering}
-\centering
-\begin{subfigure}{.5\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{figures/earthquake_bad.pdf}
-\end{subfigure}%
-\begin{subfigure}{.5\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{freq_earthquake_log.png}
-\end{subfigure}
-\caption{The left plot shows earthquakes of magnitudes 7.5 or higher over time. The right plot shows the frequencies of
-different magnitudes. Note the scale of the y-axis is logarithmic.}
-\label{fig:logexample}
-\end{figure}
 \end{comment}
 
 \begin{comment} % This needs to go somewhere else.
@@ -710,7 +629,7 @@ As a result, charts that depend on detecting variation in area will be less effe
 Instead, choose visualizations that compare the data to the a simple standard that is easy to understand and interpret.
 Figures \ref{fig:pievsbar} and \ref{fig:stacked} are examples of poorly chosen visualizations.
 
-\begin{figure} % Bad graphs.
+\begin{figure}[H] % Bad graphs.
 \centering
 \begin{subfigure}{.45\textwidth}
 \centering
@@ -730,7 +649,7 @@ Avoid making visualizations that are overly fancy or cluttered with chartjunk. T
 Visualizations are at their best when they are as simple as possible and allow the reader to easily
 interpret the information being presented.
 
-\begin{problem} % Problem: convert a pie chart to a horizontal bar chart.
+\begin{problem} % Problem: convert a pie chart to a horizontal bar chart. Dumb.
 Regraph the pie chart in Figure \ref{fig:pievsbar} as a horizontal bar chart using the follwing data.
 Spam: 21, Eggs: 20, Ham: 22, Sausage: 21, Bacon: 20, Baked Beans: 11, Lobster Thermidor: 10
 \end{problem}
@@ -760,7 +679,7 @@ Some packages for making nicer looking plots include \li{Seaborn} and \li{pretty
 
 For more about visualization of data, we highly recommend the following books and websites:
 
-% TODO get full refs for the follwoing
+% TODO: get full refs for the follwoing
 
 \begin{itemize}
     \item \emph{How to Lie with Statistics} by Darrell Huff (1954)
@@ -770,11 +689,7 @@ For more about visualization of data, we highly recommend the following books an
     \item \emph{Now you see it} by Stephen Few
     \item \url{http://www.informationisbeautiful.net/}
 \end{itemize}
-
 \end{comment}
-
-%\noindent\emph{At their best, graphics are instruments for reasoning about quantitative information.} \small{---Edward Tufte}
-% from the introduction of his book 'The Visual Display of Quantitative Information'
 
 \begin{comment} % Move to 'Additional Material'.
 \textbf{Bar Chart}: Best for small sets of discrete, one-dimensional, categorical data.
