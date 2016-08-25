@@ -90,6 +90,8 @@ In the following sections, we explore how the plots we commonly use can be impro
 
 A line plot connects ordered $(x,y)$ points with straight lines, and is therefore best for visualizing one or two ordered arrays, such as functional outputs over an ordered domain or a sequence of values over time.
 
+\newpage
+
 When creating a line plot, consider the following details.
 %
 \begin{itemize}
@@ -104,7 +106,7 @@ When creating a line plot, consider the following details.
 The \emph{Chebyshev polynomials} are a family of orthogonal polynomials that are recursively defined as follows.
 \[T_0(x) = 1 \qquad T_1(x) = x \qquad\qquad T_{n+1} = 2xT_n(x) - T_{n-1}(x)\]
 NumPy's \li{polynomial} module has a convenient tool for constructing these and other important polynomials.%
-\footnote{\li{numpy.polynomial} also has tools for computing other polynomial families, including the Legendre, Hermite, and Laguerre polynomials.}
+\footnote{\li{numpy.polynomial} also has tools for computing other important polynomial families, including the Legendre, Hermite, and Laguerre polynomials.}
 However, plotting several the polynomials on top of each other, especially with a legend, results in a very cluttered visual.
 
 \begin{lstlisting}
@@ -126,8 +128,6 @@ However, plotting several the polynomials on top of each other, especially with 
     \centering
     \includegraphics[width=.7\linewidth]{figures/chebyshev_bad.pdf}
 \end{figure}
-
-\newpage
 
 This line plot can be improved in several easy ways.
 %
@@ -189,7 +189,7 @@ For example, try replacing the final line of code in the previous example with t
 \end{lstlisting}
 
 The string's \li{<<format>>()} method inserts the input $n$ at the curly braces.
-The title of the sixth subplot, instead of being ``n = 5,'' will then be ``$T_5$.''
+The title of the sixth subplot, instead of being ``n = 5,'' will then be ``$T_5(x)$.''
 \end{info}
 
 % TODO: Make sure the Bernstein polynomial notation is consistent with the book (it is consistent with Wikipedia currently)
@@ -279,7 +279,6 @@ This color bar can be given a label as well.
 \end{lstlisting}
 
 \begin{figure}[H] % Scatter plots.
-\captionsetup[subfigure]{justification=centering}
 \centering
 \begin{subfigure}{.495\textwidth}
     \centering
@@ -312,33 +311,147 @@ Each row in the array represents a different player; the columns are the player'
 
 Describe the data with at least one scatter plot.
 Your graph(s) should demonstrate whether height, weight, or age correlated with each other in the MLB.
-Consider plotting the linear regression line to indicate trends.
+Consider plotting linear regression lines to indicate trends.
 \end{problem}
 
 % DONE TO HERE = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 \subsection*{Histograms} % ----------------------------------------------------
 
-\begin{comment}
+A histogram partitions an interval into a number of bins and counts the number of values that fall into each bin.
+Histograms are ideal for visualizing how unordered data in a single array is distributed over an interval.
+If the data are draws from a probability distribution, a histogram approximates the distribution's probability density function (PDF).
 
-\textbf{Histogram}: Partitions an interval into a number of bins and counts the number of values that fall into each bin.
+\newpage
 
-Best for visualizing a single unordered array, such as draws from a probability distribution.
+The following are important factors to consider when constructing a histogram.
 %
 \begin{itemize}
-    \item How many bins should be used?
-    \item Over what range should the bins be?
+    \item What does the $x$-axis represent? How should it be labeled?
     \item Is a linear or a logarithmic scale more appropriate for the frequency axis?
+    \item How many bins should be used? Over what range should the bins be?
+    This is perhaps the most important question, as a histogram with too few or too many bins usually fails to give a clear view of the distribution.
 \end{itemize}
 
 % Use \li{plt.hist()} to create a histogram.
 % The arguments \li{bins} and \li{<<range>>} specify the number of bins to draw and over what domain.
 
-% Details for later.
-A histogram with only a few bins or too many bins will fail to give a clear view of the distribution of the data, therefore it is important to choose the number of bins that gives the best view of the distribution of the data.
+For most histograms, the most desirable insight is the general shape of the distribution.
+The lines separating the bins, axis tick marks, and even the labels on the $y$ axis are all unnecessary (and potentially distracting) details.
+Removing the lines between bins is easy: set the line width to $0$.
+To ensure the gaps where the lines used to be are filled, specify the \li{histtype} as \li{"stepfilled"} (using \li{histtype="step"} will draw the outline without filling it in).
+Finally, to get rid of extra markings on the axes, use \li{plt.tick_params()}.
 
-Similarly, reference lines are distracting and focus on unnecessary details instead of the shape of the distribution.
-If more precise details are desired, exact figures can be presented alongside the histogram in a table.
+A histogram can be converted into a line plot by using \li{np.histogram()}.
+This function returns the number of values in each bin and the locations of the edges of the bins (in fact, \li{plt.hist()} employs this function).
+Use the edges of the bins to calculate the center of the bins, then plot the bin centers against the frequency.
+
+\begin{lstlisting}
+# Get 10,000 random samples from a Beta distribution.
+>>> data = np.random.beta(a=5, b=2, size=N)
+
+>>> plt.subplot(131)                # Draw a regular histogram.
+>>> plt.hist(data, bins=30)
+
+>>> plt.subplot(132)                # Draw a clean histogram.
+>>> plt.hist(data, bins=30, lw=0, histtype="stepfilled")
+>>> plt.tick_params(left="off", top="off", right="off", labelleft="off")
+
+>>> plt.subplot(133)                # Draw a line plot over the bins.
+>>> freq, bin_edges = np.histogram(data, bins=30)
+>>> bin_centers = (bin_edges[:-1] + bin_edges[1:])/2.
+>>> plt.plot(bin_centers, freq, 'k-', lw=4)
+>>> plt.tick_params(left="off", top="off", right="off", labelleft="off")
+\end{lstlisting}
+
+\begin{figure}[H] % Cleaning up a histogram.
+\centering
+\begin{subfigure}{.325\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/histogram_2.pdf}
+\end{subfigure}
+%
+\begin{subfigure}{.325\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/histogram_3.pdf}
+\end{subfigure}
+%
+\begin{subfigure}{.325\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/histogram_4.pdf}
+\end{subfigure}
+\end{figure}
+
+Finally, if the frequency domain is better visualized on a logarithmic scale, use \li{log=True} as an argument to \li{plt.hist()}.
+This is the histogram equivalent of using \li{plt.semilogy()} for line or scatter plots.
+
+\begin{warn} % Line plots versus histograms.
+Line plots should \textbf{not} be used for data that has no natural progression.
+For example, suppose we have a large number of random draws from a statistical distribution.
+In this case, a plain line plot is completely useless, because consecutive random draws are completely unrelated.
+A histogram, on the other hand, provides an approximation of the distribution's probability density function.
+
+\begin{lstlisting}
+# Get 1,000 random samples from the standard normal distribution.
+>>> data = np.random.normal(size=1000)
+
+>>> plt.subplot(121)                # Regular line plot of the data.
+>>> plt.plot(data)
+
+>>> plt.subplot(122)                # Histogram of the data.
+>>> plt.hist(data, bins=30)
+\end{lstlisting}
+
+\begin{figure}[H] % line plot versus a histogram.
+\centering
+\begin{subfigure}{.496\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/histogram_1_bad.pdf}
+\end{subfigure}
+%
+\begin{subfigure}{.49\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/histogram_1_good.pdf}
+\end{subfigure}
+\end{figure}
+\end{warn}
+
+\begin{problem} % Earthquake data
+The file \texttt{earthquakes.npy} contains data from over 17,000 earthquakes between 2000 and 2010 that were at least a 5 on the Richter scale.\footnote{See \url{http://earthquake.usgs.gov/earthquakes/search/}.}
+Each row in the array represents a different earthquake;
+the columns are the earthquake's date (as a fraction of the year), magnitude (on the Richter scale), longitude, and latitude, in that order.
+
+Because each earthquake is a distinct event, a good way to start visualizing this data might be a scatter plot of the years versus the magnitudes of each earthquake.
+
+\begin{lstlisting}
+>>> year, magnitude, longitude, latitude = np.load("earthquakes.npy").T
+>>> plt.plot(year, magnitude, '.')
+>>> plt.xlabel("Year")
+>>> plt.ylabel("Magnitude")
+\end{lstlisting}
+
+\begin{figure}[H] % Bad visualization: earthquake data, year vs magnitude.
+    \centering
+    \includegraphics[width=.7\textwidth]{figures/earthquake.pdf}
+\end{figure}
+
+Unfortunately, this plot communicates very little information because the data is so cluttered.
+Describe the data with two or three better visualizations, including line plots, scatter plots, and histograms as appropriate.
+Your plots should clearly answer the following questions:
+\begin{enumerate}
+    \item How many earthquakes happened every year?
+    \item How often do stronger earthquakes happen compared to weaker ones?
+    \item Where do earthquakes happen? Where do the strongest earthquakes happen?
+\end{enumerate}
+% (Hint: \li{plt.gca().set_aspect("equal")} fixes the aspect ratio, which may improve comparisons between longitude and latitude.)
+\end{problem}
+
+% Consider Figure \ref{fig:logexample} which shows data about large earthquakes from the United States Geological Survey.
+% It appears to be somewhat random however, when transformed, the frequency of the magnitudes on a logarithmic scale show a fairly strong linear relationship between the variables.
+
+\subsection*{Heat and Contour Maps} % -----------------------------------------
+
+\begin{comment}
 
 \textbf{Heat Map}: Assigns a color to each point on a 2-D domain, providing a 2-D picture representing a 3-D surface.
 
@@ -376,151 +489,6 @@ A filled contour map is discretized version of a heat map.
 % \end{tabular}
 % \end{table}
 
-
-Line plots should \emph{not} be used for data without a natural progression.
-For example, suppose we would like to make a large number of random draws from a distribution to visualize its probability density function.
-In this case, a plain line plot is completely useless, but the histogram provides an accurate picture of the statistical distribution.
-
-\begin{comment}
-\begin{lstlisting}
->>> import numpy as np
->>> from matplotlib import pyplot as plt
-
-# Get 10,000 random samples from the standard normal distribution.
->>> data = np.random.normal(size=10000)
-
->>> plt.subplot(121)                # Regular line plot of the data.
->>> plt.plot(data)
-
->>> plt.subplot(122)                # Histogram of the data.
->>> plt.hist(data, bins=30)
-
->>> plt.show()
-\end{lstlisting}
-
-\begin{figure}[H] % line plot versus a histogram.
-\captionsetup[subfigure]{justification=centering}
-\centering
-\begin{subfigure}{.49\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{figures/hist_1_bad.pdf}
-\end{subfigure}
-%
-\begin{subfigure}{.49\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{figures/hist_1_good.pdf}
-\end{subfigure}
-\end{figure}
-\end{comment}
-
-Less is more.
-In the case of a statistical distribution, all we really want to see is the general shape of the distribution.
-The lines separating the bins, axis tick marks, and even the labels on the $y$ axis are all unnecessary (and potentially distracting) details.
-
-Removing the lines between bins is easy: set the line width to $0$.
-To ensure the gaps where the lines used to be are filled, specify the \li{histtype} as \li{"stepfilled"} (using \li{histtype="step"} will draw the outline without filling it in).
-Finally, to get rid of extra markings on the axes, use \li{plt.tick_params()}.
-
-\begin{lstlisting}
-# Get 10,000 random samples from the standard exponential distribution.
->>> data = np.random.exponential(size=N)
-
->>> plt.subplot(121)
->>> plt.hist(data, bins=30)
-
->>> plt.subplot(122)                # Histogram with no lines or tick marks.
->>> plt.hist(data, bins=30, lw=0, histtype="stepfilled")
->>> plt.tick_params(axis="both", which="both", labelleft='off',
-...                              left="off", top="off", right="off")
-
->>> plt.show()
-\end{lstlisting}
-
-\begin{figure}[H] % Cleaning up a histogram.
-\captionsetup[subfigure]{justification=centering}
-\centering
-\begin{subfigure}{.49\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{figures/hist_2_bad.pdf}
-\end{subfigure}
-%
-\begin{subfigure}{.49\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{figures/hist_2_good.pdf}
-\end{subfigure}
-\end{figure}
-
-A histogram plots an array of values against the frequency with which the values occur.
-To plot a line plot of values against frequency (without drawing a histogram), use \li{np.histogram()}.
-This function returns the number of values in each bin and the locations of the edges of the bins.
-Use the edges of the bins to calculate the center of the bins, then use a line plot to connect the two.
-
-\begin{lstlisting}
-# Get samples from a beta distribution and draw its PDF.
->>> for i, N in enumerate([10000, 10000000]):
-...     plt.subplot(1,2,i+1)
-...     data = np.random.beta(a=5, b=2, size=N)
-...     # Draw a line plot using the bin centers and frequencies.
-...     frequencies, bin_edges = np.histogram(data, bins=50)
-...     bin_centers = (bin_edges[:-1] + bin_edges[1:])/2.
-...     plt.plot(bin_centers, frequencies, 'b-', lw=4)
-...     # Plot the faded histogram for comparison.
-...     plt.hist(data, bins=50, alpha=.1)
-...     plt.tick_params(axis="both", which="both", labelleft='off',
-...                                  left="off", top="off", right="off")
-...
->>> plt.show()
-\end{lstlisting}
-
-\begin{figure}[H] % Histogram Line Plot Hybrid
-\captionsetup[subfigure]{justification=centering}
-\centering
-\begin{subfigure}{.49\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{figures/hist_3_bad.pdf}
-\end{subfigure}
-%
-\begin{subfigure}{.49\textwidth}
-    \centering
-    \includegraphics[width=\linewidth]{figures/hist_3_good.pdf}
-\end{subfigure}
-\end{figure}
-
-\begin{problem} % Earthquake data
-The file \texttt{earthquakes.npy} contains data from the 17,065 earthquakes between 2000 and 2010 that were at least a 5 on the Richter scale.\footnote{See \url{http://earthquake.usgs.gov/earthquakes/search/}.}
-Each row in the array represents a different earthquake;
-the columns are the earthquake's date (as a fraction of the year), magnitude, longitude, and latitude, in that order.
-
-Because each earthquake is a distinct event, a good way to start visualizing this data might be a scatter plot of the years versus the magnitudes of each earthquake.
-
-\begin{lstlisting}
->>> year, magnitude, longitude, latitude = np.load("earthquakes.npy").T
->>> plt.plot(year, magnitude, '.')
->>> plt.xlabel("Year")
->>> plt.ylabel("Magnitude")
->>> plt.show()
-\end{lstlisting}
-
-\begin{figure}[H] % Bad visualization: earthquake data, year vs magnitude.
-    \centering
-    \includegraphics[width=.7\textwidth]{figures/earthquake.pdf}
-\end{figure}
-
-Unfortunately, this plot communicates very little information because the data is so cluttered.
-Describe the data with two or three better visualizations.
-Your graphs should clearly answer the following questions:
-\begin{enumerate}
-    \item How many earthquakes happened every year?
-    \item How often do stronger earthquakes happen compared to weaker ones?
-    \item Where do earthquakes happen? Where do the strongest earthquakes happen?
-\end{enumerate}
-% (Hint: \li{plt.gca().set_aspect("equal")} fixes the aspect ratio, which may improve comparisons between longitude and latitude.)
-\end{problem}
-
-% Consider Figure \ref{fig:logexample} which shows data about large earthquakes from the United States Geological Survey.
-% It appears to be somewhat random however, when transformed, the frequency of the magnitudes on a logarithmic scale show a fairly strong linear relationship between the variables.
-
-\subsection*{Heat and Contour Maps} % -----------------------------------------
 
 \begin{figure}[h]
 \centering
@@ -724,6 +692,7 @@ different magnitudes. Note the scale of the y-axis is logarithmic.}
 Understanding a data set through visualizations is an iterative process.
 Start with an initial visualization---usually a broad overview---and examine the data, then adjust the visualization or create other visualizations based on what you observe.
 Ask the following questions as you search for insights:
+%
 \begin{enumerate}
 \item Does the data make sense?
 \item Would a different visualization communicate more information?
@@ -732,16 +701,9 @@ Ask the following questions as you search for insights:
 \end{enumerate}
 \end{comment}
 
-As in any form of communication, integrity is important in data visualization.
-Every visualization should be presented alongside all relevant information including who created it, where the data was obtained, how it was collected, whether it was cleaned or transformed, and whether there are conflicts of
-interest or possible biases present.
-Where appropriate, use words to carefully explain the insights represented
-in the visualization.
-These practices will help the reader correctly interpret the visualization.
+\subsection*{Visualizations to Avoid} % ---------------------------------------
 
-\subsection*{Things to Avoid} % -----------------------------------------------
-
-Some popular visualizations (pie charts, radar graphs, stacked bar charts and others) interfere with our ability to interpret the information they display.
+Some popular visualizations (pie charts, radar graphs, stacked bar charts, and others) interfere with the reader's ability to interpret the information they display.
 For example, it is more difficult to detect differences in a pie chart than on a bar chart with the same data.
 This is because differences in area are more difficult to detect than differences in length.
 As a result, charts that depend on detecting variation in area will be less effective.
@@ -762,38 +724,18 @@ Figures \ref{fig:pievsbar} and \ref{fig:stacked} are examples of poorly chosen v
 \label{fig:pievsbar}
 \end{figure}
 
-\subsection*{Keep It Simple} % ------------------------------------------------
-
-It may be tempting to stylize your visualization by adding icons and pictures or by making certain features
-look 3D.  This is called chartjunk, a term coined by Edward Tufte. Chartjunk is anything in a plot that fails to add to or
-misrepresents the data.  Avoid making visualizations that are overly fancy or cluttered with chartjunk. This
-includes 3D effects (as in \ref{fig:pievsbar}), bad font choices, and unnecessary icons and pictures.
+It may be tempting to stylize your visualization by adding icons and pictures or by making certain features look 3D.
+Anything in a plot that fails to communicate information or that misrepresents the data is called \emph{chartjunk}, a term coined by Edward Tufte.
+Avoid making visualizations that are overly fancy or cluttered with chartjunk. This includes 3D effects (as in \ref{fig:pievsbar}), bad font choices, and unnecessary icons and pictures.
 Visualizations are at their best when they are as simple as possible and allow the reader to easily
 interpret the information being presented.
-
-Reference lines can distract from the visualization (see Figure \ref{fig:histogram}).
-For example, we can remove axis lines, tick marks, and bar lines
-with the following code:
-
-\begin{lstlisting}
-# Get current axis instance
-axis = plt.gca()
-
-# Hide top and right spines
-axis.spines['right'].set_visible(False)
-axis.spines['top'].set_visible(False)
-
-# Only show bottom and left tick marks
-axis.yaxis.set_ticks_position('left')
-axis.xaxis.set_ticks_position('bottom')
-\end{lstlisting}
 
 \begin{problem} % Problem: convert a pie chart to a horizontal bar chart.
 Regraph the pie chart in Figure \ref{fig:pievsbar} as a horizontal bar chart using the follwing data.
 Spam: 21, Eggs: 20, Ham: 22, Sausage: 21, Bacon: 20, Baked Beans: 11, Lobster Thermidor: 10
 \end{problem}
 
-\begin{figure} % Stacked v unstacked bar charts
+\begin{figure}[H] % Stacked v unstacked bar charts FROM THE DOCKS BAD!!!!
 \centering
 \begin{subfigure}{.45\textwidth}
 \centering
@@ -875,7 +817,6 @@ val = [10, 11, 18, 19, 20, 21, 22]    # the bar lengths
 pos = np.arange(7)+.5    # the bar centers on the y axis
 plt.barh(pos,val, align='center')
 plt.yticks(pos, labels[::-1])
-plt.show()
 \end{lstlisting}
 \end{comment}
 

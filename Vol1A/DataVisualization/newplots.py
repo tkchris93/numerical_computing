@@ -137,8 +137,8 @@ def scatter_4(length, width, height):
     cbar.set_label("Height (inches)", fontsize=18)
 
 def prob2():
-    # line_bad()
-    # line_good()
+    line_bad()
+    line_good()
     l,w,h = scatter_1()
     scatter_2(l,w,h)
     scatter_3(l,w,h)
@@ -146,39 +146,37 @@ def prob2():
 
 # Problem 4 (Histograms) ------------------------------------------------------
 
-@_save("hist_1_bad.pdf")
-def hist_1_bad(N):
+@_save("histogram_1_bad.pdf")
+def histogram_1_bad(N):
     data = np.random.normal(size=N)
     plt.plot(data)
     return data
 
-@_save("hist_1_good.pdf")
-def hist_1_good(data):
+@_save("histogram_1_good.pdf")
+def histogram_1_good(data):
     plt.hist(data, bins=30)
 
-@_save("hist_2_bad.pdf")
-def hist_2_bad(N):
-    data = np.random.exponential(size=N)
+@_save("histogram_2.pdf")
+def histogram_2(N):
+    data = np.random.beta(a=5, b=2, size=N)
     plt.hist(data, bins=30)
     return data
 
-@_save("hist_2_good.pdf")
-def hist_2_good(data):
+@_save("histogram_3.pdf")
+def histogram_3(data):
     plt.hist(data, bins=30, lw=0, histtype="stepfilled")
-    plt.tick_params(axis="y", which="both", labelcolor='white', left='off',
-                                                                right="off")
-    plt.tick_params(axis="x", which="both", top='off')
+    plt.tick_params(axis="y", labelcolor='white')
+    plt.tick_params(left="off", top="off", right="off")
 
-def hist_3(N):
-    data = np.random.beta(a=5, b=2, size=N)
-    freq, bin_edges = np.histogram(data, bins=50)
+@_save("histogram_4.pdf")
+def histogram_4(data):
+    freq, bin_edges = np.histogram(data, bins=30)
     bin_centers = (bin_edges[:-1] + bin_edges[1:])/2.
-    plt.plot(bin_centers, freq, 'b-', lw=4)
-    plt.hist(data, bins=50, alpha=.1)
-    plt.tick_params(axis="both", which="both", labelleft='off',
-                                left="off", top="off", right="off")
+    plt.plot(bin_centers, freq, 'k-', lw=4)
+    plt.tick_params(axis="y", labelcolor="white")
+    plt.tick_params(left="off", top="off", right="off")
 
-# Problem Statement - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # plt.tick_params(left="off", top="off", right="off", labelleft="off")
 
 @_save("earthquake.pdf")
 def earthquake():
@@ -189,12 +187,12 @@ def earthquake():
 
 def prob3():
 
-    hist_1_good(hist_1_bad(10000))
-    hist_2_good(hist_2_bad(10000))
-    _save("hist_3_bad.pdf")(hist_3)(10000)
-    _save("hist_3_good.pdf")(hist_3)(10000000)
+    histogram_1_good(histogram_1_bad(1000))
+    data = histogram_2(10000)
+    histogram_3(data)
+    histogram_4(data)
 
-    earthquake()
+    # earthquake()
 
 # Problem 4 -------------------------------------------------------------------
 
@@ -216,10 +214,9 @@ def rosenbrock():
     plt.ylabel("y")
 
 def save_all():
-    prob2()
+    # prob2()
     prob3()
-    rosenbrock()
+    # rosenbrock()
 
 if __name__ == '__main__':
-    prob2()
-    # save_all()
+    save_all()
