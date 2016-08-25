@@ -56,29 +56,43 @@ Write a few sentences describing what makes each section unique.
 
 \section*{Principles of Good Data Visualization} % ============================
 
+Understanding a data set through visualizations is an iterative process.
+Examine the data, start with an initial visualization, then adjust the original visualization or create new ones.
+Ask the following questions while searching for insights:
+%
+\begin{enumerate}
+\item Does the visualization represent the data accurately?
+\item Would a different visualization communicate more information?
+\item Would visualizing a subset of the data provide more information?
+\item Would transforming the data reveal a hidden pattern?
+\end{enumerate}
+
 Effectively visualizing data involves technical expertise combined with design knowledge.
 No visualization is perfect, but every good visualization must contain the following essential elements.
 
-\begin{enumerate}
+\begin{itemize}
     \item \textbf{Clarity}.
-    Visualizations should be self-explanatory.
+    Good visualizations are as self-explanatory as possible.
     Always use specific titles and axis labels, and include units of measure.
-    Use a legend or annotations where appropriate.
+    Use a legend or other annotations where appropriate.
 
     \item \textbf{Simplicity}.
     A good visualization communicates everything that it needs to, but nothing more.
-    Remove unnecessary or distracting elements of a graph, including 3-D effects or overly flashy colors.
+    Anything in a plot that fails to communicate information or that misrepresents the data is called \emph{chartjunk}, a term coined by Edward Tufte.
+    Make visualizations as simple, clean, and readable as possible.
 
     \item \textbf{Integrity}.
     Tell the truth, the whole truth, and nothing but the truth.
-    It is almost always very easy to manipulate a visualization so that it supports a desired interpretation.
+    It is usually alarmingly easy to manipulate a visualization so that it supports a specific agenda.
     Resist the temptation to morph a visualization into something that misrepresents the true nature of the data, even though that misrepresentation might support your hypotheses about the data.
 
     Every visualization should be presented together with information on who created it, where the data was obtained, how it was collected, whether it was cleaned or transformed, and whether there are conflicts of interest or possible biases present.
     Cite your sources.
-\end{enumerate}
+\end{itemize}
 
 This list could be expanded, but virtually every good data visualization principle fits into these three categories in one way or another.
+
+\newpage
 
 \section*{Improving Specific Types of Visualizations} % =======================
 
@@ -89,8 +103,6 @@ In the following sections, we explore how the plots we commonly use can be impro
 \subsection*{Line Plots} % ----------------------------------------------------
 
 A line plot connects ordered $(x,y)$ points with straight lines, and is therefore best for visualizing one or two ordered arrays, such as functional outputs over an ordered domain or a sequence of values over time.
-
-\newpage
 
 When creating a line plot, consider the following details.
 %
@@ -177,11 +189,10 @@ Matplotlib's \li{plt.tick_params()}, summarized below, controls which tick marks
 \end{figure}
 
 \begin{info} % LaTex with Matplotlib text.
-Matplotlib titles and annotations can be formatted with \LaTeX, a system designed for creating technical and scientific documents%
+Matplotlib titles and annotations can be formatted with \LaTeX, a system for creating technical documents.%
 \footnote{See \url{http://www.latex-project.org/} for more information.}
-(this lab manual, for example, is written in \LaTeX).
-To do so, use an `r' before the string quotation mark) and surround the text with dollar signs.
-
+% (this lab manual, for example, is written in \LaTeX).
+To do so, use an `r' before the string quotation mark and surround the text with dollar signs.
 For example, try replacing the final line of code in the previous example with the following line.
 
 \begin{lstlisting}
@@ -253,6 +264,12 @@ This color bar can be given a label as well.
 >>> plt.tick_params(labelbottom="off")
 >>> plt.axis([0, 20, 0, 20])
 
+# Continued on the next page.
+\end{lstlisting}
+
+\newpage
+
+\begin{lstlisting}
 >>> plt.subplot(222)                # Set the marker color to the height.
 >>> plt.scatter(length, width, c=height, s=100)
 >>> cbar = plt.colorbar()
@@ -320,8 +337,6 @@ A histogram partitions an interval into a number of bins and counts the number o
 Histograms are ideal for visualizing how unordered data in a single array is distributed over an interval.
 If the data are draws from a probability distribution, a histogram approximates the distribution's probability density function (PDF).
 
-\newpage
-
 The following are important factors to consider when constructing a histogram.
 %
 \begin{itemize}
@@ -354,7 +369,12 @@ Use the edges of the bins to calculate the center of the bins, then plot the bin
 >>> plt.subplot(132)                # Draw a clean histogram.
 >>> plt.hist(data, bins=30, lw=0, histtype="stepfilled")
 >>> plt.tick_params(left="off", top="off", right="off", labelleft="off")
+# Continued on the next page.
+\end{lstlisting}
 
+\newpage
+
+\begin{lstlisting}
 >>> plt.subplot(133)                # Convert the histogram to a line plot.
 >>> freq, bin_edges = np.histogram(data, bins=30)
 >>> bin_centers = (bin_edges[:-1] + bin_edges[1:])/2.
@@ -447,7 +467,7 @@ Your plots should clearly answer the following questions:
 \subsection*{Heat Maps and Contour Plots} % -----------------------------------
 
 Let $f:\mathbb{R}^2\rightarrow\mathbb{R}$ be a scalar-valued function on a 2-dimensional domain.
-A heat map of $f$ assigns a color to each $(x,y)$ point in the domain based on the value of $f(x,y)$, while a contour plot is a drawing of the level curves of $f$.
+A heat map of $f$ assigns a color to each $(x,y)$ point in the domain based on the value of $f(x,y)$, while a contour plot is a drawing of the level curves of $f$. % TODO: recap level curves (there's space to do it now).
 A filled contour plot, which colors in the sections between the level curves, is a discretized version of a heat map.
 
 Consider the following questions when plotting a heat map or contour plot:
@@ -459,7 +479,7 @@ Consider the following questions when plotting a heat map or contour plot:
     \item Is a linear or a logarithmic scale more appropriate for the color?
 \end{itemize}
 
-It is often sufficient to choose a fixed number of level curves, then let Matplotlib space the curves out evenly.
+It is often sufficient to choose a fixed number of level curves.
 However, it is sometimes better to strategically specify the curves.
 Consider, for example, the function $f(x,y) = y^2 - x^3 + x^2$ on the domain $[-\frac{3}{2}, \frac{3}{2}] \times [-\frac{3}{2}, \frac{3}{2}]$.
 This function has a large basin around the origin.
@@ -561,35 +581,47 @@ Consider plotting the minimizer $(1,1)$ on top of the plot as well.
 
 \subsection*{Bar Charts} % ----------------------------------------------------
 
-A bar chart plots categorical data in a sequence of bars across an axis.
-They are best for small sets of discrete, one-dimensional, categorical data.
-Usually, a horizontal bar chart is preferred over a vertical bar chart because it's harder to read vertical labels than horizontal labels.
+A bar chart plots categorical data in a sequence of bars.
+They are best for small, discrete, one-dimensional data sets.
+Use \li{plt.bar()} (vertical) or \li{plt.barh()} (horizontal) to create a bar chart in Matplotlib.
+These functions receive the locations of each bar, then the height of each bar.
 
-The data in a bar chart should be sorted in a logical way.
-If the chart is being used to compare the values of different data points, it is best to sort by size; if the chart is being used to look up specific values, the labels should be sorted in a way that makes it easy to find specific values (for example, alphabetically).
-Use \li{plt.bar()} or \li{plt.barh()} to create a bar chart in Matplotlib.
+Horizontal bar charts are usually preferable to vertical bar charts because horizontal labels are easier to read than vertical labels.
+Data in a bar chart should also be sorted in a logical way, either by bar size or by alphabetizing the labels.
+
+\begin{lstlisting}
+>>> labels = ["Lobster Thermador", "Baked Beans", "Crispy Bacon",
+...             "Smoked Sausage", "Hannibal Ham", "Eggs", "Spam"]
+>>> values = [10, 11, 18, 19, 20, 21, 22]
+>>> positions = np.arange(len(labels))
+
+>>> plt.subplot(121)
+>>> plt.bar(positions, values, align="center")
+>>> plt.xticks(positions, labels)
+
+>>> plt.subplot(122)
+>>> plt.barh(positions, values, align="center")
+>>> plt.yticks(positions, labels)
+\end{lstlisting}
+
+% \begin{figure}[H] % Horizontal vs. vertical bar chart.
+% \centering
+% \begin{subfigure}{.495\textwidth}
+%     \centering
+%     \includegraphics[width=\linewidth]{figures/bar_1.pdf}
+% \end{subfigure}
+% %
+% \begin{subfigure}{.495\textwidth}
+%     \centering
+%     \includegraphics[width=\linewidth]{figures/bar_2.pdf}
+% \end{subfigure}
+% \end{figure}
 
 % TODO: improve this section.
 
 Some kinds of visualizations, especially for categorical data, are popular even though they interfere with the reader's ability to interpret the displayed information.
 For example, it is more difficult to see the differences in a pie chart than on a bar chart since differences in area are more difficult to detect than differences in length.
 By the same logic, a stacked bar chart is almost always inferior to a side-by-side bar chart.
-
-It may also be tempting to stylize a visualization by adding extra icons or pictures or by making certain features look 3-D.
-Anything in a plot that fails to communicate information or that misrepresents the data is called \emph{chartjunk}, a term coined by Edward Tufte.
-Avoid making visualizations that are overly fancy or cluttered with chartjunk;
-Visualizations are at their best when they are as simple as possible, allowing the reader to easily interpret the information.
-
-% This code created the top right bar chart.
-% Why reverse the labels?
-\begin{lstlisting}
->>> labels = ["Spam", "Eggs", "Ham", "Sausage", "Bacon",
-...                         "Baked beans","Lobster thermidor"]
->>> lengths = [10, 11, 18, 19, 20, 21, 22]
->>> positions = np.arange(7)+.5
->>> plt.barh(positions, lengths, align="center")
->>> plt.yticks(positions, labels[::-1])
-\end{lstlisting}
 
 \begin{figure}[H] % Pie chart --> Bar chart
 \centering
@@ -607,14 +639,13 @@ Visualizations are at their best when they are as simple as possible, allowing t
 \end{figure}
 
 \begin{problem}
-The file \texttt{countries.npy} contains some information about 20 countries.
-Each row in the array is a country; the columns are the population (in millions of people), the 2015 GDP (in billions of US dollars), the average male height (in centimeters), and the average female height (in centimeters), in that order.%
+The file \texttt{countries.npy} contains information about 20 countries.
+Each row in the array represents a different country; the columns are the 2015 population (in millions of people), the 2015 GDP (in billions of US dollars), the average male height (in centimeters), and the average female height (in centimeters), in that order.%
 \footnote{
-See \url{https://en.wikipedia.org/wiki/List_of_countries_by_GDP_(nominal)}, \url{http://www.averageheight.co/}, and
-\url{https://en.wikipedia.org/wiki/List_of_countries_and_dependencies_by_population}.
-}
+See \url{https://en.wikipedia.org/wiki/List_of_countries_by_GDP_(nominal)}, \url{http://www.averageheight.co/}, and \url{https://en.wikipedia.org/wiki/List_of_countries_and_dependencies_by_population}.}
 
-Visualize the data in at least four plots, using at least one scatter plot, one histogram, and one bar chart.
+Visualize this data set with at least four plots, using at least one scatter plot, one histogram, and one bar chart.
+Write a few sentences summarizing the major insights that your visualizations reveal.
 \end{problem}
 
 \begin{comment} % Find a place for this.
@@ -640,20 +671,10 @@ in the scatter plot of the entire dataset.
 Plots like this may also reveal errors in the dataset that are harder to detect in a table of values.
 \end{comment}
 
-\begin{comment} % This needs to go somewhere else. Conclusion?
-Understanding a data set through visualizations is an iterative process.
-Start with an initial visualization---usually a broad overview---and examine the data, then adjust the visualization or create other visualizations based on what you observe.
-Ask the following questions as you search for insights:
-%
-\begin{enumerate}
-\item Does the data make sense?
-\item Would a different visualization communicate more information?
-\item Would visualizing a subset of the data provide more information?
-\item Would transforming the data reveal a hidden pattern?
-\end{enumerate}
-\end{comment}
-
 \begin{comment} % TODO: Add sections on box plots and hexbin plots.
+
+\newpage
+
 \subsection*{Additional Material} % ===========================================
 
 There are many software packages that facilitate the visual exploration of data.
