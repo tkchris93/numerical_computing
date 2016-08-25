@@ -5,7 +5,6 @@
 In this lab we discuss and demonstrate the principles of good data visualization, including the key characteristics of good graphs, common mistakes, and how to avoid unethical visualizations.
 \\ \indent We strongly recommend completing this lab as a Jupyter Notebook.}
 
-
 \section*{The Importance of Visualizations} % =================================
 
 Visualizations of data often reveal insights that may not immediately obvious from simple statistics.
@@ -518,7 +517,7 @@ Sequential color maps, like \li{"hot"} and \li{"cool"}, transition very graduall
 When in doubt, use \li{"viridis"} or \li{"plasma"}, two specialized sequential color schemes.
 For the complete list of Matplotlib color maps, see \url{http://matplotlib.org/examples/color/colormaps_reference.html}.
 
-The color map can also be changed to a log scale with the keyword argument \li{norm=matplotlib.colors.LogNorm()} (this works for \li{plt.scatter()} as well).
+The color map can also be changed to a log scale by using the keyword argument \li{norm=matplotlib.colors.LogNorm()} (this works for \li{plt.scatter()} as well).
 As an example, consider the same $f$ defined above on the larger domain $[-6,6]\times [-6,6]$.
 Log scaling can only be done on arrays of all positive values, so we visualize $|f|$.
 
@@ -560,15 +559,65 @@ Use heat maps and contour plots to visualize the Rosenbrock function in such a w
 Consider plotting the minimizer $(1,1)$ on top of the plot as well.
 \end{problem}
 
+\subsection*{Bar Charts} % ----------------------------------------------------
 
+A bar chart plots categorical data in a sequence of bars across an axis.
+They are best for small sets of discrete, one-dimensional, categorical data.
+Usually, a horizontal bar chart is preferred over a vertical bar chart because it's harder to read vertical labels than horizontal labels.
 
+The data in a bar chart should be sorted in a logical way.
+If the chart is being used to compare the values of different data points, it is best to sort by size; if the chart is being used to look up specific values, the labels should be sorted in a way that makes it easy to find specific values (for example, alphabetically).
+Use \li{plt.bar()} or \li{plt.barh()} to create a bar chart in Matplotlib.
 
-% =============================================================================
+% TODO: improve this section.
 
+Some kinds of visualizations, especially for categorical data, are popular even though they interfere with the reader's ability to interpret the displayed information.
+For example, it is more difficult to see the differences in a pie chart than on a bar chart since differences in area are more difficult to detect than differences in length.
+By the same logic, a stacked bar chart is almost always inferior to a side-by-side bar chart.
 
+It may also be tempting to stylize a visualization by adding extra icons or pictures or by making certain features look 3-D.
+Anything in a plot that fails to communicate information or that misrepresents the data is called \emph{chartjunk}, a term coined by Edward Tufte.
+Avoid making visualizations that are overly fancy or cluttered with chartjunk;
+Visualizations are at their best when they are as simple as possible, allowing the reader to easily interpret the information.
 
+% This code created the top right bar chart.
+% Why reverse the labels?
+\begin{lstlisting}
+>>> labels = ["Spam", "Eggs", "Ham", "Sausage", "Bacon",
+...                         "Baked beans","Lobster thermidor"]
+>>> lengths = [10, 11, 18, 19, 20, 21, 22]
+>>> positions = np.arange(7)+.5
+>>> plt.barh(positions, lengths, align="center")
+>>> plt.yticks(positions, labels[::-1])
+\end{lstlisting}
 
-\begin{comment} % MOVE BELOW.
+\begin{figure}[H] % Pie chart --> Bar chart
+\centering
+\begin{subfigure}{.495\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{bad_pie_chart.png}
+\end{subfigure}
+%
+\begin{subfigure}{.495\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{bar_chart_horizontal_sorted.png}
+\end{subfigure}
+\caption{Transforming the horrendous 3-D pie chart on the left into the horizontal bar chart on the right both simplifies and clarifies the information.}
+\label{fig:pievsbar}
+\end{figure}
+
+\begin{problem}
+The file \texttt{countries.npy} contains some information about 20 countries.
+Each row in the array is a country; the columns are the population (in millions of people), the 2015 GDP (in billions of US dollars), the average male height (in centimeters), and the average female height (in centimeters), in that order.%
+\footnote{
+See \url{https://en.wikipedia.org/wiki/List_of_countries_by_GDP_(nominal)}, \url{http://www.averageheight.co/}, and
+\url{https://en.wikipedia.org/wiki/List_of_countries_and_dependencies_by_population}.
+}
+
+Visualize the data in at least four plots, using at least one scatter plot, one histogram, and one bar chart.
+\end{problem}
+
+\begin{comment} % Find a place for this.
 \begin{figure}[h] % Choose an ethical scale and window.
 \centering
 \begin{subfigure}{.45\textwidth}
@@ -591,7 +640,7 @@ in the scatter plot of the entire dataset.
 Plots like this may also reveal errors in the dataset that are harder to detect in a table of values.
 \end{comment}
 
-\begin{comment} % This needs to go somewhere else.
+\begin{comment} % This needs to go somewhere else. Conclusion?
 Understanding a data set through visualizations is an iterative process.
 Start with an initial visualization---usually a broad overview---and examine the data, then adjust the visualization or create other visualizations based on what you observe.
 Ask the following questions as you search for insights:
@@ -604,66 +653,17 @@ Ask the following questions as you search for insights:
 \end{enumerate}
 \end{comment}
 
-\subsection*{Visualizations to Avoid} % ---------------------------------------
-
-Some popular visualizations (pie charts, radar graphs, stacked bar charts, and others) interfere with the reader's ability to interpret the information they display.
-For example, it is more difficult to detect differences in a pie chart than on a bar chart with the same data.
-This is because differences in area are more difficult to detect than differences in length.
-As a result, charts that depend on detecting variation in area will be less effective.
-Instead, choose visualizations that compare the data to the a simple standard that is easy to understand and interpret.
-Figures \ref{fig:pievsbar} and \ref{fig:stacked} are examples of poorly chosen visualizations.
-
-\begin{figure}[H] % Bad graphs.
-\centering
-\begin{subfigure}{.45\textwidth}
-\centering
-\includegraphics[width=\textwidth]{bad_pie_chart.png}
-\end{subfigure}
-\begin{subfigure}{.45\textwidth}
-\centering
-\includegraphics[width=\textwidth]{bar_chart_horizontal_sorted.png}
-\end{subfigure}
-\caption{A pie chart on the left that has been improved by a transformation into a bar chart on the right.}
-\label{fig:pievsbar}
-\end{figure}
-
-It may be tempting to stylize your visualization by adding icons and pictures or by making certain features look 3D.
-Anything in a plot that fails to communicate information or that misrepresents the data is called \emph{chartjunk}, a term coined by Edward Tufte.
-Avoid making visualizations that are overly fancy or cluttered with chartjunk. This includes 3D effects (as in \ref{fig:pievsbar}), bad font choices, and unnecessary icons and pictures.
-Visualizations are at their best when they are as simple as possible and allow the reader to easily
-interpret the information being presented.
-
-\begin{problem} % Problem: convert a pie chart to a horizontal bar chart. Dumb.
-Regraph the pie chart in Figure \ref{fig:pievsbar} as a horizontal bar chart using the follwing data.
-Spam: 21, Eggs: 20, Ham: 22, Sausage: 21, Bacon: 20, Baked Beans: 11, Lobster Thermidor: 10
-\end{problem}
-
-\begin{figure}[H] % Stacked v unstacked bar charts FROM THE DOCKS BAD!!!!
-\centering
-\begin{subfigure}{.45\textwidth}
-\centering
-\includegraphics[width=\textwidth]{stackedbar.png}
-\end{subfigure}
-\begin{subfigure}{.45\textwidth}
-\centering
-\includegraphics[width=\textwidth]{unstackedbar.png}
-\end{subfigure}
-\caption{Stacked Bar Chart. The relative values are harder to compare when stacked (left) instead of adjacent (right).}
-\label{fig:stacked}
-\end{figure}
-
-\begin{comment}
-
+\begin{comment} % TODO: Add sections on box plots and hexbin plots.
 \subsection*{Additional Material} % ===========================================
 
 There are many software packages that facilitate the visual exploration of data.
 One Python library is Glue (see \cite{glue}).
 
-Some packages for making nicer looking plots include \li{Seaborn} and \li{prettyplotlib}.  TODO get refs
+Some packages for making nicer looking plots include \li{Seaborn} and \li{prettyplotlib}.
 
 For more about visualization of data, we highly recommend the following books and websites:
 
-% TODO: get full refs for the follwoing
+% TODO: get full refs for the following
 
 \begin{itemize}
     \item \emph{How to Lie with Statistics} by Darrell Huff (1954)
@@ -674,48 +674,3 @@ For more about visualization of data, we highly recommend the following books an
     \item \url{http://www.informationisbeautiful.net/}
 \end{itemize}
 \end{comment}
-
-\begin{comment} % Move to 'Additional Material'.
-\textbf{Bar Chart}: Best for small sets of discrete, one-dimensional, categorical data.
-Usually, a horizontal bar chart is preferred over a vertical bar chart because it's harder to read vertical labels than horizontal labels.
-Also, horizontal labels on a vertical bar chart may not fit on the graph well (see Figure \ref{fig:barchart}).
-
-The data in a bar chart should be sorted in a logical way.
-If the chart is being used to compare the values of different data points, it is best to sort by size; if the chart is being used to look up specific values, the labels should be sorted in a way that makes it easy to find specific values (for example, alphabetically).
-Use \li{plt.bar()} or \li{plt.barh()} to create a bar chart in Matplotlib.
-
-\begin{figure}[h] % Bar chart styles
-\centering
-\begin{subfigure}{.45\textwidth}
-  \centering
-  \includegraphics[width=\textwidth]{bar_chart_horizontal_sorted.png}
-\end{subfigure}
-\begin{subfigure}{.45\textwidth}
-  \centering
-  \includegraphics[width=\textwidth]{bar_chart_unsorted.png}
-\end{subfigure}
-\begin{subfigure}{.45\textwidth}
-  \centering
-  \includegraphics[width=\textwidth]{bar_chart_vertical_bars_horizontal_labels.png}
-\end{subfigure}
-\begin{subfigure}{.45\textwidth}
-  \centering
-  \includegraphics[width=\textwidth]{bar_chart_vertical_bars_vertical_labels.png}
-\end{subfigure}
-
-\caption{Bar Charts.
-The example in the upper left is easier to use for comparison than the upper right, and easier to read than the bottom two charts.
-The labels overlap in the bottom left and the labels are vertical in the bottom right, making them hard to read.}
-\label{fig:barchart}
-\end{figure}
-
-\begin{lstlisting}
-# This code created the top right bar chart.
-labels = 'Spam', 'Eggs', 'Ham', 'Sausage', 'Bacon', 'Baked beans','Lobster thermidor'
-val = [10, 11, 18, 19, 20, 21, 22]    # the bar lengths
-pos = np.arange(7)+.5    # the bar centers on the y axis
-plt.barh(pos,val, align='center')
-plt.yticks(pos, labels[::-1])
-\end{lstlisting}
-\end{comment}
-

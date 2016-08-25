@@ -92,6 +92,10 @@ def line_good():
             plt.tick_params(labelleft="off")
         plt.title("n = {}".format(n))
 
+def prob2():
+    line_bad()
+    line_good()
+
 # Problem 3 (Scatter Plots) ---------------------------------------------------
 
 @_save("scatter_1.pdf")
@@ -136,9 +140,7 @@ def scatter_4(length, width, height):
     cbar = plt.colorbar()
     cbar.set_label("Height (inches)", fontsize=18)
 
-def prob2():
-    line_bad()
-    line_good()
+def prob3():
     l,w,h = scatter_1()
     scatter_2(l,w,h)
     scatter_3(l,w,h)
@@ -185,7 +187,7 @@ def earthquake():
     plt.xlabel("Year")
     plt.ylabel("Magnitude")
 
-def prob3():
+def prob4():
 
     histogram_1_good(histogram_1_bad(1000))
     data = histogram_2(10000)
@@ -194,7 +196,7 @@ def prob3():
 
     earthquake()
 
-# Problem 4 -------------------------------------------------------------------
+# Problem 5 -------------------------------------------------------------------
 
 @_save("heatmap_1.png")
 def heatmap_1(N):
@@ -239,26 +241,7 @@ def contour_3(X, Y, Z):
     plt.contourf(X, Y, Z, 6, cmap="viridis", norm=colors.LogNorm())
     plt.colorbar()
 
-
-@_save("rosenbrock.pdf")
-def rosenbrock():
-    fig = plt.figure()
-    ax = Axes3D(fig, azim = -128, elev = 43)
-
-    x = np.linspace(-2, 2, 50)
-    y = np.linspace(-1, 3, 50)
-    X, Y = np.meshgrid(x, y)
-    Z = (1.-X)**2 + 100.*(Y-X**2)**2
-
-    ax.plot_surface(X, Y, Z, rstride = 1, cstride = 1, cmap="viridis", linewidth=0, edgecolor='none', norm=colors.LogNorm())
-
-    ax.set_xlim([-2, 2.0])
-    ax.set_ylim([-1, 3.0])
-    ax.set_zlim([0, 2500])
-    plt.xlabel(r"$x$")
-    plt.ylabel(r"$y$")
-
-def prob4():
+def prob5():
     x,y,z = heatmap_1(200)
     heatmap_2(x,y,z)
     contour_1(x,y,z)
@@ -266,12 +249,45 @@ def prob4():
 
     x,y,z = heatmap_3(200)
     contour_3(x,y,z)
-    # rosenbrock()
+
+# Problem 6 -------------------------------------------------------------------
+
+# TODO: bar charts.
+
+def country_data(save=True):
+    data = np.array([
+                    [   8.742, 374.056, 179.2, 167.6],
+                    [  10.985, 33.197, 160.0, 142.2],
+                    [ 206.553, 1774.725, 173.1, 158.8],
+                    [1378.36, 10866.444, 167  , 158.6],
+                    [  5.495, 229.810, 178.9, 165.3],
+                    [ 81.771, 3355.772, 178  , 165  ],
+                    [  9.823, 120.687, 176  , 164  ],
+                    [1330.09, 2073.543, 164.7, 161.2],
+                    [ 127.00, 4123.258, 172.5, 158  ],
+                    [ 24.214, 17.396, 165.6, 154.9],
+                    [  0.622, 4.588, 183.2, 168.4],
+                    [  5.237, 388.315, 182.4, 168  ],
+                    [ 31.489, 192.084, 164  , 151  ],
+                    [ 50.617, 1377.873, 170.8, 157.4],
+                    [ 20.966, 82.316, 163.6, 151.4],
+                    [  8.342, 664.738, 175.4, 164  ],
+                    [ 78.742, 718.221, 174  , 158.9],
+                    [ 65.110, 2848.755, 177.8, 164.5],
+                    [324.311, 17946.996, 176.1, 162.1],
+                    [ 92.700, 193.599, 165.7, 155.2]
+                                                            ])
+    if save:
+        np.save("countries.npy", data)
+    return data
+
+# =============================================================================
 
 def save_all():
     # prob2()
     # prob3()
-    prob4()
+    # prob4()
+    pass
 
 
 if __name__ == '__main__':
