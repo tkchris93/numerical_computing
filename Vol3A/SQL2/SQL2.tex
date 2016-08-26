@@ -1,6 +1,6 @@
 \renewcommand{\lsql}[1]{\lstinline[language=SQL,prebreak=]!#1!}
 
-\lab{Advanced SQL}{SQL II}
+\lab{SQL 2 (The SQL Sequel)}{Advanced SQL}
 \objective{Learn more of the advanced and specialized features of SQL.}
 \label{lab:advancedsql}
 
@@ -235,7 +235,7 @@ Sammy Burke & Science \\
 \end{table}
 
 \subsection*{Cross Join}
-Essentially a Cartesian product of tables.  
+Essentially a Cartesian product of tables.
 Care must be taken when using cross join because of the size of the joined table.
 A cross join should only be used on small tables.
 It matches each relation in one table with every other possible combination of relations in the joined tables.
@@ -304,7 +304,9 @@ D- & 1 \\
 \end{table}
 
 \begin{problem}
-Write a SQL query that will count how many students belong to each major, including students that don't have a major.  Sort your results in ascending order by name.
+Create a database containing tables \ref{table:students}, \ref{table:majors}, \ref{table:grades}, and \ref{table:classes}.
+Write a SQL query to count how many students belong to each major, including students that don't have a major.
+Sort your results in ascending order by name.
 Your result set should be table \ref{table:grouporder}
 \begin{table}[H]
 \begin{tabular}{|l|l|}
@@ -349,28 +351,28 @@ A simple case expression is demonstrated below.
 This code will return the name of the student along with their majorcode.
 But instead of integers, the names of the majors will be returned.
 \begin{lstlisting}[language=SQL]
-SELECT name, 
-CASE majorcode 
-    WHEN 1 THEN 'Math' 
-    WHEN 2 THEN 'Science' 
-    WHEN 3 THEN 'Writing' 
-    WHEN 4 THEN 'Art' 
-    ELSE 'Undeclared' 
+SELECT name,
+CASE majorcode
+    WHEN 1 THEN 'Math'
+    WHEN 2 THEN 'Science'
+    WHEN 3 THEN 'Writing'
+    WHEN 4 THEN 'Art'
+    ELSE 'Undeclared'
     END AS major
 FROM students;
 \end{lstlisting}
 
 A searched case expression using a boolean expression for the \lsql{WHEN} clauses.
 \begin{lstlisting}[language=SQL]
-SELECT name, 
-CASE 
-    WHEN majorcode IS NULL THEN 'Undeclared' 
-    ELSE majorcode 
-    END AS major, 
-CASE 
-    WHEN minorcode IS NULL THEN 'Undeclared' 
-    ELSE minorcode 
-    END AS minor 
+SELECT name,
+CASE
+    WHEN majorcode IS NULL THEN 'Undeclared'
+    ELSE majorcode
+    END AS major,
+CASE
+    WHEN minorcode IS NULL THEN 'Undeclared'
+    ELSE minorcode
+    END AS minor
 FROM students;
 \end{lstlisting}
 
@@ -379,7 +381,7 @@ Find the overall GPA of all the students in the school.
 Use a regular 4.0 scale (A=4.0, B=3.0, C=2.0, D=1.0).
 Any pluses or minuses are dropped so an A- becomes an A.
 
-Your result set should be one column and one row with average of all GPAs of all the students taking classes.  
+Your result set should be one column and one row with average of all GPAs of all the students taking classes.
 Your solution should return a single floating point number.
 
 Use the \lsql{ROUND()} function in SQL to round your result to the nearest hundredth.
@@ -417,4 +419,4 @@ Rene Cross & Writing \\
 \label{prob:likec}
 \end{problem}
 
-\let\undefined\lsql 
+\let\undefined\lsql
