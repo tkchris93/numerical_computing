@@ -590,7 +590,7 @@ They are best for small, discrete, one-dimensional data sets.
 Use \li{plt.bar()} (vertical) or \li{plt.barh()} (horizontal) to create a bar chart in Matplotlib.
 These functions receive the locations of each bar, then the height of each bar (as lists or arrays).
 
-Consider the following questions when making a bar chart.
+Consider the following questions when constructing a bar chart.
 
 \begin{itemize}
     \item What are the different categories in the data?
@@ -599,7 +599,12 @@ Consider the following questions when making a bar chart.
 \end{itemize}
 
 Horizontal bar charts are usually preferable to vertical bar charts because horizontal labels are easier to read than vertical labels.
-Data in a bar chart should also be sorted in a logical way, either by bar size or by alphabetizing the labels.
+Labels can be rotated, but it is better when the reader doesn't have to turn his or her head.
+
+Data in a bar chart should also be sorted in a logical way.
+Sort the categories by bar size, alphabetize the labels, or use some other intuitive ordering.
+
+\newpage
 
 \begin{lstlisting}
 >>> labels = ["Lobster Thermador", "Baked Beans", "Crispy Bacon",
@@ -616,39 +621,93 @@ Data in a bar chart should also be sorted in a logical way, either by bar size o
 >>> plt.yticks(positions, labels)
 \end{lstlisting}
 
-% \begin{figure}[H] % Horizontal vs. vertical bar chart.
-% \centering
-% \begin{subfigure}{.495\textwidth}
-%     \centering
-%     \includegraphics[width=\linewidth]{figures/bar_1.pdf}
-% \end{subfigure}
-% %
-% \begin{subfigure}{.495\textwidth}
-%     \centering
-%     \includegraphics[width=\linewidth]{figures/bar_2.pdf}
-% \end{subfigure}
-% \end{figure}
+\begin{figure}[H] % Horizontal vs. vertical bar chart.
+\centering
+\begin{subfigure}{.47\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/bar_1.pdf}
+\end{subfigure}
+%
+\begin{subfigure}{.52\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/bar_2.pdf}
+\end{subfigure}
+\end{figure}
 
-% TODO: improve this section.
+\section*{Practices to Avoid} % ===============================================
+
+\subsection*{Bad Types of Visualization} % ------------------------------------
 
 Some kinds of visualizations, especially for categorical data, are popular even though they interfere with the reader's ability to interpret the displayed information.
 For example, it is more difficult to see the differences in a pie chart than on a bar chart since differences in area are more difficult to detect than differences in length.
-By the same logic, a stacked bar chart is almost always inferior to a side-by-side bar chart.
+By the same logic, bar chart with several bars per category are almost always better with the bars side by side rather than stacked.
 
 \begin{figure}[H] % Pie chart --> Bar chart
 \centering
-\begin{subfigure}{.495\textwidth}
+\begin{subfigure}{.49\textwidth}
     \centering
     \includegraphics[width=\textwidth]{figures/bad_pie_chart.png}
 \end{subfigure}
 %
-\begin{subfigure}{.495\textwidth}
+\begin{subfigure}{.49\textwidth}
     \centering
-    \includegraphics[width=\textwidth]{figures/bar_chart_horizontal_sorted.png}
+    \includegraphics[width=\textwidth]{figures/bar_2.pdf}
 \end{subfigure}
 \caption{Transforming the horrendous 3-D pie chart on the left into the horizontal bar chart on the right both simplifies and clarifies the information.}
-\label{fig:pievsbar}
 \end{figure}
+
+\subsection*{Misrepresenting Data} % --------------------------------------
+
+To conclude, we return to the issue of integrity.
+It is very easy to misrepresent the true nature of a set of data with a visualization.
+Perhaps the easiest way to do so is with poorly chosen window limits or axis scales.
+Consider the following example of a scatter plot, presented four different ways.
+The fourth subplot is the only one that correctly shows the position of the points in relation to the origin and that has a reasonable scales on both axes.
+
+\begin{lstlisting}
+>>> x = np.linspace(5, 10, N) + np.random.normal(size=N)/3.
+>>> y = .5*x + 4 + np.random.normal(size=N)/2.
+
+>>> plt.subplot(221)                # Plot a default scatter plot of the data.
+>>> plt.plot(x, y, 'o', ms=10)
+
+>>> plt.subplot(222)                # Change the window limits so that the
+>>> plt.plot(x, y, 'o', ms=10)          # data appears steep in the y direction.
+>>> plt.xlim(-5,20)
+
+>>> plt.subplot(223)                # Change the y-axis scale so that the data
+>>> plt.semilogy(x, y, 'o', ms=10)      # appears flat in the y direction.
+
+>>> plt.subplot(224)                # Plot the data with equal axis scales and
+>>> plt.plot(x, y, 'o', ms=10)          # presenting the relation to the origin.
+>>> plt.xlim(xmin=0)
+>>> plt.ylim(ymin=0)
+\end{lstlisting}
+
+\begin{figure}[H] % Heat maps and contour plots.
+\centering
+\begin{subfigure}{.495\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/dishonest_1.pdf}
+\end{subfigure}
+%
+\begin{subfigure}{.495\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/dishonest_2.pdf}
+\end{subfigure}
+\\
+\begin{subfigure}{.495\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/dishonest_3.pdf}
+\end{subfigure}
+%
+\begin{subfigure}{.495\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/honest.pdf}
+\end{subfigure}
+\end{figure}
+
+Do everything in your power to avoid visualizing data unethically.
 
 \begin{problem}
 The file \texttt{countries.npy} contains information from 20 different countries.
@@ -660,28 +719,6 @@ Visualize this data set with at least four plots, using at least one scatter plo
 Write a few sentences summarizing the major insights that your visualizations reveal.
 \end{problem}
 
-\begin{comment} % Find a place for this.
-\begin{figure}[h] % Choose an ethical scale and window.
-\centering
-\begin{subfigure}{.45\textwidth}
-\centering
-\includegraphics[width=\textwidth]{figures/scale_scatter_zoomed_in.png}
-\end{subfigure}
-\begin{subfigure}{.45\textwidth}
-\centering
-\includegraphics[width=\textwidth]{figures/scale_scatter_zoomed_out.png}
-\end{subfigure}
-\caption{Scatter Plots. The data in both plots are the same but there appears to be a weaker
-correlation in the first plot compared to the second.}
-\label{fig:scatter_correlation}
-\end{figure}
-
-Scatter plots may reveal insights other than correlation.
-Consider Figure \ref{fig:scatterquake} which plots earthquake data from the United States Geological Survey (USGS).
-The USGS data began including earthquakes with magnitude 6.5 or greater; this is clearly seen
-in the scatter plot of the entire dataset.
-Plots like this may also reveal errors in the dataset that are harder to detect in a table of values.
-\end{comment}
 
 \begin{comment} % TODO: Add sections on box plots and hexbin plots.
 

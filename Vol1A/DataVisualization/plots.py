@@ -252,7 +252,54 @@ def prob5():
 
 # Problem 6 -------------------------------------------------------------------
 
-# TODO: bar charts.
+@_save("bar_1.pdf")
+def bar_1():
+    labels = ["Lobster Thermador", "Baked Beans", "Crispy Bacon",
+                "Smoked Sausage", "Hannibal Ham", "Eggs", "Spam"]
+    values = [10, 11, 18, 19, 20, 21, 22]
+    positions = np.arange(len(labels))
+
+    plt.bar(positions, values, align="center")
+    plt.xticks(positions, labels)
+
+    return labels, values, positions
+
+@_save("bar_2.pdf")
+def bar_2(labels, values, positions):
+    plt.barh(positions, values, align="center")
+    plt.yticks(positions, labels)
+    plt.gcf().subplots_adjust(left=0.2)
+
+@_save("pie.pdf")
+def pie(labels, values, positions):
+    explode = np.zeros(len(values))
+    explode[np.random.randint(0,explode.size)] = .2
+    plt.pie(values, explode, labels, shadow=True,
+                            startangle=np.random.randint(0,360,1))
+    plt.gca().set_aspect("equal")
+
+@_save("dishonest_1.pdf")
+def dishonest_1(N):
+    x = np.linspace(5, 10, N) + np.random.normal(size=N)/3.
+    y = .5*x + 4 + np.random.normal(size=N)/2.
+    plt.plot(x, y, 'o', ms=10)
+
+    return x, y
+
+@_save("dishonest_2.pdf")
+def dishonest_2(x, y):
+    plt.plot(x, y, 'o', ms=10)
+    plt.xlim(-5,20)
+
+@_save("dishonest_3.pdf")
+def dishonest_3(x, y):
+    plt.semilogy(x, y, 'o', ms=10)
+
+@_save("honest.pdf")
+def honest(x, y):
+    plt.plot(x, y, 'o', ms=10)
+    plt.xlim([0, x.max()+.2])
+    plt.ylim([0, x.max()+.2])
 
 def country_data(save=True):
     data = np.array([
@@ -281,14 +328,24 @@ def country_data(save=True):
         np.save("countries.npy", data)
     return data
 
+def prob6():
+    l,v,p = bar_1()
+    bar_2(l,v,p)
+    pie(l,v,p)
+
+    x,y = dishonest_1(20)
+    dishonest_2(x,y)
+    dishonest_3(x,y)
+    honest(x,y)
+
 # =============================================================================
 
 def save_all():
     # prob2()
     # prob3()
     # prob4()
-    prob5()
-    pass
+    # prob5()
+    prob6()
 
 
 if __name__ == '__main__':
