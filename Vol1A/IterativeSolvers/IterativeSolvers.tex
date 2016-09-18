@@ -26,40 +26,60 @@ As a (very small) example, consider the following $3 \times 3$ system.
 \end{array}
 \end{align*}
 
-To complete the first iteration of Jacobi Method, we begin with an initial guess
-$(x^{(0)}_1, x^{(0)}_2, x^{(0)}_3) = (0,0,0)$.
-
-We then compute the next approximation $(x^{(1)}_1, x^{(1)}_2, x^{(1)}_3)$.
-For the first step, we take each of the three equations and solve for $x_1$,
-$x_2$, and $x_3$, respectively. This gives us the following.
+Solving the first equation for $x_1$, the second for $x_2$, and the third for $x_3$ yields the following.
 \begin{align*}
-\begin{array}{ccccccc}
-  x_1 & = & \frac{1}{2} ( 3 + x_3) \\
-  x_2 & = & \frac{1}{3} ( 3 + x_1 - 2x_3) \\
-  x_3 & = & \frac{1}{3} ( -1 - x_2) \\
+\begin{array}{ccc}
+    x_1 & = & \frac{1}{2}(3 + x_3) \\
+    x_2 & = & \frac{1}{3}(3 + x_1 - 2x_3) \\
+    x_3 & = & \frac{1}{3}(-1 - x_2)
 \end{array}
 \end{align*}
 
-We then use these equations for our approximation of $(x^{(1)}_1, x^{(1)}_2, x^{(1)}_3)$.
+Now begin with an initial guess $\x^{(0)} = [x^{(0)}_1, x^{(0)}_2, x^{(0)}_3]\trp = [0,0,0]\trp$.
+To compute the first approximation $\x^{(1)}$, use the entries of $\x^{(0)}$ as the variables on the right side of the previous equation.
 
-$$
-\begin{matrix}
-x^{(1)}_1 & = & \frac{1}{2} ( 3 + x^{(0)}_3)  & = & \frac{1}{2} (3 + 0)     & = & \frac{3}{2} \\
-x^{(1)}_2 & = & \frac{1}{3} ( 3 + x^{(0)}_1 - 2x^{(0)}_3) & = & \frac{1}{3} (3 + 0 - 0) & = & 1 \\
-x^{(1)}_3 & = & \frac{1}{3} ( -1 - x^{(0)}_2)       & = & \frac{1}{3} (-1 - 0)    & = & -\frac{1}{3} \\
-\end{matrix}
-$$
-So $\mathbf{x}^{(1)} = (\frac{3}{2}, 1, -\frac{1}{3})$. This concludes one iteration of
-the Jacobi method. Computing $\mathbf{x}^{(2)}$ follows similarly.
+\begin{align*}
+\begin{array}{ccccccc}
+    x^{(1)}_1 & = & \frac{1}{2}(3 + x^{(0)}_3) & = & \frac{1}{2} (3 + 0) & = & \frac{3}{2} \\
+    x^{(1)}_2 & = & \frac{1}{3}(3 + x^{(0)}_1 - 2x^{(0)}_3) & = & \frac{1}{3} (3 + 0 - 0) & = & 1 \\
+    x^{(1)}_3 & = & \frac{1}{3}(-1 - x^{(0)}_2) & = & \frac{1}{3} (-1 - 0) & = & -\frac{1}{3} \\
+\end{array}
+\end{align*}
 
-$$
-\begin{matrix}
+So $\mathbf{x}^{(1)} = [\frac{3}{2}, 1, -\frac{1}{3}]\trp$.
+Computing $\mathbf{x}^{(2)}$ is similar.
+
+\begin{align*}
+\begin{array}{ccccccc}
 x^{(2)}_1 & = & \frac{1}{2} ( 3 + x^{(1)}_3)  & = & \frac{1}{2} (3 - \frac{1}{3})     & = & \frac{4}{3} \\
 x^{(2)}_2 & = & \frac{1}{3} ( 3 + x^{(1)}_1 - 2x^{(1)}_3) & = & \frac{1}{3} (3 + \frac{3}{2} + \frac{2}{3}) & = &  \frac{31}{18} \\
 x^{(2)}_3 & = & \frac{1}{3} ( -1 - x^{(1)}_2)       & = & \frac{1}{3} (-1 - 1)    & = & -\frac{2}{3} \\
-\end{matrix}
-$$
+\end{array}
+\end{align*}
 
+The process is repeated until the difference between two consecutive differences is sufficiently small, or iterating a specific number of times.
+More precisely, we fix $\epsilon > 0$ and $N > 0$, and continue iterating until either \[\|\x^{(k-1)} - \x^{(k)}\| < \epsilon\qquad\text{or}\qquad k > N.\]
+
+For this particular problem, convergence to 8 decimal places ($\epsilon = 10^{-8}$) is reached in 29 iterations.
+
+\begin{center}
+\begin{tabular}{c|ccc}
+    & $x^{(k)}_1$ & $x^{(k)}_2$ & $x^{(k)}_3$ \\
+    \hline
+    $\x^{(0)}$ & 0 & 0 & 0 \\
+    %\hline
+    $\x^{(1)}$ & 1.5 & 1 & -0.33333 \\
+    %\hline
+    $\x^{(2)}$  & 1.33333333 & 1.72222222 & -0.66666667 \\
+    $\x^{(3)}$  & 1.16666667 & 1.88888889 & -0.90740741 \\
+    $\x^{(4)}$  & 1.04629630 & 1.99382716 & -0.96296296 \\
+    \vdots      & \vdots     & \vdots     & \vdots      \\
+    $\x^{(28)}$ & 0.99999999 & 2.00000001 & -0.99999999 \\
+    $\x^{(29)}$ & 1          & 2          & -1          \\
+\end{tabular}
+\end{center}
+
+\subsection*{Matrix Representation} % -----------------------------------------
 
 \begin{comment}
 $$
@@ -71,136 +91,102 @@ x^{(1)}_3 = ( b_1 - a_{31}x^{(0)}_1 - a_{32}x^{(0)}_2) / a_{33} \\
 $$
 \end{comment}
 
-To find $\mathbf{x}^{(k)}$, we repeat the same process of solving for each
-$x^{(k)}_i$ until convergence is reached. For this particular problem,
-convergence to 8 decimal places is reached in 29 iterations.
+The iterative steps performed above can be expressed in matrix form.
+First, decompose $A$ into its diagonal entries, its entries below the diagonal, and its entries above the diagonal, as $A = D + L + U$.
+\begin{align*}
+\begin{array}{cccccc}
+    & D & & L & & U \\
+    A = &
+    \left[\begin{array}{cccc}
+        a_{11} & 0 & \ldots & 0 \\
+        0 & a_{22} & \ldots & 0 \\
+        \vdots & \vdots & \ddots & \vdots \\
+        0 & 0 & \ldots & a_{nn} \\
+    \end{array}\right]
+    & + &
+    \left[\begin{array}{cccc}
+    0 & 0 & \ldots & 0 \\
+    a_{21} &  0 & \ldots & 0\\
+     \vdots & \ddots & \ddots & \vdots \\
+    a_{n1} & \ldots & a_{n,n-1} & 0 \\
+    \end{array}\right]
+    & + &
+    \begin{bmatrix}
+    0 & a_{12} & \ldots & a_{1n} \\
+    0 & 0 & \ddots & \vdots \\
+     \vdots & \vdots & \ddots & a_{n-1,n} \\
+    0 & 0 & \ldots & 0 \\
+    \end{bmatrix}
+\end{array}
+\end{align*}
 
-\begin{center}
-\begin{tabular}{ c|c c c  }
-          & $x^{(k)}_1$ & $x^{(k)}_2$ & $x^{(k)}_3$ \\
-    \hline
-    $x^{(0)}$ & 0 & 0 & 0 \\
-    %\hline
-    $x^{(1)}$ & 1.5 & 1 & -0.33333 \\
-    %\hline
-    $x^{(2)}$ & 1.33333333 & 1.72222222 & -0.66666667 \\
-    $x^{(3)}$ & 1.16666667 & 1.88888889 & -0.90740741 \\
-    $x^{(4)}$ & 1.0462963 & 1.99382716 & -0.96296296 \\
-    \vdots    & \vdots    & \vdots     & \vdots     \\
-    $x^{(28)}$ & 0.99999999 & 2.00000001 & -0.99999999 \\
-    $x^{(29)}$ & 1 & 2 & -1 \\
-\end{tabular}
-\end{center}
+With this decomposition, we solve for $\x$ in the following way.
+\begin{align*}
+A\x &= \b\\
+(D + L + U)\x &= \b\\
+D\x &= \b - (L+U)\x\\
+\x &= D^{-1}\b - D^{-1}(L+U)\x
+\end{align*}
 
-
-\subsection*{Matrix Representation of Jacobi Method} % ------------------------
-
-Though it may not be immediately obvious, the iterative steps performed above
-can be expressed in matrix form. First, we use the fact that
-$A = D + L + U$ where,
-
-$$
-D = \begin{bmatrix}
-a_{11} & 0 & \ldots & 0 \\
-0 & a_{22} & \ldots & 0 \\
- \vdots & \vdots & \ddots & \vdots \\
-0 & 0 & \ldots & a_{nn} \\
-\end{bmatrix}
-$$
-$$
-L = \begin{bmatrix}
-0 & 0 & \ldots & 0 \\
-a_{21} &  0 & \ldots & 0\\
- \vdots & \ddots & \ddots & \vdots \\
-a_{n1} & \ldots & a_{n,n-1} & 0 \\
-\end{bmatrix}
-$$
-$$
-U = \begin{bmatrix}
-0 & a_{12} & \ldots & a_{1n} \\
-0 & 0 & \ddots & \vdots \\
- \vdots & \vdots & \ddots & a_{n-1,n} \\
-0 & 0 & \ldots & 0 \\
-\end{bmatrix}.
-$$
-
-Now we can make substitutions to get,
-$$ A\mathbf{x} = \mathbf{b} $$
-$$ (D + L + U)\mathbf{x} = \mathbf{b} $$
-$$ D\mathbf{x} = \mathbf{b} - (L+U)\mathbf{x} $$
-$$ \mathbf{x} = D^{-1}\mathbf{b} - D^{-1}(L+U)\mathbf{x} $$
-
-With this, we can express our algorithm for iteratively updating $\mathbf{x}$ as,
-
-\begin{equation} \label{eq:trad_jacobi}
-\mathbf{x}^{(k+1)} = D^{-1}b - D^{-1}(L+U)\mathbf{x}^{(k)}
+The Jacobi method can thus be summarized as follows.
+\begin{equation}
+\x^{(k+1)} = D^{-1}\b - D^{-1}(L+U)\x^{(k)}
+\label{eq:jacobi-traditional}
 \end{equation}
 
-At this point, notice that we have $D^{-1}$ in Equation \ref{eq:trad_jacobi}. However, in
-this case, it is okay that we are calculating an inverse. Since $D$ is a diagonal
-matrix, $D^{-1}$ is very easy to compute. It is easily verifiable that $D^{-1}$
-is just,
-
-$$
-\begin{bmatrix}
-\frac{1}{a_{11}} & 0 & \ldots & 0 \\
-0 & \frac{1}{a_{22}} & \ldots & 0 \\
- \vdots & \vdots & \ddots & \vdots \\
-0 & 0 & \ldots & \frac{1}{a_{nn}} \\
-\end{bmatrix}.
-$$
-
-It is common to see the matrix representation of the Jacobi Method as expressed in
-Equation \ref{eq:trad_jacobi}.
-However, we can manipulate this equation slightly to make it easier to compute
-in Python. Since $A = D + L + U$,
-
-$$\mathbf{x}^{(k+1)} = D^{-1}b - D^{-1}(A-D)\mathbf{x}^{(k)} $$
-
-\begin{equation} \label{eq:jacobi}
-    \mathbf{x}^{(k+1)} = D^{-1}(b - (A-D)\mathbf{x}^{(k)})
+Since $L+U=A-D$, Equation \ref{eq:jacobi-traditional} can be slightly modified as follows.
+\begin{equation}
+\x^{(k+1)} = D^{-1}\b - D^{-1}(A-D)\x^{(k)}
+\label{eq:jacobi-method}
 \end{equation}
 
-Notice that for this algorithm to
-work, the matrix $A$ must have nonzero diagonal entries. Additionally, with the
-help of array broadcasting we can make a few other adjustments that make it even
-more efficient. Note that this algorithm will not always converge. We will talk
-more about the requirements for convergence in the next section.
+There is a potential problem with Equation \ref{eq:jacobi-method}: calculating a matrix inverse is the cardinal sin of numerical linear algebra, yet the equation contains $D^{-1}$.
+However, since $D$ is a diagonal matrix, $D^{-1}$ is also diagonal, and is easy to compute.
+\[
+D^{-1} =
+\left[\begin{array}{cccc}
+    \frac{1}{a_{11}} & 0                & \ldots & 0      \\
+    0                & \frac{1}{a_{22}} & \ldots & 0      \\
+    \vdots           & \vdots           & \ddots & \vdots \\
+    0                & 0                & \ldots & \frac{1}{a_{nn}}
+\end{array}\right]
+\]
+
+The Jacobi method therefore requires that $A$ have nonzero diagonal entries.
+% Additionally, with the help of array broadcasting, we can make a few other adjustments that make it even more efficient.
+% Note that this algorithm will not always converge.
 
 \begin{problem} % Implement the Jacobi Method.
-Using Equation \ref{eq:jacobi}, implement the Jacobi Method. Avoid using
-\li{la.inv}. Your function should accept a matrix \li{A}, a vector \li{b}, and
-an optional parameter \li{tol} with a default value of \li{1e-8}. Additionally,
-accept an optional parameter \li{maxiters} to help you catch nonconvergent
-systems. Set \li{maxiters} to $100$ as default. Your function should return the
-solution vector \li{x} as well as a list of all the approximations of \li{x}
-at each iteration. Stop iterating when \li{maxiters} is reached or
-$||\mathbf{x}^{(k)} - \mathbf{x}^{(k+1)}||_{\infty} < $ \li{tol}. In Python, you
-can calculate $||x||_{\infty}$ in two ways.
+Write a function that accepts a matrix $A$, a vector $\b$, a maximum number of iterations, and a convergence tolerance.
+Implement the Jacobi method using Equation \ref{eq:jacobi-method}.
+Avoid using \li{la.inv()} to calculate $D^{(-1)}$.
+Return the best approximation \li{x} as well as a list of the approximations of \li{x} at each iteration.
+
+Run the iteration until $||\mathbf{x}^{(k-1)} - \mathbf{x}^{(k)}||_{\infty}$ is less than the specified tolerance, or until iterating the maximum number of specified times.
+Use \li{la.norm()} to calculate the vector norm.
+% \footnote{See Chapter 3 of Volume I for a technical definition of this norm.}
+
 \begin{lstlisting}
->>> la.norm(x, ord=np.inf)
-<<or>>
->>> np.max(np.abs(x))
+>>> la.norm(x, <<ord>>=np.inf)
+# This is equivalent to np.max(np.abs(x)).
 \end{lstlisting}
-For more information about the $\infty$-norm see Chapter ?? of Volume 1.
 
-If \li{maxiters} is hit, return the current solution. Your function should flexible enought
-to be able to handle systems of any size. If your
-system is non-convergent, you will find that your approximations have increasingly
-large entries. Test your function on the $3 \times 3$ linear system above. Then
-test your function on a random $3 \times 3$ matrix. Chances are the random matrix
-you generate will not converge, i.e. \li{maxiters} will be hit.
-We will discuss why in the next section.
-
-\begin{info}
+\begin{warn}
 Remember that NumPy arrays are mutable. Therefore, to check convergence, you
 will need to have two copies of the array you are testing,
 i.e. a ``before'' version and an ``after'' version.
-\end{info}
+\end{warn}
+
+Your function should be robust enough to accept systems of any size.
+If the iteration is non-convergent, the successive approximations will have increasingly large entries.
+Test your function on the $3 \times 3$ linear system used in the previous section.
+Then test your function on random $3 \times 3$ matrices.
 \label{prob:jacobi}
 \end{problem}
 
-\subsection*{Convergence of the Jacobi Method} % ------------------------------
+\subsection*{Convergence} % ---------------------------------------------------
+
+% TODO: Rewrite this without formal definitions or theorems.
 
 \begin{definition}
     A matrix $A \in M_n(\mathbb{R})$ is \emph{strictly diagonally dominant} if

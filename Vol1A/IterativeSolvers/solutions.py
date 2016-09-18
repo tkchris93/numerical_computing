@@ -42,11 +42,11 @@ def spar_diag_dom(n, num_entries=None):
     Returns:
         A ((n,n) csr_matrix): A sparse nxn strictly diagonally dominant matrix.
     """
-    return sparse.csr_matrix(diag_dom(n, num_entries=numm_entries))
+    return sparse.csr_matrix(diag_dom(n, num_entries))
 
 
 # Problem 1
-def jacobi_method(A, b, maxiters=100, tol=1e-8):
+def jacobi_method(A, b, tol=1e-8, maxiters=100):
     """Calculate the solution to the system Ax = b voa the Jacobi Method.
 
     Inputs:
@@ -76,7 +76,7 @@ def jacobi_method(A, b, maxiters=100, tol=1e-8):
 
 
 # Problem 2
-def plot_convergence(A, b, maxiters=100, tol=1e-8):
+def plot_convergence(A, b, tol=1e-8, maxiters=100):
     """Plot the rate of convergence of the Jacobi Method.
 
     Inputs:
@@ -85,7 +85,7 @@ def plot_convergence(A, b, maxiters=100, tol=1e-8):
         maxiters (int, optional): the maximum number of iterations to perform.
         tol (float): the convergence tolerance.
     """
-    x, x_approx = jacobi_method(A,b,maxiters,tol)
+    x, x_approx = jacobi_method(A,b,tol,maxiters)
 
     x_approx = np.array(x_approx)
     dom = np.arange(x_approx.shape[0])
@@ -99,7 +99,7 @@ def plot_convergence(A, b, maxiters=100, tol=1e-8):
 
 
 # Problem 3
-def gauss_seidel(A, b, maxiters=100, tol=1e-8):
+def gauss_seidel(A, b, tol=1e-8, maxiters=100):
     """Calculate the solution to the system Ax = b via the Gauss-Seidel Method.
 
     Inputs:
@@ -154,7 +154,7 @@ def compare_times():
 
 
 # Problem 5
-def sparse_gauss_seidel(A, b, maxiters=100, tol=1e-8):
+def sparse_gauss_seidel(A, b, tol=1e-8, maxiters=100):
     """Calculate the solution to the sparse system Ax = b via the Gauss-Seidel
     Method.
 
@@ -192,7 +192,7 @@ def sparse_gauss_seidel(A, b, maxiters=100, tol=1e-8):
 
 
 # Problem 6
-def sparse_sor(A, b, omega, maxiters=100, tol=1e-8):
+def sparse_sor(A, b, omega, tol=1e-8, maxiters=100):
     """Calculate the solution to the system Ax = b via Successive Over-
     Relaxation.
 
