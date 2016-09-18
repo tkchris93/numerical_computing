@@ -1,13 +1,12 @@
 # solutions.py
 """Volume 1A: Iterative Solvers. Solutions File."""
-from __future__ import division
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy import linalg as la
-import scipy.sparse as spar
-import scipy.sparse.linalg as sparla
-from mpl_toolkits.mplot3d import Axes3D
+
 import time
+import numpy as np
+from scipy import sparse
+from scipy import linalg as la
+from matplotlib import pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 # Helper functions
 def diag_dom(n, num_entries=None):
@@ -29,7 +28,7 @@ def diag_dom(n, num_entries=None):
     cols = np.random.choice(np.arange(0,n), size=num_entries)
     data = np.random.randint(-4,4,size=num_entries)
     for i in xrange(num_entries):
-        A[ rows[i], cols[i] ] = data[i]
+        A[rows[i], cols[i]] = data[i]
     for i in xrange(n):
         A[i,i] = np.sum(np.abs(A[i,:])) + 1
     return A
@@ -43,9 +42,9 @@ def spar_diag_dom(n, num_entries=None):
                     defaults to n^(1.5) - n.
 
     Returns:
-        A (spar.csr_matrix) - strictly diagonally dominantn sparse nxn matrix.
+        A (sparse.csr_matrix) - strictly diagonally dominantn sparse nxn matrix.
     """
-    return spar.csr_matrix(diag_dom(n, num_entries=numm_entries))
+    return sparse.csr_matrix(diag_dom(n, num_entries=numm_entries))
 
 # Problem 1
 def jacobi_method(A,b,maxiters=100,tol=1e-8):
@@ -164,8 +163,8 @@ def sparse_gauss_seidel(A,b,maxiters=100,tol=1e-8):
         x_approx (list) - list of approximations at each iteration.
     """
 
-    if type(A) != spar.csr_matrix:
-        A = spar.csr_matrix(A)
+    if type(A) != sparse.csr_matrix:
+        A = sparse.csr_matrix(A)
     n = A.shape[0]
     x0 = np.zeros(n)
     x = np.ones(n)
@@ -200,8 +199,8 @@ def sparse_sor(A,b,omega,maxiters=100, tol=1e-8):
         x_approx (list) - list of approximations at each iteration.
 
     """
-    if type(A) != spar.csr_matrix:
-        A = spar.csr_matrix(A)
+    if type(A) != sparse.csr_matrix:
+        A = sparse.csr_matrix(A)
     n = A.shape[0]
     x0 = np.zeros(n)
     x = np.ones(n)
@@ -226,8 +225,8 @@ def sparse_sor(A,b,omega,maxiters=100, tol=1e-8):
 def finite_difference(n):
     data = [[-4]*n, [1]*n, [1]*n]
     diags = [0,1,-1]
-    subA = spar.spdiags(data, diags, n, n)
-    A = spar.block_diag((subA,)*n)
+    subA = sparse.spdiags(data, diags, n, n)
+    A = sparse.block_diag((subA,)*n)
     A.setdiag(1, n)
     A.setdiag(1,-n)
 
