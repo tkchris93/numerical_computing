@@ -45,8 +45,8 @@ def spar_diag_dom(n, num_entries=None):
     return sparse.csr_matrix(diag_dom(n, num_entries))
 
 
-# Problem 1
-def jacobi_method(A, b, tol=1e-8, maxiters=100):
+# Problems 1 and 2
+def jacobi_method(A, b, tol=1e-8, maxiters=100, plot=False):
     """Calculate the solution to the system Ax = b voa the Jacobi Method.
 
     Inputs:
@@ -54,28 +54,35 @@ def jacobi_method(A, b, tol=1e-8, maxiters=100):
         b ((n,) ndarray): A vector of length n.
         maxiters (int, optional): the maximum number of iterations to perform.
         tol (float): the convergence tolerance.
+        plot (bool): if True, plot the convergence rate of the algorithm.
+            (this is for Problem 2).
 
     Returns:
         x ((n,) ndarray): the solution to system Ax = b.
-        x_approx (list): list of approximations at each iteration.
     """
-    n = A.shape[0]
+    m,n = A.shape
+    d = np.diag(A)
     x0 = np.zeros(n)
-    x = np.zeros(n)
-    diag = np.diag(A)
-    x_approx = []
+    error = []
 
     for k in xrange(maxiters):
-        x = (b + diag*x - A.dot(x0))/diag
-        if np.max(np.abs(x0-x)) < tol:
-            return x, x_approx
-        x0 = x
-        x_approx.append(x)
+        x1 = x0 + (b - A.dot(x0))/d
+        error.append(la.norm(A.dot(x1) - b, ord=np.inf))
+        if la.norm(x0 - x1, ord=np.inf) < tol:
+            break
+        x0 = x1
 
-    return x, x_approx
+    if plot:
+        plt.semilogy(error, lw=2)
+        plt.ylabel("Absolute Error of Approximation")
+        plt.xlabel("Iteration #")
+        plt.title("Convergence of Jacobi Method")
+        plt.show()
+
+    return x1
 
 
-# Problem 2
+# Old Problem 2
 def plot_convergence(A, b, tol=1e-8, maxiters=100):
     """Plot the rate of convergence of the Jacobi Method.
 
@@ -88,18 +95,17 @@ def plot_convergence(A, b, tol=1e-8, maxiters=100):
     x, x_approx = jacobi_method(A,b,tol,maxiters)
 
     x_approx = np.array(x_approx)
-    dom = np.arange(x_approx.shape[0])
-    norms = [la.norm(A.dot(xk) - b) for xk in x_approx]
+    norms = [la.norm(A.dot(xk) - b, ord=np.inf) for xk in x_approx]
 
-    plt.semilogy(dom, norms)
+    plt.semilogy(norms, lw=2)
     plt.ylabel("Absolute Error of Approximation")
-    plt.xlabel("Iteration #")
+    plt.xlabel("Iteration")
     plt.title("Convergence of Jacobi Method")
     plt.show()
 
 
 # Problem 3
-def gauss_seidel(A, b, tol=1e-8, maxiters=100):
+def gauss_seidel(A, b, tol=1e-8, maxiters=100, plot=False):
     """Calculate the solution to the system Ax = b via the Gauss-Seidel Method.
 
     Inputs:
@@ -107,29 +113,35 @@ def gauss_seidel(A, b, tol=1e-8, maxiters=100):
         b ((n,) ndarray): A vector of length n.
         maxiters (int, optional): the maximum number of iterations to perform.
         tol (float): the convergence tolerance.
+        plot (bool): if True, plot the convergence rate of the algorithm.
 
     Returns:
         x ((n,) ndarray): the solution to system Ax = b.
-        x_approx (list): list of approximations at each iteration.
     """
-    n = A.shape[0]
+    m,n = A.shape
     x0 = np.zeros(n)
-    x = np.zeros(n)
-    k = 0
-    x_approx = []
+    error = []
 
     for k in xrange(maxiters):
-        k += 1
         x = x0.copy()
         for i in xrange(n):
             a_ii = A[i,i]
             x[i] = b[i]/a_ii + x[i] - np.dot(A[i],x)/a_ii
-        if np.max(np.abs(x0-x)) < tol:
-            return x, x_approx
+        diff = la.norm(x0-x, ord=np.inf)
+        # error.append(la.norm(A.dot(x) - b, ord=np.inf))
+        error.append(diff)
         x0 = x
-        x_approx.append(x)
+        if diff < tol:
+            break
 
-    return x, x_approx
+    if plot:
+        plt.semilogy(error, lw=2)
+        plt.ylabel("Absolute Error of Approximation")
+        plt.xlabel("Iteration")
+        plt.title("Convergence of Gauss-Seidel Method")
+        plt.show()
+
+    return x
 
 
 # Problem 4
@@ -150,7 +162,7 @@ def compare_times():
     la_solve_time = time.time() - start
 
     print "Gauss-Seidel: " + str(gauss_seidel_time)
-    print "la.solve: " + str(la_solve_time)
+    print "la.solve(): " + str(la_solve_time)
 
 
 # Problem 5
@@ -267,7 +279,7 @@ def test_jacobi():
     for n in [5, 10, 50, 100]:
         A = diag_dom(n)
         b = np.random.rand(n)
-        jacobi_sol, jacobi_approx = jacobi_method(A,b)
+        jacobi_sol = jacobi_method(A,b)
         sol = la.solve(A,b)
         results.append(np.allclose(jacobi_sol, sol))
     return np.alltrue(results)
@@ -275,7 +287,9 @@ def test_jacobi():
 def test_plot_convergence():
     A = np.array([[2,0,-1],[-1,3,2],[0,1,3]])
     b = np.array([3,3,-1])
-    plot_convergence(A,b)
+    jacobi_method(A,b,plot=True)
+    gauss_seidel(A,b,plot=True)
+    plt.show()
     return True
 
 def test_gauss_seidel():
@@ -283,7 +297,7 @@ def test_gauss_seidel():
     for n in [5, 10, 50, 100]:
         A = diag_dom(n)
         b = np.random.rand(n)
-        gs_sol, gs_approx = gauss_seidel(A,b)
+        gs_sol = gauss_seidel(A,b)
         sol = la.solve(A,b)
         results.append(np.allclose(gs_sol, sol))
     return np.alltrue(results)

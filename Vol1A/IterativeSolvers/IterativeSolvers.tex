@@ -13,6 +13,8 @@ In this lab, we implement three popular iterative methods for solving large syst
 
 \section*{The Jacobi Method} % ================================================
 
+% TODO: general algorithm box, Iterative Methods section. Easy first problem?
+
 The general idea behind any iterative method is make an initial guess, apply some easy computations to get a closer approximation, and repeat until convergence.
 Throughout this lab, we use the notation $\x^{(k)}$ to denote the $k$th approximation for $\x$ and $x^{(k)}_i$ to denote the $i^{th}$ element of $\x^{(k)}$.
 
@@ -124,21 +126,22 @@ With this decomposition, we solve for $\x$ in the following way.
 \begin{align*}
 A\x &= \b\\
 (D + L + U)\x &= \b\\
-D\x &= \b - (L+U)\x\\
-\x &= D^{-1}\b - D^{-1}(L+U)\x
+D\x &= -(L+U)\x + \b\\
+\x &= D^{-1}(-(L+U)\x + \b)
 \end{align*}
 
 The Jacobi method can thus be summarized as follows.
 \begin{equation}
-\x^{(k+1)} = D^{-1}\b - D^{-1}(L+U)\x^{(k)}
+\x^{(k+1)} = - D^{-1}(L+U)\x^{(k)} + D^{-1}\b
 \label{eq:jacobi-traditional}
 \end{equation}
 
 Since $L+U=A-D$, Equation \ref{eq:jacobi-traditional} can be slightly modified as follows.
-\begin{equation}
-\x^{(k+1)} = D^{-1}\b - D^{-1}(A-D)\x^{(k)}
+\begin{align}
+\nonumber \x^{(k+1)} &= D^{-1}(-(A-D)\x^{(k)} + \b) \\
+&= D^{-1}(D\x^{(k)} - A\x^{(k)}  + \b)
 \label{eq:jacobi-method}
-\end{equation}
+\end{align}
 
 There is a potential problem with Equation \ref{eq:jacobi-method}: calculating a matrix inverse is the cardinal sin of numerical linear algebra, yet the equation contains $D^{-1}$.
 However, since $D$ is a diagonal matrix, $D^{-1}$ is also diagonal, and is easy to compute.
@@ -153,28 +156,60 @@ D^{-1} =
 \]
 
 The Jacobi method therefore requires that $A$ have nonzero diagonal entries.
-% Additionally, with the help of array broadcasting, we can make a few other adjustments that make it even more efficient.
+
+Furthermore, the diagonal $D$ can be represented by a 1-dimensional array $\mathbf{d}$ of the diagonal entries.
+Then the matrix multiplication $D\x$ is equivalent to the component-wise vector multiplication $\mathbf{d}*\x = \x*\mathbf{d}$.
+Likewise, the matrix multiplication $D^{-1}\x$ is equivalent to the component-wise vector division $\x/\mathbf{d}$
 % Note that this algorithm will not always converge.
+
+\begin{comment} % Jacobi algorithm box. Probably unnecessary.
+\begin{algorithm}[H]
+\begin{algorithmic}[1]
+\Procedure{Jacobi Method}{$A$, $\b$, $\epsilon$, $N$}
+    \State $m, n \gets \shape{A}$
+        \Comment{Store the dimensions of $A$.}
+    \State $\mathbf{d} \gets$ diag($A$)
+        \Comment{Get the diagonal entries of $A$ with \li{np.diag()}.}
+    \State $\x^{(0)} \gets \zeros{n}$
+        \Comment{An array of $n$ zeros.}
+    \For{$k=0 \ldots N-1$}
+        \State $\x^{(k+1)} \gets (\b - A\x^{(k)} + \mathbf{d}*\x^{(k)})/\mathbf{d}$
+        \If{$\|\mathbf{x}^{(k-1)} - \mathbf{x}^{(k)}\|_{\infty} < \epsilon$}
+            \State \pseudoli{break}
+        \EndIf
+    \EndFor
+    \State \pseudoli{return} $\x^{(k)}$
+\EndProcedure
+\end{algorithmic}
+\caption{}
+\label{alg:jacobi-method}
+\end{algorithm}
+\end{comment}
 
 \begin{problem} % Implement the Jacobi Method.
 Write a function that accepts a matrix $A$, a vector $\b$, a maximum number of iterations, and a convergence tolerance.
 Implement the Jacobi method using Equation \ref{eq:jacobi-method}.
-Avoid using \li{la.inv()} to calculate $D^{(-1)}$.
+Avoid using \li{la.inv()} to calculate $D^{-1}$.
 Return the best approximation \li{x} as well as a list of the approximations of \li{x} at each iteration.
 
-Run the iteration until $||\mathbf{x}^{(k-1)} - \mathbf{x}^{(k)}||_{\infty}$ is less than the specified tolerance, or until iterating the maximum number of specified times.
+Run the iteration until $\|\mathbf{x}^{(k-1)} - \mathbf{x}^{(k)}\|_{\infty}$ is less than the specified tolerance, or until iterating the maximum number of specified times.
 Use \li{la.norm()} to calculate the vector norm.
 % \footnote{See Chapter 3 of Volume I for a technical definition of this norm.}
 
 \begin{lstlisting}
+>>> import numpy as np
+>>> from scipy import linalg as la
+
+>>> x = np.random.random(10)
 >>> la.norm(x, <<ord>>=np.inf)
-# This is equivalent to np.max(np.abs(x)).
+0.74623726404168045
+>>> np.max(np.abs(x))
+0.74623726404168045
 \end{lstlisting}
 
 \begin{warn}
-Remember that NumPy arrays are mutable. Therefore, to check convergence, you
-will need to have two copies of the array you are testing,
-i.e. a ``before'' version and an ``after'' version.
+NumPy arrays are mutable.
+Therefore, at each iteration, the values of $\x^{(k-1)}$ and $\x^{(k)}$ will need to be stored in two distinct copies.
 \end{warn}
 
 Your function should be robust enough to accept systems of any size.
@@ -204,18 +239,19 @@ We will discuss a class of problems that satisfy this condition at the end of
 this lab.
 
 \begin{problem}
-To visualize the speed of convergence of the Jacobi method, plot the error at each
-iteration. Use the list of approximations that you returned in Problem \ref{prob:jacobi}
-to calculate the errors. The error can be computed by calculating
-$||A\mathbf{x}^{(k)} - \mathbf{b}||$
-for each approximation, $x^{(k)}$. Your plot should be similar to the figure below.
-To plot with a logrithmic scale on the $y$-axis, run \li{plt.semilogy()}.
-\end{problem}
+Modify your Jacobi method function in the following ways:
+\begin{enumerate}
+    \item Add a keyword argument called \li{plot}, defaulting to \li{False}.
+    \item Keep track of the absolute error $\|A\mathbf{x}^{(k)} - \mathbf{b}\|_{\infty}$ of the approximation for each value of $k$.
+    \item If \li{plot} is \li{True}, produce a lin-log plot the error against iteration count (use \li{plt.semilogy()} instead of \li{plt.plot()}).
+    Return the approximate solution even if \li{plot} is \li{True}.
+\end{enumerate}
 
-\begin{figure} \label{fig:jacobi_convergence}
-\includegraphics[width=.7\textwidth]{jacobi_convergence.pdf}
-\label{fig:jacobi_convergence}
-\end{figure}
+% \begin{figure}
+%     \includegraphics[width=.7\textwidth]{jacobi_convergence.pdf}
+%     \label{fig:jacobi_convergence}
+% \end{figure}
+\end{problem}
 
 \section*{The Gauss-Seidel Method} % ==========================================
 
