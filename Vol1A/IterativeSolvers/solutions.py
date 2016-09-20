@@ -54,9 +54,9 @@ def jacobi_method(A, b, tol=1e-8, maxiters=100, plot=False):
     Inputs:
         A ((n,n) ndarray): A square matrix.
         b ((n,) ndarray): A vector of length n.
-        maxiters (int, optional): the maximum number of iterations to perform.
-        tol (float): the convergence tolerance.
-        plot (bool): if True, plot the convergence rate of the algorithm.
+        tol (float, opt): the convergence tolerance.
+        maxiters (int, opt): the maximum number of iterations to perform.
+        plot (bool, opt): if True, plot the convergence rate of the algorithm.
             (this is for Problem 2).
 
     Returns:
@@ -91,9 +91,9 @@ def gauss_seidel(A, b, tol=1e-8, maxiters=100, plot=False):
     Inputs:
         A ((n,n) ndarray): A square matrix.
         b ((n,) ndarray): A vector of length n.
-        maxiters (int, optional): the maximum number of iterations to perform.
-        tol (float): the convergence tolerance.
-        plot (bool): if True, plot the convergence rate of the algorithm.
+        tol (float, opt): the convergence tolerance.
+        maxiters (int, opt): the maximum number of iterations to perform.
+        plot (bool, opt): if True, plot the convergence rate of the algorithm.
 
     Returns:
         x ((n,) ndarray): the solution to system Ax = b.
@@ -159,35 +159,36 @@ def sparse_gauss_seidel(A, b, tol=1e-8, maxiters=100):
     Method.
 
     Inputs:
-        A ((n,n) csr_matrix): An nxn sparse matrix.
+        A ((n,n) csr_matrix): An nxn sparse CSR matrix.
         b ((n,) ndarray): A vector of length n.
-        maxiters (int, optional): the maximum number of iterations to perform.
-        tol (float): the convergence tolerance.
+        tol (float, opt): the convergence tolerance.
+        maxiters (int, opt): the maximum number of iterations to perform.
 
     Returns:
         x ((n,) ndarray): the solution to system Ax = b.
-        x_approx (list): list of approximations at each iteration.
     """
     if type(A) != sparse.csr_matrix:
         A = sparse.csr_matrix(A)
-    n = A.shape[0]
+    m,n = A.shape
     x0 = np.zeros(n)
-    x = np.ones(n)
-    x_approx = []
+    error = []
+    diag = A.diagonal()
+
     for k in xrange(maxiters):
-        x = x0.copy()
-        diag = A.diagonal()
+        x1 = x0.copy()
         for i in xrange(n):
+            # <A_i, x> as given in the problem.
             rowstart = A.indptr[i]
             rowend = A.indptr[i+1]
             Aix = np.dot(A.data[rowstart:rowend],
-                        x[A.indices[rowstart:rowend]])
-            x[i] += (b[i] - Aix)/diag[i]
-        if np.max(np.abs(x0-x)) < tol:
-            return x, x_approx
-        x0 = x
-        x_approx.append(x)
-    return x, x_approx
+                        x1[A.indices[rowstart:rowend]])
+            x1[i] += (b[i] - Aix)/float(diag[i])
+        if la.norm(x0-x1, ord=np.inf) < tol:
+            return x1
+        x0 = x1
+
+    return x1
+
 
 # Problem 6
 def sparse_sor(A, b, omega, tol=1e-8, maxiters=100):
@@ -197,33 +198,34 @@ def sparse_sor(A, b, omega, tol=1e-8, maxiters=100):
     Inputs:
         A ((n,n) csr_matrix): An nxn sparse matrix.
         b ((n,) ndarray): A vector of length n.
-        maxiters (int, optional): the maximum number of iterations to perform.
-        tol (float): the convergence tolerance.
+        omega (float in [0,1]): The relaxation factor.
+        tol (float, opt): the convergence tolerance.
+        maxiters (int, opt): the maximum number of iterations to perform.
 
     Returns:
         x ((n,) ndarray): the solution to system Ax = b.
-        x_approx (list): list of approximations at each iteration.
     """
     if type(A) != sparse.csr_matrix:
         A = sparse.csr_matrix(A)
-    n = A.shape[0]
+    m,n = A.shape
     x0 = np.zeros(n)
-    x = np.ones(n)
-    x_approx = []
+    error = []
+    diag = A.diagonal()
+
     for k in xrange(maxiters):
-        x = x0.copy()
-        diag = A.diagonal()
+        x1 = x0.copy()
         for i in xrange(n):
+            # <A_i, x> as given in the problem.
             rowstart = A.indptr[i]
             rowend = A.indptr[i+1]
             Aix = np.dot(A.data[rowstart:rowend],
-                        x[A.indices[rowstart:rowend]])
-            x[i] += omega*(b[i] - Aix)/diag[i]
-        if np.max(np.abs(x0-x)) < tol:
-            return x, x_approx
-        x0 = x
-        x_approx.append(x)
-    return x, x_approx
+                        x1[A.indices[rowstart:rowend]])
+            x1[i] += omega*(b[i] - Aix)/float(diag[i])  # This line changed.
+        if la.norm(x0-x1, ord=np.inf) < tol:
+            return x1
+        x0 = x1
+
+    return x1
 
 
 # Problem 6
@@ -297,7 +299,7 @@ def test_sparse_gauss_seidel():
     for n in [5, 10, 50, 100]:
         A = diag_dom(n)
         b = np.random.rand(n)
-        sgs_sol, sgs_approx = sparse_gauss_seidel(A,b)
+        sgs_sol = sparse_gauss_seidel(A,b)
         sol = la.solve(A,b)
         results.append(np.allclose(sgs_sol, sol))
     return np.alltrue(results)
@@ -307,7 +309,7 @@ def test_sparse_sor():
     for n in [5, 10, 50, 100]:
         A = diag_dom(n)
         b = np.random.rand(n)
-        sor_sol, sor_approx = sparse_sor(A,b,0.8,maxiters=300)
+        sor_sol = sparse_sor(A,b,0.8,maxiters=300)
         sol = la.solve(A,b)
         results.append(np.allclose(sor_sol, sol))
     return np.alltrue(results)

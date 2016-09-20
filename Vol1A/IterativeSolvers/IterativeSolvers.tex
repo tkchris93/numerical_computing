@@ -334,9 +334,6 @@ Notice that Gauss-Seidel converged in less than half as many iterations.
 
 \subsection*{Implementation} % ------------------------------------------------
 
-Because Gauss-Seidel updates only one element of the solution vector at a time, the iteration cannot be summarized by a single matrix equation.
-Instead, the process is most generally described by the following equation.
-
 % This matches the book (Ch. 13), but it may be confusing to the students here.
 % We begin by solving for $\x$ in a slightly different way.
 % \begin{align}
@@ -347,6 +344,8 @@ Instead, the process is most generally described by the following equation.
 % \label{eq:gauss-seidel-method}
 % \end{align}
 
+Because Gauss-Seidel updates only one element of the solution vector at a time, the iteration cannot be summarized by a single matrix equation.
+Instead, the process is most generally described by the following equation.
 \begin{equation} \label{eq:gauss-seidel-full}
 x^{(k+1)}_i = \frac{1}{a_{ii}} \left (b_i - \sum_{j < i}a_{ij}x^{(k)}_j - \sum_{j > i}a_{ij}x^{(k)}_j \right )
 \end{equation}
@@ -360,7 +359,7 @@ This gives a simplification.
 \label{eq:gauss_seidel}
 \end{align}
 
-Making one sweep through all the entries of $\x$ completes one iteration.
+One sweep through all the entries of $\x$ completes one iteration.
 
 \begin{problem} % Implement Gauss-Seidel.
 Write a function that accepts a matrix $A$, a vector $\b$, a convergence tolerance $\epsilon$, a maximum number of iterations $N$, and a keyword argument \li{plot} that defaults to \li{False}.
@@ -373,7 +372,7 @@ Use \li{diag_dom()} to generate test cases.
 
 \begin{warn}
 Since the Gauss-Seidel algorithm operates on the approximation vector in place (modifying it one entry at a time), the previous approximation $\x^{(k-1)}$ must be stored at the beginning of the $k$th iteration in order to calculate $\|\x^{(k-1)} - \x^{(k)}\|_\infty$.
-Additionally, Since NumPy arrays are mutable, the past iteration must be stored as a \textbf{copy}.
+Additionally, since NumPy arrays are mutable, the past iteration must be stored as a \textbf{copy}.
 
 \begin{lstlisting}
 >>> x0 = np.random.random(5)        # Generate a random vector.
@@ -399,8 +398,6 @@ Whether or not the Gauss-Seidel converges or not also depends on the nature of $
 If all of the eigenvalues of $A$ are positive, $A$ is called \emph{positive definite}.
 If $A$ is positive definite \emph{or} if it is strictly diagonally dominant, then the Gauss-Seidel method converges regardless of the initial guess $\x^{(0)}$.
 
-\section*{Solving Sparse Systems Iteratively} % ===============================
-
 \begin{problem} % Sparse implementation of Gauss Seidel.
 The Gauss-Seidel method is faster than the standard system solver used by \li{la.solve()} if the system is sufficiently large and sufficiently sparse.
 For each vale of $n=5,\ 6,\ \ldots,\ 11$, generate a random $2^n \times 2^n$ matrix $A$ using \li{diag_dom()} and a random $2^n$ vector $\b$.
@@ -410,10 +407,11 @@ Plot the times against the system size.
 Use log scales if appropriate.
 \end{problem}
 
-Some linear systems may have tens of thousands of parameters.
-However, in applications where systems of this size arise, it is also common
-that such matrices are sparse.
-The tools in SciPy's \li{sparse} library make it possible to work with even these very large systems.
+\section*{Solving Sparse Systems Iteratively} % ===============================
+
+Iterative solvers are best suited for solving very large sparse systems.
+However, using the Gauss-Seidel method on sparse matrices requires translating code from NumPy to \li{scipy.sparse}.
+The algorithm is the same, but there are some functions that are named differently between these two packages.
 
 \begin{comment}
 The following is a quick example of how the different types of sparse matrices
@@ -465,85 +463,61 @@ matrix([[0],
 Since the \li{coo_matrix} type allows for fast sparse matrix type conversion, it is usually worth the time and memory to convert to the sparse matrix type that corresponds with the operations you are performing.
 \end{comment}
 
+% TODO: include plotting convergence?
 \begin{problem} % Gauss-Seidel with Sparse matrices.
-To be able to use the Gauss-Seidel method on sparse matrices, you must translate the code you wrote in Problem \ref{prob:gauss_seidel} from NumPy to \li{scipy.sparse}.
-The algorithm is the same, but there are some functions that are named differently between these two packages.
+Write a (new) function that accepts a \emph{sparse} matrix $A$, a vector $\b$, a convergence tolerance $\epsilon$, and a maximum number of iterations $N$ (plotting the convergence is not required for this problem).
+Implement the Gauss-Seidel method using Equation \ref{eq:gauss_seidel}, returning the approximate solution to the equation $A\x = \b$.
+Use the usual stopping criterion.
 
-Write a new function that accepts a sparse matrix \li{A}, a NumPy array \li{b},
-an optional parameter \li{tol} that defauls to \li{1e-8}, and an optional parameter
-\li{maxiters} that defaults to 100. Your function should return the solution
-vector \li{x} as well as a list of all the approximations of \li{x} at each
-iteration.
-
-We want this function to run as quickly as possible. The Gauss-Seidel method calls for us to extract rows from the matrix $A$ then multiply by the vector $x$. There are many ways to do this that cause some fairly serious runtime issues, so we will provide the code for this specific portion of the algorithm.
+The Gauss-Seidel method requires extracting the rows $A_i$ from the matrix $A$ and computing $A_i\trp\x$.
+There are many ways to do this that cause some fairly serious runtime issues, so we provide the code for this specific portion of the algorithm.
 
 \begin{lstlisting}
-# Slice the i-th row of A and dot product the vector x
+# Slice the i-th row of A and dot product the vector x.
 rowstart = A.indptr[i]
 rowend = A.indptr[i+1]
 Aix = np.dot(A.data[rowstart:rowend], x[A.indices[rowstart:rowend]])
 \end{lstlisting}
 
-To test your function, use the following function to generate a sparse strictly diagonally dominant matrix.
+To test your function, cast the result of \li{diag_dom()} as a sparse matrix.
 
 \begin{lstlisting}
-def spar_diag_dom(n, num_entries=None):
-    """Generate a sparse strictly diagonally dominant nxn matrix.
+from scipy import sparse
 
-    Inputs:
-        n (int): the dimension of the system.
-        num_entries (int): the number of nonzero values. Defaults to n^(3/2)-n.
-
-    Returns:
-        A ((n,n) csr_matrix): A sparse nxn strictly diagonally dominant matrix.
-    """
-    return sparse.csr_matrix(diag_dom(n, num_entries))
+>>> A = sparse.csr_matrix(diag_dom(50000))
+>>> b = np.random.random(50000)
 \end{lstlisting}
-
 \end{problem}
 
 \subsection*{Successive Over-Relaxation (SOR)} % ------------------------------
 
-There are some systems that meet the requirements for convergence in the
-Gauss-Seidel method that do not converge very quickly. A slightly altered version
-of the Gauss-Seidel method has been developed that can result in faster convergence.
-This is achieved by introducting a relaxation factor, $\omega$. This method is
-called Successive Over-Relaxation. In fact, for many slowly converging iterative processes, convergence can be improved by introducing a relaxation factor.
+Some systems meet the requirements for convergence with the Gauss-Seidel method, but that do not converge very quickly.
+A slightly altered version of the Gauss-Seidel method, called \emph{Successive Over-Relaxation}, can result in faster convergence.
+This is achieved by introducing a \emph{relaxation factor}, $\omega$.
+The iterative equation for Gauss-Seidel, Equation \ref{eq:gauss-seidel-full} becomes the following.
+\[x^{(k+1)}_i = (1-\omega)x^{(k)}_i + \frac{\omega}{a_{ii}} \left(b_i - \sum_{j < i}a_{ij}x^{(k)}_j - \sum_{j > i}a_{ij}x^{(k)}_j \right)\]
 
-The iterative equation for Gauss-Seidel, Equation \ref{eq:gauss-seidel-full},
-with the introduction of a relaxing factor $\omega$ becomes,
-
-$$
-x_i^{(k+1)} = (1 - \omega)x_i^{(k)} + \frac{\omega}{a_{ii}} \left (b_i - \sum_{j < i}a_{ij}x^{(k+1)}_j - \sum_{j > i}a_{ij}x^{(k)}_j \right )
-$$
-
-Updating the solution vector $x$ inplace as we did with Gauss-Seidel, this
-equation becomes,
-
-\begin{equation} \label{eq:sor}
-x^{(k+1)}_i = x^{(k)}_i + \frac{\omega}{a_{ii}} \left ( b_i - \left < A_i, \mathbf{x}^{(k)} \right > \right )
+Simplifying the equation results in the following.
+\begin{equation}
+x^{(k+1)}_i = x^{(k)}_i + \frac{\omega}{a_{ii}}\left( b_i - A_i\trp\x^{(k)}\right)
+\label{eq:sor}
 \end{equation}
 
-Equation \ref{eq:sor} follows by simplifying the full analytic equation in the
-same way we simplified the Gauss-Seidel method. Notice that when $\omega = 1$,
-Successive Over-Relaxation is equivalent to Gauss-Seidel.
+Note that when $\omega = 1$, Successive Over-Relaxation reduces to Gauss-Seidel.
 
 \begin{problem}
-Implement Successive Over-Relaxation. You should be able to write
-this function by changing one line of your code from your Gauss Seidel
-function. Your function should be able to handle sparse matrices.
-
-We will examine how varying the values of $\omega$ affects convergence in Problem \ref{prob:application}
+Write a function that accepts a \emph{sparse} matrix $A$, a vector $\b$, a convergence tolerance $\epsilon$, and a maximum number of iterations $N$.
+Implement Successive Over-Relaxation using Equation \ref{eq:sor}, returning the approximate solution to the equation $A\x = \b$.
+Use the usual stopping criterion.
+\\(Hint: this requires changing only one line of code from the sparse Gauss-Seidel function.)
 \end{problem}
 
-\section*{Application: Finite Difference Method} % ======================================================
+\section*{Finite Difference Method} % =========================================
 
 Throughout this lab, we have said there are sparse linear systems that arise in applications that have tens of thousands of parameters. Systems of this size
 often arise in Finite Difference problems. The underlying theory behind such problems will be addressed in Volume 4 of the textbook. We now present one such problem.
 
-
-\begin{problem} \label{prob:application}
-
+\begin{problem}
 A common equation that occurs in both pure and applied mathematics is Laplace's equation.
 
 \[ \frac{\partial^2 u}{\partial x^2}+ \frac{\partial^2 u}{\partial y^2}= 0.\]
@@ -631,7 +605,7 @@ For this problem, do the following:
     \item Write a function \li{finite_difference()} that accepts an integer $n$ for the number of interior gridlines. Your function should return the corresponding sparse matrix $A$ and NumPy array $b$. For example, a value of $n = 3$ should result in the matrix $A$ and vector $b$ described above. HINT: Consider using \li{scipy.sparse.block_diag} and the \li{setdiag()} method of scipy sparse matrices for dynamically creating the matrix $A$.
     \item To demonstrate how convergence is affected by the value of $\omega$, time your \li{sparse_sor()} function for values of $\omega = [1, 1.05, 1.1, \dots , 1.9, 1.95 ]$. Plot your timings as a function of $\omega$. Generate the system $A \mathbf{x} = b$ using your \li{finite_difference()} function and a value of $n = 20$. Remember that $\omega = 1$ corresponds to the Gauss-Seidel method. How does Gauss-Seidel compare to SOR with the optimal $\omega$?
 
-    NOTE: Notice that the matrix $A$ is not strictly diagonally dominant. However, this matrix is positive definite, so the algorithm will converge. Unfortunately, convergence for these kinds of systems require many more iterations. When using the \li{sparse_sor()} function in this problem, set \li{maxiters = 10000} and \li{tol=10**-2}.
+    Note that the matrix $A$ is not strictly diagonally dominant. However, this matrix is positive definite, so the algorithm will converge. Unfortunately, convergence for these kinds of systems require many more iterations. When using the \li{sparse_sor()} function in this problem, set \li{maxiters = 10000} and \li{tol=10**-2}.
     \item Using \li{plt.pcolormesh}, create a heatmap to visualize your solution. The solution vector you get from your \li{sparse_sor()} function will need to be reshaped to properly visualize the result.
 \end{enumerate}
 
@@ -654,14 +628,12 @@ plt.show()
 \end{lstlisting}
 \end{comment}
 
-
+ \label{prob:application}
 \end{problem}
 
 %\newpage
 
-%\section*{Additional Material} % ==============================================
-
-
+%\section*{Additional Material} % =============================================
 
 \begin{comment} % Migrated from NumPy lab. vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 \begin{algorithm} % Laplace's equation procedure.
