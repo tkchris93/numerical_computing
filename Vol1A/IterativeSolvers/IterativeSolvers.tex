@@ -220,22 +220,54 @@ Avoid using \li{la.inv()} to calculate $D^{-1}$, but use \li{la.norm()} to calcu
 % \end{warn}
 
 Your function should be robust enough to accept systems of any size.
+To test your function, use the following function to generate an $n\times n$ matrix $A$ for which the Jacobi method is guaranteed to converge.
+Generate a random $\b$ with \li{np.random.random()}.
+
+\begin{lstlisting}
+def diag_dom(n, num_entries=None):
+    """Generate a strictly diagonally dominant nxn matrix.
+
+    Inputs:
+        n (int): the dimension of the system.
+        num_entries (int): the number of nonzero values
+            Defaults to n^(3/2)-n.
+
+    Returns:
+        A ((n,n) ndarray): An nxn strictly diagonally dominant matrix.
+    """
+    if num_entries is None:
+        num_entries = int(n**1.5) - n
+    A = np.zeros((n,n))
+    rows = np.random.choice(np.arange(0,n), size=num_entries)
+    cols = np.random.choice(np.arange(0,n), size=num_entries)
+    data = np.random.randint(-4, 4, size=num_entries)
+    for i in xrange(num_entries):
+        A[rows[i], cols[i]] = data[i]
+    for i in xrange(n):
+        A[i,i] = np.<<sum>>(np.<<abs>>(A[i])) + 1
+    return A
+\end{lstlisting}
+
+Also test your function on random $n \times n$ matrices
 If the iteration is non-convergent, the successive approximations will have increasingly large entries.
-Test your function on the $3 \times 3$ linear system used in the previous section.
-Then test your function on random $3 \times 3$ matrices.
+
 \label{prob:jacobi}
 \end{problem}
 
 \subsection*{Convergence} % ---------------------------------------------------
 
-The Jacobi method, like most iterative methods, does not always converge.
-In this case, convergence mostly depends on the nature of the matrix $A$.
-If the entries $a_{ij}$ of $A$ satisfy the property \[|a_{ii}| > \sum_{j \neq i} |a_{ij}|\ \text{for all}\ i = 1,2,\hdots,n,\] then $A$ is called \emph{strictly diagonally dominant}.
-If this is the case, then the Jacobi method always converges, regardless of the initial guess $\x_0$.
-Although this seems like a strong requirement, most real-world linear systems
-can be represented by strictly diagonally dominant matrices.
+Most iterative methods only converge under certain conditions.
+For the Jacobi method, convergence mostly depends on the nature of the matrix $A$.
+If the entries $a_{ij}$ of $A$ satisfy the property \[|a_{ii}| > \sum_{j \neq i} |a_{ij}|\ \text{for all}\ i = 1,2,\hdots,n,\] then $A$ is called \emph{strictly diagonally dominant} (for example, \li{diag_dom()} in Problem \ref{prob:jacobi} generates a strictly diagonally dominant $n\times n$ matrix).
+If this is the case, then the Jacobi method always converges, regardless of the initial guess $\x_0$.%
+\footnote{Although this seems like a strong requirement, most real-world linear systems can be represented by strictly diagonally dominant matrices.
+}
+Other iterative methods, such as Newton's method, depend mostly on the initial guess.
 
-% TODO: discussion on how to check that an iterative method is doing well.
+There are a few ways to determine whether or not an iterative method is converging.
+For example, since the approximation $\x^{(k)}$ should satisfy $A\x^{(k)} \approx \b$, the normed difference $\|A\x^{(k)} - \b\|_\infty$ should be small.
+This value is called the \emph{absolute error} of the approximation.
+If the iterative method converges, the absolute error should decrease to $\epsilon$.
 
 \begin{problem}
 Modify your Jacobi method function in the following ways:
@@ -245,16 +277,16 @@ Modify your Jacobi method function in the following ways:
     \item If \li{plot} is \li{True}, produce a lin-log plot the error against iteration count (use \li{plt.semilogy()} instead of \li{plt.plot()}).
     Return the approximate solution $\x$ even if \li{plot} is \li{True}.
 \end{enumerate}
+If the iteration converges, your plot should resemble the following figure.
 
-% \begin{figure}
-%     \includegraphics[width=.7\textwidth]{jacobi_convergence.pdf}
-%     \label{fig:jacobi_convergence}
-% \end{figure}
+\begin{figure}[H]
+    \includegraphics[width=.7\textwidth]{jacobi_convergence.pdf}
+\end{figure}
 \end{problem}
 
 \section*{The Gauss-Seidel Method} % ==========================================
 
-The Gauss-Seidel Method is quite similar to the Jacobi Method. We will examine
+The Gauss-Seidel method is quite similar to the Jacobi method. We will examine
 the same system as before. The main difference between Gauss-Seidel and Jacobi
 is that in Gauss-Seidel, any new information is used immediately. As with Jacobi,
 
@@ -326,7 +358,7 @@ Making one sweep through all the entries of $x$ completes one iteration. We
 continue this same process until convergence is attained.
 
 \begin{problem} \label{prob:gauss_seidel}
-Implement the Gauss-Seidel Method using Equation \ref{eq:gauss_seidel}. Your
+Implement the Gauss-Seidel method using Equation \ref{eq:gauss_seidel}. Your
 function should accept a matrix \li{A}, a vector \li{b}, an optional parameter
 \li{tol} that defaults to \li{1e-8} and an optional parameter \li{maxiters} that
 defaults to $100$. Your function should return the solution vector \li{x} as

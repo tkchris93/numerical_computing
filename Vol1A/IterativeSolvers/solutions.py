@@ -73,35 +73,13 @@ def jacobi_method(A, b, tol=1e-8, maxiters=100, plot=False):
         x0 = x1
 
     if plot:
-        plt.semilogy(error, lw=2)
+        plt.semilogy(error, lw=2, label="Jacobi")
         plt.ylabel("Absolute Error of Approximation")
         plt.xlabel("Iteration #")
         plt.title("Convergence of Jacobi Method")
         plt.show()
 
     return x1
-
-
-# Old Problem 2
-def plot_convergence(A, b, tol=1e-8, maxiters=100):
-    """Plot the rate of convergence of the Jacobi Method.
-
-    Inputs:
-        A ((n,n) ndarray): A square matrix.
-        b ((n,) ndarray): A vector of length n.
-        maxiters (int, optional): the maximum number of iterations to perform.
-        tol (float): the convergence tolerance.
-    """
-    x, x_approx = jacobi_method(A,b,tol,maxiters)
-
-    x_approx = np.array(x_approx)
-    norms = [la.norm(A.dot(xk) - b, ord=np.inf) for xk in x_approx]
-
-    plt.semilogy(norms, lw=2)
-    plt.ylabel("Absolute Error of Approximation")
-    plt.xlabel("Iteration")
-    plt.title("Convergence of Jacobi Method")
-    plt.show()
 
 
 # Problem 3
@@ -123,25 +101,23 @@ def gauss_seidel(A, b, tol=1e-8, maxiters=100, plot=False):
     error = []
 
     for k in xrange(maxiters):
-        x = x0.copy()
+        x1 = x0.copy()
         for i in xrange(n):
             a_ii = A[i,i]
-            x[i] = b[i]/a_ii + x[i] - np.dot(A[i],x)/a_ii
-        diff = la.norm(x0-x, ord=np.inf)
-        # error.append(la.norm(A.dot(x) - b, ord=np.inf))
-        error.append(diff)
-        x0 = x
-        if diff < tol:
+            x1[i] = x1[i] + (b[i] - np.dot(A[i], x1))/float(a_ii)
+        error.append(la.norm(A.dot(x1) - b, ord=np.inf))
+        if la.norm(x0-x1, ord=np.inf) < tol:
             break
+        x0 = x1
 
     if plot:
-        plt.semilogy(error, lw=2)
+        plt.semilogy(error, lw=2, label="Gauss-Seidel")
         plt.ylabel("Absolute Error of Approximation")
         plt.xlabel("Iteration")
         plt.title("Convergence of Gauss-Seidel Method")
         plt.show()
 
-    return x
+    return x1
 
 
 # Problem 4
