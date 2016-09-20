@@ -32,6 +32,8 @@ def diag_dom(n, num_entries=None):
         A[i,i] = np.sum(np.abs(A[i])) + 1
     return A
 
+
+# TODO: Eliminate this.
 def spar_diag_dom(n, num_entries=None):
     """Generate a sparse strictly diagonally dominant nxn matrix.
 
@@ -121,24 +123,34 @@ def gauss_seidel(A, b, tol=1e-8, maxiters=100, plot=False):
 
 
 # Problem 4
-def compare_times():
+def prob4():
     """For a 5000 parameter system, compare the runtimes of the Gauss-Seidel
     method and la.solve(). Print an explanation of why Gauss-Seidel is so much
     faster.
     """
-    A = diag_dom(5000)
-    b = np.random.rand(5000)
+    gs_times, solve_times = [], []
+    domain = 2**np.arange(5,12)
 
-    start = time.time()
-    gauss_seidel(A,b)
-    gauss_seidel_time = time.time() - start
+    for n in domain:
+        A = diag_dom(n)
+        b = np.random.rand(n)
 
-    start = time.time()
-    la.solve(A,b)
-    la_solve_time = time.time() - start
+        start = time.time()
+        gauss_seidel(A,b)
+        gs_times.append(time.time() - start)
 
-    print "Gauss-Seidel: " + str(gauss_seidel_time)
-    print "la.solve(): " + str(la_solve_time)
+        start = time.time()
+        la.solve(A,b)
+        solve_times.append(time.time() - start)
+
+    plt.loglog(domain, gs_times, '.-', basex=2, basey=2, lw=2, ms=10,
+                                                        label="Gauss-Seidel")
+    plt.loglog(domain, solve_times, '.-', basex=2, basey=2, lw=2, ms=10,
+                                                        label="la.solve()")
+    plt.xlabel("System Size")
+    plt.ylabel("Time (seconds)")
+    plt.legend(loc="upper left")
+    plt.show()
 
 
 # Problem 5
@@ -156,7 +168,6 @@ def sparse_gauss_seidel(A, b, tol=1e-8, maxiters=100):
         x ((n,) ndarray): the solution to system Ax = b.
         x_approx (list): list of approximations at each iteration.
     """
-
     if type(A) != sparse.csr_matrix:
         A = sparse.csr_matrix(A)
     n = A.shape[0]
@@ -177,7 +188,6 @@ def sparse_gauss_seidel(A, b, tol=1e-8, maxiters=100):
         x0 = x
         x_approx.append(x)
     return x, x_approx
-
 
 # Problem 6
 def sparse_sor(A, b, omega, tol=1e-8, maxiters=100):
@@ -279,7 +289,7 @@ def test_gauss_seidel():
     return np.alltrue(results)
 
 def test_compare_times():
-    compare_times()
+    prob4()
     return True
 
 def test_sparse_gauss_seidel():

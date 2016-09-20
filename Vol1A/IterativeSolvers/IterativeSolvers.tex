@@ -201,8 +201,6 @@ Implement the Jacobi method using Equation \ref{eq:jacobi-method}, returning the
 Run the iteration until $\|\mathbf{x}^{(k-1)} - \mathbf{x}^{(k)}\|_{\infty} < \epsilon$, and only iterate at most $N$ times.
 Avoid using \li{la.inv()} to calculate $D^{-1}$, but use \li{la.norm()} to calculate the vector $\infty$-norm $\|\x\|_\infty = \sup{|x_i|}$.
 
-% \footnote{See Chapter 3 of Volume I for a technical definition of this norm.}
-
 \begin{lstlisting}
 >>> from scipy import linalg as la
 
@@ -213,15 +211,8 @@ Avoid using \li{la.inv()} to calculate $D^{-1}$, but use \li{la.norm()} to calcu
 0.74623726404168045
 \end{lstlisting}
 
-% TODO: Move this elsewhere...
-% \begin{warn}
-% NumPy arrays are mutable.
-% Therefore, at each iteration, the values of $\x^{(k-1)}$ and $\x^{(k)}$ will need to be stored in two distinct copies.
-% \end{warn}
-
 Your function should be robust enough to accept systems of any size.
 To test your function, use the following function to generate an $n\times n$ matrix $A$ for which the Jacobi method is guaranteed to converge.
-Generate a random $\b$ with \li{np.random.random()}.
 
 \begin{lstlisting}
 def diag_dom(n, num_entries=None):
@@ -248,7 +239,10 @@ def diag_dom(n, num_entries=None):
     return A
 \end{lstlisting}
 
-Also test your function on random $n \times n$ matrices
+Generate a random $\b$ with \li{np.random.random()}.
+Run the iteration, then check that $A\x^{(k)}$ and $\b$ are close using \li{np.allclose()}.
+
+Also test your function on random $n \times n$ matrices.
 If the iteration is non-convergent, the successive approximations will have increasingly large entries.
 
 \label{prob:jacobi}
@@ -282,140 +276,139 @@ If the iteration converges, your plot should resemble the following figure.
 \begin{figure}[H]
     \includegraphics[width=.7\textwidth]{jacobi_convergence.pdf}
 \end{figure}
+
+\label{prob:plot-iterative-convergence}
 \end{problem}
 
 \section*{The Gauss-Seidel Method} % ==========================================
 
-The Gauss-Seidel method is quite similar to the Jacobi method. We will examine
-the same system as before. The main difference between Gauss-Seidel and Jacobi
-is that in Gauss-Seidel, any new information is used immediately. As with Jacobi,
+The Gauss-Seidel method is essentially a slight modification of the Jacobi method.
+The main difference is that in Gauss-Seidel, new information is used immediately.
+Consider the same system as in the previous section.
+\begin{align*}
+\begin{array}{ccccccc}
+  2x_1 &   &      & - & x_3  & = & 3  \\
+  -x_1 & + & 3x_2 & + & 2x_3 & = & 3  \\
+       & + & x_2  & + & 3x_3 & = & -1 \\
+\end{array}
+\end{align*}
 
-$$
-\begin{matrix}
-x^{(1)}_1 & = & \frac{1}{2} ( 3 + x^{(0)}_3)  & = & \frac{1}{2} (3 + 0)     & = & \frac{3}{2} \\
-\end{matrix}
-$$
+As with the Jacobi method, solve for $x_1$ in the first equation, $x_2$ in the second equation, and $x_3$ in the third equation.
+\begin{align*}
+\begin{array}{ccc}
+    x_1 & = & \frac{1}{2}(3 + x_3) \\
+    x_2 & = & \frac{1}{3}(3 + x_1 - 2x_3) \\
+    x_3 & = & \frac{1}{3}(-1 - x_2)
+\end{array}
+\end{align*}
 
-But now, we use this updated value of $x^{(1)}_1$ in our calculation of
-$x^{(1)}_2$ as follows
-$$
-\begin{matrix}
-x^{(1)}_2 & = & \frac{1}{3} ( 3 + x^{(1)}_1 - 2x^{(0)}_3) & = & \frac{1}{3} (3 + \frac{3}{2} - 0) & = & \frac{3}{2} \\
-\end{matrix}
-$$
+Use $\x^{(0)}$ to compute $x^{(1)}_1$ in the first equation.
+\[x^{(1)}_1 = \frac{1}{2}(3 + x^{(0)}_3) = \frac{1}{2}(3 + 0) = \frac{3}{2}\]
 
-We now can use the updated values of $x^{(1)}_1$ and $x^{(1)}_2$ in our
-calculation of $x^{(1)}_3$,
-$$
-\begin{matrix}
-x^{(1)}_3 & = & \frac{1}{3} ( -1 - x^{(1)}_2)       & = & \frac{1}{3} (-1 - \frac{3}{2})    & = & -\frac{5}{6}
-\end{matrix}.
-$$
+Now, however, use the updated value of $x^{(1)}_1$ in the calculation of $x^{(1)}_2$.
+\[x^{(1)}_2 = \frac{1}{3}(3 + x^{(1)}_1 - 2x^{(0)}_3) = \frac{1}{3}(3 + \frac{3}{2} - 0) = \frac{3}{2}\]
 
-This process of using what we have calculated immediately is called
-\emph{forward substitution}. Using forward substitution causes the algorithm to
-converge much faster.
+Likewise, use the updated values of $x^{(1)}_1$ and $x^{(1)}_2$ to calculate $x^{(1)}_3$.
+
+\[x^{(1)}_3 = \frac{1}{3}(-1 - x^{(1)}_2) = \frac{1}{3}(-1 - \frac{3}{2}) = -\frac{5}{6}\]
+
+This process of using calculated information immediately is called \emph{forward substitution}, and causes the algorithm to (generally) converge much faster.
 
 \begin{center}
-    \begin{tabular} {c | c c c}
-        & $x^{(k)}_1$ & $x^{(k)}_2$ & $x^{(k)}_3$ \\
-        \hline
-          $x^{(0)}$ & 0 & 0 & 0 \\
-          %\hline
-          $x^{(1)}$ & 1.5 & 1.5 & -0.833333 \\
-          %\hline
-          $x^{(2)}$ & 1.08333333 & 1.91666667 & -0.97222222 \\
-          $x^{(3)}$ & 1.01388889 & 1.98611111 & -0.99537037 \\
-          $x^{(4)}$ & 1.00231481 & 1.99768519 & -0.9992284 \\
-          \vdots    & \vdots    & \vdots     & \vdots     \\
-          $x^{(11)}$ & 1.00000001 & 1.99999999 & -1 \\
-          $x^{(12)}$ & 1 & 2 & -1 \\
-        \end{tabular}
+\begin{tabular}{c|ccc}
+    & $x^{(k)}_1$ & $x^{(k)}_2$ & $x^{(k)}_3$ \\
+    \hline
+      $x^{(0)}$ & 0 & 0 & 0 \\
+      %\hline
+      $x^{(1)}$ & 1.5 & 1.5 & -0.833333 \\
+      %\hline
+      $x^{(2)}$ & 1.08333333 & 1.91666667 & -0.97222222 \\
+      $x^{(3)}$ & 1.01388889 & 1.98611111 & -0.99537037 \\
+      $x^{(4)}$ & 1.00231481 & 1.99768519 & -0.9992284 \\
+      \vdots    & \vdots    & \vdots     & \vdots     \\
+      $x^{(11)}$ & 1.00000001 & 1.99999999 & -1 \\
+      $x^{(12)}$ & 1 & 2 & -1 \\
+\end{tabular}
 \end{center}
 Notice that Gauss-Seidel converged in less than half as many iterations.
 
-As shown above, Gauss-Seidel updates one element of the solution vector at a time.
-This process is more generally described by the following equation.
+\subsection*{Implementation} % ------------------------------------------------
 
-\begin{equation} \label{eq:gauss_seidel_full}
-x^{(k+1)}_i = \frac{1}{a_{ii}} \left (b_i - \sum_{j < i}a_{ij}x^{(k+1)}_j - \sum_{j > i}a_{ij}x^{(k)}_j \right )
+Because Gauss-Seidel updates only one element of the solution vector at a time, the iteration cannot be summarized by a single matrix equation.
+Instead, the process is most generally described by the following equation.
+
+% This matches the book (Ch. 13), but it may be confusing to the students here.
+% We begin by solving for $\x$ in a slightly different way.
+% \begin{align}
+% \nonumber A\x &= \b\\
+% \nonumber (D + L + U)\x &= \b\\
+% \nonumber (D + L)\x &= -U\x + \b\\
+% \x &= -(D + L)^{-1}(U\x + \b)
+% \label{eq:gauss-seidel-method}
+% \end{align}
+
+\begin{equation} \label{eq:gauss-seidel-full}
+x^{(k+1)}_i = \frac{1}{a_{ii}} \left (b_i - \sum_{j < i}a_{ij}x^{(k)}_j - \sum_{j > i}a_{ij}x^{(k)}_j \right )
 \end{equation}
 
-Notice that the two sums closely resemble an inner product without the
-$i^{\text{th}}$ term. If we update the entries of the vector $\mathbf{x}$ in place,
-this equation can be represented as,
+Let $A_i$ be the $i$th row of $A$.
+The two sums closely resemble the regular vector product of $A_i$ and $\x^{(k)}$ without the $i^{\text{th}}$ term $a_{ii}x^{(k)}_i$.
+This gives a simplification.
+\begin{align}
+\nonumber x^{(k+1)}_i &= \frac{1}{a_{ii}} \left(b_i - A_i\trp\x^{(k)} + a_{ii}x^{(k)}_i \right)\\
+&= x^{(k)}_i + \frac{1}{a_{ii}}\left( b_i - A_i\trp\x^{(k)}\right)
+\label{eq:gauss_seidel}
+\end{align}
 
-$$
-x^{(k+1)}_i = \frac{1}{a_{ii}} \left ( b_i - \left < A_i, \mathbf{x}^{(k)} \right > + a_{ii}x^{(k)}_i \right )
-$$
-where $A_i$ is the $i^{th}$ row of $A$. This can be simplified further to
+Making one sweep through all the entries of $\x$ completes one iteration.
 
-\begin{equation} \label{eq:gauss_seidel}
-x^{(k+1)}_i = x^{(k)}_i + \frac{1}{a_{ii}} \left ( b_i - \left < A_i, \mathbf{x}^{(k)}\right >\right)
-\end{equation}
+\begin{problem} % Implement Gauss-Seidel.
+Write a function that accepts a matrix $A$, a vector $\b$, a convergence tolerance $\epsilon$, a maximum number of iterations $N$, and a keyword argument \li{plot} that defaults to \li{False}.
+Implement the Gauss-Seidel method using Equation \ref{eq:gauss_seidel}, returning the approximate solution to the equation $A\x = \b$.
 
-Making one sweep through all the entries of $x$ completes one iteration. We
-continue this same process until convergence is attained.
+Use the same stopping criterion as in Problem \ref{prob:jacobi}.
+Also keep track of the absolute errors of the iteration, as in Problem \ref{prob:plot-iterative-convergence}.
+If \li{plot} is \li{True}, plot the error against iteration count.
+Use \li{diag_dom()} to generate test cases.
 
-\begin{problem} \label{prob:gauss_seidel}
-Implement the Gauss-Seidel method using Equation \ref{eq:gauss_seidel}. Your
-function should accept a matrix \li{A}, a vector \li{b}, an optional parameter
-\li{tol} that defaults to \li{1e-8} and an optional parameter \li{maxiters} that
-defaults to $100$. Your function should return the solution vector \li{x} as
-well as a list of all the approximations of \li{x} at each iteration. HINT: It is
-easiest to implement this algorithm if you update the approximation vector, $x^{(k)}$, in-place.
-\end{problem}
+\begin{warn}
+Since the Gauss-Seidel algorithm operates on the approximation vector in place (modifying it one entry at a time), the previous approximation $\x^{(k-1)}$ must be stored at the beginning of the $k$th iteration in order to calculate $\|\x^{(k-1)} - \x^{(k)}\|_\infty$.
+Additionally, Since NumPy arrays are mutable, the past iteration must be stored as a \textbf{copy}.
 
-\subsection*{Convergence of Gauss-Seidel} % -----------------------------------
-
-\begin{definition}
-    A matrix $A \in M_n(\mathbb{R})$ is \emph{positive definite} if all its
-    eigenvalues are positive.
-\end{definition}
-
-\begin{theorem}
-    The Gauss-Seidel method converges for a matrix $A$ if it is strictly
-    diagonally dominant or positive definite.
-\end{theorem}
-
-For a treatment on the theory of positive definite matrices, see Chapter ?? of
-Volume 1 of the textbook.
-
-\begin{problem}
-As we have described up to this point in the lab, we can take advantage of the
-sparsity of a linear system by using iterative methods like Jacobi and Gauss-Seidel.
-For this problem, compare the runtimes between your \li{gauss_seidel()} function and
-\li{la.solve()} for a strictly diagonally dominant system of 5000 parameters. Use the following
-code to generate a strictly diagonal dominant matrix:
 \begin{lstlisting}
-def diag_dom(n, num_entries=None):
-    """Generate a strictly diagonally dominant nxn matrix.
-
-    Inputs:
-        n (int) - dimension.
-        vals (list) - range of values for off-diagonal entries.
-        num_entries (int) - number of nonzero values. If None, num_entries
-                    defaults to n^(1.5) - n.
-
-    Returns:
-        A (array) - nxn strictly diagonally dominant matrix.
-    """
-    if num_entries is None:
-        num_entries = int(n**1.5) - n
-    A = np.zeros((n,n))
-    i = np.random.choice(np.arange(0,n), size=num_entries)
-    j = np.random.choice(np.arange(0,n), size=num_entries)
-    data = np.random.randint(-4,4,size=num_entries)
-    for c in xrange(num_entries):
-        A[ i[c], j[c] ] = data[c]
-    for i in xrange(n):
-        A[i,i] = np.sum(np.abs(A[i,:])) + 1
-    return A
+>>> x0 = np.random.random(5)        # Generate a random vector.
+>>> x1 = x0                         # Attempt to make a copy.
+>>> x1[3] = 1000                    # Modify the "copy" in place.
+>>> np.allclose(x0, x1)             # But x0 was also changed!
+True
+# Instead, make a copy of x0 when creating x1.
+>>> x0 = np.copy(x1)                # Make a copy.
+>>> x1[3] = -1000
+>>> np.allclose(x0, x1)
+False
 \end{lstlisting}
-What difference do you see between these two functions? Explain why there is such a big difference.
+% It is good practice in most iterative methods to record a copy of $\x^{(k-1)}$ at the beginning of the $k$th iteration.
+\end{warn}
+
+\label{prob:gauss_seidel}
 \end{problem}
 
-\section*{Sparse Systems} % ===================================================
+\subsection*{Convergence} % ---------------------------------------------------
+
+Whether or not the Gauss-Seidel converges or not also depends on the nature of $A$.
+If all of the eigenvalues of $A$ are positive, $A$ is called \emph{positive definite}.
+If $A$ is positive definite \emph{or} if it is strictly diagonally dominant, then the Gauss-Seidel method converges regardless of the initial guess $\x^{(0)}$.
+
+\section*{Solving Sparse Systems Iteratively} % ===============================
+
+\begin{problem} % Sparse implementation of Gauss Seidel.
+The Gauss-Seidel method is faster than the standard system solver used by \li{la.solve()} if the system is sufficiently large and sufficiently sparse.
+For each vale of $n=5,\ 6,\ \ldots,\ 11$, generate a random $2^n \times 2^n$ matrix $A$ using \li{diag_dom()} and a random $2^n$ vector $\b$.
+Time how long it takes to solve $A\x = \b$ using your Gauss-Seidel function from Problem \ref{prob:gauss_seidel}, and how long it takes to solve using \li{la.solve()}.
+
+Plot the times against the system size.
+Use log scales if appropriate.
+\end{problem}
 
 Some linear systems may have tens of thousands of parameters.
 However, in applications where systems of this size arise, it is also common
@@ -472,12 +465,9 @@ matrix([[0],
 Since the \li{coo_matrix} type allows for fast sparse matrix type conversion, it is usually worth the time and memory to convert to the sparse matrix type that corresponds with the operations you are performing.
 \end{comment}
 
-
 \begin{problem} % Gauss-Seidel with Sparse matrices.
-To be able to use the Gauss-Seidel method on sparse matrices, you must translate
-the code you wrote in Problem \ref{prob:gauss_seidel} from \li{numpy} to \li{scipy.sparse}.
-The algorithm is the same, but there are some functions that are named differently
-between these two packages.
+To be able to use the Gauss-Seidel method on sparse matrices, you must translate the code you wrote in Problem \ref{prob:gauss_seidel} from NumPy to \li{scipy.sparse}.
+The algorithm is the same, but there are some functions that are named differently between these two packages.
 
 Write a new function that accepts a sparse matrix \li{A}, a NumPy array \li{b},
 an optional parameter \li{tol} that defauls to \li{1e-8}, and an optional parameter
@@ -494,28 +484,25 @@ rowend = A.indptr[i+1]
 Aix = np.dot(A.data[rowstart:rowend], x[A.indices[rowstart:rowend]])
 \end{lstlisting}
 
-To test your function, you can create a strictly diagonally dominant matrix with
-the following code. In this code, also note how different types of sparse matrices
-have been used to optimize performance.
+To test your function, use the following function to generate a sparse strictly diagonally dominant matrix.
 
 \begin{lstlisting}
 def spar_diag_dom(n, num_entries=None):
-    """Generate a strictly diagonally dominant sparse nxn matrix.
+    """Generate a sparse strictly diagonally dominant nxn matrix.
 
     Inputs:
-        n (int) - dimension
-        num_entries (int) - number of nonzero values. If None, num_entries
-                    defaults to n^(1.5) - n.
+        n (int): the dimension of the system.
+        num_entries (int): the number of nonzero values. Defaults to n^(3/2)-n.
 
     Returns:
-        A (spar.csr_matrix) - strictly diagonally dominant sparse nxn matrix.
+        A ((n,n) csr_matrix): A sparse nxn strictly diagonally dominant matrix.
     """
-    return spar.csr_matrix(diag_dom(n, num_entries=num_entries))
+    return sparse.csr_matrix(diag_dom(n, num_entries))
 \end{lstlisting}
 
 \end{problem}
 
-\subsection*{Successive Over-Relaxation (SOR)} % ------------------------------------
+\subsection*{Successive Over-Relaxation (SOR)} % ------------------------------
 
 There are some systems that meet the requirements for convergence in the
 Gauss-Seidel method that do not converge very quickly. A slightly altered version
@@ -523,7 +510,7 @@ of the Gauss-Seidel method has been developed that can result in faster converge
 This is achieved by introducting a relaxation factor, $\omega$. This method is
 called Successive Over-Relaxation. In fact, for many slowly converging iterative processes, convergence can be improved by introducing a relaxation factor.
 
-The iterative equation for Gauss-Seidel, Equation \ref{eq:gauss_seidel_full},
+The iterative equation for Gauss-Seidel, Equation \ref{eq:gauss-seidel-full},
 with the introduction of a relaxing factor $\omega$ becomes,
 
 $$
