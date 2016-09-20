@@ -11,14 +11,32 @@ In this lab, we implement three popular iterative methods for solving large syst
 
 % TODO talk about LU-decomposition a bit and why we don't want to use it in this case.
 
+\section*{Iterative Methods} % ================================================
+
+The general idea behind any iterative method is to make an initial guess at the solution to a problem, apply a few easy computations to better approximate the solution, use that approximation as the new initial guess, and repeat until done.
+Throughout this lab, we use the notation $\x^{(k)}$ to denote the $k$th approximation for the solution vector $\x$ and $x^{(k)}_i$ to denote the $i^{th}$ component of $\x^{(k)}$.
+With this notation, every iterative method can be summarized as
+\begin{equation}\x^{(k+1)} = f(\x^{(k)}),\label{eq:iter-summary}\end{equation}
+where $f$ is some function used to approximate the true solution $\x$.
+
+In the best case, the iteration converges to the true solution ($\x^{(k)}\rightarrow\x$).
+In the worst case, the iteration continues forever without approaching the solution.
+Iterative methods therefore require carefully chosen \emph{stopping criteria} to prevent iterating forever.
+The general approach is to continue until the difference between two consecutive approximations is sufficiently small, and to iterate no more than a specific number of times.
+More precisely, choose a very small $\epsilon > 0$ and an integer $N\in\mathbb{N}$, and update the approximation using Equation \ref{eq:iter-summary} until either
+\begin{equation} % Stopping Criteria.
+\|\x^{(k-1)}-\x^{(k)}\| < \epsilon
+\qquad \text{or} \qquad
+k > N.
+\label{stopping-criteria}
+\end{equation}
+
+The choices for $\epsilon$ and $N$ are significant: a ``large'' $\epsilon$ (such as $10^{-6}$) produces a less accurate result than a ``small'' $\epsilon$ (such $10^{-16}$), but demands less computations; a small $N$ (10) also potentially lowers accuracy, but detects and halts non-convergent iterations sooner than with a large $N$ (10,000).
+
 \section*{The Jacobi Method} % ================================================
 
-% TODO: general algorithm box, Iterative Methods section. Easy first problem?
-
-The general idea behind any iterative method is make an initial guess, apply some easy computations to get a closer approximation, and repeat until convergence.
-Throughout this lab, we use the notation $\x^{(k)}$ to denote the $k$th approximation for $\x$ and $x^{(k)}_i$ to denote the $i^{th}$ element of $\x^{(k)}$.
-
-The main idea behind the \emph{Jacobi Method} is simple: solve for each variable in terms of the others, then use the previous values to update each approximation.
+The \emph{Jacobi Method} is a simple but powerful method used for solving certain kinds of large linear systems.
+The main idea is simple: solve for each variable in terms of the others, then use the previous values to update each approximation.
 As a (very small) example, consider the following $3 \times 3$ system.
 \begin{align*}
 \begin{array}{ccccccc}
@@ -39,7 +57,6 @@ Solving the first equation for $x_1$, the second for $x_2$, and the third for $x
 
 Now begin with an initial guess $\x^{(0)} = [x^{(0)}_1, x^{(0)}_2, x^{(0)}_3]\trp = [0,0,0]\trp$.
 To compute the first approximation $\x^{(1)}$, use the entries of $\x^{(0)}$ as the variables on the right side of the previous equation.
-
 \begin{align*}
 \begin{array}{ccccccc}
     x^{(1)}_1 & = & \frac{1}{2}(3 + x^{(0)}_3) & = & \frac{1}{2} (3 + 0) & = & \frac{3}{2} \\
@@ -50,7 +67,6 @@ To compute the first approximation $\x^{(1)}$, use the entries of $\x^{(0)}$ as 
 
 So $\mathbf{x}^{(1)} = [\frac{3}{2}, 1, -\frac{1}{3}]\trp$.
 Computing $\mathbf{x}^{(2)}$ is similar.
-
 \begin{align*}
 \begin{array}{ccccccc}
 x^{(2)}_1 & = & \frac{1}{2} ( 3 + x^{(1)}_3)  & = & \frac{1}{2} (3 - \frac{1}{3})     & = & \frac{4}{3} \\
@@ -59,9 +75,7 @@ x^{(2)}_3 & = & \frac{1}{3} ( -1 - x^{(1)}_2)       & = & \frac{1}{3} (-1 - 1)  
 \end{array}
 \end{align*}
 
-The process is repeated until the difference between two consecutive differences is sufficiently small, or iterating a specific number of times.
-More precisely, we fix $\epsilon > 0$ and $N > 0$, and continue iterating until either \[\|\x^{(k-1)} - \x^{(k)}\| < \epsilon\qquad\text{or}\qquad k > N.\]
-
+The process is repeated until at least one of the two stopping criteria in Equation \ref{stopping-criteria} is met.
 For this particular problem, convergence to 8 decimal places ($\epsilon = 10^{-8}$) is reached in 29 iterations.
 
 \begin{center}
@@ -83,42 +97,31 @@ For this particular problem, convergence to 8 decimal places ($\epsilon = 10^{-8
 
 \subsection*{Matrix Representation} % -----------------------------------------
 
-\begin{comment}
-$$
-\begin{matrix}
-x^{(1)}_1 = ( b_1 - a_{12}x^{(0)}_2 - a_{13}x^{(0)}_3) / a_{11} \\
-x^{(1)}_2 = ( b_1 - a_{21}x^{(0)}_1 - a_{23}x^{(0)}_3) / a_{22} \\
-x^{(1)}_3 = ( b_1 - a_{31}x^{(0)}_1 - a_{32}x^{(0)}_2) / a_{33} \\
-\end{matrix}
-$$
-\end{comment}
-
 The iterative steps performed above can be expressed in matrix form.
 First, decompose $A$ into its diagonal entries, its entries below the diagonal, and its entries above the diagonal, as $A = D + L + U$.
 \begin{align*}
-\begin{array}{cccccc}
-    & D & & L & & U \\
-    A = &
+\begin{array}{ccccc}
     \left[\begin{array}{cccc}
         a_{11} & 0 & \ldots & 0 \\
         0 & a_{22} & \ldots & 0 \\
         \vdots & \vdots & \ddots & \vdots \\
         0 & 0 & \ldots & a_{nn} \\
     \end{array}\right]
-    & + &
+    & &
     \left[\begin{array}{cccc}
     0 & 0 & \ldots & 0 \\
     a_{21} &  0 & \ldots & 0\\
      \vdots & \ddots & \ddots & \vdots \\
     a_{n1} & \ldots & a_{n,n-1} & 0 \\
     \end{array}\right]
-    & + &
-    \begin{bmatrix}
+    & &
+    \left[\begin{array}{cccc}
     0 & a_{12} & \ldots & a_{1n} \\
     0 & 0 & \ddots & \vdots \\
      \vdots & \vdots & \ddots & a_{n-1,n} \\
     0 & 0 & \ldots & 0 \\
-    \end{bmatrix}
+    \end{array}\right]
+    \\D & & L & & U
 \end{array}
 \end{align*}
 
@@ -130,16 +133,11 @@ D\x &= -(L+U)\x + \b\\
 \x &= D^{-1}(-(L+U)\x + \b)
 \end{align*}
 
-The Jacobi method can thus be summarized as follows.
-\begin{equation}
-\x^{(k+1)} = - D^{-1}(L+U)\x^{(k)} + D^{-1}\b
-\label{eq:jacobi-traditional}
-\end{equation}
-
-Since $L+U=A-D$, Equation \ref{eq:jacobi-traditional} can be slightly modified as follows.
+Now using $\x^{(k)}$ as the variables on the right side of the equation to produce $\x^{(k+1)}$ on the left, and noting that $L+U=A-D$, we have the following.
 \begin{align}
 \nonumber \x^{(k+1)} &= D^{-1}(-(A-D)\x^{(k)} + \b) \\
-&= D^{-1}(D\x^{(k)} - A\x^{(k)}  + \b)
+\nonumber &= D^{-1}(D\x^{(k)} - A\x^{(k)}  + \b)\\
+&= \x^{(k)} + D^{-1}(\b - A\x^{(k)})
 \label{eq:jacobi-method}
 \end{align}
 
@@ -155,12 +153,22 @@ D^{-1} =
 \end{array}\right]
 \]
 
-The Jacobi method therefore requires that $A$ have nonzero diagonal entries.
+Because of this, the Jacobi method requires that $A$ have nonzero diagonal entries.
 
-Furthermore, the diagonal $D$ can be represented by a 1-dimensional array $\mathbf{d}$ of the diagonal entries.
+The diagonal $D$ can be represented by the 1-dimensional array $\mathbf{d}$ of the diagonal entries. %(instead of as a 2-dimensional array).
 Then the matrix multiplication $D\x$ is equivalent to the component-wise vector multiplication $\mathbf{d}*\x = \x*\mathbf{d}$.
-Likewise, the matrix multiplication $D^{-1}\x$ is equivalent to the component-wise vector division $\x/\mathbf{d}$
-% Note that this algorithm will not always converge.
+Likewise, the matrix multiplication $D^{-1}\x$ is equivalent to the component-wise ``vector division'' $\x/\mathbf{d}$.
+
+% TODO: this isn't super useful, but we do need to demonstrate "vector division".
+\begin{lstlisting}
+>>> import numpy as np
+
+>>> D = np.array([[2,0],[0,16]])    # Let D be a diagonal matrix.
+>>> d = np.diag(D)                  # Extract the diagonal as a 1-D array.
+>>> x = np.random.random(2)
+>>> np.allclose(D.dot(x), d*x)
+True
+\end{lstlisting}
 
 \begin{comment} % Jacobi algorithm box. Probably unnecessary.
 \begin{algorithm}[H]
@@ -187,30 +195,29 @@ Likewise, the matrix multiplication $D^{-1}\x$ is equivalent to the component-wi
 \end{comment}
 
 \begin{problem} % Implement the Jacobi Method.
-Write a function that accepts a matrix $A$, a vector $\b$, a maximum number of iterations, and a convergence tolerance.
-Implement the Jacobi method using Equation \ref{eq:jacobi-method}.
-Avoid using \li{la.inv()} to calculate $D^{-1}$.
-Return the best approximation \li{x} as well as a list of the approximations of \li{x} at each iteration.
+Write a function that accepts a matrix $A$, a vector $\b$, a convergence tolerance $\epsilon$, and a maximum number of iterations $N$.
+Implement the Jacobi method using Equation \ref{eq:jacobi-method}, returning the approximate solution to the equation $A\x = \b$.
 
-Run the iteration until $\|\mathbf{x}^{(k-1)} - \mathbf{x}^{(k)}\|_{\infty}$ is less than the specified tolerance, or until iterating the maximum number of specified times.
-Use \li{la.norm()} to calculate the vector norm.
+Run the iteration until $\|\mathbf{x}^{(k-1)} - \mathbf{x}^{(k)}\|_{\infty} < \epsilon$, and only iterate at most $N$ times.
+Avoid using \li{la.inv()} to calculate $D^{-1}$, but use \li{la.norm()} to calculate the vector $\infty$-norm $\|\x\|_\infty = \sup{|x_i|}$.
+
 % \footnote{See Chapter 3 of Volume I for a technical definition of this norm.}
 
 \begin{lstlisting}
->>> import numpy as np
 >>> from scipy import linalg as la
 
 >>> x = np.random.random(10)
->>> la.norm(x, <<ord>>=np.inf)
+>>> la.norm(x, <<ord>>=np.inf)          # Use la.norm() for ||x||.
 0.74623726404168045
->>> np.max(np.abs(x))
+>>> np.<<max>>(np.<<abs>>(x))               # Use pure NumPy for ||x||.
 0.74623726404168045
 \end{lstlisting}
 
-\begin{warn}
-NumPy arrays are mutable.
-Therefore, at each iteration, the values of $\x^{(k-1)}$ and $\x^{(k)}$ will need to be stored in two distinct copies.
-\end{warn}
+% TODO: Move this elsewhere...
+% \begin{warn}
+% NumPy arrays are mutable.
+% Therefore, at each iteration, the values of $\x^{(k-1)}$ and $\x^{(k)}$ will need to be stored in two distinct copies.
+% \end{warn}
 
 Your function should be robust enough to accept systems of any size.
 If the iteration is non-convergent, the successive approximations will have increasingly large entries.
@@ -221,22 +228,14 @@ Then test your function on random $3 \times 3$ matrices.
 
 \subsection*{Convergence} % ---------------------------------------------------
 
-% TODO: Rewrite this without formal definitions or theorems.
-
-\begin{definition}
-    A matrix $A \in M_n(\mathbb{R})$ is \emph{strictly diagonally dominant} if
-    $|a_{ii}| > \sum_{j \neq i} |a_{ij}|$ for all $i = 1,2,\hdots,n$.
-\end{definition}
-
-\begin{theorem}
-The Jacobi method converges for a matrix $A$ if it is strictly diagonally
-dominant.
-\end{theorem}
-
+The Jacobi method, like most iterative methods, does not always converge.
+In this case, convergence mostly depends on the nature of the matrix $A$.
+If the entries $a_{ij}$ of $A$ satisfy the property \[|a_{ii}| > \sum_{j \neq i} |a_{ij}|\ \text{for all}\ i = 1,2,\hdots,n,\] then $A$ is called \emph{strictly diagonally dominant}.
+If this is the case, then the Jacobi method always converges, regardless of the initial guess $\x_0$.
 Although this seems like a strong requirement, most real-world linear systems
-are represented by strictly diagonally dominant matrices.
-We will discuss a class of problems that satisfy this condition at the end of
-this lab.
+can be represented by strictly diagonally dominant matrices.
+
+% TODO: discussion on how to check that an iterative method is doing well.
 
 \begin{problem}
 Modify your Jacobi method function in the following ways:
@@ -244,7 +243,7 @@ Modify your Jacobi method function in the following ways:
     \item Add a keyword argument called \li{plot}, defaulting to \li{False}.
     \item Keep track of the absolute error $\|A\mathbf{x}^{(k)} - \mathbf{b}\|_{\infty}$ of the approximation for each value of $k$.
     \item If \li{plot} is \li{True}, produce a lin-log plot the error against iteration count (use \li{plt.semilogy()} instead of \li{plt.plot()}).
-    Return the approximate solution even if \li{plot} is \li{True}.
+    Return the approximate solution $\x$ even if \li{plot} is \li{True}.
 \end{enumerate}
 
 % \begin{figure}
