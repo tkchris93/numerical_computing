@@ -465,7 +465,7 @@ Since the \li{coo_matrix} type allows for fast sparse matrix type conversion, it
 
 % TODO: include plotting convergence?
 \begin{problem} % Gauss-Seidel with Sparse matrices.
-Write a (new) function that accepts a \emph{sparse} matrix $A$, a vector $\b$, a convergence tolerance $\epsilon$, and a maximum number of iterations $N$ (plotting the convergence is not required for this problem).
+Write a new function that accepts a \textbf{sparse} matrix $A$, a vector $\b$, a convergence tolerance $\epsilon$, and a maximum number of iterations $N$ (plotting the convergence is not required for this problem).
 Implement the Gauss-Seidel method using Equation \ref{eq:gauss_seidel}, returning the approximate solution to the equation $A\x = \b$.
 Use the usual stopping criterion.
 
@@ -510,38 +510,62 @@ Write a function that accepts a \emph{sparse} matrix $A$, a vector $\b$, a conve
 Implement Successive Over-Relaxation using Equation \ref{eq:sor}, returning the approximate solution to the equation $A\x = \b$.
 Use the usual stopping criterion.
 \\(Hint: this requires changing only one line of code from the sparse Gauss-Seidel function.)
+\label{prob:sor}
 \end{problem}
 
 \section*{Finite Difference Method} % =========================================
 
-Throughout this lab, we have said there are sparse linear systems that arise in applications that have tens of thousands of parameters. Systems of this size
-often arise in Finite Difference problems. The underlying theory behind such problems will be addressed in Volume 4 of the textbook. We now present one such problem.
-
-\begin{problem}
-A common equation that occurs in both pure and applied mathematics is Laplace's equation.
-
-\[ \frac{\partial^2 u}{\partial x^2}+ \frac{\partial^2 u}{\partial y^2}= 0.\]
-
-We can use Laplace's Equation to model steady-state heat flow. Imagine we have a square metal plate where the top and bottom sides are fixed at 0 degrees Celcius and the left and right sides are fixed at 100 degrees Celcius. We can use Laplace's Equation to approximate the temperature of the interior of the metal plate at any given point.
-
-For this problem we will solve Laplace's equation numerically using a technique called \textit{the finite difference method}.  The derivation of the finite difference method will be saved until the lab on Numerical Differentiation, but the relevant equations will be given here.
-
-The finite difference method can be reduced to solving a sparse system of linear equations. We will describe how to initialize this linear system, but again, all the derivation will be saved for the lab on Numerical Differentiation.
-
-In Figure \ref{fig:application} we have the basic set up of the problem described above. The metal plate being represented is $10 in \times 10 in$. The points $u_{i,j}$ are the discretized grid points we will use to approximate the temperature across the plate.
-
-Then at an interior point of the grid, Laplace's equation can be approximated by
-\begin{equation} \label{eq:laplace}
-\begin{split}
-    \frac{\partial^2 u_{i,j}}{\partial x^2}+ \frac{\partial^2 u_{i,y}}{\partial y^2} \approx \frac{1}{h^2}\left[-4u_{i,j} + u_{i+1,j} + u_{i-1,j} + u_{i,j+1} +  u_{i,j-1}\right]
-\end{split}
+\emph{Laplace's equation} is an important partial differential equation that arises often in both pure and applied mathematics.
+In two dimensions, the equation has the following form.
+\begin{equation}
+\frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2} = f(x,y)
+\label{eq:laplaces-equation}
 \end{equation}
-where $h$ is the distance between gridlines.
 
-Writing Equation \ref{eq:laplace} for the $9$ interior points of the grid in Figure \ref{fig:application}result in a $9 \times 9$ system, $A \mathbf{x} = b$.
+Laplace's equation can be used to model heat flow.
+Consider a square metal plate where the top and bottom sides are fixed at $0^\circ$ Celsius and the left and right sides are fixed at $100^\circ$ Celsius.
+Given these boundary conditions, we want to describe how heat diffuses through the rest of the plate.
+If $f(x,y)=0$, then the solution to Laplace's equation describes the plate when it is in a \emph{steady state}, meaning that the heat at a given part of the plate no longer changes with time.
 
-$$
-\begin{bmatrix}
+It is possible to solve Equation \ref{eq:laplaces-equation} analytically when $f(x,y) = 0$.
+Instead, however, we use a \emph{finite difference method} to solve the problem numerically.
+To begin, we impose a discrete, square grid on the plate (see Figure \ref{fig:itersolve-finite-difference-grid}).
+Denote the points on the grid by $u_{i,j}$.
+Then the interior points of the grid can be numerically approximated as follows:
+\begin{equation}
+\frac{\partial^2 u_{i,j}}{\partial x^2}+ \frac{\partial^2 u_{i,j}}{\partial y^2}
+\approx
+\frac{1}{h^2}\left(-4u_{i,j} + u_{i+1,j} + u_{i-1,j} + u_{i,j+1} +  u_{i,j-1}\right),
+\label{eq:laplace-finite-diff}
+\end{equation}
+where $h$ is the distance between $u_{i,j}$ and $u_{i+1,j}$ (and between $u_{i,j}$ and $u_{i,j+1}$).%
+\footnote{The derivation of Equation \ref{eq:laplace-finite-diff} will be studied in the lab on numerical differentiation.}
+
+\begin{figure}[H]
+    \includegraphics[width=\linewidth]{Grid.pdf}
+    \caption{On the left, an example of a $6\times 6$ grid where the red dots are hot boundary zones and the blue dots are cold boundary zones.
+    On the right, the green dots are the neighbors of the interior black dot that are used to approximate the heat at the black dot.}
+    \label{fig:itersolve-finite-difference-grid}
+\end{figure}
+
+This problem can be formulated as a linear system.
+Suppose the grid has exactly $(n+2)\times (n+2)$ entries.
+Then the interior of the grid is $n\times n$, and can be flattened into an $n^2\times 1$ vector $\u$.
+The entire first row goes first, then the second row, proceeding to the $n^{th}$ row.
+\[\u = \left[u_{1,1},\ u_{1,2},\ \cdots,\ u_{1,n},\ u_{2,1},\ u_{2,2},\ \cdots,\ u_{2,n}\, \ldots,\ u_{n,n}\right]\trp\]
+From Equations \ref{eq:laplaces-equation} and \ref{eq:laplace-finite-diff} with $f(x,y) = 0$, we have the following for an interior point $u_{i,j}$:
+\begin{equation}
+-4u_{i,j} + u_{i+1,j} + u_{i-1,j} + u_{i,j+1} +  u_{i,j-1} = 0.
+\label{eq:hot-plate}
+\end{equation}
+If any of the neighbors to $u_{i,j}$ is a boundary point on the grid, its value is already determined.
+For example, for $u_{3,1}$, the neighbor $u_{3,0} = 100$, so
+\[-4u_{3,1} + u_{4,1} + u_{2,1} + u_{3,2} = -100.\]
+The constants on the right side of the equation become the $n^2\times 1$ vector $\b$.
+
+For example, writing Equation \ref{eq:hot-plate} for the $9$ interior points of the grid in Figure \ref{fig:itersolve-finite-difference-grid} result the a $9 \times 9$ system, $A\u = \b$.
+\begin{align*}
+\left[\begin{array}{ccccccccc}
 -4 & 1  &  0 &  1 &  0 &  0 &  0 &  0 & 0 \\
  1 & -4 &  1 &  0 &  1 &  0 &  0 &  0 & 0 \\
  0 & 1  & -4 &  0 &  0 &  1 &  0 &  0 & 0 \\
@@ -551,63 +575,67 @@ $$
  0 & 0  &  0 &  1 &  0 &  0 & -4 &  1 & 0 \\
  0 & 0  &  0 &  0 &  1 &  0 &  1 & -4 & 1 \\
  0 & 0  &  0 &  0 &  0 &  1 &  0 &  1 & -4 \\
-\end{bmatrix}
-\begin{bmatrix}
-u_{1,1} \\
-u_{1,2} \\
-u_{1,3} \\
-u_{2,1} \\
-u_{2,2} \\
-u_{2,3} \\
-u_{3,1} \\
-u_{3,2} \\
-u_{3,3} \\
-\end{bmatrix}
+\end{array}\right]
+\left[\begin{array}{c}
+u_{1,1} \\ u_{1,2} \\ u_{1,3} \\
+u_{2,1} \\ u_{2,2} \\ u_{2,3} \\
+u_{3,1} \\ u_{3,2} \\ u_{3,3}
+\end{array}\right]
 =
-\begin{bmatrix}
--100 \\
- 0  \\
--100 \\
--100 \\
- 0  \\
--100 \\
--100 \\
- 0  \\
--100 \\
-\end{bmatrix}
-$$
-For any positive integer n, the corresponding system $A \mathbf{x} = b$ can be expressed as,
-$$
-A = \begin{bmatrix}
+\left[\begin{array}{c}
+-100 \\ 0 \\ -100 \\
+-100 \\ 0 \\ -100 \\
+-100 \\ 0 \\ -100
+\end{array}\right]
+\end{align*}
+More generally, for any positive integer $n$, the corresponding system $A \u = \b$ can be expressed as follows.
+\begin{align*}
+A = \left[\begin{array}{ccccc}
 B_1 & I &      &        & \\
 I & B_2 &  I   &        & \\
   & I & \ddots & \ddots & \\
   &   & \ddots & \ddots & I \\
   &   &        &    I   & B_n
-\end{bmatrix}
-$$
-where $B_i$, is an $n \times n$ matrix,
-$$
+\end{array}\right],
+\quad
 B_i = \begin{bmatrix}
 -4 &  1 &      &        & \\
  1 & -4 &  1   &        & \\
    &  1 & \ddots & \ddots & \\
    &    & \ddots & \ddots & 1 \\
    &    &        &    1   & -4
-\end{bmatrix}.
-$$
-So the resulting matrix $A$ ends up being of size $n^2 \times n^2$.
+\end{bmatrix},
+\end{align*}
+where each $B_i$ is $n\times n$.
+All nonzero entries of $\b$ correspond to interior points that touch the left or right boundaries (since the top and bottom boundaries are held constant at $0$).
 
-For the vector $b$, all nonzero entries correspond to interior points that touch the left or right boundaries. The vector $b$ will be $n^2 \times 1$.
+\begin{problem}
+Write a function that accepts an integer $n$ for the number of interior grid points.
+Return the corresponding sparse matrix $A$ and NumPy array $b$.\\
+(Hint: Consider using \li{scipy.sparse.block_diag} and the \li{setdiag()} method of scipy sparse matrices for dynamically creating the matrix $A$.)
+\label{prob:finite-difference-setup}
+\end{problem}
 
-For this problem, do the following:
-\begin{enumerate}
-    \item Write a function \li{finite_difference()} that accepts an integer $n$ for the number of interior gridlines. Your function should return the corresponding sparse matrix $A$ and NumPy array $b$. For example, a value of $n = 3$ should result in the matrix $A$ and vector $b$ described above. HINT: Consider using \li{scipy.sparse.block_diag} and the \li{setdiag()} method of scipy sparse matrices for dynamically creating the matrix $A$.
-    \item To demonstrate how convergence is affected by the value of $\omega$, time your \li{sparse_sor()} function for values of $\omega = [1, 1.05, 1.1, \dots , 1.9, 1.95 ]$. Plot your timings as a function of $\omega$. Generate the system $A \mathbf{x} = b$ using your \li{finite_difference()} function and a value of $n = 20$. Remember that $\omega = 1$ corresponds to the Gauss-Seidel method. How does Gauss-Seidel compare to SOR with the optimal $\omega$?
+\begin{problem}
+To demonstrate how convergence is affected by the value of $\omega$ in SOR, time your function from Problem \ref{prob:sor} with $\omega = 1,\ 1.05,\ 1.1,\ \dots , 1.9, 1.95$ using the $A$ and $\b$ generated by problem \ref{prob:finite-difference-setup} with $n = 20$.
+Plot the times as a function of $\omega$.
+% Remember that $\omega = 1$ corresponds to the Gauss-Seidel method.
+% How does Gauss-Seidel compare to SOR with the optimal $\omega$?
 
-    Note that the matrix $A$ is not strictly diagonally dominant. However, this matrix is positive definite, so the algorithm will converge. Unfortunately, convergence for these kinds of systems require many more iterations. When using the \li{sparse_sor()} function in this problem, set \li{maxiters = 10000} and \li{tol=10**-2}.
-    \item Using \li{plt.pcolormesh}, create a heatmap to visualize your solution. The solution vector you get from your \li{sparse_sor()} function will need to be reshaped to properly visualize the result.
-\end{enumerate}
+Note that the matrix $A$ is not strictly diagonally dominant.
+However, $A$ is positive definite, so the algorithm will converge.
+Unfortunately, convergence for these kinds of systems usually require more iterations than for strictly diagonally dominant systems.
+Therefore, set \li{tol=1e-2} and \li{maxiters = 1000} on the SOR function.
+\end{problem}
+
+\begin{problem}
+Write a function that accepts an integer $n$.
+Use Problem \ref{prob:finite-difference-setup} to generate the corresponding system $A\u = \b$, then solve the system using SciPy's sparse system solver, \li{scipy.sparse.linalg.spsolve()} (\li{spla.spsolve()} from the previous lab).
+Visualize the solution using a heatmap using \li{np.meshgrid()} and \li{plt.pcolormesh()}
+(\li{"seismic"} is a good color map in this case).
+This shows the distribution of heat over the hot plate after it has reached its steady state.
+Note that the solution vector $\u$ must be reshaped to properly visualize the result.
+\end{problem}
 
 \begin{comment}
 The following code generates a heatmap to help you visualize the steady-state heat flow across the interior of the plate:
@@ -616,10 +644,10 @@ The following code generates a heatmap to help you visualize the steady-state he
 from matplotlib import pyplot as plt
 import numpy as np
 
-n = 50
+n = 100
 A,b = finite_difference(n)
-x = sparse_sor(A,b,1.9,maxiters=10000,tol=10**-2)[0]
-U = x.reshape(n,n)
+x = sparse_sor(A,b,1.9,maxiters=10000,tol=10**-2)
+U = x.reshape((n,n))
 x,y = np.linspace(0,10,n), np.linspace(0,10,n)
 X,Y = np.meshgrid(x,y)
 
@@ -628,12 +656,11 @@ plt.show()
 \end{lstlisting}
 \end{comment}
 
- \label{prob:application}
-\end{problem}
-
 %\newpage
 
 %\section*{Additional Material} % =============================================
+
+% END OF LAB ==================================================================
 
 \begin{comment} % Migrated from NumPy lab. vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 \begin{algorithm} % Laplace's equation procedure.

@@ -7,6 +7,7 @@ from scipy import sparse
 from scipy import linalg as la
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from scipy.sparse import linalg as spla
 
 
 # Helper functions
@@ -227,9 +228,8 @@ def sparse_sor(A, b, omega, tol=1e-8, maxiters=100):
 
     return x1
 
-
-# Problem 6
-def finite_difference(n):
+# Problem 7
+def finite_difference_setup(n):
     data = [[-4]*n, [1]*n, [1]*n]
     diags = [0,1,-1]
     subA = sparse.spdiags(data, diags, n, n)
@@ -237,7 +237,7 @@ def finite_difference(n):
     A.setdiag(1, n)
     A.setdiag(1,-n)
 
-    # the vector b is still royally screwed up
+    # CHECK THIS IS RIGHT
     b = np.zeros(n**2)
     left_bound = np.arange(0,n**2, n)
     right_bound = np.arange(n-1, n**2, n)
@@ -245,23 +245,35 @@ def finite_difference(n):
     b[left_bound] = -100
     b[right_bound] = -100
 
-    return A, b
+    return A.tocsr(), b
 
+# Problem 8
 def compare_omega():
     # Find an approximation for the optimal omega
-    n = 20
-    A,b = finite_difference(n)
+    n = 10
+    A,b = finite_difference_setup(n)
     timings = []
-    for o in np.arange(1,2,.05):
+    domain = np.arange(1,2,.05)
+    for o in domain:
         before = time.time()
-        x = sparse_sor(A,b,o,maxiters=10000,tol=10**-2)[0]
+        sparse_sor(A, b, o, tol=1e-2, maxiters=1000)
         after = time.time()
         timings.append(after - before)
-    plt.plot(np.arange(1,2,.05), timings)
+    plt.plot(domain, timings, lw=2) # use log scale?
     plt.show()
 
+# Problem 9
+def hot_plate(n):
+    A,b = finite_difference_setup(n)
+    U = spla.spsolve(A,b).reshape((n,n))
 
-# Testing solutions file.
+    x,y = np.linspace(0,10,n), np.linspace(0,10,n)
+    X,Y = np.meshgrid(x, y)
+    plt.pcolormesh(X, Y, U, cmap='seismic')
+    plt.colorbar()
+    plt.show()
+
+# Testing solutions file ======================================================
 def test_jacobi():
     results = []
     for n in [5, 10, 50, 100]:
@@ -332,6 +344,8 @@ def test_all():
         print "Failed SOR"
         return False
 
+    compare_omega()
+    hot_plate(150)
     print "Passed All Tests!"
     return True
 
