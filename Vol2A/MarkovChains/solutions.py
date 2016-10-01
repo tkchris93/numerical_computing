@@ -12,8 +12,7 @@ def random_markov(n):
     'n' states. This should be stored as an nxn NumPy array.
     """
     transition_matrix = np.random.random((n,n))
-    transition_matrix /= transition_matrix.sum(axis=1)[:,np.newaxis]
-    return transition_matrix
+    return transition_matrix / transition_matrix.sum(axis=0)
 
 
 # Problem 2
@@ -28,18 +27,18 @@ def forecast(days):
         >>> forecast(5)
         [0, 0, 0, 1, 0]
     """
-    transition_matrix = np.array([[.7, .3], [.6, .4]])
+    transition_matrix = np.array([[.7, .6], [.3, .4]])
     current_state = 0
     record = []
     for day in xrange(days):
-        if np.random.random() < transition_matrix[current_state, 1]:
+        if np.random.random() < transition_matrix[1, current_state]:
             current_state = 1       # Transition to cold.
         else:
             current_state = 0       # Transition to hot.
         record.append(current_state)
     return record
-# Roughly 66.7% of the entries should be zeros.
-# Roughly 33.3% of the entries should be ones.
+# 66.6666667% of the entries should be zeros.
+# 33.3333333% of the entries should be ones.
 
 
 # Problem 3
@@ -55,22 +54,21 @@ def four_state_forecast(days):
         >>> four_state_forecast(5)
         [2, 1, 2, 1, 1]
     """
-    transition = np.array([ [.5, .3, .2, 0.],
-                            [.3, .3, .3, .1],
-                            [.1, .3, .4, .2],
-                            [0., .3, .5, .2]    ])
-
+    transition = np.array([ [.5, .3, .1, 0.],
+                            [.3, .3, .3, .3],
+                            [.2, .3, .4, .5],
+                            [0., .1, .2, .2]])
     current_state = 0
     record = []
     for day in xrange(days):
         current_state = np.argmax(
-                    np.random.multinomial(1, transition[current_state]))
+                    np.random.multinomial(1, transition[:,current_state]))
         record.append(current_state)
     return record
-# Roughly 24.6% of the entries should be zeros.
-# Roughly 30.0% of the entries should be ones.
-# Roughly 33.3% of the entries should be twos.
-# Roughly 12.1% of the entries should be threes.
+# 24.655172% of the entries should be zeros.
+# 30.000000% of the entries should be ones.
+# 33.275862% of the entries should be twos.
+# 12.068966% of the entries should be threes.
 
 
 # Problem 4
@@ -107,7 +105,7 @@ class SentenceGenerator(object):
 
     Example:
         >>> yoda = SentenceGenerator("Yoda.txt")
-        >>> print yoda.babble()
+        >>> print(yoda.babble())
         The dark side of loss is a path as one with you.
     """
 
@@ -138,16 +136,16 @@ class SentenceGenerator(object):
                         self.states.append(word)
                 indices = [self.states.index(word) for word in sentence]
 
-                self.chain[0, indices[0]] += 1                 # &tart -> first
+                self.chain[indices[0], 0] += 1                 # &tart -> first
                 for i in xrange(len(indices)-1):
-                    self.chain[indices[i], indices[i+1]] += 1  # middle -> next
-                self.chain[indices[-1], -1] += 1               # last -> $top
+                    self.chain[indices[i+1], indices[i]] += 1  # middle -> next
+                self.chain[-1, indices[-1]] += 1               # last -> $top
 
         self.chain[-1, -1] = 1.
         self.states.append("$top")
 
-        # Make each row sum to 1.
-        self.chain /= self.chain.sum(axis=1)[:,np.newaxis]
+        # Make each column sum to 1.
+        self.chain /= self.chain.sum(axis=0)
 
     def babble(self):
         """Begin at the start sate and use the strategy from
@@ -158,19 +156,18 @@ class SentenceGenerator(object):
         """
         stop = self.num_states - 1
         path = []
-        state = 0
+        state = np.argmax(np.random.multinomial(1, self.chain[:,0]))
 
         # Begin at the start state and end at the stop state.
-        while state != stop:        # Transition to a new state...
-            state = np.argmax(np.random.multinomial(1, self.chain[state]))
-            if state != stop:       # ...and record the corresponding word.
-                path.append(self.states[state])
+        while state != stop:
+            path.append(self.states[state])
+            state = np.argmax(np.random.multinomial(1, self.chain[:,state]))
 
         return " ".join(path)
 
 
 if __name__ == '__main__':
-    analyze_simulation()
-    yoda = SentenceGenerator("Yoda.txt")
-    for i in xrange(5):
+    # analyze_simulation()
+    yoda = SentenceGenerator("yoda.txt")
+    for i in xrange(50):
         print yoda.babble()
