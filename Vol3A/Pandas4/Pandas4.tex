@@ -181,7 +181,7 @@ Hint: to combine two \li{DatetimeIndex} objects, you can use the \li{.union()} m
 \section*{Plotting Time Series}
 The process for plotting a time series is identical to plotting any other Series or DataFrame. For more information and examples, refer back to Lab \ref{lab:pandas2}.
 
-\begin{problem}
+\begin{problem} \label{prob:plot}
 Plot the DJIA dataset that you read in as part of Problem \ref{prob:DJIA}. Label your axes and title the plot.
 \end{problem}
 
@@ -326,11 +326,11 @@ The two main forms of resampling are downsampling (aggregating data into fewer i
 \subsection*{Downsampling}
 When downsampling data, we aggregate our time series data into fewer intervals. Let's futher consider the website traffic examples given above.
 
-Say we have a data set of website traffic indexed by timestamp. Each entry in the dataset contains the IP address of the user and the amount of time the user spent on the website.
+Say we have a data set of website traffic indexed by timestamp. Each entry in the dataset contains the IP address of the user, the time the user entered the website, and the time the user left the website.
 
 If we were interested in having information regarding the average visit duration for any given day, we could downsample the data to a daily timescale. To aggregate the data, we would take the average across all the datapoints for the day.
 
-Instead, if we were interested in the number of visits to the website per week, we could downsample to a weekly timescale. To aggregate the data in this case, we would count up the number of visits in a week.
+Instead, if we were interested in the number of visits to the website per hour, we could downsample to a weekly timescale. To aggregate the data in this case, we would count up the number of visits in a hour.
 
 The task of downsampling is handled using the \li{resample()} method. The parameters we will use are \li{rule}, \li{how}, \li{closed}, and \li{label}. For explanations of these parameters, see Table \ref{table:resample}.
 
@@ -350,15 +350,63 @@ The task of downsampling is handled using the \li{resample()} method. The parame
 \end{table}
 
 \begin{problem}
-Using the ??? dataset, solve the problem described above. Namely, downsample the ??? dataset to show daily average visit duration and downsample the ??? dataset to show total number of visits per week. Your resulting time series should use a \li{PeriodIndex}.
+Using the ``website\_traffic.csv" dataset, solve the problem described above. Namely, downsample the dataset to show daily average visit duration. In a different DataFrame, also downsample the dataset to show total number of visits per hour. Your resulting time series should use a \li{PeriodIndex}.
 \end{problem}
 
 \section*{Basic Time Series Analysis}
 As mentioned in the beginning of this lab, the focus of this lab is not meant to be on Time Series Analysis. However, we would like to address a few very basic methods that are built into pandas.
 
 \subsection*{Shifting}
+DataFrame and Series objects have a \li{shift()} method that allows you to move data up or down relative to the index. When dealing with time series data, we can also shift the DatetimeIndex relative to a time offset. See the following example code for clarification:
 
-(TODO) So it may not seem like a big whoop, but this is super useful for finding changes between indices.
+\begin{lstlisting}
+>>> df = pd.DataFrame(dict(VALUE=np.random.rand(5)),
+                index=pd.date_range("2016-10-7", periods=5, freq='D'))
+>>> df
+               VALUE
+2016-10-07  0.127895
+2016-10-08  0.811226
+2016-10-09  0.656711
+2016-10-10  0.351431
+2016-10-11  0.608767
+
+>>> df.shift(1)
+               VALUE
+2016-10-07       NaN
+2016-10-08  0.127895
+2016-10-09  0.811226
+2016-10-10  0.656711
+2016-10-11  0.351431
+
+>>> df.shift(-2)
+VALUE
+2016-10-07  0.656711
+2016-10-08  0.351431
+2016-10-09  0.608767
+2016-10-10       NaN
+2016-10-11       NaN
+
+>>> df.shift(14, freq="D")
+               VALUE
+2016-10-21  0.127895
+2016-10-22  0.811226
+2016-10-23  0.656711
+2016-10-24  0.351431
+2016-10-25  0.608767
+\end{lstlisting}
+
+Shifting data has a particularly useful application. We can easily gather statistics about changes from one timestamp or period to the next.
+
+\begin{lstlisting}
+# find the changes from one period/timestamp to the next
+>>> df - df.shift(1)
+               VALUE
+2016-10-07       NaN
+2016-10-08  0.683331
+2016-10-09 -0.154516
+2016-10-10 -0.305279
+2016-10-11  0.257336
+\end{lstlisting}
 
 \begin{problem}
 From the Dow Jones Industrial Average dataset referenced in Problem 1, use shifting to find the following information:
@@ -368,9 +416,20 @@ From the Dow Jones Industrial Average dataset referenced in Problem 1, use shift
         \item The month with the largest gain
         \item The month with the largest loss
     \end{itemize}
-Hint: downsample or use groupby to answer the questions regarding months
+Hint: Downsample or use \li{groupby()} to answer the questions regarding months.
 \end{problem}
 
 \subsection*{Rolling Functions and Exponentially-Weighted Functions}
 
-(TODO) Problem. Compare rolling average and exponentially-weighted averages.
+(TODO) Explanation, introduction, comparison, etc.
+
+\begin{problem}
+To your plot from Problem \ref{prob:plot}, add the following to your plot:
+    \begin{itemize}
+        \item Rolling average with window ???
+        \item Rolling average with window ???
+        \item Exponential average with window ???
+        \item Exponential average with window ???
+    \end{itemize}
+Include a legend to your plot to differentiate the different lines.
+\end{problem}
