@@ -76,5 +76,11 @@ class SentenceGenerator(object):
         raise NotImplementedError("Problem 5 Incomplete")
 
     def babble(self):
+        """Begin at the start sate and use the strategy from
+        four_state_forecast() to transition through the Markov chain.
+        Keep track of the path through the chain and the corresponding words.
+        When the stop state is reached, stop transitioning and terminate the
+        sentence. Return the resulting sentence as a single string.
+        """
         raise NotImplementedError("Problem 6 Incomplete")
 

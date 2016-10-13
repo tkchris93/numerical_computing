@@ -40,7 +40,7 @@ def _timeout(seconds):
 
 import numpy as np
 from os import remove as rm
-from solutions import analyze_simulation, SentenceGenerator
+from solutions import SentenceGenerator
 
 def test(student_module):
     """Grade a student's entire solutions file.
@@ -152,11 +152,11 @@ class _testDriver(object):
     def problem1(self, s):
         """Test random_markov(). 5 points."""
         def test_chain(m):
-            for row in m:
-                if not np.allclose(row.sum(), 1.):
+            for column in m.T:
+                if not np.allclose(column.sum(), 1.):
                     self.feedback += "\nInvalid Markov chain."
-                    self.feedback += "\n\tRow doesn't sum to one:\n\t"
-                    self.feedback += str(row)
+                    self.feedback += "\n\tColumn doesn't sum to one:\n\t"
+                    self.feedback += str(column)
                     return 0
             return 1
         points  =   test_chain(s.random_markov(  3))
@@ -182,17 +182,7 @@ class _testDriver(object):
                      "four_state_forecast(n) should return a list of length n")
 
 
-        # analyze_simulation(): 10 points.
-        print("Correct output:")
-        analyze_simulation()
-
-        print("\nStudent output:")
-        x = s.analyze_simulation()
-        if x is not None:
-            print(x)
-
-        points += self._grade(10)
-
+        # TODO: change this test steady_state().
         return points
 
     def problem6(self, s):

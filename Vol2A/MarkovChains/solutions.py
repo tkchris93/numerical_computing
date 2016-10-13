@@ -2,8 +2,7 @@
 """Volume II: Markov Chains. Solutions file."""
 
 import numpy as np
-# from scipy.sparse import lil_matrix
-# from sklearn.preprocessing import normalize
+from scipy import linalg as la
 
 
 # Problem 1
@@ -72,29 +71,34 @@ def four_state_forecast(days):
 
 
 # Problem 4
-# TODO: Turn this problem into an explanation of steady states.
-def analyze_simulation():
-    """Investigate and interpret the results of the simulations in the previous
-    two problems. Specifically, find the average percentage of days that are
-    hot, mild, cold, and freezing in each simulation. Does the starting day
-    alter the results? Print a report of your findings (return nothing).
+def steady_state(A, tol=1e-12, N=40):
+    """Compute the steady state of the transition matrix A.
+
+    Inputs:
+        A ((n,n) ndarray): A column-stochastic transition matrix.
+        tol (float): The convergence tolerance.
+        N (int): The maximum number of iterations to compute.
+
+    Raises:
+        ValueError: if the iteration does not converge within N steps.
+
+    Returns:
+        x ((n,) ndarray): The steady state distribution vector of A.
     """
-    hot1, cold1, hot2, mild, cold2, frozen  = [], [], [], [], [], []
-    for i in xrange(10):
-        f2 = forecast(10000)
-        f4 = four_state_forecast(10000)
-        hot1.append(f2.count(0))
-        cold1.append(f2.count(1))
-        hot2.append(f4.count(0))
-        mild.append(f4.count(1))
-        cold2.append(f4.count(2))
-        frozen.append(f4.count(3))
-    print("2-state forecast Hot days:\t{}%".format(np.mean(hot1)/100.))
-    print("2-state forecast Cold days:\t{}%".format(np.mean(cold1)/100.))
-    print("4-state forecast Hot days:\t{}%".format(np.mean(hot2)/100.))
-    print("4-state forecast Mild days:\t{}%".format(np.mean(mild)/100.))
-    print("4-state forecast Cold days:\t{}%".format(np.mean(cold2)/100.))
-    print("4-state forecast Freezing days:\t{}%".format(np.mean(frozen)/100.))
+    # Generate a random initial state distribution vector.
+    x = np.random.random(A.shape[0])
+    x /= x.sum()
+
+    # Run the iteration until convergence.
+    for i in xrange(N):
+        x1 = np.dot(A, x)
+        if la.norm(x - x1) < tol:
+            print i
+            return x1
+        x = x1
+
+    # Raise an error after N iterations without convergence.
+    raise ValueError("Iteration did not converge")
 
 
 class SentenceGenerator(object):
@@ -109,11 +113,8 @@ class SentenceGenerator(object):
         The dark side of loss is a path as one with you.
     """
 
-    def __init__(self, filename=None):
-        if filename is not None:
-            self._read(filename)
-
-    def _read(self, filename):
+    # Problem 5
+    def __init__(self, filename):
         """Read the specified file and build a transition matrix from its
         contents. You may assume that the file has one complete sentence
         written on each line.
@@ -136,7 +137,7 @@ class SentenceGenerator(object):
                         self.states.append(word)
                 indices = [self.states.index(word) for word in sentence]
 
-                self.chain[indices[0], 0] += 1                 # &tart -> first
+                self.chain[indices[0], 0] += 1                 # $tart -> first
                 for i in xrange(len(indices)-1):
                     self.chain[indices[i+1], indices[i]] += 1  # middle -> next
                 self.chain[-1, indices[-1]] += 1               # last -> $top
@@ -147,6 +148,7 @@ class SentenceGenerator(object):
         # Make each column sum to 1.
         self.chain /= self.chain.sum(axis=0)
 
+    # Problem 6
     def babble(self):
         """Begin at the start sate and use the strategy from
         four_state_forecast() to transition through the Markov chain.
@@ -164,10 +166,3 @@ class SentenceGenerator(object):
             state = np.argmax(np.random.multinomial(1, self.chain[:,state]))
 
         return " ".join(path)
-
-
-if __name__ == '__main__':
-    # analyze_simulation()
-    yoda = SentenceGenerator("yoda.txt")
-    for i in xrange(50):
-        print yoda.babble()

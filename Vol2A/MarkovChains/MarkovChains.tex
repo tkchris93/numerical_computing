@@ -13,12 +13,11 @@ For example, a board game where players move around the board based on die rolls
 Each space represents a state, and a player is said to be in a state if their piece is currently on the corresponding space.
 In this case, the probability of moving from one space to another only depends on the player's current location; where the player was on a previous turn does not affect their current turn.
 
-% A Markov chain is a collection of states, together with the probabilities of moving from one state to another.
 Finite Markov chains have an associated \emph{transition matrix} that stores the information about the transitions between the states in the chain.
 The $(i,j)$th entry of the matrix gives the probability of moving from state $j$ to state $i$.
 Thus each of the columns of the transition matrix must sum to 1.
 
-\begin{info} % Row / column stochasticity
+\begin{info} % Generate random row stochastic transitino matrices.
 A transition matrix where the columns sum to 1 is called \emph{column stochastic} (or \emph{left stochastic}).
 The rows of a \emph{row stochastic} (or \emph{right stochastic}) transition matrix each sum to 1 and the $(i,j)$th entry of the matrix is the probability of moving from state $i$ to state $j$.
 Both representations are common, but in this lab we exclusively use column stochastic transition matrices for consistency.
@@ -53,12 +52,13 @@ The Markov chain described above has the following state diagram.
 Transition matrices for Markov chains are efficiently stored as NumPy arrays.
 Write a function that accepts an integer $n$ and returns the transition matrix for a random Markov chain with $n$ states.
 \\ (Hint: use array broadcasting to avoid looping.)
+\label{prob:random-markov-chain}
 \end{problem}
 
 \subsection*{Simulating State Transitions} % ----------------------------------
 
-% TODO: Use the binomial distribution instead of uniform. (?)
-Since the rows of a transition matrix sum to $1$, the entries of each column partition the interval $[0, 1]$.
+% TODO: USE THE BINOMIAL DISTRIBUTION.
+Since the columns of a transition matrix sum to $1$, the entries of each column partition the interval $[0, 1]$.
 We can thus choose the next state to move to by generating a random number between $0$ and $1$.
 
 Consider again the simple weather model and suppose that today is hot.
@@ -84,10 +84,12 @@ Modify \li{forecast()} so that it accepts an integer parameter \li{days} and run
 Return a list containing the day-by-day weather predictions (0 for hot, 1 for cold).
 Assume the first day is hot, but do not include the data from the first day in the list of predictions.
 The resulting list should therefore have \li{days} entries.
+\label{prob:small-markov-transitions}
 \end{problem}
 
 \subsection*{Larger Chains} % -------------------------------------------------
 
+% TODO: move the explanation of binomial up to the previous section.
 The \li{forecast()} function makes one random draw from a \emph{uniform} distribution to simulate a state change.
 Larger Markov chains require draws from a \emph{multinomial} distribution, a multivariate generalization of the binomial distribution.
 
@@ -106,7 +108,7 @@ array([0, 0, 0, 1, 0, 0])                       # The roll resulted in a 4.
 \end{lstlisting}
 
 \begin{problem} % 4 states chain with multinomial transitioning.
-Let the following be the transition chain for a Markov chain modeling weather with four states: hot, mild, cold, and freezing.
+Let the following matrix be the transition matrix for a Markov chain modeling weather with four states: hot, mild, cold, and freezing.
 
 \begin{align*}
 \begin{blockarray}{ccccc}
@@ -122,17 +124,186 @@ Let the following be the transition chain for a Markov chain modeling weather wi
 Write a new function that accepts an integer parameter and runs the same kind of simulation as \li{forecast()}, but that uses this new four-state transition matrix.
 This time, assume that the first day is mild.
 Return a list containing the day-to-day results (0 for hot, 1 for mild, 2 for cold, and 3 for freezing).
-\label{prob:makov-state-transition}
+\label{prob:markov-larger-chain}
 \end{problem}
 
-% TODO: instead of crappy empirical analysis, teach briefly about steady states and raising the transition matrix to a large power.
-
+\begin{comment} % TODO: instead of empirical analysis, teach briefly about steady states and raising the transition matrix to a large power.
 \begin{problem} % Problem: Analysis of results.
 Write a function that investigates and interprets the results of the simulations in the previous two problems.
 Specifically, find the average percentage of days that are hot, mild, cold, and freezing in each simulation.
 Does changing the starting day alter the results?
 Print a report of your findings.
 \end{problem}
+\end{comment}
+
+\newpage
+
+\section*{General State Distributions} % ======================================
+
+\begin{comment} % The 1-Norm. Might be able to get away without this.
+For an $n\times 1$ vector $\x$ with entries $x_i$ and an $n\times n$ matrix $A$ with entries $a_{ij}$, the \emph{1-norm} is defined as follows.
+\begin{align*}
+\|\x\|_1 = \sum_{i=1}^n|x_i| && \|A\|_1 = \sup_j \sum_{i=1}^n |a_{ij}|
+\end{align*}
+In other words, the $1$-norm for both vectors and matrices is the maximum absolute column sum.
+Then if $A$ is a transition matrix, $\|A\|_1 = 1$, since each of the entries of the matrix are positive and each of the columns sum to $1$ by definition.
+The power method with the 1-norm can be used to find the unique stable steady state distribution of $A$.
+\end{comment}
+
+For a Markov chain with $n$ states, the probability of being in each of the states can be encoded by a single $n \times 1$ vector $\x$, called a \emph{state distribution vector}.
+The entries of $\x$ must be nonnegative and sum to 1.
+Then the $i$th entry $x_i$ of $\x$ is the probability of being in state $i$.
+For example, the state distribution vector $\x = [0.8,\ 0.2]\trp$ corresponding to the 2-state weather model of Problem \ref{prob:small-markov-transitions} indicates that there is a $80\%$ chance that today is hot and a $20\%$ chance that today is cold.
+On the other hand, the vector $\x = [0, 1]\trp$ implies that today is, with $100\%$ certainty, cold.
+
+If $A$ is an $n\times n$ transition matrix for a Markov chain and $\x$ is a state distribution vector, then $A\x$ is also a state distribution vector.
+% To verify this fact, let $a_{ij}$ be the entries of $A$ and $x_i$ the entries of $\x$.
+% The columns of $A$ sum to $1$, so $\sum_{j=1}^n a_{ij} = 1$ for $i = 1,\ 2,\ \ldots,\ n$.
+% In addition, $\sum_{j=1}^n x_j = 1$ since the entries of $\x$ also sum to $1$.
+% From matrix multiplication, the $i$th entry of $A\x$ is given by $\sum_{j=1}^n a_{ij}x_j$, so the sum of the entries of $A\x$ is
+% \[\sum_{i=1}^n\sum_{j=1}^n a_{ij}x_j
+% = \sum_{j=1}^n\left(x_j\left(\sum_{j=1}^n a_{ij}\right)\right)
+% = \sum_{j=1}^n x_j = 1.\]
+In fact, if $\x^{(k)}$ is the state distribution vector corresponding to a certain time $k$, then $\x^{(k+1)} = A\x^{(k)}$ contains the probabilities of being in each state after allowing the system to transition again.
+For the weather model, this means that if there is an $80\%$ chance that it will be hot 5 days from now, written $\x^{(5)} = [0.8,\ 0.2]\trp$, then since
+\[
+\x^{(6)} = A\x^{(5)} =
+\left[\begin{array}{cc}
+0.7 & 0.6 \\
+0.3 & 0.4 \\
+\end{array}\right]
+\left[\begin{array}{c}0.8 \\ 0.2\end{array}\right]
+=
+\left[\begin{array}{c}0.68 \\ 0.32\end{array}\right],
+\]
+there is a $68\%$ chance that 6 days from now will be a hot day.
+
+\subsection*{Convergent Transition Matrices} % --------------------------------
+
+Given an initial state distribution vector $\x^{(0)}$, defining $\x^{(k+1)} = A\x^{(k)}$ yields the following significant relation.
+\[\x^{(k)} = A\x^{(k-1)} = A(A\x^{(k-2)}) = A(A(A\x^{(x-3)})) = \cdots = A^k\x^{(0)}\]
+
+This indicates that the $(i,j)$th entry of $A^k$ is the probability of transition from state $j$ to state $i$ in $k$ steps.
+For the transition matrix of the 2-state weather model, something curious happens to $A^k$ for even small values of $k$.
+\[
+A = \left[\begin{array}{cc}
+0.7 & 0.6 \\
+0.3 & 0.4 \\
+\end{array}\right]
+\quad
+A^2 = \left[\begin{array}{cc}
+0.67 & 0.66 \\
+0.33 & 0.34 \\
+\end{array}\right]
+\quad
+A^3 = \left[\begin{array}{cc}
+0.667 & 0.666 \\
+0.333 & 0.334 \\
+\end{array}\right]
+\]
+As $k\rightarrow\infty$, the entries of $A^k$ converge, written as follows.
+\begin{equation}
+\lim_{k \rightarrow \infty} A^k = \left[\begin{array}{ccc}
+2/3 & 2/3 \\
+1/3 & 1/3 \\
+\end{array}\right].
+\label{eq:markov-steady-transition}
+\end{equation}
+In addition, for any initial state distribution vector $\x^{(0)} = [a,\ b]\trp$, $a + b = 1$,
+\[
+\lim_{k \rightarrow \infty} \x^{(k)} = \lim_{k \rightarrow \infty}A^k\x^{(0)}
+=
+\left[\begin{array}{ccc}
+2/3 & 2/3 \\
+1/3 & 1/3 \\
+\end{array}\right]
+\left[\begin{array}{c}a\\b\end{array}\right]
+=
+\left[\begin{array}{c}2(a+b)/3\\(a+b)/3\end{array}\right]
+=
+\left[\begin{array}{c}2/3\\1/3\end{array}\right].
+\]
+
+Thus as $k\rightarrow\infty$, $\x^{(k)} \rightarrow \x = [2/3,\ 1/3]\trp$, regardless of the initial state distribution $\x^{(0)}$.
+So according to this model, no matter the weather today, the probability that it is hot a week from now is approximately $66.67\%$.
+In fact, approximately 2 out of 3 days in the year should be hot.
+
+\subsection*{Steady State Distributions} % ------------------------------------
+
+The state distribution $\x = [2/3,\ 1/3]\trp$ has another important property.
+\[
+A\x =
+\left[\begin{array}{cc}
+7/10 & 3/5 \\
+3/10 & 2/5 \\
+\end{array}\right]
+\left[\begin{array}{c}2/3 \\ 1/3\end{array}\right]
+=
+\left[\begin{array}{c}14/30 + 3/15 \\ 6/30 + 2/15\end{array}\right]
+=
+\left[\begin{array}{c}2/3 \\ 1/3\end{array}\right]
+= \x.
+\]
+Any $\x$ satisfying $A\x = \x$ is called a \emph{steady state distribution} or a \emph{stable fixed point} of $A$.
+In other words, a steady state distribution is an eigenvector of $A$ with corresponding eigenvalue $\lambda = 1$.
+
+% TODO: Verify this paragraph.
+Every Markov chain has at least one steady state distribution.
+If some power $A^k$ of $A$ has all positive (nonzero) entries, then the steady state distribution is unique.%
+\footnote{This is a consequence of the \emph{Perron-Frobenius theorem}, which is presented in conjunction with spectral calculus in Volume I.}
+In this case, $\lim_{k\rightarrow\infty}A^k$ is the matrix whose columns are all equal to the unique steady state distribution, as in (\ref{eq:markov-steady-transition}).
+Under these circumstances, the steady state distribution $\x$ can be found by iteratively calculating $\x^{(k+1)} = A\x^{(k)}$, as long as the initial vector $\x^{(0)}$ is a state distribution vector.
+
+\begin{warn}
+Though every Markov chain has at least one steady state distribution, the procedure described above fails if $A^k$ fails to converge.
+Consider the following example.
+\[
+A = \left[\begin{array}{ccc}
+0 & 0 & 1 \\
+0 & 1 & 0 \\
+1 & 0 & 0
+\end{array}\right]
+,\quad A^k = \begin{cases}
+A\quad\text{if } k\ \text{is odd}
+\\
+I\quad\text{if } k\ \text{is even}
+\end{cases}
+\]
+In this case as $k\rightarrow\infty$, $A^k$ oscillates between two different matrices.
+
+Furthermore, the steady state distribution is not always unique; the transition matrix defined above, for example, has infinitely many.
+\end{warn}
+
+\begin{problem} % Use the power method (simple) to get the steady state.
+Write a function that accepts an $n\times n$ transition matrix $A$, a convergence tolerance $\epsilon$, and a maximum number of iterations $N$.
+Generate a random state distribution vector $\x^{(0)}$ and calculate $\x^{(k+1)} = A\x^{(k)}$ until $\|\mathbf{x}^{(k-1)} - \mathbf{x}^{(k)}\| < \epsilon$.
+If $k$ exceeds $N$, raise a \li{ValueError} to indicate that $A^k$ does not converge.
+Return the approximate steady state distribution $\x$ of $A$.
+
+To test your function, use Problem \ref{prob:random-markov-chain} to generate a random transition matrix $A$.
+Verify that $A\x = \x$ and that the columns of $A^k$ approach $\x$ as $k\rightarrow\infty$.
+To compute $A^k$, use NumPy's (very efficient) algorithm for computing matrix powers. % (which is not part of \li{scipy.linalg}).
+
+\begin{lstlisting}
+>>> A = np.array([[.7, .6],[.3, .4]])
+>>> np.linalg.matrix_power(A, 10)       # Compute A^10.
+array([[ 0.66666667,  0.66666667],
+       [ 0.33333333,  0.33333333]])
+\end{lstlisting}
+
+Finally, use your function to validate the results of Problems \ref{prob:small-markov-transitions} and \ref{prob:markov-larger-chain}:
+\begin{enumerate}
+    \item Calculate the steady state distributions corresponding to the transition matrices for each simulation.
+    \item Run each simulation for a large number of days and verify that the results match the steady state distribution (for example, check that approximately 2/3 of the days are hot for the smaller weather model).
+\end{enumerate}
+
+\label{prob:markov-power-method}
+\end{problem}
+
+\begin{info}
+Problem \ref{prob:markov-power-method} is a special case of the \emph{power method}, an algorithm for calculating an eigenvector of a matrix corresponding to the eigenvalue of largest magnitude.
+The general version of the power method, together with a discussion of its convergence conditions, will be discussed in another lab.
+\end{info}
 
 \section*{Using Markov Chains to Simulate English} % ==========================
 % TODO: is it okay to make this reference?
@@ -166,7 +337,7 @@ The stop state is called an \emph{absorbing state} because once we reach it, we 
 % Because every state has a possible path to the stop state, this model is called an \emph{absorbing Markov chain}.
 
 After determining the states in the Markov chain, we need to determine the transition probabilities between the states and build the corresponding transition matrix.
-Consider the following small training set as an example.
+Consider the following small training set from Dr. Seuss as an example.
 
 \begin{lstlisting}
 <<I am Sam Sam I am.
@@ -244,7 +415,7 @@ The entire procedure of creating the transition matrix for the Markov chain with
 \State Initialize a list of states, beginning with \li{"\$tart"}.
 \For {each sentence in the training set}
     \State Split the sentence into a list of words.
-    \State Add each \emph{new} word in the sentence to the list of states.
+    \State Add each \textbf{new} word in the sentence to the list of states.
     \State Convert the list of words into a list of indices indicating which row and \par\qquad\enspace column of the transition matrix each word corresponds to.
     \State Add 1 to the entry of the transition matrix corresponding to
     \par\qquad\enspace transitioning from the start state to the first word of the sentence.
@@ -262,17 +433,20 @@ The entire procedure of creating the transition matrix for the Markov chain with
 \label{alg:MarkovSentencesTransitionMatrix}
 \end{algorithm}
 
+\newpage
+
 \begin{problem} % Class that makes a Markov chain from a file.
 Write a class called \li{SentenceGenerator}.
 The constructor should accept a filename (the training set).
-Read the file and build a transition matrix from its contents.
-You may assume that the file has one complete sentence written on each line.
+Read the file and build a transition matrix from its contents as described in Algorithm \ref{alg:MarkovSentencesTransitionMatrix}.
+
+You may assume that the file has one complete sentence written on each line, and your implementation may be either column- or row-stochastic.
 \label{problem:markov-random-sentences-init}
 \end{problem}
 
 \begin{problem} % Create random sentences.
 Add a method to the \li{SentenceGenerator} class called \li{babble()}.
-Begin at the start state and use the strategy from Problem \ref{prob:makov-state-transition} to repeatedly transition through the object's Markov chain.
+Begin at the start state and use the strategy from Problem \ref{prob:markov-larger-chain} to repeatedly transition through the object's Markov chain.
 Keep track of the path through the chain and the corresponding sequence of words.
 When the stop state is reached, stop transitioning to terminate the simulation.
 Return the resulting sentence as a single string.
@@ -280,16 +454,43 @@ Return the resulting sentence as a single string.
 For example, your \li{SentenceGenerator} class should be able to create random sentences that sound somewhat like Yoda speaking.
 
 \begin{lstlisting}
->>> yoda = SentenceGenerator("Yoda.txt")
+>>> yoda = SentenceGenerator("yoda.txt")
 >>> for i in xrange(5):
 ... 	print(yoda.babble())
 ...
-<<
-Impossible to my size, do not!
+<<Impossible to my size, do not!
 For eight hundred years old to enter the dark side of Congress there is.
 But beware of the Wookiees, I have.
 Fear leads to eat as well.
-But agree on this, we must, and find your weapon!>>
+But agree on this, we must, and find your weapon!
+Hear you fear of the Force.
+So certain, are they.
+To his powers.
+The capture of Congress there are.
+Why wish you have for the Force.
+A Jedi must go.
+Fear is upon me by a fight.
+Never his ally in you.
+Or I mean you it appears to answer that strong.
+Hard to let go of a long time have I have.
+Obi-Wan, my choice is.
+Luke, when gone am I, the Force be with him.
+Told you are, no harm.
+Impossible to learn he is.
+Inform the Force, but the dark, path as is ready.
+Twisted by Chancellor Palpatine.
+Quickly and help you Count, this be?
+Unexpected this move by Darth Vader.
+At an end this kind?
+A master and decisively we have.
+Much anger there are, no more, no less.
+What know you Count, this boy's future is.
+Heard from the Force.
+Will he begins?
+But this war.
+So certain, are worse.
+Death is time have the dark place we will be when sensing the way of
+    the Force.>>
 \end{lstlisting}
 
 \label{prob:markov-random-sentences-babble}
@@ -304,7 +505,7 @@ But agree on this, we must, and find your weapon!>>
 The approach in Problems \ref{problem:markov-random-sentences-init} and \ref{prob:markov-random-sentences-babble} begins to fail as the training set grows larger.
 For example, a single Shakespearean play may not be large enough to cause memory problems, but \emph{The Complete Works of William Shakespeare} certainly will.
 
-To accommodate larger data sets, consider use a sparse matrix for the transition matrix in instead of a regular NumPy array. %(use the \li{lil_matrix} from the \li{scipy.sparse} library). % Why lil_matrix?
+To accommodate larger data sets, consider use a sparse matrix for the transition matrix in instead of a regular NumPy array. %(use the \li{lil_matrix} from the \li{scipy.sparse} library). % TODO: Why lil_matrix?
 Ensure that the process still works on small training sets, then proceed to larger training sets.
 How are the resulting sentences different if a very large training set is used instead of a small training set?
 
@@ -344,3 +545,4 @@ For example, \li{nltk.sent_tokenize()} reads a single string and splits it up by
 
 The \li{nltk} module is \textbf{not} part of the Python standard library.
 For instructions on downloading, installing, and using \li{nltk}, visit \url{http://www.nltk.org/}.
+
