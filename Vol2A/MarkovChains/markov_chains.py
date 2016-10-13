@@ -42,11 +42,19 @@ def four_state_forecast(days):
 
 
 # Problem 4
-def analyze_simulation():
-    """Investigate and interpret the results of the simulations in the previous
-    two problems. Specifically, find the average percentage of days that are
-    hot, mild, cold, and freezing in each simulation. Does the starting day
-    alter the results? Print a report of your findings (return nothing).
+def steady_state(A, tol=1e-12, N=40):
+    """Compute the steady state of the transition matrix A.
+
+    Inputs:
+        A ((n,n) ndarray): A column-stochastic transition matrix.
+        tol (float): The convergence tolerance.
+        N (int): The maximum number of iterations to compute.
+
+    Raises:
+        ValueError: if the iteration does not converge within N steps.
+
+    Returns:
+        x ((n,) ndarray): The steady state distribution vector of A.
     """
     raise NotImplementedError("Problem 4 Incomplete")
 
