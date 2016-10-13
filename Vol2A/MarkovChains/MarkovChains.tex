@@ -57,29 +57,35 @@ Write a function that accepts an integer $n$ and returns the transition matrix f
 
 \subsection*{Simulating State Transitions} % ----------------------------------
 
-% TODO: USE THE BINOMIAL DISTRIBUTION.
-Since the columns of a transition matrix sum to $1$, the entries of each column partition the interval $[0, 1]$.
-We can thus choose the next state to move to by generating a random number between $0$ and $1$.
+A single draw from a \emph{binomial distribution} with parameter $p$ indicates the outcome of a single experiment with probability $p$ of success.
+The classic example is a coin flip, where the $p$ is the probability that the coin lands heads side up.
+NumPy's \li{random} module has an efficient tool, \li{binomial()}, for drawing from a binomial distribution.
+
+\begin{lstlisting}
+>>> import numpy as np
+
+# Make a single draw from the binomial distribution with p = .5 (flip a coin).
+>>> np.random.binomial(1, .5)
+0                             # The coin flip resulted in tails.
+\end{lstlisting}
 
 Consider again the simple weather model and suppose that today is hot.
 The column that corresponds to ``hot''in the transition matrix is $[0.7, 0.3]$.
-If we generate a random number and it is smaller than $0.3$, then the simulation indicates that tomorrow will be cold.
-Conversely, if the random number is between $0.3$ and $1$, then the simulation says that tomorrow will be hot.
+To determine whether tomorrow is hot or cold, draw from the binomial distribution with parameter $p = 0.3$.
+If the draw is 1, which has $30\%$ likelihood, then tomorrow is cold.
+If the draw is 0, which has $70\%$ likelihood, then tomorrow is hot.
+The following function implements this idea.
 
 \begin{lstlisting}
-import numpy as np
-
 def forecast():
-	"""Forecast tomorrow's weather given that today is hot."""
-	transition_matrix = np.array([[0.7, 0.6], [0.3, 0.4]])
-	# Sample from the standard uniform distribution to choose a new state.
-	if np.random.random() < transition_matrix[1, 0]:
-		return 1              # Tomorrow will be cold.
-	else:
-		return 0              # Tomorrow will be hot.
+    """Forecast tomorrow's weather given that today is hot."""
+    transition = np.array([[0.7, 0.6], [0.3, 0.4]])
+
+    # Sample from a binomial distribution to choose a new state.
+    return np.binomial(1, transition[1, 0])
 \end{lstlisting}
 
-\begin{problem} % Forecasting over several days.
+\begin{problem} % 2-state chain with binomial transitioning.
 Modify \li{forecast()} so that it accepts an integer parameter \li{days} and runs a simulation of the weather for the number of days given.
 Return a list containing the day-by-day weather predictions (0 for hot, 1 for cold).
 Assume the first day is hot, but do not include the data from the first day in the list of predictions.
@@ -89,25 +95,20 @@ The resulting list should therefore have \li{days} entries.
 
 \subsection*{Larger Chains} % -------------------------------------------------
 
-% TODO: move the explanation of binomial up to the previous section.
-The \li{forecast()} function makes one random draw from a \emph{uniform} distribution to simulate a state change.
-Larger Markov chains require draws from a \emph{multinomial} distribution, a multivariate generalization of the binomial distribution.
-
-A single draw from a binomial distribution with parameter $p$ indicates successes or failure of a single experiment with probability $p$ of success.
-The classic example is a coin flip, where the $p$ is the probability that the coin lands heads side up.
-A single draw from a multinomial distribution with parameters $\left(p_1, p_2, ..., p_n \right)$ indicates which of $n$ outcomes occurs.
-In this case the classic example is a dice roll, with $6$ possible outcomes instead of the $2$ in a coin toss.
+The \li{forecast()} function makes one random draw from a binomial distribution to simulate a state change.
+Larger Markov chains require draws from a \emph{multinomial distribution}, a multivariate generalization of the binomial distribution.
+A single draw from a multinomial distribution with $n$ parameters $(p_1,\ p_2,\ \ldots,\ p_n)$ indicates which of $n$ outcomes occurs.
+In this case the classic example is a dice roll, with $6$ possible outcomes instead of the $2$ possible outcomes of a coin toss.
 
 \begin{lstlisting}
-# To simulate a single dice roll, store the probabilities of each outcome.
 >>> die_probabilities = np.array([1./6, 1./6, 1./6, 1./6, 1./6, 1./6])
 
-# Make a single random draw (roll the die once).
+# Make a single draw from the multinomial distribution (roll a die).
 >>> np.random.multinomial(1, die_probabilities)
-array([0, 0, 0, 1, 0, 0])                       # The roll resulted in a 4.
+array([0, 0, 0, 1, 0, 0])     # The roll resulted in a 4.
 \end{lstlisting}
 
-\begin{problem} % 4 states chain with multinomial transitioning.
+\begin{problem} % 4-state chain with multinomial transitioning.
 Let the following matrix be the transition matrix for a Markov chain modeling weather with four states: hot, mild, cold, and freezing.
 
 \begin{align*}
@@ -126,17 +127,6 @@ This time, assume that the first day is mild.
 Return a list containing the day-to-day results (0 for hot, 1 for mild, 2 for cold, and 3 for freezing).
 \label{prob:markov-larger-chain}
 \end{problem}
-
-\begin{comment} % TODO: instead of empirical analysis, teach briefly about steady states and raising the transition matrix to a large power.
-\begin{problem} % Problem: Analysis of results.
-Write a function that investigates and interprets the results of the simulations in the previous two problems.
-Specifically, find the average percentage of days that are hot, mild, cold, and freezing in each simulation.
-Does changing the starting day alter the results?
-Print a report of your findings.
-\end{problem}
-\end{comment}
-
-\newpage
 
 \section*{General State Distributions} % ======================================
 
@@ -389,7 +379,7 @@ Now divide each column by its sum so that each column sums to 1.
 \begin{align*}
 \begin{blockarray}{cccccccc}
 & \text{\textcolor[rgb]{.3,.6,.1}{\$tart}} & \text{I} & \text{am} & \text{Sam} & & \text{ham.} & \text{\textcolor[rgb]{1,0,0}{\$top}} \\
-\begin{block}{c[ccccccc]} % TODO: turn these into hard brackets?
+\begin{block}{c[ccccccc]}
 \text{\textcolor[rgb]{.3,.6,.1}{\$tart}} & 0 & 0 & 0 & 0 & \ldots & 0 & 0\\
 \text{I}        & 3/4 & 0 & 0 & 2/3 & \ldots & 0 & 0\\
 \text{am}       & 0 & 1/5 & 0 & 0 & \ldots & 0 & 0\\
@@ -450,12 +440,12 @@ Begin at the start state and use the strategy from Problem \ref{prob:markov-larg
 Keep track of the path through the chain and the corresponding sequence of words.
 When the stop state is reached, stop transitioning to terminate the simulation.
 Return the resulting sentence as a single string.
-\newpage
+
 For example, your \li{SentenceGenerator} class should be able to create random sentences that sound somewhat like Yoda speaking.
 
 \begin{lstlisting}
 >>> yoda = SentenceGenerator("yoda.txt")
->>> for i in xrange(5):
+>>> for _ in xrange(25):
 ... 	print(yoda.babble())
 ...
 <<Impossible to my size, do not!
@@ -464,10 +454,6 @@ But beware of the Wookiees, I have.
 Fear leads to eat as well.
 But agree on this, we must, and find your weapon!
 Hear you fear of the Force.
-So certain, are they.
-To his powers.
-The capture of Congress there are.
-Why wish you have for the Force.
 A Jedi must go.
 Fear is upon me by a fight.
 Never his ally in you.
@@ -478,8 +464,6 @@ Luke, when gone am I, the Force be with him.
 Told you are, no harm.
 Impossible to learn he is.
 Inform the Force, but the dark, path as is ready.
-Twisted by Chancellor Palpatine.
-Quickly and help you Count, this be?
 Unexpected this move by Darth Vader.
 At an end this kind?
 A master and decisively we have.
@@ -487,7 +471,6 @@ Much anger there are, no more, no less.
 What know you Count, this boy's future is.
 Heard from the Force.
 Will he begins?
-But this war.
 So certain, are worse.
 Death is time have the dark place we will be when sensing the way of
     the Force.>>

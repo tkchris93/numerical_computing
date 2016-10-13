@@ -26,18 +26,13 @@ def forecast(days):
         >>> forecast(5)
         [0, 0, 0, 1, 0]
     """
-    transition_matrix = np.array([[.7, .6], [.3, .4]])
-    current_state = 0
+    transition = np.array([[.7, .6], [.3, .4]])
+    state = 0
     record = []
     for day in xrange(days):
-        if np.random.random() < transition_matrix[1, current_state]:
-            current_state = 1       # Transition to cold.
-        else:
-            current_state = 0       # Transition to hot.
-        record.append(current_state)
+        state = np.random.binomial(1, transition[1, state])
+        record.append(state)
     return record
-# 66.6666667% of the entries should be zeros.
-# 33.3333333% of the entries should be ones.
 
 
 # Problem 3
@@ -57,17 +52,12 @@ def four_state_forecast(days):
                             [.3, .3, .3, .3],
                             [.2, .3, .4, .5],
                             [0., .1, .2, .2]])
-    current_state = 0
+    state = 0
     record = []
     for day in xrange(days):
-        current_state = np.argmax(
-                    np.random.multinomial(1, transition[:,current_state]))
-        record.append(current_state)
+        state = np.argmax(np.random.multinomial(1, transition[:,state]))
+        record.append(state)
     return record
-# 24.655172% of the entries should be zeros.
-# 30.000000% of the entries should be ones.
-# 33.275862% of the entries should be twos.
-# 12.068966% of the entries should be threes.
 
 
 # Problem 4
@@ -93,11 +83,10 @@ def steady_state(A, tol=1e-12, N=40):
     for i in xrange(N):
         x1 = np.dot(A, x)
         if la.norm(x - x1) < tol:
-            print i
             return x1
         x = x1
 
-    # Raise an error after N iterations without convergence.
+    # Raise an exception after N iterations without convergence.
     raise ValueError("Iteration did not converge")
 
 
