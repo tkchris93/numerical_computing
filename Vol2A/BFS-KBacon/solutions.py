@@ -24,26 +24,20 @@ class Graph(object):
             >>> test = {'A':['D', 'C', 'B'], 'D':['A', 'C'],
             ...         'C':['B', 'A', 'D'], 'B':['A', 'C']}
             >>> print(Graph(test))
-            A: B; C; D
+            A: D; C; B #note this has been edited to remove sorting requirement
+            C: B; A; D
             B: A; C
-            C: A; B; D
             D: A; C
         """
-        out = ""
-        keys = self.dictionary.keys()
-        keys.sort()
         # join() approach
-        for key in keys:
-            out += str(key) + ": "              # add each node
-            values = self.dictionary[key]
-            values.sort()
-            out += "; ".join(values) + "\n"     # add the node's neighborhood
-        return out
+        return "\n".join([]"{}: {}".format(key,'; '.join(self.dictionary[key]))
+                                            for key in self.dictionary.keys()])
         # for loop approach
+        out = ""
         for key in keys:
             out += str(key) + ": "              # add each node
             values = self.dictionary[key]
-            values.sort()
+            #values.sort()
             for value in values:                # add each neighbor
                 out += str(value) + "; "
             out = out.strip("; ") + "\n"        # strip off the last "; "
@@ -199,32 +193,6 @@ def convert_to_networkx(dictionary):
             output.add_edge(key, value)
     return output
 
-
-# Helper function for problem 6
-def parse(filename="movieData.txt"):
-    """Generate an adjacency dictionary where each key is
-    a movie and each value is a list of actors in the movie.
-    """
-
-    # open the file, read it in, and split the text by '\n'
-    movieFile = open(filename, 'r')
-    movieFile = movieFile.read()
-    movieFile = movieFile.split('\n')
-    graph = dict()
-
-    # for each movie in the file,
-    for line in movieFile:
-        # get movie name and list of actors
-        names = line.split('/')
-        movie = names[0]
-        graph[movie] = []
-        # add the actors to the dictionary
-        for actor in names[1:]:
-            graph[movie].append(actor)
-
-    return graph
-
-
 # Problems 6-8: Implement the following class
 class BaconSolver(object):
     """Class for solving the Kevin Bacon problem."""
@@ -235,17 +203,30 @@ class BaconSolver(object):
         file. Store the graph as a class attribute. Also store the collection
         of actors in the file as a class attribute.
         """
-        # Get the adjacency dictionary from the file
-        movie_to_actors = parse(filename)
+        # Open the file, read it in, and split the text by '\n'
+        with open(filename, 'r') as myfile:
+            contents = myfile.read()
+        contents = contents.split('\n')
+        graph = dict()
+
+        # For each movie in the file,
+        for line in contents:
+            # Get movie name and list of actors
+            names = line.split('/')
+            movie = names[0]
+            graph[movie] = []
+            # Add the actors to the dictionary
+            for actor in names[1:]:
+                graph[movie].append(actor)
 
         # Extract the actors from the adjacency dictionary (values)
         self.actors = set()
-        for movie in movie_to_actors:
-            for actor in movie_to_actors[movie]:
+        for movie in graph:
+            for actor in graph[movie]:
                 self.actors.add(actor)
 
         # Convert the adjacency matrix to networkX
-        self.bacon_graph = convert_to_networkx(movie_to_actors)
+        self.bacon_graph = convert_to_networkx(graph)
 
     # Problem 6
     def path_to_bacon(self, start, target="Bacon, Kevin"):
@@ -297,4 +278,3 @@ class BaconSolver(object):
         plt.xlabel(name + " Number")
         plt.ylabel("Actors")
         plt.show()
-
