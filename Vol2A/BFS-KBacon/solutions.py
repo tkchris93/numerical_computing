@@ -24,7 +24,7 @@ class Graph(object):
             >>> test = {'A':['D', 'C', 'B'], 'D':['A', 'C'],
             ...         'C':['B', 'A', 'D'], 'B':['A', 'C']}
             >>> print(Graph(test))
-            A: D; C; B #note this has been edited to remove sorting requirement
+            A: D; C; B
             C: B; A; D
             B: A; C
             D: A; C
@@ -37,7 +37,6 @@ class Graph(object):
         for key in keys:
             out += str(key) + ": "              # add each node
             values = self.dictionary[key]
-            #values.sort()
             for value in values:                # add each neighbor
                 out += str(value) + "; "
             out = out.strip("; ") + "\n"        # strip off the last "; "
