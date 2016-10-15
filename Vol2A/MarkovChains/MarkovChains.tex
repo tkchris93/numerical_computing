@@ -57,21 +57,21 @@ Write a function that accepts an integer $n$ and returns the transition matrix f
 
 \subsection*{Simulating State Transitions} % ----------------------------------
 
-A single draw from a \emph{binomial distribution} with parameter $p$ indicates the outcome of a single experiment with probability $p$ of success.
-The classic example is a coin flip, where the $p$ is the probability that the coin lands heads side up.
+A single draw from a \emph{binomial distribution} with parameters $n$ and $p$ indicates the number of successes out of $n$ independent experiments, each with probability $p$ of success.
+The classic example is a series of coin flips, where $p$ is the probability that the coin lands heads side up.
 NumPy's \li{random} module has an efficient tool, \li{binomial()}, for drawing from a binomial distribution.
 
 \begin{lstlisting}
 >>> import numpy as np
 
-# Make a single draw from the binomial distribution with p = .5 (flip a coin).
+# Draw from the binomial distribution with n = 1 and p = .5 (flip 1 coin).
 >>> np.random.binomial(1, .5)
 0                             # The coin flip resulted in tails.
 \end{lstlisting}
 
 Consider again the simple weather model and suppose that today is hot.
 The column that corresponds to ``hot''in the transition matrix is $[0.7, 0.3]$.
-To determine whether tomorrow is hot or cold, draw from the binomial distribution with parameter $p = 0.3$.
+To determine whether tomorrow is hot or cold, draw from the binomial distribution with $n = 1$ and $p = 0.3$.
 If the draw is 1, which has $30\%$ likelihood, then tomorrow is cold.
 If the draw is 0, which has $70\%$ likelihood, then tomorrow is hot.
 The following function implements this idea.
@@ -97,13 +97,13 @@ The resulting list should therefore have \li{days} entries.
 
 The \li{forecast()} function makes one random draw from a binomial distribution to simulate a state change.
 Larger Markov chains require draws from a \emph{multinomial distribution}, a multivariate generalization of the binomial distribution.
-A single draw from a multinomial distribution with $n$ parameters $(p_1,\ p_2,\ \ldots,\ p_n)$ indicates which of $n$ outcomes occurs.
-In this case the classic example is a dice roll, with $6$ possible outcomes instead of the $2$ possible outcomes of a coin toss.
+A draw from a multinomial distribution parameters $n$ and $(p_1,\ p_2,\ \ldots,\ p_k)$ indicates which of $k$ outcomes occurs in $n$ different experiments.
+In this case the classic example is a series of dice rolls, with $6$ possible outcomes of equal probability.
 
 \begin{lstlisting}
 >>> die_probabilities = np.array([1./6, 1./6, 1./6, 1./6, 1./6, 1./6])
 
-# Make a single draw from the multinomial distribution (roll a die).
+# Draw from the multinomial distribution with n = 1 (roll a single die).
 >>> np.random.multinomial(1, die_probabilities)
 array([0, 0, 0, 1, 0, 0])     # The roll resulted in a 4.
 \end{lstlisting}
@@ -127,6 +127,15 @@ This time, assume that the first day is mild.
 Return a list containing the day-to-day results (0 for hot, 1 for mild, 2 for cold, and 3 for freezing).
 \label{prob:markov-larger-chain}
 \end{problem}
+
+% TODO: Turn this into a Note down below?
+% \begin{info}
+% A single experiment with probability $p$ of success is called a \emph{Bernoulli trial}.
+% In general, the binomial distribution is the sum of $n$ repeated Bernoulli trials.
+% Like the Bernoulli is a special case of the binomial, the \emph{categorical distribution} is a special case of the \emph{multinomial distribution}, when n = 1.
+% NumPy only has direct implementations for the binomial and multinomial distributions, since the Bernoulli and categorical distributions are just special cases of these.
+% \end{info}
+
 
 \section*{General State Distributions} % ======================================
 
@@ -530,7 +539,7 @@ For example, \li{nltk.sent_tokenize()} reads a single string and splits it up in
 
 \begin{lstlisting}
 >>> from nltk import sent_tokenize
->>> with open("Yoda.txt", 'r') as yoda:
+>>> with open("yoda.txt", 'r') as yoda:
 ...     sentences = sent_tokenize(yoda.read())
 ...
 >>> print(sentences)
