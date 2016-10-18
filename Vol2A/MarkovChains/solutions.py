@@ -6,7 +6,7 @@ from scipy import linalg as la
 
 
 # Problem 1
-def random_markov(n):
+def random_chain(n):
     """Create and return a transition matrix for a random Markov chain with
     'n' states. This should be stored as an nxn NumPy array.
     """

@@ -45,9 +45,11 @@ from solutions import SentenceGenerator
 def test(student_module):
     """Grade a student's entire solutions file.
 
-    5  points for problem 1
-    15 points for problems 2-4
-    20 points for problems 5-6
+     5 points for random_chain()
+     5 points for forecast()
+     5 points for four_state_forecast()
+    10 points for steady_state()
+    15 points for the SentenceGenerator class.
 
     Inputs:
         student_module: the imported module for the student's file.
@@ -92,9 +94,11 @@ class _testDriver(object):
                 self.feedback += "\n{}: {}".format(self._errType(e), e)
 
         # Grade each problem.
-        test_one(self.problem1, "Problem 1",     5)
-        test_one(self.problem4, "Problems 2-4", 15)
-        test_one(self.problem6, "Problems 5-6", 20)
+        test_one(self.problem1, "Problem 1",                 5)
+        test_one(self.problem2, "Problem 2",                 5)
+        test_one(self.problem3, "Problem 3",                 5)
+        test_one(self.problem4, "Problem 4",                10)
+        test_one(self.problem6, "SentenceGenerator class",  15)
 
         # Report final score.
         percentage = (100. * self.score) / total
@@ -114,6 +118,11 @@ class _testDriver(object):
     def _errType(error):
         """Get just the name of the exception 'error' in string format."""
         return str(type(error).__name__)
+
+    @staticmethod
+    def random_chain(n):
+        A = np.random.random((n,n))
+        return A / A.sum(axis=0)
 
     def _eqTest(self, correct, student, message):
         """Test to see if 'correct' and 'student' are equal.
@@ -148,9 +157,9 @@ class _testDriver(object):
         return credit
 
     # Problems ----------------------------------------------------------------
-    @_timeout(5)
+    @_timeout(2)
     def problem1(self, s):
-        """Test random_markov(). 5 points."""
+        """Test random_chain(). 5 points."""
         def test_chain(m):
             for column in m.T:
                 if not np.allclose(column.sum(), 1.):
@@ -159,34 +168,67 @@ class _testDriver(object):
                     self.feedback += str(column)
                     return 0
             return 1
-        points  =   test_chain(s.random_markov(  3))
-        points += 2*test_chain(s.random_markov( 10))
-        points += 2*test_chain(s.random_markov(100))
+        points  =   test_chain(s.random_chain(  3))
+        points += 2*test_chain(s.random_chain( 10))
+        points += 2*test_chain(s.random_chain(100))
         return points
 
-    def problem4(self, s):
-        """Test forecast(), four-state-forecast(), and analyze_simulation().
-        15 points.
-        """
-        # forecast(): 2 points.
+    @_timeout(2)
+    def problem2(self, s):
+        """Test forecast(). 5 points."""
+        points = 0
+
+        # Check that forecast() accepts an integer argument.
         try:
             s.forecast(10)
+            points += 2
         except TypeError:
             raise NotImplementedError("Problem 2 Incomplete")
 
-        points  = 2*self._eqTest(10, len(s.forecast(10)),
+        # Check that forecast(n) returns a list of the appropriate length.
+        points += 3*self._eqTest(10, len(s.forecast(10)),
                                 "forecast(n) should return a list of length n")
+        return points
 
-        # four-state-forecast(): 3 points.
-        points += 3*self._eqTest(20, len(s.four_state_forecast(20)),
+    @_timeout(2)
+    def problem3(self, s):
+        """Test four_state_forecast(). 5 points."""
+        def _test_one(n):
+            """Check that four_state_forecast returns a list of length n."""
+            return self._eqTest(n, len(s.four_state_forecast(n)),
                      "four_state_forecast(n) should return a list of length n")
 
+        return _test_one(5) + 2*_test_one(10) + 2*_test_one(100)
 
-        # TODO: change this test steady_state().
+    @_timeout(2)
+    def problem4(self, s):
+        """Test steady_state(). 10 points."""
+
+        # Test that Ax = x.
+        def _test_one(n):
+            """Check that steady_state() actually returns a steady state."""
+            A = self.random_chain(n)
+            x = s.steady_state(A, tol=1e-8, N=50)
+            return self._eqTest(A.dot(x), x, "Ax != x")
+
+        points = 2*_test_one(100) + 3*_test_one(50) + 3*_test_one(20)
+
+        # Provide a matrix that won't converge.
+        A = np.array([[0,0,1],[0,1,0],[1,0,0]])
+        try:
+            s.steady_state(A, tol=1e-14, N=50)
+        except ValueError:
+            points += 2
+        except Exception as e:
+            self.feedback += "\nExpected a ValueError for A =\n{}".format(A)
+            self.feedback += "\n\t(got {} instead)".format(self._errType(e))
+        else:
+            self.feedback += "\nValueError not raised for A =\n{}".format(A)
+
         return points
 
     def problem6(self, s):
-        """Test the SentenceGenerator class. 20 points."""
+        """Test the SentenceGenerator class. 15 points."""
 
         with open("__test1__.txt", 'w') as f:
             f.write("a b c d e f g h i j k l m n o p q r s t u v w x y z")
@@ -206,15 +248,6 @@ class _testDriver(object):
                     "It always protects always trusts\n"
                     "always hopes always perseveres\n"
                     "Love never fails")
-        with open("__test4__.txt", 'w') as f:
-            f.write("the quick brown fox jumped over the lazy dog\n"
-                    "the slow brown snake slithered over the brown patch\n"
-                    "the slow green snake slithered under the green leaves\n"
-                    "the quick green fox doesnt exist since foxes are orange\n"
-                    "the quick orange fox out foxed the fox in disguise\n"
-                    "the sneaky orange duck quacked at the brown fox\n"
-                    "what does the fox say\n"
-                    "what doesnt the fox say")
 
         def test_sentences(filename, num_sentences):
 
@@ -237,9 +270,8 @@ class _testDriver(object):
         points  = test_sentences("test1", 2)
         points += test_sentences("test2", 3)
         points += test_sentences("test3", 5)
-        points += test_sentences("test4", 5)
 
-        for i in xrange(1,5):
+        for i in xrange(1,4):
             rm("__test{}__.txt".format(i))
 
         return points
