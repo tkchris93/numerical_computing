@@ -7,7 +7,6 @@ import scipy.sparse as spar
 from scipy import linalg as la
 from scipy.sparse import linalg as sparla
 import matplotlib.pyplot as plt
-from matplotlib import pyplot as plt
 
 def laplacian(A):
     '''
