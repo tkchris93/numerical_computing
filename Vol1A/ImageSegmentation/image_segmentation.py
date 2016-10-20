@@ -5,6 +5,8 @@
 <Date>
 """
 
+from matplotlib import pyplot as plt
+
 # Problem 1: Implement this function.
 def laplacian(A):
     '''
@@ -34,14 +36,14 @@ def n_components(A,tol=1e-8):
     raise NotImplementedError("Problem 2 Incomplete")
 
 # Problem 3: Implement this function.
-def adjacency(img_brightness, radius = 5.0, sigma_I = .15, sigma_d = 1.7):
+def adjacency(filename="dream.png", radius = 5.0, sigma_I = .02, sigma_d = 3.0):
     '''
     Compute the weighted adjacency matrix for
     the image given the radius. Do all computations with sparse matrices.
     Also, return an array giving the main diagonal of the degree matrix.
 
     Inputs:
-        img_brightness (array): array of brightnesses given by the function getImage()
+        filename (string): filename of the image for which the adjacency matrix will be calculated
         radius (float): maximum distance where the weight isn't 0
         sigma_I (float): some constant to help define the weight
         sigma_d (float): some constant to help define the weight
@@ -53,7 +55,7 @@ def adjacency(img_brightness, radius = 5.0, sigma_I = .15, sigma_d = 1.7):
     raise NotImplementedError("Problem 3 Incomplete")
 
 # Problem 4: Implement this function.
-def segment(img_brightness):
+def segment(filename="dream.png"):
     '''
     Compute and return the two segments of the image as described in the text.
     Compute L, the laplacian matrix. Then compute D^(-1/2)LD^(-1/2),and find
@@ -61,8 +63,7 @@ def segment(img_brightness):
     Use this eigenvector to calculate a mask that will be usedto extract
     the segments of the image.
     Inputs:
-        img_brightness (array): an array of brightnesses given by the function
-            getImage().
+        filename (string): filename of the image to be segmented
     Returns:
         seg1 (array): an array the same size as img_brightness, but with 0's
                 for each pixel not included in the positive
@@ -147,4 +148,3 @@ def displayPosNeg(img_color,pos,neg):
     plt.subplot(133)
     plt.imshow(img_color)
     plt.show()
-

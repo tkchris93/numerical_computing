@@ -132,7 +132,13 @@ def segment(filename="dream.png"):
     Inputs:
         filename -- filename of the image to be segmented
     Returns:
-        Graphs the positively and negatively segmented image, along with the original image.
+        seg1 -- an array the same size as img, but with 0's
+                for each pixel not included in the positive
+                segment (which corresponds to the positive
+                entries of the computed eigenvector)
+        seg2 -- an array the same size as img, but with 0's
+                for each pixel not included in the negative
+                segment.
     '''
     # call the function adjacency to obtain the adjacency matrix W
     # and the degree array D.
@@ -172,9 +178,8 @@ def segment(filename="dream.png"):
     # belonging to the posative segment.
     neg = I*~mask
 
-    # display the segmented images
-    colors = getImage(filename)[0]
-    displayPosNeg(colors, pos, neg)
+    # return the two segments (positive first)
+    return pos, neg
 
 # Helper function used to convert the image into the correct format.
 def getImage(filename='dream.png'):
