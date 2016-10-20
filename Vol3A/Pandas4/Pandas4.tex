@@ -419,17 +419,81 @@ From the Dow Jones Industrial Average dataset referenced in Problem 1, use shift
 Hint: Downsample or use \li{groupby()} to answer the questions regarding months.
 \end{problem}
 
-\subsection*{Rolling Functions and Exponentially-Weighted Functions}
+\subsection*{Rolling Functions and Exponentially-Weighted Moving Functions}
 
-(TODO) Explanation, introduction, comparison, etc.
+In many situations, your data will be noisy. You will often be more interested in general trends. We can accomplish this through \emph{rolling functions} and \emph{exponentally-weighted moving (EWM)} functions.
 
-\begin{problem}
-To your plot from Problem \ref{prob:plot}, add the following to your plot:
+Rolling functions, or intuitively called \emph{moving window functions}, perform some kind of calculation on just a window of data. There are a few rolling functions that come standard with pandas. However, we will only cover a few of these. To visualize the effects these operations have on our time series, we will plot the results.
+
+We first begin by defining the time series we will use throughout the remaining example code.
+\begin{lstlisting}
+# Generate a time series using random walk from a uniform distribution.
+N = 10000
+bias = 0.01
+s = np.zeros(N)
+s[1:] = np.random.uniform(low=-1, high=1, size=N-1) + bias
+s = pd.Series(s, index=pd.date_range("2015-10-20", freq='H', periods=N))
+s = s.cumsum()
+\end{lstlisting}
+
+\subsubsection*{Rolling Functions (Moving Window Functions)}
+One of the most commonly used rolling functions is the rolling average.
+
+\begin{lstlisting}
+s.plot(lw=.3, color='grey', label="Actual")
+s.rolling(window=200).mean().plot(color='r', lw=2, label="Moving Average")
+plt.legend(loc="lower right")
+plt.show()
+\end{lstlisting}
+
+Now let's break apart the syntax. The function call, \li{s.rolling(window=200)} creates a \li{pd.core.rolling.Window} object. You can then call any functions you would traditionally call on a DataFrame. For example, you can call \li{mean(), std(), var(), min(), max(), etc.}. As your intuition would suggest, rather than executing these functions across the whole time series, these functions are executed across each window and then aggregated into a new time series object.
+
+\subsubsection*{Exponentially-Weighted Moving (EWM) Functions}
+Whereas a moving window function gives equal weight to the whole window, an exponentially-weighted moving function gives more weight to the most recent data points.
+
+In the case of a exponentially-weighted moving average (EWMA), each data point is calculated as,
+
+$$
+z_i = \alpha \bar{x}_i + (1 - \alpha)z_{i-1}
+$$
+
+where $z_i$ is the value of the EWMA at time $i$, $\bar{x}_i$ is the average for the $i$-th window, and $\alpha$ is the decay factor that controls the importance of previous data points. Notice that $\alpha=1$ reduces to the rolling average.
+
+More commonly, the decay is expressed as a function of the window size. In fact, the \li{span} for an EWMA is nearly analogous to \li{window} size for a rolling average.
+
+Notice the syntax for EWM functions is very similar to that of rolling functions.
+
+\begin{figure} \label{fig:moving}
+    \includegraphics[width=\textwidth]{moving.png}
+    \caption{Rolling average and EWMA}
+\end{figure}
+
+\begin{lstlisting}
+s.plot(lw=.3, color='grey', label="Actual")
+s.ewm(span=200).mean().plot(color='r', lw=2, label="EWMA")
+plt.legend(loc="lower right")
+plt.show()
+\end{lstlisting}
+
+\begin{problem} \label{prob:averages}
+In this problem, we will explore the differences between rolling functions and EWM functions.
+
+Generate a time series plot with the following information from the DJIA dataset:
     \begin{itemize}
-        \item Rolling average with window ???
-        \item Rolling average with window ???
-        \item Exponential average with window ???
-        \item Exponential average with window ???
+        \item The original data points.
+        \item Rolling average with window 30.
+        \item Rolling average with window 365.
+        \item Exponential average with span 30.
+        \item Exponential average with span 365.
     \end{itemize}
-Include a legend to your plot to differentiate the different lines.
+Include a legend, axis labels, and title. Your plot should look like Figure \ref{fig:averages}.
+\end{problem}
+
+\begin{figure} \label{fig:averages}
+    \includegraphics[width=\textwidth]{dow_averages.png}
+    \caption{Rolling average and EWMA with windows 30 and 365.}
+\end{figure}
+
+\begin{problem} \label{prob:rolling_bound}
+Plot the rolling minimum and rolling maximum values over the DJIA dataset with a window size of 30. This will create a moving bound for all the data that is easy to visualize.
 \end{problem}
