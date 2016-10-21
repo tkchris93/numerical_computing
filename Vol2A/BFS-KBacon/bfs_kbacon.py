@@ -6,7 +6,7 @@
 """
 
 
-# Problems 1-4: Implement the following class
+# Problems 1-3: Implement the following class
 class Graph(object):
     """A graph object, stored as an adjacency dictionary. Each node in the
     graph is a key in the dictionary. The value of each key is a list of the
@@ -22,7 +22,7 @@ class Graph(object):
 
     # Problem 1
     def __str__(self):
-        """String representation: a sorted view of the adjacency dictionary.
+        """String representation: a view of the adjacency dictionary.
 
         Example:
             >>> test = {'A':['B'], 'B':['A', 'C',], 'C':['B']}
@@ -55,7 +55,7 @@ class Graph(object):
         """
         raise NotImplementedError("Problem 2 Incomplete")
 
-    # Problem 3 (Optional)
+    # (Optional)
     def DFS(self, start):
         """Begin at 'start' and perform a depth-first search until all
         nodes in the graph have been visited. Return a list of values,
@@ -70,7 +70,7 @@ class Graph(object):
         """
         raise NotImplementedError("Problem 3 Incomplete")
 
-    # Problem 4
+    # Problem 3
     def shortest_path(self, start, target):
         """Begin at the node containing 'start' and perform a breadth-first
         search until the node containing 'target' is found. Return a list
@@ -95,47 +95,23 @@ class Graph(object):
         raise NotImplementedError("Problem 4 Incomplete")
 
 
-# Problem 5: Write the following function
+# Problem 4: Write the following function
 def convert_to_networkx(dictionary):
     """Convert 'dictionary' to a networkX object and return it."""
     raise NotImplementedError("Problem 5 Incomplete")
 
 
-# Helper function for problem 6
-def parse(filename="movieData.txt"):
-    """Generate an adjacency dictionary where each key is
-    a movie and each value is a list of actors in the movie.
-    """
-
-    # open the file, read it in, and split the text by '\n'
-    with open(filename, 'r') as movieFile:
-        moviesList = movieFile.read().split('\n')
-    graph = dict()
-
-    # for each movie in the file,
-    for movie in moviesList:
-        # get movie name and list of actors
-        names = movie.split('/')
-        title = names[0]
-        graph[title] = []
-        # add the actors to the dictionary
-        for actor in names[1:]:
-            graph[title].append(actor)
-
-    return graph
-
-
-# Problems 6-8: Implement the following class
+# Problems 5-7: Implement the following class
 class BaconSolver(object):
     """Class for solving the Kevin Bacon problem."""
 
-    # Problem 6
+    # Problem 5
     def __init__(self, filename="movieData.txt"):
-        """Initialize the networkX graph and with data from the specified
+        """Initialize the networkX graph with data from the specified
         file. Store the graph as a class attribute. Also store the collection
         of actors in the file as an attribute.
         """
-        raise NotImplementedError("Problem 6 Incomplete")
+        raise NotImplementedError("Problem 5 Incomplete")
 
     # Problem 6
     def path_to_bacon(self, start, target="Bacon, Kevin"):
