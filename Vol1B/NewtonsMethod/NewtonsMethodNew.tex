@@ -61,7 +61,7 @@ We have already computed the root 1 to two digits of accuracy.
 \label{prob:newton_arr}
 \leavevmode
 
-Implement Newton's method with the a function called \li{Newtons_method()} that accepts the following parameters: a function $f$, an initial x-value, the derivative of the function $f$, the number of iterations of Newton's method to perform that defaults to 15, and a tolerance that defaults to $10^{-6}$.  
+Implement Newton's method with a function called \li{Newtons_method()} that accepts the following parameters: a function $f$, an initial x-value, the derivative of the function $f$, the number of iterations of Newton's method to perform that defaults to 15, and a tolerance that defaults to $10^{-6}$.  
 The function  returns when the difference between successive approximations is less than the tolerance or the max number of iterations has been reached.
 \end{problem}
 
@@ -113,7 +113,7 @@ This also means that you will have to use your own \li{jacobian} function.
 \end{comment}
 
 \section*{Backtracking}
-There are times when Newton's method may not converge due to the fact that the step from $x_n$ to $x_{n+1}$ was too large and the zero was stepped over completely.  This was seen in Problem \ref{prob:functions} when using $x_0 = .01$ to find the zero of $f(x)=x^{1/3}$. In that example, Newton's method did not converge since it stepped over the zero of the function, produced $x_1 = -.02$ and each iteration got increasingly more negative.  To combat this problem of overstepping, backtracking is a useful tool.  Backtracking is simply taking a fraction of the full step from $x_n$ to $x_{n+1}$.  Define Newton's Method with the recursive sequence:
+There are times when Newton's method may not converge due to the fact that the step from $x_n$ to $x_{n+1}$ was too large and the zero was stepped over completely.  This was seen in Problem \ref{prob:functions} when using $x_0 = .01$ to find the zero of $f(x)=x^{1/3}$. In that example, Newton's method did not converge since it stepped over the zero of the function, produced $x_1 = -.02$, and each iteration got increasingly more negative.  To combat this problem of overstepping, backtracking is a useful tool.  Backtracking is simply taking a fraction of the full step from $x_n$ to $x_{n+1}$.  Define Newton's Method with the recursive sequence:
 \[
 x_{n+1} = x_n - \alpha\frac{f(x_n)}{f'(x_n)}
 \]
@@ -155,7 +155,7 @@ Hint: use starting values within the rectangle
 \[
 {(x, y) : -.25 \leqslant x \leqslant .25, -.25 \leqslant y \leqslant .25}.
 \]
-(Adapted from problem 5.19 of M. T. Heath, Scientific Computing, an Introductory Survey, 2nd edition, McGraw?Hill, 2002 and the Notes of Homer Walker)
+(Adapted from problem 5.19 of M. T. Heath, Scientific Computing, an Introductory Survey, 2nd edition, McGraw-Hill, 2002 and the Notes of Homer Walker)
 \end{enumerate}
 \end{problem}
 
