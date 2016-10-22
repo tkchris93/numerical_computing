@@ -37,7 +37,7 @@
 
    \path[draw] (0) edge node [left] {3} (1);
    \path[draw] (2) edge node [left] {1} (3);
-   \path[draw] (4) edge node{-1} (5);
+   \path[draw] (4) edge node{1} (5);
    \path[draw] (3) edge node{2} (4);
    \path[draw] (3) edge node [below]{.5} (5);
 \end{tikzpicture}
@@ -122,8 +122,8 @@ A_1 = \begin{pmatrix}
 3 & 0 & 0 & 0 & 0 & 0\\
 0 & 0 & 0 & 1 & 0 & 0\\
 0 & 0 & 1 & 0 & 2 & .5\\
-0 & 0 & 0 & 2 & 0 & -1\\
-0 & 0 & 0 & .5 & -1 & 0
+0 & 0 & 0 & 2 & 0 & 1\\
+0 & 0 & 0 & .5 & 1 & 0
 \end{pmatrix}.
 \]
 Notice that these adjacency matrices are symmetric. This will always be the case for undirected graphs.
@@ -210,8 +210,8 @@ D_1 = \begin{pmatrix}
 0 & 3 & 0 & 0 & 0 & 0\\
 0 & 0 & 1 & 0 & 0 & 0\\
 0 & 0 & 0 & 3.5 & 0 & 0\\
-0 & 0 & 0 & 0 & 1 & 0\\
-0 & 0 & 0 & 0 & 0 & -.5
+0 & 0 & 0 & 0 & 3 & 0\\
+0 & 0 & 0 & 0 & 0 & 1.5
 \end{pmatrix}
 \]
 
@@ -242,8 +242,8 @@ L_1 = \begin{pmatrix}
 -3 & 3 & 0 & 0 & 0 & 0\\
 0 & 0 & 1 & -1 & 0 & 0\\
 0 & 0 & -1 & 3.5 & -2 & -.5\\
-0 & 0 & 0 & -2 & 1 & 1\\
-0 & 0 & 0 &- .5 & 1 & -.5
+0 & 0 & 0 & -2 & 3 & -1\\
+0 & 0 & 0 &- .5 & -1 & 1.5
 \end{pmatrix}
 \]
 
@@ -255,7 +255,7 @@ While the Laplacian matrix seems simple, we can learn surprising things from its
 Write a function that accepts the adjacency matrix of a graph as an argument and returns the Laplacian matrix. 
 Test your function on the graphs in Figures \ref{fig:example_graph} and \ref{fig:example_graph2}.
 
-Hint: You can compute the diagonal of the degree matrix in one line by summing over an axis (see Lab \ref{lab:NumpyIntro}).
+Hint: You can compute the diagonal of the degree matrix in one line by summing over an axis (see Lab 2 and NumPy Visual Guide).
 \label{prob:laplacian}
 \end{problem}
 
@@ -294,7 +294,7 @@ In other words, for each connected component, 0 appears at least once as an eige
 In fact, it can be rigorously proven that the number of zero eigenvalues of the Laplacian exactly \textit{equals} the number of connected components. 
 If we can solve for the eigenvalues of $L$, this makes it simple to calculate how many connected components are in the graph.
 
-$L$ is always a positive semi-definite matrix, so all of its eigenvalues are greater than or equal to 0.
+$L$ is always a positive semi-definite matrix when all weights in the graph are positive, so all of its eigenvalues are greater than or equal to 0.
 The second smallest eigenvalue of $L$ is known as the \textit{algebraic connectivity} of the graph.
 It is clearly 0 for non-connected graphs.
 For connected graphs, the algebraic connectivity can give us useful information about the sparsity or ``connectedness'' of a graph.
@@ -540,7 +540,7 @@ This section will discuss how to implement this efficiently in Python.
 
 First, load an image and convert it to grayscale. 
 The included function \li{getImage} helps handle color images.
-It accepts a filename and returns a 2-D grayscale image.
+It accepts a filename and returns a 3-D representation of the image and a 2-D representation of the brightness values of the image.
 
 It will be useful to flatten the $M \times N$ image.
 This converts it into a 1-D array of pixels of length $MN$, essentially giving each pixel an index. 
