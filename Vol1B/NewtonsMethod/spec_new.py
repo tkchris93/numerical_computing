@@ -25,8 +25,8 @@ def Newtons_method(f, x0, Df, iters=15, tol=.1e-5):
 # Problem 2.1: Implement this function.
 def problemTwoOne():
     '''
-    Plot f(x) = sin(x)/x - x on [-4,4].  Return the zero of this function to
-    7 digits of accuracy.
+    Plot f(x) = sin(x)/x - x on [-4,4].  
+    Return the zero of this function to 7 digits of accuracy.
     '''
     raise NotImplementedError("Problem 2.1 Incomplete")
 
@@ -42,14 +42,15 @@ def problemTwoTwo():
 def problemThree():
     '''
     Given P1[(1+r)**N1-1]=P2[1-(1+r)**(-N2)], if N1 = 30, N2 = 20, P1 = 2000, and P2 = 8000, use Newton's method to determine r.  
-    Return r
+    Return r.
     '''
     raise NotImplementedError("Problem 3 Incomplete")
 
 # Problem 4: Modify Newtons_method and implement this function
 def problemFour():
     '''
-    Find an alpha < 1 so that running Newtons_method() on f(x) = x**(1/3) with x0 = .01 converges. Return the results of Newtons_method().
+    Find an alpha < 1 so that running Newtons_method() on f(x) = x**(1/3) with x0 = .01 converges. 
+    Return the results of Newtons_method().
     '''
     raise NotImplementedError("Problem 4 Incomplete")
     
