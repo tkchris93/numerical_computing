@@ -26,6 +26,7 @@
 *.vrb
 *.bcf
 *.xml
+*.fls
 
 ######################
 # OS generated files #

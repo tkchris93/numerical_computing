@@ -18,3 +18,4 @@ Email: acme@math.byu.edu
 
 This project is funded in part by the National Science Foundation, grant no. TUES Phase II DUE-1323785.
 
+Build Instructions: Each volume can be built separately using, for example, latexmk -pdf Vol1.tex
