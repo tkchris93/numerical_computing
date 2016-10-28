@@ -231,20 +231,35 @@ NetworkX is a Python package for creating, manipulating, and exploring large gra
 It contains a graph object constructor as well as methods for adding nodes and edges to the graph.
 It also has methods for recovering information about the graph and its structure.
 
+A node can be an int, a string, or a Python object, and an edge can be weighted or unweighted. 
+There are several ways to add nodes and edges to the graph, some of which are listed below.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{r|l}
+    Function & Description\\ 
+    \hline
+    \li{add_node()} & Add a single node to the graph.\\
+    \li{add_nodes_from()} & Add a list of nodes to the graph.\\
+    \li{add_edge()} & Add an edge between two nodes.\\
+    \li{add_edges_from()} & Add a list of edges to the graph.
+\end{tabular}
+\end{table}
+
 \begin{lstlisting}
 # Create a new graph object using networkX
 >>> import networkx as nx
 >>> nx_graph = nx.Graph()
 
-# There are several ways to add nodes and edges to the graph.
-# One is to use the add_edge method, which creates new edge
-# and node objects as needed, ignoring duplicates
+>>> nx_graph.add_node('A')
+>>> nx_graph.add_node('B')
 >>> nx_graph.add_edge('A', 'B')
->>> nx_graph.add_edge('A', 'C')
->>> nx_graph.add_edge('A', 'D')
->>> nx_graph.add_edge('A', 'E')
->>> nx_graph.add_edge('B', 'C')
->>> nx_graph.add_edge('C', 'D')
+>>> nx_graph.add_edge('A', 'C') # Node 'C' is added to the graph
+>>> nx_graph.add_edges_from([('A', 'D'), ('A', 'E'), ('B', 'C')])
+
+# We can also add weighted edges to the graph
+>>> nx_graph.add_edge('C', 'D', weight=0.5)
+
 # Nodes and edges are easy to access
 >>> print(nx_graph.nodes())
 ['A', 'C', 'B', 'E', 'D']
@@ -252,10 +267,8 @@ It also has methods for recovering information about the graph and its structure
 >>> print(nx_graph.edges())
 [('A', 'C'), ('A', 'B'), ('A', 'E'), ('A', 'D'), ('C', 'B'), ('C', 'D')]
 
-# NetworkX also has its own shortest_path method, implemented
-# with a bidirectional BFS (starting from both ends)
->>> nx.shortest_path(nx_graph, 'C', 'E')
-['C', 'A', 'E']
+>>> print(nx_graph.get_edge_data('C', 'D'))
+{'weight': 0.5}
 
 # With small graphs, we can visualize the graph with nx.draw()
 >>> from matplotlib import pyplot as plt
@@ -263,7 +276,7 @@ It also has methods for recovering information about the graph and its structure
 >>> plt.show()
 \end{lstlisting}
 
-% Problem 5: Intro to NetworkX
+% Problem 4: Intro to NetworkX
 \begin{problem}
 Write a function that accepts an adjacency dictionary.
 Create a \li{networkx} object, load it with the graph information from the dictionary, and return it.
@@ -277,7 +290,7 @@ For example, Samuel L. Jackson was in the film \emph{Captain America: The First 
 Thus Samuel L. Jackson has a ``Bacon number'' of 2.
 Any actors who have been in a movie with Kevin Bacon have a Bacon number of 1.
 
-% Problem 6: BaconSolver constructor and shortest path
+% Problem 5: BaconSolver constructor and shortest path
 \begin{problem}
 Write a \li{BaconSolver} class to solve the Kevin Bacon problem.
 
@@ -298,6 +311,33 @@ Because of the size of the dataset, \textbf{do not} attempt to visualize the gra
 The visualization tool in NetworkX is only effective on relatively small graphs.
 In fact, graph visualization in general remains a challenging and ongoing area of research.
 \end{warn}
+
+NetworkX is equipped with a variety of methods to aid in the analysis of graphs.
+A selected few are listed below.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{r|l}
+    Function & Description\\
+    \hline
+    \li{adjacency_matrix()} & Returns the adjacency matrix as a SciPy sparse matrix.\\
+    \li{dijkstra_path()} & Returns the shortest path from a source to a target in a weighted graph.\\
+    \li{has_path()} & Returns True if the graph has a path from a source to a target.\\
+    \li{prim_mst()} & Returns a minimum spanning tree for a weighted graph.\\
+    \li{shortest_path()} & Returns the shortest path from a source to a target.
+\end{tabular}
+\end{table}
+    
+\begin{lstlisting}
+# Verify nx_graph has a path from 'C' to 'E'
+>>> nx.has_path(nx_graph, 'C', 'E')
+True
+
+# The shortest_path method is implemented with a
+# bidirectional BFS (starting from both ends)
+>>> nx.shortest_path(nx_graph, 'C', 'E')
+['C', 'A', 'E']
+\end{lstlisting}
 
 \begin{problem}
 Use NetworkX to implement the \li{path_to_bacon()} method.
