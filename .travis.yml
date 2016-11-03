@@ -12,13 +12,8 @@ before_install:
 install:
   - git clone https://github.com/scottkosty/install-tl-ubuntu.git
   - cp ./.nmc.profile install-tl-ubuntu/
-  - pwd
-  - ls -a
   - cd install-tl-ubuntu
-  - pwd
-  - ls -a
-  - ls -a ../
-  - sudo ./install-tl-ubuntu -profile ../.nmc.profile
+  - sudo ./install-tl-ubuntu -profile /home/travis/build/Foundations-of-Applied-Mathematics/Lab-Development/install-tl-ubuntu/.nmc.profile
   - cd ..
   - sudo /opt/texbin/texhash
 
