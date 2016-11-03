@@ -10,12 +10,10 @@ before_install:
   - python travis_pre.py
 
 install:
-  - pwd
-  - ls -l ./.nmc.profile
   - git clone https://github.com/scottkosty/install-tl-ubuntu.git
   - cp ./.nmc.profile install-tl-ubuntu/
   - cd install-tl-ubuntu
-  - sudo ./install-tl-ubuntu -profile ./.nmc.profile
+  - sudo ./install-tl-ubuntu -profile /home/travis/build/Foundations-of-Applied-Mathematics/Lab-Development/.nmc.profile
   - cd ..
   - sudo /opt/texbin/texhash
 
