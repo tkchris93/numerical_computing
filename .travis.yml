@@ -11,11 +11,13 @@ before_install:
 
 install:
   - git clone https://github.com/scottkosty/install-tl-ubuntu.git
-  - cp ./.nmc.profile install-tl-ubuntu/
+  # - cp ./.nmc.profile install-tl-ubuntu/
+  - pwd
+  - ls
   - cd install-tl-ubuntu
   - pwd
   - ls
-  - sudo ./install-tl-ubuntu -profile $(pwd)/.nmc.profile
+  - sudo ./install-tl-ubuntu -profile ../.nmc.profile
   - cd ..
   - sudo /opt/texbin/texhash
 
