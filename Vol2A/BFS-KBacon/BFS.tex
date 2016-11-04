@@ -303,6 +303,7 @@ Implement the constructor of \li{BaconSolver}.
 Accept a filename to pull data from and generate a dictionary where each key is a movie title and each value is a list of the actors that appeared in the movie.
 Store the collection of values in the dictionary (the actors) as a class attribute, avoiding duplicates.
 Convert the dictionary to a NetworkX graph and store it as another class attribute.
+Note that in the graph, actors only have movies as neighbors, and movies only have actors as neighbors.
 \\(Hint: recall the \li{split()} method for strings.)
 \end{problem}
 
@@ -311,6 +312,25 @@ Because of the size of the dataset, \textbf{do not} attempt to visualize the gra
 The visualization tool in NetworkX is only effective on relatively small graphs.
 In fact, graph visualization in general remains a challenging and ongoing area of research.
 \end{warn}
+
+\begin{figure}
+\centering
+\begin{tikzpicture} [mindmap,every node/.style=concept,concept color=green!60!black,grow cyclic,level 1/.append style={level distance=4cm,sibling angle=90},level 2/.append style={level distance=3cm,sibling angle=45}]
+
+\begin{scope}[text=white]
+\node [root concept,scale=.8] {`Bacon, Kevin'}[clockwise from=-5] 
+	child [concept color=black!70, text=white] {node {Movie} 
+		child [concept color=green!60!black, text=white] {node {Actor}}
+		child [concept color=green!60!black, text=white] {node {Actor}} }
+	child [concept color=black!70, text=white] {node {Movie} 
+		child [concept color=green!60!black, text=white] {node {Actor}} }
+	child [concept color=black!70, text=white] {node {Movie}} ;
+\end{scope} 
+
+\end{tikzpicture}
+\caption{A small subgraph demonstrating the structure of the bacon graph.}
+\label{fig:bacon_graph}
+\end{figure}
 
 NetworkX is equipped with a variety of methods to aid in the analysis of graphs.
 A selected few are listed below.
@@ -395,3 +415,5 @@ Consider adding a \li{plot_bacon()} method in the \li{BaconSolver} class that pr
 % \label{fig:bacon_numbers}
 % \end{figure}
 % \end{problem}
+
+
