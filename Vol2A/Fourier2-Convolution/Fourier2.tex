@@ -104,8 +104,8 @@ This ``mixing'' is better referred to as \emph{convolution}. With the impulse re
 Since audio needs to be sampled frequently (44100 samples per second is standard) to create smooth playback, a recording of a song can contain tens of millions of samples (one minutes at 44100 samples per second gives $2646000$ samples).
 Each of these samples needs to be combined with the impulse response, which may be several seconds long.
 This may be starting to seem computationally infeasible or at least very difficult, but surprisingly, it is not.
-The key is to recognize that this process can be described as a convolution: namely, the final sound is simply the convolution of the our original sound with the impulse response, or in other words, the original sound with the echoes of the prexious $n$ samples,
-where $n$ is the number of samples in the impulse response.
+The key is to recognize that this process can be described as a convolution: namely, the final sound is simply the convolution of the our original sound with the impulse response.
+In other words, it is the original sound with the echoes of the prexious $n$ samples, where $n$ is the number of samples in the impulse response.
 We can calculate convolutions quickly using the convolution theorem:
 
 \[\mathcal{F}(f \ast g) = \mathcal{F}(f)\cdot\mathcal{F}(g)\]
@@ -142,7 +142,7 @@ To summarize:
 
 \item Read in \texttt{chopin.wav} and the impulse response with \li{wavfile},
 \item Add several seconds of silence to the signal from \texttt{chopin.wav},
-\item Insert zeros into the middle of the impulse response transform so that it is the same length as,
+\item Insert zeros into the middle of the impulse response transform so that it is the same length as  \texttt{chopin.wav},
 \item Calculate the convolution of the signals,
 \item And finally, calculate the inverse Fourier transform.
 \end{enumerate}
