@@ -1,6 +1,6 @@
 \lab{1-d Optimization}{1-d Optimization}
 \label{lab:1-dOpt}
-\objective{To help students be comfortable with all the techniques of 1-d optimization. This will prepare them for later line-search methods in higher-dimensional optimization.}
+\objective{Teach students basic techniques to perform 1-D optimization. This understanding will motivate and prepare them for later line-search methods in higher-dimensional optimization.}
 
 \section*{Overview of 1-d Optimization}
 Imagine you are out hiking on a mountain, and you lose track of the trail. Thick fog
@@ -34,20 +34,30 @@ we will discuss approaches to choosing the step size and the search direction.
 Line search procedures are an integral part of many nonlinear optimization techniques.
 In some sense, they represent the simplest nontrivial case in general optimization, as
 we only have to worry about one parameter. And yet far more sophisticated optimization
-algorithms really crucially on the effectiveness and efficiency of line searches, since
+algorithms rely crucially on the effectiveness and efficiency of line searches, since
 higher-dimensional problems are often broken down into one-dimensional optimizations.
-There are many different line search methods, and their effectiveness depends very much
+There are many different one-dimensional optimization methods, and their effectiveness depends very much
 on the nature of the optimization problem. Although the line search procedure is often
 only a subroutine of the optimization algorithm at hand, understanding the basics of
 the line search is necessary for understanding the robustness of the entire algorithm.
-\section*{Optimizing Functions on the Real Numbers}
+
 \subsection*{Derivative versus Derivative-Free Methods}
 As you have seen in calculus classes, the derivative of a function gives information
 about how the value of the function changes at each point, and can be used to determine
-local optima. However, not all objective functions are differentiable, so we need other
-techniques at our disposal. Line search methods may be broadly separated into two groups
-based on whether they use the derivative of the objective function. We discuss two
-simple examples to illustrate this distinction.
+local optima. Not all objective functions are differentiable and many more are
+difficult and costly to differentiate, so we need other ways to optimize functions
+without derivatives. Line search methods may be broadly separated into two groups:
+those that require the derivative of the objective function, and those that do not.
+
+\section*{Optimizing Functions on the Real Numbers}
+
+\subsection*{Simple Line Search Algorithms}
+In this section we will discuss four line search algorithms. The first two, golden section
+and bisection search, are especially simple, as the step size in some sense is fixed,
+and we are only left with a binary decision of search direction. The third, Newton's method,
+you should have seen previously in the labs for Volume 1. Newton's Method uses an algorithm
+to determine both the step size and direction of the search. Our final algorithm, The Secant Method,
+can be thought of as an approximation of Newton's Method.
 
 \subsection*{Golden Section Search}
 This method is appropriate when minimizing a real-valued function on the reals over a
@@ -98,10 +108,30 @@ $(0.61803)^n$ times the length of the original interval. Note that this converge
 independent of the objective function.
 
 \begin{problem}
-Implement Golden Section Search as described above. Use this to minimize $e^x - 4x$
+Implement Golden Section Search as described above. Use this to minimize $f(x) = e^x - 4x$
 on the interval $\lbrack 0, 3 \rbrack$. How many steps do you need to take to get
 within $.001$ of the true minimizer? Check that with the sentence preceding this
 problem.
+\end{problem}
+
+\subsection*{Bisection Algorithm for Critical Points}
+This method is similar to the Golden Ratio method, but instead of cutting our interval into
+two overlapping sections, we divide the interval evenly in half, and then use $f'(x)$ to determine where the minimizer lies.
+This method takes advantage of the fact that a unimodal function's derivative is strictly less than
+0 to the left of the minimizer, and strictly greater than 0 to the right.
+
+For a unimodal function on $[a, b]$, take the midpoint, $x_1 = \frac{b + a}{2}$. Now test the sign
+of $f'$. If $f'(x_1) > 0$, the critical point must lie in the interval $[a, x_1]$, otherwise,
+the critical point lies in the other half of the interval, $[x_1, b]$. Now repeat this process on the
+correct interval until the desired accuracy is achieved.
+
+At each step, the interval is reduced by a factor of two. This is slightly quicker than the $1-\rho$ factor
+in the Golden Section search method. Like the Golden Section search, this convergence is independent of the objective function.
+
+\begin{problem}
+Implement the Bisection Algorithm as described above. Use it to mimimize the same function as
+the previous problem. How many steps do you need to take to get within $.001$ of the true minimizer?
+Time both algorithms and report which one is faster to converge.
 \end{problem}
 
 \subsection*{One-Dimensional Newton's Method}
@@ -115,7 +145,7 @@ differentiable. The idea is to approximate the function with a quadratic polynom
 then solve the trivial problem of minimizing the polynomial. Doing so in an iterative
 manner can lead us to the actual minimizer. Let $f$ be a function satisfying the
 appropriate conditions, and let us make an initial guess, $x_0$. The relevant quadratic
-approximation to $f$ is
+approximation to $f$ at $x_0$ is
 \begin{equation*}
 q(x) = f(x_0) + f'(x_0)(x-x_0) + \frac{1}{2}f''(x_0)(x-x_0)^2,
 \end{equation*}
@@ -149,36 +179,43 @@ an initial guess of 4 led to only a local minimum.}
 \end{figure}
 
 \begin{problem}
-Implement Newton's Method as described using the following function declaration. 
-\begin{lstlisting}
-def newton1d(f, df, ddf, x, niter=10):
-    '''
-    Perform Newton's method to minimize a function from R to R.
-    
-    Parameters
-    ----------
-    f : callable function object 
-        The objective function (twice differentiable)
-    df : callable function object 
-        The first derivative
-    ddf : callable function object
-        The second derivative
-    x : float
-        The initial guess
-    niter : integer
-        The number of iterations
-        
-    Returns
-    ------
-        min : float
-            The approximated minimizer
-    '''
-    pass
-\end{lstlisting}
+Implement Newton's Method. You will write a function that takes a function and its two derivatives, as well as 
+a starting point. It will return the minimizer. 
 
-Use this function to minimize $x^2 + \sin(5x)$ with an initial guess of $x_0 = 0$.
+Use this function to minimize $f(x) = x^2 + \sin(5x)$ with an initial guess of $x_0 = 0$.
 Now try other initial guesses farther away from the true minimizer, and note when the
 method fails to obtain the correct answer.
+\end{problem}
+
+\subsection*{One-Dimensional Secant Method}
+Sometimes we would like to use Newton's Method, but for whatever reason we don't have a second derivative.
+Maybe calculating it is too costly or the function is not twice differentiable. In this situation we can
+approximate the second derivative using the first derivative. The approximation using a secant calculation,
+hence the name. We use the same basic algorithm as in Newton's Method, but with an approximation for the
+second derivative of the objective function.
+\begin{equation*}
+x_{n+1} = x_n - \frac{f'(x_n)}{f''_{approx}(x_n)},
+\end{equation*}
+where we approximate the second derivative as follows:
+\begin{equation*}
+f''_{approx}(x_n) = \frac{f'(x_n) - f'(x_{n-1})}{x_n - x_{n-1}}.
+\end{equation*}
+This gives us the final equation:
+\begin{equation*}
+x_{n+1} = x_n - \frac{x_n - x_{n-1}}{f'(x_n) - f'(x_{n-1})}f'(x_n),
+\end{equation*}
+Notice that this equation requires two initial points (both $x_n$ and $x_{n-1}$) to calculate the next
+estimate.
+
+\begin{problem}
+Implement the Secant Method. You will write a function that accepts a function, its first derivative and a starting point, and returns the function's minimizer.
+
+Use this function to minimize $x^2 + \sin(x) + \sin(10x)$ with an initial guess of $x_0 = 0$.
+Now try other initial guesses farther away from the true minimizer, and note when the
+method fails to obtain the correct answer.
+
+(Hint: You may want to plot this function to
+understand why this problem is so sensitive to the starting point.)
 \end{problem}
 
 \section*{General Line Search Methods}
@@ -206,6 +243,11 @@ terminate the search at a point of steep decrease (since then we could achieve e
 better results by choosing a slightly larger step size). The first condition is known
 as the \emph{Armijo} condition.
 
+We will discuss methods of finding search directions in future labs. For now, we will discuss
+one simple algorithm for finding an appropriate step size which satisifies the Armijo conditions.
+
+\subsection*{Backtracking}
+
 Finding such a step size satisfying these conditions is not always an easy task, however.
 One simple approach, known as \emph{backtracking}, starts with an initial step size
 $\alpha$, and repeatedly scales it down until the Armijo condition is satisfied.
@@ -218,92 +260,8 @@ $\nabla f_k^Tp_k$ remains fixed for the duration of the backtracking algorithm, 
 be calculated once at the beginning.
 
 \begin{problem}
-Implement this backtracking algorithm using the following function declaration. 
-\begin{lstlisting}
-def backtracking(f, slope, x, p, a=1, rho=.9, c=10e-4):
-    '''
-    Perform a backtracking line search to satisfy the Armijo condition.
-    
-    Parameters
-    ----------
-    f : callable function object
-        The objective function
-    slope : float 
-        The value of grad(f)^T p
-    x : ndarray of shape (n,) 
-        The current iterate
-    p : ndarray of shape (n,) 
-        The current search direction
-    a : float 
-        The intial step length (set to 1 in Newton and quasi-Newton methods)
-    rho : float 
-        A number in (0,1)
-    c : float 
-        A number in (0,1)
-    
-    Returns
-    -------
-        alpha : float
-            The computed step size satisfying the Armijo condition.
-    '''
-    pass
-\end{lstlisting}
-\end{problem}
-
-
-\begin{problem}
-Implement the Gradient Descent algorithm and Newton's Method using the following function declarations.
-In each function, you should call your backtracking function with
-values $\alpha = 1, \rho = .9$, and $c = 10^{-4}$. The \li{scipy.linalg} module
-may be useful when computing the search direction in Newton's Method.
-\begin{lstlisting}
-def gradientDescent(f, df, x, niter=10):
-    '''
-    Minimize a function using gradient descent.
-    
-    Parameters
-    ----------
-    f : callable function object 
-        A differentiable real-valued function
-    df : callable function object 
-        The gradient of the function
-    x : ndarray of shape (n,) 
-        The initial point
-    niter : integer 
-        The number of iterations to run.
-    
-    Returns
-    -------
-        pts: list of ndarrays 
-            The sequence of points generated
-    '''
-    pass
-
-def newtonsMethod(f, df, ddf, x, niter=10):
-    '''
-    Minimize a function using Newton's method.
-    
-    Parameters
-    ----------
-    f : callable function object
-        Real-valued, twice-differentiable function
-    df : callable function object
-        The gradient of the function
-    ddf : callable function object 
-        The Hessian of the function
-    x : ndarray of shape (n,) 
-        The initial point
-    niter : integer 
-        The number of iterations
-        
-    Returns
-    -------
-    pts : list of ndarrays
-        The sequence of points generated
-    '''
-    pass
-\end{lstlisting}
-
+Implement this backtracking algorithm using the function definition in the spec file.
+Your function will accept a function, its derivative, a starting point, and the direction p.
 \end{problem}
 
 \subsection*{Line Search in SciPy}

@@ -13,16 +13,22 @@
 
 \section*{Sound Waves} % ======================================================
 
-Sounds are vibrations in the air around us.
-The frequency and intensity of these vibrations determine how sound is perceived.
-Sounds correspond physically to continuous functions, but they may be discretely approximated on a computer.
-These discrete approximations can be made indistinguishable from a continuous signal.
+Sound is the way that we perceive vibrations in matter.  These vibrations travel in waves.  Sound waves
+have two important characteristics that determine what we hear, or whether or not we can hear it.
+\emph{Frequency} is a measurement of the number of occurrences in a certain time, and determines the
+pitch of the sound.  Only certain frequencies are perceptible to the human ear.  The second characteristic
+is \emph{intensity} or \emph{amplitude}, and determines the volume of the sound.  Sounds waves correspond
+physically to continuous functions, but computers can approximate sound waves using discrete measurements.
+Indeed, discrete measurements can be made indistinguishable to the human ear from a truly continuous wave.
+Usually, sound waves are of a sinusoidal nature (with some form of decay), and the frequency is related to
+the wavelength, and the intensity to the wave amplitude.
 
 \section*{Digital Audio Signals} % ============================================
 
-There are two components of a digital audio signal: samples from the soundwave and a sample rate.
-These correspond to amplitude and frequency, respectively.
-A sample is a measurement of the amplitude of the wave at an instant in time.
+\emph{Digital Audio Signals} are how computers can approximate sound waves, and have two key components that
+relate to the frequency and amplitude of sound waves: samples, and sampling rate.  A sample is a measurement
+of the amplitude of a sound wave at a specific instant in time.  The sampling rate corresponds to the sound
+frequency.
 
 \begin{comment} % TODO: This figure.
 To see why the sample rate is necessary, consider an array with samples from a soundwave.
@@ -31,7 +37,7 @@ See Figure \ref{fig:comp_wave} for an illustration of this principle.
 
 \begin{figure}
 \centering
-\caption{A picture of samples from a soundwave with varything frequencies.
+\caption{A picture of samples from a sound wave with varying frequencies.
 It should be stretched or compressed to show how the frequency changes. Also describe how the sounds would be perceived.
 The stretched out signal will sound deeper-ish.
 Liiiiikkkkeeee tttthhhhhiiiiissss.
@@ -43,9 +49,10 @@ Like this.}
 \end{comment}
 
 %However,
-If we know at what rate the samples were taken, then we can construct the wave exactly as it was recorded.
-In most applications, this sample rate will be measured in number of samples taken per second.
-The standard rate for high quality audio is $44100$ equally spaced samples per second.
+If we know at what rate a set of samples were taken, then we can reconstruct the wave exactly as it was recorded.
+If we don't know the sampling rate, then our frequencies will be unknown.
+In most applications, this sample rate will be measured in the number of samples taken per second, Hertz (Hz).
+The standard rate for high quality audio is $44100$ equally spaced samples per second, or $44.1$ kHz.
 
 % Problem 1: Signal class.
 \begin{problem}
@@ -53,8 +60,8 @@ Write a class called \li{Signal} for storing digital audio signals.
 The constructor should accept a sample rate (an integer) and an array of samples (a NumPy array).
 Store these inputs as attributes.
 
-Write a method called \li{plot()} that generates the graph of the soundwave.
-Use the sample rate to get the x-axis in terms of seconds.
+Write a method called \li{plot()} that generates the graph of the sound wave.
+Use the sample rate to label the x-axis in terms of seconds.
 See Figure \ref{fig:tada_sig} for an example.
 
 %Finally, implement the \li{__add__()} magic method so that if two instances of \li{Signal} of the same length are added together, the sum of their signals are returned.% (as a new Signal object).
@@ -89,7 +96,7 @@ Writing a signal to a file is also simple.
 We use \li{wavfile.write()}, specifing the name of the new file, the sample rate, and the array of samples.
 
 \begin{lstlisting}
-# Write a random signal sampled at a rate of 44100 hz to my_sound.wav.
+# Write a random signal sampled at a rate of 44100 Hz to my_sound.wav.
 >>> wave = sp.random.randint(-32767, 32767, 30000)
 >>> samplerate = 44100
 >>> wavfile.write('my_sound.wav', samplerate, wave)
@@ -115,15 +122,16 @@ If the entries of a wave are not scaled properly, the operating system may not k
 % Problem 2: Signal.export
 \begin{problem}
 Add a method to the \li{Signal} class called \li{export()} that accepts a file name and generates a \texttt{.wav} file from the sample rate and the array of samples.
-Scale the array of samples appropriately before writing to the outfile.
+Scale the array of samples appropriately before writing to the output file.
 Ensure that your scaling technique is valid for arbitrary arrays of samples.
+Note that some arrays will not need to be scaled.
 \end{problem}
 % TODO: how do you determine if an array doesn't need to be scaled?
 
 \section*{Creating Sounds in Python} % ========================================
 
-In order to generate a sound in python, we need to sample the corresponding sine wave and then save it as an audio file.
-For example, suppose that we want to generate a sound with a frequency of 500 hertz for 10 seconds.
+In order to generate a sound in python, we need to sample the corresponding sinusoidal wave and then save it as an audio file.
+For example, suppose that we want to generate a sound with a frequency of 500 Hertz for 10 seconds.
 
 \begin{lstlisting}
 >>> samplerate = 44100
@@ -144,9 +152,9 @@ where $f$ is our desired frequency.
 >>> wave_function = lambda x: sp.sin(2*sp.pi*x*frequency)
 \end{lstlisting}
 
-In the following code, we generate a signal using three steps: first, find the correct step size given the sample rate.
-Next, generate the points at which we wish to sample the wave.
-Finally, sample the wave by passing the sample points to \li{wave_function}.
+In the following code, we generate a signal using three steps: first, we find the correct step size given the sample rate.
+Next, we generate the points at which we wish to sample the wave.
+Finally, we sample the wave by passing the sample points to \li{wave_function}.
 Then we can use our \li{Signal} class to plot the soundwave or write it to a file.
 
 \begin{lstlisting}
@@ -177,11 +185,12 @@ This file can be played using media software included with most operating system
 
 % Problem 3: make a sound.
 \begin{problem}
-The `A' note occurs at a frequency of 440 hertz.
+The `A' note occurs at a frequency of 440 Hertz.
 Generate the sine wave that corresponds to an `A' note being played for 5 seconds.
 
 Once you have successfully generated the `A' note, experiment with different frequencies to generate different notes.
-The following table shows some frequencies that correspond to common notes.
+The following table shows some frequencies that correspond to common notes. Octaves of these notes are obtained by
+doubling or halving these frequencies.
 
 \begin{center}
 \begin{tabular}{|c|c|}
@@ -195,6 +204,7 @@ D & 587.33 \\
 E & 659.25 \\
 F & 698.46 \\
 G & 783.99 \\
+A & 880 \\
 \hline
 \end{tabular}
 \end{center}
@@ -233,7 +243,7 @@ Return the array of calculated coefficients.
 SciPy has several methods for calculating the DFT of an array.
 Use \li{scipy.fft()} or \li{scipy.fftpack.fft()} to check your implementation.
 The naive method is significantly slower than SciPy's implementation, so test your function only on small arrays.
-Can you calculate each coefficient $c_k$ in just one line of code?
+When you have your method working, try to optimize it so that you can calculate each coefficient $c_k$ in just one line of code.
 \end{problem}
 
 \begin{comment}
@@ -251,20 +261,22 @@ Implement the FFT.
 \begin{center}
 \begin{figure}
 \includegraphics[scale=0.7]{figures/a_dft}
-\caption{The magnitude of the coefficients of the discrete Fourier transform of an `A' note.  Notice that there are two spikes in the graph, the first around 440 on the x-axis.  This second spike is due to symmetries inherent in the DFT.  For our purposes we will mostly be concerned with the left side of the DFT plot.}
+\caption{The magnitude of the coefficients of the discrete Fourier transform of an `A' note.  Notice that there are two spikes in the graph, the first around 440 on the x-axis.
+This second spike is due to symmetries inherent in the DFT.  For our purposes we will mostly be concerned with the left side of the DFT plot.}
 \label{fig:dft_a}
 \end{figure}
 \end{center}
 
-The graph of the fourier transform of a sound file is useful in applications.
-While the graph of the original signal gives information about the amplitude of a soundwave at certain points, the graph of the discrete Fourier transform  shows which frequencies are present in the signal.
+The graph of the Fourier transform of a sound file is useful in a variety of applications.
+While the graph of the original signal gives information about the amplitude of a soundwave at certain points, the graph of the discrete Fourier transform
+shows which frequencies are present in the signal.  Often, this information is of greater importance than how the wave changes in time.
 Frequencies present in the signal have non-zero coefficients.
 The magnitude of these coefficients corresponds to how influential the frequency is in the signal.
 For example, the sounds that we generated in the previous section contained only one frequency.
-If we created an `A' note at 440 hz, then the graph of the DFT would appear as in Figure \ref{fig:dft_a}.
+If we created an `A' note at 440 Hz, then the graph of the DFT would appear as in Figure \ref{fig:dft_a}.
 
-On the other hand, the DFT of a more complicated soundwave will have many frequencies present.
-Some of these frequencis correspond to the different tones present in the signal.
+On the other hand, the DFT of a more complicated sound wave will have many frequencies present.
+Some of these frequencies correspond to the different tones present in the signal.
 See Figure \ref{fig:dft_tada} for an example.
 
 \begin{center}
@@ -280,9 +292,9 @@ See Figure \ref{fig:dft_tada} for an example.
 If we take the DFT of a signal and then plot it without any other considerations, the x-axis will correspond to the index of the coefficients in the DFT and not their frequencies.
 In a previous section, we mention that the ``fundamental frequency'' for the DFT corresponds to a sine wave whose period is the same as the length of the signal.
 Thus, if unchanged, the x-axis gives us the number of times a particular sine wave cycles throughout the whole signal.
-If we want to label the x-axis with the frequencies measured in hertz, or cycles per second, we will need to convert the units.
+If we want to label the x-axis with the frequencies measured in Hertz, or cycles per second, we will need to convert the units.
 Fortunately, the bitrate is measured in samples per second.
-Therfore, if we divide the frequency (given by the index) by the number of samples, and multiply by the sample rate, we end up with cycles per second, or hertz.
+Therfore, if we divide the frequency (given by the index) by the number of samples, and multiply by the sample rate, we end up with cycles per second, or Hertz.
 
 \begin{center}
     $\frac{\mbox{cycles}}{\mbox{samples}} \times \frac{\mbox{samples}}{\mbox{second}} = \frac{\mbox{cycles}}{\mbox{second}}$
@@ -290,7 +302,7 @@ Therfore, if we divide the frequency (given by the index) by the number of sampl
 
 \begin{lstlisting}
 # Calculate the DFT and the x-values that correspond to the coefficients. Then
-# convert the x-values so that they measure frequencies in hertz.
+# convert the x-values so that they measure frequencies in Hertz.
 >>> dft = sp.fft(signal)
 >>> x_vals = sp.arange(1,len(dft)+1, 1)*1. # Make them floats
 
@@ -301,7 +313,7 @@ Therfore, if we divide the frequency (given by the index) by the number of sampl
 
 \begin{comment} % Modify this problem so it's about calculating Hz.
 \begin{problem}
-Modify the \li{calculate_dft()} method so that in addition to calculating the Fourier coefficients, it also returns a list of their corresponding frequencies measured in hertz.
+Modify the \li{calculate_dft()} method so that in addition to calculating the Fourier coefficients, it also returns a list of their corresponding frequencies measured in Hertz.
 \end{problem}
 \end{comment}
 
@@ -316,7 +328,7 @@ Use one of SciPy's FFT implementations to calculate the DFT.
 \begin{problem}
 A chord is a conjunction of several notes played together.
 We can create a chord in Python by adding several sound waves together.
-For example, to create a chord with `A', `C', and `E' notes, we generate the sound waves for each, as in the prior problem, and then add them together.
+For example, to create a (minor) chord with `A', `C', and `E' notes, we generate the sound waves for each, as in the prior problem, and then add them together.
 
 Create several chords and observe the plot of their DFT.
 There should be as many spikes as there are notes in the plot.

@@ -10,7 +10,7 @@ In previous labs, we stored graphs as trees and linked lists.
 For non-tree graphs, perhaps the most common data structure is an adjacency matrix, where each row of the matrix corresponds to a node in the graph and the entries of the row indicate which other nodes the current node is connected to.
 For more on adjacency matrices, see chapter 2 of the Volume II text.
 
-Another comon graph data structure is an \emph{adjacency dictionary}, a Python dictionary with a key for each node in the graph.
+Another common graph data structure is an \emph{adjacency dictionary}, a Python dictionary with a key for each node in the graph.
 The dictionary values are lists containing the nodes that are connected to the key.
 For example, the following is an adjacency dictionary for the graph in Figure \ref{fig:simple_graph}:
 
@@ -24,8 +24,8 @@ For example, the following is an adjacency dictionary for the graph in Figure \r
 ['A', 'C', 'B', 'E', 'D']
 
 # The values are the nodes that the key is connected to.
->>> print(adjacency_dictionary[A])
->>> ['B', 'C', 'D', 'E']            # A in connected to B, C, D, and E.
+>>> print(adjacency_dictionary['A'])
+>>> ['B', 'C', 'D', 'E']            # A is connected to B, C, D, and E.
 \end{lstlisting}
 
 \begin{figure}
@@ -54,17 +54,16 @@ For example, the following is an adjacency dictionary for the graph in Figure \r
 % Problem 1: __str__ for Graph class (warmup with dictionaries)
 \begin{problem}
 Implement the \li{__str__()} method in the provided \li{Graph} class.
-Print each node in the graph in sorted order, followed by a sorted list of the neighboring nodes separated by semicolons.
-
-(Hint: consider using the \li{join()} method for strings.)
+Print each node in the graph, followed by a list of the neighboring nodes separated by semicolons.
+\\(Hint: consider using the \li{join()} method for strings.)
 
 \begin{lstlisting}
 >>> my_dictionary = {'A':['C', 'B'], 'C':['A'], 'B':['A']}
 >>> graph = Graph(my_dictionary)
 >>> print(graph)
-A: B; C
-B: A
+A: C; B
 C: A
+B: A
 \end{lstlisting}
 \end{problem}
 
@@ -155,8 +154,9 @@ deque(['A', 'D', 'A', 'C'])
 
 We have arrived at a new problem.
 The nodes $A$ and $C$ were added to the queue to be visited, even though $C$ has already been visited and $A$ is next in line.
+
 We can prevent these nodes from being added to the queue again by creating a set of nodes to contain all nodes that have already been visited, or that are marked to be visited.
-Checking set membership is very fast, so this additional data strutcure has minimal impact on the program's speed (and is faster than checking the deque).
+Checking set membership is very fast, so this additional data structure has minimal impact on the program's speed (and is faster than checking the deque).
 
 In addition, we keep a list of the nodes that have actually been visited to track the order of the search.
 By checking the set at each step of the algorithm, the previous problems are avoided.
@@ -231,20 +231,35 @@ NetworkX is a Python package for creating, manipulating, and exploring large gra
 It contains a graph object constructor as well as methods for adding nodes and edges to the graph.
 It also has methods for recovering information about the graph and its structure.
 
+A node can be an int, a string, or a Python object, and an edge can be weighted or unweighted. 
+There are several ways to add nodes and edges to the graph, some of which are listed below.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{r|l}
+    Function & Description\\ 
+    \hline
+    \li{add_node()} & Add a single node to the graph.\\
+    \li{add_nodes_from()} & Add a list of nodes to the graph.\\
+    \li{add_edge()} & Add an edge between two nodes.\\
+    \li{add_edges_from()} & Add a list of edges to the graph.
+\end{tabular}
+\end{table}
+
 \begin{lstlisting}
 # Create a new graph object using networkX
 >>> import networkx as nx
 >>> nx_graph = nx.Graph()
 
-# There are several ways to add nodes and edges to the graph.
-# One is to use the add_edge method, which creates new edge
-# and node objects as needed, ignoring duplicates
+>>> nx_graph.add_node('A')
+>>> nx_graph.add_node('B')
 >>> nx_graph.add_edge('A', 'B')
->>> nx_graph.add_edge('A', 'C')
->>> nx_graph.add_edge('A', 'D')
->>> nx_graph.add_edge('A', 'E')
->>> nx_graph.add_edge('B', 'C')
->>> nx_graph.add_edge('C', 'D')
+>>> nx_graph.add_edge('A', 'C') # Node 'C' is added to the graph
+>>> nx_graph.add_edges_from([('A', 'D'), ('A', 'E'), ('B', 'C')])
+
+# We can also add weighted edges to the graph
+>>> nx_graph.add_edge('C', 'D', weight=0.5)
+
 # Nodes and edges are easy to access
 >>> print(nx_graph.nodes())
 ['A', 'C', 'B', 'E', 'D']
@@ -252,10 +267,8 @@ It also has methods for recovering information about the graph and its structure
 >>> print(nx_graph.edges())
 [('A', 'C'), ('A', 'B'), ('A', 'E'), ('A', 'D'), ('C', 'B'), ('C', 'D')]
 
-# NetworkX also has its own shortest_path method, implemented
-# with a bidirectional BFS (starting from both ends)
->>> nx.shortest_path(nx_graph, 'C', 'E')
-['C', 'A', 'E']
+>>> print(nx_graph.get_edge_data('C', 'D'))
+{'weight': 0.5}
 
 # With small graphs, we can visualize the graph with nx.draw()
 >>> from matplotlib import pyplot as plt
@@ -263,7 +276,7 @@ It also has methods for recovering information about the graph and its structure
 >>> plt.show()
 \end{lstlisting}
 
-% Problem 5: Intro to NetworkX
+% Problem 4: Intro to NetworkX
 \begin{problem}
 Write a function that accepts an adjacency dictionary.
 Create a \li{networkx} object, load it with the graph information from the dictionary, and return it.
@@ -277,7 +290,7 @@ For example, Samuel L. Jackson was in the film \emph{Captain America: The First 
 Thus Samuel L. Jackson has a ``Bacon number'' of 2.
 Any actors who have been in a movie with Kevin Bacon have a Bacon number of 1.
 
-% Problem 6: BaconSolver constructor and shortest path
+% Problem 5: BaconSolver constructor and shortest path
 \begin{problem}
 Write a \li{BaconSolver} class to solve the Kevin Bacon problem.
 
@@ -286,15 +299,48 @@ A single movie is listed on each line, followed by a sequence of actors that sta
 The movie title and actors' names are separated by a `/' character.
 The actors are listed by last name first, followed by their first name.
 
-The provided \li{parse()} function generates an adjacency dictionary from a specified file.
-In particular, \li{parse("movieData.txt")} generates a dictionary where each key is a movie title and each value is a list of the actors that appeared in the movie.
-
 Implement the constructor of \li{BaconSolver}.
-Accept a filename to pull data from and get the dictionary generated by calling \li{parse()} with the filename.
+Accept a filename to pull data from and generate a dictionary where each key is a movie title and each value is a list of the actors that appeared in the movie.
 Store the collection of values in the dictionary (the actors) as a class attribute, avoiding duplicates.
 Convert the dictionary to a NetworkX graph and store it as another class attribute.
+\\(Hint: recall the \li{split()} method for strings.)
+\end{problem}
 
-Finally, use NetworkX to implement the \li{path_to_bacon()} method.
+\begin{warn}
+Because of the size of the dataset, \textbf{do not} attempt to visualize the graph with \li{nx.draw()}.
+The visualization tool in NetworkX is only effective on relatively small graphs.
+In fact, graph visualization in general remains a challenging and ongoing area of research.
+\end{warn}
+
+NetworkX is equipped with a variety of methods to aid in the analysis of graphs.
+A selected few are listed below.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{r|l}
+    Function & Description\\
+    \hline
+    \li{adjacency_matrix()} & Returns the adjacency matrix as a SciPy sparse matrix.\\
+    \li{dijkstra_path()} & Returns the shortest path from a source to a target in a weighted graph.\\
+    \li{has_path()} & Returns True if the graph has a path from a source to a target.\\
+    \li{prim_mst()} & Returns a minimum spanning tree for a weighted graph.\\
+    \li{shortest_path()} & Returns the shortest path from a source to a target.
+\end{tabular}
+\end{table}
+    
+\begin{lstlisting}
+# Verify nx_graph has a path from 'C' to 'E'
+>>> nx.has_path(nx_graph, 'C', 'E')
+True
+
+# The shortest_path method is implemented with a
+# bidirectional BFS (starting from both ends)
+>>> nx.shortest_path(nx_graph, 'C', 'E')
+['C', 'A', 'E']
+\end{lstlisting}
+
+\begin{problem}
+Use NetworkX to implement the \li{path_to_bacon()} method.
 Accept start and target values (actors' names) and return a list with the shortest path from the start to the target.
 Set Kevin Bacon as the default target.
 If either of the inputs are not contained in the stored collection of dictionary values (if either input is not an actor's name), raise a \li{ValueError}.
@@ -305,16 +351,9 @@ If either of the inputs are not contained in the stored collection of dictionary
 ['Jackson, Samuel L.', 'Captain America: The First Avenger', 'Stark,
 Peter', 'X-Men: First Class', 'Bacon, Kevin']
 \end{lstlisting}
-
-\begin{warn}
-Because of the size of the dataset, \textbf{do not} attempt to visualize the graph with \li{nx.draw()}.
-The visualization tool in NetworkX is only effective on relatively small graphs.
-In fact, graph visualization in general remains a challenging and ongoing area of research.
-\end{warn}
 \end{problem}
 
-% Problem 7: individual and average Bacon numbers
-\begin{problem}
+\begin{problem} % Individual and average Bacon numbers
 Implement the \li{bacon_number()} method in the \li{BaconSolver} class.
 Accept start and target values and return the number of actors in the shortest path from start to target.
 Note that this is different than the number of entries in the shortest path list, since movies do not contribute to an actor's Bacon number.

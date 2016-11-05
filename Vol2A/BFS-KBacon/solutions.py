@@ -6,10 +6,14 @@ import networkx as nx
 from matplotlib import pyplot as plt
 
 
-# Problems 1-4: Implement the following class
+# Problems 1-3: Implement the following class
 class Graph(object):
-    """A graph object, stored as an adjacency dictionary. Each node in the graph is a key in the dictionary.
-    The value of each key is a list of the corresponding node's neighbors.
+    """A graph object, stored as an adjacency dictionary. Each node in the
+    graph is a key in the dictionary. The value of each key is a list of the
+    corresponding node's neighbors.
+
+    Attributes:
+        dictionary: the adjacency list of the graph.
     """
 
     def __init__(self, adjacency):
@@ -18,32 +22,25 @@ class Graph(object):
 
     # Problem 1
     def __str__(self):
-        """String representation: a sorted view of the adjacency dictionary.
+        """String representation: a view of the adjacency dictionary.
 
         Example:
             >>> test = {'A':['D', 'C', 'B'], 'D':['A', 'C'],
             ...         'C':['B', 'A', 'D'], 'B':['A', 'C']}
             >>> print(Graph(test))
-            A: B; C; D
+            A: D; C; B
+            C: B; A; D
             B: A; C
-            C: A; B; D
             D: A; C
         """
-        out = ""
-        keys = self.dictionary.keys()
-        keys.sort()
         # join() approach
-        for key in keys:
-            out += str(key) + ": "              # add each node
-            values = self.dictionary[key]
-            values.sort()
-            out += "; ".join(values) + "\n"     # add the node's neighborhood
-        return out
+        return "\n".join(["{}: {}".format(key,'; '.join(self.dictionary[key]))
+                                            for key in self.dictionary.keys()])
         # for loop approach
+        out = ""
         for key in keys:
             out += str(key) + ": "              # add each node
             values = self.dictionary[key]
-            values.sort()
             for value in values:                # add each neighbor
                 out += str(value) + "; "
             out = out.strip("; ") + "\n"        # strip off the last "; "
@@ -61,6 +58,9 @@ class Graph(object):
 
         Returns:
             the list of visited nodes (in order of visitation)
+
+        Raises:
+            ValueError: if 'start' is not in the adjacency dictionary.
 
         Example:
             >>> test = {'A':['B'], 'B':['A', 'C',], 'C':['B']}
@@ -91,7 +91,7 @@ class Graph(object):
                     marked.add(neighbor)
         return visited
 
-    # Problem 3 (Optional)
+    # (Optional)
     def DFS(self, start):
         """Begin at 'start' and perform a depth-first search until all
         nodes in the graph have been searched. Return a list of values, in
@@ -126,7 +126,7 @@ class Graph(object):
                     marked.add(neighbor)
         return visited
 
-    # Problem 4
+    # Problem 3
     def shortest_path(self, start, target):
         """Begin at the node containing 'start' and perform a breadth-first
         search until the node containing 'target' is found. Return a list
@@ -188,7 +188,7 @@ class Graph(object):
             convert_to_networkx(self.dictionary), start, target)
 
 
-# Problem 5: Write the following function
+# Problem 4
 def convert_to_networkx(dictionary):
     """Convert 'dictionary' to a networkX object and return it."""
     # Make the graph
@@ -199,51 +199,37 @@ def convert_to_networkx(dictionary):
             output.add_edge(key, value)
     return output
 
-
-# Helper function for problem 6
-def parse(filename="movieData.txt"):
-    """Generate an adjacency dictionary where each key is
-    a movie and each value is a list of actors in the movie.
-    """
-
-    # open the file, read it in, and split the text by '\n'
-    movieFile = open(filename, 'r')
-    movieFile = movieFile.read()
-    movieFile = movieFile.split('\n')
-    graph = dict()
-
-    # for each movie in the file,
-    for line in movieFile:
-        # get movie name and list of actors
-        names = line.split('/')
-        movie = names[0]
-        graph[movie] = []
-        # add the actors to the dictionary
-        for actor in names[1:]:
-            graph[movie].append(actor)
-
-    return graph
-
-
-# Problems 6-8: Implement the following class
+# Problems 5-7
 class BaconSolver(object):
     """Class for solving the Kevin Bacon problem."""
 
-    # Problem 6
+    # Problem 5
     def __init__(self, filename="movieData.txt"):
-        """Initialize the networkX graph and with data from the specified
+        """Initialize the networkX graph with data from the specified
         file. Store the graph as a class attribute. Also store the collection
         of actors in the file as a class attribute.
         """
-        # Get the adjacency dictionary from the file
-        movie_to_actors = parse(filename)
+        # Open the file, read it in, and split the text by '\n'
+        with open(filename, 'r') as myfile:
+            contents = myfile.read()
+        contents = contents.split('\n')
+        graph = dict()
+
+        # For each movie in the file,
+        for line in contents:
+            # Get movie name and list of actors
+            names = line.split('/')
+            movie = names[0]
+            graph[movie] = []
+            # Add the actors to the dictionary
+            for actor in names[1:]:
+                graph[movie].append(actor)
 
         # Extract the actors from the adjacency dictionary (values)
-        self.actors = {actor for movie in movie_to_actors
-                             for actor in movie_to_actors[movie]}
+        self.actors = {actor for movie in graph for actor in graph[movie]}
 
         # Convert the adjacency matrix to networkX
-        self.bacon_graph = convert_to_networkx(movie_to_actors)
+        self.bacon_graph = convert_to_networkx(graph)
 
     # Problem 6
     def path_to_bacon(self, start, target="Bacon, Kevin"):
@@ -264,6 +250,9 @@ class BaconSolver(object):
     def average_bacon(self, target="Bacon, Kevin"):
         """Calculate the average Bacon number in the data set.
         Note that actors are not guaranteed to be connected to the target.
+
+        Inputs:
+            target (str): the node to search the graph for
         """
         connected = 0
         isolated = 0
@@ -278,7 +267,7 @@ class BaconSolver(object):
 
         return float(total)/connected, isolated
 
-    # Problem 8 (Optional)
+    # (Optional)
     def plot_bacon(self, target="Bacon, Kevin"):
         """Create and show a histogram displaying the frequency of the Bacon
         numbers in the data set. Ignore entries with no path to 'target'.
@@ -295,6 +284,3 @@ class BaconSolver(object):
         plt.xlabel(name + " Number")
         plt.ylabel("Actors")
         plt.show()
-
-if __name__ == '__main__':
-    print BaconSolver().average_bacon()
