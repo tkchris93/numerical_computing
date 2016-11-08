@@ -18,9 +18,7 @@ In this lab, we will become familiar with some of the basic ideas behind paralle
 \section*{Serial Execution vs. Parallel Execution}
 Up to this point, all the programs you have written run in \emph{serial}. This means that each command is executed one line at a time. The following exercise will help you visualize what is happening.
 
-\begin{info}
-Engaged Learning Section! Try this out!
-
+\begin{problem}
 If you are working on a Linux computer, open a terminal and execute the \li{htop} command. (If \li{htop} is not on your system, install it using your default package manager). When opening this program, your terminal should see an interface similar to Figure \ref{fig:htop}. The numbered bars at the top represent each of the cores of your processor and the workload on each of these cores.
 
 Now, run the following python code with your terminal running \li{htop} still visible. The sole purpose of the following code is to create a computationally intensive function that runs for about 15 seconds.
@@ -32,7 +30,7 @@ for i xrange(10000):
 \end{lstlisting}
 
 You should have seen one of the cores get maxed out at 100\%. It is also possible that you saw the load-carrying core switch midway through the execution of the file. This is evidence one indicator that our script is being executed in serial -- one line at a time, one core at a time.
-\end{info}
+\end{problem}
 
 \begin{figure}
     \includegraphics[width=\textwidth]{active.jpg}
@@ -55,5 +53,51 @@ $ conda update anaconda
 $ conda install ipyparallel
 \end{lstlisting}
 
-TODO Starting up ipcluster.
-TODO add a note about enabling the notebook extension
+With \li{ipyparallel} installed, we can now initialize an IPython cluster. We won't go too much into the architecture of the IPython cluster, but if you are interested in learning more, visit \url{https://ipyparallel.readthedocs.io/en/latest/intro.html#architecture-overview}.
+
+Now to initialize an IPython cluster, run the following code:
+
+\begin{lstlisting}
+$ ipcluster start
+\end{lstlisting}
+
+This will start a cluster with one engine per processor. If you would like to specify the number of engines to initialize, run the following:
+
+\begin{lstlisting}
+# start a cluster with 8 engines.
+$ ipcluster start --n 8
+\end{lstlisting}
+
+If you choose to explicitly specify the number of engines, it is not optimal to initialize more engines than you have processors. Doing so would require multitasking on each processor instead of having each processor dedicated to one task.
+
+If you are more accustomed to using Jupyter Notebooks, you may have noticed the ``Clusters" tab. You can start an IPython cluster in this tab after enabling the \li{ipcluster} notebook extension.
+
+\begin{lstlisting}
+$ ipcluster nbextension enable
+\end{lstlisting}
+
+\begin{problem}
+Initialize an IPython cluster with an engine for each processor. As you did in the previous problem, open \li{htop}. Run the following code and examine what happens in htop.
+
+\begin{lstlisting}
+from ipyparallel import Client
+client = Client()
+dview = client[:]
+
+dview.execute("""
+import numpy as np
+for i in xrange(10000):
+    np.random.random(100000)
+""")
+\end{lstlisting}
+
+The output of \li{htop} should appear similar to Figure \ref{fig:htop_cluster}. Notice that all of the processors are being utilized to run the script.
+\end{problem}
+
+\begin{figure}
+    \includegraphics[width=\textwidth]{cluster_active.jpg}
+\caption{An example of \li{htop} with a computationally intense python script running in parallel.}
+\label{fig:htop_cluster}
+\end{figure}
+
+We have now ensured that our IPython cluster is successfully executing on all engines. Now we will dive into the details of how we can utilize the cluster and discuss the syntax to use.
