@@ -41,4 +41,6 @@ def prob4(N):
     plt.show()
     return myarray
 
-prob2(1000)
+def prob5():
+    # solution coming.
+    # Create a dictionary on each engine, gather the dictionaries, then create the sparse occurence matrix.
