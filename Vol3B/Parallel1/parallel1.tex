@@ -193,5 +193,93 @@ In theory, using parallel computing for this problem should be approximately $n$
 \begin{problem}
 Now let's do a problem that is a bit more computationally intensive. Define the random variable $X$ to be the maximum out of a $N$ draws from the standard normal distribution. Take 500,000 draws from this distribution and plot the draws in a histogram. The resulting histogram will approximate the p.d.f. of $X$.
 
-Right your function in such a way that each engine will carry an equal load. Also right your function in such a way that it is flexible to the number of engines that are running. HINT: Remember that you can get a list of all available engines using \li{clients.ids}.
+Write your function in such a way that each engine will carry an equal load. Also write your function in such a way that it is flexible to the number of engines that are running. HINT: Remember that you can get a list of all available engines using \li{clients.ids}.
+\end{problem}
+
+\subsection*{The $\texttt{scatter()}$ and $\texttt{gather()}$ Methods}
+There are many situations where we would want to spread a dataset across all the available engines. This way, we can have a function work on each of these portions of the dataset. In its simplest form, this is the basis of MapReduce. We will address MapReduce in more detail in a future lab.
+
+We will first introduce an example of \li{scatter()} and explain the proper usage in more detail throughout the example.
+
+\begin{lstlisting}
+# Initialize the dataset to scatter
+>>> a = np.arange(10)
+
+# Scatter the data. The pieces of the data will be
+#   named "a_partition" on each of the engines.
+>>> dview.scatter("a_partition", a)
+
+# Verify that the data has been successfully scattered
+#    Notice that the data has been scattered as
+#    equally as possible.
+>>> client[0]["a_partition"]
+array([0, 1, 2])
+
+>>> client[1]["a_partition"]
+array([3, 4, 5])
+
+>>> client[2]["a_partition"]
+array([6, 7])
+
+>>> client[3]["a_partition"]
+array([8, 9])
+\end{lstlisting}
+
+Now that the \li{a_partition} variable has been initialized on each engine, we can now execute functions that depend on this variable. Consider the following simple example using the \li{execute()} method.
+
+\begin{lstlisting}
+# Pass a string with the Python code that we wish to run
+#   on each engine. This code will simply sum the entries
+#   in "a_partition"
+>>> dview.execute("""
+... b = a_partition.sum()
+... """)
+\end{lstlisting}
+
+We have now computed the sum of each of these pieces of the data and stored the result in the variable $b$. Now how can we gain access to all these results? We use the \li{gather()} method.
+
+\begin{lstlisting}
+# gather all the 'b' values into a list.
+>>> b_list = dview.gather("b", block=True)
+[3, 12, 13, 17]
+
+>>> sum(b_list)
+45
+\end{lstlisting}
+
+To summarize, this example has taken a piece of data, scattered it to all available engines, performed a computation on each of these pieces of data, then gathered the results back to the controller.
+
+\begin{problem}
+All of the examples that we have done in this lab up to this point may have seemed quite simplistic. However, we will now apply all these examples to a real-world example.
+
+Many natural language processing (NLP) problems naturally extend to a parallel computing architecture. In many situations, we will have a function we want to apply to a piece of text, whether that be a sentence, paragraph, or an entire document. An efficient way to handle these problems is to scatter the data to all available engines, perform the calculations, then gather the results.
+
+The introductory step to latent symantic analysis is to create a occurance matrix based on the bag-of-words model. This matrix has the ids for the different documents as the rows and the different words in the vocabulary as the columns. Then the $ij$-th entries of this matrix is the number of times the $j$-th word appears in the $i$-th document. For example, consider the following example:
+
+Say we have the following 4 pieces of text:
+\begin{enumerate}
+    \item the rose is red
+    \item the violet is blue
+    \item my car is red
+    \item i have a red rose and a red car
+\end{enumerate}
+
+It is common to remove \emph{stopwords} or the most common words in the language. We can get a list of stopwords by running:
+\begin{lstlisting}
+>>> from nltk.corpus import stopwords
+>>> set_stopwords = set(stopwords.words('english'))
+\end{lstlisting}
+
+After removing the stopwords, the resulting occurence matrix would be:
+\begin{lstlisting}
+      'blue' 'car' 'red' 'rose' 'violet'
+doc1     0     0     1      1       0
+doc2     1     0     0      0       1
+doc3     0     1     1      0       0
+doc4     0     1     2      1       0
+\end{lstlisting}
+
+The \li{state_union.zip} file contains all of the State of the Union addresses from 1945-2006. For this problem, leverage the power of parallel computing to create an occurence matrix where the rows are the different State of the Union addresses and the columns are the words in the collective vocabulary. There are many ways to tackle this problem, so we will leave it open-ended. However, we strongly recommend that you base your solution around the \li{scatter()} and \li{gather()} methods.
+
+For the sake of grading, order the rows chronologically and the columns in alphabetical order. Also, as you can imagine, this matrix will end up being fairly sparse, so it is more efficient to use \li{scipy.sparse} matrices.
 \end{problem}
