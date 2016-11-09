@@ -101,3 +101,97 @@ The output of \li{htop} should appear similar to Figure \ref{fig:htop_cluster}. 
 \end{figure}
 
 We have now ensured that our IPython cluster is successfully executing on all engines. Now we will dive into the details of how we can utilize the cluster and discuss the syntax to use.
+
+\section*{Syntax for $\texttt{ipyparallel}$}
+The basic framework for \li{ipyparallel} revolves around a \li{DirectView} or a \li{LoadBalancedView}.
+A \li{DirectView} is the object through which we communicate with each of the engines. You have control over which variables are pushed to each engine and what functions are performed. A \li{LoadBalancedView} takes the commands that are being executed and does its best to distribute the load evenly across all the engines.
+
+For the purposes of having more control over each engine, we will focus on the \li{DirectView} in this lab. To initialize a \li{DirectView}, run the following code:
+
+\begin{lstlisting}
+>>> from ipyparallel import Client
+>>> client = Client()
+
+# verify the dview has been generated correctly.
+#   On my system, I have 4 processors.
+>>> client.ids
+[0, 1, 2, 3]
+
+# initialize DirectView
+>>> dview = client[:]
+\end{lstlisting}
+
+\subsection*{Variables on Different Engines}
+When using multiple processors, each engine has its own namespace. Therefore, just because a variable has been initialized does not mean that each engine is aware of that variable. You must initialize these variables explicitly on each engine. There are a few different ways to do this.
+
+\begin{lstlisting}
+# To share the variable `a' across all engines
+>>> a = 10
+>>> b = 5
+>>> dview["a"] = a
+>>> dview["b"] = b
+
+# Or alternatively,
+>>> dview.push({'a':a, 'b':b})
+
+# To ensure the variables are on engine 0
+>>> client[0]['a']
+10
+
+>>> client[0]['b']
+5
+\end{lstlisting}
+
+The code you just ran is the easiest way to get individiual values on each of the engines. We will discuss some other methods a bit later in this lab. We will now move on to doing some simple computations in parallel.
+
+\subsection*{The $\texttt{apply()}$ and $\texttt{apply\_sync()}$ Methods}
+To execute functions on each of the engines, we can use the \li{apply()} or the \li{apply\_sync()} methods.  The difference between \li{apply()} and \li{apply\_sync()} comes down to blocking. If a function is executed with blocking, you will be unable to run any other commands until the function has finished. If a function is run without blocking, you can execute other commands while that function is still computing its result. The \li{apply()} methods executes without blocking and the \li{apply\_sync()} method executes with blocking. The following code box describes how this is done:
+
+\begin{lstlisting}
+>>> def add():
+...     return a+b
+
+# Runs add() without blocking (in background)
+>>> result = dview.apply(add)
+
+# Checks to see if the output is ready
+>>> result.ready()
+True
+
+# Retrieves output
+>>> result.get()
+[15, 15, 15, 15]
+
+# Runs add() with blocking
+>>> dview.apply_sync(add)
+[15, 15, 15, 15]
+\end{lstlisting}
+
+You can also pass variables into your function as part of call to \li{apply\_sync()}. Consider the following example:
+
+\begin{lstlisting}
+>>> def add(x, y):
+...    return x+y
+
+>>> dview.apply_sync(add, 3, 6)
+[9, 9, 9, 9]
+\end{lstlisting}
+
+\begin{problem}
+To this point, the examples of what you can do with parallel computing may not have been very convincing since we were just getting the same answer on each engine. In this problem, we will make better use of each of the engines.
+
+Using \li{apply\_sync()}, draw 1,000,000 samples from a standard normal distribution. Report the mean, max, and min for draws on each individual processor. For example, you output should look like:
+\begin{lstlisting}
+means = [0.0031776784, -0.0058112042, 0.0012574772, -0.0059655951]
+maxs = [4.0388107, 4.3664958, 4.2060184, 4.3391623]
+mins = [-4.1508589, -4.3848019, -4.1313324, -4.2826519]
+\end{lstlisting}
+
+In theory, using parallel computing for this problem should be approximately $n$ times faster where $n$ is the number of engines you are using.
+\end{problem}
+
+\begin{problem}
+Now let's do a problem that is a bit more computationally intensive. Define the random variable $X$ to be the maximum out of a $N$ draws from the standard normal distribution. Take 500,000 draws from this distribution and plot the draws in a histogram. The resulting histogram will approximate the p.d.f. of $X$.
+
+Right your function in such a way that each engine will carry an equal load. Also right your function in such a way that it is flexible to the number of engines that are running. HINT: Remember that you can get a list of all available engines using \li{clients.ids}.
+\end{problem}
