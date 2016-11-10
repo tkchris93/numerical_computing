@@ -180,7 +180,7 @@ You can also pass variables into your function as part of call to \li{apply\_syn
 \begin{problem}
 To this point, the examples of what you can do with parallel computing may not have been very convincing since we were just getting the same answer on each engine. In this problem, we will make better use of each of the engines.
 
-Using \li{apply\_sync()}, draw 1,000,000 samples from a standard normal distribution. Report the mean, max, and min for draws on each individual processor. For example, you output should look like:
+Using \li{apply\_sync()}, draw 1,000,000 samples from a standard normal distribution. Report the mean, max, and min for draws on each individual engine. For example if you have four engines running, your output should look like:
 \begin{lstlisting}
 means = [0.0031776784, -0.0058112042, 0.0012574772, -0.0059655951]
 maxs = [4.0388107, 4.3664958, 4.2060184, 4.3391623]
@@ -236,6 +236,11 @@ Now that the \li{a_partition} variable has been initialized on each engine, we c
 ... """)
 \end{lstlisting}
 
+\begin{info}
+If you are using a Jupyter Notebook, there is a built in magic function that is analagous to \li{dview.execute()}. If you put the \li{\%\%px} magic at the beginning of a cell of code, that cell of code will be executed on each engine. This tool is very useful for designing and debugging parallel algorithms.
+\end{info}
+
+
 We have now computed the sum of each of these pieces of the data and stored the result in the variable $b$. Now how can we gain access to all these results? We use the \li{gather()} method.
 
 \begin{lstlisting}
@@ -256,7 +261,7 @@ Many natural language processing (NLP) problems naturally extend to a parallel c
 
 The introductory step to latent symantic analysis is to create a occurance matrix based on the bag-of-words model. At a high level, the bag-of-words model gives us insight as to the topic of a given document. It can also be used to measure the similarity between two documents.
 
-The occurence matrix has the ids for the different documents as the rows and the different words in the vocabulary as the columns. Then the $ij$-th entries of this matrix is the number of times the $j$-th word appears in the $i$-th document. For example, consider the following example:
+The occurrence matrix has the ids for the different documents as the rows and the different words in the vocabulary as the columns. Then the $ij$-th entries of this matrix is the number of times the $j$-th word appears in the $i$-th document. For example, consider the following example:
 
 Say we have the following 4 pieces of text:
 \begin{enumerate}
@@ -272,7 +277,7 @@ It is common to remove \emph{stopwords} or the most common words in the language
 >>> set_stopwords = set(stopwords.words('english'))
 \end{lstlisting}
 
-After removing the stopwords, the resulting occurence matrix would be:
+After removing the stopwords, the resulting occurrence matrix would be:
 \begin{lstlisting}
       'blue' 'car' 'red' 'rose' 'violet'
 doc1     0     0     1      1       0
@@ -283,7 +288,7 @@ doc4     0     1     2      1       0
 
 Notice that the columns contain all the non-stopwords that were used throughout all the documents combined.
 
-The \li{state_union.zip} file contains all of the State of the Union addresses from 1945-2006. For this problem, leverage the power of parallel computing to create an occurence matrix where the rows are the different State of the Union addresses and the columns are the words in the collective vocabulary. There are many ways to tackle this problem, so we will leave it open-ended. However, we strongly recommend that you base your solution around the \li{scatter()} and \li{gather()} methods.
+The \li{state_union.zip} file contains all of the State of the Union addresses from 1945-2006. For this problem, leverage the power of parallel computing to create an occurrence matrix where the rows are the different State of the Union addresses and the columns are the words in the collective vocabulary. There are many ways to tackle this problem, so we will leave it open-ended. However, we strongly recommend that you base your solution around the \li{scatter()} and \li{gather()} methods.
 
 For the sake of grading, order the rows chronologically and the columns in alphabetical order. Also, as you can imagine, this matrix will end up being fairly sparse, so it is more efficient to use \li{scipy.sparse} matrices.
 \end{problem}
