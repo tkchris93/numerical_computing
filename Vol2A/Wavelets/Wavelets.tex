@@ -76,13 +76,11 @@ See Algorithm \ref{alg:1d_wavelet} and Figure \ref{fig:filterbank} for the speci
 \begin{algorithm}
 \begin{algorithmic}[1]
 \Procedure{dwt}{$X, L, H, n$}
-	\State $i \gets 0$						\Comment{Some initialization steps}
-    \State $A_i \gets X$
-    \While{$i < n$}
+    \State $A_i \gets X$						\Comment{Some initialization steps}
+   \For{$i=0 \ldots n-1$}
         \State $D_{i+1} \gets \,\,DS(A_i * H)$ \Comment{High-pass filtering}
         \State $A_{i+1} \gets \,\,DS(A_i * L)$ \Comment{Low-pass filtering}
-        \State $i \gets i + 1$
-    \EndWhile
+    \EndFor
     \State \pseudoli{return} $A_n,D_n, D_{n-1},\ldots, D_1$.
 \EndProcedure
 \end{algorithmic}
@@ -168,7 +166,7 @@ of two, which means keeping only every other entry:
 Putting these two operations together, we can obtain the approximation coefficients in one
 line of code:
 \begin{lstlisting}
->>> A = fft.convolve(X,L)[1::2]
+>>> A = fftconvolve(X,L)[1::2]
 \end{lstlisting}
 Computing the detail coefficients is done in exactly the same way, replacing $L$ with $H$.
 \begin{problem}
@@ -184,7 +182,7 @@ to adhere to the required return format.
 Test your function by calculating the Haar wavelet coefficients of a noisy sine signal for $n=4$:
 
 \begin{lstlisting}
->>> domain = np.linspace(0,4*np.pi, 1024)
+>>> domain = np.linspace(0, 4*np.pi, 1024)
 >>> noise =  np.random.randn(1024)*.1
 >>> noisysin = np.sin(domain) + noise
 >>> coeffs = dwt(noisysin, L, H, 4)
@@ -192,6 +190,16 @@ Test your function by calculating the Haar wavelet coefficients of a noisy sine 
 
 Plot your results and verify that they match the plots in Figure \ref{fig:dwt1D}.
 \end{problem}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width = 0.5\textwidth]{figures/dwt1D}
+\caption{A level 4 wavelet decomposition of a signal. The top panel is the original signal,
+the next panel down is the approximation, and the remaining panels are the detail coefficients.
+Notice how the approximation resembles a smoothed version of the original signal, while the
+details capture the high-frequency oscillations and noise.}
+\label{fig:dwt1D}
+\end{figure}
 
 We can now transform a one-dimensional signal into its wavelet coefficients,
 but the reverse transformation is just as important.
@@ -210,7 +218,7 @@ we can recreate $A_{n-1}$ by tracing the schematic backwards: $A_n$ and $D_n$ ar
 added together to obtain $A_{n-1}$. Up-sampling means doubling the length of an array
 by inserting a 0 at every other position.
 
-\newpage
+% \newpage
 
 \begin{lstlisting}
 >>> # up-sample the coefficient arrays A, D
@@ -242,6 +250,8 @@ the discrete wavelet transform of a random array for different values of $n$, th
 transform.
 Compare the original signal with the recovered signal using \li{np.allclose}.
 \end{problem}
+
+\newpage
 
 \section*{The PyWavelets Module} % ============================================
 
@@ -305,7 +315,7 @@ PyWavelets supports a number of different Wavelets, however, which you can list 
 \end{lstlisting}
 Different wavelets have different properties; the most suitable wavelet is dependent on the specific application.
 See Figure \ref{fig:more_wavelets} for the plots of a couple of additional wavelets.
-\begin{figure}[H]
+\begin{figure}
 \begin{subfigure}[b]{0.45\textwidth}
     \includegraphics[width=\textwidth]{figures/mexicanHat}
 \end{subfigure}
@@ -318,7 +328,7 @@ See Figure \ref{fig:more_wavelets} for the plots of a couple of additional wavel
 
 \section*{The 2-dimensional Wavelet Transform} % ==============================
 
-We can generalize the wavelet transform for two dimensions much as we generalized the fourier transform.
+We can generalize the wavelet transform for two dimensions much as we generalized the Fourier transform.
 This allows us to perform wavelet analysis on, for example, digital images.
 In particular, we can calculate the wavelet transform of a two-dimensional
 array  by first transforming the rows, and then the columns of the array.
@@ -333,7 +343,7 @@ By recursively feeding any or all of the subbands back into the filterbank, we c
 of many subbands.
 This decomposition can be represented schematically by a dyadic partition of a rectangle, called a \emph{subband pattern}.
 The subband pattern for one pass of the filterbank is shown in Figure \ref{fig:2dsubbands}, with a concrete example given in Figure \ref{fig:dwt2D}.
-\begin{figure}
+\begin{figure}[H]
 \begin{tikzpicture}
 %\node[draw, thick, minimum size=4cm](-2,-2) square (2,2) []{$A_k$};
 \draw[thick] (-2,-2) rectangle (2,2);
@@ -386,9 +396,10 @@ This is the key fact for wavelet-based image compression.
 PyWavelets provides a simple way to calculate the subbands resulting from one pass through the filterbank.
 \begin{lstlisting}
 >>> from scipy.misc import imread
->>> fingerprint = imread(filename, True)  # flag True produces a grayscale image
+>>> # flag True produces a grayscale image
+>>> mandrill = imread('mandrill1.png', True) 
 >>> # use the db4 wavelet with periodic extension
->>> lw = pywt.dwt2(fingerprint, 'db4', mode='per')
+>>> lw = pywt.dwt2(mandrill, 'db4', mode='per')
 \end{lstlisting}
 Note that the \li{mode} keyword argument determines the type of extension mode (required for the convolution
 operation).
@@ -397,25 +408,25 @@ The second entry of the list is a tuple containing the remaining subbands, $LH$,
 Plot these subbands as follows:
 \begin{lstlisting}
 >>> plt.subplot(221)
->>> plt.imshow(np.abs(lw[0]), cmap=plt.cm.Greys_r, interpolation='none')
+>>> plt.imshow(np.abs(lw[0]), cmap='gray')
 >>> plt.subplot(222)
->>> plt.imshow(np.abs(lw[1][0]), cmap=plt.cm.Greys_r, interpolation='none')
+>>> plt.imshow(np.abs(lw[1][0]), cmap='gray')
 >>> plt.subplot(223)
->>> plt.imshow(np.abs(lw[1][1]), cmap=plt.cm.Greys_r, interpolation='none')
+>>> plt.imshow(np.abs(lw[1][1]), cmap='gray')
 >>> plt.subplot(224)
->>> plt.imshow(np.abs(lw[1][2]), cmap=plt.cm.Greys_r, interpolation='none')
+>>> plt.imshow(np.abs(lw[1][2]), cmap='gray')
 >>> plt.show()
 \end{lstlisting}
 
 \begin{problem}
-Plot the subbands of the file \li{swan_lake_polluted.png} as described above.
+Plot the subbands of the file \li{swanlake_polluted.png} as described above.
 Compare this with the subbands the mandrill image shown in Figure \ref{fig:dwt2D}.
 \end{problem}
 
 \section*{Image Processing}
 We are now ready to use the two-dimensional wavelet transform for image processing.
 Wavelets are especially good at filtering out high-frequency noise from an image.
-Just as we were able to pinpoint the noise added to the sin wave in Figure \ref{fig:dwt1D}, the majority of the noise added to an image will be contained in the final $LH$, $HL$, and $HH$ detail subbands of our wavelet decomposition.
+Just as we were able to pinpoint the noise added to the sine wave in Figure \ref{fig:dwt1D}, the majority of the noise added to an image will be contained in the final $LH$, $HL$, and $HH$ detail subbands of our wavelet decomposition.
 If we decompose our image and reconstruct it with all subbands except these final subbands, we will eliminate most of the troublesome noise while preserving the primary aspects of the image.
 
 We perform this cleaning as follows:
@@ -427,7 +438,7 @@ new_image = pywt.waverec2(WaveletCoeffs[:-1], wavelet)
 \end{lstlisting}
 
 \begin{problem}
-Write a function called \li{clean_image()} which accepts the name of a grayscale image file, and cleans high-frequency noise out of the image.
+Write a function called \li{clean_image()} which accepts the name of a grayscale image file and cleans high-frequency noise out of the image.
 Load the image as an ndarray, and perform a wavelet decomposition using PyWavelets.
 Reconstruct the image using all subbands except the last set of detail coefficients, and return this cleaned image as an ndarray.
 \end{problem}
