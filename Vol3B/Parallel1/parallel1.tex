@@ -254,7 +254,9 @@ All of the examples that we have done in this lab up to this point may have seem
 
 Many natural language processing (NLP) problems naturally extend to a parallel computing architecture. In many situations, we will have a function we want to apply to a piece of text, whether that be a sentence, paragraph, or an entire document. An efficient way to handle these problems is to scatter the data to all available engines, perform the calculations, then gather the results.
 
-The introductory step to latent symantic analysis is to create a occurance matrix based on the bag-of-words model. This matrix has the ids for the different documents as the rows and the different words in the vocabulary as the columns. Then the $ij$-th entries of this matrix is the number of times the $j$-th word appears in the $i$-th document. For example, consider the following example:
+The introductory step to latent symantic analysis is to create a occurance matrix based on the bag-of-words model. At a high level, the bag-of-words model gives us insight as to the topic of a given document. It can also be used to measure the similarity between two documents.
+
+The occurence matrix has the ids for the different documents as the rows and the different words in the vocabulary as the columns. Then the $ij$-th entries of this matrix is the number of times the $j$-th word appears in the $i$-th document. For example, consider the following example:
 
 Say we have the following 4 pieces of text:
 \begin{enumerate}
@@ -278,6 +280,8 @@ doc2     1     0     0      0       1
 doc3     0     1     1      0       0
 doc4     0     1     2      1       0
 \end{lstlisting}
+
+Notice that the columns contain all the non-stopwords that were used throughout all the documents combined.
 
 The \li{state_union.zip} file contains all of the State of the Union addresses from 1945-2006. For this problem, leverage the power of parallel computing to create an occurence matrix where the rows are the different State of the Union addresses and the columns are the words in the collective vocabulary. There are many ways to tackle this problem, so we will leave it open-ended. However, we strongly recommend that you base your solution around the \li{scatter()} and \li{gather()} methods.
 
