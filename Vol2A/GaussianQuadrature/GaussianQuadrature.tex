@@ -20,121 +20,115 @@ As with all quadrature methods, we begin by choosing a set of points $x_i$ and w
 \]
 
 When we do Gaussian quadrature, we are required to choose a weight function $W(x)$.
-This function determines both the $x_i$'s and the $w_i$'s.
+This function determines both the $x_i$'s and the $w_i$'s. % TODO: HOW? Details!
 Theoretically, the weight function determines a set of orthogonal polynomials to approximate the function $f$.
 
 The weight function also determines the interval over which the integration will occur.
-For example, we choose the weight function as $W(x) = 1$ over $[-1,1]$ to integrate functions on $[-1,1]$.
-To calculate the definite integrate over any interval, we perform a u-substitution.
-This results in the following formula.
+For example, we may choose the weight function as $W(x) = 1$ over $[-1,1]$ to integrate functions on $[-1,1]$.
+To calculate the definite integrate over a the arbitrary interval $[a,b]$, we perform a u-substitution to shift the interval of integration from $[a,b]$ to $[-1,1]$.
+Let \[u = \frac{2x - b - a}{b - a}\] so that $u = -1$ when $x = a$ and $u = 1$ when $x=b$.
+Then we have \[x = \frac{b - a}{2}u + \frac{a + b}{2}\qquad \text{and}\qquad dx = \frac{b - a}{2}du,\] so the transformed integral is given by
+\begin{equation}
+\int_a^b f(x) dx = \frac{b-a}{2}\int_{-1}^1 f\left(\frac{b-a}{2}u + \frac{a+b}{2}\right)du.
+\label{eq:quadrature-usub}
+\end{equation}
+
+The general quadrature formula is then given by the following equation.
 \[
-\int_a^b f(x) dx = \frac{b-a}{2}\int_{-1}^1 f(\frac{b-a}{2}z + \frac{a+b}{2})dz.
+\int_a^b f(x) dx \approx \frac{b - a}{2} \sum_i w_i f\left(\frac{(b-a)}{2}x_i + \frac{(a+b)}{2}\right)
 \]
 
-Once we have changed the interval, we may apply quadrature to the integral from $-1$ to $1$ and then scale it appropriately to get the answer we want.
-\[
-\int_a^b f(x) dx \approx \frac{b - a}{2} \sum_i w_if(\frac{(b-a)}{2}x_i + \frac{(b+a)}{2})
-\]
+\begin{problem} % Shift the integral.
+Write a function that accepts a function $f$, interval endpoints $a$ and $b$, and a keyword argument \li{plot} that defaults to \li{False}.
+Use (\ref{eq:quadrature-usub}) to construct a function $g$ such that \[\int_a^b f(x)dx = \frac{b - a}{2}\int_{-1}^1 g(u)du.\]
+(Hint: this can be done in a single line using the \li{lambda} keyword.)
 
-% Problem 1: shift the integral for a particular function.
-\begin{problem}
-Let $f(x) = x^2$ on $[1,4]$. Then $g(x)$ will be the interval-adjusted version of $f$ on $[-1,1]$, with $W(x)=1$, $a=1$, and $b=4$. So,
-\begin{align*}
-g(x) &= f(\frac{b-a}{2}x + \frac{b+a}{2}) \\
-&= \frac{9}{4} x^2 + \frac{15 x}{2} + \frac{25}{4}
-\end{align*}
+If \li{plot} is \li{True}, plot $f$ over $[a,b]$ and $g$ over $[-1,1]$ in separate subplots.
+The functions probably have similar shapes, but note the difference in the scaling of the $y$-axis.
+Try $f(x) = x^2$ and $f(x) = (x - 3)^3$ over $1,4]$ as examples.
 
-and the interval-adjusted integral of $f(x)$ will be
-
-\begin{align*}
-G(x) &= \frac{b - a}{2} \int f(\frac{b - a}{2} x + \frac{b + a}{2})dx \\
-&= \frac{9}{8} x^3 + \frac{45}{8} x^2 + \frac{75}{8} x
-\end{align*}
-
-Verify that evaluating $G(1) - G(-1) = \int_1^4 f(x)dx$.
+Finally, return the new function $g$.
+\label{prob:funcshift}
 \end{problem}
 
-% Problem 2: general integral shift.
-\begin{problem}
-Write a function that will accept a function $f$ and an interval $[a,b]$ and return a function $g$ on $[-1,1]$ that has the same integral (scaled by a constant) as $f$.
-
-Use your function to plot $f(x) = x^2$ on $[1, 4]$ and the corresponding function $\frac{\left(b - a\right)}{2}g$ on $[-1,1]$.
-Note that the functions will not look the same plotted, since they are defined over intervals with different lengths, but they integrate to the same value.
-\end{problem}
+\begin{comment} % Unnecessary.
+As an example, let $f(x) = x^2$ on $[1,4]$.
+We know that $\left.\int_1^4 x^2 dx = \frac{x^3}{3}\right|_1^4 = 21$.
+Then setting
+\begin{align*}
+g(x) &= \frac{b - a}{2}f\left(\frac{b-a}{2}x + \frac{b+a}{2}\right) \\
+& = \frac{3}{2}\left(\frac{3}{2}x + \frac{5}{2}\right)^2 \\
+&= \frac{27}{8}x^2 + \frac{45}{8}x + \frac{75}{8},
+\end{align*}
+the interval-adjusted integral of $f(x)$ is given by
+\begin{align*}
+\int_a^b f(x)dx = \int_{-1}^1 g(x)dx = \left.\frac{9}{8} x^3 + \frac{45}{4} x^2 + \frac{75}{8} x\right|_{-1}^1 = 21.
+\end{align*}
+\end{comment}
 
 \section*{Integrating with Given Weights and Points} % ========================
 
-We now give an example of quadrature with known weights and points.
-We use the constant weight function $W(x) = 1$ from $-1$ to $1$ (this weight function corresponds to the Legendre polynomials) to calculate the integral of $f(x) = sin(x)$ from $-\pi$ to $\pi$, with $5$ interpolation points.
+With the new shifted function $g$ from Problem \ref{prob:funcshift}, we can write the quadrature formula as follows.
+\begin{equation}
+\int_a^b f(x) dx \approx \frac{b - a}{2} \sum_i w_i g(x_i)
+\label{eq:general-quadrature}
+\end{equation}
 
-First, we change the interval from $[-\pi,\pi]$ to $[-1,1]$.
+Suppose for a given weight function $W(x)$ and a given number of points $n$, we have the sample points $\x = [x_1,\ldots,x_n]\trp$ and weights $\w = [w_1,\ldots,w_n]\trp$ stored as 1-d NumPy arrays.
+The summation in (\ref{eq:general-quadrature}) can then be calculated with the vector multiplication $\w\trp g(\x)$, where $g(\x) = [g(x_1),\ldots,g(x_n)]\trp$.
 
-\begin{lstlisting}
->>> import numpy as np
->>> a, b = - np.pi, np.pi
+\begin{problem} % Integrate with given points and weights.
+Write a function that accepts a function $f$, interval endpoints $a$ and $b$, an array of points $\x$, and an array of weights $\w$.
+Use (\ref{eq:general-quadrature}) and your function from Problem \ref{prob:funcshift} to calculate the integral of $f$ over $[a,b]$.
+Return the value of the integral.
 
-# f is the function to integrate.
->>> f = np.sin
-
-# g is the function with the interval changed.
->>> g = lambda x: f((b - a) / 2 * x + (a + b) / 2)
-\end{lstlisting}
-
-\begin{table}[h!]
-\begin{center}
-\begin{tabular}{|c|c|}
-\hline
-point $x_i$ & weight $w_i$ \\
-\hline
-$-\frac{1}{3}\sqrt{5 + 2\sqrt{\frac{10}{7}}}$ &  $\frac{322-13\sqrt{70}}{900}$ \\
-\hline
-$-\frac{1}{3}\sqrt{5 - 2\sqrt{\frac{10}{7}}}$ & $\frac{322+13\sqrt{70}}{900}$ \\
-\hline
-$0$ & $\frac{128}{225}$ \\
-\hline
-$\frac{1}{3}\sqrt{5 - 2\sqrt{\frac{10}{7}}}$ & $\frac{322+13\sqrt{70}}{900}$ \\
-\hline
-$\frac{1}{3}\sqrt{5 + 2\sqrt{\frac{10}{7}}}$ & $\frac{322-13\sqrt{70}}{900}$ \\
-\hline
-\end{tabular}
-\end{center}
-\caption{Quadrature points and weights on $\left[-1, 1\right]$.}
-\label{intro_table}
-\end{table}
-
-The weights($w_i$) and points at which $f$ is evaluated ($x_i$) are given in order in Table \ref{intro_table}.
-We put them into an array here.
-
-% TODO: fix these (HOW?).
-\begin{lstlisting}
->>> from math import sqrt
->>> points = np.array([- sqrt(5 + 2 * sqrt(10. / 7)) / 3,
-                       - sqrt(5 - 2 * sqrt(10. / 7)) / 3,
-                       0,
-                       sqrt(5 - 2 * sqrt(10. / 7)) / 3,
-                       sqrt(5 + 2 * sqrt(10. / 7)) / 3])
->>> weights = np.array([(322 - 13 * sqrt(70)) / 900,
-                        (322 + 13 * sqrt(70)) / 900,
-                        128. / 225,
-                        (322 + 13 * sqrt(70)) / 900,
-                        (322 - 13 * sqrt(70)) / 900])
-\end{lstlisting}
-
-We now calculate the integral
+To test this function, use the following 5 points and weights that accompany the constant weight function $W(x) = 1$ (this weight function corresponds to the \emph{Legendre polynomials}). % TODO: why / how does this correspond to the Legendre polynomials?
+See the next page for their definitions using NumPy.
+\[
+\centering % TODO: make this a little prettier.
+\begin{array}{c|c|c|c|c|c}
+    x_i
+    & -\frac{1}{3}\sqrt{5 + 2\sqrt{\frac{10}{7}}}
+    & -\frac{1}{3}\sqrt{5 - 2\sqrt{\frac{10}{7}}}
+    & 0
+    & \frac{1}{3}\sqrt{5 - 2\sqrt{\frac{10}{7}}}
+    & \frac{1}{3}\sqrt{5 + 2\sqrt{\frac{10}{7}}}
+    \\[1em] \hline
+    w_i
+    & \dfrac{322-13\sqrt{70}}{900}
+    & \dfrac{322+13\sqrt{70}}{900}
+    & \dfrac{128}{225}
+    & \dfrac{322+13\sqrt{70}}{900}
+    & \dfrac{322-13\sqrt{70}}{900}
+\end{array}
+\]
+% \caption{Quadrature points and weights on $\left[-1, 1\right]$.}
 
 \begin{lstlisting}
->>> integral = (b - a)/2 * np.dot(weights, g(points))
-\end{lstlisting}
+import numpy as np
+from math import sqrt
 
-\begin{problem} % Integrating with Weights.
-Write a function that accepts a function f, an array of points, an array of weights, and limits of integration and returns the integral.
-Don't forget to adjust the interval as in the above example.
+s1 = 2 * sqrt(10. / 7.)
+points = np.array([-sqrt(5 + s1) / 3.,
+                   -sqrt(5 - s1) / 3.,
+                                   0.,
+                    sqrt(5 - s1) / 3.,
+                    sqrt(5 + s1) / 3.])
+
+s2 = 13 * sqrt(70)
+weights = np.array([(322 - s2) / 900.,
+                    (322 + s2) / 900.,
+                           128 / 225.,
+                    (322 + s2) / 900.,
+                    (322 - s2) / 900.])
+\end{lstlisting}
+Using these points and weights should yield the approximations \[\int_{-\pi}^\pi \sin(x)dx \approx 0\quad\text{and}\quad\int_{-\pi}^\pi \cos(x)dx \approx 0.000196.\]
 \end{problem}
 
 \section*{Calculating Weights and Points} % ===================================
 
 Calculating an integral when the weights and points are given is straightforward.
-But, how are these weights and points found?
+But how are these weights and points found?
 There are many publications that will give tables of points for various weight functions.
 We will demonstrate how to find such a list using the Golub-Welsch algorithm.
 
