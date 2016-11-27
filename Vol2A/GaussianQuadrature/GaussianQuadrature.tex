@@ -8,8 +8,9 @@ The Gaussian Quadrature method, on the other hand, uses carefully chosen points 
 }
 
 % TODO:
-% - The approach here is to essentially build the integrator backwards. Is there a more intutive approach?
-% - We should do multivariable integration at the end at least once.
+% - The approach here is to essentially build the quadrature backwards piece by piece. Is there a more direct approach?
+% - Most of the lab is essentially magic right now. Needs explanation related to the theory of orthogonal polynomials.
+% - We should do multivariable integration at the end at least once. Could we build a multivariate quadrature by hand?
 % - This lab needs to be carefully synchronized with the Volume II text.
 
 \section*{Shifting the Interval of Integration} % =============================
@@ -134,9 +135,9 @@ We will demonstrate how to find such a list using the Golub-Welsch algorithm.
 
 \subsection*{The Golub-Welsch Algorithm} % ------------------------------------
 
-This Golub-Welsch algorithm builds a tri-diagonal matrix and finds its eigenvalues.
+The Golub-Welsch algorithm builds a tri-diagonal matrix and finds its eigenvalues.
 These eigenvalues are the points at which a function is evaluated for Guassian quadrature.
-The weights are the length of $\left[a, b\right]$ times the first coordinate of each eigenvector squared.
+The weights are the length of the shifted interval of integration times the first coordinate of each eigenvector squared.
 We note that finding eigenvalues for a tridiagonal matrix is a well conditioned, relatively painless problem.
 Using a good eigenvalue solver gives the Golub-Welsch algorithm a complexity of $O(n^2)$.
 A full treatment of the Golub-Welsch algorithm may be found at \url{http://gubner.ece.wisc.edu/gaussquad.pdf}.
@@ -147,12 +148,12 @@ An important fact about orthogonal polynomials is that any set of orthogonal pol
 u_{i}(x) = (\gamma_{i-1}x-\alpha_i)u_{i-1}(x) - \beta_iu_{i-2}(x)
 \]
 where $u_{-1}(x) = 0$ and $u_0(x) = 1$.
-The coefficients $\{\gamma_k, \alpha_i, \beta_i\}$ have been calculated for several classes of orthogonal polynomials, and may be determined for an arbitrary class using the procedure found in ``Calculation of Gauss Quadrature Rules'' by Golub and Welsch.
+The coefficients $\{\gamma_i, \alpha_i, \beta_i\}$ have been calculated for several classes of orthogonal polynomials, and may be determined for an arbitrary class using the procedure found in ``Calculation of Gauss Quadrature Rules'' by Golub and Welsch.
 Using these coefficients we may create a tri-diagonal matrix
 
-\[
-J = \begin{bmatrix}
 
+\[ % TODO: make this matrix smaller. Doesn't have to be so huge.
+J = \begin{bmatrix}
 a_1 & b_1 & 0 & 0 & ... & 0 \\
 b_1 & a_2 & b_2 & 0 & ... & 0 \\
 0 & b_2 & a_3 & b_3 & ... & 0 \\
@@ -160,25 +161,24 @@ b_1 & a_2 & b_2 & 0 & ... & 0 \\
 \vdots & & & & & \vdots \\
 0 & ... & & & & b_{N-1} \\
 0 & ... & & & b_{N-1} & a_N
-
 \end{bmatrix}
 \]
 
 Where $a_i = \frac{-\beta_i}{\alpha_i}$ and $b_i = (\frac{\gamma_{i+1}}{\alpha_i \alpha_{i+1}})^{\frac{1}{2}}$.
 This matrix is called the Jacobi matrix.
-The eigenvalues of this matrix give us the points $x_i$ and the length of $\left[a, b\right]$ times the squares of the first entries of the corresponding eigenvectors gives the weights.
 
 \begin{problem} % Construct the Jacobi matrix.
 Write a function that will accept three arrays representing the coefficients $\{\gamma_i, \alpha_i, \beta_i\}$ from the recurrence relation above and return the Jacobi matrix.
 \end{problem}
 
+The eigenvalues of the Jacobi matrix are the sample points $x_i$.
+The length of the shifted interval of integration (in this case 2) times the squares of the first entries of the corresponding eigenvectors give the weights.
+
 \begin{problem} % Calculate points and weights.
 The coefficients of the Legendre polynomials (which correspond to the weight function $W(x) = 1$ on $[-1,1]$) are given by
-\begin{align}\nonumber
-\alpha_k = \frac{2k - 1}{k} && \beta_k = 0 && \gamma_k = \frac{k-1}{k}
-\end{align}
+\[\gamma_k = \frac{k-1}{k} \qquad \alpha_k = \frac{2k - 1}{k} \qquad \beta_k = 0\]
 
-Write a function that accepts an integer $n$ representing the number of points to use in the quadrature. Calculate $\alpha$, $\beta$, and $\gamma$ as above, calculate the Jacobi matrix, then use it to find the points $x_i$ and weights $w_i$ that correspond to this weight function.
+Write a function that accepts an integer $n$ representing the number of points to use in the quadrature. Calculate $\alpha$, $\beta$, and $\gamma$ as above, form the Jacobi matrix, then use it to find the points $x_i$ and weights $w_i$ that correspond to this weight function.
 Verify that when $n=5$ the points and weights match the ones given in the first part of this lab.
 \end{problem}
 
@@ -189,7 +189,9 @@ Use the previously defined functions to estimate $\int_a^b f(x)dx$ using the coe
 This completes our implementation of the Gaussian Quadrature for a particular set orthogonal polynomials.
 \end{problem}
 
-\section*{Integration with SciPy} % ===========================================
+\newpage
+
+\section*{Numerical Integration with SciPy} % =================================
 
 There are many other techniques for finding the weights and points for a given weighting function.
 % This is, in fact, not even the fastest method.
