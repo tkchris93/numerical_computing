@@ -3,7 +3,7 @@
 
 import numpy as np
 from math import sqrt
-from scipy import stats
+from scipy.stats import norm
 from scipy import linalg as la
 from scipy.integrate import quad
 from matplotlib import pyplot as plt
@@ -97,13 +97,7 @@ def points_and_weights(n):
     # Get the points and weights from the Jacobi eigenvalues and eigenvectors.
     points = eigs
     weights = 2 * vecs[0]**2
-
     return points.real, weights.real
-
-    evals, evecs = eig(jac)
-    print evecs
-    weights = [(evecs[i,0]**2)*2 for i in xrange(evecs.shape[0])]
-    return evals, weights
 
 
 # Problem 5
@@ -114,11 +108,6 @@ def gaussian_quadrature(f, a, b, n):
     points, weights = points_and_weights(n)
     return estimate_integral(f, a, b, points, weights)
 
-    evals, evecs = eig(jac)
-    print evecs
-    weights = [(evecs[i,0]**2)*2 for i in xrange(evecs.shape[0])]
-    return evals, weights
-
 
 # Problem 6
 def normal_cdf(x):
@@ -128,153 +117,3 @@ def normal_cdf(x):
     """
     return quad(norm.pdf, -5, x)[0]
 
-
-# ============================== END OF FILE ============================== #
-
-from numpy.random import randn
-
-# Test script
-def test(student_module):
-    """Test script. Import the student's solutions file as a module.
-
-     5 points for problem 2
-    30 points for problem 6
-     5 points for problem 7
-
-    Inputs:
-        student_module: the imported module for the student's file.
-
-    Returns:
-        score (int): the student's score, out of TOTAL.
-        feedback (str): a printout of test results for the student.
-    """
-    tester = _testDriver()
-    tester.test_all(student_module)
-    return tester.score, tester.feedback
-
-def _autoclose(func):
-    """function decorator for closing figures automatically."""
-    def wrapper(*args, **kwargs):
-        try:
-            plt.ion()
-            return func(*args, **kwargs)
-        finally:
-            plt.close('all')
-            plt.ioff()
-    return wrapper
-
-class _testDriver(object):
-    """Class for testing a student's work. See test.__doc__ for more info."""
-
-    # Constructor -------------------------------------------------------------
-    def __init__(self):
-        """Initialize the feedback attribute."""
-        self.feedback = ""
-
-    # Main routine -----------------------------------------------------------
-    def test_all(self, student_module, total=40):
-        """Grade the provided module on each problem and compile feedback."""
-        # Reset feedback and score.
-        self.feedback = ""
-        self.score = 0
-
-        def test_one(problem, number, value):
-            """Test a single problem, checking for errors."""
-            try:
-                self.feedback += "\n\nProblem %d (%d points):"%(number, value)
-                points = problem(student_module)
-                self.score += points
-                self.feedback += "\nScore += %d"%points
-            except BaseException as e:
-                self.feedback += "\n%s: %s"%(self._errType(e),e)
-
-        # Grade each problem.
-        test_one(self.problem2, 2, 5)   # Problem 1:  5 points.
-        test_one(self.problem6, 6, 30)  # Problem 2: 30 points.
-        test_one(self.problem7, 7, 5)   # Problem 2:  5 points.
-
-        # Report final score.
-        percentage = (100. * self.score) / total
-        self.feedback += "\n\nTotal score: %d/%d = %s%%"%(
-                                    self.score, total, percentage)
-        if   percentage >=  98: self.feedback += "\n\nExcellent!"
-        elif percentage >=  90: self.feedback += "\n\nGreat job!"
-
-        # Add comments (optionally).
-        print(self.feedback)
-        comments = str(raw_input("Comments: "))
-        if len(comments) > 0:
-            self.feedback += '\n\n\nComments:\n\t%s'%comments
-
-    # Helper Functions --------------------------------------------------------
-    @staticmethod
-    def _errType(error):
-        """Get just the name of the exception 'error' in string format."""
-        if isinstance(error, BaseException):
-            return str(type(error)).lstrip("<type 'exceptions.").rstrip("'>")
-        else:
-            return str(error)
-
-    def _eqTest(self, correct, student, message):
-        """Test to see if 'correct' and 'student' are equal.
-        Report the given 'message' if they are not.
-        """
-        if abs(correct - student) < 1e-6:
-            return 1
-        else:
-            self.feedback += "\n%s"%message
-            self.feedback += "\n\tCorrect response: %s"%correct
-            self.feedback += "\n\tStudent response: %s"%student
-            return 0
-
-    def _grade(self, points, message=None):
-        """Manually grade a problem worth 'points'. Return the score."""
-        credit = -1
-        while credit > points or credit < 0:
-            try:
-                credit = int(input("\nScore out of %d: "%points))
-            except:
-                credit = -1
-        if credit != points:
-            # Add comments (optionally),
-            comments = raw_input("Comments: ")
-            if len(comments) > 0:
-                self.feedback += "\n%s"%comments
-            # Or add a predetermined error message.
-            elif message is not None:
-                self.feedback += "\n%s"%message
-        return credit
-
-    # Problems ----------------------------------------------------------------
-    @_autoclose
-    def problem1(self, s):
-        """Test shift(). 5 points."""
-        s.prob2()
-        return self._grade(5, "prob2() failed")
-
-    def problem5(self, s):
-        """Test gaussian_quadrature(). 30 points.""" # LOL spread it out...
-        f = lambda x: x**2
-        points =  10*self._eqTest(21, s.gaussian_quadrature(f, 1, 4, 5),
-                            "gaussian_quadrature() failed for f(x) = "
-                            "x^2 over [1, 4]")
-
-        g = lambda x: 4*x**3 - 3*x**2 + 2*x - 5
-        points += 10*self._eqTest(46, s.gaussian_quadrature(g, 2, 3, 6),
-                            "gaussian_quadrature() failed for f(x) = "
-                            "4x^3 - 3x^2 + 2x - 5 over [2, 3]")
-
-        h = lambda x: (x-5)**3
-        points += 10*self._eqTest(0, s.gaussian_quadrature(h, 3, 7, 5),
-                            "gaussian_quadrature() failed for f(x) = "
-                            "(x-5)^3 over [3, 7]")
-        return points
-
-    def problem6(self, s):
-        """Test normal_cdf(). 5 points."""
-        points  = 2*self._eqTest(norm.cdf(1), s.normal_cdf(1),
-                                        "normal_cdf(1) failed")
-        x = randn()
-        points += 3*self._eqTest(norm.cdf(x), s.normal_cdf(x),
-                                        "normal_cdf({!f}) failed".format(x))
-        return points
