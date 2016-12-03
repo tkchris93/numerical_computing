@@ -1,5 +1,8 @@
 \lab{BeautifulSoup}{BeautifulSoup}
-\objective{Learn how to load HTML documents into BeautifulSoup and navigate the resulting BeautifulSoup object}
+\objective{Virtually everything rendered by an internet browser as a web page uses HTML.
+As a result, learning HTML is key to any kind of internet programming. 
+BeautifulSoup is a Python package that helps with navigating HTML documents.
+In this lab, we learn how to load HTML documents into BeautifulSoup and navigate the resulting BeautifulSoup object.}
 \label{lab:BS_scraping}
 
 \section*{HTML}
@@ -145,23 +148,15 @@ It only gives you the \textit{first} tag by that name.
 <<<a class="stooge" href="http://example.com/larry" id="link1">Larry</a>>>
 \end{lstlisting}
 
-\begin{problem}
-What will the following code return?
-\begin{lstlisting}
->>> soup.p
-\end{lstlisting}
-\end{problem}
-
 \subsubsection{Tag Properties}
 
 Once a tag has been selected, you can access its properties such as its name, attributes, and strings where applicable.
 
 A tag's name is found using \li{.name}.
 \begin{lstlisting}
->>> soup_properties = BeautifulSoup('<a href="http://example.com/larry" class="stooge" id="link1">Larry</a>')
 >>> tag = soup.a
 >>> tag.name
-<<'p'>>
+<<u'a'>>
 \end{lstlisting}
 
 The attributes of a tag, if it has them, are stored in a dictionary and can be accessed as such.
@@ -170,16 +165,16 @@ Individual tags values can be reached by calling the key associated with it.
 If you try to access a key that is not an attribute, you get \li{None} in return.
 \begin{lstlisting}
 >>> tag.attrs
-<<{'class': ['stooge'], 'href': 'http://example.com/larry', 'id': 'link1'}>>
+<<{u'class': [u'stooge'], u'href': u'http://example.com/larry', u'id': u'link1'}>>
 
 >>> tag['class']
-<<['stooge']>>
+<<[u'stooge']>>
 
 >>> tag['href']
-<<'http://example.com/larry'>>
+<<u'http://example.com/larry'>>
 
 >>> tag['id']
-<<'link1'>>
+<<u'link1'>>
 
 >>> print(tag['color'])
 <<None>>
@@ -194,6 +189,13 @@ If a tag contains any text, it can accessed with \li{.string}.
 <<u'Larry'>>
 \end{lstlisting}
 
+\begin{problem}
+In the Three Stooges example, what code would you use to return the following?
+\begin{lstlisting}
+[u'title']
+\end{lstlisting}
+\end{problem}
+
 \subsection*{By Family Relations}
 
 Once we have selected a tag, we have several options available to navigate up, down, and sideways through an HTML tree.
@@ -204,10 +206,11 @@ Tags may contain other tags or text.
 These are the \textit{children} of a tag, and the call \li{.contents} returns the children of the parent tag.
 \begin{lstlisting}
 >>> head_tag = soup.head
+>>> head_tag
 <<<head><title>The Three Stooges</title></head>>>
 
 >>> head_tag.contents
-<<[<title.The Three Stooges</title>]>>
+<<[<title>The Three Stooges</title>]>>
 
 >>> title_tag = head_tag.contents[0]
 >>> title_tag
@@ -259,7 +262,7 @@ u'\n'>>
 \end{lstlisting}
 
 There is a \li{.descendants} attribute which will recursively go through a tag's children, the children's children, etc.
-It is left to you to look at the online documentation for this attribute.
+It is left to the student to look at the online documentation for this attribute.
 
 If a tag has only one child, and that child is a string, the child is available using \li{.string}.
 If a tag has one tag, and that tag has a single string as a child, then the parent tag can use \li{.string} to access the string as well.
@@ -276,7 +279,7 @@ If a tag has one tag, and that tag has a single string as a child, then the pare
 <<u'The Three Stooges'>>
 \end{lstlisting}
 If a tag contains more than one string, \li{.string} return \lstinline{None}.
-However, you can use \li{.strings} to return a generator that iterates through all strings contained within a tag.
+However, \li{.strings} returns a generator that iterates through all strings contained within a tag.
 Check the online documentation for examples.
 
 \subsubsection{Going Up}
@@ -379,11 +382,7 @@ Answer the following questions.
 \begin{lstlisting}
 <<u'Mo'>>
 \end{lstlisting}
-2. How would you return the following:
-\begin{lstlisting}
-<<<p class="story''>...</p>>>
-\end{lstlisting}
-3. Download 'example.htm' associated with the lab into your working directory.
+2. Download 'example.htm' associated with the lab into your working directory.
 You can go to \url{http://example.com} to see the site where this file originates from.
 The following code allows you to bring in any file into \li{BeautifulSoup()}
 \begin{lstlisting}
