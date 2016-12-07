@@ -462,11 +462,11 @@ If \li{method} is 2, use the second method.
 
 \begin{problem}
 Download 'SanDiegoWeather.htm' and load it into BeautifulSoup.
-You can find the corresponding website at \url{http://www.wunderground.com/history/airport/KSAN/2015/1/1/DailyHistory.html?req_city=San+Diego&req_state=CA&req_statename=California&reqdb.zip=92101&reqdb.magic=1&reqdb.wmo=99999&MR=1}. Using the \li{.find()} method, print the tags referred to in the following questions:
+You can find the corresponding website at \url{http://www.wunderground.com/history/airport/KSAN/2015/1/1/DailyHistory.html?req_city=San+Diego&req_state=CA&req_statename=California&reqdb.zip=92101&reqdb.magic=1&reqdb.wmo=99999&MR=1}. Using the \li{.find()} method, write a function that prints the tags referred to in the following questions:
 \begin{enumerate}
 \item What is the tag which contains the date, Thursday, January 1, 2015?
 \item What are the tags which contain the links 'Previous Day' and 'Next Day'?
-\item What is the tag which contains the number associated with the Actual Max Temperature.
+\item What is the tag which contains the number associated with the Actual Max Temperature?
 \end{enumerate}
 [Hint: You can do a \li{ctrl+f} to find where the text is in the HTML, then study the tags around it.]
 \end{problem}
@@ -524,8 +524,10 @@ The following returns all tags that have some value associated with their \li{hr
 \begin{problem}
 
 Use BeautifulSoup to load the 'Big Data dates' file.
-This page is found at \url{https://www.federalreserve.gov/releases/lbr/}, although the actual website may include more dates.
+This page can be found at \url{https://www.federalreserve.gov/releases/lbr/}.
+Note that the actual website may include more dates than the file provided.
 Notice all the release dates of bank data, ranging from 2003 to 2014 in the file you downloaded.
 Using \li{find_all()} and \li{re}, find all the links to bank data from September 30, 2003 to December 31, 2014.
+Write a function that loads the file into BeautifulSoup and returns a list of all of the tags containing these links.
 
 \end{problem}
