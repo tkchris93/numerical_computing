@@ -1,15 +1,8 @@
+"""Volume 3B: Web Scraping 1. Solutions file."""
+
 from bs4 import BeautifulSoup
 import re
 
-#Problem 1
-# Part 1
-print 'html', 'head', 'title', 'meta', 'style', 'body', 'div', 'h1', 'p', 'a'
-
-# Part 2
-print "text/css"
-
-
-#Problem 2
 html_doc = """
 <html><head><title>The Three Stooges</title></head>
 <body>
@@ -22,52 +15,83 @@ and they are really hilarious.</p>
 <p class="story">...</p>
 """
 
-soup = BeautifulSoup(html_doc)
-print(soup.prettify())
+# Problem 1
+def Prob1():
+    """Returns a list of tags used and the value of
+    the type attribute associated with the style tag
+    """
+    tags_used = ['html', 'head', 'title', 'meta', 'style', 'body', 'div', 'h1', 'p', 'a']
+    value = "text/css"
+    return tags_used, value
 
-#Problem 3
-soup.p
+# Problem 2
+def Prob2():
+    """Prints (not returns) the prettified
+    string for the Three Stooges HTML.
+    """
+    soup = BeautifulSoup(html_doc, 'html.parser')
+    print(soup.prettify())
 
-#Problem 4
-# Part 1
-soup.a.next_sibling.next_sibling.string   #if you use print, you get Mo, not u'Mo'
+# Problem 3
+def Prob3():
+    """Returns [u'title'] from the Three Stooges soup"""
+    soup = BeautifulSoup(html_doc, 'html.parser')
+    tag = soup.p
+    return tag['class']
 
-# Part 2
-soup.body.contents[5]
-#or
-soup.p.next_sibling.next_sibling.next_sibling.next_sibling
+# Problem 4
+def Prob4():
+    """Returns u'Mo' from the Three Stooges soup"""
+    soup = BeautifulSoup(html_doc, 'html.parser')
+    return soup.a.next_sibling.next_sibling.string
 
-# Part 3
-example_soup = BeautifulSoup(open('example.htm'),'html.parser')
-example_soup.a.string
-example_soup.p.next_sibling.next_sibling.a.string
+# Problem 5
+def Prob5(method):
+    """Returns the u'More information...' using two different methods.
+    If method is 1, it uses first method. If method is 2, it uses
+    the second method.
+    """
+    example_soup = BeautifulSoup(open('example.htm'), 'html.parser')
+    if method == 1:
+        return example_soup.a.string
+    if method == 2:
+        return example_soup.p.next_sibling.next_sibling.a.string
 
-#Problem 5
-example_soup = BeautifulSoup(open('example.htm'),'html.parser')
-example_soup.find(href=True)['href']
-example_soup.a['href']
+# Problem 6
+def Prob6(method):
+    """Returns the tag associated with the "More information..."
+    link using two different methods. If method is 1, it uses the
+    first method. If method is 2, it uses the second method.
+    """
+    example_soup = BeautifulSoup(open('example.htm'), 'html.parser')
+    if method == 1:
+        return example_soup.find(href='http://www.iana.org/domains/example')
+    if method == 2:
+        return example_soup.find(string='More information...').parent
 
-#Problem 6
-SOUP = BeautifulSoup(open('SanDiegoWeather.htm'))
+# Problem 7
+def Prob7():
+    """Loads 'SanDiegoWeather.htm' into BeautifulSoup and prints
+    (not returns) the tags referred to the in the Problem 7 questions.
+    """
+    soup = BeautifulSoup(open('SanDiegoWeather.htm'), 'html.parser')
+    # Question 1
+    print soup.find(string="Thursday, January 1, 2015").parent
+    # Question 2
+    print soup.find(href='/history/airport/KSAN/2014/12/31/DailyHistory.html')
+    print soup.find(href='/history/airport/KSAN/2015/1/2/DailyHistory.html')
+    # Question 3
+    print soup.find(string= 'Max Temperature').parent.parent.next_sibling.next_sibling.span.span
 
-# Part 1
-SOUP.find(class_='history-date')
-
-# Part 2
-SOUP.find(class_='previous-link').a
-SOUP.find(class_='next-link').a
-#or
-SOUP.find(string=re.compile('Previous Day')).parent
-SOUP.find(string=re.compile('Next Day')).parent
-
-# Part 3
-SOUP.find(text='Max Temperature').parent.parent.next_sibling.next_sibling.span.span
-#or
-SOUP.find(text='Max Temperature').parent.parent.parent.find(class_='wx-value')
-
-#Problem 7
-dates_soup = BeautifulSoup(open('Big Data dates.htm'))
-
-dates_soup.find_all(href=re.compile('[01]/default.htm')) #this would give all websites that have a date in the directory path. Could accidentally include files from years outside the allowed range 2003-2014
-#or
-dates_soup.find_all(href=re.compile('((200[3-9])|(201[0-4])).*/default.htm')) #restricts the years to the correct range 2003-2014
+# Problem 8
+def Prob8():
+    """Loads 'Big Data dates.htm' into BeautifulSoup and uses find_all()
+    and re to return a list of all tags containing links to bank data
+    from September 30, 2003 to December 31, 2014.
+    """
+    soup = BeautifulSoup(open('Big Data dates.htm'), 'html.parser')
+    # Pulls all data from years 2010-2014
+    links = soup.find_all(href=True, string=re.compile("201[0-4]"))
+    # Adds all data from years 2003-2009
+    links += soup.find_all(href=True, string=re.compile("200[3-9]"))
+    return links
