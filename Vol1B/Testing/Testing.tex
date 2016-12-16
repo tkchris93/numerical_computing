@@ -1,41 +1,39 @@
 \lab{Unit Testing In Python}{Unit Testing In Python}
 
-\objective{Convey the importance of unit testing in code, especially in the corporate world. Unit testing in python is easy, valuable, and powerful. Any project manager will appreciate a developer who is able to accurately test their code.}
+\objective{Convey the importance of unit testing in code, especially in the corporate world. Unit testing in python is easy, valuable, and powerful. Help students understand how they can use unit testing to become more effective and productive programmers.}
 
-In school, coding projects are usually done by a single student in isolation.  However, when you write code in the real world, you often need to think about how other developers would react to your code, particularly developers working alongside you.
-When working on projects with hundreds of thousand lines of code, it is nigh on impossible to understand how the individual functions work together to form your product.
 
-Thankfully, there is a simple and elegant solution to this problem which keeps you as the developer from having to be omniscient about the code you are writing: Unit Testing.
-Unit testing only requires you to know what the inputs and outputs of a function are.
-Beyond that, you can rely on the unit tests that have been written to know whether or not the function, and by extension the software, is working as expected.
-Unit testing helps you understand requirements, keeps you aware of dependency changes, and gives you confidence about where to find bugs when your code breaks.
+In school, coding projects are usually done by a single student in isolation, on a relatively small scale.  However, when you write code in the real world, projects are often very large, and you often need to collaborate and shared code with other developers.
+When working on projects with hundreds of thousand lines of code, it is nigh on impossible to understand how the individual functions work together or to be sure that the code contains no errors, especially when the code was written by multiple people.
 
-TODO: Describe exactly what Unit Testing is
+Thankfully, there is a simple and elegant solution to this problem which keeps you as the developer from having to be omniscient about the code you are writing: unit testing.
+Unit tesing is a method of testing which evaluates the correctness of code on the level of single functions or classes. A unit test verifies that an isolated unit of code behaves correctly by comparing actual output to expected output. A well written collection of unit tests can ensure that all functions, and by extension, the software as a whole, works correctly.
 
-Imagine for a few moments that you are hired as a developer for a company. On your first day, you are assigned the task of figuring out why your banner upload tool isn't allowing some particular user to upload a banner.
-Very quickly you discover that the user simply doesn't have sufficient credentials to use the tool. At this point, you have two options: you can either change the individual user's credentials, or change the credential requirements for users wanting to use the upload tool.
-You decide to go with the latter and change the requirments for the upload. Then you mark the task as complete, and your code is shipped for the user to see.
-Very soon, however, the bug fix comes back to haunt you! Now that same person who tried to upload the banner in the beginning is having the same issue again.
-In confusion, you go back to find that your coworker had changed the permissions back to fix an issue where anyone could upload a banner, including those who did not have any credentials at all.
-So, now you're back to where you started.  It isn't strictly your coworker's fault that you are tasked with the same bug again, though, since there was nothing to indicate to him that he should not have simply put that code back in place.
+Unit testing also helps you understand requirements, keeps you aware of dependency changes, and gives you confidence about where to find bugs when your code breaks.
 
-Unit testing is the perfect thing to implement in order to keep this sort of thing from happening.
-A well written unit test would have prevented you from editing the code to allow any user to add a banner; i.e., running the pre-written unit testes would have alerted you to the fact that your fix was inappropriate.
-
-Test coverage is even sometimes used in the sales arena to describe the quality of a product!
 
 \section*{PyTest}
 
-Okay, so we've disscussed enough of the why. Now we will explore the "how" of testing code in python.
+Now that we have discussed the ``why" of unit testing, we will discuss the ``how" of testing code in Python.
 It is easiest and most efficient to think about testing individual functions rather than entire files or modules.
 (As we will discuss later, even testing classes should happen on a function level.)
+To test a function we use Python's reserved word \li{assert} and provide our function with input and expected output. Basic assert statements take the form\\
+
+\begin{lstlisting}
+assert <truth statement>, 'message'
+\end{lstlisting}
+
+which raises an AssertionError with error message \li{'message'} if \li{<truth statement>} is false, or else does nothing.
+
 For example, we might test the following function
 
 \begin{lstlisting}
 >>> def addition(a,b):
 ...     return a+b
 \end{lstlisting}
+
 with this test function:
+
 \begin{lstlisting}
 >>> from solutions import addition
 >>> def test_addition():
@@ -44,14 +42,9 @@ with this test function:
 ...     assert addition(6,14) == 20
 \end{lstlisting}
 
-\begin{info}
-Just so you know:
-\begin{lstlisting}
-assert <truth statement>, 'message'
-\end{lstlisting}
-raises an AssertionError with error message \li{'message'} if \li{<truth statement>} is false.  Otherwise, it does nothing.
-\end{info}
+When run, \li{test_addition()} displays no output since all the tests are valid.
 
+Python provides an efficient way for running unit tests through a module called PyTest. PyTest is a tool that allows you run many tests at the same time and get more information about their results.
 
 Now this is all well and good; we can write tests for a function by using the \li{assert} function with expected inputs and outputs.
 However, there is a more practical and useful way to do this.  PyTest is a tool that allows you to aggregate your tests and give you more information about their results.
@@ -111,55 +104,52 @@ platform_tests/test_google.py ......
 Each dot represents a test passing. They show up in order, so, for example, if instead of the third dot there is an "F" (meaning test failed), you would know the third test in the respective file failed.
 \end{info}
 
-Understanding which parts of your code are and are not being tested is a very useful way to get an idea of how well a project is being tested.
-An easy way to do this is to install a tool called \li{pytest-cov}. For some reason, pytest comes bundled with Anaconda while pytest-cov does not.  However, you should be able to install it from the terminal by running the following:
+
+\section*{Coverage}
+
+More important than simply writing tests for code is writing quality tests. One way to measure the quality of your unit tests is by their coverage. Coverage measures how many lines of code are executed by at least one test case. 
+When cosidering coverage, it is useful to think of a function in the form of a diagram, containing branches and loops. Each test takes a certain path through the function, traversing some branches and not others. Full coverage is reached when each branch of the function is traversed by at least one test case.
+
+An easy way to measure coverage in Python is to use a tool called  \li{pytest-cov}. While the pytest module comes bundled with Anaconda, pytest-cov does not.  However, you should be able to install it from the terminal by running the following command:
 \begin{lstlisting}
   $ pip install pytest-cov
 \end{lstlisting}
-Now adding the flag "--cov" to py.test will give you a breakdown of test coverage on your code.
+Adding the flag \li{--cov} to py.test prints out a breakdown of test coverage on your code. For example, running the empty files for this lab yields the following output:
 \begin{lstlisting}
   $ py.test --cov
 ======================= test session starts ========================
-platform darwin -- Python 2.7.10 -- py-1.4.27 -- pytest-2.7.1
+platform win32 -- Python 2.7.11 -- py-2.8.5 -- pytest-2.7.31, pluggy-0.3.1
 rootdir: /Users/lnelson/Desktop/ACME_WORK/python_tests, inifile:
-plugins: cov
-collected 29 items
+plugins: cov-2.4.0
+collected 8 items
 
-api_tests/test_accounts.py ....
-api_tests/test_auth.py .....
-api_tests/test_base.py ....
-api_tests/test_common.py ....
-platform_tests/test_bulk.py ....
-platform_tests/test_calendar.py ..
-platform_tests/test_google.py ......
---------- coverage: platform darwin, python 2.7.10-final-0 ---------
-Name                              Stmts   Miss  Cover
------------------------------------------------------
-api_tests/test_accounts.py            8      0   100%
-api_tests/test_auth.py               10      0   100%
-api_tests/test_base.py                8      0   100%
-api_tests/test_common.py              8      0   100%
-platform_tests/test_bulk.py           8      0   100%
-platform_tests/test_calendar.py       4      0   100%
-platform_tests/test_google.py        12      0   100%
------------------------------------------------------
-TOTAL                                58      0   100%
+test_solutions.py ........
 
-==================== 29 passed in 0.07 seconds =====================
+---------- coverage: platform win32, python 2.7.11-final-0 -----------
+Name                Stmts   Miss  Cover
+---------------------------------------
+solutions.py           65     38    42%
+test_solutions.py      31      0   100%
+---------------------------------------
+TOTAL                  96     38    60%
+
+
+==================== 8 passed in 0.03 seconds =====================
 \end{lstlisting}
 
-The above of course give 100\% coverage because the only files gathered were test files, and pytest runs those files in their entirety.  TODO: give examples that are more substantial and relevant.
+In the above output, \li{Stmts} refers to the number of lines in the code that pytest ran, while \li{Miss} is the number of lines of code that were not run.
+Notice the file \li{test_solutions.py} has 100\% coverage while \li{solutions.py} does not. Test files will generally have 100\% coverage, since pytest is designed to run these files in their entirety. However, the solutions file does not have full coverage and requires additional test cases to be thoroughly tested.
 
 \begin{problem}
 Install pytest-cov with pip.
-Run "py.test --cov" in the directory which has the two files "solutions.py" and "test\_solutions.py" to see how well the tests are covering your code.
+Run "py.test --cov" in the directory which has the two files "solutions.py" and "test\_solutions.py". You should see an output similar to the one above.
 
-Now write some of your own tests for the addition function and the Fibonacci function. Be sure to give each function its own test. (This is more of a convention than mandate,
+Now write some of your own tests for the addition function and the smallest factor function. Be sure to give each function its own test. (This is more of a convention than mandate,
 but it's good practice and will allow you to track down bugs quickly in the future.) Be sure that your tests cover every statement of your code in those two functions.
-(The number of statements missed should go from 100 to 94 TODO double check this)
+(The number of statements missed should go from 35 to 28)
 \end{problem}
 
-\section*{pytest as a module}
+\section*{Pytest as a Module}
 
 When developing software, we often want our code to raise an exception when certain input is given, instead of proceeding.  Furthermore, we want the exception to give us relevant info about what went wrong and why it was raised.
 For example, if a user feeds a bad value to a calculator (like dividing by 0), we would like if if the calculator were very explicit as to why it wasn't able to process our input.
@@ -200,10 +190,10 @@ In this example, \li{excinfo} is an object of type \li{py.code.ExceptionInfo()} 
 \begin{problem}
 Write tests for the \li{operator} function.  Be sure to handle every statment and check against every exception.
 For exceptions, be sure to check both the typename and the message, that way you can say with certainty that the test is adequately testing your code.
-(The number of statments missed should go from 94 to 79 TODO: double-check this)
+(The number of statments missed should go from 28 to 21)
 \end{problem}
 
-Pytest also offers an option to make "pytest fixtures". These are wildly useful for mocking data or preventing constant code duplication.
+Suppose you want to use the same pieces of code in different test functions. Pytest has a feature called "fixtures" for mocking data that reduces code duplication. 
 Mocking data is useful when you don't want certain test to be dependent on the working of completely separate code.
 For example if we had a feature which was dependent upon a user service working correctly, rather than having my tests make a call to the user service I may write a fixture which simply gives existing mock data that I expect for my feature.
 As far as preventing code duplication a fixture may also be utilized to create a class object which we can then call within our function.
@@ -269,42 +259,162 @@ Given the previous class, you could reduce code setup for your tests by using a 
 \begin{problem}
 Finish writing unit test for the complex numbers class. Be sure to utilize fixtures in order to reduce on the length of your code.
 Also, remember, it would be useful (and good practice) to write a different test function for each method in the ComplexNumberClass.
-(The number of statements missed should go from \_\_ to \_\_ TODO: this)
+(The number of statements missed should go from 21 to 0)
 \end{problem}
 
-\begin{problem}
-Write unit tests for the \li{LinkedListNode} and \li{LinkedList} classes provided in solutions.py. It is not necessary, but it will help you to get total line coverage if every function has its own test.
-If you have trouble finding everything, consider commenting out sections of code in solutions.py and seeing if the number of statements missed goes down.
-If it does, then you know that part of what you deleted is un-tested.
-(At the end of this the number of missed statements should be 0.)
-\end{problem}
 
 \section*{Test Driven Development}
 
-Kent Beck, the creator of \href{https://en.wikipedia.org/wiki/Extreme_programming}{extreme programming}, claims to have re-discovered  Test Driven Development (TDD). He said,
+Test Driven Development (TDD) is a programming style in which the unit tests are written first and the actual code is written after.
+Kent Beck, the creator of \href{https://en.wikipedia.org/wiki/Extreme_programming}{extreme programming}, claims to have re-discovered  Test Driven Development. He said,
 ``The original description of TDD was in an ancient book about programming. It said you take the input tape, manually type in the output tape you expect, then program until the actual output tape matches the expected output.''
-TDD incentivizes simple design, elegant code, and gives quantifiable checkpoints in the development process.
+
+TDD initially sounds extreme at first, but it actually incentivizes simple design, elegant code, and gives quantifiable checkpoints in the development process.
+
 The idea is simple enough:
+\begin{center}
 \begin{tikzpicture}
 \matrix [column sep=40mm, row sep=5mm] {
   & \node (id) [draw, shape=rectangle] {    Idea    }; & \\
-  & \node (ts) [draw, shape=circle] {    Test    }; & \\
+  & \node (ts) [draw, shape=circle] {    Tests    }; & \\
   & \node (im) [draw, shape=rectangle] {Implementation}; & \\
 };
 \draw[->, thick] (id) -- (ts);
 \draw[->, thick] (ts) -- (im);
 \end{tikzpicture}\\
+\end{center}
+
+First the developer writes a test case for each feature of the program. Since the program is as yet unwritten, all of the test cases will initially fail. Next the developer implements each feature until the test succeeds. If the test cases are sufficiently thorough, when the tests all pass, the developer knows the program is complete.
+
+TDD eliminates the chore of testing code after it has been written. It also eliminates the fear that even though code is complete, it may contain obscure bugs. Furthermore, writing unit tests helps the developer understand the project as a whole as well as the minute details of each feature.
+
 The idea must be a bit more concrete then ``I want to add a chat room to my website.'' The general idea of how the chat room will look in code (like a history module, a data base, and a sketch of required functions, etc.) is required.
 Next that idea is transformed into tests because the inputs and outputs of required functionality are understood.
 Following the example of the chat room, you could write a unit test that checks what a given API returns when a user has broadcasted some message.
 The implementation is simply adding, changing and editing code until all the required tests pass.
 
 \begin{problem}
-Use TDD to create a module which takes the string representation of a polynomial (of one arbitrary variable) and plots it.
-For example, it should take in:
-"$5x^4 + 4x^3 + 3x^2+ 2x + 1$" and plot it
-Equivlently "$5y^4 + 4y^3 + 3y^2+ 2y + 1$" (you may throw an excpetion if two variables are given).
-(If you wanna get really "Wolfram Alpha-y", allow "$5y4 + 4y3 + 3y2+ 2y + 1$ as valid input.)  TODO: clean this up, add a graph, more guidelines as to how to implement TDD
+The game Set is a card game about finding patterns. Each card contains a design with 4 different properties: color (red, green or purple), shape (diamond, oval or sqiggly), quantity (one, two or three) and pattern (solid, striped or outlined). Twelve cards are laid on a table and the object is to recognize sets of cards. A "set" is made up of three cards which are either the all same or all different for each property. You can try playing Set online \href{http://smart-games.org/en/set/start}{here}.
+
+Here is a group of 12 cards from Set.
+
+\vspace{5mm} 
+
+\includegraphics{set_game.jpg}
+
+\vspace{5mm} 
+
+This collection of cards contains 5 unique sets:
+\vspace{5mm}
+
+\begin{figure}[H] % Briefly describe the figure.
+\captionsetup[subfigure]{justification=centering}
+\centering
+\begin{subfigure}{.47\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{set1.jpg}
+    \caption{Same in quantity and shape; different in pattern and color}
+    \label{fig:labelthefirstfigure}
+\end{subfigure}
+\begin{subfigure}{.47\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{set2.jpg}
+    \caption{Same in pattern; different in shape, quantity and color}
+    \label{fig:labeltheotherfigure}
+\end{subfigure}%
+\begin{subfigure}{.47\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{set3.jpg}
+    \caption{Same in shape; different in quantity, pattern and color}
+    \label{fig:labeltheotherfigure}
+\end{subfigure}
+\begin{subfigure}{.47\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{set4.jpg}
+    \caption{Different in all aspects}
+    \label{fig:labeltheotherfigure}
+\end{subfigure}
+\begin{subfigure}{.48\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{set5.jpg}
+    \caption{Different in all aspects}
+    \label{fig:labeltheotherfigure}
+\end{subfigure}
+\caption{Five unique sets from the above group of cards}
+\end{figure}
+
+
+\vspace{5mm}
+
+Use the principles of Test Driven Development to write a program that identifies number of sets in a collection of 12 cards. Begin by writing test cases for your code. Focus on \textit{what} you want to implement rather \textit{how} you are going to implement it. Use these specifications:
+\begin{itemize}
+\item Each card in Set can be uniquely represented by a 4 bit integer in base 3, where each digit represents a different property and each property has 3 possible values. Represent a group of Set cards as a text file where each line contains a 4 bit number representing one card.
+\item Have your program throw an error if the input is invalid (anything that is not a valid Set card as described above),  if a duplicate card is entered, if less or more than 12 cards are given, or if the file name given is not valid.
+\item Ensure that each possible error gives an appropriate error message.
+\item Aggregate all your text files in a single folder called "hands" and upload the folder to your git repository along with your code.
+\end{itemize}
+
+Consider breaking this problem down into a few smaller functions and writing a unit test for each function.
+
 \end{problem}
+
+\begin{problem}
+Now that you have written test cases for a set game pattern recognizer, write code until all your test cases pass. Write this code at the end of \li{solutions.py}. Rather than running this file to see if your code is working, simply run the test file to see if all the test cases pass. Here are some suggestions for writing the implementation:
+
+Hint: Given three integer which represent cards, the cards form a set if their columns each sum to a multiple of 3.
+
+\end{problem}
+
+\section*{Additional Material} %===========================================
+
+\subsection*{Python Debugger}
+
+Python has a built in debugger called pdb (Python DeBugger) to aid in finding mistakes in code. Pdb runs in the terminal or in Jupyter. This section focuses on how to set break points and step through code at these break points. To begin using pdb, import it in your program
+
+\begin{lstlisting}
+>>> import pdb
+\end{lstlisting}
+and then add
+\begin{lstlisting}
+... pdb.set_trace()
+\end{lstlisting}
+where you would like to set a breakpoint.
+Then when you run your code, instead of running in its entirety, it will run until it reaches the break point and then the pbd prompt will be displayed, waiting for a command:
+\begin{lstlisting}
+(Pdb)
+\end{lstlisting}
+At this point there are several commands you can run, depending on what you want to do.
+\begin{table}[H]
+\centering
+\begin{tabular}{r|l}
+    Command & Description\\
+    \hline
+    \li{n} & ``Next": executes the next line\\
+    \li{p <var>} & ``Print": displays the value of the specified variable\\
+    \li{c} & ``Continue": Stops debugging and runs the program normally to the end\\
+    \li{q} & ``Quit": terminates the program\\
+    \li{l} & ``list": shows several lines of code around the current line\\
+    \li{r} & ``Return": returns to the end of a subroutine\\
+    \li{<Enter>} & Executes the most recent command again
+\end{tabular}
+\end{table}
+
+\begin{info}
+Pdb allow you alot of freedom to change the values of your variables while debugging. Suppose you are debugging the following code:
+\begin{lstlisting}
+def func():
+    pdb.set_trace()
+    foo = 1
+    bar = 2
+    return foo + bar + 42
+\end{lstlisting}
+and while debugging you reliaze that the value of \li{foo} was initialized wrong. Then after \li{foo} has been initialized you can enter the command
+\begin{lstlisting}
+(Pdb) foo = 5
+\end{lstlisting}
+and the value of the variable will be changed as the program continues to run and the program will return 49 instead of 45.
+\end{info}
+
+
 
 

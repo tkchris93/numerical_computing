@@ -1,18 +1,18 @@
 import solutions
 import pytest
 
-#problem 1 test the addition and fibonacci functions from solutions.py
+# Problem 1: Test the addition and fibonacci functions from solutions.py
 def test_addition():
     pass
-    
-def test_fib():
+
+def test_smallest_factor():
     pass
 
-#problem 2 test the operator function from solutions.py
+# Problem 2: Test the operator function from solutions.py
 def test_operator():
     pass
 
-#problem 3 finish testing the complex number class
+# Problem 3: Finish testing the complex number class
 @pytest.fixture
 def set_up_complex_nums():
     number_1 = solutions.ComplexNumber(1, 2)
@@ -33,6 +33,4 @@ def test_complex_multiplication(set_up_complex_nums):
     assert number_2 * number_3 == solutions.ComplexNumber(-35, 55)
     assert number_3 * number_3 == solutions.ComplexNumber(-77, 36)
 
-#problem 4 test the linked list class from solutions.py
-def test_linked_list_node_init():
-    pass
+# Problem 4: Write test cases for the Set game here
