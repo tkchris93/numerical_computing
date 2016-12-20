@@ -1,7 +1,7 @@
 \lab{BeautifulSoup}{BeautifulSoup}
 \objective{Virtually everything rendered by an internet browser as a web page uses HTML.
-As a result, learning HTML is key to any kind of internet programming. 
-BeautifulSoup is a Python package that helps with navigating HTML documents.
+As a result, learning HTML is key to any kind of internet programming.
+BeautifulSoup is a Python package that helps navigate HTML documents.
 In this lab, we learn how to load HTML documents into BeautifulSoup and navigate the resulting BeautifulSoup object.}
 \label{lab:BS_scraping}
 
@@ -15,7 +15,7 @@ Here is an example:
 <html>
     <body>
         <p>
-            Click <a id='info' href='http://www.example.com/info'>here</a> for more information.
+            Click <a id='info' href='http://www.example.com'>here</a> for more information.
         </p>
     </body>
 </html>
@@ -25,7 +25,7 @@ The above example would output a single line
 \begin{lstlisting}[language=HTML]
 Click here for more information.
 \end{lstlisting}
-with `here' being a clickable link to the website \url{http://www.example.com/info}.
+with `here' being a clickable link to the website \url{http://www.example.com}.
 
 While less readable, this HTML code can also be written as a single line as follows:
 \begin{lstlisting}[language=HTML]
@@ -37,7 +37,7 @@ If a given tag doesn't contain any text or other tags, it can be written in a si
 \end{lstlisting}
 
 The HTML of a website is very easy to view.
-Go to any website, such as \url{http://www.example.com/myfavoritesite}, in whatever browser is most convenient.
+Go to any website, such as \url{http://www.example.com}, in whatever browser is most convenient.
 Once on the website, right click with the mouse pointer and look for `View Page Source' or a similarly worded option.
 Click it and the browser will open a new browser with the HTML code for your site.
 Some code is easy to follow, other code not so much.
@@ -45,13 +45,13 @@ Some code is easy to follow, other code not so much.
 \begin{problem}
 Go to the website \url{http://www.example.com} and open the source code.
 What are all the tags used?
-What is the value of the \li{type} attribute associated with the \li{style} tag?
-Write a function that returns a list of all the tags used and the value of the \li{type} attribute. 
+What is the value of the \li{<<type>>} attribute associated with the \li{style} tag?
+Write a function that returns a list of all the tags used and the value of the \li{<<type>>} attribute.
 \end{problem}
 
 \section*{Loading HTML into BeautifulSoup}
 Now that we know what HTML is, we can use BeautifulSoup to create a \li{BeautifulSoup} object.
-BeautifulSoup is a library capable of pulling data out of HTML scripts and files, and works with a parser to provide commands to navigate and search the resulting HTML tree.
+BeautifulSoup is a library capable of pulling data out of HTML scripts and files. BeautifulSoup works with a parser to provide commands to navigate and search the resulting HTML tree.
 Make sure the module \li{bs4} is installed in your Python packages.
 This section takes most of its material from \url{http://www.crummy.com/software/BeautifulSoup/bs4/doc/index.html}.
 
@@ -65,7 +65,7 @@ First we want a variable to store our HTML code as a string.
 \end{lstlisting}
 
 Next, we import \li{BeautifulSoup} from the \li{bs4} module.
-We call \li{BeautifulSoup()}, which takes as parameters the HTML string and an HTML parser. 
+We call \li{BeautifulSoup()}, which takes as parameters the HTML string and an HTML parser.
 It returns a \li{BeautifulSoup} object, which represents the document as a nested data structure.
 \begin{lstlisting}
 >>> from bs4 import BeautifulSoup
@@ -92,7 +92,7 @@ This will be useful later to make sure we are getting the correct HTML from webs
 \end{lstlisting}
 
 \begin{problem}\label{make_soup}
-Write a function that loads the following string into BeautifulSoup, then prettifies it. Return the prettified string.
+Write a function that loads the following string into BeautifulSoup, then prettifies it. Print the prettified string.
 \begin{lstlisting}
 html_doc = """
 <html><head><title>The Three Stooges</title></head>
@@ -178,8 +178,8 @@ If we try to access a key that is not an attribute, we get a \li{KeyError} in re
 >>> tag['id']
 <<u'link1'>>
 \end{lstlisting}
-Note that \lstinline{class} returns a list.
-This is because the \lstinline{class} attribute can have more than one value.
+Note that \li{<<class>>} returns a list.
+This is because the \li{<<class>>} attribute can have more than one value.
 This may show up in some HTML trees, but is not very common.
 
 If a tag contains any text, it can accessed with \li{.string}.
@@ -218,7 +218,7 @@ Calling \li{.contents} returns the children of the parent tag in a list.
 >>> title_tag.contents
 <<[u'The Three Stooges']>>
 \end{lstlisting}
-Note that the child of \li{title_tag} is the string \li{<<'The Three Stooges'>>}. 
+Note that the child of \li{title_tag} is the string \li{<<'The Three Stooges'>>}.
 Since strings cannot cannot have children, calling \li{.contents} on this string will return an error.
 
 \begin{info}
@@ -395,7 +395,7 @@ Have the function accept an integer \li{method}. If \li{method} is 1, return the
 If \li{method} is 2, return the line using the other.
 \end{problem}
 
-\subsection*{By \li{find()}}
+\subsection*{By \texttt{find()}}
 
 In actual website HTML, often there are many tags that share a common name.
 It would be nice to find characteristics that might be unique for a given tag.
@@ -416,7 +416,7 @@ Search by name:
 
 Search by attribute:
 \begin{lstlisting}
->>> soup.find(id='link3') #Search by unique id attribute
+>>> soup.find(<<id>>='link3') #Search by unique id attribute
 <<<a class="stooge" href="http://example.com/curly" id="link3">Curly</a>>>
 
 >>> #class is a Python keyword. Use 'class_' for the attribute key.
@@ -447,7 +447,7 @@ Search by string:
 Search by combining parameters:
 \begin{lstlisting}
 >>> soup.find('a', attrs={'id':'link2','class':'stooge'})
-<a class="stooge" href="http://example.com/mo" id="link2">Mo</a>
+<a <<class>>="stooge" href="http://example.com/mo" <<id>>="link2">Mo</a>
 \end{lstlisting}
 
 \begin{problem}
@@ -465,7 +465,7 @@ Download 'SanDiegoWeather.htm' and load it into BeautifulSoup.
 You can find the corresponding website at \url{http://www.wunderground.com/history/airport/KSAN/2015/1/1/DailyHistory.html?req_city=San+Diego&req_state=CA&req_statename=California&reqdb.zip=92101&reqdb.magic=1&reqdb.wmo=99999&MR=1}. Using the \li{.find()} method, write a function that prints the tags referred to in the following questions:
 \begin{enumerate}
 \item What is the tag which contains the date, Thursday, January 1, 2015?
-\item What are the tags which contain the links 'Previous Day' and 'Next Day'?
+\item What are the tags which contain the links `Previous Day' and `Next Day'?
 \item What is the tag which contains the number associated with the Actual Max Temperature?
 \end{enumerate}
 [Hint: You can do a \li{ctrl+f} to find where the text is in the HTML, then study the tags around it.]
