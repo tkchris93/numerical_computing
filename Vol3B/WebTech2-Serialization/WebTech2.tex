@@ -266,6 +266,10 @@ Using ElementTree to parse books.xml, which represents a small dataset of books,
 3) Which books reference Microsoft in their descriptions?
 \end{problem}
 
+\begin{problem}
+We will now try another data problem. The City of New York makes publicly available some data concerning the location of publicly available recycling bins. The XML endpoint is located at \url{https://data.cityofnewyork.us/api/views/sxx4-xhzg/rows.xml?accessType=DOWNLOAD}. Using the \li{requests} library, GET the XML file from that address and build it into an Element Tree. Then calculate the average Euclidean distance between each recycling bin and it's closest neighbor. Hint: If you get the file from requests, you must remove '<response>' and '</response>' from the beginning and end of your content string. Each latitude or longitude degree is approximately 69 miles. More information on this dataset is available at \url{https://catalog.data.gov/dataset/public-recycling-bins-eb48e}.
+\end{problem}
+
 
 \newpage
 
