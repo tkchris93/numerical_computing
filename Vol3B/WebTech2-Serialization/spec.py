@@ -7,6 +7,7 @@
 
 import json
 import datetime
+import requests
 
 # Problem 1
 class DateEncoder(json.JSONEncoder):
@@ -63,3 +64,14 @@ def books_xml():
     
     in books.xml
     ''' 
+
+# Problem 4
+    def recycle_bins():
+    '''
+    This method should automatically pull the XML
+    file from https://data.cityofnewyork.us/api/
+    views/sxx4-xhzg/rows.xml?accessType=DOWNLOAD.
+    It should then calculate and return the average
+    distance between each bin and its closest 
+    neighbor.
+    '''
