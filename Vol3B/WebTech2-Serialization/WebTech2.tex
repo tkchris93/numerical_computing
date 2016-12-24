@@ -1,4 +1,4 @@
-\lab{Web Technologies 2: Serialization}{Web Technologies 2: Serialization}
+\lab{Web Technologies 2: Data Serialization}{Web Technologies 2: Data Serialization}
 \objective{Understand how serialization is used in web technologies. Practice using serialization to pack, transport, unpack, and navigate data structures in order to more easily utilize web based data sources.}
 \label{lab:webtech}
 
@@ -19,7 +19,7 @@ The process of serialization seeks to address this situation.
 Serialization is the process of storing an object and its properties in a form that can be saved or transmitted and later reconstructed back into an identical copy of the original object.
 \end{comment}
 
-\subsection*{JSON} % ----------------------------------------------------------
+\section*{JSON} % =============================================================
 
 JSON stands for \emph{JavaScript Object Notation}.
 This serialization method stores information about the objects as a specially formatted string that is easy for both humans and machines to read and write.
@@ -35,10 +35,10 @@ Let's begin by serializing some common Python data structures.
 >>> import json
 >>> ex1 = [0, 1, 2, 3, 4]
 >>> json.dumps(ex1)
-'[0, 1, 2, 3, 4]'
+<<'[0, 1, 2, 3, 4]'>>
 >>> ex2 = {'a': 34, 'b': 483, 'c':"Hello JSON"}
 >>> json.dumps(ex2)
-'{"a": 34, "c": "Hello JSON", "b": 483}'
+<<'{"a": 34, "c": "Hello JSON", "b": 483}'>>
 \end{lstlisting}
 
 The JSON representation of a Python list and dictionary are very similar to their respective string representations.
@@ -55,7 +55,7 @@ Since JSON is based on a dictionary-like structure, you can nest multiple messag
     }"""
 >>> t = json.loads(aJSONstring)
 >>> print t
-{u'car': {u'color': [255, 30, 30], u'make': u'Ford', u'model': u'Focus', u'year': 2010}}}
+<<{u'car': {u'color': [255, 30, 30], u'make': u'Ford', u'model': u'Focus', u'year': 2010}}}>>
 >>> print t['car']['color']
 [255, 30, 30]
 \end{lstlisting}
@@ -91,7 +91,7 @@ class CustomEncoder(json.JSONEncoder):
 
 >>> a = set('abcdefg')
 >>> json.dumps(a, cls=CustomEncoder)
-'{"dtype": "set", "data": ["a", "c", "b", "e", "d", "g", "f"]}'
+<<'{"dtype": "set", "data": ["a", "c", "b", "e", "d", "g", "f"]}'>>
 \end{lstlisting}
 
 Though this is helpful, decoding this string would give us all of our data in a list.
@@ -99,15 +99,15 @@ To allow for this string to be decoded as a Python set, we must build a custom d
 Notice that we don't need to subclass anything.
 
 \begin{lstlisting}
-accepted_dtypes = {'set': set}
-def CustomDecoder(item):
-    type = accepted_dtypes.get(item['dtype'], None)
-    if type is not None and 'data' in item:
-        return type(item['data'])
-    return item
+>>> accepted_dtypes = {'set': set}
+>>> def CustomDecoder(item):
+...     type = accepted_dtypes.get(item['dtype'], None)
+...     if type is not None and 'data' in item:
+...         return type(item['data'])
+...     return item
 
 >>> c = json.loads(s, object_hook=CustomDecoder)
-{u'a', u'b', u'c', u'd', u'e', u'f', u'g'}
+<<{u'a', u'b', u'c', u'd', u'e', u'f', u'g'}>>
 # The 'u' is a prefix that signifies that the string value is Unicode.
 # You can test this with:
 >>> print c[0]
@@ -150,7 +150,7 @@ Use Bokeh to plot these points on a map of Los Angeles (refer to Lab 10 for addi
 More information about this dataset is available at \url{http://catalog.data.gov/dataset/residential-water-usage-zip-code-on-top-cb2ac}.
 \end{problem}
 
-\subsection*{XML} % -----------------------------------------------------------
+\section*{XML} % ==============================================================
 
 XML is another data interchange metalanguage.
 However, it is a markup language rather than a object notation language. This means that it utilizes tags to distinguish the formatting of data rather than just encoding them.
@@ -206,7 +206,7 @@ In addition to stream processing the XML, it will build the DOM tree as it itera
 ElementTree provides a DOM-like interface for reading XML files via its \li{parse()} method.
 This will create the tag tree that DOM creates.
 
-We will demonstrate ElementTree using the following XML.
+We will demonstrate ElementTree using the following XML file.
 \lstinputlisting[style=FromFile,language=XML]{contacts.xml}
 
 First, we will look at viewing an XML document as a tree similar to the DOM model described above.
@@ -297,23 +297,23 @@ More information on this dataset is available at \url{https://catalog.data.gov/d
 \\ (Hint: If you get the file from requests, you must remove `$<$response$>$' and `$<$/response$>$' from the beginning and end of your content string.)
 \end{problem}
 
-
 \newpage
 
-\section*{Additional Material}
+\section*{Additional Material} % ==============================================
 
+\subsection*{Pickle} % --------------------------------------------------------
 
-\subsection*{Pickle}
 Aside from the serialization methods we have demonstrated, Python has a serialization library called \emph{pickle}.
 This library makes it very easy to serialize and share your python objects.
 The following code is a simple example of how to create a pickled object and then unpack it.
+
 \begin{lstlisting}
 >>> import pickle
 
->>> listobject = [1,2,3,4,5]
+>>> listobject = [1, 2, 3, 4, 5]
 >>> item = pickle.dumps(listobject)
->>> print item
-'(lp0\nI1\naI2\naI3\naI4\naI5\naI6\naI7\na.'
+>>> item
+<<'(lp0\nI1\naI2\naI3\naI4\naI5\na.'>>
 
 >>> pickle.loads(item)
 [1, 2, 3, 4, 5]
@@ -321,7 +321,8 @@ The following code is a simple example of how to create a pickled object and the
 
 You can also write these pickled objects to a text file as strings. The following code demonstrates this.
 \begin{lstlisting}
->>> a = open('list.txt', 'w') # The text file must be open and be able to be written to
+
+>>> a = open('list.txt', 'w')
 
 >>> listobject = [1,2,3,4,5]
 >>> item = pickle.dump(listobject, a)
@@ -333,4 +334,4 @@ You can also write these pickled objects to a text file as strings. The followin
 \end{lstlisting}
 
 Pickle has many powerful applications such as these for communication between Python users.
-You may look at the documentation for \emph{pickle} online for more information.
+See \li{https://docs.python.org/2.7/library/pickle.html} for more documentation.
