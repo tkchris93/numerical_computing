@@ -1,9 +1,9 @@
-\lab{Simplex Method}{Simplex Method}
+\lab{The Simplex Method}{The Simplex Method}
 \label{lab:Simplex}
 \objective{
-The \emph{Simplex Algorithm} provides a straightforward method for finding optimal solutions to optimization problems with linear constraints and cost functions.
+The \emph{Simplex Method} is a straightforward algorithm for finding optimal solutions to optimization problems with linear constraints and cost functions.
 Because of its simplicity and applicability, this algorithm has been named one of the most important algorithms invented within the last 100 years.
-In this lab, we implement a standard Simplex solver for the primal problem.
+In this lab, we implement a standard Simplex solver for the primal problem. %s that are feasible at the origin.
 % In the next lab, we will expand our implementation so that it also solves the auxiliary and dual problems.
 }
 
@@ -12,31 +12,29 @@ In this lab, we implement a standard Simplex solver for the primal problem.
 
 \section*{Standard Form} % ====================================================
 
-The Simplex Algorithm accepts a linear constrained optimization problem, also known as a \emph{linear program},
-in the form given below:
+The Simplex Algorithm accepts a linear constrained optimization problem, also called a \emph{linear program}, in the form given below:
 
 \begin{align*}
-\text{maximize}\qquad &c^Tx \\
-\text{subject to}\qquad A&x \leq b \\
- &x \geq 0
+\text{maximize}\qquad &\c\trp\x \\
+\text{subject to}\qquad & A\x \preceq \b \\
+ &\x \succeq \0
 \end{align*}
-Note that any linear program can be converted to standard form, so there is no loss of
-generality in restricting our attention to this particular formulation.
+Note that any linear program can be converted to standard form, so there is no loss of generality in restricting our attention to this particular formulation.
 
-Such an optimization problem defines a region in space called the \emph{feasible region}, the set of points
-satisfying the constraints. Because the constraints are all linear, the feasible region forms a geometric object
-called a \emph{polytope}, having flat faces and edges (see Figure \ref{fig:polytope}).
+Such an optimization problem defines a region in space called the \emph{feasible region}, the set of points satisfying the constraints.
+Because the constraints are all linear, the feasible region forms a geometric object called a \emph{polytope}, having flat faces and edges (see Figure \ref{fig:polytope}).
 The Simplex Algorithm jumps among the vertices of the feasible region searching for an optimal point.
-It does this by moving along the edges of the feasible region in such a way that the objective function
-is always increased after each move.
+It does this by moving along the edges of the feasible region in such a way that the objective function is always increased after each move.
 
-\begin{figure}
+\begin{figure} % 2-d feasible polytope.
 \centering
 \includegraphics[width=\textwidth]{feasiblePolytope.pdf}
-\caption{The feasible region for a linear program. The optimal point
-is one of the vertices of the polytope.}
+\caption{The feasible region for a linear program.
+The optimal point is one of the vertices of the polytope.}
 \label{fig:polytope}
 \end{figure}
+
+% TODO: subfigure for 3-d polytope from book.
 
 Implementing the Simplex Algorithm is straightforward, provided one carefully follows the procedure.
 We will break the algorithm into several small steps, and write a function to perform each one.
@@ -48,8 +46,8 @@ Our program will be more lengthy than many other lab exercises and will consist 
 It is important to clearly define the task of each function and how all the functions will work together.
 If this program is written haphazardly, it will be much longer and more difficult to read than it needs to be.
 We will walk you through the steps of implementing the Simplex Algorithm as a Python class.
-%Since the Simplex Algorithm assumes that all the variables are non-negative, we do not need any special logic for it.
-%what is this previous statement saying? What 'special logic' would you need if the variables were negative?
+% Since the Simplex Algorithm assumes that all the variables are non-negative, we do not need any special logic for it.
+% what is this previous statement saying? What 'special logic' would you need if the variables were negative?
 
 For demonstration purposes, we will use the following linear program.
 \begin{align*}
@@ -64,50 +62,37 @@ For demonstration purposes, we will use the following linear program.
 \subsection*{Accepting a Linear Program} % ------------------------------------
 
 Our first task is to determine if we can even use the Simplex algorithm.
-Assuming that the problem is presented to us in standard form, we need
-to check that the feasible region is nonempty.
+Assuming that the problem is presented to us in standard form, we need to check that the feasible region is nonempty.
 
-% Problem 1: Check Feasibility
-\begin{problem}
-Write a class that accepts the arrays \li{c}, \li{A}, and \li{b} of a linear optimization problem in standard form.
-In the constructor, check that the system is feasible at the origin\footnote{For simplicity, we only check feasibility at the origin. A more robust solver sets up the auxiliary problem and solves it to find a starting point if the origin is infeasible.}.
-That is, check that $Ax \leq b$ componentwise when $x = 0$. % TODO: bell <=
+\begin{problem} % Check Feasibility
+Write a class that accepts the arrays $\c$, $A$, and $\b$ of a linear optimization problem in standard form.
+In the constructor, check that the system is feasible at the origin\footnote{For now, we only check for feasibility at the origin.
+A more robust solver sets up the auxiliary problem and solves it to find a starting point if the origin is infeasible.}.
+That is, check that $A\x \preceq \b$ when $\x = \0$.
 Raise a \li{ValueError} if the problem is not feasible at the origin.
 \label{prob:initsolver}
 \end{problem}
 
 \subsection*{Adding Slack Variables} % ----------------------------------------
 
-Our next step is to convert the inequality constraints $Ax \leq b$ into equality constraints
-by introducing one slack variable for each constraint.
-If the constraint matrix $A$ is an $m \times n$ matrix, then there are $m$ slack variables,
-one for each row of $A$.
-Grouping all of the slack variables into a vector of length $m$, denoted $z$, our
-constraints now take the form $Ax + z = b$.
-In our example, this gives
-\[
-\z = \begin{bmatrix}
- x_2 \\
- x_3 \\
- x_4
-\end{bmatrix},
-\]
+The next step is to convert the inequality constraints $A\x \preceq \b$ into equality constraints by introducing a slack variable for each constraint equation.
+If the constraint matrix $A$ is an $m \times n$ matrix, then there are $m$ slack variables, one for each row of $A$.
+Grouping all of the slack variables into a vector $\w$ of length $m$, the constraints now take the form $A\x + \w = \b$.
+In our example, we have \[\w = \left[\begin{array}{c}x_2\\x_3 \\x_4\end{array}\right]\]
 
-When adding slack variables, it is useful to represent all of your variables, both the original primal variables and
-the additional slack variables, in a convenient manner.
+% TODO: change the representation of the slack variables to match the book.
+When adding slack variables, it is useful to represent all of your variables, both the original primal variables and the additional slack variables, in a convenient manner.
 One effective way is to refer to a variable by its subscript.
-For example, we can use the integers $0$ through $n-1$ to refer to the original (non-slack) variables $x_0$ through
-$x_{n-1}$, and we can use the integers $n$ through $n+m-1$ to track the slack variables (where the slack variable
-corresponding to the $i$-th row of the constraint matrix is represented by the index $n+i-1$).
+For example, we can use the integers $0$ through $n-1$ to refer to the original (non-slack) variables $x_0$ through $x_{n-1}$, and we can use the integers $n$ through $n+m-1$ to track the slack variables (where the slack variable corresponding to the $i$th row of the constraint matrix is represented by the index $n+i-1$).
 
-We also need some way to track which variables are basic (non-zero) and which variables are nonbasic (those that have value $0$).
+We also need some way to track which variables are \emph{basic} (non-zero) and which variables are \emph{nonbasic} (those that have value $0$).
 A useful representation for the variables is a Python list (or NumPy array), where the elements of the list are integers.
-Since we know how many basic variables we have ($m$, to be precise), we can partition the list so that all the basic
-variables are kept in the first $m$ locations, and all the non-basic variables are stored at the end of the list.
-The ordering of this list is important. In particular, if $i \leq m$, the $i$-th element of the list represents
-the basic variable corresponding to the $i$-th row of $A$. Henceforth we will refer to this list as the \emph{index list}.
+Since we know how many basic variables we have ($m$), we can partition the list so that all the basic variables are kept in the first $m$ locations, and all the non-basic variables are stored at the end of the list.
+The ordering of this list is important.
+In particular, if $i \leq m$, the $i$th element of the list represents the basic variable corresponding to the $i$th row of $A$.
+Henceforth we will refer to this list as the \emph{index list}.
 
-Initially, the basic variables are simply the slack variables, and their values correspond to the values of the matrix $b$.
+Initially, the basic variables are simply the slack variables, and their values correspond to the values of the vector $\b$.
 In our example, we have 2 primal variables $x_0$ and $x_1$, and we must add 3 slack variables.
 Thus, we instantiate the following index list:
 
@@ -119,9 +104,9 @@ Notice how the first $3$ entries of the index list are $2, 3, 4$, the indices re
 This reflects the fact that the basic variables at this point are exactly the slack variables.
 
 As the Simplex Algorithm progresses, however, the basic variables change, and it will be necessary to swap
-elements in our index list. Suppose the variable represented by the index $4$ becomes nonbasic, while
-the variable represented by index $0$ becomes basic. We must swap these two entries in the index list.
-This can be done in a single, efficient line of Python code:
+elements in our index list.
+For example, suppose the variable represented by the index $4$ becomes nonbasic, while the variable represented by index $0$ becomes basic.
+In this case we swap these two entries in the index list.
 
 \begin{lstlisting}
 >>> L[2], L[3] = L[3], L[2]
@@ -131,8 +116,7 @@ This can be done in a single, efficient line of Python code:
 
 Now our index list tells us that the current basic variables have indices $2, 3, 0$.
 
-% Problem 2: Slack variables.
-\begin{problem}
+\begin{problem} % Slack variables. % TODO: this problem is worthless...
 Design and implement a way to store and track all of the basic and non-basic variables.
 
 Hint: Using integers that represent the index of each variable is useful for Problem \ref{prob:blands}.
@@ -141,41 +125,28 @@ Hint: Using integers that represent the index of each variable is useful for Pro
 
 \subsection*{Creating a Tableau} % --------------------------------------------
 
-After we have determined that our program is feasible, we need to create the \emph{tableau} (sometimes called the \emph{dictionary}, a construct that tracks the state of the algorithm.
+After we have determined that our program is feasible, we need to create the \emph{tableau} (sometimes called the \emph{dictionary}), a data structure to track the state of the algorithm.
 You may structure the tableau to suit your specific implementation.
 Remember that your tableau will need to include in some way the slack variables that you created in Problem \ref{prob:slackvars}.
 
 There are many different ways to build your tableau.
 One way is to mimic the tableau that is often used when performing the Simplex Algorithm by hand.
-Define
-\[
-\bar{A} = \begin{bmatrix}
-  A & I_m
-\end{bmatrix},
-\]
-where $I_m$ is the $m \times m$ identity matrix,
-and define
-\[
-\bar{c} = \begin{bmatrix}
-  c\\
-  0\\
-  \vdots\\
-  0
-\end{bmatrix}.
-\]
-That is, $\bar{c} \in \mathbb{R}^{n+m}$ such that the first $n$ entries are $c$ and the final $m$ entries are zeros.
+Define \[\bar{A} = \left[\begin{array}{cc} A & I_m \end{array}\right],\]
+where $I_m$ is the $m \times m$ identity matrix, and define
+\[\bar{\c} = \left[\begin{array}{c}\c\\ \0\end{array}\right].\]
+That is, $\bar{\c} \in \mathbb{R}^{n+m}$ such that the first $n$ entries are $\c$ and the final $m$ entries are zeros.
 Then the initial tableau has the form
 \begin{equation}
-T = \begin{bmatrix}
-    0 & -\bar{c}^T & 1  \\
-    b & \bar{A} & 0
-    \end{bmatrix}.
+T =
+\left[\begin{array}{ccc}
+0  & -\bar{\c}\trp &  1 \\
+\b &  \bar{A}      & \0
+\end{array}\right]
 \label{eqn:hand_tab}
 \end{equation}
 
-The columns of the tableau correspond to each of the variables (both primal and slack), and the rows of the tableau
-correspond to the basic variables. Using the convention introduced above
-of representing the variables by indices in the index list, we have the following correspondence:
+The columns of the tableau correspond to each of the variables (both primal and slack), and the rows of the tableau correspond to the basic variables.
+Using the convention introduced above of representing the variables by indices in the index list, we have the following correspondence:
 \[
 \text{column } i \Leftrightarrow \text{index } i-2, \qquad i = 2, 3, \ldots, n+m+1,
 \]
@@ -183,7 +154,7 @@ and
 \[
 \text{row } j \Leftrightarrow L_{j-1}, \qquad j = 2, 3, \ldots, m+1,
 \]
-where $L_{j-1}$ refers to the $(j-1)$-th entry of the index list.
+where $L_{j-1}$ refers to the $(j-1)$th entry of the index list.
 
 For our example problem, the initial index list is
 \[
@@ -204,14 +175,14 @@ third entry of the index list.
 The advantage of using this kind of tableau is that it is easy to check the progress of your algorithm by hand.
 The disadvantage is that pivot operations require careful bookkeeping to track the variables and constraints.
 
-% I (Jared) propose that we don't introduce the below tableau in the lab. It is less intuitive, and I think could lead to more confusion.
-% \begin{comment}
+% This tableau is less intuitive, and I think could lead to more confusion.
+\begin{comment}
 We can also use a tableau of the following format:
 \begin{equation}
 T = \begin{bmatrix}
-    0 & c^T  & 0 \\
-    0 & I_n & 0\\
-    b & -A  & 0
+    0 & \c\trp  & 0 \\
+    \0 & I_n & \0\\
+    \b & -A  & \0
 \end{bmatrix}.
 \label{eqn:matrix_tab}
 \end{equation}
@@ -229,11 +200,10 @@ T = \begin{bmatrix}
 \end{bmatrix}.
 \label{eqn:matrix_inittab}
 \end{equation}
-% \end{comment}
+\end{comment}
 
-\begin{problem}
-Add a method to your Simplex solver that will create the initial tableau that you will use.
-Using a NumPy array to represent your tableau will simplify several parts of the Simplex algorithm.
+\begin{problem} % Initialize the tableau.
+Add a method to your Simplex solver that will create the initial tableau as a NumPy array.
 \label{prob:maketableau}
 \end{problem}
 
@@ -248,7 +218,8 @@ When initiating a pivot, you need to determine which variables will be swapped.
 In the tableau representation, you first find a specific element on which to pivot, and the row and column that contain the pivot element correspond to the variables that need to be swapped.
 Row operations are then performed on the tableau so that the pivot column becomes an elementary vector.
 
-Let's break it down, starting with the pivot selection. We need to use some care when choosing the pivot element.
+Let's break it down, starting with the pivot selection.
+We need to use some care when choosing the pivot element.
 To find the pivot column, search from left to right along the top row of the tableau (ignoring the first column), and stop once you encounter the first negative value.
 The index corresponding to this column will be designated the \emph{entering index}, since after the full pivot operation, it will enter
 the basis and become a basic variable.
@@ -264,17 +235,19 @@ Using our initial tableau $T$ in the example, we stop at the second column:
 \cline{2-2}
 \end{array}
 \right] \]
-We now know that our pivot element will be found in the second column. Our entering index is thus $0$.
+We now know that our pivot element will be found in the second column.
+The entering index is thus $0$.
 
 Next, we select the pivot element from among the positive entries in the pivot column (ignoring the entry in the first row).
 \emph{If all entries in the pivot column are non-positive, the problem is unbounded and has no solution.}
 In this case, the algorithm should terminate.
-Otherwise, assuming our pivot column is the $j$-th column of the tableau and that the positive entries of this column are
+Otherwise, assuming our pivot column is the $j$th column of the tableau and that the positive entries of this column are
 $T_{i_1, j}, T_{i_2, j}, \ldots, T_{i_k, j}$, we calculate the ratios
 \[
 \frac{T_{i_1,1}}{T_{i_1,j}}, \frac{T_{i_2,1}}{T_{i_2,j}}, \ldots, \frac{T_{i_k,1}}{T_{i_k,j}},
 \]
-and we choose our pivot element to be one that minimizes this ratio. If multiple entries minimize the ratio, then we utilize \emph{Bland's Rule}, which instructs us to choose the entry in the row corresponding to the smallest index (obeying this rule is important, as it prevents the possibility of the algorithm cycling back on itself infinitely).
+and we choose our pivot element to be one that minimizes this ratio.
+If multiple entries minimize the ratio, then we utilize \emph{Bland's Rule}, which instructs us to choose the entry in the row corresponding to the smallest index (obeying this rule is important, as it prevents the possibility of the algorithm cycling back on itself infinitely).
 The index corresponding to the pivot row is designated as the \emph{leaving index}, since after the full pivot operation, it will leave the basis and become a nonbasic variable.
 
 In our example, we see that all entries in the pivot column (ignoring the entry in the first row, of course) are positive, and hence they are all potential choices for the pivot element.
@@ -282,7 +255,8 @@ We then calculate the ratios, and obtain
 \[
 \frac{2}{1} = 2,\quad \frac{5}{3} = 1.66...,\quad \frac{7}{4} = 1.75.
 \]
-We see that the entry in the third row minimizes these ratios. Hence, the element in the second column, third row is our designated
+We see that the entry in the third row minimizes these ratios.
+Hence, the element in the second column, third row is our designated
 pivot element, and our leaving index is $L_2 = 3$:
 
 \[ T = \left[ \:
@@ -295,10 +269,11 @@ pivot element, and our leaving index is $L_2 = 3$:
 \end{array}
 \right] \]
 
-% \begin{comment}
+\begin{comment}
 If we are using the tableau representation in equation \ref{eqn:matrix_tab}, pivot operations are reduced to a simple matrix equation:
 \[T = T + T_m \otimes T_n,\]
-where $T_m$ is the column corresponding to the variable entering the basis and $T_n$ is a normalized vector corresponding to the variable leaving the basis.  The result of the equation is the new tableau.
+where $T_m$ is the column corresponding to the variable entering the basis and $T_n$ is a normalized vector corresponding to the variable leaving the basis.
+The result of the equation is the new tableau.
 
 For example, for the initial tableau, \ref{eqn:matrix_inittab}, we will demonstrate the first pivot operation.
 We can do the entire pivot with a single outer product.
@@ -354,13 +329,14 @@ T = \begin{bmatrix}
         1/3 & 0 & -5/3 & 0 & 4/3 & 0
 \end{bmatrix}.
 \]
-% \end{comment}
+\end{comment}
 \begin{problem}
 Write a method that will determine the pivot row and pivot column according to Bland's Rule.
 % \begin{comment}
 \begin{definition}[Bland's Rule]
 Choose the nonbasic variable with the smallest index that has a positive coefficient in the objective function
-as the leaving variable.  Choose the basic variable with the smallest index among all the binding basic variables.
+as the leaving variable.
+Choose the basic variable with the smallest index among all the binding basic variables.
 \end{definition}
 
 Bland's Rule is important in avoiding cycles when performing pivots.
@@ -370,7 +346,8 @@ This rule guarantees that a feasible Simplex problem will terminate in a finite 
 \end{problem}
 
 The next step is to swap the entering and leaving indices in our index list.
-In the example, we determined above that these indices are $0$ and $3$. We swap these two elements in our index list,
+In the example, we determined above that these indices are $0$ and $3$.
+We swap these two elements in our index list,
 and the updated index list is now
 \[
 L = (2, 0, 4, 3, 1),
@@ -378,8 +355,8 @@ L = (2, 0, 4, 3, 1),
 so the basic variables are now given by the indices $2, 0, 4$.
 
 Finally, we perform row operations on our tableau in the following way: divide the pivot row by the value of the pivot entry.
-Then use the pivot row to zero out all entries in the pivot column above and below the pivot entry. In our example, we first divide
-the pivot row by 3, and then zero out the two entries above the pivot element and the single entry below it:
+Then use the pivot row to zero out all entries in the pivot column above and below the pivot entry.
+In our example, we first divide the pivot row by 3, and then zero out the two entries above the pivot element and the single entry below it:
 \begin{align*}
 \begin{bmatrix}
     0 & -3 & -2 & 0 & 0 & 0 & 1\\
@@ -414,24 +391,25 @@ the pivot row by 3, and then zero out the two entries above the pivot element an
 \end{align*}
 The result of these row operations is our updated Tableau, and the pivot operation is complete.
 
-% Problem 5: Pivoting
-\begin{problem}
+\begin{problem} % Pivoting
 Add a method to your solver that checks for unboundedness and performs a single pivot operation from start to completion.
 If the problem is unbounded, raise a \li{ValueError}.
 \end{problem}
 
-\subsection*{Termination and Reading the Tableau}
-Up to this point, our algorithm accepts a linear program, adds slack variables, and creates the initial tableau. After
-carrying out these initial steps, it then performs the pivoting operation iteratively until the optimal point is found.
-But how do we determine when the optimal point is found? The answer is to look at the top row of the tableau. More specifically,
-before each pivoting operation, check whether all of the entries in the top row of the tableau (ignoring the entry in the first
-column) are nonnegative. If this is the case, then we have found an optimal solution, and so we terminate the algorithm.
+\subsection*{Termination and Reading the Tableau} % ---------------------------
 
-The final step is to report the solution. The ending state of the tableau and index list tell us everything we need to know.
-The maximum value attained by the objective function is found in the upper leftmost entry of the tableau. The nonbasic variables,
-whose indices are located in the last $n$ entries of the index list, all have the value $0$. The basic variables, whose indices
-are located in the first $m$ entries of the index list, have values given by the first column of the tableau. Specifically, the basic
-variable whose index is located at the $i$-th entry of the index list has the value $T_{i+1, 1}$.
+Up to this point, our algorithm accepts a linear program, adds slack variables, and creates the initial tableau.
+After carrying out these initial steps, it then performs the pivoting operation iteratively until the optimal point is found.
+But how do we determine when the optimal point is found? The answer is to look at the top row of the tableau.
+More specifically, before each pivoting operation, check whether all of the entries in the top row of the tableau (ignoring the entry in the first column) are nonnegative.
+If this is the case, then we have found an optimal solution, and so we terminate the algorithm.
+
+The final step is to report the solution.
+The ending state of the tableau and index list tell us everything we need to know.
+The maximum value attained by the objective function is found in the upper leftmost entry of the tableau.
+The nonbasic variables, whose indices are located in the last $n$ entries of the index list, all have the value $0$. The basic variables, whose indices
+are located in the first $m$ entries of the index list, have values given by the first column of the tableau.
+Specifically, the basic variable whose index is located at the $i$th entry of the index list has the value $T_{i+1, 1}$.
 
 In our example, suppose that our algorithm terminates with the tableau and index list in the following state:
 \[
@@ -445,7 +423,8 @@ T = \begin{bmatrix}
 \[
 L = (2, 0, 1, 3, 4).
 \]
-Then the maximum value of the objective function is $5.2$. The nonbasic variables have indices $3, 4$ and have the value $0$.
+Then the maximum value of the objective function is $5.2$.
+The nonbasic variables have indices $3, 4$ and have the value $0$.
 The basic variables have indices $2, 0,$ and $1$, and have values $.6, 1.6$, and $.2$, respectively.
 In the notation of the original problem statement, the solution is given by
 \begin{align*}
@@ -462,8 +441,8 @@ For our example, we would return the tuple \li{(5.2, \{0: 1.6, 1: .2, 2: .6\}, \
 %The correct format of this tuple is critical, as this tuple of information will be used judge whether or not your solver works!
 \end{problem}
 
-At this point, you should have a Simplex solver that is simple to use. The following code demonstrates how your solver is
-expected to behave:
+At this point, you should have a Simplex solver that is simple to use.
+The following code demonstrates how your solver is expected to behave:
 
 \begin{lstlisting}
 >>> import SimplexSolver
@@ -493,8 +472,9 @@ is not overly difficult.
 \section*{The Product Mix Problem}
 We now use our Simplex implementation to solve the \emph{product mix problem}, which in its basic form can be expressed as a simple linear program.
 Suppose that a manufacturer makes $n$ products using $m$ different resources (labor, raw materials, machine time available, etc).
-The $i$-th product is sold at a unit price $p_i$, and there are at most $m_j$ units
-of the $j$-th resource available. Additionally, each unit of the $i$-th product requires $a_{j,i}$ units of resource $j$.
+The $i$th product is sold at a unit price $p_i$, and there are at most $m_j$ units
+of the $j$th resource available.
+Additionally, each unit of the $i$th product requires $a_{j,i}$ units of resource $j$.
 Given that the demand for product $i$ is $d_i$ units per a certain time period, how do we choose the optimal amount
 of each product to manufacture in that time period so as to maximize revenue, while not exceeding the available resources?
 
@@ -515,22 +495,28 @@ Finally, we have the demand constraints which tell us not to exceed the demand f
 x_i \leq d_i \text{ for } i = 1, 2, \ldots, n
 \]
 
-The variables $x_i$ are constrained to be nonnegative, of course. We therefore have a linear program in the appropriate form that is feasible at the origin.
+The variables $x_i$ are constrained to be nonnegative, of course.
+We therefore have a linear program in the appropriate form that is feasible at the origin.
 It is a simple task to solve the problem using our Simplex solver.
 
-\begin{problem}
-Solve the product mix problem for the data contained in the file \li{productMix.npz}. In this problem, there are 4 products and 3 resources.
+\begin{problem} % Product mix problem.
+Solve the product mix problem for the data contained in the file \li{productMix.npz}.
+In this problem, there are 4 products and 3 resources.
 The archive file, which you can load using the function
-\li{np.load}, contains a dictionary of arrays. The array with key \li{'A'} gives the resource coefficients $a_{i,j}$ (i.e. the $(i,j)$-th entry
-of the array give $a_{i,j}$). The array with key \li{'p'} gives the unit prices $p_i$. The array with key \li{'m'} gives the available resource
-units $m_j$. The array with key \li{'d'} gives the demand constraints $d_i$.
+\li{np.load}, contains a dictionary of arrays.
+The array with key \li{'A'} gives the resource coefficients $a_{i,j}$ (i.e. the $(i,j)$-th entry of the array give $a_{i,j}$).
+The array with key \li{'p'} gives the unit prices $p_i$.
+The array with key \li{'m'} gives the available resource
+units $m_j$.
+The array with key \li{'d'} gives the demand constraints $d_i$.
 
 Report the number of units that should be produced for each product.
 \end{problem}
 
+\begin{comment}
 \section*{Auxiliary Problems} % ===============================================
 
-When one of the entries of $b$ is negative, we need to run an auxiliary problem to find a feasible point.
+When one of the entries of $\b$ is negative, we need to run an auxiliary problem to find a feasible point.
 Try adding $x_0$ as the last variable.
 That way you just need to add a single row and column to your current tableau $T$.
 You can check that subtracting $x_0$ from each of the constraints is the same as adding $x_0$ to each of the expressions for the slack variables.
@@ -555,22 +541,24 @@ If the problem is feasible, get the system of equations from $N$ and put them ba
 T[1:s,0:s] = N[1:s,0:s]
 \end{lstlisting}
 
-The last thing you need to do is insert your previous objective function.
-However, you need to re-write it in terms of the current nonbasic variables.
-Fortunately, $T$ currently contains all of your variables written in terms of the nonbasic variables.
+The last thing to do is to insert the previous objective function.
+However, we need to re-write it in terms of the current nonbasic variables.
+Fortunately, $T$ currently contains all of the variables written in terms of the nonbasic variables.
 You can check (mathematically, or however you want to satisfy yourself) that
 
 \begin{lstlisting}
-T[0,0:s] = T[0,0:s]*T
-\end{lstlisting} % * or np.dot()?
+T[0,0:s] = np.dot(T[0,0:s], T)
+\end{lstlisting}
 
 will put the objective function into the first row, now written in terms of the new nonbasic variables.
+\end{comment}
 
 % TODO: Dual problem and duality theory.
 
-\section*{Beyond Simplex}
+\section*{Beyond Simplex} % ===================================================
+
 The \emph{Computing in Science and Engineering} journal listed Simplex as one of the top ten algorithms of the twentieth century \cite{Nash2000}.
-Despite its popularity, like any other algorithm, Simplex has its drawbacks.
+However, like any other algorithm, Simplex has its drawbacks.
 
 In 1972, Victor Klee and George Minty Cube published a paper with several examples of worst-case polytopes for the Simplex algorithm \cite{Klee1972}.
 In their paper, they give several examples of polytopes that the Simplex algorithm struggles to solve.
@@ -629,4 +617,4 @@ With only $n$ constraints and $n$ variables, the simplex algorithm goes through 
 This is because there are $2^n$ extreme points, and when starting at the point $x=0$, the simplex algorithm goes through all of the extreme points before reaching the optimal point $(0,0,\dots, 0, 5^n)$.
 Other algorithms, such as interior point methods, solve this problem much faster because they are not constrained to follow the edges.
 
-\printbibliography
+% \printbibliography
