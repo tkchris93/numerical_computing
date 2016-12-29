@@ -42,11 +42,29 @@ Conversely, if it is cold today, there is a $60\%$ chance that tomorrow will be 
 Markov chains can be represented by a \emph{state diagram}, a type of directed graph.
 The nodes in the graph are the states, and the edges indicate the state transition probabilities.
 The Markov chain described above has the following state diagram.
-%
-% TODO: Turn this into a tikzpicture.
-\begin{figure}[H]
-    \includegraphics[width=.5\linewidth]{figures/WeatherChain.pdf}
+
+\begin{figure}[H] % 2-state chain.
+\centering
+\begin{tikzpicture}[normalcircle/.style={draw, circle, minimum size=1.5cm, thick, node distance=2.5cm}]
+    % Place the circles
+    \node[normalcircle] (Hot) {};
+    \node[red] at (Hot) {Hot};
+
+    \node[normalcircle, right=of Hot] (Cold) {};
+    \node[blue] at (Cold) {Cold};
+
+    % Draw loop, place number, draw line
+    \draw[thick,->,>=stealth',red!50!black] (Hot)+(-.52,.52) arc (325:40:.35 and -.85);
+    \node[left,red!50!black] at (Hot.west) [shift={+(-.5,0)}] {0.7};
+    \draw[thick,->,>=stealth',red!50!black] (Hot.north east) -- node[above] {0.3} (Cold.north west);
+
+    \draw[thick,->,>=stealth',blue!50!black] (Cold)+(.52,.52) arc (325:40:-.35 and -.85);
+    \node[right,blue!50!black] at (Cold.east) [shift={+(.5,0)}] {0.4};
+    \draw[thick,->,>=stealth',blue!50!black] (Cold.south west) -- node[below] {0.6} (Hot.south east);
+
+\end{tikzpicture}
 \end{figure}
+
 %
 \begin{problem} % Make a column stochastic matrix.
 Transition matrices for Markov chains are efficiently stored as NumPy arrays.
