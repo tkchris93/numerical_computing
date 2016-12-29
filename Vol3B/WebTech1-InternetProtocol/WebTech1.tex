@@ -1,36 +1,37 @@
-\lab{Internet Protocols}{Internet Protocols}
-\objective{Understand how protocols allow for general internet connection between machines. Learn how to create a server and client program. Apply this understanding to navigation of online infrastructure and to data collection.}
+\lab{Web Technologies 1: Internet Protocols}{Web Technologies 1: Internet Protocols}
+\objective{The internet has strict protocols for managing communications between machines.
+In this lab, we introduce the basics of TCP, IP, and HTTP, and create a server and client program.
+We then apply this understanding to navigation of online infrastructure and to data collection.}
 %\label{lab:webtech}
 
-The "internet" is comparable to a network of roads connecting the buildings of a city. Each building represents a computer and the roads are the physical wires or wireless pathways that allow for intercommunication. In order to properly navigate the road, you must use the correct kind of vehicle and follow the established instructions for travel. If these requirements are not met, you are not allowed to navigate the road to another building. There are also vehicles of different capabilities and sizes which can retrieve items from particular buildings. In a similar fashion, the internet has specific rules and procedures, called protocols, which allow for standardized communication within and between computers. By understanding these protocols, we can more easily navigate the world web to collect data, create web dependent programs, and interact with other network connected computers.
+The internet is comparable to a network of roads connecting the buildings of a city. Each building represents a computer and the roads are the physical wires or wireless pathways that allow for intercommunication. In order to properly navigate the road, you must use the correct kind of vehicle and follow the established instructions for travel. If these requirements are not met, you are not allowed to navigate the road to another building. There are also vehicles of different capabilities and sizes which can retrieve items from particular buildings. In a similar fashion, the internet has specific rules and procedures, called protocols, which allow for standardized communication within and between computers. By understanding these protocols, we can more easily navigate the world web to collect data, create web dependent programs, and interact with other network connected computers.
 
 The most common communication protocols in computer networks are contained in the Internet Protocol Suite. Among these are TCP (Transmission Control Protocol) and IP (Internet Protocol), which are two of the oldest and most important protocols. In fact, they are so important that the entire suite is sometimes referred to as TCP/IP. However, there are many other protocols in the suite, all of which are divided into four abstraction layers:
 \begin{enumerate}
-\item Application: Software that utilizes transport protocols to move information between computers.
+\item \textbf{Application}: Software that utilizes transport protocols to move information between computers.
 This layer includes protocols important for email, file transfers, and browsing the web.
-\item Transport: Protocols that define basic high level communication between two computers.
+\item \textbf{Transport}: Protocols that define basic high level communication between two computers.
 The two most common protocols in this layer are TCP and UDP.
 TCP is by far the most widely used due to its reliability.
 UDP, however, trades reliability for low latency.
-\item Internet: Protocols that handle routing and movement of data on a network.
-\item Link: Protocols that deal with local networking hardware such as routers and switches.
+\item \textbf{Internet}: Protocols that handle routing and movement of data on a network.
+\item \textbf{Link}: Protocols that deal with local networking hardware such as routers and switches.
 \end{enumerate}
 
-For this lab, we will focus on understanding and utilizing TCP/IP and HTTP, which are, respectively, the most common Transport and Application protocols.
+For this lab, we will focus on understanding and utilizing TCP/IP and HTTP, which are the most common Transport and Application protocols, respectively.
 
-\section*{TCP}
-TCP is specifically used to establish a connection between computers, exchange bits of information called \textit{packets}, and then close their connection.
+\section*{TCP} % ==============================================================
+
+TCP is specifically used to establish a connection between computers, exchange bits of information called \emph{packets}, and then close their connection.
 Built for host computers on an IP network, TCP allows for a very reliable, ordered, and error-checked stream of data bytes (eight binary bits).
 
-Specifically, TCP creates network \textit{sockets} that are used to send and receive data packets. While we would normally think of sending data between two different machines, two sockets on the same machine can communicate via TCP as well. Using the Python \li{socket} module, we will demonstrate how to create a network socket (a \textit{server} to listen for incoming data, and how to create a second socket (a \textit{client}) to send data.
+Specifically, TCP creates network \emph{sockets} that are used to send and receive data packets. While we would normally think of sending data between two different machines, two sockets on the same machine can communicate via TCP as well. Using the Python \li{socket} module, we will demonstrate how to create a network socket (a \emph{server} to listen for incoming data, and how to create a second socket (a \emph{client}) to send data.
 
+\subsection*{Creating a Server} % ---------------------------------------------
 
-
-\subsection*{Creating a Server}
-A \textit{server} is a program that provides functionality to \textit{client} programs. Oftentimes, these server programs run on dedicated computer hardware that we also refer to as servers. These servers are fundamental to the modern networks we work on and provide services such as file sharing, authentication, webpage information, databases, etc. 
+A \emph{server} is a program that provides functionality to \emph{client} programs. Oftentimes, these server programs run on dedicated computer hardware that we also refer to as servers. These servers are fundamental to the modern networks we work on and provide services such as file sharing, authentication, webpage information, databases, etc.
 To create a server, we first create a new socket object.
 The socket object will be able to listen for and accept incoming connections from other sockets.
-
 
 The two input arguments specify the socket type. Further description of socket types can be found in the python documentation.
 
@@ -45,13 +46,13 @@ There are 65535 available ports.
 Of those, about 250 are commonly used.
 Certain ports are have pre-defined uses. For example:
 \begin{itemize}
-        \item 0 to 1023: Special reserved ports
-        \item  80, 443: Commonly used for web traffic
-        \item 25, 110, 143, 465: Commonly used for email servers
-    \end{itemize}
-We also specify an address for the host, which is analogous to the "mailing address" of the machine on which the server is running.
-The address may be set to the computer's IP address, to \li{'localhost'}, or to an empty string. We bind the socket to the port and address, then call \li{listen} to tell it to listen for connections.
-
+    \item 0 to 1023: Special reserved ports
+    \item  80, 443: Commonly used for web traffic
+    \item 25, 110, 143, 465: Commonly used for email servers
+\end{itemize}
+We also specify an address for the host, which is analogous to the ``mailing address'' of the machine on which the server is running.
+The address may be set to the computer's IP address, to \li{"localhost"}, or to an empty string.
+We bind the socket to the port and address, then call \li{listen()} to tell it to listen for connections.
 
 \begin{lstlisting}
 address = '127.0.0.1' # Default address that specifies the local machine
@@ -60,13 +61,12 @@ s.listen(1) # Tell the socket to listen for incoming connections
 \end{lstlisting}
 
 Next we tell the socket what do with incoming connections.
-Once a connection is made, the \li{accept} method returns the connection, which is itself a socket object.
+Once a connection is made, the \li{accept()} method returns the connection, which is itself a socket object.
 The connection object receives data (as a string) in blocks, so we specify a block size in bits.
 
 The connection object can also send back data.
 In the code below, the connection simply echoes back whatever data it receives.
 After all the data has been received, we close the connection.
-
 
 \begin{lstlisting}
 size = 2048 # Block size of 20 bytes
@@ -80,18 +80,21 @@ while True:
 conn.close()
 \end{lstlisting}
 
-We can also close the server by using the KeyBoardInterrupt (ctrl+c).
+We can also close the server by using the KeyBoardInterrupt (\li{ctrl+c}).
 
-\subsection*{Creating a Client}
-A \textit{client} is a program that contacts a server in order to receive data or functionality. We use many client programs which include web browsers, mail programs, online video games, etc.
-We will create a new client socket to connect to our server. We follow a similar process as we did for the server socket:
+\subsection*{Creating a Client} % ---------------------------------------------
+
+A \emph{client} is a program that contacts a server in order to receive data or functionality. We use many client programs which include web browsers, mail programs, online video games, etc.
+We will create a new client socket to connect to our server.
+We follow a similar process as we did for the server socket:
 
 \begin{lstlisting}
 import socket
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 \end{lstlisting}
 
-We specify the address of the server, and the port (this needs to be the same port on which the server is listening). We then connect to the server.
+We specify the address of the server, and the port (this needs to be the same port on which the server is listening).
+We then connect to the server.
 
 \begin{lstlisting}
 ip = '127.0.0.1'
@@ -100,7 +103,10 @@ client.connect((ip, port))
 \end{lstlisting}
 
 Once connected, the client can send and receive data.
-Unlike the server, the client sends and reads the data itself instead of creating a new connection socket. When we are done with the client, we close it.
+Unlike the server, the client sends and reads the data itself instead of creating a new connection socket.
+When we are done with the client, we close it.
+
+\newpage
 
 \begin{lstlisting}
 size = 2048 # Block size of 20 bytes
@@ -116,42 +122,51 @@ client.close()
 
 To see the client and server communicate, open a terminal and run the server. Then run the client in a separate terminal.
 
-\begin {table}
-\begin{tabular}{| l | p{8cm}|}
-	\hline
+\begin{table}[H]
+\begin{tabular}{r|p{8cm}}
 	Command & Description\\
 	\hline
 	\li{bind((address, port)) }&  Binds to a port and an address.\\
-	\li{listen} & Starts listening for requests.\\
-	\li{accept} & Accepts a connection from a client, and returns a new socket object and a connection address.\\
+	\li{listen()} & Starts listening for requests.\\
+	\li{accept()} & Accepts a connection from a client, and returns a new socket object and a connection address.\\
 	\li{recv(size)} & Reads and returns a block of incoming data.\\
 	\li{send(data)} & Sends data to the client.\\
-	\li{close} & Closes the socket.\\
-	\li{gethostname} & Returns the host name of the machine.\\
-	\li{getsockname} & Returns the socket's own address.\\
-
-	\hline
+	\li{close()} & Closes the socket.\\
+	\li{gethostname()} & Returns the host name of the machine.\\
+	\li{getsockname()} & Returns the socket's own address.\\
 \end {tabular}
 \caption{Table of Socket Commands}
 \end{table}
 
-\begin{problem}
-Write a file called \li{simple_server.py}. When run, this file creates a server socket, accepts a connection and then reads incoming data. The server should append the current time onto each data block, then send it back to the client. (Look at \li{time.strftime('\%H:\%M:\%S')}  for formatting the current time.)
+\begin{problem} % Simple server/client
+Write a file called \texttt{simple\_server.py}.
+When run, this file should create a server socket, accept a connection and then read incoming data.
+The server should append the current time onto each data block, then send it back to the client.\\
+(Hint: use \li{time.strftime('\%H:\%M:\%S')} to format the current time nicely.)
 
-Also write a file called \li{simple_client.py}. In this file, create a client socket and connect to the server created in \li{simple_server.py}. The client should send a message to the server and print the server's response.
+Also write a file called \texttt{simple\_client.py}.
+In this file, create a client socket and connect to the server created in \texttt{simple\_server.py}.
+The client should send a message to the server and print the server's response.
 \end{problem}
 
-\begin{problem}
-Write a file called \li{rps_server.py}, which plays rock-paper-scissors with a client. The server should accept a connection, and while the connection is open, cycle through the following loop:
-\begin {itemize}
-	\item{Receive a move ("rock","paper", or "scissors").}
-	\item{Generate a random move of its own. Print both moves.}
-	\item{Determine who won the round.}
-	\item{Send "you win", "you lose", or "draw" back to the client, depending on the outcome of the round. If the move is invalid, send back "invalid move."}
-	\item{If the client won, break the loop and close the connection.}
+\newpage
+
+\begin{problem} % Rock Paper Scissors server/client
+Write a file called \texttt{rps\_server.py}, which plays rock-paper-scissors with a client.
+The server should accept a connection, and while the connection is open, cycle through the following loop:
+\begin{itemize}
+	\item Receive a move (\li{"rock"}, \li{"paper"}, or \li{"scissors"}).
+	\item Generate a random move of its own. Print both moves.
+	\item Determine who won the round.
+	\item Send \li{"you win"}, \li{"you lose"}, or \li{"draw"} back to the client, depending on the outcome of the round.
+    If the move is invalid, send back \li{"invalid move"}.
+	\item If the client won, break the loop and close the connection.
 \end{itemize}
 
-Also write a file called \li{rps_client.py}. The client should connect to the server and then enter a while loop. In the loop, the client sends the server a move and prints the server's response. The client should break the loop and close once it receives a "you win" back from the server.
+Also write a file called \texttt{rps\_client.py}.
+The client should connect to the server and then enter a while loop.
+In the loop, the client sends the server a move and prints the server's response.
+The client should break the loop and close once it receives a \li{"you win"} back from the server.
 \end{problem}
 
 Although these examples are simple, we use a similar pattern for every transfer of data over TCP.
@@ -159,20 +174,23 @@ For simple connections, the amount of work the programmer has to do can be minim
 However, requesting a complicated webpage would require us to manage possibly hundreds of connections.
 Naturally, we would want to use a higher level protocol that takes care of the smaller details for us.
 
-%While we would normally think of communication between sockets on different machines, two sockets on the same machine can communicate via TCP as well.
-%We give an example of the latter, for simplicity.
+\begin{comment}
+While we would normally think of communication between sockets on different machines, two sockets on the same machine can communicate via TCP as well.
+We give an example of the latter, for simplicity.
 
-%\lstinputlisting[style=FromFile]{tcp_server.py}
+\lstinputlisting[style=FromFile]{tcp_server.py}
 
-%\lstinputlisting[style=FromFile]{tcp_client.py}
+\lstinputlisting[style=FromFile]{tcp_client.py}
 
-%We can start understanding the code above by seeing that a TCP connection is a link between two sockets.
-%Those sockets can be on the same machine (as in the case above), or different machines.
-%The machines are uniquely identified by an IP address.
-%The IP address used in our example is a special IP address that always refers the local machine.
-%Every computer has the ip 127.0.0.1.
+We can start understanding the code above by seeing that a TCP connection is a link between two sockets.
+Those sockets can be on the same machine (as in the case above), or different machines.
+The machines are uniquely identified by an IP address.
+The IP address used in our example is a special IP address that always refers the local machine.
+Every computer has the ip 127.0.0.1.
+\end{comment}
 
-\section*{HTTP}
+\section*{HTTP} % =============================================================
+
 HTTP stands for Hypertext Transfer Protocol, which is an application layer networking protocol.
 It is a higher level protocol than TCP and takes care of many of the small details of TCP for us.
 It also relies on underlying TCP protocol to provide network capabilities.
@@ -180,7 +198,8 @@ The protocol is centered around a request and response paradigm.
 A client makes a request to a server and the server replies with response.
 There are several methods, or requests, defined for HTTP servers. The two most common of which are GET and POST.
 GET requests are typically used to request information from a server.
-POST requests are sent to the server with the intent of modifying the state of the server.  We can send additional information with both GET and POST requests.
+POST requests are sent to the server with the intent of modifying the state of the server.
+We can send additional information with both GET and POST requests.
 
 Every HTTP request consists of two parts: a header and a body.
 The headers contain important information about the request including: the type of request, encoding, and a timestamp.
@@ -188,8 +207,9 @@ We can add custom headers to any request to provide additional information.
 The body of the request contains the requested data and may or may not be empty.
 
 We can setup an HTTP connection in Python as demonstrated below.
-We will encourage you to use the "requests" library instead of the modules in the standard library.
-However, the code below is illustrative of the steps in making an HTTP connection using "httplib."
+We will encourage you to use the \li{requests} library instead of the modules in the standard library.
+However, the code below is illustrative of the steps in making an HTTP connection using \li{httplib}.
+
 \begin{lstlisting}
 import httplib
 conn = httplib.HTTPConnection("www.example.net")
@@ -202,6 +222,7 @@ conn.close() # After collecting the information we need, we close the connection
 print headers
 print data      # Long string full of HTML code from the webpage
 \end{lstlisting}
+
 The above codes starts by creating a connection to specific host.
 We then make a request, which in this case was a GET request.
 The host we are connected to then responds and we retrieve the response.
@@ -209,7 +230,8 @@ In order to know if our request was successfully processed, we need to check the
 A status code of $200$ means that everything went alright.
 We can now read the data of the response and then explicitly close the connection.
 
-This exchange is greatly simplified by the "requests" library:
+This exchange is greatly simplified by the \li{requests} library:
+
 \begin{lstlisting}
 import requests
 r = requests.get("http://www.example.net")
@@ -220,57 +242,69 @@ print r.content
 
 We will now examine an example of a GET request with a list of parameters in the form of a Python dictionary.
 We will use a web service called HTTPBin which is very helpful in developing applications that make HTTP requests.
+
 \begin{lstlisting}
 >>> data = {'key1': 0, 'key2': 1}
 >>> r = requests.get("http://httpbin.org/get", params=data)
 >>> print r.content # Our parameters now show up in the args() of the get request
 \end{lstlisting}
 
-For more information on the "requests" library, see the Python documentation.
-%When we post to a server, we have the option of sending data.
-%This data can be a file object, a dictionary or a string.
-%To send our data via post, we first serialize it to JSON and then send the resulting string to the request.
-%\begin{lstlisting}
-%>>> p = requests.post("http://httpbin.org/post", data=json.dumps(data))
-%>>> print p.content
-%\end{lstlisting}
-%
+For more information on the \li{requests} library, see the documentation at \url{http://docs.python-requests.org/}.
+
+\begin{comment}
+When we post to a server, we have the option of sending data.
+This data can be a file object, a dictionary or a string.
+To send our data via post, we first serialize it to JSON and then send the resulting string to the request.
+\begin{lstlisting}
+>>> p = requests.post("http://httpbin.org/post", data=json.dumps(data))
+>>> print p.content
+\end{lstlisting}
+\end{comment}
+
 \begin{problem}
-Included is \li{nameserver.py}. This is an example of a simple HTTP server using a Python library called BaseHTTPServer. It allows clients to send the last name of a famous computer scientist with GET and then returns the corresponding first name. For example, running the following code results in the message `Grace' from the server. The \textit{?} signifies the start of a \textit{query} in the URL.
+The file \texttt{nameserver.py} is an example of a simple HTTP server using the Python module \li{BaseHTTPServer}.
+It allows clients to send the last name of a famous computer scientist with GET and then returns the corresponding first name.
+For example, running the following code results in the message \li{"Grace"} from the server.
+The \emph{?} signifies the start of a \emph{query} in the URL.
 
 \begin{lstlisting}
 r = requests.get("http://localhost:8000?lastname=Hopper")
 \end{lstlisting}
 
-Expand the functionality of the server so that a client can also use GET to obtain a dictionary of everybody whose last name starts with a given string or everybody on the list with \li{lastname=AllNames}. Then add a method so that clients can add a person to the dictionary (or modify an existing entry) using PUT with a query of \li{firstname} and \li{lastname}
+Expand the functionality of the server so that a client can also use GET to obtain a dictionary of everybody whose last name starts with a given string or everybody on the list with \li{lastname=AllNames}.
+Then add a method so that clients can add a person to the dictionary (or modify an existing entry) using PUT with a query of \li{firstname} and \li{lastname}
 \end{problem}
 
-Though simple, this HTTP server was the original idea for Instant Messaging. The instant messaging client on your computer sends your name, IP address, and port number to the web server. This server then advises your contacts that you are online. If they wish to message you, all communication then happens between your port and IP address and the port and IP address of the other user without passing through the main name server.
+Though simple, this HTTP server was the original idea for Instant Messaging.
+The instant messaging client on your computer sends your name, IP address, and port number to the web server.
+This server then advises your contacts that you are online.
+If they wish to message you, all communication then happens between your port and IP address and the port and IP address of the other user without passing through the main name server.
 
 \begin{problem}
-We will now practice chatting through HTTP. 
-To do so, create a new HTTP server in a file called \li{chatserver.py} using the same method as problem 3.
-This new server should store a set of dictionaries instead of a \li{names} dictionary. 
-The GET method should return all items within each dictionary in your set on separate lines. 
-The PUT method should accept a \li{name} and a \li{message} and store them in a new dictionary in your set. 
+We will now practice chatting through HTTP.
+To do so, create a new HTTP server in a file called \texttt{chatserver.py} using the same method as Problem 3. %TODO: \ref{prob:}.
+This new server should store a set of dictionaries instead of a \li{names} dictionary.
+The GET method should return all items within each dictionary in your set on separate lines.
+The PUT method should accept a \li{name} and a \li{message} and store them in a new dictionary in your set.
 Sample requests are as follows:
 
 \begin{lstlisting}
 # Request names and IP addresses from nameserver.
 r = requests.get("http://ipaddress:portnumber?name=AllNames")
 # Send a message to another persons chat server.
-r = requests.put("http://ipaddress:portnumber?name=Thomas&message=Hows it going")
+r = requests.put("http://ipaddress:portnumber?name=Thomas&message=Hello World")
 \end{lstlisting}
 
-Once you have successfully created your server, run it through a terminal at your localhost IP address. 
-You may then PUT your \li{name} and \li{ipaddressport} on the HTTP server provided by your instructor. 
-To find your own IP address, run in a separate terminal, \li{ifconfig} (for Mac or Linux) or \li{ipconfig} on Windows command prompt. 
-You may use GET requests of \li{AllNames} to the nameserver to retrieve the names of other active users. 
-To send them a message, use their IP address and port number in the above request examples. 
+Once you have successfully created your server, run it through a terminal at your localhost IP address.
+You may then PUT your \li{name} and \li{ipaddressport} on the HTTP server provided by your instructor.
+To find your own IP address, run in a separate terminal, \li{ifconfig} (for Mac or Linux) or \li{ipconfig} on Windows command prompt.
+You may use GET requests of \li{AllNames} to the nameserver to retrieve the names of other active users.
+To send them a message, use their IP address and port number in the above request examples.
 
-To receive credit for this problem, please send a message with your name to the \textit{TA} user IP address.
-
+To receive credit for this problem, send a message with your name to the \emph{TA} user IP address.
 When you have finished chatting, update your IP address to an empty string in the name server.
 
-Note: This requires a level of remote network access. If the network doesn't allow you to connect, use SSH to remote into a network location where this can be done.
+\begin{warn}
+This problem requires a level of remote network access. If the network doesn't allow you to connect, use SSH to remote into a network location where this can be done.
+\end{warn}
 \end{problem}
