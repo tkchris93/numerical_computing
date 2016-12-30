@@ -35,7 +35,7 @@ $ pdflatex Vol1.tex
 ### Data Files
 
 The data sets used in these labs can be found at http://acme.byu.edu/data/.
-They are organized by semesters: Volume 1 first half as `Vol1A`, second half as `Vol1B`, and so on.
+They are organized by semester: Volume 1 first half as `Vol1A`, second half as `Vol1B`, and so on.
 
 See the [Wiki page](https://github.com/Foundations-of-Applied-Mathematics/Lab-Development/wiki/File-Dependencies-Index) for an index of labs and data file dependencies.
 
