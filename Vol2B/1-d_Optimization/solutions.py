@@ -1,45 +1,52 @@
-'''
-Solutions file for the line search lab.
-'''
-import numpy as np
-import scipy.optimize as opt
+# solutions.py
+"""Volume 2B: 1-D Optimization. Solutions file."""
 
-def goldenSection(f, a, b, niter=10):
-    '''
-    Perform a Golden Section Search on the objective function.
+import numpy as np
+from math import sqrt, exp
+from scipy import optimize as opt
+
+
+# Problem 1
+def golden_section(f, a, b, niter=10):
+    """Find the minimizer of the unimodal function f on the interval [a,b]
+    using the golden section search method.
+
     Inputs:
-        f -- unimodal objective function
-        a -- left bound of the interval
-        b -- right bound of the interval
-        niter -- integer, number of iterations
+        f (function): unimodal scalar-valued function on R.
+        a (float): left bound of the interval of interest.
+        b (float): right bound of the interval of interest.
+        niter (int): number of iterations to compute.
+
     Returns:
-        the approximated minimizer
-    '''
-    rho = 0.5 * (3 - np.sqrt(5))
-    for i in range(niter):
-        aprime = a + rho * (b-a)
-        bprime = a + (1-rho) * (b-a)
-        fa = f(aprime)
-        fb = f(bprime)
-        if fa > fb:
+        the approximated minimizer (the midpoint of the final interval).
+    """
+    rho = (3 - sqrt(5)) / 2.
+    for _ in xrange(niter):
+        aprime = a + rho*(b - a)
+        bprime = a + (1 - rho)*(b - a)
+        if f(aprime) > f(bprime):
             a = aprime
         else:
             b = bprime
-    return (a+b)/2.
+    return (a + b) / 2.
 
+def test_golden_section():
+    return golden_section(lambda x: exp(x) - 4*x, 0, 3, niter=15)
+
+
+# Problem 2
 def bisection(df, a, b, niter=10):
-    '''
-    Perform a Bisection Method Search on the objective function.
+    """Find the minimizer of the unimodal function with derivative df on the
+    interval [a,b] using the bisection algorithm.
+
     Inputs:
-        df -- derivative of unimodal objective function
-        a -- left bound of the interval
-        b -- right bound of the interval
-        niter -- integer, number of iterations
-    Returns:
-        the approximated minimizer
-    '''
-    for i in range(niter):
-        mid = (b+a)/2.
+        df (function): derivative of a unimodal scalar-valued function on R.
+        a (float): left bound of the interval of interest.
+        b (float): right bound of the interval of interest.
+        niter (int): number of iterations to compute.
+    """
+    for _ in xrange(niter):
+        mid = (b + a) / 2.
         d = df(mid)
         if d > 0:
             b = mid
@@ -47,18 +54,18 @@ def bisection(df, a, b, niter=10):
             a = mid
         else:
             return mid
-    return (a+b)/2.
+    return (a + b) / 2.
 
 
 def newton1d(f, df, ddf, x, niter=10):
     '''
     Perform Newton's method to minimize a function from R to R.
-    
+
     Parameters
     ----------
-    f : callable function object 
+    f : callable function object
         The objective function (twice differentiable)
-    df : callable function object 
+    df : callable function object
         The first derivative
     ddf : callable function object
         The second derivative
@@ -66,7 +73,7 @@ def newton1d(f, df, ddf, x, niter=10):
         The initial guess
     niter : integer
         The number of iterations
-        
+
     Returns
     ------
         min : float
@@ -79,18 +86,18 @@ def newton1d(f, df, ddf, x, niter=10):
 def secant1d(f, df, x0, x1, niter=10):
     '''
     Perform the Secant method to minimize a function from R to R.
-    
+
     Parameters
     ----------
-    f : callable function object 
+    f : callable function object
         The objective function (twice differentiable)
-    df : callable function object 
+    df : callable function object
         The first derivative
     x : float
         The initial guess
     niter : integer
         The number of iterations
-        
+
     Returns
     ------
         min : float
@@ -99,7 +106,7 @@ def secant1d(f, df, x0, x1, niter=10):
     for i in range(niter):
         x0, x1 = x1, x1 - (x1 - x0) / (df(x1) - df(x0)) * df(x1)
     return x1
-    
+
 def backtracking(f, slope, x, p, a=1, rho=.9, c=10e-4):
     '''
     Perform a backtracking line search to satisfy the Wolfe Conditions.

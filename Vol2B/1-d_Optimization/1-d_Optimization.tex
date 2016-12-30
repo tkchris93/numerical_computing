@@ -1,81 +1,76 @@
-\lab{1-d Optimization}{1-d Optimization}
+\lab{1-D Optimization}{1-D Optimization}
 \label{lab:1-dOpt}
-\objective{There are several canonical techniques for optimizing scalar-valued functions.
-In this lab, we implement the golden ratio method, the bisection algorithm, Newton's method, and the secant method.
-We will generalize some of these approaches to optimization in $n$ dimensions in future labs.
+\objective{
+Many high-dimensional optimization algorithms rely on one-dimensional optimization methods.
+In this lab, we implement four \emph{line search} algorithms for optimizing scalar-valued functions defined on $\mathbb{R}$.
+We will generalize some of these approaches to high-dimensional optimization problems in subsequent labs.
+% In some sense, they represent the simplest nontrivial case in general optimization, as there is only one parameter to optimize.
+% Even so, many sophisticated optimization algorithms rely crucially on the effectiveness and efficiency of line searches, since higher-dimensional problems are often broken down into one-dimensional optimizations.
+% There are many different one-dimensional optimization methods, and their effectiveness depends very much on the nature of the optimization problem.
+% Although the line search procedure is often only a subroutine of the optimization algorithm at hand, understanding the basics of the line search is necessary for understanding the robustness of the entire algorithm.
+% For some functions, we can use techniques from calculus to analytically obtain this minimizer.
+% However, in practical applications, this is often impossible, especially when
+% we need a system that works for a wide class of functions.
 }
 
-\section*{Overview of 1-d Optimization} % =====================================
+\section*{Overview of Line Search Algorithms} % ===============================
 
-Imagine you are out hiking on a mountain, and you lose track of the trail.
-Thick fog gathers around, reducing visibility to just a couple of feet.
-You decide it is time to head back home, which is located in the valley located near the base of the mountain.
+% TODO: make this metaphor WAY more concise.
+Imagine you are hiking a steep mountain.
+When it is time to head home, thick fog gathers around, reducing visibility to just a couple of feet.
 How can you find your way back with such limited visibility?
-The obvious way might be to pick a direction that leads downhill, and follow that direction as far as you can, or until it starts leading upward again.
-Then you might choose another downhill direction, and take that as far as you can, repeating the process.
-By always choosing a downhill direction, you hope to eventually make it back to the bottom of the valley, where you live.
+One strategy is to pick a downhill direction and follow that direction as far as you can, or until it starts leading upward again.
+Then choose another downhill direction, and take that as far as you can, repeating the process.
+By always choosing a downhill direction, you hope to eventually make it back to the base of the mountain.
 
 This is the basic approach of \emph{line search algorithms} for numerical optimization.
-Suppose we have a function $f:\mathbb{R}\rightarrow\mathbb{R}$ that we wish to minimize.
-The goal is to find the point $x^*$ such that $f(x^*) \le f(x)$ for all $x$.
-For some functions, we can use techniques from calculus to analytically obtain this minimizer.
-However, in practical applications, this is often impossible, especially when
-we need a system that works for a wide class of functions.
-A line search algorithm starts with an initial guess at the minimizer, call it $x_0$, and iteratively produces a sequence of points $x_1, x_2, x_3, \ldots$ that hopefully converge to the minimizer $x^*$.
-The basic iteration to move from $x_k$ to $x_{k+1}$ involves two steps: first, choosing a search direction $p_k$ in which to proceed from the current point, and second, specifying a step size $\alpha_k$ to travel
-in this direction.
-The next point is determined by the formula
-$$
-x_{k+1} = x_k + \alpha_kp_k.
-$$
-This procedure is called a line search because at each iteration, we are simply examining the function in a particular linear direction.
-The choice of the step size $\alpha_k$ is often chosen by solving a one-dimensional optimization problem in the given direction.
-In this lab, we will discuss approaches to choosing the step size and the search direction.
-
-Line search procedures are an integral part of many nonlinear optimization techniques.
-In some sense, they represent the simplest nontrivial case in general optimization, as we only have to worry about one parameter.
-And yet far more sophisticated optimization algorithms rely crucially on the effectiveness and efficiency of line searches, since higher-dimensional problems are often broken down into one-dimensional optimizations.
-There are many different one-dimensional optimization methods, and their effectiveness depends very much on the nature of the optimization problem.
-Although the line search procedure is often only a subroutine of the optimization algorithm at hand, understanding the basics of the line search is necessary for understanding the robustness of the entire algorithm.
+Let $f$ be a scalar-valued function.
+The goal is to find the \emph{global minimizer} $\x^*$ such that $f(\x^*) \le f(\x)$ for all $\x$ in the domain of $f$.
+After choosing an initial guess $\x_0$, we produce a sequence of approximations $\x_1,\ \x_2,\ \x_3,\ \ldots$ using the rule
+\begin{equation}
+    \x_{k+1} = \x_k + \alpha_k \mathbf{p}_k.
+    \label{eq:line-search-iter}
+\end{equation}
+The point $\mathbf{p}_k$ is the \emph{search direction} (which way to go) and the scalar $\alpha_k$ is called the \emph{step size} (how far to go).
+% This procedure is called a line search because at each iteration, we are simply examining the function in a particular linear direction.
+% The choice of the step size $\alpha_k$ is often chosen by solving a one-dimensional optimization problem in the given direction.
+The choice of search direction and step size at each step is what defines different line search algorithms.
 
 \subsection*{Derivative versus Derivative-Free Methods} % ---------------------
 
-As you have seen in calculus classes, the derivative of a function gives information about how the value of the function changes at each point, and can be used to determine local optima.
-Not all objective functions are differentiable and many more are difficult and costly to differentiate, so we need other ways to optimize functions without derivatives.
-Line search methods may be broadly separated into two groups: those that require the derivative of the objective function, and those that do not.
+A function's derivative provides information about how the value of the function changes at each point, and can be used to determine local optima.
+Unfortunately, not all objective functions are differentiable, and many are difficult or costly to differentiate.
+Thus some line search methods utilize the derivative of the objective function, but others do not.
 
-\section*{Optimizing Functions on the Real Numbers}
+\section*{Interval Approximation Methods for Unimodal Functions} % ============
 
-\subsection*{Simple Line Search Algorithms}
-In this section we will discuss four line search algorithms.
-The first two, golden section and bisection search, are especially simple, as the step size in some sense is fixed, and we are only left with a binary decision of search direction.
-The third, Newton's method, you should have seen previously in the labs for Volume 1.
-Newton's Method uses an algorithm to determine both the step size and direction of the search.
-Our final algorithm, The Secant Method, can be thought of as an approximation of Newton's Method.
+A function $f:[a,b]\rightarrow\mathbb{R}$ satisfies the \emph{unimodal property} if it has just \textbf{one} local (hence global) minimum and is monotonic to the left and right of the minimum.
+The following line search methods optimize a unimodal function by partitioning the function's domain into progressively smaller intervals that contain the minimizer.
+% Although we may not end up with the exact minimum, these method allows us to pin down the true minimum within an interval of any given width in a finite number of steps.
+% The first two, golden section and bisection search, are especially simple, as the step size in some sense is fixed, and we are only left with a binary decision of search direction.
+% Newton's Method uses an algorithm to determine both the step size and direction of the search.
+% Our final algorithm, The Secant Method, can be thought of as an approximation of Newton's Method.
 
-\subsection*{Golden Section Search}
-This method is appropriate when minimizing a real-valued function on the reals over a closed interval.
-The function must further satisfy the \emph{unimodal} property, i.e. it has just one local minimum, and is monotonic to the left and right of the minimum.
-The goal, of course, is to find the global minimum.
-We do this by making a sequence of guesses that we hope will converge quickly to the minimum.
-Although we may not end up with the exact minimum, this method will allow us to pin down the true minimum within an interval of any given width in a finite number of steps.
+\subsection*{Golden Section Search} % -----------------------------------------
 
-For the Golden Section Search, each step consists of evaluating the function at two points within the current interval, comparing these values, and then reducing the size of the interval for the next step.
-Let us consider a typical step in the algorithm.
-At the outset, we have our function $f$ and a closed interval $[a, b]$ over which we seek to minimize $f$.
-Choose two points $a'$ and $b'$ within the interval, and assume that $a' < b'$.
-Now calculate $f(a')$ and $f(b')$, and assume that $f(a') \geq f(b')$.
-Because of the unimodal condition, we now know that the minimizer must be in the interval $[a', b]$, for otherwise the function $f$ would have a local minimum in both $[a, a']$ and $[a', b]$.
+Let $f:[a,b]\rightarrow\mathbb{R}$ be unimodal.
+Starting with the closed interval $[a,b]$, the \emph{golden section search} finds a smaller interval that contains $x^*$ as follows.
+
+Choose two points $a'$ and $b'$ with $a' < b'$.
+If $f(a') \geq f(b')$, the unimodal property guarantees that the minimizer must be in the interval $[a', b]$, for otherwise the function $f$ would have a local minimum in both $[a, a']$ and $[a', b]$. % TODO: WHY??
 In the next step, we repeat the process over the interval $[a', b]$.
-If instead we had $f(b') \geq f(a')$, then we choose the interval $[a, b']$ for the next step, and if the two values are equal, then it does not matter which interval is chosen.
+If instead $f(a') \leq f(b')$, then we choose the interval $[a, b']$ for the next step.
+Finally, if $f(a') = f(b')$, then it does not matter which interval is chosen.
 
-We now have the basic description of the algorithm, but how do we choose the two test points $a'$ and $b'$? There is in fact an optimal choice, which reduces the amount of work we have to do.
-Given an interval $[a, b]$, choose $a'$ and $b'$ satisfying
+It turns out that there is an optimal choice for the two test points $a'$ and $b'$.
+Given the current interval $[a, b]$, choose $a'$ and $b'$ satisfying
 \begin{align*}
 a' &= a + \rho(b - a) \\
 b' &= a + (1 - \rho)(b - a),
 \end{align*}
-where $\rho = \frac{1}{2}(3 - \sqrt{5}) \approx 0.382$.
+where $\rho = \frac{1}{2}(3 - \sqrt{5}) \approx 0.382$ (this constant is related to the famous \emph{golden ratio}, hence the name of the algorithm).
+
+\begin{comment} % TODO: What does this have to do with the implementation?
 By choosing these particular points, we need to only evaluate the function at one additional point in the next step.
 To demonstrate this fact, the reader may verify that, within the interval $[a, b']$, the point $a'$ already satisfies the equation
 \begin{equation*}
@@ -85,35 +80,42 @@ and so we need only evaluate the function at the point $c$ satisfying
 \begin{equation*}
 c = a + \rho(b' - a).
 \end{equation*}
-(The constant $\rho$ is not difficult to derive, and is related to the famous Golden Ratio, hence the name of this algorithm.)
+\end{comment}
 
-At each step, the interval is reduced by a factor of $1-\rho$, which means that after $n$ steps, we have pinned down the minimizer to within an interval approximately $(0.61803)^n$ times the length of the original interval.
-Note that this convergence is independent of the objective function.
+At each step, the interval is reduced by a factor of $1-\rho$, which means that after $n$ steps, the minimizer is pinned down to within an interval approximately $(0.618)^n$ times the length of the original interval.
+Note that this rate of convergence is independent of the objective function.
 
-\begin{problem}
-Implement Golden Section Search as described above.
-Use this to minimize $f(x) = e^x - 4x$ on the interval $\lbrack 0, 3 \rbrack$.
-How many steps do you need to take to get within $.001$ of the true minimizer? Check that with the sentence preceding this problem.
+\begin{problem} % Golden Section Search
+Write a function that accepts a callable function $f$, interval limits $a$ and $b$, and a number of iterations \li{niter} to calculate.
+Implement the golden section search as described above, returning the midpoint of the final interval.
+
+Use your function to minimize $f(x) = e^x - 4x$ on the interval $\lbrack 0, 3 \rbrack$.
+How many steps do you need to take to get within $.001$ of the true minimizer?
+% TODO: how do you plan on testing / reporting this part?
+\label{prob:golden-section-search}
 \end{problem}
 
-\subsection*{Bisection Algorithm for Critical Points}
-This method is similar to the Golden Ratio method, but instead of cutting our interval into two overlapping sections, we divide the interval evenly in half, and then use $f'(x)$ to determine where the minimizer lies.
+\subsection*{Bisection Algorithm} % -------------------------------------------
+
+This method is similar to the Golden Ratio method, but instead of cutting our interval into two overlapping sections, we divide the interval evenly in half, and then use the derivative $f'(x)$ to determine where the minimizer lies.
 This method takes advantage of the fact that a unimodal function's derivative is strictly less than 0 to the left of the minimizer, and strictly greater than 0 to the right.
 
-For a unimodal function on $[a, b]$, take the midpoint, $x_1 = \frac{b + a}{2}$.
-Now test the sign of $f'$.
-If $f'(x_1) > 0$, the critical point must lie in the interval $[a, x_1]$, otherwise, the critical point lies in the other half of the interval, $[x_1, b]$.
-Now repeat this process on the correct interval until the desired accuracy is achieved.
+For a unimodal function $f:[a, b]\rightarrow\mathbb{R}$, take the midpoint, $x_1 = \frac{b + a}{2}$.
+If $f'(x_1) > 0$, the critical point must lie in the interval $[a, x_1]$; otherwise, the critical point lies in the other half of the interval, $[x_1, b]$.
+We repeat this process on the correct interval until the desired accuracy is achieved.
 
 At each step, the interval is reduced by a factor of two.
-This is slightly quicker than the $1-\rho$ factor in the Golden Section search method.
-Like the Golden Section search, this convergence is independent of the objective function.
+This is slightly quicker than the factor of $1-\rho$ in the Golden Section search method.
+Like the golden section search, the convergence of this method is independent of the objective function.
 
-\begin{problem}
-Implement the Bisection Algorithm as described above.
-Use it to mimimize the same function as the previous problem.
+\begin{problem} % Bisection algorithm
+Write a function that accepts a callable function $f$, interval limits $a$ and $b$, and a number of iterations \li{niter} to calculate.
+Implement the bisection algorithm as described above, returning the midpoint of the final interval.
+
+Use your function to minimize the same objective function as in Problem \ref{prob:golden-section-search}.
 How many steps do you need to take to get within $.001$ of the true minimizer?
 Time both algorithms and report which one is faster to converge.
+% TODO: how do you plan on testing this?
 \end{problem}
 
 \subsection*{One-Dimensional Newton's Method}

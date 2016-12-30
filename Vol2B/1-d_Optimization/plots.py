@@ -2,10 +2,10 @@
 import matplotlib
 matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
 
-from matplotlib import pyplot as plt
 import numpy as np
 from scipy import linalg as la
 from scipy import optimize as opt
+from matplotlib import pyplot as plt
 
 def newtonsMethod1d(f, df, ddf, x, niter=10):   # Keep!
     '''
@@ -18,9 +18,10 @@ def newtonsMethod1d(f, df, ddf, x, niter=10):   # Keep!
         niter -- integer, giving the number of iterations
     Returns:
         the approximated minimizer
+        the approximated minimal value
     '''
     for i in xrange(niter):
-        x = x-df(x)/ddf(x)
+        x = x - df(x)/ddf(x)
     return x, f(x)
 
 def myFunc(x):   # Keep!
