@@ -193,6 +193,7 @@ Using what you have just learned, write a function that returns the following fr
 \begin{lstlisting}
 [u'title']
 \end{lstlisting}
+(Hint: This is the attribute in the eighth line of the prettified string from the previous problem.)
 \end{problem}
 
 \subsection*{By Family Relations}
@@ -372,6 +373,7 @@ We need to make two calls to \li{.next_sibling} in order to get the next \li{<p>
 Keep this in mind for future questions as you navigate across siblings.
 
 Just as with parents and children, there are also sibling generators \li{.next_siblings} and \li{.previous_siblings} to iterate through all the siblings of a given tag.
+These generators can be useful when multiple calls to \li{.next_sibling} must be made.
 As before, check the online documentation for more information.
 
 \begin{problem}
@@ -468,10 +470,10 @@ You can find the corresponding website at \url{http://www.wunderground.com/histo
 \item What are the tags which contain the links `Previous Day' and `Next Day'?
 \item What is the tag which contains the number associated with the Actual Max Temperature?
 \end{enumerate}
-[Hint: You can do a \li{ctrl+f} to find where the text is in the HTML, then study the tags around it.]
+(Hint: You can do a \li{ctrl+f} to find where the text is in the HTML, then study the tags around it.)
 \end{problem}
 
-\subsection*{By \li{find_all()}}
+\subsection*{By \texttt{find\_all()}}
 
 Recall that when a tag appeared multiple times, calling that tag name would return the first tag of that name.
 \begin{lstlisting}
