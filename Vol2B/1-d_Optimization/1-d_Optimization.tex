@@ -118,11 +118,11 @@ Time both algorithms and report which one is faster to converge.
 % TODO: how do you plan on testing this?
 \end{problem}
 
-\subsection*{One-Dimensional Newton's Method}
-Let us first start out with a basic task: minimizing a function of one variable.
-We will use a popular approach known as Newton's Method, which is a basic line search algorithm that uses the derivatives of the function to select a direction and step size.
+\section*{Newton's Method and Quasi-Newton Methods} % =========================
 
-To use this method, we need a real-valued function of a real variable that is twice differentiable.
+Newton's Method, is a basic line search algorithm that uses the derivatives of the function to select a direction and step size.
+
+To use this method, we need a function that is twice differentiable.
 The idea is to approximate the function with a quadratic polynomial and then solve the trivial problem of minimizing the polynomial.
 Doing so in an iterative manner can lead us to the actual minimizer.
 Let $f$ be a function satisfying the appropriate conditions, and let us make an initial guess, $x_0$.
@@ -130,24 +130,23 @@ The relevant quadratic approximation to $f$ at $x_0$ is
 \begin{equation*}
 q(x) = f(x_0) + f'(x_0)(x-x_0) + \frac{1}{2}f''(x_0)(x-x_0)^2,
 \end{equation*}
-or just the second-degree Taylor polynomial for $f$ centered at $x_0$.
+which is the second-degree Taylor polynomial for $f$ centered at $x_0$.
 The minimum for this quadratic function is easily found by solving $q'(x) = 0$, and we take the obtained $x$-value as our new approximation.
-The formula for the $(n+1)$-th approximation, which the reader can verify, is
+The formula for the $(k+1)$-th approximation, which the reader can verify, is
 \begin{equation*}
-x_{n+1} = x_n - \frac{f'(x_n)}{f''(x_n)}.
+x_{k+1} = x_k - \frac{f'(x_k)}{f''(x_k)}.
 \end{equation*}
 In the one dimensional case, there are only two search directions: to the right ($+$) or to the left ($-$).
-Newton's method chooses the search direction $\text{sign}(-f'(x_n)/f''(x_n))$ and the step size $|f'(x_n)/f''(x_n)|$.
+Newton's method chooses the search direction $\p_k = \text{sign}(-f'(x_k)/f''(x_k))$ and the step size $\alpha_k = |f'(x_k)/f''(x_k)|$.
 
-As is typical with optimization algorithms, Newton's Method generates a sequence of points or successive approximations to the minimizer.
-However, the convergence properties of this sequence depend heavily on the initial guess $x_0$ and the function $f$.
+The convergence properties of this sequence depend heavily on the initial guess $x_0$ and the function $f$.
 Roughly speaking, if $x_0$ is sufficiently close to the actual minimizer, and if $f$ is well-approximated by parabolas, then one can expect the sequence to converge quickly.
 However, there are cases when the sequence converges slowly or not at all.
 See Figure \ref{linesearch:newton}.
 
 \begin{figure}
 \centering
-\includegraphics[width=\textwidth]{newton.pdf}
+\includegraphics[width=.7\textwidth]{newton.pdf}
 \caption{The results of Newton's Method using two different initial guesses.
 The global minimizer was correctly found with initial guess of 1.
 However, an initial guess of 4 led to only a local minimum.}
@@ -163,7 +162,8 @@ Use this function to minimize $f(x) = x^2 + \sin(5x)$ with an initial guess of $
 Now try other initial guesses farther away from the true minimizer, and note when the method fails to obtain the correct answer.
 \end{problem}
 
-\subsection*{One-Dimensional Secant Method}
+\subsection*{One-Dimensional Secant Method} % ---------------------------------
+
 Sometimes we would like to use Newton's Method, but for whatever reason we don't have a second derivative.
 Maybe calculating it is too costly or the function is not twice differentiable.
 In this situation we can approximate the second derivative using the first derivative.
@@ -192,50 +192,52 @@ Now try other initial guesses farther away from the true minimizer, and note whe
 (Hint: You may want to plot this function to understand why this problem is so sensitive to the starting point.)
 \end{problem}
 
-\section*{General Line Search Methods}
-\subsection*{Step Size Calculation}
-We now examine Line Search methods in more generality.
-Given a differentiable function $f : \mathbb{R}^n \rightarrow \mathbb{R}$ that we wish to minimize, and assuming that we already have a current point $x_k$ and direction $p_k$ in which to search, how do we choose our step size $\alpha_k$? If our step size is too small, we will not make good progress toward the minimizer, and convergence will be slow.
+\section*{General Line Search Methods} % ======================================
+
+\subsection*{Step Size Calculation} % -----------------------------------------
+
+Given a differentiable function $f: \mathbb{R}^n \rightarrow \mathbb{R}$ that we wish to minimize, and assuming that we already have a current point $\x_k$ and direction $\p_k$ in which to search, how do we choose our step size $\alpha_k$? If our step size is too small, we will not make good progress toward the minimizer, and convergence will be slow.
 If the step size is too large, however, we may overshoot and produce points that are far away from the solution.
 A common approach to pick an appropriate step size involves the \emph{Wolfe conditions}:
 
 \begin{align*}
-&f(x_k + \alpha_kp_k) \leq f(x_k) + c_1\alpha_k\nabla f_k^Tp_k, &(0 < c_1 < 1),
-\\ &\nabla f(x_k + \alpha_kp_k)^Tp_k \geq c_2\nabla f_k^Tp_k, &(c_1 < c_2 < 1).
+&f(\x_k + \alpha_k\p_k) \leq f(\x_k) + c_1\alpha_k\nabla f(\x_k)\trp \p_k, &(0 < c_1 < 1),
+\\ &\nabla f(\x_k + \alpha_k\p_k)\trp \p_k \geq c_2\nabla f(\x_k)\trp \p_k, &(c_1 < c_2 < 1).
 \end{align*}
 
-Here, we use the shorthand notation $\nabla f_k$ to mean the gradient of $f$ evaluated at the point $x_k$.
-The search direction $p_k$ is often required to satisfy $p_k^T \nabla f_k < 0$, in which case it is called a \emph{descent direction}, since the function is guaranteed to decrease in this direction.
+The search direction $p_k$ is often required to satisfy $p_k\trp \nabla f(\x_k) < 0$, in which case it is called a \emph{descent direction}, since the function is guaranteed to decrease in this direction.
 Generally speaking, choosing a step size $\alpha_k$ satisfying these conditions ensures that we achieve sufficient decrease in the function and also that we do not terminate the search at a point of steep decrease (since then we could achieve even better results by choosing a slightly larger step size).
 The first condition is known as the \emph{Armijo} condition.
 
 We will discuss methods of finding search directions in future labs.
-For now, we will discuss one simple algorithm for finding an appropriate step size which satisifies the Armijo conditions.
+For now, we will discuss one simple algorithm for finding an appropriate step size which satisfies the Armijo conditions.
 
-\subsection*{Backtracking}
+\subsection*{Backtracking} % --------------------------------------------------
 
 Finding such a step size satisfying these conditions is not always an easy task, however.
 One simple approach, known as \emph{backtracking}, starts with an initial step size $\alpha$, and repeatedly scales it down until the Armijo condition is satisfied.
 That is, choose $\alpha >0, \rho \in (0, 1), c\in (0, 1)$, and while
-$$
-f(x_k + \alpha p_k) > f(x_k) + c\alpha\nabla f_k^Tp_k,
-$$
-re-scale $\alpha := \rho\alpha$.
+\[f(\x_k + \alpha \p_k) > f(\x_k) + c\alpha\nabla f(\x_k)\trp \p_k,\]
+re-scale $\alpha = \rho\alpha$.
 Once the loop terminates, set $\alpha_k = \alpha$.
-Note that the value $\nabla f_k^Tp_k$ remains fixed for the duration of the backtracking algorithm, and hence need only be calculated once at the beginning.
+Note that the value $\nabla f(\x_k)\trp \p_k$ remains fixed for the duration of the backtracking algorithm, and hence need only be calculated once at the beginning.
 
-\begin{problem}
+\begin{problem} % Backtracking
 Implement this backtracking algorithm using the function definition in the spec file.
 Your function will accept a function, its derivative, a starting point, and the direction p.
 \end{problem}
 
-\subsection*{Line Search in SciPy}
-The SciPy module \li{scipy.optimize} contains implementations of various optimization algorithms, including several line search methods.
+% TODO: Need a problem that USES this backtracking algorithm!
+
+\subsection*{Line Search in SciPy} % ------------------------------------------
+
+SciPy's \li{optimize} module contains implementations of various optimization algorithms, including several line search methods.
 In particular, the module provides a useful routine for calculating a step size satisfying the Wolfe Conditions described above, which is more robust and efficient than our simple backtracking approach.
 We recommend its use for the remainder of this lab.
-The function is called \li{line_search}, and accepts several arguments.
+The function is called \li{line_search()}, and accepts several arguments.
 We can typically leave the keyword arguments at their default values, but we do need to pass in the objective function, its gradient, the current point, and the search direction.
 The following code gives an example of its usage, using the objective function $f(x, y) = x^2+4y^2$.
+
 \begin{lstlisting}
 >>> import numpy as np
 >>> from scipy.optimize import line_search
@@ -244,12 +246,15 @@ The following code gives an example of its usage, using the objective function $
 >>>     return x[0]**2 + 4*x[1]**2
 >>>
 >>> def grad(x):
->>>     return 2*x*np.array([1, 4])
+>>>     return np.array([2*x[0], 8*x[1]])
 >>>
->>> x = np.array([1., 3.]) #current point
->>> p = -grad(x)           #current search direction
+>>> x = np.array([1., 3.]) # current point
+>>> p = -grad(x)           # current search direction
 >>> a = line_search(objective, grad, x, p)[0]
 >>> print a
 0.125649913345
 \end{lstlisting}
+
 Note that the function returns a tuple of values, the first of which is the step size.
+
+% TODO: Needs an application problem that uses SciPy!

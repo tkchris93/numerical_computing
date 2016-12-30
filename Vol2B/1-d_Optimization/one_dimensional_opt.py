@@ -1,9 +1,9 @@
-# solutions.py
-"""Volume 2B: 1-D Optimization. Solutions file."""
-
-import numpy as np
-from math import sqrt, exp
-from scipy import optimize as opt
+# one_dimensional_optimization.py
+"""Volume 2B: 1-D Optimization.
+<Name>
+<Class>
+<Date>
+"""
 
 
 # Problem 1
@@ -20,18 +20,7 @@ def golden_section(f, a, b, niter=10):
     Returns:
         the approximated minimizer (the midpoint of the final interval).
     """
-    rho = (3 - sqrt(5)) / 2.
-    for _ in xrange(niter):
-        aprime = a + rho*(b - a)
-        bprime = a + (1 - rho)*(b - a)
-        if f(aprime) > f(bprime):
-            a = aprime
-        else:
-            b = bprime
-    return (a + b) / 2.
-
-def test_golden_section():
-    return golden_section(lambda x: exp(x) - 4*x, 0, 3, niter=15)
+    raise NotImplementedError("Problem 1 Incomplete")
 
 
 # Problem 2
@@ -45,19 +34,7 @@ def bisection(df, a, b, niter=10):
         b (float): right bound of the interval of interest.
         niter (int): number of iterations to compute.
     """
-    for _ in xrange(niter):
-        mid = (b + a) / 2.
-        d = df(mid)
-        if d > 0:
-            b = mid
-        elif d < 0:
-            a = mid
-        else:
-            return mid
-    return (a + b) / 2.
-
-def test_bisection():
-    return bisection(lambda x: exp(x) - 4*x, 0, 3, niter=15)
+    raise NotImplementedError("Problem 2 Incomplete")
 
 
 # Problem 3
@@ -65,7 +42,7 @@ def newton1d(f, df, ddf, x, niter=10):
     """Minimize the scalar function f with derivative df and second derivative
     df using Newton's method.
 
-    Inputs:
+    Parameters
         f (function): A twice-differentiable scalar-valued function on R.
         df (function): The first derivative of f.
         ddf (function): The second derivative of f.
@@ -75,9 +52,7 @@ def newton1d(f, df, ddf, x, niter=10):
     Returns:
         The approximated minimizer.
     """
-    for i in xrange(niter):
-        x = x - df(x)/ddf(x)
-    return x
+    raise NotImplementedError("Problem 3 Incomplete")
 
 
 # Problem 4
@@ -93,9 +68,7 @@ def secant1d(f, df, x0, x1, niter=10):
     Returns:
         The approximated minimizer.
     """
-    for i in range(niter):
-        x0, x1 = x1, x1 - (x1 - x0) / (df(x1) - df(x0)) * df(x1)
-    return x1
+    raise NotImplementedError("Problem 4 Incomplete")
 
 
 # Problem 5
@@ -116,7 +89,4 @@ def backtracking(f, slope, x, p, a=1, rho=.9, c=10e-4):
     Returns:
         The computed step size.
     """
-    b = f(x)
-    while f(x + a*p) > b + c*a*slope:
-        a = rho*a
-    return a
+    raise NotImplementedError("Problem 5 Incomplete")
