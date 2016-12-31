@@ -1,23 +1,26 @@
 \lab{Unit Testing In Python}{Unit Testing In Python}
 
-\objective{Convey the importance of unit testing in code, especially in the corporate world. Unit testing in python is easy, valuable, and powerful. Help students understand how they can use unit testing to become more effective and productive programmers.}
+%\objective{Convey the importance of unit testing in code, especially in the corporate world. Unit testing in python is easy, valuable, and powerful. Help students understand how to use unit testing to become a more effective and productive programmer.}
+
+\objective{Convey the importance and advantages of unit testing. Learn how to create unit tests in Python and use the concept of Test Driven Design.}
 
 
-In school, coding projects are usually done by a single student in isolation, on a relatively small scale.  However, when you write code in the real world, projects are often very large, and you often need to collaborate and shared code with other developers.
-When working on projects with hundreds of thousand lines of code, it is nigh on impossible to understand how the individual functions work together or to be sure that the code contains no errors, especially when the code was written by multiple people.
+One of the hardest parts of computer programming is ensuring that a program does what you expect it to do. For instance, a program may fail to meet specifications, or may work in some cases and not in others. Finding and fixing errors may be difficult and time consuming, especially if the program is very large or if many people are contributing the same program. 
 
-Thankfully, there is a simple and elegant solution to this problem which keeps you as the developer from having to be omniscient about the code you are writing: unit testing.
-Unit tesing is a method of testing which evaluates the correctness of code on the level of single functions or classes. A unit test verifies that an isolated unit of code behaves correctly by comparing actual output to expected output. A well written collection of unit tests can ensure that all functions, and by extension, the software as a whole, works correctly.
+Unit testing is a simple solutions which helps to solve many of these difficulties in programming. In unit testing, the smallest testable pieces of a program (often functions or classes) are checked for correctness, independent of the rest of the code. Testing each unit of code verifies that each piece of code works as expected. When code does contain bugs, it is easier to identify which part of the code they came from. Writing unit tests also ensures that the specifications of a program are met.
 
-Unit testing also helps you understand requirements, keeps you aware of dependency changes, and gives you confidence about where to find bugs when your code breaks.
+
+Unit Testing is especially vital in corporate settings, where many developers often work on the same code or expand existing code. By keeping a collection of unit tests associated with a program, developers can ensure that when adding new features, they do not break any existing features of the program.
+
+A well written collection of unit tests can ensure that all functions, and by extension an enitre program, works correctly.
+
 
 
 \section*{PyTest}
 
-Now that we have discussed the ``why" of unit testing, we will discuss the ``how" of testing code in Python.
-It is easiest and most efficient to think about testing individual functions rather than entire files or modules.
-(As we will discuss later, even testing classes should happen on a function level.)
-To test a function we use Python's reserved word \li{assert} and provide our function with input and expected output. Basic assert statements take the form\\
+We now explore how to write unit tests in Python. A unit test verifies that a piece of code works by comparing actual ouput with expected output, given some specific input. Unit tests are often written for individual functions, but they can also test whole classes or files.
+
+To test a function we use Python's reserved word \li{assert} and provide our function with input and expected output. Basic assert statements take the form
 
 \begin{lstlisting}
 assert <truth statement>, 'message'
@@ -37,17 +40,16 @@ with this test function:
 \begin{lstlisting}
 >>> from solutions import addition
 >>> def test_addition():
-...     assert addition(1,3) == 4
-...     assert addition(5,7) == 12
-...     assert addition(6,14) == 20
+...     assert addition(1,3) == 4, "Addition failed on positive integers"
+...     assert addition(-5,-7) == -12, "Addition failed on negative integers"
+...     assert addition(-6,14) == 8
 \end{lstlisting}
 
-When run, \li{test_addition()} displays no output since all the tests are valid.
+When run, \li{test_addition()} displays no output since all the tests are valid. Note that an error is optional.
 
 Python provides an efficient way for running unit tests through a module called PyTest. PyTest is a tool that allows you run many tests at the same time and get more information about their results.
 
-Now this is all well and good; we can write tests for a function by using the \li{assert} function with expected inputs and outputs.
-However, there is a more practical and useful way to do this.  PyTest is a tool that allows you to aggregate your tests and give you more information about their results.
+
 Try running the following from the terminal in your current directory:
 
 \begin{lstlisting}
@@ -59,10 +61,10 @@ Unless you've already written some tests, you probably got something like this:
 \begin{lstlisting}
 ============================= test session starts =============================
 platform win32 -- Python 2.7.10 -- py-1.4.27 -- pytest-2.7.1
-rootdir: C:\Users\Tanner\ACME Labs for class, inifile:
+rootdir: C:\Users\Student\ACME, inifile:
 collected 0 items
 
-==============================  in 0.13 seconds ===============================
+==============================  <<in>> 0.13 seconds ===============================
 \end{lstlisting}
 
 
@@ -87,8 +89,8 @@ If you run \li{py.test} here, the following output is produced:
 
 \begin{lstlisting}
 ========================= test session starts ==========================
-platform darwin -- Python 2.7.10 -- py-1.4.27 -- pytest-2.7.1
-rootdir: /Users/lnelson/Desktop/ACME_WORK/python_tests, inifile:
+platform win32 -- Python 2.7.10 -- py-1.4.27 -- pytest-2.7.1
+rootdir: C:\Users\Student\ACME\python_tests, inifile:
 collected 29 items
 
 api_tests/test_accounts.py ....
@@ -98,7 +100,7 @@ api_tests/test_common.py ....
 platform_tests/test_bulk.py ....
 platform_tests/test_calendar.py ..
 platform_tests/test_google.py ......
-======================= 29 passed in 0.07 seconds =======================
+======================= 29 passed <<in>> 0.07 seconds =======================
 \end{lstlisting}
 \begin{info}
 Each dot represents a test passing. They show up in order, so, for example, if instead of the third dot there is an "F" (meaning test failed), you would know the third test in the respective file failed.
@@ -108,7 +110,7 @@ Each dot represents a test passing. They show up in order, so, for example, if i
 \section*{Coverage}
 
 More important than simply writing tests for code is writing quality tests. One way to measure the quality of your unit tests is by their coverage. Coverage measures how many lines of code are executed by at least one test case. 
-When cosidering coverage, it is useful to think of a function in the form of a diagram, containing branches and loops. Each test takes a certain path through the function, traversing some branches and not others. Full coverage is reached when each branch of the function is traversed by at least one test case.
+When considering coverage, it is useful to think of a function in the form of a diagram, containing branches and loops. Each test takes a certain path through the function, traversing some branches and not others. Full coverage is reached when each branch of the function is traversed by at least one test case.
 
 An easy way to measure coverage in Python is to use a tool called  \li{pytest-cov}. While the pytest module comes bundled with Anaconda, pytest-cov does not.  However, you should be able to install it from the terminal by running the following command:
 \begin{lstlisting}
@@ -118,8 +120,8 @@ Adding the flag \li{--cov} to py.test prints out a breakdown of test coverage on
 \begin{lstlisting}
   $ py.test --cov
 ======================= test session starts ========================
-platform win32 -- Python 2.7.11 -- py-2.8.5 -- pytest-2.7.31, pluggy-0.3.1
-rootdir: /Users/lnelson/Desktop/ACME_WORK/python_tests, inifile:
+platform win32 -- Python 2.7.10 -- py-1.4.27 -- pytest-2.7.1
+rootdir: C:\Users\Student\ACME, inifile:
 plugins: cov-2.4.0
 collected 8 items
 
@@ -134,7 +136,7 @@ test_solutions.py      31      0   100%
 TOTAL                  96     38    60%
 
 
-==================== 8 passed in 0.03 seconds =====================
+==================== 8 passed <<in>> 0.03 seconds =====================
 \end{lstlisting}
 
 In the above output, \li{Stmts} refers to the number of lines in the code that pytest ran, while \li{Miss} is the number of lines of code that were not run.
@@ -144,7 +146,7 @@ Notice the file \li{test_solutions.py} has 100\% coverage while \li{solutions.py
 Install pytest-cov with pip.
 Run "py.test --cov" in the directory which has the two files "solutions.py" and "test\_solutions.py". You should see an output similar to the one above.
 
-Now write some of your own tests for the addition function and the smallest factor function. Be sure to give each function its own test. (This is more of a convention than mandate,
+Now write some of your own tests for the addition function and the smallest factor function. Be sure to give each function its own test. (This is more of a convention than a mandate,
 but it's good practice and will allow you to track down bugs quickly in the future.) Be sure that your tests cover every statement of your code in those two functions.
 (The number of statements missed should go from 35 to 28)
 \end{problem}
@@ -193,7 +195,7 @@ For exceptions, be sure to check both the typename and the message, that way you
 (The number of statments missed should go from 28 to 21)
 \end{problem}
 
-Suppose you want to use the same pieces of code in different test functions. Pytest has a feature called "fixtures" for mocking data that reduces code duplication. 
+Suppose you want to use the same pieces of code in different test functions. Pytest has a feature called \emph{fixtures} for mocking data that reduces code duplication. 
 Mocking data is useful when you don't want certain test to be dependent on the working of completely separate code.
 For example if we had a feature which was dependent upon a user service working correctly, rather than having my tests make a call to the user service I may write a fixture which simply gives existing mock data that I expect for my feature.
 As far as preventing code duplication a fixture may also be utilized to create a class object which we can then call within our function.
@@ -294,7 +296,7 @@ Following the example of the chat room, you could write a unit test that checks 
 The implementation is simply adding, changing and editing code until all the required tests pass.
 
 \begin{problem}
-The game Set is a card game about finding patterns. Each card contains a design with 4 different properties: color (red, green or purple), shape (diamond, oval or sqiggly), quantity (one, two or three) and pattern (solid, striped or outlined). Twelve cards are laid on a table and the object is to recognize sets of cards. A "set" is made up of three cards which are either the all same or all different for each property. You can try playing Set online \href{http://smart-games.org/en/set/start}{here}.
+The game Set is a card game about finding patterns. Each card contains a design with 4 different properties: color (red, green or purple), shape (diamond, oval or sqiggly), quantity (one, two or three) and pattern (solid, striped or outlined). Twelve cards are laid on a table and the object is to recognize sets of cards. A \emph{set} is made up of three cards which are either the all same or all different for each property. You can try playing Set online \href{http://smart-games.org/en/set/start}{here}.
 
 Here is a group of 12 cards from Set.
 
@@ -334,7 +336,7 @@ This collection of cards contains 5 unique sets:
     \caption{Different in all aspects}
     \label{fig:labeltheotherfigure}
 \end{subfigure}
-\begin{subfigure}{.48\textwidth}
+\begin{subfigure}{.47\textwidth}
     \centering
     \includegraphics[width=\linewidth]{figures/set5.jpg}
     \caption{Different in all aspects}
@@ -346,12 +348,12 @@ This collection of cards contains 5 unique sets:
 
 \vspace{5mm}
 
-Use the principles of Test Driven Development to write a program that identifies number of sets in a collection of 12 cards. Begin by writing test cases for your code. Focus on \textit{what} you want to implement rather \textit{how} you are going to implement it. Use these specifications:
+Use the principles of Test Driven Development to write a function that takes as input 12 Set cards and returns the number of sets they contain. Begin by writing test cases for your code. Focus on \emph{what} you want to implement rather \emph{how} you are going to implement it. Use these specifications:
 \begin{itemize}
 \item Each card in Set can be uniquely represented by a 4 bit integer in base 3, where each digit represents a different property and each property has 3 possible values. Represent a group of Set cards as a text file where each line contains a 4 bit number representing one card.
 \item Have your program throw an error if the input is invalid (anything that is not a valid Set card as described above),  if a duplicate card is entered, if less or more than 12 cards are given, or if the file name given is not valid.
 \item Ensure that each possible error gives an appropriate error message.
-\item Aggregate all your text files in a single folder called "hands" and upload the folder to your git repository along with your code.
+\item Aggregate all your text files in a single folder called ``hands" and upload the folder to your git repository along with your code.
 \end{itemize}
 
 Consider breaking this problem down into a few smaller functions and writing a unit test for each function.
@@ -369,7 +371,10 @@ Hint: Given three integer which represent cards, the cards form a set if their c
 
 \subsection*{Python Debugger}
 
-Python has a built in debugger called pdb (Python DeBugger) to aid in finding mistakes in code. Pdb runs in the terminal or in Jupyter. This section focuses on how to set break points and step through code at these break points. To begin using pdb, import it in your program
+Python has a built in debugger called pdb (Python DeBugger) to aid in finding mistakes in code. Pdb runs in the terminal or in a Jupyter Notebook. This section focuses on how to step through code using break points. 
+A break point is a spot where the program will pause while running. Setting break points allows you to view the state of your program while it is running.
+
+To begin using pdb, import it in your program
 
 \begin{lstlisting}
 >>> import pdb
