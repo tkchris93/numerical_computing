@@ -2,31 +2,36 @@
 
 %\objective{Convey the importance of unit testing in code, especially in the corporate world. Unit testing in python is easy, valuable, and powerful. Help students understand how to use unit testing to become a more effective and productive programmer.}
 
-\objective{Convey the importance and advantages of unit testing. Learn how to create unit tests in Python and use the concept of Test Driven Design.}
+\objective{
+One of the hardest parts of computer programming is ensuring that a program does what you expect it to do.
+For instance, a program may fail to meet specifications, or may work in some cases and not in others.
+Finding and fixing errors may be difficult and time consuming, especially if the program is very large or if many people are contributing the same program.
+Unit testing is a simple solutions which helps to solve many of these difficulties in programming.
+\\ \indent In this lab, we explore unit testing in Python and apply them to the concept of Test Driven Design.
+}
 
+A \emph{unit test} is a formal test that checks the smallest testable pieces of a program (often functions or classes) for correctness, independent of the rest of the code.
+Testing each unit of code verifies that each piece of code works as expected.
+When code does contain bugs, it is easier to identify which part of the code they came from.
+Writing unit tests also ensures that the specifications of a program are met.
 
-One of the hardest parts of computer programming is ensuring that a program does what you expect it to do. For instance, a program may fail to meet specifications, or may work in some cases and not in others. Finding and fixing errors may be difficult and time consuming, especially if the program is very large or if many people are contributing the same program. 
+Unit Testing is especially vital in corporate settings, where many developers often work on the same code or expand existing code.
+By keeping a collection of unit tests associated with a program, developers can ensure that when adding new features, they do not break any existing features of the program.
 
-Unit testing is a simple solutions which helps to solve many of these difficulties in programming. In unit testing, the smallest testable pieces of a program (often functions or classes) are checked for correctness, independent of the rest of the code. Testing each unit of code verifies that each piece of code works as expected. When code does contain bugs, it is easier to identify which part of the code they came from. Writing unit tests also ensures that the specifications of a program are met.
+A well written collection of unit tests can ensure that all functions, and by extension an entire program, works correctly.
 
+\section*{PyTest} % ===========================================================
 
-Unit Testing is especially vital in corporate settings, where many developers often work on the same code or expand existing code. By keeping a collection of unit tests associated with a program, developers can ensure that when adding new features, they do not break any existing features of the program.
-
-A well written collection of unit tests can ensure that all functions, and by extension an enitre program, works correctly.
-
-
-
-\section*{PyTest}
-
-We now explore how to write unit tests in Python. A unit test verifies that a piece of code works by comparing actual ouput with expected output, given some specific input. Unit tests are often written for individual functions, but they can also test whole classes or files.
+A unit test verifies that a piece of code works by comparing actual output with expected output, given some specific input.
+Unit tests are often written for individual functions, but they can also test whole classes or files.
 
 To test a function we use Python's reserved word \li{assert} and provide our function with input and expected output. Basic assert statements take the form
 
 \begin{lstlisting}
-assert <truth statement>, 'message'
+assert <truth statement>, "message"
 \end{lstlisting}
 
-which raises an AssertionError with error message \li{'message'} if \li{<truth statement>} is false, or else does nothing.
+which raises an \li{AssertionError} with error message \li{"message"} if \li{<truth statement>} is false, or else does nothing.
 
 For example, we might test the following function
 
@@ -49,11 +54,10 @@ When run, \li{test_addition()} displays no output since all the tests are valid.
 
 Python provides an efficient way for running unit tests through a module called PyTest. PyTest is a tool that allows you run many tests at the same time and get more information about their results.
 
-
 Try running the following from the terminal in your current directory:
 
 \begin{lstlisting}
-  $ py.test
+$ py.test
 \end{lstlisting}
 
 Unless you've already written some tests, you probably got something like this:
@@ -67,13 +71,14 @@ collected 0 items
 ==============================  <<in>> 0.13 seconds ===============================
 \end{lstlisting}
 
+Even if you have already written some tests, pytest will not find them unless their filenames have the form test\_*.py or *\_test.py, where the * represents any number of characters.
+In addition, the test methods inside the files need to follow suit and be named \li{test_*()} or \li{*_test()}.
+(If you need to change this for some reason, you can consult the documentation at \url{http://pytest.org/latest/example/pythoncollection.html}.)
 
-Even if you have already written some tests, pytest will not find them unless their filenames have the form test\_*.py or *\_test.py.  In addition, the test methods inside the files need to follow suit and be named \li{test_*()} or \li{*_test()}.  (If you need to change this for some reason, you can consult \href{http://pytest.org/latest/example/pythoncollection.html} {the documentation}.)
+For example, consider the following directory tree:
+% note: the \li{tree} command in a terminal lists the contents of a directory recursively and may need to be installed separately):
 
-
-For example, consider the following directory: (note: the \li{tree} command in a terminal lists the contents of a directory recursively.)
 \begin{lstlisting}[language=bash]
-$ tree
 |-- api_tests
 |   |-- test_accounts.py
 |   |-- test_auth.py
@@ -102,21 +107,22 @@ platform_tests/test_calendar.py ..
 platform_tests/test_google.py ......
 ======================= 29 passed <<in>> 0.07 seconds =======================
 \end{lstlisting}
-\begin{info}
-Each dot represents a test passing. They show up in order, so, for example, if instead of the third dot there is an "F" (meaning test failed), you would know the third test in the respective file failed.
-\end{info}
 
+Each dot represents a test passing. They show up in order, so, for example, if instead of the third dot there is an ``F'' (meaning test failed), you would know the third test in the respective file failed.
 
-\section*{Coverage}
+\section*{Coverage} % =========================================================
 
-More important than simply writing tests for code is writing quality tests. One way to measure the quality of your unit tests is by their coverage. Coverage measures how many lines of code are executed by at least one test case. 
+More important than simply writing tests for code is writing quality tests. One way to measure the quality of your unit tests is by their coverage. Coverage measures how many lines of code are executed by at least one test case.
 When considering coverage, it is useful to think of a function in the form of a diagram, containing branches and loops. Each test takes a certain path through the function, traversing some branches and not others. Full coverage is reached when each branch of the function is traversed by at least one test case.
 
 An easy way to measure coverage in Python is to use a tool called  \li{pytest-cov}. While the pytest module comes bundled with Anaconda, pytest-cov does not.  However, you should be able to install it from the terminal by running the following command:
+
 \begin{lstlisting}
-  $ pip install pytest-cov
+$ conda install pytest-cov
 \end{lstlisting}
+
 Adding the flag \li{--cov} to py.test prints out a breakdown of test coverage on your code. For example, running the empty files for this lab yields the following output:
+
 \begin{lstlisting}
   $ py.test --cov
 ======================= test session starts ========================
@@ -143,15 +149,15 @@ In the above output, \li{Stmts} refers to the number of lines in the code that p
 Notice the file \li{test_solutions.py} has 100\% coverage while \li{solutions.py} does not. Test files will generally have 100\% coverage, since pytest is designed to run these files in their entirety. However, the solutions file does not have full coverage and requires additional test cases to be thoroughly tested.
 
 \begin{problem}
-Install pytest-cov with pip.
-Run "py.test --cov" in the directory which has the two files "solutions.py" and "test\_solutions.py". You should see an output similar to the one above.
+Install pytest-cov (\li{conda install pytest-cov}).
+Run \li{py.test --cov} in the directory which has the two files \texttt{solutions.py} and \texttt{test\_solutions.py}. You should see an output similar to the one above.
 
 Now write some of your own tests for the addition function and the smallest factor function. Be sure to give each function its own test. (This is more of a convention than a mandate,
 but it's good practice and will allow you to track down bugs quickly in the future.) Be sure that your tests cover every statement of your code in those two functions.
 (The number of statements missed should go from 35 to 28)
 \end{problem}
 
-\section*{Pytest as a Module}
+\section*{Pytest as a Module} % ===============================================
 
 When developing software, we often want our code to raise an exception when certain input is given, instead of proceeding.  Furthermore, we want the exception to give us relevant info about what went wrong and why it was raised.
 For example, if a user feeds a bad value to a calculator (like dividing by 0), we would like if if the calculator were very explicit as to why it wasn't able to process our input.
@@ -168,7 +174,9 @@ Consider the following example:
 ...     else:
 ...         return float(a)/float(b)
 \end{lstlisting}
+
 The above function could be tested by this test function:
+
 \begin{lstlisting}
 >>> import pytest
 >>> def test_divide():
@@ -190,12 +198,13 @@ The above code tests whether or not a \li{ValueError} is raised when \li{divide}
 In this example, \li{excinfo} is an object of type \li{py.code.ExceptionInfo()} which contains info about the exception that was raised.  Once we have raised the expection within the \li{with} block, we can assert whatever we want about the different attributes of \li{execinfo} to test whether we raised the right exception.
 
 \begin{problem}
-Write tests for the \li{operator} function.  Be sure to handle every statment and check against every exception.
+Write tests for the \li{operator} function.
+Be sure to handle every statment and check against every exception.
 For exceptions, be sure to check both the typename and the message, that way you can say with certainty that the test is adequately testing your code.
 (The number of statments missed should go from 28 to 21)
 \end{problem}
 
-Suppose you want to use the same pieces of code in different test functions. Pytest has a feature called \emph{fixtures} for mocking data that reduces code duplication. 
+Suppose you want to use the same pieces of code in different test functions. Pytest has a feature called \emph{fixtures} for mocking data that reduces code duplication.
 Mocking data is useful when you don't want certain test to be dependent on the working of completely separate code.
 For example if we had a feature which was dependent upon a user service working correctly, rather than having my tests make a call to the user service I may write a fixture which simply gives existing mock data that I expect for my feature.
 As far as preventing code duplication a fixture may also be utilized to create a class object which we can then call within our function.
@@ -234,7 +243,9 @@ class ComplexNumber(object):
 ... def __str__(self):
 ...     return str(self.real)+('+' if self.imag>=0 else '')+str(self.imag)+'i'
 \end{lstlisting}
+
 Given the previous class, you could reduce code setup for your tests by using a test fixture like so:
+
 \begin{lstlisting}
 >>> from solutions import ComplexNumber
 >>> import pytest
@@ -258,14 +269,13 @@ Given the previous class, you could reduce code setup for your tests by using a 
 ...     assert number_3 * number_3 == ComplexNumber(-80, 18)
 \end{lstlisting}
 
-\begin{problem}
+\begin{problem} % TODO: Come up with another simple class that they haven't already seen somewhere.
 Finish writing unit test for the complex numbers class. Be sure to utilize fixtures in order to reduce on the length of your code.
 Also, remember, it would be useful (and good practice) to write a different test function for each method in the ComplexNumberClass.
 (The number of statements missed should go from 21 to 0)
 \end{problem}
 
-
-\section*{Test Driven Development}
+\section*{Test Driven Development} % ==========================================
 
 Test Driven Development (TDD) is a programming style in which the unit tests are written first and the actual code is written after.
 Kent Beck, the creator of \href{https://en.wikipedia.org/wiki/Extreme_programming}{extreme programming}, claims to have re-discovered  Test Driven Development. He said,
@@ -300,11 +310,11 @@ The game Set is a card game about finding patterns. Each card contains a design 
 
 Here is a group of 12 cards from Set.
 
-\vspace{5mm} 
+\vspace{5mm}
 
 \includegraphics{figures/set_game.jpg}
 
-\vspace{5mm} 
+\vspace{5mm}
 
 This collection of cards contains 5 unique sets:
 \vspace{5mm}
@@ -345,7 +355,6 @@ This collection of cards contains 5 unique sets:
 \caption{Five unique sets from the above group of cards}
 \end{figure}
 
-
 \vspace{5mm}
 
 Use the principles of Test Driven Development to write a function that takes as input 12 Set cards and returns the number of sets they contain. Begin by writing test cases for your code. Focus on \emph{what} you want to implement rather \emph{how} you are going to implement it. Use these specifications:
@@ -369,26 +378,35 @@ Hint: Given three integer which represent cards, the cards form a set if their c
 
 \section*{Additional Material} %===========================================
 
-\subsection*{Python Debugger}
+\subsection*{Python Debugger} % -----------------------------------------------
 
-Python has a built in debugger called pdb (Python DeBugger) to aid in finding mistakes in code. Pdb runs in the terminal or in a Jupyter Notebook. This section focuses on how to step through code using break points. 
-A break point is a spot where the program will pause while running. Setting break points allows you to view the state of your program while it is running.
+Python has a built in debugger called pdb (Python DeBugger) to aid in finding mistakes in code.
+Pdb runs in the terminal or in a Jupyter Notebook.
 
-To begin using pdb, import it in your program
+A \emph{break point} is a spot where the program will pause while running.
+Setting break points allows you to view the state of your program while it is running.
+
+To begin using pdb, import it in your program:
 
 \begin{lstlisting}
 >>> import pdb
 \end{lstlisting}
-and then add
+
+then add
+
 \begin{lstlisting}
 ... pdb.set_trace()
 \end{lstlisting}
+
 where you would like to set a breakpoint.
 Then when you run your code, instead of running in its entirety, it will run until it reaches the break point and then the pbd prompt will be displayed, waiting for a command:
+
 \begin{lstlisting}
 (Pdb)
 \end{lstlisting}
+
 At this point there are several commands you can run, depending on what you want to do.
+
 \begin{table}[H]
 \centering
 \begin{tabular}{r|l}
@@ -405,7 +423,9 @@ At this point there are several commands you can run, depending on what you want
 \end{table}
 
 \begin{info}
-Pdb allow you alot of freedom to change the values of your variables while debugging. Suppose you are debugging the following code:
+Pdb provides the freedom to change the values of your variables while debugging.
+Suppose you are debugging the following code:
+
 \begin{lstlisting}
 def func():
     pdb.set_trace()
@@ -413,13 +433,12 @@ def func():
     bar = 2
     return foo + bar + 42
 \end{lstlisting}
-and while debugging you reliaze that the value of \li{foo} was initialized wrong. Then after \li{foo} has been initialized you can enter the command
+
+While debugging, you realize that the value of \li{foo} was initialized wrong.
+Then after \li{foo} has been initialized you can enter the command
+
 \begin{lstlisting}
 (Pdb) foo = 5
 \end{lstlisting}
 and the value of the variable will be changed as the program continues to run and the program will return 49 instead of 45.
 \end{info}
-
-
-
-
