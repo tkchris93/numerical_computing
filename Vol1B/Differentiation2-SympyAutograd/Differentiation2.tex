@@ -1,62 +1,66 @@
 \lab{Symbolic and Automatic Differentiation in Python}{SymPyAutograd}
 \label{lab:SymPyAutograd}
 
-\objective{Become familiar with some of the basic tools available in SymPy and autograd.  Use these tools in differentiation.}
-
+\objective{
 Python is good for more than just analysis of numerical data.
 There are several packages available which allow symbolic and automatic computation in Python, two of which are SympPy and autograd.
 This lab should teach you to do some basic manipulations in SymPy and autograd as well as their applications in differentiation. Keep in mind, however, that this introduction is not comprehensive.
+% Become familiar with some of the basic tools available in SymPy and autograd.
+% Use these tools in differentiation.
+}
 
-
-\section*{SymPy}
+\section*{SymPy} % ============================================================
 
 SymPy is designed to be a fully featured computer algebra system in Python.
 It is actually used for much of the symbolic computation in Sage.
-An example of what we mean by ``symbolic computation" is the following:
+An example of what we mean by \emph{symbolic computation} is the following:
+
 \begin{lstlisting}
-import sympy as sy
-x = sy.symbols('x')
-sy.expand((x+1)**10)
-\end{lstlisting}
-which will return the following:
-\begin{lstlisting}
+>>> import sympy as sy
+>>> x = sy.symbols('x')             # Define a symbolic variable.
+>>> sy.expand((x+1)**10)            # Expand an expression with that variable.
 x**10 + 10*x**9 + 45*x**8 + 120*x**7 + 210*x**6 + 252*x**5 + 210*x**4 + 120*x**3 + 45*x**2 + 10*x + 1
 \end{lstlisting}
+
 When used properly, this package can simplify large amounts of algebra for you.
 This can be incredibly useful in a wide variety of situations.
 As you may have guessed, such packages generally have a wide variety of features.
-If you want to know how to do something, consider checking the documentation  at the SymPy website (\url{http://sympy.org/en/index.html}).
+The official documentation for SymPy is found at \url{http://sympy.org/en/index.html}.
 
-\subsection*{Some Convenient Tools}
+\subsection*{Some Convenient Tools} % -----------------------------------------
 
 SymPy includes a simplified plotting wrapper around Matplotlib.
-A simple example is:
+
 \begin{lstlisting}
-x = sy.symbols('x')
-expr = sy.sin(x)*sy.exp(x)
-sy.plot(expr, (x, -3, 3))
+>>> x = sy.symbols('x')
+>>> expr = sy.sin(x) * sy.exp(x)
+>>> sy.plot(expr, (x, -3, 3))
 \end{lstlisting}
-which will plot $\sin\left(x\right) e^x$ for values of $x$ from -3 to 3.
+
+which plots $\sin(x)e^x$ for values of $x$ from -3 to 3.
 
 SymPy also has several nice options for printing equations.
 If you want to get a rough idea of what the equation looks like, you can use \li{sy.pprint()}.
 It can interface with the IPython Notebook to display the formula more clearly as well.
 If you are using the IPython Notebook, you can enable pretty printing by loading the extension that comes with SymPy.
-In SymPy 7.2 this is done like this:
+In SymPy 7.2 this is done as follows:
+
 \begin{lstlisting}
 %load_ext sympy.interactive.ipythonprinting
 \end{lstlisting}
+
 In SymPy 7.3 it is:
+
 \begin{lstlisting}
 import sympy as sy
 sy.init_printing()
 \end{lstlisting}
+
 SymPy has many more useful features.
-When in doubt, take a look at the SymPy documentation.
 Figure \ref{sympy:pretty_printing} shows a screenshot of SymPy's special printing in the IPython notebook.
 If at some point you need to write a formula in \LaTeX, the function \li{sy.latex()} can convert a SymPy symbolic expression to \LaTeX{} for you.
 
-\begin{figure}
+\begin{figure}[H]
 \includegraphics[width=\textwidth]{pretty_printing.png}
 \caption{A screenshot showing how SymPy can interface with the IPython Notebook to display equations nicely.}
 \label{sympy:pretty_printing}
@@ -90,7 +94,7 @@ We used a rather crude error estimate to ensure that we were close enough to bre
 
 \begin{problem}
 Write a function \li{myexp} that takes an integer $n$ as a parameter and evaluates $e$ to the $n$th digit, using an approach similar to the code given above.
-Use the series 
+Use the series
 \begin{equation*}
 e=\sum_{n=0}^{\infty} \frac{1}{n!}
 \end{equation*}
@@ -111,7 +115,7 @@ We consider the following equation:
 \begin{equation*}
 \frac{w}{w-x}+\frac{x}{x-y}+\frac{y}{y-z}+\frac{z}{z-w}=0
 \end{equation*}
-Say we need an explicit solution for a given variable. 
+Say we need an explicit solution for a given variable.
 Since the expression is symmetrical, it doesn't really matter which one, but we can solve this in the following way:
 \begin{lstlisting}
 import sympy as sy
@@ -121,7 +125,7 @@ sy.solve(expr, w)
 \end{lstlisting}
 In any variable, this expression is quadratic, but each coefficient will depend on the other 3 variables.
 This would be a terrible pain to do by hand, but SymPy can take care of that for us.
-It is worth noting that SymPy cannot do everything, but if we keep in mind what we are doing and are familiar with the tools it has, it can make complex algebraic operations a great deal faster. 
+It is worth noting that SymPy cannot do everything, but if we keep in mind what we are doing and are familiar with the tools it has, it can make complex algebraic operations a great deal faster.
 We should also note that \li{solve()} returns a list of expressions.
 If we want an expression to work with, we must take an item from the list.
 
@@ -205,7 +209,7 @@ If you want to substitute values in for multiple variables, you can either use a
 \subsection*{Calculus in SymPy}
 SymPy can also be used to take limits, integrals, and derivatives.
 Again, this can be very helpful when doing things that would be difficult to do by hand.
-For example, the following equation takes the 20th partial derivative with respect to $x$ of 
+For example, the following equation takes the 20th partial derivative with respect to $x$ of
 \begin{equation*}
 \prod_{i=1}^{23} \left(x+i y\right)
 \end{equation*}
@@ -259,7 +263,7 @@ sy.integrate(y**2 * x**2, x, y)
 
 
 \begin{problem}
-Use SymPy to symbolically evaluate 
+Use SymPy to symbolically evaluate
 \begin{equation*}
 \int_0^\infty \sin\left(x^2\right) dx
 \end{equation*}
@@ -293,12 +297,12 @@ Use SymPy to solve the following differential equation:
 & x^{10}e^x + x^{11}\sin\left(x\right) + x^{12}e^x\sin\left(x\right) -x^{13}\cos\left(2x\right) + x^{14}e^x\cos\left(3x\right)
 \end{split}
 \end{equation*}
-You may recall from your last class on differential equations that this sort of problem is solved by the method of undetermined coefficients. 
+You may recall from your last class on differential equations that this sort of problem is solved by the method of undetermined coefficients.
 Imagine how terrible this would be to do by hand!
 \end{problem}
 
 SymPy can also be used to compute the Jacobian of a matrix using the \li{.jacobian()} method, which takes in either a list or a matrix of the variables.  The Jacobian of $f(x,y) = \left[\begin{array}{c} x^2 \\ x+y \end{array}\right]$ is found by doing the following:
-\begin{lstlisting} 
+\begin{lstlisting}
 x,y = sy.symbols('x,y')
 F = sy.Matrix([x**2,x+y])
 F.jacobian([x,y])
@@ -316,7 +320,7 @@ Autograd is very useful in machine learning.
 Autograd is installed by running the following command in the terminal:
 \begin{lstlisting}
 pip install autograd
-\end{lstlisting} 
+\end{lstlisting}
 The following code computes the derivative of $e^{\sin\left(\cos\left(x\right)\right)}$ at $x=1$ using autograd.
 \begin{lstlisting}
 >>> from autograd import grad
@@ -374,5 +378,5 @@ e^{x} \sin(y) + y^3 \\
 Find the Jacobian function using SymPy and autograd.  Time how long it takes to compute each Jacobian at $(x,y) = (1,1)$.
 \end{problem}
 
-To learn more about autograd visit the website \url{https://github.com/HIPS/autograd}.
+To learn more about autograd visit \url{https://github.com/HIPS/autograd}.
 
