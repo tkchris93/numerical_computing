@@ -4,25 +4,30 @@ python:
   - 2.7
 
 env:
-  - PATH: /opt/texbin:$PATH
+  - PATH: /opt/texbin:/usr/local/texlive/2016/bin/x86_64-linux:$PATH
 
 before_install:
   - python travis_pre.py
 
 install:
-  - git clone https://github.com/scottkosty/install-tl-ubuntu.git
-  - cp ./.nmc.profile install-tl-ubuntu/
-  - cd install-tl-ubuntu
-  - ls /home/travis/build/Foundations-of-Applied-Mathematics/Lab-Development/install-tl-ubuntu/.nmc.profile
-  - sudo ./install-tl-ubuntu -profile /home/travis/build/Foundations-of-Applied-Mathematics/Lab-Development/install-tl-ubuntu/.nmc.profile
-  - cd ..
-  - sudo /opt/texbin/texhash
+  - cd ../
+  - wget -c http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz
+  - mkdir texlive
+  - tar -zxf install-tl-unx.tar.gz -C ./texlive --strip-components=1
+  - cd texlive
+  - cp $TRAVIS_BUILD_DIR/.nmc.profile ./installation.profile
+  - sudo ./install-tl -profile installation.profile
+  - sudo /usr/local/texlive/2014/bin/x86_64-linux/tlmgr update --self
+  - sudo /usr/local/texlive/2014/bin/x86_64-linux/tlmgr update --all
+  - sudo /usr/local/texlive/2014/bin/x86_64-linux/tlmgr install iftex
+  - sudo /usr/local/texlive/2014/bin/x86_64-linux/texhash
+  - cd $TRAVIS_BUILD_DIR
 
 script:
-  - /opt/texbin/pdflatex -halt-on-error Vol1.tex
-  - /opt/texbin/pdflatex -halt-on-error Vol2.tex
-  - /opt/texbin/pdflatex -halt-on-error Vol3.tex
-  - /opt/texbin/pdflatex -halt-on-error Vol4.tex
-  - /opt/texbin/pdflatex -halt-on-error ExtraLabs.tex
-  - /opt/texbin/pdflatex -halt-on-error InstructorNotes.tex
+  - pdflatex Vol1.tex
+  - pdflatex Vol2.tex
+  - pdflatex Vol3.tex
+  - pdflatex Vol4.tex
+  - pdflatex ExtraLabs.tex
+  - pdflatex InstructorNotes.tex
   - python travis_post.py
