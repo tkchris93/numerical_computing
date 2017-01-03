@@ -6,9 +6,6 @@ The internet is full of information.
 Sometimes this information is easy to read, sometimes it's not.
 No matter the case, web scraping is a useful tool used to transform unstructured data into structured data that is easier to analyze.
 
-Throughout this lab, you will use two Python modules in conjunction with \li{BeautifulSoup4}: \li{urllib2}, and \li{selenium}.
-Make sure these are installed and updated on your machine.
-
 \begin{warn}
 Web scraping has legal implications.
 Do not scrape copyrighted information without the consent of the copyright owner.
@@ -43,9 +40,9 @@ Once the file is loaded, you can navigate through the HTML tree and pick out the
 \begin{problem}
 Use BeautifulSoup to load the 'Big Bank Info' file.
 This page is also found at \url{http://www.federalreserve.gov/releases/lbr/20030930/default.htm}.
-Using the methods taught, make a 2-D array for bank information.
-Each row represents a different bank, and each column represents various bank information.
-In your 2-D array, include the Bank Name, Rank, ID, Domestic Assets, and number of Domestic Branches for the following banks: JPMORGAN, CAPITAL ONE, and DISCOVER.
+Using the methods taught, write a function that returns a 2-D NumPy array for bank information.
+Each row in the array represents a different bank, and each column represents a different piece of bank information.
+In your array, include the Bank Name, Rank, ID, Domestic Assets, and number of Domestic Branches for the following banks: JPMORGAN, CAPITAL ONE, and DISCOVER.
 \end{problem}
 
 This is a very slow way to access information from a website.
@@ -57,7 +54,8 @@ Use the \li{urllib2} library in conjunction with BeautifulSoup to load HTML code
 We will go through some simple examples.
 First import \li{urllib2.}
 Use \li{urllib2}'s \li{urlopen()} function in conjunction with \li{read()} to load the HTML code into Python.
-Then simply use \li{BeautifulSoup()} to turn the HTML code into a navigable HTML tree.
+Then simply use \li{BeautifulSoup()} to turn the HTML code into a navigable HTML tree. 
+Note \li{urllib2} may need to be installed or updated before use.
 
 \begin{lstlisting}
 >>> from bs4 import BeautifulSoup
@@ -148,7 +146,9 @@ Therefore, we add the string representing the base url with the string represent
 The output is the list of actual max temps over a year, which we can graph.
 
 \begin{problem}
-How would you adjust the above program to make a list of the average max temperatures over a year?
+Adjust the above code to write a function that makes a list of the average max temperatures over a year.
+Graph this list, then return it.
+Note that because this code goes through a whole year's worth of urls, the function will take a long time to run.
 \end{problem}
 
 Let's do another example before we turn you lose on the internet.
@@ -187,7 +187,7 @@ Just as in the previous example, we need to concatenate the server url \url{http
 This link is loaded into BeautifulSoup.
 
 Now that we are on the webpage desired, we find the row we want by looking for the tag containing \li{'JPMORGAN'}. Once we have the tag, we navigate to the appropriate column.
-Notice we need to use 10 call to \li{.next_sibling} in order to get to the correct information.
+Notice we need to use 10 calls to \li{.next_sibling} in order to get to the correct information.
 The info is then appended into the data list.
 
 \begin{problem}
@@ -249,11 +249,17 @@ The \li{webdriver} allows you to use website functionality, while \li{Keys} allo
 Next, you want to open up a web browser and a website.
 For these exercises we will use Firefox.
 You can also use Chrome or IE if those are more familiar; all the commands will be similar.
+
 \begin{lstlisting}
 driver = webdriver.Firefox()
 example_url = 'http://www.example.com'
 driver.get(example_url)
 \end{lstlisting}
+
+\begin{info}
+If not already installed, you will have to download both Selenium and the driver associated with the browser you would like you use. More information and links to download can be found at \url{https://pypi.python.org/pypi/selenium}. In addition, the browser will need to be up to date.
+\end{info}
+
 The \li{.get()} command acts like \li{urllib2}'s \li{.urlopen()} and \li{.read()} combination.
 We can print out the HTML code using Selenium's \li{.page_source} attribute.
 \begin{lstlisting}
@@ -285,7 +291,7 @@ This time there is a tag with `Chicago' contained as text!
 
 \begin{problem}\label{bball}
 Consider the url \url{http://stats.nba.com/league/team/#!/?sort=W&dir=1}.
-Make a list of the \li{a} tags containing each of the 30 NBA teams.
+Use Selenium to return a list of the \li{a} tags containing each of the 30 NBA teams.
 Use \li{.find_all()} in conjunction with whatever unique identifiers get you the correct tags.
 Hint: class and tag name are a good start.
 \end{problem}
