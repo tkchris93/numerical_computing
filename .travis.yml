@@ -1,27 +1,36 @@
+# .travis.yml
+
+# This script is used for testing using Travis
+# It is intended to work on their VM set up: Ubuntu 12.04 LTS
+# A minimal current TL is installed adding only the packages that are
+# required
+
 language: python
 
 python:
   - 2.7
 
 env:
-  - PATH: /opt/texbin:/usr/local/texlive/2016/bin/x86_64-linux:$PATH
+  # - PATH: /opt/texbin:/usr/local/texlive/2016/bin/x86_64-linux:$PATH
+  - PATH: /tmp/texlive/bin/x86_64-linux:$PATH
 
 before_install:
   - python travis_pre.py
 
-install:
+#!/usr/bin/env sh
+
+install: # Download and install a vanilla TexLive
+  - wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz
+  - mkdir temp_texlive
+  - tar -xzf install-tl-unx.tar.gz -C ./temp_texlive # --strip-components=1
+  - cd temp_texlive
+  - sudo ./install-tl -profile=../.nmc.profile
+  # - sudo /usr/local/texlive/2014/bin/x86_64-linux/tlmgr update --self
+  # - sudo /usr/local/texlive/2014/bin/x86_64-linux/tlmgr update --all
+  # - sudo /usr/local/texlive/2014/bin/x86_64-linux/tlmgr install iftex
+  # - sudo /usr/local/texlive/2014/bin/x86_64-linux/texhash
   - cd ../
-  - wget -c http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz
-  - mkdir texlive
-  - tar -zxf install-tl-unx.tar.gz -C ./texlive --strip-components=1
-  - cd texlive
-  - cp $TRAVIS_BUILD_DIR/.nmc.profile ./installation.profile
-  - sudo ./install-tl -profile installation.profile
-  - sudo /usr/local/texlive/2014/bin/x86_64-linux/tlmgr update --self
-  - sudo /usr/local/texlive/2014/bin/x86_64-linux/tlmgr update --all
-  - sudo /usr/local/texlive/2014/bin/x86_64-linux/tlmgr install iftex
-  - sudo /usr/local/texlive/2014/bin/x86_64-linux/texhash
-  - cd $TRAVIS_BUILD_DIR
+  - tlmgr update --self --all --no-auto-install
 
 script:
   - pdflatex Vol1.tex
@@ -31,3 +40,46 @@ script:
   - pdflatex ExtraLabs.tex
   - pdflatex InstructorNotes.tex
   - python travis_post.py
+
+
+# Other contrib packages: done as a block to avoid multiple calls to tlmgr
+# Dependencies other than the core l3build set up, metafont, fontspec and the
+# 'graphics stack' (itself needed by fontspec) are listed below
+# tlmgr install --no-depends \
+#   chemformula \
+#   ctex        \
+#   mhchem      \
+#   siunitx     \
+#   unicode-math
+# tlmgr install --no-depends cjk
+# tlmgr install   \
+#   adobemapping  \
+#   amsfonts      \
+#   amsmath       \
+#   chemgreek     \
+#   cjkpunct      \
+#   ctablestack   \
+#   ec            \
+#   environ       \
+#   etoolbox      \
+#   fandol        \
+#   filehook      \
+#   ifxetex       \
+#   lm-math       \
+#   lualatex-math \
+#   luatexbase    \
+#   luatexja      \
+#   ms            \
+#   pgf           \
+#   tools         \
+#   trimspaces    \
+#   ucharcat      \
+#   ulem          \
+#   units         \
+#   xcolor        \
+#   xecjk         \
+#   xunicode      \
+#   zhmetrics     \
+#   zhnumber
+
+
