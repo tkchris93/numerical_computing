@@ -1,17 +1,11 @@
 # .travis.yml
 
-# This script is used for testing using Travis
-# It is intended to work on their VM set up: Ubuntu 12.04 LTS
-# A minimal current TL is installed adding only the packages that are
-# required
-
 language: python
 
 python:
   - 2.7
 
 env:
-  # - PATH: /opt/texbin:/usr/local/texlive/2016/bin/x86_64-linux:$PATH
   - PATH: /tmp/texlive/bin/x86_64-linux:$PATH
 
 before_install:
