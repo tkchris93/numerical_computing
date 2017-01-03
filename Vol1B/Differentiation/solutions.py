@@ -13,30 +13,33 @@ def centered_difference_quotient(f, pts, h=1e-5):
     given points (pts).
 
     Inputs:
-        f (function): the function for which the derivative will be approximated
-        pts (array): array of values to calculate the derivative
+        f (function): the function for which the derivative will be
+            approximated.
+        pts (array): array of values to calculate the derivative.
 
     Returns:
-        centered difference quotient (array): array of the centered difference
-            quotient
+        An array of the centered difference quotient.
     """
-    Df_app = lambda x: .5*(f(x+h)-f(x-h))/h
+    Df_app = lambda x: .5*(f(x+h)-f(x-h)) / h
     return Df_app(pts)
+    # or,
+    return .5 * (f(pts+h) - f(pts-h)) / h
 
 
-# This problem got pulled out.
+# OLD PROBLEM
 def calculate_errors(f,pts,h = 1e-5):
     """Compute the errors using the centered difference quotient approximation.
 
     Inputs:
-        f (function): the function for which the derivative will be approximated
+        f (function): the function for which the derivative will be
+            approximated.
         pts (array): array of values to calculate the derivative
 
     Returns:
-        errors (array): array of the errors for the centered difference quotient
-            approximation
+        errors (array): array of the errors for the centered difference
+            quotient approximation.
     """
-    return f(pts)-centered_difference_quotient(f,pts)
+    return f(pts) - centered_difference_quotient(f, pts)
 
 
 # Problem 2
@@ -46,11 +49,11 @@ def jacobian(f, n, m, pt, h=1e-5):
 
     Inputs:
         f (function): the multidimensional function for which the derivative
-            will be approximated
-        n (int): dimension of the domain of f
-        m (int): dimension of the range of f
-        pt (array): an n-dimensional array representing a point in R^n
-        h (float): a float to use in the centered difference approximation
+            will be approximated.
+        n (int): dimension of the domain of f.
+        m (int): dimension of the range of f.
+        pt (array): an n-dimensional array representing a point in R^n.
+        h (float): a float to use in the centered difference approximation.
 
     Returns:
         Jacobian matrix of f at pt using the centered difference quotient.
@@ -66,7 +69,7 @@ def jacobian(f, n, m, pt, h=1e-5):
 # Problem 3
 def findError():
     """Compute the maximum error of jacobian() for the function
-    f(x,y)=[(e^x)*sin(y)+y^3,3y-cos(x)] on the square [-1,1]x[-1,1].
+    f(x,y)=[(e^x)sin(y) + y^3, 3y - cos(x)] on the square [-1,1]x[-1,1].
 
     Returns:
         Maximum error of your jacobian function.
@@ -87,7 +90,7 @@ def Filter(image, F):
     """Applies the filter to the image.
 
     Inputs:
-        image (ndarray): an array of the image
+        image (ndarray): an array of the image.
         F (ndarray): an nxn array of the filter to be applied.
 
     Returns:
@@ -103,12 +106,13 @@ def Filter(image, F):
             C[i,j] = (F*image_pad[i:h+i, j:k+j]).sum()
     return C
 
+
 # Problem 5
 def sobelFilter(image):
     """Apply the Sobel filter to the image.
 
     Inputs:
-        image (ndarray): an array of the image in grayscale
+        image (ndarray): an array of the image in grayscale.
 
     Returns:
         The filtered image.
@@ -117,8 +121,8 @@ def sobelFilter(image):
     AstarS = Filter(image,S)
     AstarST = Filter(image,S.T)
     gradient = np.sqrt(AstarS**2+AstarST**2)
-    threshold = 4*gradient.mean()
-    return gradient>threshold
+    threshold = 4 * gradient.mean()
+    return gradient > threshold
 
 
 def test_one():
