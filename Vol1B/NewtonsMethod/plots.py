@@ -1,61 +1,59 @@
-import matplotlib
-matplotlib.rcParams = matplotlib.rc_params_from_file('../../matplotlibrc')
-
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
 
-def basins_1d():
-    f = lambda x:x**2-1
-    Df = lambda x:2*x
-    x0 = np.linspace(-1.5, 1.5, 40)
+def Newtons_method_vector(f, x0, Df, iters = 15, tol = 1e-5, alpha = 1):
+    x_old = x0
 
-    xold=x0
-    n = 0
-    while n <= 6:
-        xnew = xold - f(xold)/Df(xold)
-        xold = xnew
-        n += 1
+    x_val = [x_old[0]]
+    y_val = [x_old[1]]
 
-    plt.scatter(x0, np.zeros_like(x0), marker='s', c=xnew, edgecolor='None', cmap='bwr')
-    plt.plot(x0, f(x0), c='black', linewidth=3)
-    plt.savefig('figures/basins1d.pdf', bbox_inches='tight')
+    #Do Newton's method for the specified amount of iterations
+    for x in xrange(iters):
+        x_new = np.array([x_old]).T - alpha*np.linalg.inv(Df(x_old)).dot(f(x_old))
+
+        #if already within the tolerance, break from the iterations
+        if np.linalg.norm(x_new-np.array([x_old]).T) < tol:
+            return x_val, y_val
+
+        else:
+            x_old = [x_new[0,0],x_new[1,0]]
+            x_val.append(x_old[0])
+            y_val.append(x_old[1])
+
+    return x_val, y_val
+
+def plot_contour():
+    DF = lambda x: np.array([[4*x[1]-1, 4*x[0]],[-x[1], -x[0]-2*x[1]]])
+    F = lambda x: np.array([[4*x[0]*x[1]-x[0]], [-x[0]*x[1]+1-x[1]**2]])
+
+    x, y = Newtons_method_vector(F, [-.2,.2], DF, alpha = .25, iters = 13, tol = 1e-2)
+    x1, y1 = Newtons_method_vector(F, [-.2,.2], DF, alpha = 1, iters = 6)
+
+
+    plt.scatter(x,y, color = 'b')
+    plt.plot(x, y, color = 'b', linewidth = 3)
+    plt.scatter(x1, y1, color = 'r')
+    plt.plot(x1, y1, color = 'r')
+
+    for i in range(len(x1)-2):
+        plt.annotate(str(i), xy = (x1[i],y1[i]))
+    for j in [1, 2, len(x)-1]:
+        plt.annotate(str(j), xy = (x[j],y[j]))
+
+    #Create contour plot
+    n=400
+    xran = np.linspace(-7,8,n)
+    yran = np.linspace(-6,6,n)
+    X, Y = np.meshgrid(xran,yran)
+    F = -X*Y+1-Y**2
+    plt.contour(X, Y, F, [-4,-2,0,2,4,6],cmap=plt.get_cmap('afmhot'))
+    plt.contour(X, Y, 5*X*Y-X*(1+Y),0,cmap=plt.get_cmap('afmhot'))
+    plt.xlim(-6,8)
+    plt.ylim(-6,6)
+    plt.plot()
+    plt.savefig('figures/contour.pdf', bbox_inches='tight')
     plt.close()
-
-def fractal_1d():
-    f = lambda x:x**3-x
-    Df = lambda x:3*x**2-1
-    x0 = np.linspace(-1.5, 1.5, 500)
-
-    xold=x0
-    n = 0
-    while n <= 50:
-        xnew = xold - f(xold)/Df(xold)
-        xold = xnew
-        n += 1
-
-    y = np.array([-.1, .1])
-    X, Y = np.meshgrid(x0, y)
-    plt.pcolormesh(X, Y, np.atleast_2d(xnew).repeat(2, axis=0), cmap='brg')
-    plt.plot(x0, f(x0), c='black', linewidth=3)
-    plt.savefig('figures/fractal1d.pdf', bbox_inches='tight')
-    plt.close()
-
-def plot_basins(f, Df, roots, xmin, xmax, ymin, ymax, numpoints=100, iters=15, colormap='brg', name='name.png', dpinum=150):
-    xreal = np.linspace(xmin, xmax, numpoints)
-    ximag = np.linspace(ymin, ymax, numpoints)
-    Xreal, Ximag = np.meshgrid(xreal, ximag)
-    Xold = Xreal + 1j * Ximag
-    for i in xrange(iters):
-        Xnew = Xold - f(Xold)/Df(Xold)
-        Xold = Xnew
-    m,n = Xnew.shape
-    for i in xrange(m):
-        for j in xrange(n):
-            Xnew[i,j] = np.argmin(np.abs(Xnew[i,j]-roots))
-    plt.pcolormesh(Xreal, Ximag, Xnew, cmap=colormap)
-    plt.savefig(name, bbox_inches='tight', dpi=dpinum)
 
 if __name__ == "__main__":
-    basins_1d()
-    fractal_1d()
+    plot_contour()
