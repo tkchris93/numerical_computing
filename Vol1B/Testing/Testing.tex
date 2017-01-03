@@ -357,9 +357,10 @@ This collection of cards contains 5 unique sets:
 
 \vspace{5mm}
 
-Use the principles of Test Driven Development to write a function that takes as input 12 Set cards and returns the number of sets they contain. Begin by writing test cases for your code. Focus on \emph{what} you want to implement rather \emph{how} you are going to implement it. Use these specifications:
+Use the principles of Test Driven Development to write a function that takes as input a file name of a file containing 12 Set cards and returns the number of sets they contain. In this problem, \textbf{only} write test cases for the function, \textbf{not} the function itself. Focus on \emph{what} you want to implement rather \emph{how} you are going to implement it. Use these specifications:
 \begin{itemize}
-\item Each card in Set can be uniquely represented by a 4 bit integer in base 3, where each digit represents a different property and each property has 3 possible values. Represent a group of Set cards as a text file where each line contains a 4 bit number representing one card.
+\item Each card in Set can be uniquely represented by a 4-bit integer in base 3, where each digit represents a different property and each property has 3 possible values. Represent a group of Set cards as a text file where each line contains a 4-bit number representing one card.\footnote{A 4-bit integer in base 3 contains four digits that are either 0, 1 or 2. For example, 0000 and 1201 are 4-bit integers in base 3, whereas 000 is not because it has only three digits, and 0123 is not because it contains the number 3.}
+
 \item Have your program throw an error if the input is invalid (anything that is not a valid Set card as described above),  if a duplicate card is entered, if less or more than 12 cards are given, or if the file name given is not valid.
 \item Ensure that each possible error gives an appropriate error message.
 \item Aggregate all your text files in a single folder called ``hands" and upload the folder to your git repository along with your code.
