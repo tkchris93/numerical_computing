@@ -1,27 +1,32 @@
+# .travis.yml
+
 language: python
 
 python:
   - 2.7
 
 env:
-  - PATH: /opt/texbin:$PATH
+  - PATH: /tmp/texlive/bin/x86_64-linux:$PATH
 
 before_install:
   - python travis_pre.py
 
-install:
-  - git clone https://github.com/scottkosty/install-tl-ubuntu.git
-  - cp ./.nmc.profile install-tl-ubuntu/
-  - cd install-tl-ubuntu
-  - sudo ./install-tl-ubuntu # -profile /.nmc.profile
-  - cd ..
-  - sudo /opt/texbin/texhash
+install: # Download and install a vanilla TexLive
+  - wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz
+  - tar -xzf install-tl-unx.tar.gz
+  - cd install-tl-20*
+  - sudo ./install-tl -profile=../.nmc.profile
+  - sudo /usr/local/texlive/20*/bin/x86_64-linux/tlmgr install algorithmicx
+  - sudo /usr/local/texlive/20*/bin/x86_64-linux/tlmgr install algorithms
+  - sudo /usr/local/texlive/20*/bin/x86_64-linux/tlmgr update --self --all --no-auto-install
+  - cd ../
 
 script:
-  - /opt/texbin/pdflatex -halt-on-error Vol1.tex
-  - /opt/texbin/pdflatex -halt-on-error Vol2.tex
-  - /opt/texbin/pdflatex -halt-on-error Vol3.tex
-  - /opt/texbin/pdflatex -halt-on-error Vol4.tex
-  - /opt/texbin/pdflatex -halt-on-error ExtraLabs.tex
-  - /opt/texbin/pdflatex -halt-on-error InstructorNotes.tex
+  - /usr/local/texlive/20*/bin/x86_64-linux/pdflatex Vol1.tex
+  - /usr/local/texlive/20*/bin/x86_64-linux/pdflatex Vol2.tex
+  - /usr/local/texlive/20*/bin/x86_64-linux/pdflatex Vol3.tex
+  - /usr/local/texlive/20*/bin/x86_64-linux/pdflatex Vol4.tex
+  - /usr/local/texlive/20*/bin/x86_64-linux/pdflatex ExtraLabs.tex
+  - /usr/local/texlive/20*/bin/x86_64-linux/pdflatex InstructorNotes.tex
   - python travis_post.py
+
