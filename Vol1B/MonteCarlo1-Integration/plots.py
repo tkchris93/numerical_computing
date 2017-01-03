@@ -1,3 +1,6 @@
+# plots.py
+"""Volume 1B: Monte Carlo 1 (Integration). Plotting file."""
+
 import matplotlib
 matplotlib.rcParams = matplotlib.rc_params_from_file('../../../matplotlibrc')
 
