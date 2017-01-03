@@ -276,7 +276,7 @@ The function should project the image or images into the appropriate $s$-dimensi
 \item Add back the mean face \li{facialRec.mu}.
 \item Plot the resulting image.
 \end{enumerate}
-Your image should match Figure \ref{fig:75_efaces}.
+Your image should match Figure \ref{fig:19_efaces}.
 \end{enumerate}
 \end{problem}
 
@@ -411,7 +411,7 @@ def getFaces(path="./faces94"):
     return F
 
 
-def sampleFaces(n_tests,path = "./faces94")
+def sampleFaces(n_tests,path = "./faces94"):
     """Return an array containing a sample of n_tests images contained
     in the path as flattened images in the columns of the output.
     """
@@ -419,7 +419,7 @@ def sampleFaces(n_tests,path = "./faces94")
     for (dirpath, dirnames, filenames) in walk(path):
         for f in filenames:
             if f[-3:]=="jpg": # only get jpg images
-            files.append(dirpath+"/"+f)
+                files.append(dirpath+"/"+f)
 
     #Get a sample of the images
     test_files = sample(files, n_tests)

@@ -34,7 +34,7 @@ def _timeout(seconds):
             try:
                return func(*args, **kwargs)
             finally:
-                signal.alarm(0)                 # Turn the alarm off.
+               signal.alarm(0)                 # Turn the alarm off.
         return wrapper
     return decorator
 

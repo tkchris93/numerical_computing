@@ -2,9 +2,13 @@
 \objective{The Fourier transform reveals things about an audio signal that are not immediately apparent from the soundwave. In this lab we learn to filter noise out of a signal using the discrete Fourier transform, and explore the effect of convolution on sound files.}
 
 % TODO:
+%       - Remove excessive helper code for problem 1.
 %       - Address stereo vs. mono signals, especially for the convolution.
+%       - Integrate this lab with the class described in Fourier 1.
+%       - Move whitenoise convolution up; make the balloon pop the last thing.
+%       - Convolution with scipy.signal.fftconvolve()?
 
-\section*{Cleaning up a Noisy Signal}
+\section*{Cleaning up a Noisy Signal} % =======================================
 
 Digital audio signals can be used to produce actual sound waves.  When you play a digital audio signal on your computer, the signal is sent to
 a speaker, which vibrates, producing sound waves.  When more than one speaker is used, they can both produce the same signal, or each could produce
@@ -17,22 +21,26 @@ This is a mono recording of a (probably familiar) voice with some annoying noise
 The plot of the soundwave isn't very descriptive; in fact, it looks like static.
 See Figure \ref{fig:noisysignal}.
 
-\begin{figure}
-\centering
-\includegraphics[width=\textwidth]{figures/noisy}
-\caption{The plot of \texttt{Noisysignal1.wav}.}
-\label{fig:noisysignal}
-\end{figure}
-
 However, if we take the Fourier transform of the signal, we see that the static in Figure \ref{fig:noisysignal} is the result of some concentrated high-frequency noise.
 (In this case, artificially added).
 See Figure \ref{fig:noisyspec}.
 
 \begin{figure}
+\captionsetup[subfigure]{justification=centering}
 \centering
-\includegraphics[width=\textwidth]{figures/noisyspec}
-\caption{Spectrum of \li{Noisysignal1.wav}}
-\label{fig:noisyspec}
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/noisy.png}
+    \caption{The plot of \texttt{Noisysignal1.wav}.}
+    \label{fig:noisysignal}
+\end{subfigure}%
+\begin{subfigure}{.5\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/noisyspec.png}
+    \caption{Spectrum of \texttt{Noisysignal1.wav}}
+    \label{fig:noisyspec}
+\end{subfigure}
+\caption{}
 \end{figure}
 
 The noise can be removed by setting the coefficients of the high frequencies to zero.
@@ -63,15 +71,14 @@ Now we can save the resulting cleaned-up signal \texttt{newsig} to a \li{.wav} f
 The plot of the wave now reveals individual syllables as they are spoken.
 See Figure \ref{fig:cleansignal}.
 
-\begin{figure}
-\centering
-\includegraphics[width=\textwidth]{figures/Cleanedsignal}
-\caption{The plot of \texttt{Noisysignal1.wav} after being cleaned.}
-\label{fig:cleansignal}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.7\textwidth]{figures/Cleanedsignal}
+    \caption{The plot of \texttt{Noisysignal1.wav} after being cleaned.}
+    \label{fig:cleansignal}
 \end{figure}
 
-% Problem 1: Clean up a noisy signal (The only thing we have to fear...)
-\begin{problem}
+\begin{problem} % Clean up a noisy signal (The only thing we have to fear...)
 Listen to \texttt{Noisysignal2.wav}.
 You will probably just hear noise.
 Inspect the discrete Fourier transform to see where there is noise.
@@ -83,7 +90,7 @@ Who is the speaker?
 
 The DFT is commonly used in sound filtering, though identifying the particular frequencies to zero out can be difficult.
 
-\section*{Filtering and Convolution}
+\section*{Filtering and Convolution} % ========================================
 
 The DFT is useful for more than filtering noise out of a signal.
 Suppose we have a recording of a musical piece played in a small, carpeted room with essentially no acoustics (little or no echo), and suppose we would like to apply an effect to make it sound as if the piece were played in a large concert hall or some other room.
@@ -104,8 +111,8 @@ This ``mixing'' is better referred to as \emph{convolution}. With the impulse re
 Since audio needs to be sampled frequently (44100 samples per second is standard) to create smooth playback, a recording of a song can contain tens of millions of samples (one minutes at 44100 samples per second gives $2646000$ samples).
 Each of these samples needs to be combined with the impulse response, which may be several seconds long.
 This may be starting to seem computationally infeasible or at least very difficult, but surprisingly, it is not.
-The key is to recognize that this process can be described as a convolution: namely, the final sound is simply the convolution of the our original sound with the impulse response, or in other words, the original sound with the echoes of the prexious $n$ samples,
-where $n$ is the number of samples in the impulse response.
+The key is to recognize that this process can be described as a convolution: namely, the final sound is simply the convolution of the our original sound with the impulse response.
+In other words, it is the original sound with the echoes of the prexious $n$ samples, where $n$ is the number of samples in the impulse response.
 We can calculate convolutions quickly using the convolution theorem:
 
 \[\mathcal{F}(f \ast g) = \mathcal{F}(f)\cdot\mathcal{F}(g)\]
@@ -113,7 +120,8 @@ We can calculate convolutions quickly using the convolution theorem:
 where $\mathcal{F}$ is the Fourier Transform, $\ast$ is convolution, and $\cdot$ is component-wise multiplication.
 Thus we calculate the convolution of two arrays by simply taking the Fourier transform of each, multiplying them pointwise, and then taking the inverse Fourier transform.
 
-% Problem 2 (Optional): Get a good ballon pop (impulse response) to use in convolution.
+% TODO: Turn this from a problem into a note or something.
+% Get a good ballon pop (impulse response) to use in convolution.
 \begin{problem}
 (Optional)\footnote{If the instructor does not require this problem then students may use the provided \texttt{balloon.wav} file which contains the sound of a balloon pop in a large room.} Find a large room or area with good acoustics, and record (an approximation to) its impulse response using a balloon pop.
 To record the sound, you will want to use at least a decent microphone.
@@ -126,8 +134,9 @@ If you've chosen a good room, the response should be audible for at least a full
 Include a plot of both the waveform and spectrum of the impulse response you recorded.
 \end{problem}
 
-% Problem 3: Convolve the balloon pop with Chopin.
-\begin{problem}\label{convolution_problem}
+% TODO: consider moving this to the end, AFTER convolving with whitenoise.
+% Convolve the balloon pop with Chopin.
+\begin{problem}
 Download and listen to the file \texttt{chopin.wav}.
 You will hear a piano being played in a dead room with little or no acoustics.
 Using the Convolution Theorem, take the convolution of this signal with the impulse response recorded in the previous problem.
@@ -139,10 +148,9 @@ Describe the resulting sound.
 
 To summarize:
 \begin{enumerate}
-
 \item Read in \texttt{chopin.wav} and the impulse response with \li{wavfile},
 \item Add several seconds of silence to the signal from \texttt{chopin.wav},
-\item Insert zeros into the middle of the impulse response transform so that it is the same length as,
+\item Insert zeros into the middle of the impulse response transform so that it is the same length as  \texttt{chopin.wav},
 \item Calculate the convolution of the signals,
 \item And finally, calculate the inverse Fourier transform.
 \end{enumerate}
@@ -158,8 +166,7 @@ samplerate = 22050
 noise = sp.int16(sp.random.randint(-32767, 32767, samplerate * 10))
 \end{lstlisting}
 
-% Problem 4: White noise.
-\begin{problem}
+\begin{problem} % White noise.
 Create white noise and listen to the resulting sound (\textbf{CAUTION:} Turn your volume \emph{way} down! It may be very, \emph{very} loud).
 This kind of noise is called ``white" because it contains all frequencies with the same strength, or rather, with the same expected strength (since the amplitude of a specific frequency is a matter of chance).
 In order to see this, plot the spectrum of the noise.
@@ -180,18 +187,16 @@ sig = sp.append(sig, sig)
 
 Listen to the resulting sound, and notice that we are not able to identify where the sound loops back to the beginning, because there is no break or click.
 
-
-
-% Useless old problem.
+% Old problem exploring Stereo vs. Mono.
 \begin{comment}
 \begin{problem}
 Record yourself singing a few notes (or, feel free to produce some other sound another way).
 Take the circular convolution of white noise with this recording.
 Now do it again using stereo white noise.
-This is just like the mono white noise problem, but make the SciPy array in two dimensions.
-It's no problem that your original recording will probably be mono; just make the left and right channels duplicate in the recording (but: be sure to use different left and right channels for the white noise).
+This is just like the mono white noise problem, but make the NumPy array in two dimensions.
+It's no problem that your original recording will probably be mono; just make the left and right channels duplicate in the recording (but be sure to use different left and right channels for the white noise).
 Can you hear any difference between the mono and stereo versions of the result?
 \end{problem}
 
-Feel free to play around with this. The file \texttt{guitar-conv.mp3} is a collage of sounds created using this technique (mostly using guitar samples). You could probably think of other lots of other things you can do with this.
+Feel free to play around with this. The file \texttt{guitar-conv.mp3} is a collage of sounds created using this technique (mostly using guitar samples).
 \end{comment}
