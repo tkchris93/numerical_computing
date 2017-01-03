@@ -19,15 +19,12 @@ before_install:
 
 install: # Download and install a vanilla TexLive
   - wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz
-  - tar -xzf install-tl-unx.tar.gz # -C ./temp_texlive # --strip-components=1
+  - tar -xzf install-tl-unx.tar.gz
   - cd install-tl-20*
   - sudo ./install-tl -profile=../.nmc.profile
-  - sudo /usr/local/texlive/20*/bin/x86_64-linux/tlmgr install algorithmicx
+  # - sudo /usr/local/texlive/20*/bin/x86_64-linux/tlmgr install algorithmicx
   - sudo /usr/local/texlive/20*/bin/x86_64-linux/tlmgr install algorithms
   - sudo /usr/local/texlive/20*/bin/x86_64-linux/tlmgr update --self --all --no-auto-install
-  # - tlmgr update --self --all --no-auto-install
-  # - sudo /usr/local/texlive/2014/bin/x86_64-linux/tlmgr install iftex
-  # - sudo /usr/local/texlive/2014/bin/x86_64-linux/texhash
   - cd ../
 
 script:
