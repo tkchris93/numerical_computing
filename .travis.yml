@@ -23,13 +23,18 @@ install: # Download and install a vanilla TexLive
   - wget http://mirror.ctan.org/systems/texlive/tlnet/install-tl-unx.tar.gz
   - tar -xzf install-tl-unx.tar.gz # -C ./temp_texlive # --strip-components=1
   - cd install-tl-20*
+  - pwd
+  - ls -alS
   - sudo ./install-tl -profile=../.nmc.profile
+  - sudo /usr/local/texlive/2017/bin/x86_64-linux/tlmgr update --self --all --no-auto-install
   # - sudo /usr/local/texlive/2014/bin/x86_64-linux/tlmgr update --self
   # - sudo /usr/local/texlive/2014/bin/x86_64-linux/tlmgr update --all
   # - sudo /usr/local/texlive/2014/bin/x86_64-linux/tlmgr install iftex
   # - sudo /usr/local/texlive/2014/bin/x86_64-linux/texhash
   - cd ../
-  - tlmgr update --self --all --no-auto-install
+  - pwd
+  - ls -alS
+  # - tlmgr update --self --all --no-auto-install
 
 script:
   - pdflatex Vol1.tex
