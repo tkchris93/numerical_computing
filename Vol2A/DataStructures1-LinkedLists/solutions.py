@@ -1,5 +1,5 @@
 # solutions.py
-"""Volume II Lab 4: Data Structures 1 (Linked Lists). Solutions file."""
+"""Volume 2A: Data Structures 1 (Linked Lists). Solutions file."""
 
 
 # Problem 1: Modify the constructor of the Node class.

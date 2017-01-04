@@ -1,5 +1,5 @@
 # linked_lists.py
-"""Volume II Lab 4: Data Structures 1 (Linked Lists)
+"""Volume 2A: Data Structures 1 (Linked Lists).
 <Name>
 <Class>
 <Date>
