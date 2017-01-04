@@ -1,8 +1,8 @@
-# name this file 'solutions.py'.
-"""Volume II Lab 16: Simplex
-<name>
-<class>
-<date>
+# simplex.py
+"""Volume 2B: Simplex.
+<Name>
+<Class>
+<Date>
 
 Problems 1-6 give instructions on how to build the SimplexSolver class.
 The grader will test your class by solving various linear optimization
@@ -21,7 +21,7 @@ class SimplexSolver(object):
                                          x >= 0
     via the Simplex algorithm.
     """
-    
+
     def __init__(self, c, A, b):
         """
 
@@ -58,5 +58,3 @@ def prob7(filename='productMix.npz'):
     """
     raise NotImplementedError("Problem 7 Incomplete")
 
-
-# END OF FILE =================================================================
