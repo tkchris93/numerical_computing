@@ -174,6 +174,7 @@ class BaseTestDriver(object):
         """Initialize attributes."""
         self.feedback = ""
         self.score = 0
+        self._feedback_newlines = False
         self.problems = NotImplemented
         # Each test driver should initialize self.problems differently.
         # For example, if the lab has two problems, the first worth 5 points
@@ -242,8 +243,12 @@ class BaseTestDriver(object):
         answer versus the student's answer.
         """
         self.feedback += "\n{}".format(message)
-        self.feedback += "\n\tCorrect response: {}".format(correct)
-        self.feedback += "\n\tStudent response: {}".format(student)
+        if self._feedback_newlines:
+            self.feedback += "\n\tCorrect response:\n{}".format(correct)
+            self.feedback += "\n\tStudent response:\n{}".format(student)
+        else:
+            self.feedback += "\n\tCorrect response: {}".format(correct)
+            self.feedback += "\n\tStudent response: {}".format(student)
 
     def _eqTest(self, correct, student, message):
         """Test to see if 'correct' and 'student' have the same value."""
@@ -291,7 +296,9 @@ class BaseTestDriver(object):
                 self.feedback += "\n{}".format(message)
         return credit
 
-    # Problems ----------------------------------------------------------------
+
+# TODO: write a TestDriver class to copy as a template.
+
 
 # Main Routine ================================================================
 
