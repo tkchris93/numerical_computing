@@ -1,4 +1,4 @@
-# testDriver.py
+# test_driver.py
 """Introductory Labs: Intro to Matplotlib. Test driver."""
 
 import sys
