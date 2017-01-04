@@ -1,5 +1,5 @@
 # testDriver.py
-"""Volume 2B: Data Structures 2 (Trees). Test Driver."""
+"""Volume 2A: Data Structures 2 (Trees). Test Driver."""
 
 import sys
 sys.path.insert(0, "../..")
