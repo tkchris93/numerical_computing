@@ -174,7 +174,7 @@ class BaseTestDriver(object):
         """Initialize attributes."""
         self.feedback = ""
         self.score = 0
-        raise NotImplementedError("self.problems not implemented")
+        self.problems = NotImplemented
         # Each test driver should initialize self.problems differently.
         # For example, if the lab has two problems, the first worth 5 points
         # and the second worth 15 points, set
@@ -191,7 +191,7 @@ class BaseTestDriver(object):
         self.score = 0
 
         # Grade each problem.
-        for problem in problems:
+        for problem in self.problems:
             try:
                 func, label, value = problem
                 self.feedback += "\n\n{} ({} points):".format(label, value)
