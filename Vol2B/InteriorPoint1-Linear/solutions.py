@@ -229,7 +229,7 @@ def leastAbsoluteDeviations(save=False):
     # plt.title("Problem 5")
     plt.legend()
     if save is True: # For figure file creation
-        plt.savefig("LADprob.pdf")
+        plt.savefig("figures/LADprob.pdf")
     else:
         plt.show()
     print 'Beta:', beta

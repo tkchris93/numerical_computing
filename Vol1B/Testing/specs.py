@@ -1,6 +1,8 @@
-# solutions.py
-"""Volume IB: Testing. Solutions file (for specs.py)."""
-
+# specs.py
+"""Volume IB: Testing.
+<Name>
+<Date>
+"""
 import math
 
 # Problem 1 Write unit tests for addition().
@@ -80,36 +82,4 @@ class ComplexNumber(object):
         return "{}{}{}i".format(self.real, '+' if self.imag >= 0 else '-',
                                                                 abs(self.imag))
 
-
-def read_in_cards(filename):
-    cards = []
-    with open(filename, 'r') as infile:
-        cards = infile.read().strip().split('\n')
-    if len(cards) != 12:
-        raise ValueError("There must be 12 cards in each file")
-    if len(set(cards)) != 12:
-        raise ValueError("There may not be any duplicate cards")
-    for card in cards:
-        if len(str(card)) != 4:
-            raise ValueError(str(card) + " is invalid: wrong number of characters")
-        for a in str(card):
-            if a not in ['0','1','2']:
-                raise ValueError(str(card) + " can only contain the digits 0, 1 and 2")
-    return cards
-
-def is_set(a,b,c):
-    for i in range(4):
-        if (int(a[i]) + int(b[i]) + int(c[i])) % 3 != 0:
-            return False
-    return True
-
-def count_matches(filename):
-    cards = read_in_cards(filename)
-    count = 0
-    for i in xrange(len(cards)):
-        for j in xrange(i+1,len(cards)):
-            for k in xrange(j+1, len(cards)):
-                if is_set(cards[i], cards[j], cards[k]):
-                    count += 1
-                    print cards[i], cards[j], cards[k]
-    return count
+# Problem 5: Write code for the Set game here
