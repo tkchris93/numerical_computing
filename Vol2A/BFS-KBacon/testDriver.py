@@ -1,19 +1,210 @@
 # testDriver.py
-"""Volume II: Breadth-First Search (Kevin Bacon) Test Driver."""
+"""Volume 2A: Breadth-First Search (Kevin Bacon). Test Driver."""
+
+import sys
+sys.path.insert(0, "../..")
+from base_test_driver import BaseTestDriver, _timeout
 
 from solutions import *
-import inspect
 
-'''
-def getCode():
-    rawcode = inspect.getsource(Graph.shortest_path).splitlines()[21:]
-    code = ""
-    for line in rawcode: code += line
-    if len(code.partition('shortest_path(')[1]) > 0:
-        for line in rawcode:
-            print line
-'''
-# Old Test script
+
+class TestDriver(BaseTestDriver):
+    """Class for testing a student's work.
+
+     5 points for problem 1
+    10 points for problem 2
+    15 points for problem 3
+     3 points for problem 4 (Extra Credit)
+    10 points for problem 5
+    10 points for problem 6
+    10 points for problem 7
+     3 points for problem 8 (Extra Credit)
+
+    Grade the entire lab assignment at once via test_all(), or grade one
+    problem at a time via the different problemX() methods.
+    """
+    # Constructor -------------------------------------------------------------
+    def __init__(self):
+        """Initialize attributes."""
+        BaseTestDriver.__init__(self)
+        self.problems = [   (self.problem1, "Problem 1",  5),
+                            (self.problem2, "Problem 2", 10),
+                            (self.problem3, "Problem 3", 15),
+                            (self.baconator, "BaconSolver", 20) ]
+
+    # Helper Functions --------------------------------------------------------
+    def _addFeedback(self, correct, student, message):
+        """Add a message to the feedback, plus a description of the correct
+        answer versus the student's answer.
+        """
+        self.feedback += "\n{}".format(message)
+        self.feedback += "\n\tCorrect response:\n{}".format(correct)
+        self.feedback += "\n\tStudent response:\n{}".format(student)
+
+    # Test cases --------------------------------------------------------------
+    graph1 = {'A':['B'], 'B':['A', 'C',], 'C':['B']}
+    graph2 = {'A':['D', 'B'], 'D':['A', 'C'],
+              'C':['B', 'D'], 'B':['C', 'A']}
+    graph3 = {'A':['B', 'F'], 'B':['A', 'C'], 'C':['B', 'D'],
+              'D':['C', 'E'], 'E':['D', 'F'], 'F':['A', 'E', 'G'],
+              'G':['A', 'F']}
+    graph4 = {'A':['B'], 'B':['C', 'D'], 'C':['B', 'D'], 'D':['B', 'E'],
+              'E':['F', 'G'], 'F':['E', 'H'], 'H':['F'],
+              'G':['E', 'I', 'J'], 'I':['G', 'J'], 'J':['G', 'J', 'K'],
+              'K':['J', 'L'], 'L':['K']}
+
+    # Problems ----------------------------------------------------------------
+    def problem1(self, s):
+        """Test Graph.__str__. 5 points.""" # TODO: Modify later
+        print("Example graph printout:")
+        print(Graph(self.graph4))
+        print("Student graph printouts:")
+        print(s.Graph(self.graph1))
+        points = self._grade(2)
+        print(s.Graph(self.graph2))
+        return points + self._grade(3)
+
+    def problem2(self, s):
+        """Test Graph.traverse(). 10 Points."""
+        print("Correct:")
+        print(Graph(self.graph3).traverse('A'))
+        print("Student response:")
+        print(s.Graph(self.graph3).traverse('A'))
+        points = self._grade(5)
+        print("Correct:")
+        print(Graph(self.graph4).traverse('A'))
+        print("Student response:")
+        print(s.Graph(self.graph4).traverse('A'))
+        points += self._grade(5)
+        return points
+
+        '''
+        def test_traverse(graph):
+            solution = Graph(graph).traverse('A')
+            student = list(s.Graph(graph).traverse('A'))
+            return self._strTest(solution, student,
+                                "\n\tGraph.traverse() failed.")
+
+        points  = test_traverse(self.graph1)*2
+        points += test_traverse(self.graph2)*2
+        points += test_traverse(self.graph3)*3
+        points += test_traverse(self.graph4)*3
+        '''
+
+        return points
+
+    def problem3(self, s):
+        """Test Graph.shortest_path(). 15 Points."""
+
+        print("Correct:")
+        print(Graph(self.graph2).traverse('A'))
+        print("Student response:")
+        print(s.Graph(self.graph2).traverse('A'))
+        points = self._grade(5)
+        print("Correct:")
+        print(Graph(self.graph3).traverse('A'))
+        print("Student response:")
+        print(s.Graph(self.graph3).traverse('A'))
+        points += self._grade(5)
+        print("Correct:")
+        print(Graph(self.graph4).traverse('A'))
+        print("Student response:")
+        print(s.Graph(self.graph4).traverse('A'))
+        points += self._grade(5)
+        return points
+        '''
+        def test_shortest_path(graph, target):
+            solution = Graph(graph).shortest_path('A', target)
+            student = list(s.Graph(graph).shortest_path('A', target))
+            return self._strTest(solution, student,
+                                "\n\tGraph.shortest_path() failed.")
+
+        points  = test_shortest_path(self.graph1, 'C')*3
+        points += test_shortest_path(self.graph2, 'C')*3
+        points += test_shortest_path(self.graph3, 'G')*4
+        points += test_shortest_path(self.graph4, 'K')*5
+
+        # TODO: use self._checkCode(s.Graph.shortest_path, "nx.") instead
+        rawcode = inspect.getsource(s.Graph.shortest_path).splitlines()[21:]
+        code = ""
+        for line in rawcode: code += line
+        if len(code.partition('shortest_path(')[1]) > 0:
+            for line in rawcode: print line
+            print("\nCheck that the above code is NetworkX-free")
+            points *= self._grade(1)
+            points *= p; feedback += f
+
+        return points
+        '''
+
+    # NOT USED YET
+    def problem4(self, s):
+        """Test convert_to_networkx. 10 points. (NOT USED HERE)"""
+
+        def test_convert(graph):
+            solution = convert_to_networkx(graph)
+            student = s.convert_to_networkx(graph)
+            count = self._strTest(solution.nodes(), student.nodes(),
+                        "\n\tconvert_to_networkx() failed (nodes)")
+            count += self._strTest(solution.edges(), student.edges(),
+                        "\n\tconvert_to_networkx() failed (edges)")
+            return count
+
+        points  = test_convert(self.graph1)
+        points += test_convert(self.graph2)
+        points += test_convert(self.graph3)
+        points += test_convert(self.graph4)*2
+
+        return points
+
+    def baconator(self, s):
+        bacon = s.BaconSolver('movieData.txt')
+        print("Path from Neeson, Liam to Bacon, Kevin:")
+        print(bacon.path_to_bacon("Neeson, Liam"))
+        print("Bacon number of Mortensen, Viggo: "),
+        print(bacon.bacon_number("Mortensen, Viggo"))
+        print("Average Bacon number: "),
+        print(bacon.average_bacon("Bacon, Kevin"))
+        print("Correct: {}".format(2.6646202338108345))
+        return self._grade(20)
+
+
+# Main Routine ================================================================
+
+def test(student_module, total=40):
+    """Grade a student's entire solutions file.
+
+     5 points for problem 1
+    10 points for problem 2
+    15 points for problem 3
+     3 points for problem 4 (Extra Credit)
+    10 points for problem 5
+    10 points for problem 6
+    10 points for problem 7
+     3 points for problem 8 (Extra Credit)
+
+    Inputs:
+        student_module: the imported module for the student's file.
+        total (int): the total possible score.
+
+    Returns:
+        score (int): the student's score, out of 'total'.
+        feedback (str): a printout of results for the student.
+    """
+    tester = TestDriver()
+    tester.test_all(student_module, total)
+    return tester.score, tester.feedback
+
+# Validation ==================================================================
+
+if __name__ == '__main__':
+    import solutions
+    test(solutions)
+
+# =============================================================================
+# OLD CODE ====================================================================
+# =============================================================================
+
 def old_test(student_module):
     """Old test script. UNDER CONSTRUCTION."""
 
@@ -105,235 +296,3 @@ def old_test(student_module):
 
             score += points; feedback += "\nScore += " + str(points)
         except Exception as e: feedback += "\nError: " + e.message
-
-def test(student_module):
-    """Test script. Import the student's solutions file as a module.
-
-     5 points for problem 1
-    10 points for problem 2
-    15 points for problem 3
-     3 points for problem 4 (Extra Credit)
-    10 points for problem 5
-    10 points for problem 6
-    10 points for problem 7
-     3 points for problem 8 (Extra Credit)
-
-    Inputs:
-        student_module: the imported module for the student's file.
-
-    Returns:
-        score (int): the student's score, out of 80.
-        feedback (str): a printout of test results for the student.
-    """
-    tester = _testDriver()
-    tester.test_all(student_module)
-    return tester.score, tester.feedback
-
-class _testDriver(object):
-    """Class for testing a student's work. See test.__doc__ for more info."""
-
-    # Constructor and Main routine --------------------------------------------
-    def __init__(self):
-        self.feedback = ""
-
-    def test_all(self, student_module, total=50):
-        """Grade the provided module on each problem and compile feedback."""
-        # Reset feedback and score.
-        self.feedback = ""
-        self.score = 0
-
-        def test_one(problem, label, value):
-            """Test a single problem, checking for errors."""
-            try:
-                self.feedback += "\n\n{} ({} points):".format(label, value)
-                points = problem(student_module)
-                self.score += points
-                self.feedback += "\nScore += {}".format(points)
-            except BaseException as e:
-                self.feedback += "\n{}: {}".format(self._errType(e), e)
-
-        # Grade each problem.
-        test_one(self.problem1, "Problem 1",  5)    # Problem 1:  5 points.
-        test_one(self.problem2, "Problem 2", 10)    # Problem 2: 10 points.
-        test_one(self.problem3, "Problem 3", 15)    # Problem 3: 15 points.
-        test_one(self.baconator, "BaconSolver", 20)  # BaconSolver: 20 points.
-
-        # Report final score.
-        percentage = (100. * self.score) / total
-        self.feedback += "\n\nTotal score: {}/{} = {}%".format(
-                                    self.score, total, round(percentage, 2))
-        if   percentage >=  98: self.feedback += "\n\nExcellent!"
-        elif percentage >=  90: self.feedback += "\n\nGreat job!"
-
-        # Add comments (optionally).
-        print(self.feedback)
-        comments = str(raw_input("Comments: "))
-        if len(comments) > 0:
-            self.feedback += '\n\n\nComments:\n\t{}'.format(comments)
-
-    # Helper Functions --------------------------------------------------------
-    @staticmethod
-    def _errType(error):
-        """Get just the name of the exception 'error' in string format."""
-        return str(type(error).__name__)
-
-    def _strTest(self, correct, student, message):
-        """Test to see if correct and student have the same
-        string representation.
-        """
-        if str(correct) == str(student):
-            return 1
-        else:
-            self.feedback += message
-            self.feedback += "\nCorrect response:\n" + str(correct)
-            self.feedback += "\nStudent response:\n" + str(student)
-            return 0
-
-    def _grade(self, points, message=None):
-        """Manually grade a problem worth 'points'. Return the score.
-        If full points are not earned, get feedback on the problem.
-        """
-        credit = -1
-        while credit > points or credit < 0:
-            try:
-                credit = int(input("\nScore out of {}: ".format(points)))
-            except:
-                credit = -1
-        if credit != points:
-            # Add comments (optionally),
-            comments = raw_input("Comments: ")
-            if len(comments) > 0:
-                self.feedback += "\n{}".format(comments)
-            # Or add a predetermined error message.
-            elif message is not None:
-                self.feedback += "\n{}".format(message)
-        return credit
-
-    # Test cases --------------------------------------------------------------
-    graph1 = {'A':['B'], 'B':['A', 'C',], 'C':['B']}
-    graph2 = {'A':['D', 'B'], 'D':['A', 'C'],
-              'C':['B', 'D'], 'B':['C', 'A']}
-    graph3 = {'A':['B', 'F'], 'B':['A', 'C'], 'C':['B', 'D'],
-              'D':['C', 'E'], 'E':['D', 'F'], 'F':['A', 'E', 'G'],
-              'G':['A', 'F']}
-    graph4 = {'A':['B'], 'B':['C', 'D'], 'C':['B', 'D'], 'D':['B', 'E'],
-              'E':['F', 'G'], 'F':['E', 'H'], 'H':['F'],
-              'G':['E', 'I', 'J'], 'I':['G', 'J'], 'J':['G', 'J', 'K'],
-              'K':['J', 'L'], 'L':['K']}
-
-    # Problems ----------------------------------------------------------------
-    def problem1(self, s):
-        """Test Graph.__str__. 5 points.""" # TODO: Modify later
-        print("Example graph printout:")
-        print(Graph(_testDriver.graph4))
-        print("Student graph printouts:")
-        print(s.Graph(_testDriver.graph1))
-        points = self._grade(2)
-        print(s.Graph(_testDriver.graph2))
-        return points + self._grade(3)
-
-    def problem2(self, s):
-        """Test Graph.traverse(). 10 Points."""
-        print("Correct:")
-        print(Graph(_testDriver.graph3).traverse('A'))
-        print("Student response:")
-        print(s.Graph(_testDriver.graph3).traverse('A'))
-        points = self._grade(5)
-        print("Correct:")
-        print(Graph(_testDriver.graph4).traverse('A'))
-        print("Student response:")
-        print(s.Graph(_testDriver.graph4).traverse('A'))
-        points += self._grade(5)
-        return points
-
-        '''
-        def test_traverse(graph):
-            solution = Graph(graph).traverse('A')
-            student = list(s.Graph(graph).traverse('A'))
-            return self._strTest(solution, student,
-                                "\n\tGraph.traverse() failed.")
-
-        points  = test_traverse(_testDriver.graph1)*2
-        points += test_traverse(_testDriver.graph2)*2
-        points += test_traverse(_testDriver.graph3)*3
-        points += test_traverse(_testDriver.graph4)*3
-        '''
-
-        return points
-
-    def problem3(self, s):
-        """Test Graph.shortest_path(). 15 Points."""
-
-        print("Correct:")
-        print(Graph(_testDriver.graph2).traverse('A'))
-        print("Student response:")
-        print(s.Graph(_testDriver.graph2).traverse('A'))
-        points = self._grade(5)
-        print("Correct:")
-        print(Graph(_testDriver.graph3).traverse('A'))
-        print("Student response:")
-        print(s.Graph(_testDriver.graph3).traverse('A'))
-        points += self._grade(5)
-        print("Correct:")
-        print(Graph(_testDriver.graph4).traverse('A'))
-        print("Student response:")
-        print(s.Graph(_testDriver.graph4).traverse('A'))
-        points += self._grade(5)
-        return points
-        '''
-        def test_shortest_path(graph, target):
-            solution = Graph(graph).shortest_path('A', target)
-            student = list(s.Graph(graph).shortest_path('A', target))
-            return self._strTest(solution, student,
-                                "\n\tGraph.shortest_path() failed.")
-
-        points  = test_shortest_path(_testDriver.graph1, 'C')*3
-        points += test_shortest_path(_testDriver.graph2, 'C')*3
-        points += test_shortest_path(_testDriver.graph3, 'G')*4
-        points += test_shortest_path(_testDriver.graph4, 'K')*5
-
-        rawcode = inspect.getsource(s.Graph.shortest_path).splitlines()[21:]
-        code = ""
-        for line in rawcode: code += line
-        if len(code.partition('shortest_path(')[1]) > 0:
-            for line in rawcode: print line
-            print("\nCheck that the above code is NetworkX-free")
-            points *= self._grade(1)
-            points *= p; feedback += f
-
-        return points
-        '''
-    def problem4(self, s):
-        """Test convert_to_networkx. 10 points. (NOT USED HERE)"""
-
-        def test_convert(graph):
-            solution = convert_to_networkx(graph)
-            student = s.convert_to_networkx(graph)
-            count = self._strTest(solution.nodes(), student.nodes(),
-                        "\n\tconvert_to_networkx() failed (nodes)")
-            count += self._strTest(solution.edges(), student.edges(),
-                        "\n\tconvert_to_networkx() failed (edges)")
-            return count
-
-        points  = test_convert(_testDriver.graph1)
-        points += test_convert(_testDriver.graph2)
-        points += test_convert(_testDriver.graph3)
-        points += test_convert(_testDriver.graph4)*2
-
-        return 0 #points
-
-    def baconator(self, s):
-        bacon = s.BaconSolver('movieData.txt')
-        print("Path from Neeson, Liam to Bacon, Kevin:")
-        print(bacon.path_to_bacon("Neeson, Liam"))
-        print("Bacon number of Mortensen, Viggo: "),
-        print(bacon.bacon_number("Mortensen, Viggo"))
-        print("Average Bacon number: "),
-        print(bacon.average_bacon("Bacon, Kevin"))
-        print("Correct: %f"%2.6646202338108345)
-        return self._grade(20)
-
-
-if __name__ == '__main__':
-    import solutions
-    test(solutions)
