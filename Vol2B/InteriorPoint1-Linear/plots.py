@@ -42,7 +42,7 @@ def interiorPath():
     plt.text(2,3,'Feasible Region')
     plt.ylim([0,6])
     plt.xlim([0,6])
-    plt.savefig('interiorPath.pdf')
+    plt.savefig('figures/interiorPath.pdf')
     plt.clf()
 
 
@@ -96,7 +96,7 @@ def leastAbsDev():
     plt.subplot(212)
     plt.scatter(x,y, c='k')
     plt.plot(dom, coeffs2[0]*dom+coeffs2[1], 'g-', linewidth=2)
-    plt.savefig('leastAbsDev.pdf')
+    plt.savefig('figures/leastAbsDev.pdf')
     plt.clf()
 
 if __name__ == "__main__":

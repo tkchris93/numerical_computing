@@ -48,7 +48,7 @@ def startingPoint(G, c, A, b, guess):
 
     return x0, y0, l0
 
-# Problems 1-2: Implement this function.
+# Problems 1-2
 def qInteriorPoint(Q, c, A, b, guess, niter=20, tol=1e-16, verbose=False):
     """Solve the Quadratic program min .5 x^T Q x +  c^T x, Ax >= b
     using an Interior Point method.
@@ -240,7 +240,8 @@ def laplacian(n):
     diags = np.array([-n, -1, 0, 1, n])
     return spdiags(data, diags, n**2, n**2).toarray()
 
-# Problem 2
+
+# Problem 3
 def circus(n=15):
     """Solve the circus tent problem for grid size length 'n'."""
     # Create the tent pole configuration.
@@ -287,33 +288,43 @@ def circus(n=15):
     # ax1.plot_surface(X, Y, z1,  rstride=1, cstride=1, color='r')
     # plt.show()
 
+
+# Problem 4
 def portfolio(filename="portfolio.txt"):
-    # Markowitz portfolio optimization
+    """Markowitz Portfolio Optimization
+
+    Parameters:
+        filename (str): The name of the portfolio data file.
+
+    Returns:
+        (ndarray) The optimal portfolio with short selling.
+        (ndarray) The optimal portfolio without short selling.
+    """
     data = np.loadtxt('portfolio.txt')[:,1:]
     n = data.shape[1]
     mu = 1.13
-    
+
     # calculate covariance matrix
     Q = np.cov(data.T)
-    
+
     # calculate returns
     R = data.mean(axis=0)
-    
+
     P = matrix(Q)
     q = matrix(np.zeros(n))
     b = matrix(np.array([1., mu]))
     A = np.ones((2,n))
     A[1,:] = R
     A = matrix(A)
-    
+
     # calculate optimal portfolio with short selling.
     sol1 = solvers.qp(P, q, A=A, b=b)
-    x1 = np.array(sol1['x']).flatten()
-    
+    x1 = np.ravel(sol1['x'])
+
     # calculate optimal portfolio without short selling.
     G = matrix(-np.eye(n))
     h = matrix(np.zeros(n))
     sol2 = solvers.qp(P, q, G, h, A, b)
-    x2 = np.array(sol2['x']).flatten()
-    
+    x2 = np.ravel(sol2['x'])
+
     return x1, x2
