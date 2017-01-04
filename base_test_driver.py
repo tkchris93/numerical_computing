@@ -183,7 +183,7 @@ class BaseTestDriver(object):
         # where problem1() and problem2() are methods of the test driver
         # that test the corresponding problem.
 
-    # Main routine ------------------------------------------------------------
+    # Main Routine ------------------------------------------------------------
     def test_all(self, student_module, total):
         """Grade the provided module on each problem and compile feedback."""
         # Reset feedback and score.
@@ -304,6 +304,7 @@ def test(student_module, total=40):
 
     Inputs:
         student_module: the imported module for the student's file.
+        total (int): the total possible score.
 
     Returns:
         score (int): the student's score, out of 'total'.

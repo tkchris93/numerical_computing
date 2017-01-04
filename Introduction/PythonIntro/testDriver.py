@@ -1,5 +1,5 @@
 # testDriver.py
-"""Introductory Labs: Getting Started. Test Driver."""
+"""Introductory Labs: Intro to Python. Test Driver."""
 
 import sys
 sys.path.insert(0, "../..")
@@ -125,8 +125,9 @@ def test(student_module, total=40):
     10 points for problem 6
      5 points for problem 7
 
-    Parameters:
+    Inputs:
         student_module: the imported module for the student's file.
+        total (int): the total possible score.
 
     Returns:
         score (int): the student's score, out of 'total'.

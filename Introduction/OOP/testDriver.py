@@ -1,72 +1,25 @@
 # testDriver.py
 """Introductory Labs: Object Oriented Programming. Test Driver."""
 
-# Decorator ===================================================================
-
-import signal
-from functools import wraps
-
-def _timeout(seconds):
-    """Decorator for preventing a function from running for too long.
-
-    Inputs:
-        seconds (int): The number of seconds allowed.
-
-    Notes:
-        This decorator uses signal.SIGALRM, which is only available on Unix.
-    """
-    assert isinstance(seconds, int), "@timeout(sec) requires an int"
-
-    class TimeoutError(Exception):
-        pass
-
-    def _handler(signum, frame):
-        """Handle the alarm by raising a custom exception."""
-        message = "Timeout after {0} seconds".format(seconds)
-        print(message)
-        raise TimeoutError(message)
-
-    def decorator(func):
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            signal.signal(signal.SIGALRM, _handler)
-            signal.alarm(seconds)               # Set the alarm.
-            try:
-               return func(*args, **kwargs)
-            finally:
-                signal.alarm(0)                 # Turn the alarm off.
-        return wrapper
-    return decorator
-
-# Test Driver =================================================================
+import sys
+sys.path.insert(0, "../..")
+from base_test_driver import BaseTestDriver, _timeout
 
 from math import sqrt
 from numpy.random import randint
 from solutions import Backpack, Jetpack
 
-# Test script
-def test(student_module):
-    """Test script. Import the student's solutions file as a module.
+
+class TestDriver(BaseTestDriver):
+    """Class for testing a student's work.
 
     10 points for problem 1: Backpack constructor, put(), and dump()
     10 points for problem 2: Jetpack constructor, fly(), and dump().
     10 points for problem 3: Backpack __eq__() and __str__().
     10 points for problem 4: ComplexNumber class.
 
-    Inputs:
-        student_module: the imported module for the student's file.
-
-    Returns:
-        score (int): the student's score, out of 40.
-        feedback (str): a printout of test results for the student.
-    """
-    tester = _testDriver()
-    tester.test_all(student_module)
-    return tester.score, tester.feedback
-
-# Test Driver
-class _testDriver(object):
-    """Class for testing a student's work. See test.__doc__ for more info.
+    Grade the entire lab assignment at once via test_all(), or grade one
+    problem at a time via the different problemX() methods.
 
     This particular test driver is designed to allow flexibility in the
     student's Backpack and Jetpack classes by never explicitly calling
@@ -77,66 +30,16 @@ class _testDriver(object):
     'contents' is specifically referred to, because it is explicitly named
     that way in the example code.
     """
-
     # Constructor -------------------------------------------------------------
     def __init__(self):
-        """Initialize the feedback attribute."""
-        self.feedback = ""
-
-    # Main routine ------------------------------------------------------------
-    def test_all(self, student_module, total=40):
-        """Grade the provided module on each problem and compile feedback."""
-        # Reset feedback and score.
-        self.feedback = ""
-        self.score = 0
-
-        def test_one(problem, label, value):
-            """Test a single problem, checking for errors."""
-            try:
-                self.feedback += "\n\n{} ({} points):".format(label, value)
-                points = problem(student_module)
-                self.score += points
-                self.feedback += "\nScore += {}".format(points)
-            except BaseException as e:
-                self.feedback += "\n{}: {}".format(self._errType(e), e)
-
-        # Grade each problem.
-        test_one(self.problem1, "Problem 1", 10)
-        test_one(self.problem2, "Problem 2", 10)
-        test_one(self.problem3, "Problem 3", 10)
-        test_one(self.problem4, "Problem 4", 10)
-
-        # Report final score.
-        percentage = (100. * self.score) / total
-        self.feedback += "\n\nTotal score: {}/{} = {}%".format(
-                                    self.score, total, round(percentage, 2))
-        if   percentage >=  98: self.feedback += "\n\nExcellent!"
-        elif percentage >=  90: self.feedback += "\n\nGreat job!"
-
-        # Add comments (optionally).
-        print(self.feedback)
-        comments = str(raw_input("Comments: "))
-        if len(comments) > 0:
-            self.feedback += '\n\n\nComments:\n\t{}'.format(comments)
+        """Initialize attributes."""
+        BaseTestDriver.__init__(self)
+        self.problems = [   (self.problem1, "Problem 1", 10),
+                            (self.problem2, "Problem 2", 10),
+                            (self.problem3, "Problem 3", 10),
+                            (self.problem4, "Problem 4", 10)    ]
 
     # Helper Functions --------------------------------------------------------
-    @staticmethod
-    def _errType(error):
-        """Get just the name of the exception 'error' in string format."""
-        return str(type(error).__name__)
-
-    def _eqTest(self, correct, student, message):
-        """Test to see if 'correct' and 'student' are equal.
-        Report the given 'message' if they are not.
-        """
-        if correct == student:
-            return 1
-        else:
-            self.feedback += "\n{}".format(message)
-            self.feedback += "\n\tCorrect response: {}".format(correct)
-            self.feedback += "\n\tStudent response: {}".format(student)
-            return 0
-
     def _evalTest(self, expression, message):
         """Test a boolean 'expression' to see if it is True.
         Report the given 'message' if it is not.
@@ -146,26 +49,6 @@ class _testDriver(object):
         else:
             self.feedback += "\n{}".format(message)
             return 0
-
-    def _grade(self, points, message=None):
-        """Manually grade a problem worth 'points'. Return the score.
-        If full points are not earned, get feedback on the problem.
-        """
-        credit = -1
-        while credit > points or credit < 0:
-            try:
-                credit = int(input("\nScore out of {}: ".format(points)))
-            except:
-                credit = -1
-        if credit != points:
-            # Add comments (optionally),
-            comments = raw_input("Comments: ")
-            if len(comments) > 0:
-                self.feedback += "\n{}".format(comments)
-            # Or add a predetermined error message.
-            elif message is not None:
-                self.feedback += "\n{}".format(message)
-        return credit
 
     # Problems ----------------------------------------------------------------
     def problem1(self, s):
@@ -387,21 +270,45 @@ class _testDriver(object):
         a, b, c, d = randint(-50, 50, 4)
         cn1 = (a + 1j*b) * (c + 1j*d)
         cn2 = s.ComplexNumber(a, b) * s.ComplexNumber(c, d)
-        points += .5*self._eqTest(cn1.real, cn2.real,
-                    "ComplexNumber.__mul__() failed on real part")
-        points += .5*self._eqTest(cn1.imag, cn2.imag,
-                    "ComplexNumber.__mul__() failed on imag part")
+        points += .5*self._eqTest(round(cn1.real, 6), round(cn2.real, 6),
+                                "ComplexNumber.__mul__() failed on real part")
+        points += .5*self._eqTest(round(cn1.imag, 6), round(cn2.imag, 6),
+                                "ComplexNumber.__mul__() failed on imag part")
 
         # Test ComplexNumber.__div__() (1 points).
         a, b, c, d = randint(-50, 50, 4)
         cn1 = (a + 1.0j*b) / (c + 1.0j*d)
         cn2 = s.ComplexNumber(a, b) / s.ComplexNumber(c, d)
-        points += .5*self._eqTest(cn1.real, cn2.real,
-                    "ComplexNumber.__div__() failed on real part")
-        points += .5*self._eqTest(cn1.imag, cn2.imag,
-                    "ComplexNumber.__div__() failed on imag part")
+        points += .5*self._eqTest(round(cn1.real, 6), round(cn2.real, 6),
+                                "ComplexNumber.__div__() failed on real part")
+        points += .5*self._eqTest(round(cn1.imag, 6), round(cn2.imag, 6),
+                                "ComplexNumber.__div__() failed on imag part")
 
         return int(points)
+
+# Main Routine ================================================================
+
+def test(student_module, total=40):
+    """Grade a student's entire solutions file.
+
+    10 points for problem 1: Backpack constructor, put(), and dump()
+    10 points for problem 2: Jetpack constructor, fly(), and dump().
+    10 points for problem 3: Backpack __eq__() and __str__().
+    10 points for problem 4: ComplexNumber class.
+
+    Inputs:
+        student_module: the imported module for the student's file.
+        total (int): the total possible score.
+
+    Returns:
+        score (int): the student's score, out of 'total'.
+        feedback (str): a printout of results for the student.
+    """
+    tester = TestDriver()
+    tester.test_all(student_module, total)
+    return tester.score, tester.feedback
+
+# Validation ==================================================================
 
 if __name__ == '__main__':
     import solutions
