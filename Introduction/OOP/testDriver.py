@@ -165,20 +165,26 @@ class TestDriver(BaseTestDriver):
         # Test Backpack.__str__() on an empty Backpack (2 points).
         b1 =   Backpack("Student", "green", 4)
         b2 = s.Backpack("Student", "green", 4)
-        print("\nCorrect output:"); print(b1)
-        print("\nStudent output:"); print(b2)
-        points += self._grade(2,
+        if str(b1) != str(b2):
+            print("\nCorrect output:"); print(b1)
+            print("\nStudent output:"); print(b2)
+            points += self._grade(2,
                             "Incorrect Backpack.__str__():\n{}\n".format(b2))
+        else:
+            points += 2
 
         # Test Backpack.__str__() on a Backpack with contents (3 points).
         b1 =   Backpack("Master Yoda", "tan", 7)
         b2 = s.Backpack("Master Yoda", "tan", 7)
-        for item in ["Crystal", "Lightsaber", "Commlink", "Banana"]:
-            b1.put(item); b2.put(item)
-        print("\nCorrect output:"); print(b1)
-        print("\nStudent output:"); print(b2)
-        points += self._grade(3,
+        if str(b1) != str(b2):
+            for item in ["Crystal", "Lightsaber", "Commlink", "Banana"]:
+                b1.put(item); b2.put(item)
+            print("\nCorrect output:"); print(b1)
+            print("\nStudent output:"); print(b2)
+            points += self._grade(3,
                             "Incorrect Backpack.__str__():\n{}\n".format(b2))
+        else:
+            points += 3
 
         return points
 

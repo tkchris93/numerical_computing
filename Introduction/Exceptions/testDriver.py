@@ -1,127 +1,42 @@
-# solution.py
+# testDriver.py
 """Introductory Labs: Exceptions and File I/O. Test Driver."""
 
 import sys
+sys.path.insert(0, "../..")
+from base_test_driver import BaseTestDriver
+
 import signal
 from os import remove as rm
 from solutions import ContentFilter
 
-def test(student_module):
-    """Test script. Import the student's solutions file as a module.
 
-    5  points for problem 1: arithmagic()
-    5  points for problem 2: random_walk()
-    5  points for problem 3: ContentFilter.__init__()
-    25 points for problem 4: ContentFilter methods.
-
-    Inputs:
-        student_module: the imported module for the student's file.
-
-    Returns:
-        score (int): the student's score, out of 40.
-        feedback (str): a printout of test results for the student.
-    """
-    tester = _testDriver()
-    tester.test_all(student_module)
-    return tester.score, tester.feedback
-
-
-class _testDriver(object):
+class TestDriver(BaseTestDriver):
     """Class for testing a student's work.
 
-    Attributes:
-        Score (int)
-        Feedback (str)
-        data_file (str): the name of the file to use in testing.
-    """
+     5 points for problem 1: arithmagic()
+     5 points for problem 2: random_walk()
+     5 points for problem 3: ContentFilter.__init__()
+    25 points for problem 4: ContentFilter methods.
 
-    data_file = "contentfilter_test.txt"
+    Grade the entire lab assignment at once via test_all(), or grade one
+    problem at a time via the different problemX() methods.
+    """
+    data_file = "__contentfilter_test__.txt"
 
     # Constructor -------------------------------------------------------------
     def __init__(self):
         """Initialize the feedback attribute."""
-        self.feedback = ""
-
-    # Main routine ------------------------------------------------------------
-    def test_all(self, student_module, total=40):
-        """Grade the provided module on each problem and compile feedback."""
-        # Reset feedback and score.
-        self.feedback = ""
-        self.score = 0
-
-        def test_one(problem, label, value):
-            """Test a single problem, checking for errors."""
-            try:
-                self.feedback += "\n\n{} ({} points):".format(label, value)
-                points = problem(student_module)
-                self.score += points
-                self.feedback += "\nScore += {}".format(points)
-            except BaseException as e:
-                self.feedback += "\n{}: {}".format(self._errType(e), e)
-
-        # Grade each problem.
-        test_one(self.problem1, "Problem 1",  5)   # Problem 1:  5 points.
-        test_one(self.problem2, "Problem 2",  5)   # Problem 2:  5 points.
-        test_one(self.problem3, "Problem 3",  5)   # Problem 3:  5 points.
-        test_one(self.problem4, "Problem 4", 25)   # Problem 4: 25 points.
-
-        # Report final score.
-        percentage = (100. * self.score) / total
-        self.feedback += "\n\nTotal score: {}/{} = {}%".format(
-                                    self.score, total, round(percentage, 2))
-        if   percentage >=  98: self.feedback += "\n\nExcellent!"
-        elif percentage >=  90: self.feedback += "\n\nGreat job!"
-
-        # Add comments (optionally).
-        print(self.feedback)
-        comments = str(raw_input("Comments: "))
-        if len(comments) > 0:
-            self.feedback += '\n\n\nComments:\n\t{}'.format(comments)
-
-    # Helper Functions --------------------------------------------------------
-    @staticmethod
-    def _errType(error):
-        """Get just the name of the exception 'error' in string format."""
-        return str(type(error).__name__)
-
-    def _eqTest(self, correct, student, message):
-        """Test to see if 'correct' and 'student' are equal.
-        Report the given 'message' if they are not.
-        """
-        if correct == student:
-            return 1
-        else:
-            self.feedback += "\n{}".format(message)
-            self.feedback += "\n\tCorrect response: {}".format(correct)
-            self.feedback += "\n\tStudent response: {}".format(student)
-            return 0
-
-    def _grade(self, points, message=None):
-        """Manually grade a problem worth 'points'. Return the score.
-        If full points are not earned, get feedback on the problem.
-        """
-        credit = -1
-        while credit > points or credit < 0:
-            try:
-                credit = int(input("\nScore out of {}: ".format(points)))
-            except:
-                credit = -1
-        if credit != points:
-            # Add comments (optionally),
-            comments = raw_input("Comments: ")
-            if len(comments) > 0:
-                self.feedback += "\n{}".format(comments)
-            # Or add a predetermined error message.
-            elif message is not None:
-                self.feedback += "\n{}".format(message)
-        return credit
+        BaseTestDriver.__init__(self)
+        self.problems = [   (self.problem1, "Problem 1",  5),
+                            (self.problem2, "Problem 2",  5),
+                            (self.problem3, "Problem 3",  5),
+                            (self.problem4, "Problem 4", 25)    ]
 
     # Problems ----------------------------------------------------------------
     def problem1(self, s):
         """Test arithmagic(). 5 points."""
 
         def test_arithmagic(entries, err):
-
             standard_in = sys.stdin
             standard_out = sys.stdout
             try:
@@ -152,7 +67,6 @@ class _testDriver(object):
                 sys.stdout = standard_out               # Reset std out.
                 rm("__IN__.txt")
                 rm("__OUT__.txt")
-
 
         points  = test_arithmagic([1234], "Input must be 3 digits")
         points += test_arithmagic([121],
@@ -213,11 +127,18 @@ class _testDriver(object):
             self.feedback += "\nFailed to raise a TypeError"
 
         # Test proper initialization (3 points).
+        with open(self.data_file, 'w') as testfile:
+            testfile.write("simple test")
         x = s.ContentFilter(self.data_file)
+        rm(self.data_file)
         return points + 3
 
     def problem4(self, s):
         """Test the ContentFilter class's methods. 25 points."""
+
+        with open(self.data_file, 'w') as testfile:
+            testfile.write("A b C d E f G\nh I j K l M n\n"
+                           "O p Q r S t U\nv W x Y z Z z")
 
         def test_bad(cf, method, *args, **kwargs):
             """Test that eval(statement) raises an ValueError."""
@@ -270,14 +191,40 @@ class _testDriver(object):
         rm("_OUT_")
 
         # Test ContentFilter.__str__() (5 points).
-        print("\nCorrect ContentFilter.__str__() output:\n")
-        print(ContentFilter(self.data_file))
-        print("\nStudent ContentFilter.__str__() output:\n")
-        print(sCF)
-        points += self._grade(5,
-                    "ContentFilter.__str__() failed:\n\n{}\n".format(sCF))
+        if str(ContentFilter(self.data_file)) != str(scF):
+            print("\nCorrect ContentFilter.__str__() output:\n")
+            print(ContentFilter(self.data_file))
+            print("\nStudent ContentFilter.__str__() output:\n")
+            print(sCF)
+            points += self._grade(5,
+                        "ContentFilter.__str__() failed:\n\n{}\n".format(sCF))
+        else:
+            points += 5
+
+        rm(self.data_file)
         return points
 
+# Main Routine ================================================================
+
+def test(student_module, total=40):
+    """Grade a student's entire solutions file.
+
+     5 points for problem 1: arithmagic()
+     5 points for problem 2: random_walk()
+     5 points for problem 3: ContentFilter.__init__()
+    25 points for problem 4: ContentFilter methods.
+
+    Inputs:
+        student_module: the imported module for the student's file.
+        total (int): the total possible score.
+
+    Returns:
+        score (int): the student's score, out of 'total'.
+        feedback (str): a printout of results for the student.
+    """
+    tester = TestDriver()
+    tester.test_all(student_module, total)
+    return tester.score, tester.feedback
 
 # Validation ==================================================================
 
