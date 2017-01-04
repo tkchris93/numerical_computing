@@ -1,27 +1,13 @@
 # testDriver.py
 """Introductory Labs: Intro to Matplotlib. Test driver."""
 
-# Decorators ==================================================================
+import sys
+sys.path.insert(0, "../..")
+from base_test_driver import BaseTestDriver, _autoclose
 
-from functools import wraps
-from matplotlib import pyplot as plt
 
-def _autoclose(func):
-    """Decorator for closing figures automatically."""
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        try:
-            plt.ion()
-            return func(*args, **kwargs)
-        finally:
-            plt.close('all')
-            plt.ioff()
-    return wrapper
-
-# Test Driver =================================================================
-
-def test(student_module):
-    """Grade a student's entire solutions file.
+class TestDriver(BaseTestDriver):
+    """Class for testing a student's work.
 
      5 points for problem 1
      5 points for problem 2
@@ -30,94 +16,19 @@ def test(student_module):
     10 points for problem 5
     10 points for problem 6
 
-    Inputs:
-        student_module: the imported module for the student's file.
-
-    Returns:
-        score (int): the student's score, out of 40.
-        feedback (str): a printout of test results for the student.
+    Grade the entire lab assignment at once via test_all(), or grade one
+    problem at a time via the different problemX() methods.
     """
-    tester = _testDriver()
-    tester.test_all(student_module)
-    return tester.score, tester.feedback
-
-
-class _testDriver(object):
-    """Class for testing a student's work.
-
-    Attributes:
-        Score (int)
-        Feedback (str)
-    """
-
     # Constructor -------------------------------------------------------------
     def __init__(self):
-        """Initialize the feedback attribute."""
-        self.feedback = ""
-
-    # Main routine ------------------------------------------------------------
-    def test_all(self, student_module, total=40):
-        """Grade the provided module on each problem and compile feedback."""
-        # Reset feedback and score.
-        self.feedback = ""
-        self.score = 0
-
-        def test_one(problem, label, value):
-            """Test a single problem, checking for errors."""
-            try:
-                self.feedback += "\n\n{} ({} points):".format(label, value)
-                points = problem(student_module)
-                self.score += points
-                self.feedback += "\nScore += {}".format(points)
-            except BaseException as e:
-                self.feedback += "\n{}: {}".format(self._errType(e), e)
-
-        # Grade each problem.
-        test_one(self.problem1, "Problem 1",  5)   # Problem 1:  5 points.
-        test_one(self.problem2, "Problem 2",  5)   # Problem 2:  5 points.
-        test_one(self.problem3, "Problem 3",  5)   # Problem 3:  5 points.
-        test_one(self.problem4, "Problem 4",  5)   # Problem 4:  5 points.
-        test_one(self.problem5, "Problem 5", 10)   # Problem 5: 10 points.
-        test_one(self.problem6, "Problem 6", 10)   # Problem 6: 10 points.
-
-        # Report final score.
-        percentage = (100. * self.score) / total
-        self.feedback += "\n\nTotal score: {}/{} = {}%".format(
-                                    self.score, total, round(percentage, 2))
-        if   percentage >=  98: self.feedback += "\n\nExcellent!"
-        elif percentage >=  90: self.feedback += "\n\nGreat job!"
-
-        # Add comments (optionally).
-        print(self.feedback)
-        comments = str(raw_input("Comments: "))
-        if len(comments) > 0:
-            self.feedback += '\n\n\nComments:\n\t{}'.format(comments)
-
-    # Helper Functions --------------------------------------------------------
-    @staticmethod
-    def _errType(error):
-        """Get just the name of the exception 'error' in string format."""
-        return str(type(error).__name__)
-
-    def _grade(self, points, message=None):
-        """Manually grade a problem worth 'points'. Return the score.
-        If full points are not earned, get feedback on the problem.
-        """
-        credit = -1
-        while credit > points or credit < 0:
-            try:
-                credit = int(input("\nScore out of {}: ".format(points)))
-            except:
-                credit = -1
-        if credit != points:
-            # Add comments (optionally),
-            comments = raw_input("Comments: ")
-            if len(comments) > 0:
-                self.feedback += "\n{}".format(comments)
-            # Or add a predetermined error message.
-            elif message is not None:
-                self.feedback += "\n{}".format(message)
-        return credit
+        """Initialize attributes."""
+        BaseTestDriver.__init__(self)
+        self.problems = [   (self.problem1, "Problem 1",  5),
+                            (self.problem2, "Problem 2",  5),
+                            (self.problem3, "Problem 3",  5),
+                            (self.problem4, "Problem 4",  5),
+                            (self.problem5, "Problem 5", 10),
+                            (self.problem6, "Problem 6", 10)    ]
 
     # Problems ----------------------------------------------------------------
     @_autoclose
@@ -200,8 +111,32 @@ class _testDriver(object):
         (Equal aspect unnecessary -- might appear vertically squished""")
         return self._grade(10, "prob6() plot does not match specifications")
 
+# Main Routine ================================================================
+
+def test(student_module, total=40):
+    """Grade a student's entire solutions file.
+
+     5 points for problem 1
+     5 points for problem 2
+     5 points for problem 3
+     5 points for problem 4
+    10 points for problem 5
+    10 points for problem 6
+
+    Inputs:
+        student_module: the imported module for the student's file.
+        total (int): the total possible score.
+
+    Returns:
+        score (int): the student's score, out of 'total'.
+        feedback (str): a printout of results for the student.
+    """
+    tester = TestDriver()
+    tester.test_all(student_module, total)
+    return tester.score, tester.feedback
+
+# Validation ==================================================================
+
 if __name__ == '__main__':
     import solutions
     test(solutions)
-
-
