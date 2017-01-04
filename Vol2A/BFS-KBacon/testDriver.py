@@ -177,7 +177,7 @@ class _testDriver(object):
         """Get just the name of the exception 'error' in string format."""
         return str(type(error).__name__)
 
-    def strTest(self, correct, student, message):
+    def _strTest(self, correct, student, message):
         """Test to see if correct and student have the same
         string representation.
         """
@@ -250,7 +250,7 @@ class _testDriver(object):
         def test_traverse(graph):
             solution = Graph(graph).traverse('A')
             student = list(s.Graph(graph).traverse('A'))
-            return self.strTest(solution, student,
+            return self._strTest(solution, student,
                                 "\n\tGraph.traverse() failed.")
 
         points  = test_traverse(_testDriver.graph1)*2
@@ -284,7 +284,7 @@ class _testDriver(object):
         def test_shortest_path(graph, target):
             solution = Graph(graph).shortest_path('A', target)
             student = list(s.Graph(graph).shortest_path('A', target))
-            return self.strTest(solution, student,
+            return self._strTest(solution, student,
                                 "\n\tGraph.shortest_path() failed.")
 
         points  = test_shortest_path(_testDriver.graph1, 'C')*3
@@ -309,9 +309,9 @@ class _testDriver(object):
         def test_convert(graph):
             solution = convert_to_networkx(graph)
             student = s.convert_to_networkx(graph)
-            count = self.strTest(solution.nodes(), student.nodes(),
+            count = self._strTest(solution.nodes(), student.nodes(),
                         "\n\tconvert_to_networkx() failed (nodes)")
-            count += self.strTest(solution.edges(), student.edges(),
+            count += self._strTest(solution.edges(), student.edges(),
                         "\n\tconvert_to_networkx() failed (edges)")
             return count
 
