@@ -247,7 +247,7 @@ class BaseTestDriver(object):
 
     def _eqTest(self, correct, student, message):
         """Test to see if 'correct' and 'student' have the same value."""
-        if correct == student:
+        if np.allclose(correct, student):
             return 1
         else:
             self._addFeedback(correct, student, message)
