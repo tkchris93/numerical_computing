@@ -124,12 +124,22 @@ class BaseTestDriver(object):
 
     Helper Methods:
         _errType(error): Return the type name of the exception 'error'.
-        _printCode():
-        _checkCode():
+        _printCode(f): Print the source code of the function 'f'.
+        _checkCode(func, keyword): Check a function's source code for a key
+            word to detect cheating. Return a fraction out of 1.
+        _addFeedback(correct, student, message): governs how the next three
+            functions format their feedback.
         _eqTest(correct, student, message): Compare `correct` and `student`
             with np.allclose(). If they are the same, return 1. Else, add the
-            `message` to the feedback and return 0.
-        _grade():
+            `message` to the feedback, along with the correct answer versus
+            the student answer, and return 0.
+        _isTest(correct, student, message): Same as _eqTest(), but comparing
+            with the is operator.
+        _strTest(correct, student, message): Same as _eqTest(), but comparing
+            string representations of the inputs.
+        _grade(points, message=None): Prompt the grader for a score out of
+            'points'. Add the 'message' to the feedback if full credit is not
+            earned.
 
     Notes:
         This class cannot be instantiated and is meant as a base class to be
@@ -204,8 +214,6 @@ class BaseTestDriver(object):
         if len(comments) > 0:
             self.feedback += '\n\n\nComments:\n\t{}'.format(comments)
 
-        return self.score, self.feedback
-
     # Helper Functions --------------------------------------------------------
     @staticmethod
     def _errType(error):
@@ -265,7 +273,7 @@ class BaseTestDriver(object):
 
     def _grade(self, points, message=None):
         """Manually grade a problem worth 'points'. Return the score.
-        If full points are not earned, get feedback on the problem.
+        If full points are not earned, give feedback on the problem.
         """
         credit = -1
         while credit > points or credit < 0:
