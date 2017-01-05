@@ -26,6 +26,7 @@ class TestDriver(BaseTestDriver):
     def __init__(self):
         """Initialize attributes."""
         BaseTestDriver.__init__(self)
+        self._feedback_newlines = True
         self.problems = [   (self.problem1, "Problem 1",  5),
                             (self.problem2, "Problem 2",  5),
                             (self.problem3, "Problem 3",  5),
@@ -33,15 +34,6 @@ class TestDriver(BaseTestDriver):
                             (self.problem5, "Problem 5",  5),
                             (self.problem6, "Problem 6",  5),
                             (self.problem7, "Problem 7", 10)    ]
-
-    # Helper Functions --------------------------------------------------------
-    def _addFeedback(self, correct, student, message):
-        """Add a message to the feedback, plus a description of the correct
-        answer versus the student's answer.
-        """
-        self.feedback += "\n{}".format(message)
-        self.feedback += "\n\tCorrect response:\n{}".format(correct)
-        self.feedback += "\n\tStudent response:\n{}".format(student)
 
     # Problems ----------------------------------------------------------------
     def problem1(self, s):
