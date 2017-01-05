@@ -144,13 +144,14 @@ class BaseTestDriver(object):
         _checkCode(func, keyword): Check a function's source code for a key
             word to detect cheating. Return a fraction out of 1.
         _addFeedback(correct, student, message): governs how the next three
-            functions format their feedback.
-        _eqTest(correct, student, message): Compare `correct` and `student`
+            functions format their feedback. Behavior depends on the
+            _feedback_newlines attribute.
+        _eqTest(correct, student, message): Compare 'correct' and 'student'
             with np.allclose(). If they are the same, return 1. Else, add the
-            `message` to the feedback, along with the correct answer versus
+            'message' to the feedback, along with the correct answer versus
             the student answer, and return 0.
         _isTest(correct, student, message): Same as _eqTest(), but comparing
-            with the is operator.
+            with the 'is' operator.
         _strTest(correct, student, message): Same as _eqTest(), but comparing
             string representations of the inputs.
         _grade(points, message=None): Prompt the grader for a score out of
@@ -333,15 +334,15 @@ class TestDriver(BaseTestDriver):
     def __init__(self):
         """Initialize attributes."""
         BaseTestDriver.__init__(self)
-        self.problems = [   (self.problem1, "Problem 2",  5),
+        self.problems = [   (self.problem1, "Problem 1",  5),
                             (self.problem2, "Problem 2", 15)    ]
 
     # Problems ----------------------------------------------------------------
     def problem1(self, s):
-        pass
+        return 0
 
     def problem2(self, s):
-        pass
+        return 0
 
 # Main Routine ================================================================
 
@@ -367,4 +368,8 @@ def test(student_module, total=40):
 
 if __name__ == '__main__':
     import solutions
+    # To use IPython for validation, include these lines:
+    # from imp import reload        # Python 3.0-3.3
+    # from importlib import reload  # Python 3.4+
+    # reload(solutions)
     test(solutions)

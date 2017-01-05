@@ -54,13 +54,13 @@ class TestDriver(BaseTestDriver):
         if s.backward("abcde") is None:
             raise NotImplementedError("backward() returned nothing")
 
-        points  = 2*self._eqTest(first_half("abcde"), s.first_half("abcde"),
+        points  = 2*self._strTest(first_half("abcde"), s.first_half("abcde"),
                                             "first_half('abcde') failed")
-        points += 3*self._eqTest(first_half("TK421"), s.first_half("TK421"),
+        points += 3*self._strTest(first_half("TK421"), s.first_half("TK421"),
                                             "first_half('TK421') failed")
-        points += 2*self._eqTest(backward("abcde"), s.backward("abcde"),
+        points += 2*self._strTest(backward("abcde"), s.backward("abcde"),
                                             "backward('abcde') failed")
-        points += 3*self._eqTest(backward("TK421"), s.backward("TK421"),
+        points += 3*self._strTest(backward("TK421"), s.backward("TK421"),
                                             "backward('TK421') failed")
         return points
 
@@ -70,7 +70,7 @@ class TestDriver(BaseTestDriver):
         if s.list_ops() is None:
             raise NotImplementedError("list_ops() returned nothing")
 
-        return 5*self._eqTest(list_ops(), s.list_ops(), "list_ops() failed")
+        return 5*self._strTest(list_ops(), s.list_ops(), "list_ops() failed")
 
     @_timeout(5)
     def problem5(self, s):
@@ -78,10 +78,10 @@ class TestDriver(BaseTestDriver):
         if s.pig_latin("piglatin") is None:
             raise NotImplementedError("pig_latin() returned nothing")
 
-        points = 2*self._eqTest(  pig_latin("college"),
+        points = 2*self._strTest(  pig_latin("college"),
                                 s.pig_latin("college"),
                                             "pig_latin('college') failed")
-        points += 3*self._eqTest(  pig_latin("university"),
+        points += 3*self._strTest(  pig_latin("university"),
                                  s.pig_latin("university"),
                                         "pig_latin('university') failed")
         return points
