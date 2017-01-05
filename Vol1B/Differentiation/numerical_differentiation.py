@@ -32,30 +32,30 @@ def calculate_errors(f,df,pts,h = 1e-5):
         pts (array): array of values to calculate the derivative
 
     Returns:
-        errors (array): array of the errors for the centered difference
-            quotient approximation.
+        an array of the errors for the centered difference quotient
+            approximation.
     """
     raise NotImplementedError("Problem 2 Incomplete")
 
 # Problem 3
-def Prob3():
+def prob3():
     """Use the centered difference quotient to approximate the derivative of
-        f(x)=(sin(x)+1)^x at x= π/3, π/4, and π/6.
-        Then compute the error of each approximation
-        
+    f(x)=(sin(x)+1)^x at x= π/3, π/4, and π/6.
+    Then compute the error of each approximation
+
     Returns:
-        (derivative approximations, errors) (tuple): a tuple of one array of the derivative
-        approximations and another array of the errors of the approximations
+        an array of the derivative approximations
+        an array of the errors of the approximations
     """
     raise NotImplementedError("Problem 3 Incomplete")
 
 # Problem 4
-def Prob4():
-    """Use centered difference quotients to calculate the speed v of the plane at t = 10 s
-    
+def prob4():
+    """Use centered difference quotients to calculate the speed v of the plane
+    at t = 10 s
+
     Returns:
-        speed v of plane (float)
-    
+        (float) speed v of plane
     """
     raise NotImplementedError("Problem 4 Incomplete")
 
@@ -74,7 +74,8 @@ def jacobian(f, n, m, pt, h=1e-5):
         h (float): a float to use in the centered difference approximation.
 
     Returns:
-        Jacobian matrix of f at pt using the centered difference quotient.
+        (ndarray) Jacobian matrix of f at pt using the centered difference
+            quotient.
     """
     raise NotImplementedError("Problem 5 Incomplete")
 
