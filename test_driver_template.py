@@ -1,13 +1,13 @@
-# template_test_driver.py
+# test_driver_template.py
 """For new test drivers, copy the following template class.
 
 Test driver files should be named test_driver.py and placed in the folder with
 the solutions file. See base_test_driver.py for more information.
 """
 
-import sys
-sys.path.insert(0, "../..")
-from base_test_driver import BaseTestDriver, [other imports]
+# import sys
+# sys.path.insert(0, "../..")
+from base_test_driver import BaseTestDriver #, _timeout, _autoclose
 
 class TestDriver(BaseTestDriver):
     """Class for testing a student's work.
@@ -22,6 +22,7 @@ class TestDriver(BaseTestDriver):
     def __init__(self):
         """Initialize attributes."""
         BaseTestDriver.__init__(self)
+        # self._feedback_newlines = True
         self.problems = [   (self.problem1, "Problem 1",  5),
                             (self.problem2, "Problem 2", 15)    ]
 
