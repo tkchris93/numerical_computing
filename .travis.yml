@@ -32,6 +32,8 @@ script: # Compile the major tex files.
 
 deploy: # Deploy the major pdf files to releases when tagged.
   provider: releases
+  api_key:
+    secure: gLC3oZ1Cr7mfvcvcbKjPBi/hZzfxSDNmudm97DO8Mr6XnnSW+Aaj5dGhShfeoDancIciTVhgscY7uTjWQxx2vsc38rnd29SAUtMi+mWUCuYZ9Zg2vR7exQCd+y0T/r641PGJ9x48o/53GG7MFSPzBKuxCJx973jBmJKeA/oUb5w=
   file:
     - "Vol1.pdf"
     - "Vol2.pdf"
@@ -40,4 +42,7 @@ deploy: # Deploy the major pdf files to releases when tagged.
   skip_cleanup: true
   on:
     tags: true
+
+
+
 
