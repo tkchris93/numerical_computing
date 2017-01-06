@@ -15,8 +15,8 @@ class TestDriver(BaseTestDriver):
 
     10 points for problem 1
     10 points for problem 2
-    10 points for problem 3
-    10 points for problem 4
+     5 points for problem 3
+     5 points for problem 4
     10 points for problem 5
 
     Grade the entire lab assignment at once via test_all(), or grade one
@@ -28,8 +28,8 @@ class TestDriver(BaseTestDriver):
         BaseTestDriver.__init__(self)
         self.problems = [   (self.problem1, "Problem 1", 10),
                             (self.problem2, "Problem 2", 10),
-                            (self.problem3, "Problem 3", 10),
-                            (self.problem4, "Problem 4", 10),
+                            (self.problem3, "Problem 3",  5),
+                            (self.problem4, "Problem 4",  5),
                             (self.problem5, "Problem 5", 10)    ]
 
     # Helper functions --------------------------------------------------------
@@ -104,11 +104,19 @@ class TestDriver(BaseTestDriver):
     def problem2(self, s):
         """Test visualize_svd(). 10 points."""
         s.visualize_svd()
+        print("""\nSpecifications:
+        Four plots,
+        1.1) Should look like 3:00 on a clock
+        1.2) Looks like Mr. Pacman but backwards, 7:50 on a clock
+        2.1) Looks like 1.2, but compressed
+        2.2) Looks like 1.1, but comressed and shifted up to a slight angle
+
+        (Aspect ratio may be stretched)""")
         return self._grade(10)
 
     @_timeout(2)
     def problem3(self, s):
-        """Test svd_approx(). 10 points."""
+        """Test svd_approx(). 5 points."""
 
         def _test(m, n, r):
             A = self._test_case(m, n)
@@ -117,15 +125,15 @@ class TestDriver(BaseTestDriver):
             _, sig, _ = la.svd(A)
             stu_error = la.norm(A - s.svd_approx(A.copy(), r), ord=2)
 
-            return 5 * self._eqTest(sig[r], stu_error, "svd_approx() failed "
+            return self._eqTest(sig[r], stu_error, "svd_approx() failed "
                             "with k = {} (showing ||A - Ahat||_2)".format(r))
 
-        points = _test(6, 6, 4) + _test(12, 12, 8)
+        points = 2*_test(6, 6, 4) + 3*_test(12, 12, 8)
         return points
 
     @_timeout(2)
     def problem4(self, s):
-        """Test lowest_rank_approx(). 10 points."""
+        """Test lowest_rank_approx(). 5 points."""
 
         def _test(filename, err):
             image = imread(filename, flatten=True)
@@ -134,11 +142,11 @@ class TestDriver(BaseTestDriver):
             _, sig, _ = la.svd(image)
             stu_error = la.norm(image - s.lowest_rank_approx(image,err), ord=2)
 
-            return 5 * self._eqTest(sig[np.argmax(sig < err)], stu_error,
+            return self._eqTest(sig[np.argmax(sig < err)], stu_error,
                                     "lowest_rank_approx() failed with error = "
                                     "{} (showing ||A - Ahat||_2)".format(err))
 
-        return _test("hubble.jpg", 3.5) + _test("hubble.jpg", 10.)
+        return 2*_test("hubble.jpg", 3.5) + 3*_test("hubble.jpg", 10.)
 
     def problem5(self, s):
         """Test compress_image(). 10 points."""
@@ -147,19 +155,22 @@ class TestDriver(BaseTestDriver):
         def _test(n):
             """Do a test case worth 5 points."""
             s.compress_image("hubble_image.jpg", n)
+            print("""\nSpecifications:
+            Should display the hubble image and its compressed image
+            (Aspect ratio may be stretched)""")
             return self._grade(5)
 
         return _test(7) + _test(40)
 
 # Main Routine ================================================================
 
-def test(student_module, total=50):
+def test(student_module, total=40):
     """Grade a student's entire solutions file.
 
     10 points for problem 1
     10 points for problem 2
-    10 points for problem 3
-    10 points for problem 4
+     5 points for problem 3
+     5 points for problem 4
     10 points for problem 5
 
     Inputs:
