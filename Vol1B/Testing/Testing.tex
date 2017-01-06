@@ -154,7 +154,7 @@ Run \li{py.test --cov} in the directory which has the two files \texttt{solution
 
 Now write some of your own tests for the addition function and the smallest factor function. Be sure to give each function its own test. (This is more of a convention than a mandate,
 but it's good practice and will allow you to track down bugs quickly in the future.) Be sure that your tests cover every statement of your code in those two functions.
-(The number of statements missed should go from 35 to 28)
+(The number of statements missed should go from 33 to 26)
 \end{problem}
 
 \section*{Pytest as a Module} % ===============================================
@@ -201,7 +201,7 @@ In this example, \li{excinfo} is an object of type \li{py.code.ExceptionInfo()} 
 Write tests for the \li{operator} function.
 Be sure to handle every statement and check against every exception.
 For exceptions, be sure to check both the typename and the message, that way you can say with certainty that the test is adequately testing your code.
-(The number of statements missed should go from 28 to 21)
+(The number of statements missed should go from 26 to 11)
 \end{problem}
 
 Suppose you want to use the same pieces of code in different test functions. Pytest has a feature called \emph{fixtures} for mocking data that reduces code duplication.
@@ -272,7 +272,7 @@ Given the previous class, you could reduce code setup for your tests by using a 
 \begin{problem} % TODO: Come up with another simple class that they haven't already seen somewhere.
 Finish writing unit test for the complex numbers class. Be sure to utilize fixtures in order to reduce on the length of your code.
 Also, remember, it would be useful (and good practice) to write a different test function for each method in the ComplexNumberClass.
-(The number of statements missed should go from 21 to 0)
+(The number of statements missed should go from 11 to 0)
 \end{problem}
 
 \section*{Test Driven Development} % ==========================================
