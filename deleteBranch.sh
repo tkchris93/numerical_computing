@@ -16,7 +16,8 @@ else                                # Delete the specified git branch.
     git push origin :$1
     # Clean up the repository by removing auxiliary files.
     set +e
-    find . -name "*.pyc" -exec rm -f {} +
+    find . -type f -name "*.pyc" -exec rm -f {} +
+    find . -type d -name ".ipynb_checkpoints" -exec rm -rf {} +
     rm -f Vol?.[^tex]* Vol?.toc
     rm -f ExtraLabs.[^tex]* ExtraLabs.toc
     rm -f InstructorNotes.[^tex]* InstructorNotes.toc
