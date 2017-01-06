@@ -54,7 +54,7 @@ The address may be set to the computer's IP address, to \li{'localhost'}, or to 
 
 
 \begin{lstlisting}
-address = '127.0.0.1' # Default address that specifies the local machine
+address = '0.0.0.0' # Default address that specifies the local machine and allows connection on all interfaces
 s.bind((address, 33498)) # Bind the socket to a port 33498, which was arbitrarily chosen
 s.listen(1) # Tell the socket to listen for incoming connections
 \end{lstlisting}
@@ -94,7 +94,7 @@ client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 We specify the address of the server, and the port (this needs to be the same port on which the server is listening). We then connect to the server.
 
 \begin{lstlisting}
-ip = '127.0.0.1'
+ip = '0.0.0.0'
 port = 33498
 client.connect((ip, port))
 \end{lstlisting}
@@ -245,14 +245,33 @@ r = requests.get("http://localhost:8000?lastname=Hopper")
 Expand the functionality of the server so that a client can also use GET to obtain a dictionary of everybody whose last name starts with a given string or everybody on the list with \li{lastname=AllNames}. Then add a method so that clients can add a person to the dictionary (or modify an existing entry) using PUT with a query of \li{firstname} and \li{lastname}
 \end{problem}
 
-Though simple, this HTTP server was the original idea for Instant Messaging. The instant messaging client on your computer sends your name, IP address, and port number to the web server. This server then advises your contacts that you are online. If they wish to message you, all communication then happens between your port and IP address and the port and IP address of the other user without passing through the main name server.
+Though simple, this HTTP server was the original idea for Instant Messaging.
+The instant messaging client on your computer sends your name, IP address, and port number to the web server.
+This server then advises your contacts that you are online. 
+If they wish to message you, all communication then happens between your port and IP address and the port and IP address of the other user without passing through the main name server.
 
 \begin{problem}
 We will now practice chatting through HTTP. 
 To do so, create a new HTTP server in a file called \li{chatserver.py} using the same method as problem 3.
-This new server should store a set of dictionaries instead of a \li{names} dictionary. 
-The GET method should return all items within each dictionary in your set on separate lines. 
-The PUT method should accept a \li{name} and a \li{message} and store them in a new dictionary in your set. 
+This new server should store a dictionary with keys of names and values as lists of messages.
+The GET method should return in this format:
+\begin{lstlisting}
+Name1:
+	Message 1
+	Message 2
+Name2:
+	Message 1
+	...
+...
+\end{lstlisting} 
+The PUT method should accept a \li{name} and a \li{message} and store them in your dictionary.
+
+Once you have successfully created your server, run it through a terminal at your localhost IP address. 
+You may then PUT your \li{name} and \li{ipaddressport} on the HTTP server provided by your instructor. 
+To find your own IP address, run in a separate terminal, \li{ifconfig} (for Mac or Linux) or \li{ipconfig} on Windows command prompt. 
+You may use GET requests of \li{AllNames} to the nameserver to retrieve the names of other active users. 
+To send them a message, use PUT requests to their respective IP address and port.
+
 Sample requests are as follows:
 
 \begin{lstlisting}
@@ -262,13 +281,12 @@ r = requests.get("http://ipaddress:portnumber?name=AllNames")
 r = requests.put("http://ipaddress:portnumber?name=Thomas&message=Hows it going")
 \end{lstlisting}
 
-Once you have successfully created your server, run it through a terminal at your localhost IP address. 
-You may then PUT your \li{name} and \li{ipaddressport} on the HTTP server provided by your instructor. 
-To find your own IP address, run in a separate terminal, \li{ifconfig} (for Mac or Linux) or \li{ipconfig} on Windows command prompt. 
-You may use GET requests of \li{AllNames} to the nameserver to retrieve the names of other active users. 
-To send them a message, use their IP address and port number in the above request examples. 
-
-To receive credit for this problem, please send a message with your name to the \textit{TA} user IP address.
+To receive credit for this problem, please do the following:
+\begin{enumerate}
+\item PUT your name, IP address, and port number on the provided nameserver.
+\item Send a message with your name to the \textit{TA} user IP address and port.
+\item Accomplish any additional specified by your instructor.
+\end{enumerate}
 
 When you have finished chatting, update your IP address to an empty string in the name server.
 
