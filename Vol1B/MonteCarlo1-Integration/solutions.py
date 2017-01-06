@@ -87,6 +87,11 @@ def prob3(f, mins, maxs, N=10000):
     return estimate
 
 def prob4():
+    """Integrate the joint normal distribution.
+
+    Return your Monte Carlo estimate, SciPy’s answer, and (assuming SciPy is
+    correct) the relative error of your Monte Carlo estimate.
+    """
 
     #define the joint normal distribution
     joint_normal = lambda x: 1/(2*np.pi)**(len(x)/2.)*np.exp(-x.T.dot(x)/2.)
@@ -102,8 +107,7 @@ def prob4():
     return my_value, scipy_value, err
 
 def prob5(numEstimates=50):
-    """Plot the error of Monte Carlo Integration.
-    """
+    """Plot the error of Monte Carlo Integration."""
 
     # actual volume of the unit sphere
     actual = 4.1887902047863905
