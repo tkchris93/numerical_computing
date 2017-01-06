@@ -70,7 +70,7 @@ After all the data has been received, we close the connection.
 
 \begin{lstlisting}
 size = 2048 # Block size of 20 bytes
-conn, add = s.accept() # conn is our new socket object for receiving/sending data
+conn, addr = s.accept() # conn is our new socket object for receiving/sending data
 print "Accepting connection from:", addr
 while True:
 	data = conn.recv(size) # Read 20 bytes from the incoming connection
@@ -81,6 +81,14 @@ conn.close()
 \end{lstlisting}
 
 We can also close the server by using the KeyBoardInterrupt (\li{ctrl+c}).
+
+\begin{warn}
+When running the code above, you will see the program hang on the line,
+\begin{lstlisting}
+conn, addr = s.accept()
+\end{lstlisting}
+As mentioned above, the \li{accept()} method does not return until a connection is made. Therefore for the code above to execute in its entirety, a client needs to connect to the server. Creating a client is addressed in the next section.
+\end{warn}
 
 \subsection*{Creating a Client} % ---------------------------------------------
 
@@ -105,8 +113,6 @@ client.connect((ip, port))
 Once connected, the client can send and receive data.
 Unlike the server, the client sends and reads the data itself instead of creating a new connection socket.
 When we are done with the client, we close it.
-
-\newpage
 
 \begin{lstlisting}
 size = 2048 # Block size of 20 bytes
@@ -196,10 +202,11 @@ It is a higher level protocol than TCP and takes care of many of the small detai
 It also relies on underlying TCP protocol to provide network capabilities.
 The protocol is centered around a request and response paradigm.
 A client makes a request to a server and the server replies with response.
-There are several methods, or requests, defined for HTTP servers. The two most common of which are GET and POST.
+There are several methods, or requests, defined for HTTP servers. The three most common of which are GET, POST, and PUT.
 GET requests are typically used to request information from a server.
 POST requests are sent to the server with the intent of modifying the state of the server.
-We can send additional information with both GET and POST requests.
+PUT requests are used to add new pieces of data to the server.
+%We can send additional information with both GET and POST requests.
 
 Every HTTP request consists of two parts: a header and a body.
 The headers contain important information about the request including: the type of request, encoding, and a timestamp.
@@ -268,11 +275,22 @@ For example, running the following code results in the message \li{"Grace"} from
 The \emph{?} signifies the start of a \emph{query} in the URL.
 
 \begin{lstlisting}
-r = requests.get("http://localhost:8000?lastname=Hopper")
+requests.get("http://localhost:8000?lastname=Hopper").text
 \end{lstlisting}
 
-Expand the functionality of the server so that a client can also use GET to obtain a dictionary of everybody whose last name starts with a given string or everybody on the list with \li{lastname=AllNames}.
-Then add a method so that clients can add a person to the dictionary (or modify an existing entry) using PUT with a query of \li{firstname} and \li{lastname}
+Expand the functionality of the server to do the following:
+\begin{itemize}
+\item Obtain a list of everybody whose last name starts with a given string. For example, a query of \li{lastname=B} would return all the names whose last name starts with the letter \li{"B"}.
+\item Similarly, obtain a list of everybody in the list of names with \li{lastname=AllNames}.
+\item Then add a method \li{do_PUT()} so that clients can add a person to the dictionary (or modify an existing entry) using PUT with a query of \li{firstname} and \li{lastname}. Multiple query fields separated using the \li{"&"} character.
+\end{itemize}
+The format of the list of names returns from the server should be:
+\begin{lstlisting}
+LASTNAME, FIRSTNAME
+LASTNAME, FIRSTNAME
+   ...      ...
+\end{lstlisting}
+
 \end{problem}
 
 Though simple, this HTTP server was the original idea for Instant Messaging.
