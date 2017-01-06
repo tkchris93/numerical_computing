@@ -38,7 +38,7 @@ class TestDriver(BaseTestDriver):
         """Generate an nonsingular mxn matrix."""
         A = np.random.randint(1,10,(m,n)).astype(np.float)
         if np.linalg.matrix_rank(A) != n:
-            return _testDriver._qrTestCase(m,n)
+            return TestDriver._qrTestCase(m,n)
         return A[:,la.qr(A, pivoting=True)[-1]]
 
     @_timeout(2)
