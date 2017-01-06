@@ -160,7 +160,7 @@ but it's good practice and will allow you to track down bugs quickly in the futu
 \section*{Pytest as a Module} % ===============================================
 
 When developing software, we often want our code to raise an exception when certain input is given, instead of proceeding.  Furthermore, we want the exception to give us relevant info about what went wrong and why it was raised.
-For example, if a user feeds a bad value to a calculator (like dividing by 0), we would like if if the calculator were very explicit as to why it wasn't able to process our input.
+For example, if a user feeds a bad value to a calculator (like dividing by 0), we would like it if the calculator were very explicit as to why it wasn't able to process our input.
 Just as you should test your code to make sure valid cases give the correct output, like you did in the Problem 1, you should also test cases that generate an exception.  Standard assert functions, however, simply will not do, because they can't catch an exception.
 
 Instead, we can use the \li{raises} method from the \li{pytest} module, which acts like an assert statement for raising and catching exceptions.
@@ -199,15 +199,15 @@ In this example, \li{excinfo} is an object of type \li{py.code.ExceptionInfo()} 
 
 \begin{problem}
 Write tests for the \li{operator} function.
-Be sure to handle every statment and check against every exception.
+Be sure to handle every statement and check against every exception.
 For exceptions, be sure to check both the typename and the message, that way you can say with certainty that the test is adequately testing your code.
-(The number of statments missed should go from 28 to 21)
+(The number of statements missed should go from 28 to 21)
 \end{problem}
 
 Suppose you want to use the same pieces of code in different test functions. Pytest has a feature called \emph{fixtures} for mocking data that reduces code duplication.
-Mocking data is useful when you don't want certain test to be dependent on the working of completely separate code.
-For example if we had a feature which was dependent upon a user service working correctly, rather than having my tests make a call to the user service I may write a fixture which simply gives existing mock data that I expect for my feature.
-As far as preventing code duplication a fixture may also be utilized to create a class object which we can then call within our function.
+Mocking data is useful when you don't want certain tests to be dependent on the working of completely separate code.
+For example, if we had a feature which was dependent upon a user service working correctly, rather than having my tests make a call to the user service I may write a fixture which simply gives existing mock data that I expect for my feature.
+As far as preventing code duplication, a fixture may also be utilized to create a class object which we can then call within our function.
 
 \begin{lstlisting}
 class ComplexNumber(object):
@@ -300,10 +300,10 @@ First the developer writes a test case for each feature of the program. Since th
 
 TDD eliminates the chore of testing code after it has been written. It also eliminates the fear that even though code is complete, it may contain obscure bugs. Furthermore, writing unit tests helps the developer understand the project as a whole as well as the minute details of each feature.
 
-The idea must be a bit more concrete then ``I want to add a chat room to my website.'' The general idea of how the chat room will look in code (like a history module, a data base, and a sketch of required functions, etc.) is required.
+The idea must be a bit more concrete than ``I want to add a chat room to my website.'' The general idea of how the chat room will look in code (like a history module, a data base, and a sketch of required functions, etc.) is required.
 Next that idea is transformed into tests because the inputs and outputs of required functionality are understood.
 Following the example of the chat room, you could write a unit test that checks what a given API returns when a user has broadcasted some message.
-The implementation is simply adding, changing and editing code until all the required tests pass.
+The implementation is simply adding, changing, and editing code until all the required tests pass.
 
 \begin{problem}
 The game Set is a card game about finding patterns. Each card contains a design with 4 different properties: color (red, green or purple), shape (diamond, oval or sqiggly), quantity (one, two or three) and pattern (solid, striped or outlined). Twelve cards are laid on a table and the object is to recognize sets of cards. A \emph{set} is made up of three cards which are either the all same or all different for each property. You can try playing Set online \href{http://smart-games.org/en/set/start}{here}.
@@ -373,7 +373,7 @@ Consider breaking this problem down into a few smaller functions and writing a u
 \begin{problem}
 Now that you have written test cases for a set game pattern recognizer, write code until all your test cases pass. Write this code at the end of \li{solutions.py}. Rather than running this file to see if your code is working, simply run the test file to see if all the test cases pass. Here are some suggestions for writing the implementation:
 
-Hint: Given three integer which represent cards, the cards form a set if their columns each sum to a multiple of 3.
+Hint: Given three integers which represent cards, the cards form a set if their columns each sum to a multiple of 3.
 
 \end{problem}
 
