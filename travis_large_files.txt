@@ -1,10 +1,6 @@
-Vol1A/LinearTransformations/horse.npy
 Vol1A/IterativeSolvers/figures/jacobi_small.pdf
 Vol1A/DataVisualization/figures/heatmap_2.png
 
-Vol1B/Complex1-Plots/arctan_riemann_surface.pdf
-Vol1B/Complex1-Plots/poly_color_plot_imag.pdf
-Vol1B/Complex1-Plots/poly_color_plot_real.pdf
 Vol1B/GMRES/figures/LeastSquares.pdf
 
 Vol2A/Wavelets/Archived/Haar.tex
@@ -13,7 +9,6 @@ Vol2B/scipyoptimize/ManyMinima.pdf
 Vol2B/scipyoptimize/Rosenbrock.pdf
 
 Vol3A/Pandas2/plotting_demos.ipynb
-Vol3A/Pandas3/industry_return_data.csv
 Vol3A/Bokeh/BokehFigs/color_states.png
 
 MachineLearning/Metropolis/samples.pdf
