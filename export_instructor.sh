@@ -13,5 +13,5 @@ else
     find . -type f -name "*[Nn]otes.tex" | cpio -pdv $1
     cp SIAM-GH-book.cls $1
     cp command.tex $1
-
+    cp *.pdf $1
 fi
