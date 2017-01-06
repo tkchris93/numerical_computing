@@ -7,7 +7,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 # Problem 1
-def truncated_svd(A,k=None,tol=10**-6):
+def truncated_svd(A, k=None, tol=1e-6):
     """Computes the truncated SVD of A. If r is None or equals the number
         of nonzero singular values, it is the compact SVD.
     Parameters:
@@ -20,13 +20,16 @@ def truncated_svd(A,k=None,tol=10**-6):
         Vh - the matrix V^H in the SVD
     """
     m,n = A.shape
-    eigs,evecs = la.eig(A.conj().T.dot(A))
 
+    # Compute the eigenvalues and eigenvectors of A^H A.
+    eigs, evecs = la.eig(A.conj().T.dot(A))
+
+    # Compute singular values and sort them from greatest to least.
     s = np.sqrt(eigs)
-    sort_indices = np.argsort(s)[::-1] #Sort from greatest to least
-    # Sort singular values
+    sort_indices = np.argsort(s)[::-1]
     s = s[sort_indices]
-    # Sort eigenvectors the same way
+
+    # Sort eigenvectors the same way.
     evecs = evecs[:,sort_indices]
     if k is not None:
         if k > len(s):
@@ -41,16 +44,21 @@ def truncated_svd(A,k=None,tol=10**-6):
     V = evecs[:,:len(s)]
 
     #calculate U
-    U = np.empty((m,len(s)))
+    U = np.empty((m,len(s)), dtype=np.complex)
     for i in xrange(len(s)):
-        U[:,i] = (1./s[i])*A.dot(V[:,i])
+        U[:,i] = A.dot(V[:,i]) / s[i]
 
-    return U, s, V.conj().T
+    return U, s.real, V.conj().T
 
 # Problem 2
 def visualize_svd():
-    S = np.load("circle.npz")["circle"]
-    vec = np.load("circle.npz")["unit_vectors"]
+
+    theta = np.linspace(0, 2*np.pi, 200)
+    S = np.vstack((np.cos(theta), np.sin(theta)))
+    vec = np.array([[1, 0, 0],[0, 0, 1]])
+
+    # S = np.load("circle.npz")["circle"]
+    # vec = np.load("circle.npz")["unit_vectors"]
 
     A = np.array([3,1,1,3]).reshape((2,2))
     U,s,Vh = la.svd(A)
@@ -97,14 +105,14 @@ def svd_approx(A, k):
     U,s,Vt = la.svd(A, full_matrices=False)
     S = np.diag(s[:k])
     u1,s1,vt1 = U[:,:k],S[:k,:k],Vt[:k,:]
-    diff = (u1.nbytes + np.diag(s1).nbytes + vt1.nbytes) - A.nbytes
-    if diff > 0:
-        print "WARNING: Given parameters do not result in compressed data."
+    # diff = (u1.nbytes + np.diag(s1).nbytes + vt1.nbytes) - A.nbytes
+    # if diff > 0:
+    #     print "WARNING: Given parameters do not result in compressed data."
     Ahat = U[:,:k].dot(S).dot(Vt[:k,:])
     return Ahat
 
 # Problem 4
-def lowest_rank_approx(A,e):
+def lowest_rank_approx(A, e):
     """Returns the lowest rank approximation of A with error less than e
     with respect to the induced 2-norm.
 
@@ -116,15 +124,15 @@ def lowest_rank_approx(A,e):
     Ahat - the lowest rank approximation of A with error less than e.
     """
     U,s,Vt = la.svd(A, full_matrices=False)
-    if e<=s[-1]:
-        print "Warning: Matrix cannot be approximated below this error bound"
+    if e <= s[-1]:
+        print "Matrix cannot be approximated below this error bound"
         return A
     k = np.where(s<e)[0][0]
-    Ahat = U[:,:k].dot(S).dot(Vt[:k,:])
+    Ahat = U[:,:k].dot(np.diag(s[:k])).dot(Vt[:k,:])
     return Ahat
 
 # Problem 5
-def compress_image(filename,k):
+def compress_image(filename, k):
     """Plot the original image found at 'filename' and the rank k approximation
     of the image found at 'filename.'
 

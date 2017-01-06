@@ -49,7 +49,7 @@ class TestDriver(BaseTestDriver):
         try:
             Q,R = stu
         except(TypeError, ValueError):
-            raise ValueError("{} failed to return two arrays".format(
+            raise ValueError("{} failed to return 2 arrays".format(
                                                                 func.__name__))
         pts = 5
         if not all(np.allclose(*x) for x in [(A, Q.dot(R)), (np.triu(R), R),
