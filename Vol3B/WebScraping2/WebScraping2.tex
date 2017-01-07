@@ -38,8 +38,8 @@ In lab \ref{lab:BS_scraping}, BeautifulSoup was used to read short bits of HTML 
 Once the file is loaded, you can navigate through the HTML tree and pick out the data that you want.
 
 \begin{problem}
-Use BeautifulSoup to load the 'Big Bank Info' file.
-This page is also found at \url{http://www.federalreserve.gov/releases/lbr/20030930/default.htm}.
+Go to the url \url{http://www.federalreserve.gov/releases/lbr/20030930/default.htm}.
+Download the page source as an htm file and use BeautifulSoup to load the file.
 Using the methods taught, write a function that returns a 2-D NumPy array for bank information.
 Each row in the array represents a different bank, and each column represents a different piece of bank information.
 In your array, include the Bank Name, Rank, ID, Domestic Assets, and number of Domestic Branches for the following banks: JPMORGAN, CAPITAL ONE, and DISCOVER.
@@ -84,6 +84,15 @@ Note \li{urllib2} may need to be installed or updated before use.
 \begin{warn}
 Since \li{urllib2} accesses a website server, you may run into problems where you cannot establish a connection to the server.
 You can create a \li{try-except} clause to account for this, or just rerun your program.
+One possible way is as follows.
+\begin{lstlisting}
+while True:
+    try:
+        content = urllib2.urlopen(url).read()
+        break
+    except:
+        pass
+\end{lstlisting}
 \end{warn}
 
 \begin{problem}\label{SanDiego}
@@ -173,7 +182,7 @@ for url in dates_list:
     link_content = urllib2.urlopen(link_url).read()
     link_soup = BeautifulSoup(link_content)
     amt = link_soup.find(string=re.compile('JPMORGAN')).parent.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling.next_sibling
-    data.append(amt.string)
+    assets.append(amt.string)
 \end{lstlisting}
 Now we will examine this code and see how it works.
 
@@ -276,7 +285,6 @@ Remember how we said Selenium reads HTML from a webpage differently than Beautif
 Take a look again at the soccer example.
 \begin{lstlisting}
 >>> from selenium import webdriver
->>> from selenium.webdriver.common.keys import Keys
 >>> from bs4 import BeautifulSoup
 
 >>> browser = webdriver.Firefox()
@@ -304,4 +312,5 @@ Create a SQL table which stores the following information:
 \item Each row represents a different basketball team, with its home and away win percentages.
 \end{itemize}
 Hint: You will need to use Selenium to access each teams website using the links from the tags found in problem \ref{bball}.
+If the websites do not load properly, consider a \li{try-except} clause like the one suggested previously.
 \end{problem}

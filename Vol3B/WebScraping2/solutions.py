@@ -1,7 +1,7 @@
 """Volume III: Web Scraping 1.
-Spencer Giddens
+<Name>
 <Class>
-11/14/2016
+<Date>
 """
 
 from bs4 import BeautifulSoup
@@ -11,7 +11,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 import sqlite3 as sql
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 
 # Problem 1
 def Prob1():
@@ -203,7 +202,7 @@ def Prob4():
 # Problem 5
 def Prob5():
     """Use selenium to return a list of all the a tags containing each of the
-    30 NBA teams. Return only one tag per team. 
+    30 NBA teams. Return only one tag per team.
     """
     url = 'http://stats.nba.com/league/team/#!/?sort=W&dir=1'
     # Open driver and scrape data into soup
@@ -237,9 +236,10 @@ def Prob6():
     # Go through each tag
     for tag in tags:
         # Create link_url and make soup via selenium
+        link_url = 'http://stats.nba.com/team/#!' + tag['href'][10:]
+        # Create while loop that breaks when page loads correctly
         while True:
             try:
-                link_url = 'http://stats.nba.com/team/#!' + tag['href'][10:]
                 driver = webdriver.Firefox()
                 driver.get(link_url)
                 soup = BeautifulSoup(driver.page_source, 'html.parser')
@@ -260,10 +260,10 @@ def Prob6():
                         aw = float(tag.string)
                 # Add info to rows
                 rows.append((name, hw, aw))
-                print (name, hw, aw)
                 break
+            # If an error arises, try again to open the page and get the info
             except:
-                print 'Failed to open'
+                pass
     # Put info into table
     cur.executemany('INSERT INTO Basketball VALUES (?, ?, ?);', rows)
     # Commit and close database
