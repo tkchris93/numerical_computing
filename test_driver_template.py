@@ -15,7 +15,7 @@ class TestDriver(BaseTestDriver):
      5 points for problem 1
     35 points for problem 2
 
-    Grade an entire lab assignment at once via test_all(), or grade one
+    Grade the entire lab assignment at once via test_all(), or grade one
     problem at a time via the different problemX() methods.
     """
     # Constructor -------------------------------------------------------------

@@ -1,5 +1,5 @@
 # test_driver.py
-"""Volume 2A: Nearest Neighbor Search. Test Driver."""
+"""Volume 2A: Data Structures 3 (Nearest Neighbor Search). Test Driver."""
 
 import sys
 sys.path.insert(0, "../..")
@@ -28,11 +28,32 @@ class TestDriver(BaseTestDriver):
     def __init__(self):
         """Initialize attributes."""
         BaseTestDriver.__init__(self)
+        self.total = 60
         self.problems = [   (self.problem1, "Problem 1", 5),
                             (self.problem2, "Problem 2", 5),
                             (self.problem5, "Problems 4 and 5", 30),
                             (self.problem6, "Problem 6", 10)            ]
 
+    # Main Routine ------------------------------------------------------------
+    @staticmethod
+    def main(student_module):
+        """Grade a student's entire solutions file.
+
+         5 points for problem 1
+         5 points for problem 2
+        10 points for problem 3
+        10 points for problem 4
+        20 points for problem 5
+        10 points for problem 6
+
+        Inputs:
+            student_module: the imported module for the student's file.
+
+        Returns:
+            score (int): the student's score.
+            feedback (str): a printout of results for the student.
+        """
+        return TestDriver().test_all(student_module)
 
     # Helper Functions --------------------------------------------------------
     def neighbor(self, m, k, func):
@@ -161,32 +182,13 @@ class TestDriver(BaseTestDriver):
 
         return self._grade(10)
 
-# Main Routine ================================================================
-
-def test(student_module, total=60):
-    """Grade a student's entire solutions file.
-
-     5 points for problem 1
-     5 points for problem 2
-    10 points for problem 3
-    10 points for problem 4
-    20 points for problem 5
-    10 points for problem 6
-
-    Inputs:
-        student_module: the imported module for the student's file.
-        total (int): the total possible score.
-
-    Returns:
-        score (int): the student's score, out of 'total'.
-        feedback (str): a printout of results for the student.
-    """
-    tester = TestDriver()
-    tester.test_all(student_module, total)
-    return tester.score, tester.feedback
-
 # Validation ==================================================================
 
 if __name__ == '__main__':
+    """Validate TestDriver by testing the solutions file."""
     import solutions
-    test(solutions)
+    # If using IPython, include the appropriate line:
+    # reload(solutions)             # Python 2.7
+    # from imp import reload        # Python 3.0-3.3
+    # from importlib import reload  # Python 3.4+
+    TestDriver.main(solutions)

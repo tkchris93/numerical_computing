@@ -28,11 +28,31 @@ class TestDriver(BaseTestDriver):
     def __init__(self):
         """Initialize attributes."""
         BaseTestDriver.__init__(self)
-        self._feedback_newlines = True
+        self.total = 60
         self.problems = [   (self.problem1, "Problem 1",  5),
                             (self.problem2, "Problem 2", 15),
                             (self.problem3, "Problem 3", 30),
                             (self.problem4, "Problem 4", 10)    ]
+        self._feedback_newlines = True
+
+    # Main Routine ------------------------------------------------------------
+    @staticmethod
+    def main(student_module):
+        """Grade a student's entire solutions file.
+
+         5 points for problem 1
+        15 points for problem 2
+        30 points for problem 3
+        10 points for problem 4
+
+        Inputs:
+            student_module: the imported module for the student's file.
+
+        Returns:
+            score (int): the student's score.
+            feedback (str): a printout of results for the student.
+        """
+        return TestDriver().test_all(student_module)
 
     # Problems ----------------------------------------------------------------
     def problem1(self, s):
@@ -215,30 +235,13 @@ class TestDriver(BaseTestDriver):
         s.prob4()
         return self._grade(10)
 
-# Main Routine ================================================================
-
-def test(student_module, total=60):
-    """Grade a student's entire solutions file.
-
-     5 points for problem 1
-    15 points for problem 2
-    30 points for problem 3
-    10 points for problem 4
-
-    Inputs:
-        student_module: the imported module for the student's file.
-        total (int): the total possible score.
-
-    Returns:
-        score (int): the student's score, out of 'total'.
-        feedback (str): a printout of results for the student.
-    """
-    tester = TestDriver()
-    tester.test_all(student_module, total)
-    return tester.score, tester.feedback
-
 # Validation ==================================================================
 
 if __name__ == '__main__':
+    """Validate TestDriver by testing the solutions file."""
     import solutions
-    test(solutions)
+    # If using IPython, include the appropriate line:
+    # reload(solutions)             # Python 2.7
+    # from imp import reload        # Python 3.0-3.3
+    # from importlib import reload  # Python 3.4+
+    TestDriver.main(solutions)

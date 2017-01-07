@@ -7,6 +7,7 @@ from base_test_driver import BaseTestDriver, _timeout
 
 from solutions import *
 
+# TODO: Update and synchronize with lab.
 
 class TestDriver(BaseTestDriver):
     """Class for testing a student's work.
@@ -27,11 +28,33 @@ class TestDriver(BaseTestDriver):
     def __init__(self):
         """Initialize attributes."""
         BaseTestDriver.__init__(self)
-        self._feedback_newlines = True
+        self.total = 50
         self.problems = [   (self.problem1, "Problem 1",  5),
                             (self.problem2, "Problem 2", 10),
                             (self.problem3, "Problem 3", 15),
                             (self.baconator, "BaconSolver", 20) ]
+        self._feedback_newlines = True
+
+    # Main Routine ------------------------------------------------------------
+    @staticmethod
+    def main(student_module):
+        """Grade a student's entire solutions file.
+
+         5 points for problem 1
+        10 points for problem 2
+        15 points for problem 3
+        10 points for problem 5
+        10 points for problem 6
+        10 points for problem 7
+
+        Inputs:
+            student_module: the imported module for the student's file.
+
+        Returns:
+            score (int): the student's score.
+            feedback (str): a printout of results for the student.
+        """
+        return TestDriver().test_all(student_module)
 
     # Test cases --------------------------------------------------------------
     graph1 = {'A':['B'], 'B':['A', 'C',], 'C':['B']}
@@ -160,41 +183,24 @@ class TestDriver(BaseTestDriver):
         print("Correct: {}".format(2.6646202338108345))
         return self._grade(20)
 
-# Main Routine ================================================================
-
-def test(student_module, total=40):
-    """Grade a student's entire solutions file.
-
-     5 points for problem 1
-    10 points for problem 2
-    15 points for problem 3
-     3 points for problem 4 (Extra Credit)
-    10 points for problem 5
-    10 points for problem 6
-    10 points for problem 7
-     3 points for problem 8 (Extra Credit)
-
-    Inputs:
-        student_module: the imported module for the student's file.
-        total (int): the total possible score.
-
-    Returns:
-        score (int): the student's score, out of 'total'.
-        feedback (str): a printout of results for the student.
-    """
-    tester = TestDriver()
-    tester.test_all(student_module, total)
-    return tester.score, tester.feedback
-
 # Validation ==================================================================
 
 if __name__ == '__main__':
+    """Validate TestDriver by testing the solutions file."""
     import solutions
-    test(solutions)
+    # If using IPython, include the appropriate line:
+    # reload(solutions)             # Python 2.7
+    # from imp import reload        # Python 3.0-3.3
+    # from importlib import reload  # Python 3.4+
+    TestDriver.main(solutions)
+
+
 
 # =============================================================================
 # OLD CODE ====================================================================
 # =============================================================================
+
+
 
 def old_test(student_module):
     """Old test script. UNDER CONSTRUCTION."""

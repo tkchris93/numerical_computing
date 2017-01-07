@@ -27,16 +27,36 @@ class TestDriver(BaseTestDriver):
     def __init__(self):
         """Initialize the feedback attribute."""
         BaseTestDriver.__init__(self)
+        self.total = 40
         self.problems = [   (self.problem1, "Problem 1",  5),
                             (self.problem2, "Problem 2",  5),
                             (self.problem3, "Problem 3",  5),
                             (self.problem4, "Problem 4", 25)    ]
 
+    # Main Routine ------------------------------------------------------------
+    @staticmethod
+    def main(student_module):
+        """Grade a student's entire solutions file.
+
+         5 points for problem 1: arithmagic()
+         5 points for problem 2: random_walk()
+         5 points for problem 3: ContentFilter.__init__()
+        25 points for problem 4: ContentFilter methods.
+
+        Inputs:
+            student_module: the imported module for the student's file.
+
+        Returns:
+            score (int): the student's score.
+            feedback (str): a printout of results for the student.
+        """
+        return TestDriver().test_all(student_module)
+
     # Problems ----------------------------------------------------------------
     def problem1(self, s):
         """Test arithmagic(). 5 points."""
 
-        def test_arithmagic(entries, err):
+        def _test(entries, err):
             standard_in = sys.stdin
             standard_out = sys.stdout
             try:
@@ -68,12 +88,12 @@ class TestDriver(BaseTestDriver):
                 rm("__IN__.txt")
                 rm("__OUT__.txt")
 
-        points  = test_arithmagic([1234], "Input must be 3 digits")
-        points += test_arithmagic([121],
+        points  = _test([1234], "Input must be 3 digits")
+        points += _test([121],
                             "First and last digit must differ by 2 or more")
-        points += test_arithmagic([123, 323], "Incorrect reversal")
-        points += test_arithmagic([123, 321, 111], "Incorrect difference")
-        points += test_arithmagic([123, 321, 198, 899], "Incorrect reversal")
+        points += _test([123, 323], "Incorrect reversal")
+        points += _test([123, 321, 111], "Incorrect difference")
+        points += _test([123, 321, 198, 899], "Incorrect reversal")
 
         return points
 
@@ -140,7 +160,7 @@ class TestDriver(BaseTestDriver):
             testfile.write("A b C d E f G\nh I j K l M n\n"
                            "O p Q r S t U\nv W x Y z Z z")
 
-        def test_bad(cf, method, *args, **kwargs):
+        def _test_bad(cf, method, *args, **kwargs):
             """Test that eval(statement) raises an ValueError."""
             ags = ["'{}'".format(arg) for arg in args]
             kwgs = ["{}='{}'".format(key, val) for key,val in kwargs.items()]
@@ -156,7 +176,7 @@ class TestDriver(BaseTestDriver):
                 self.feedback += message
             return 0
 
-        def test_good(cf, method, value, *args, **kwargs):
+        def _test_good(cf, method, value, *args, **kwargs):
             ags = ["'{}'".format(arg) for arg in args]
             kwgs = ["{}='{}'".format(key, val) for key,val in kwargs.items()]
             message = "ContentFilter.{}({}, {})".format(
@@ -167,67 +187,50 @@ class TestDriver(BaseTestDriver):
                 print(f.read())
             return self._grade(value, message + " failed")
 
-        sCF = s.ContentFilter(self.data_file)
+        CF = s.ContentFilter(self.data_file)
 
         # Test that each method raises an ValueError for bad 'mode' (3 points).
-        points  = test_bad(sCF, "uniform",   "_OUT_", mode='z')
-        points += test_bad(sCF, "reverse",   "_OUT_", mode='z')
-        points += test_bad(sCF, "transpose", "_OUT_", mode='z')
+        points  = _test_bad(CF, "uniform",   "_OUT_", mode='z')
+        points += _test_bad(CF, "reverse",   "_OUT_", mode='z')
+        points += _test_bad(CF, "transpose", "_OUT_", mode='z')
 
         # Test that uniform() and reverse() raise ValueErrors (2 points).
-        points += test_bad(sCF, "uniform", "_OUT_", case="middle")
-        points += test_bad(sCF, "reverse", "_OUT_", unit="chunk")
+        points += _test_bad(CF, "uniform", "_OUT_", case="middle")
+        points += _test_bad(CF, "reverse", "_OUT_", unit="chunk")
 
         print("\nSource file:\n")
         with open(self.data_file) as f:
             print(f.read())
 
         # Test each method with correct usage (15 points).
-        points += test_good(sCF, "uniform", 3, "_OUT_", mode='w', case="upper")
-        points += test_good(sCF, "uniform", 3, "_OUT_", mode='w', case="lower")
-        points += test_good(sCF, "reverse", 3, "_OUT_", mode="w", unit="word")
-        points += test_good(sCF, "reverse", 3, "_OUT_", mode="w", unit="line")
-        points += test_good(sCF, "transpose", 3, "_OUT_", mode="w")
+        points += _test_good(CF, "uniform", 3, "_OUT_", mode='w', case="upper")
+        points += _test_good(CF, "uniform", 3, "_OUT_", mode='w', case="lower")
+        points += _test_good(CF, "reverse", 3, "_OUT_", mode="w", unit="word")
+        points += _test_good(CF, "reverse", 3, "_OUT_", mode="w", unit="line")
+        points += _test_good(CF, "transpose", 3, "_OUT_", mode="w")
         rm("_OUT_")
 
         # Test ContentFilter.__str__() (5 points).
-        if str(ContentFilter(self.data_file)) != str(scF):
+        if str(ContentFilter(self.data_file)) != str(CF):
             print("\nCorrect ContentFilter.__str__() output:\n")
             print(ContentFilter(self.data_file))
             print("\nStudent ContentFilter.__str__() output:\n")
-            print(sCF)
+            print(CF)
             points += self._grade(5,
-                        "ContentFilter.__str__() failed:\n\n{}\n".format(sCF))
+                        "ContentFilter.__str__() failed:\n\n{}\n".format(CF))
         else:
             points += 5
 
         rm(self.data_file)
         return points
 
-# Main Routine ================================================================
-
-def test(student_module, total=40):
-    """Grade a student's entire solutions file.
-
-     5 points for problem 1: arithmagic()
-     5 points for problem 2: random_walk()
-     5 points for problem 3: ContentFilter.__init__()
-    25 points for problem 4: ContentFilter methods.
-
-    Inputs:
-        student_module: the imported module for the student's file.
-        total (int): the total possible score.
-
-    Returns:
-        score (int): the student's score, out of 'total'.
-        feedback (str): a printout of results for the student.
-    """
-    tester = TestDriver()
-    tester.test_all(student_module, total)
-    return tester.score, tester.feedback
-
 # Validation ==================================================================
 
 if __name__ == '__main__':
+    """Validate TestDriver by testing the solutions file."""
     import solutions
-    test(solutions)
+    # If using IPython, include the appropriate line:
+    # reload(solutions)             # Python 2.7
+    # from imp import reload        # Python 3.0-3.3
+    # from importlib import reload  # Python 3.4+
+    TestDriver.main(solutions)

@@ -31,7 +31,7 @@ class TestDriver(BaseTestDriver):
     def __init__(self):
         """Initialize attributes."""
         BaseTestDriver.__init__(self)
-        # self._feedback_newlines = True
+        self.total = 45
         self.problems = [   (self.problem1, "Problem 1", 5),
                             (self.problem2, "Problem 2", 5),
                             (self.problem3, "Problem 3", 5),
@@ -41,6 +41,30 @@ class TestDriver(BaseTestDriver):
                             (self.problem7, "Problem 7", 5),
                             (self.problem8, "Problem 8", 5),
                             (self.problem9, "Problem 9", 5)     ]
+
+    # Main Routine ------------------------------------------------------------
+    @staticmethod
+    def main(student_module):
+        """Grade a student's entire solutions file.
+
+        5 points for problem 1
+        5 points for problem 2
+        5 points for problem 3
+        5 points for problem 4
+        5 points for problem 5
+        5 points for problem 6
+        5 points for problem 7
+        5 points for problem 8
+        5 points for problem 9
+
+        Inputs:
+            student_module: the imported module for the student's file.
+
+        Returns:
+            score (int): the student's score.
+            feedback (str): a printout of results for the student.
+        """
+        return TestDriver().test_all(student_module)
 
     # Problems ----------------------------------------------------------------
     def problem1(self, s):
@@ -179,35 +203,13 @@ class TestDriver(BaseTestDriver):
         # """)
         return self._grade(5, "prob9() does not match specifications")
 
-# Main Routine ================================================================
-
-def test(student_module, total=45):
-    """Grade a student's entire solutions file.
-
-    5 points for problem 1
-    5 points for problem 2
-    5 points for problem 3
-    5 points for problem 4
-    5 points for problem 5
-    5 points for problem 6
-    5 points for problem 7
-    5 points for problem 8
-    5 points for problem 9
-
-    Inputs:
-        student_module: the imported module for the student's file.
-        total (int): the total possible score.
-
-    Returns:
-        score (int): the student's score, out of 'total'.
-        feedback (str): a printout of results for the student.
-    """
-    tester = TestDriver()
-    tester.test_all(student_module, total)
-    return tester.score, tester.feedback
-
 # Validation ==================================================================
 
 if __name__ == '__main__':
+    """Validate TestDriver by testing the solutions file."""
     import solutions
-    test(solutions)
+    # If using IPython, include the appropriate line:
+    # reload(solutions)             # Python 2.7
+    # from imp import reload        # Python 3.0-3.3
+    # from importlib import reload  # Python 3.4+
+    TestDriver.main(solutions)

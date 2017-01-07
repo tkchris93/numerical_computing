@@ -221,6 +221,11 @@ class BaseTestDriver(object):
             score (int): the number of points earned.
             feedback (str): feedback for the student.
         """
+        if self.total is NotImplemented:
+            raise NotImplementedError("self.total not assigned")
+        elif self.problems is NotImplemented:
+            raise NotImplementedError("self.problems not assigned")
+
         # Reset feedback and initialize score.
         self.feedback = ""
         score = 0
