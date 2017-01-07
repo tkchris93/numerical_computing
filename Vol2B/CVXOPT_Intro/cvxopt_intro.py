@@ -1,5 +1,5 @@
-# name this file solutions.py
-"""Volume 2 Lab 14: Optimization Packages II (CVXOPT)
+# cvxopt_intro.py
+"""Volume 2B: CVXOPT
 <Name>
 <Class>
 <Date>
@@ -97,4 +97,3 @@ def prob6():
         The optimal value (sol['primal objective']*-1000)
     """
     raise NotImplementedError("Forest problem not started.")
-    

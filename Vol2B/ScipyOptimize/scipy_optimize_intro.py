@@ -1,5 +1,5 @@
-# name this file 'solutions.py'
-"""Volume II Lab 13: Optimization Packages I (scipy.optimize)
+# scipy_optimize_intro.py
+"""Volume 2B: Optimization with Scipy.
 <Name>
 <Class>
 <Date>
@@ -10,7 +10,7 @@ from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import axes3d
 from blackbox_function import blackbox
 
-# Problem 1: use scipy.optimize.minimize() with different methods and compare.
+# Problem 1
 def prob1():
     """Use the minimize() function in the scipy.optimize package to find the
     minimum of the Rosenbrock function (scipy.optimize.rosen) using the
@@ -19,43 +19,43 @@ def prob1():
         CG
         BFGS
     Use x0 = np.array([4., -2.5]) for the initial guess for each test.
-    
-    For each method, print whether it converged, and if so, print how many 
+
+    For each method, print whether it converged, and if so, print how many
         iterations it took.
     """
     return NotImplementedError("Problem 1 not implemented")
 
-# Problem 2: Minizize an unknown "blackbox" function.
+# Problem 2
 def prob2():
-    """Minimize the function blackbox() in the blackbox_function module, 
+    """Minimize the function blackbox() in the blackbox_function module,
     selecting the appropriate method of scipy.optimize.minimize() for this
-    problem.  Do not pass your method a derivative. You may need to test 
+    problem.  Do not pass your method a derivative. You may need to test
     several methods and determine which is most appropriate.
 
     The blackbox() function returns the length of a piecewise-linear curve
-    between two fixed points: the origin, and the point (40,30). 
+    between two fixed points: the origin, and the point (40,30).
     It accepts a one-dimensional ndarray} of length m of y-values, where m
     is the number of points of the piecewise curve excluding endpoints.
-    These points are spaced evenly along the x-axis, so only the y-values 
+    These points are spaced evenly along the x-axis, so only the y-values
     of each point are passed into blackbox().
 
-    Once you have selected a method, select an initial point with the 
+    Once you have selected a method, select an initial point with the
     provided code.
 
-    Then plot your initial curve and minimizing curve together on the same
-    plot, including endpoints. Note that this will require padding your 
-    array of internal y-values with the y-values of the endpoints, so 
+    Plot your initial curve and minimizing curve together on the same
+    plot, including endpoints. Note that this will require padding your
+    array of internal y-values with the y-values of the endpoints, so
     that you plot a total of 20 points for each curve.
     """
     return NotImplementedError("Problem 2 not implemented")
 
-# Problem 3: learn and use scipy.optimize.basinhopping()
+# Problem 3
 def prob3():
     """Explore the documentation on the function scipy.optimize.basinhopping()
     online or via IPython. Use it to find the global minimum of the multmin()
     function given in the lab, with initial point x0 = np.array([-2, -2]) and
     the Nelder-Mead algorithm. Try it first with stepsize=0.5, then with
-    stepsize=0.2. 
+    stepsize=0.2.
 
     Plot the multimin function and minima found using the code provided.
     Print statements answering the following questions:
@@ -64,26 +64,30 @@ def prob3():
 
     Finally, return the global minimum.
     """
+    def multimin(x):
+        r = np.sqrt((x[0]+1)**2 + x[1]**2)
+        return r**2 *(1+ np.sin(4*r)**2)
+
     return NotImplementedError("Problem 3 not implemented")
 
 
-# Problem 4: learn and use scipy.optimize.root()
+# Problem 4
 def prob4():
-    """Find the roots of the system
-    [       -x + y + z     ]   [0]
-    [  1 + x^3 - y^2 + z^3 ] = [0]
-    [ -2 - x^2 + y^2 + z^2 ]   [0]
+    """Find the roots of the function
+               [       -x + y + z     ]
+    f(x,y,z) = [  1 + x^3 - y^2 + z^3 ]
+               [ -2 - x^2 + y^2 + z^2 ]
 
     Returns the values of x,y,z as an array.
     """
     return NotImplementedError("Problem 4 not implemented")
 
 
-# Problem 5: learn and use scipy.optimize.curve_fit().
+# Problem 5
 def prob5():
     """Use the scipy.optimize.curve_fit() function to fit a curve to
-    the data found in `convection.npy`. The first column of this file is R, 
-    the Rayleigh number, and the second column is Nu, the Nusselt number. 
+    the data found in `convection.npy`. The first column of this file is R,
+    the Rayleigh number, and the second column is Nu, the Nusselt number.
 
     The fitting parameters should be c and beta, as given in the convection
     equations.
