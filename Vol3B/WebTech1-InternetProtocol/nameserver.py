@@ -47,7 +47,7 @@ class NameServerHTTPRequestHandler(BaseHTTPRequestHandler):
 
 def run():
     # Print("http server is starting...")
-    server_address = ("127.0.0.1", 8000)
+    server_address = ("0.0.0.0", 8000)
     httpd = HTTPServer(server_address, NameServerHTTPRequestHandler)
     print("http server is running...")
     httpd.serve_forever()
