@@ -113,6 +113,8 @@ class BaseTestDriver(object):
                 accept as input the imported student module.
             label (str): a label for the problem or code being tested.
             value (int): the amount of points that the problem is worth.
+        _debug (bool): If True, exceptions raised by problemX() methods will
+            be passed up to the user.
         _feedback_newlines (bool): If False, feedback appears as follows:
 
             <message>
@@ -191,6 +193,7 @@ class BaseTestDriver(object):
         """Initialize attributes."""
         self.feedback = ""
         self.score = 0
+        self._debug = False
         self._feedback_newlines = False
         self.problems = NotImplemented
         # Each test driver should initialize self.problems differently.
@@ -218,6 +221,8 @@ class BaseTestDriver(object):
                 self.feedback += "\nScore += {}".format(points)
             except BaseException as e:
                 self.feedback += "\n{}: {}".format(self._errType(e), e)
+                if self._debug:
+                    raise
 
         # Report final score.
         percentage = (100. * self.score) / total

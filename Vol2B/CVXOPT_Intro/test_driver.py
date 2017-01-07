@@ -10,10 +10,15 @@ from solutions import *
 solvers.options["show_progress"] = False
 
 
-
 class TestDriver(BaseTestDriver):
     """Class for testing a student's work.
 
+     5 points for problem 1
+     5 points for problem 2
+     5 points for problem 3
+     5 points for problem 4
+     5 points for problem 5
+    15 points for problem 6
 
     Grade the entire lab assignment at once via test_all(), or grade one
     problem at a time via the different problemX() methods.
@@ -98,6 +103,12 @@ class TestDriver(BaseTestDriver):
 def test(student_module, total=40):
     """Grade a student's entire solutions file.
 
+     5 points for problem 1
+     5 points for problem 2
+     5 points for problem 3
+     5 points for problem 4
+     5 points for problem 5
+    15 points for problem 6
 
     Inputs:
         student_module: the imported module for the student's file.
