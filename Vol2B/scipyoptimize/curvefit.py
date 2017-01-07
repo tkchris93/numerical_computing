@@ -22,4 +22,4 @@ yfit = func(x,popt[0],popt[1],popt[2])
 
 plt.scatter(x,yn,marker='.')
 plt.plot(x,yfit)
-plt.savefig("curve_fit.pdf")
+plt.savefig("figures/curve_fit.pdf")

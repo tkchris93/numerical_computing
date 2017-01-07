@@ -23,4 +23,4 @@ plt.legend(loc="lower right")
 # plt.show()
 
 # Save the plot.
-plt.savefig("ConvectionFit.pdf")
+plt.savefig("figures/ConvectionFit.pdf")

@@ -7,6 +7,7 @@ from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import axes3d
 from blackbox_function import blackbox
 
+
 # Problem 1: use scipy.optimize.minimize() with different methods and compare.
 def prob1():
     """Use the minimize() function in the scipy.optimize package to find the
@@ -31,10 +32,11 @@ def prob1():
 
     # Report the info.
     for method in info:
-        print("Method:\t{}\nConverged:\t{} "
-                                    .format(method, info[method]['success']))
-        if info[method]['success']:
-            print "Number of Iterations:", info[method]['nit'], '\n'
+        result = info[method]
+        print("\nMethod:\t{}\nSuccess:\t{}".format(method, result['success']))
+        if result['success']:
+            print "Number of Iterations:\t{}".format(result['nit'])
+
 
 # Problem 2: Minizize an unknown "blackbox" function.
 def prob2():
@@ -78,16 +80,14 @@ def prob2():
     if not result['success']:
         raise RuntimeError("didn't converge")
 
-    ypost = np.hstack((0,result['x'],30))
+    ypost = np.hstack((0, result['x'], 30))
     plt.plot(x, ypost, '.-b', markersize=10)
     plt.show()
-    # The solution should plot the Batman symbol.
-    # Run blackbox_Batman.py to see original.
+    # The solution should be a straight line.
 
-prob2()
 
 # Problem 3: learn and use scipy.optimize.basinhopping()
-def prob3():
+def prob3(grading=False):
     """Explore the documentation on the function scipy.optimize.basinhopping()
     online or via IPython. Use it to find the global minimum of the multmin()
     function given in the lab, with initial point x0 = np.array([-2, -2]) and
@@ -116,30 +116,32 @@ def prob3():
     large = opt.basinhopping(multimin, x0, stepsize=large_step,
                             minimizer_kwargs={'method':'nelder-mead'})
 
-    # Print the results.
-    print("Stepsize:\t{}\nMinimum:\t{}\nX-Values:\t{}\n".format(small_step,
-                                                     small['fun'], small['x']))
-    print("Stepsize:\t{}\nMinimum:\t{}\nX-Values:\t{}\n".format(large_step,
-                                                     large['fun'], large['x']))
+    if not grading:
 
-    # Plot the multimin graph. Here, the points are colored differently for emphasis.
-    xdomain = np.linspace(-3.5,1.5,70)
-    ydomain = np.linspace(-2.5,2.5,60)
-    X,Y = np.meshgrid(xdomain,ydomain)
-    Z = multimin((X,Y))
-    fig = plt.figure()
-    ax1 = fig.add_subplot(111, projection='3d')
-    ax1.plot_wireframe(X, Y, Z, linewidth=.5, color='c')
-    ax1.scatter(x0[0], x0[1], multimin(x0), c='b')               # Initial pt: blue
+        # Print the results.
+        print("Stepsize:\t{}\nMinimum:\t{}\nX-Values:\t{}\n".format(small_step,
+                                                    small['fun'], small['x']))
+        print("Stepsize:\t{}\nMinimum:\t{}\nX-Values:\t{}\n".format(large_step,
+                                                    large['fun'], large['x']))
 
-    # Plot the results of the algorithms.
-    ax1.scatter(small.x[0], small.x[1], small.fun, s=30, c='r')  # Small step: red
-    ax1.scatter(large.x[0], large.x[1], large.fun, s=30, c='g')  # Large step: green
-    plt.show()
+        # Plot the multimin graph. Here, the points are colored differently for emphasis.
+        xdomain = np.linspace(-3.5,1.5,70)
+        ydomain = np.linspace(-2.5,2.5,60)
+        X,Y = np.meshgrid(xdomain,ydomain)
+        Z = multimin((X,Y))
+        fig = plt.figure()
+        ax1 = fig.add_subplot(111, projection='3d')
+        ax1.plot_wireframe(X, Y, Z, linewidth=.5, color='c')
+        ax1.scatter(x0[0], x0[1], multimin(x0), c='b')               # Initial pt: blue
 
-    # Answer the problem questions.
-    print("minimize() fails because it gets trapped in a basin.")
-    print("0.2 fails because it is too small a stepsize to escape a basin.")
+        # Plot the results of the algorithms.
+        ax1.scatter(small.x[0], small.x[1], small.fun, s=30, c='r')  # Small step: red
+        ax1.scatter(large.x[0], large.x[1], large.fun, s=30, c='g')  # Large step: green
+        plt.show()
+
+        # Answer the problem questions.
+        print("minimize() fails because it gets trapped in a basin.")
+        print("0.2 fails because it is too small a stepsize to escape a basin.")
 
     # Return the correct global minimum.
     return large['fun']
@@ -169,12 +171,12 @@ def prob4():
 
     # Calculate the solution, check that it is a root, and return it.
     sol = opt.root(f, x0, jac=jacobian, method='hybr')
-    assert np.allclose(np.zeros_like(sol.x), f(sol.x)), "FAILURE"
+    # assert np.allclose(np.zeros_like(sol.x), f(sol.x)), "FAILURE"
     return sol.x
 
 
 # Problem 5: learn and use scipy.optimize.curve_fit().
-def prob5():
+def prob5(grading=False):
     """Use the scipy.optimize.curve_fit() function to fit a curve to
     the data found in `convection.npy`. The first column of this file is R,
     the Rayleigh number, and the second column is Nu, the Nusselt number.
@@ -186,21 +188,24 @@ def prob5():
     Return the values c and beta as an array.
     """
     data = np.load("convection.npy")
-    initial = 4
 
     # Define the function to optimize.
     def nusselt(R, c, beta):
-        return c*R**beta
+        return c * R**beta
 
     # Use curve_fit and the data to get the parameters.
-    popt, pcov = opt.curve_fit(nusselt, data[initial:,0], data[initial:,1])
-    curve = nusselt(data[initial:,0], popt[0], popt[1])
+    popt, pcov = opt.curve_fit(nusselt, data[:,0], data[:,1])
 
-    # Plot the data and the curve.
-    plt.loglog(data[:,0], data[:,1], '.k', label='Data')
-    plt.loglog(data[initial:,0], curve, 'b', label='Curve', linewidth=2)
-    plt.legend(loc="lower right")
-    plt.show()
+    # Calculate the curve using a more refined domain.
+    domain = np.linspace(data[0,0], data[-1,0], 200)
+    curve = nusselt(domain, popt[0], popt[1])
+
+    if not grading:
+        # Plot the data and the curve.
+        plt.plot(domain, curve, '-b', label='Curve', linewidth=2)
+        plt.plot(data[:,0], data[:,1], '.k', ms=10, label='Data')
+        plt.legend(loc="lower right")
+        plt.show()
 
     # Return the parameter values.
     return popt

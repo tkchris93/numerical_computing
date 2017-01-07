@@ -1,10 +1,10 @@
 \lab{Optimization with Scipy}{scipy.optimize}
 \label{lab:Optimization1}
-\objective{The Optimize package in Scipy provides highly optimized and versatile methods for solving fundamental optimization problems.  
+\objective{The Optimize package in Scipy provides highly optimized and versatile methods for solving fundamental optimization problems.
 In this lab we introduce the syntax and variety of \li{scipy.optimize} as a foundation for unconstrained numerical optimization.}
 
-Numerical optimization is one of the most common modern applications of mathematics. 
-Many mathematical problems can be rewritten in terms of optimization, and unless the problem is both simple and small, usually cannot be solved analytically, and must be approximated by numerical computation. 
+Numerical optimization is one of the most common modern applications of mathematics.
+Many mathematical problems can be rewritten in terms of optimization, and unless the problem is both simple and small, usually cannot be solved analytically, and must be approximated by numerical computation.
 
 To assist with this, the \li{scipy.optimize} package has several functions for minimizing, root finding, and curve fitting, of which we will introduce the most essential.
 
@@ -22,7 +22,7 @@ See Figure \ref{opt:rosenbrock}.
 The Rosenbrock function is included in the optimize package (as \li{rosen}), as well as its gradient (\li{rosen_der}) and its hessian (\li{rosen_hess}).
 
 \begin{figure}
-\includegraphics[width=\textwidth]{Rosenbrock.pdf}
+\includegraphics[width=\textwidth]{figures/Rosenbrock.pdf}
 \caption{$f(x,y) = (1-x)^2 + 100(y-x^2)^2$}
 \label{opt:rosenbrock}
 \end{figure}
@@ -34,13 +34,13 @@ You may recognize some of these algorithms, and several of them will be discusse
 how to use them.
 
 % Give an example and explain how to read the output
-As an example, we'll minimize the Rosenbrock with the Newton-CG method. 
+As an example, we'll minimize the Rosenbrock with the Newton-CG method.
 This method often performs better by including the optional hessian as an argument, which we will do here.
 \begin{lstlisting}
 >>> import numpy as np
 >>> from scipy import optimize as opt
 >>> x0 = np.array([4., -2.5])
->>> opt.minimize(opt.rosen, x0, method='Newton-CG', hess=opt.rosen_hess, 
+>>> opt.minimize(opt.rosen, x0, method='Newton-CG', hess=opt.rosen_hess,
 													jac=opt.rosen_der)
      fun: 1.1496545381999877e-15
      jac: array([  1.12295570e-05,  -5.63744647e-06])
@@ -53,24 +53,24 @@ This method often performs better by including the optional hessian as an argume
  success: True
        x: array([ 0.99999997,  0.99999993])
 \end{lstlisting}
-As the online documentation indicates, \li{opt.minimize()} returns an object of type \li{opt.optimize.OptimizeResult}. 
+As the online documentation indicates, \li{opt.minimize()} returns an object of type \li{opt.optimize.OptimizeResult}.
 
-The printed output gives you information on the performance of the algorithm. 
-The most relevant output for this lab include 
+The printed output gives you information on the performance of the algorithm.
+The most relevant output for this lab include
 
-\li{fun: 1.1496545381999877e-15}, the obtained minimum; 
+\li{fun: 1.1496545381999877e-15}, the obtained minimum;
 
-\li{nit: 96}, the number of iterations the algorithm took to complete; 
+\li{nit: 96}, the number of iterations the algorithm took to complete;
 
-\li{success: True}, whether the algorithm converged or not; 
+\li{success: True}, whether the algorithm converged or not;
 
 \li{x: array([ 0.99999997,  0.99999993])}, the obtained minimizer.
 
-Each of these outputs can be accessed either by indexing \li{OptimizeResult} object like a dictionary (\li{result['nit']}), or as attributes of a class (\li{result.nit}).  
+Each of these outputs can be accessed either by indexing \li{OptimizeResult} object like a dictionary (\li{result['nit']}), or as attributes of a class (\li{result.nit}).
 We recommend access by indexing, as this is consistent with other optimization packages in Python.
 
-The online documenation for \li{scipy.optimize.minimize()} includes other optional parameters available to users, for example, to set a tolerance of convergence. 
-In some methods, the derivative may be optional, while it may be necessary in others. 
+The online documenation for \li{scipy.optimize.minimize()} includes other optional parameters available to users, for example, to set a tolerance of convergence.
+In some methods, the derivative may be optional, while it may be necessary in others.
 While we do not cover all possible parameters in this lab, they should be explored as needed for specific applications.
 
 \begin{problem} % Minimize the Rosenbrock function.
@@ -78,27 +78,27 @@ Use the \li{opt.minimize()} function to find the minimum of the Rosenbrock funct
 Test Nelder-Mead, CG, and BFGS, starting each with the initial guess \li{x_0 = np.array([4., -2.5])}.
 For each method, print whether it converged, and if so, print how many iterations it took.
 
-Note that the hessian argument is not needed for these paticular methods. 
+Note that the hessian argument is not needed for these paticular methods.
 \end{problem}
 
 Each of these three algorithms will be explored in great detail later in Volume 2: Nelder-Mead is a variation of the Simplex algorithm, CG is a variant of the Conjugate Gradient algorithm, and BFGS is a quasi-Newton method developed by Broyden, Fletcher, Goldfarb, and Shanno.
 
-The \li{minimize()} function can use various algorithms, each of which is best for certain problems.  
-Which algorithm one uses depends on the specific nature of one's problem. 
+The \li{minimize()} function can use various algorithms, each of which is best for certain problems.
+Which algorithm one uses depends on the specific nature of one's problem.
 
-It is also important to note that in many optimization applications, very little is known about the function to optimize. 
+It is also important to note that in many optimization applications, very little is known about the function to optimize.
 These functions are often called \emph{blackbox functions}.
-For example, one may be asked in the airline industry to analyze and optimize certain properties involving a segment of airplane wing. 
+For example, one may be asked in the airline industry to analyze and optimize certain properties involving a segment of airplane wing.
 Perhaps expert engineers have designed extremely robust and complicated software to model this wing segment given certain inputs, but this function is so complicated that nobody except the experts dares to try parcing it.
-Briefly said, you simply don't want to understand it; nobody wants to understand it. 
+Briefly said, you simply don't want to understand it; nobody wants to understand it.
 
 Fortunately, one can still optimize effectively in such situations by wisely selecting a correct algorithm.
 However, because so little is known about the blackbox function, one must wisely select an appropriate minimization method and follow the specifications of the problem exactly.
 
 \begin{problem} % Minimize a 'blackbox' function.
-Minimize the \li{blackbox()} function in the \li{blackbox_function} module. 
+Minimize the \li{blackbox()} function in the \li{blackbox_function} module.
 You don't need to know the source code or how it works in order to minimize it.
-Simply select the appropriate method of \li{scipy.optimize.minimize()} for this problem, without passing your method a derivative. 
+Simply select the appropriate method of \li{scipy.optimize.minimize()} for this problem, without passing your method a derivative.
 You may need to test several methods and determine which is most appropriate.
 
 The function \li{blackbox()} returns a certain measure of a piecewise-linear curve between two fixed points: the origin, and the point \li{(40,30)}.
@@ -131,7 +131,7 @@ r = \sqrt{(x+1)^2 + y^2}.
 \]
 Essentially, this is a wavy crater offset from the origin by 1 along the $x$ axis (see Figure \ref{opt:multimin}).
 \begin{figure}
-\includegraphics[width=\textwidth]{ManyMinima.pdf}
+\includegraphics[width=\textwidth]{figures/ManyMinima.pdf}
 \caption{$z = r^2 (1+ 2\sin^2(4r))$}
 \label{opt:multimin}
 \end{figure}
@@ -146,7 +146,7 @@ For example, if we try using the Nelder-Mead method as previously, with an initi
 >>> x0 = np.array([-2, -2])
 >>> res = opt.minimize(multimin, x0, method='Nelder-Mead')
  final_simplex: (array([[-2.11758025, -2.04313668], [-2.11748198, -2.04319043],
-       [-2.11751491, -2.04317242]]), array([ 5.48816866,  
+       [-2.11751491, -2.04317242]]), array([ 5.48816866,
        												5.48816866,  5.48816866]))
            fun: 5.488168656962328
        message: 'Optimization terminated successfully.'
@@ -163,21 +163,21 @@ For example, if we try using the Nelder-Mead method as previously, with an initi
 0.0
 \end{lstlisting}
 
-However, SciPy does have some tools to help us with these problems. 
+However, SciPy does have some tools to help us with these problems.
 Specifically, we can use the \li{opt.basinhopping()} function.
 
 The \li{opt.basinhopping()} function uses the same minimizing algorithms (in fact, you can tell it whatever minimizing algorithm you can pass to \li{opt.minimize()}).
 However, once it settles on a minimum, it hops randomly to a new point in the domain (depending on how we set the ``hopping" distance) that hopefully lies outside of the valley
 or basin belonging to the current local minimum.
-It then searches for the minimum from this new starting point, and if it finds a better minimizer, it repeats the hopping process from this new minimizer. 
-Thus, the \li{opt.basinhopping()} function has multiple chances to escape a local basin and find the correct global minimum. 
+It then searches for the minimum from this new starting point, and if it finds a better minimizer, it repeats the hopping process from this new minimizer.
+Thus, the \li{opt.basinhopping()} function has multiple chances to escape a local basin and find the correct global minimum.
 
 \emph{Only Scipy Version 0.12+ has \li{opt.basinhopping}. In earlier versions, such as 0.11, you won't find it.}
 
 \begin{problem} % Basinhopping
 Explore the documentation for the \li{opt.basinhopping()} function online or via IPython, and use it to find the global minimum of our \li{multimin()} function with \li{x0 = np.array([-2, -2])}.
 Call it using the same \li{Nelder-Mead} algorithm with \li{opt.basinhopping(multimin, x0, stepsize=0.5, minimizer_kwargs=\{'method':'nelder-mead'\})}.
-Try it first with \li{stepsize=0.5} and then with \li{stepsize=0.2}. 
+Try it first with \li{stepsize=0.5} and then with \li{stepsize=0.2}.
 
 Plot the multimin function using the following code:
 \begin{lstlisting}
@@ -192,7 +192,7 @@ ax1.plot_wireframe(X, Y, Z, linewidth=.5, color='c')
 
 Plot the initial point and minima by adapting the following line:
 \begin{lstlisting}
-ax1.scatter(x_value, y_value, z_value)     
+ax1.scatter(x_value, y_value, z_value)
 \end{lstlisting}
 
 Why doesn't the alogrithm find the global minimum with \li{stepsize=0.2}?
@@ -249,7 +249,7 @@ Return the values of $x,y,z$ as an array.
 \end{problem}
 
 As with \li{opt.minimize()}, \li{opt.root()} has more than one algorithm for root finding.
-Here we have used the \li{hybr} method. 
+Here we have used the \li{hybr} method.
 There are also several algorithms for scalar root finding. See the online documentation for more.
 
 \section*{Curve Fitting} % ====================================================
@@ -258,7 +258,7 @@ There are also several algorithms for scalar root finding. See the online docume
 %least squares programming -- but it seems that it's already been done in Volume One
 
 SciPy also has methods for curve fitting wrapped by the \li{opt.curve_fit()} function.
-Just pass it data and a function to be fit. 
+Just pass it data and a function to be fit.
 The function should take in the independent variable as its first argument and values for the fitting parameters as subsequent arguments.
 Examine the following example from the online documentation.
 \begin{lstlisting}
@@ -280,32 +280,32 @@ Examine the following example from the online documentation.
 The variable \li{popt} now contains the fitted parameters and \li{pcov} gives the covariance of the fit.
 See Figure \ref{opt:curve_fit} for a plot of the data and the fitted curve.
 
-One of the most fundamental phenomena in the physical and engineering sciences is turbulent convection, wherein an unstable density gradient induces a fluid to move chaotically (basically, hot air rises).  
-This problem is so important that experiments and numerical simulations have been pushed to their limits in the past several decades to determine the qualitative nature of the fluid's motion under an extreme forcing (think of boiling a pot of water, but instead at temperatures akin to the interior of the sun).  
-The strength of the forcing (amount of the enforced temperature gradient) is measured by the non-dimensional Rayleigh number $R$.  
-Of paticular interest is to determine how well the chaotic turbulent flow transports the heat from the hot bottom to the cold top, as measured by the Nusselt number $\nu$.  
+One of the most fundamental phenomena in the physical and engineering sciences is turbulent convection, wherein an unstable density gradient induces a fluid to move chaotically (basically, hot air rises).
+This problem is so important that experiments and numerical simulations have been pushed to their limits in the past several decades to determine the qualitative nature of the fluid's motion under an extreme forcing (think of boiling a pot of water, but instead at temperatures akin to the interior of the sun).
+The strength of the forcing (amount of the enforced temperature gradient) is measured by the non-dimensional Rayleigh number $R$.
+Of paticular interest is to determine how well the chaotic turbulent flow transports the heat from the hot bottom to the cold top, as measured by the Nusselt number $\nu$.
 One of the primary goals of experiments, simulations, and analysis is to determine how the Nusselt number $\nu$ depends on the Rayleigh number $R$, i.e. if the bottom of the pot of water is heated more strongly, how much faster does the boiling water transport heat to the top?
 
-It is often generically believed that the Nusselt number obeys a power law of the form $\nu = cR^\beta$, where $\beta \le 1/2$.  
+It is often generically believed that the Nusselt number obeys a power law of the form $\nu = cR^\beta$, where $\beta \le 1/2$.
 Through some mild assumptions on the temperature, we can construct an eigenvalue problem that we solve numerically for a variety of Rayleigh numbers, thus obtaining an upper bound on the Nusselt number as $\nu \le cR^\beta$.  With our physical specifications of the problem, we may predict $\beta < 1/2$.
 
 \begin{figure}
-\includegraphics[width=\textwidth]{curve_fit.pdf}
+\includegraphics[width=\textwidth]{figures/curve_fit.pdf}
 \caption{Example of perturbed data graphed with the resulting curve using the fitted parameters: $a=2.72$,  $b=1.31$, and $c=0.45$.}
 \label{opt:curve_fit}
 \end{figure}
 
 \begin{problem} % Convection curve fitting.
 Use \li{opt.curve_fit()} to fit a curve to data obtained from numerical simulations of convection.
-The data are in the file \li{convection.npy}. 
+The data are in the file \li{convection.npy}.
 The first column is $R$, the Rayleigh number, and the second column is $\nu$, the Nusselt number.
-With the convection equation 
+With the convection equation
 \[
 \nu = cR^\beta,
 \]
-use \li{opt.curve_fit()} to find a fit to the data using $c$ and $\beta$ as the fitting parameters. 
+use \li{opt.curve_fit()} to find a fit to the data using $c$ and $\beta$ as the fitting parameters.
 See Figure \ref{opt:ConvectionFit} for a plot of the data along with a fitted curve.
-Though it may be difficult to see in the figure, the first four points skew the data, and do not help us determine the appropriate long-term values of $c$ and $\beta$. 
+Though it may be difficult to see in the figure, the first four points skew the data, and do not help us determine the appropriate long-term values of $c$ and $\beta$.
 Thus, do not use the first four points when fitting a curve to the data, but include them in the plot.
 
 Just so that you know that you are getting realistic values, $c$ should be around $.1$, and $\beta$ should be less than $1/2$.
@@ -313,10 +313,10 @@ Return your values for $c$ and $\beta$ in a NumPy array of length 2.
 \end{problem}
 
 \begin{figure}
-\includegraphics[width=\textwidth]{ConvectionFit.pdf}
+\includegraphics[width=\textwidth]{figures/ConvectionFit.pdf}
 \caption{The black points are the data from \li{convection.npy} plotted as a scatter plot. The blue line is a fitted curve.}
 \label{opt:ConvectionFit}
 \end{figure}
 
-The \li{scipy.optimize} package has many other useful functions, and is a good first resource when confronting a numerical optimization problem. 
+The \li{scipy.optimize} package has many other useful functions, and is a good first resource when confronting a numerical optimization problem.
 See the online documentation for further details.

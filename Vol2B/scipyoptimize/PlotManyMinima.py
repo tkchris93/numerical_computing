@@ -33,5 +33,5 @@ def plot():
 
 	plt.axis('tight')
 	plt.show()
-	#plt.savefig("ManyMinima.pdf",format='pdf')
+	#plt.savefig("figures/ManyMinima.pdf",format='pdf')
 	return 1;

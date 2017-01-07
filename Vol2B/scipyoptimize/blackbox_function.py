@@ -24,5 +24,5 @@ def blackbox(y_free):
     y = np.hstack((0,y_free, b))
 
     # Calculate and return the line integral of the approximated curve.
-    return sum([la.norm(np.array([x[i+1]-x[i],y[i+1]]))
-                                            for i,item in enumerate(y[:-1])])
+    return sum([la.norm(np.array([x[i+1]-x[i],y[i+1]-y[i]]))
+                                                for i in xrange(len(y[:-1]))])

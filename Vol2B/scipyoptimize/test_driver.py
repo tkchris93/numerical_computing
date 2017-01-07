@@ -1,13 +1,13 @@
-# solutions.py
+# test_driver.py
 """Volume 2B: Optimization with SciPy. Test Driver."""
 
 import sys
 sys.path.insert(0, "../..")
-from base_test_driver import BaseTestDriver, _autoclose
+from base_test_driver import BaseTestDriver, _timeout, _autoclose
 
 import numpy as np
-from scipy import optimize as opt
-from matplotlib import pyplot as plt
+
+from solutions import *
 
 
 class TestDriver(BaseTestDriver):
@@ -26,42 +26,53 @@ class TestDriver(BaseTestDriver):
         """Initialize attributes."""
         BaseTestDriver.__init__(self)
         # self._feedback_newlines = True
-        self.problems = [   (self.problem1, "Problem 1", 10),
-                            (self.problem2, "Problem 2", 10),
+        self.problems = [   (self.problem1, "Problem 1",  5),
+                            (self.problem2, "Problem 2",  5),
                             (self.problem3, "Problem 3", 10),
-                            (self.problem4, "Problem 4", 10)  ]
+                            (self.problem4, "Problem 4", 10),
+                            (self.problem5, "Problem 5", 10)    ]
 
     # Problems ----------------------------------------------------------------
     def problem1(self, s):
-        """Test Problem 1. 10 points."""
+        """Test prob1(). 5 points."""
 
-        print("Student Response:")
+        print("Correct Response:".format(' -'*10))
+        prob1()
+        print("\nStudent Response:".format(' -'*10))
         s.prob1()
-        print("""\nCorrect Response:
-            The Powell algorithm takes the least number of iterations (19).
-            COBYLA fails to find the correct minimum.
-            """)
 
-        print("Least number of iterations\t"),
-        points = self._grade(5, "Incorrect for which method takes least iters")
-        print("The algorithms that fail\t"),
-        points += self._grade(5, "Incorrect for which fails to find the min")
+        return self._grade(5, "prob1() incorrect")
 
-        return points
-
+    @_autoclose
     def problem2(self, s):
-        """Test Problem 2. 10 points."""
-
-        points = 5*self._eqTest(prob2(verbose=False), s.prob2(),
-                                        "Incorrect minimum function value.")
-        print("""\nCorrect Response:
-            .2 is too small a stepsize to escape the basin of a local min.
+        """Test prob2(). 5 points."""
+        s.prob2()
+        print("""\nSpecifications:
+            1. One line is jagged (the initial guess)           (2 points)
+            3. The other line is straight (the minimizer)       (3 points)
             """)
-        points += self._grade(5, "Incorrect reason why stepsize=0.2 fails")
+        return self._grade(5, "prob2() incorrect")
+
+    @_autoclose
+    def problem3(self, s):
+        """Test prob3() (basin hopping). 10 points."""
+
+        print("\nCorrect Response:")
+        print(".2 is too small a stepsize to escape the basin of a local min.")
+        print("\nStudent Response:{}\n".format(' -'*10))
+        points = 3*self._eqTest(prob3(grading=True), s.prob3(),
+                                        "Incorrect minimum function value.")
+        points += self._grade(2, "Incorrect reason why stepsize=0.2 fails")
+        print("""\nSpecifications:
+            1. 3-d wireframe plot
+            2. Two different minima
+            """)
+        points += self._grade(5, "Incorrect plot")
 
         return points
 
-    def problem3(self, s):
+    @_timeout(2)
+    def problem4(self, s):
         """Test Problem 3. 10 points."""
 
         def f(X):
@@ -70,21 +81,23 @@ class TestDriver(BaseTestDriver):
             return np.array([   -x + y + z,
                                 1 + x**3 -y**2 + z**3,
                                 -2 -x**2 + y**2 + z**2  ])
-        ans = s.prob3()
-        if ans is None:
-            self.feedback += "\nFailed to return a value."
-            return 0
-        return 10*self._eqTest(np.zeros(3), f(ans),
+        ans = s.prob4()
+        return 10 * self._eqTest(np.zeros(3), f(ans),
                                 "Returned value is not a root of the system"
                                 "\n(check by computing f(result), as below)")
 
     @_autoclose
-    def problem4(self, s):
-        """Test Problem 4. 10 points."""
+    def problem5(self, s):
+        """Test prob5(). 10 points."""
 
-        points  = 5*self._eqTest(prob4(display=False), s.prob4(),
-                                                    "Incorrect return values")
-        points += self._grade(5, "Incorrect figure")
+        points = 5*self._eqTest(prob5(grading=True), s.prob5(),
+                                                    "Incorrect fit parameters")
+        print("""\nSpecifications:
+              1. Data and curve plotted together            (2 points)
+              2. Curve matches data, especially toward
+                    the right end of the domain.            (3 points)
+              """)
+        points += self._grade(5, "Incorrect plot")
         return points
 
 # Main Routine ================================================================
