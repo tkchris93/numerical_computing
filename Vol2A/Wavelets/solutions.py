@@ -1,5 +1,5 @@
 # solutions.py
-"""Volume 2A: Wavelets. Solutions file."""
+"""Volume 2A: Wavelets. Solutions File."""
 
 import numpy as np
 from scipy.misc import imread

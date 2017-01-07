@@ -1,5 +1,5 @@
 # solutions.py
-"""Volume 1B: Newton's Method. Solutions file."""
+"""Volume 1B: Newton's Method. Solutions File."""
 
 import numpy as np
 from matplotlib import pyplot as plt

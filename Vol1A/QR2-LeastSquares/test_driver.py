@@ -1,5 +1,5 @@
 # test_driver.py
-"""Volume 1A: QR 2 (Least Squares and Computing Eigenvalues). Test driver."""
+"""Volume 1A: QR 2 (Least Squares and Computing Eigenvalues). Test Driver."""
 
 import sys
 sys.path.insert(0, "../..")

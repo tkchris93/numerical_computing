@@ -1,5 +1,5 @@
 # solutions.py
-"""Volume 2B: Optimization with SciPy. Test driver."""
+"""Volume 2B: Optimization with SciPy. Test Driver."""
 
 import sys
 sys.path.insert(0, "../..")

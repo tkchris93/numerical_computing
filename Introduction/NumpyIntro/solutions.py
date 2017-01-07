@@ -1,5 +1,5 @@
 # solutions.py
-"""Introductory Labs: Intro to NumPy. Solutions file."""
+"""Introductory Labs: Intro to NumPy. Solutions File."""
 
 import numpy as np
 

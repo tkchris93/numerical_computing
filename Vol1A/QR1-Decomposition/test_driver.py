@@ -1,5 +1,5 @@
 # test_driver.py
-"""Volume 1A: QR 1 (Decomposition). Test driver."""
+"""Volume 1A: QR 1 (Decomposition). Test Driver."""
 
 import sys
 sys.path.insert(0, "../..")

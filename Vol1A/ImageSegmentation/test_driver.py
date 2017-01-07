@@ -1,5 +1,5 @@
 # test_driver.py
-"""Vol1A: Image Segmentation. Test driver."""
+"""Vol1A: Image Segmentation. Test Driver."""
 
 import sys
 sys.path.insert(0, "../..")

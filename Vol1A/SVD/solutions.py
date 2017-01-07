@@ -1,5 +1,5 @@
 # solutions.py
-"""Volume 1A: SVD and Image Compression. Solutions file."""
+"""Volume 1A: SVD and Image Compression. Solutions File."""
 
 # solutions.py
 from scipy import linalg as la

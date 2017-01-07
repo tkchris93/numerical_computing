@@ -1,5 +1,5 @@
 # solutions.py
-"""Introductory Labs: Getting Started. Solutions file.
+"""Introductory Labs: Getting Started. Solutions File.
 NOTE: For this Introductory lab, we recommend NOT providing a specifications
 file so that they have to define the functions themselves.
 """

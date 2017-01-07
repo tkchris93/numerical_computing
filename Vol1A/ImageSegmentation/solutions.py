@@ -1,5 +1,5 @@
 # solutions.py
-"""Volume 1A: Image Segmentation. Solutions file."""
+"""Volume 1A: Image Segmentation. Solutions File."""
 
 # Remember to include all necessary imports here
 import numpy as np

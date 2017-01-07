@@ -1,5 +1,6 @@
 # solutions.py
-"""Volume 1A: QR 2 (Least Squares and Computing Eigenvalues).Solutions file."""
+"""Volume 1A: QR 2 (Least Squares and Computing Eigenvalues). Solutions File.
+"""
 
 import numpy as np
 from cmath import sqrt

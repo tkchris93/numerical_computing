@@ -1,6 +1,5 @@
 # solutions.py
-"""Volume 2A: Fouier I (Discrete Fourier Transform). Solutions file."""
-
+"""Volume 2A: Fouier 1 (Discrete Fourier Transform). Solutions File."""
 
 import scipy as sp
 from scipy.io import wavfile

@@ -1,5 +1,5 @@
 # solutions.py
-"""Volume 1A: QR 1 (Decomposition). Solutions file."""
+"""Volume 1A: QR 1 (Decomposition). Solutions File."""
 
 import numpy as np
 from scipy import linalg as la

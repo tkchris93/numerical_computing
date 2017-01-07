@@ -1,5 +1,5 @@
 # solutions.py
-"""Volume I: Complex Integration. Solutions file."""
+"""Volume I: Complex Integration. Solutions File."""
 
 import numpy as np
 from sympy import mpmath as mp
@@ -12,13 +12,13 @@ def singular_surface_plot(f, x_bounds=(-1.,1), y_bounds=(-1.,1.), res=500, thres
     y = np.linspace(y_bounds[0], y_bounds[1], res)
     X, Y = np.meshgrid(x, y, copy=False)
     Z = f(X + 1.0j * Y)
-    
+
     Z = np.absolute(Z)
     Z[(threshold+lip>Z)&(Z>threshold)] = threshold
     Z[(-threshold-lip<Z)&(Z<-threshold)] = -threshold
     Z[np.absolute(Z) >= threshold + lip] = np.nan
-    
-    
+
+
     fig = plt.figure()
     ax = fig.gca(projection='3d')
     surf = ax.plot_surface(X, Y, Z, cmap="coolwarm")

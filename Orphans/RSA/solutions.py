@@ -1,18 +1,16 @@
 # solutions.py
-"""Volume II Lab 3: Public Key Encryption (RSA)
-Solutions file. Written by Shane A. McQuarrie.
-"""
+"""Public Key Encryption (RSA). Solutions file."""
 
 # Students will implement the Extended Euclidean Algorithm as part of a
 # homework exercise, and they should use it to complete problem 1.
 # This is one possible implementation.
 def eea(a, b):
     """The Extended Euclidean Algorithm.
-    
+
     Inputs:
         a (int)
         b (int)
-    
+
     Returns:
         gcd (int), c (int), d (int) such that gcd = ac + bd.
     """
@@ -53,14 +51,14 @@ def string_to_int(msg):
     """Convert the string 'msg' to an integer.
     This function is the inverse of int_to_string().
     """
-    # bytearray will give us the ASCII values for each character 
+    # bytearray will give us the ASCII values for each character
     if not isinstance(msg, bytearray):
         msg = bytearray(msg)
     binmsg = []
     # convert each character to binary
     for c in msg:
         binmsg.append(bin(c)[2:].zfill(8))
-    return int(''.join(binmsg), 2) 
+    return int(''.join(binmsg), 2)
 
 def int_to_string(msg):
     """Convert the integer 'msg' to a string.
@@ -88,22 +86,22 @@ from Crypto.PublicKey import RSA
 class myRSA(object):
     """RSA String Encryption System. Do not use any external modules except for
     'rsa_tools' and your implementation of the Extended Euclidean Algorithm.
-    
+
     Attributes:
         public_key (tup): the RSA key that is available to everyonem, of the
             form (e, n). Used only in encryption.
         _private_key (tup, hidden): the secret RSA key, of the form (d, n).
             Used only in decryption.
-    
+
     Examples:
         >>> r = myRSA()
         >>> r.generate_keys(1000003,608609,1234567891)
         >>> print(r.public_key)
         (1234567891, 608610825827)
-        
+
         >>> r.decrypt(r.encrypt("SECRET MESSAGE"))
         'SECRET MESSAGE'
-        
+
         >>> s = myRSA()
         >>> s.generate_keys(287117,104729,610639)
         >>> s.decrypt(r.encrypt("SECRET MESSAGE",s.public_key))
@@ -114,15 +112,15 @@ class myRSA(object):
         self.public_key = None
         self._private_key = None
         # Or self.generate_keys() here, if you provide default values.
-    
+
     def generate_keys(self, p, q, e):
         """Create a pair of RSA keys.
-        
+
         Inputs:
             p (int): A large prime.
             q (int): A second large prime .
-            e (int): The encryption exponent. 
-        
+            e (int): The encryption exponent.
+
         Returns:
             Set the public_key and _private_key attributes.
         """
@@ -133,15 +131,15 @@ class myRSA(object):
             raise ValueError("e and phi(n) not relatively prime")
         d = d[1]
         d %= phi_n
-        
+
         self.public_key = (e,n)                 # Set key attributes
         self._private_key = (d,n)
-    
+
     def encrypt(self, message, key=None):
         """Encrypt 'message' with a public key and return its encryption as a
         list of integers. If no key is provided, use the 'public_key' attribute
         to encrypt the message.
-        
+
         Inputs:
             message (str): the message to be encrypted.
             key (int tup, opt): the public key to be used in the encryption.
@@ -157,7 +155,7 @@ class myRSA(object):
         for i in numbers:                       # Encrypt the numbers
             ciphertext.append(pow(i,key[0],key[1]))
         return ciphertext
-    
+
     def decrypt(self, ciphertext):
         """Decrypt 'ciphertext' with the private key and return its decryption
         as a single string. You may assume that the format of 'ciphertext' is
@@ -185,39 +183,39 @@ def test_myRSA(message, p, q, e):
     'e'. Encrypt the message, then decrypt the encryption. If the decryption
     is not exactly the same as the original message, raise a ValueError with
     error message "decrypt(encrypt(message)) failed."
-    
+
     If 'message' is not a string, raise a TypeError with error message
     "message must be a string."
-    
+
     If any of p, q, or e are not integers, raise a TypeError with error
     message "p, q, and e must be integers."
-    
+
     Inputs:
         message (str): a message to be encrypted and decrypted.
         p (int): A large prime for key generation.
         q (int): A second large prime for key generation.
         e (int): The encryption exponent.
-        
+
     Returns:
         True if no exception is raised.
     """
     # Input validation 1
     if type(message) != str:
         raise TypeError("message must be a string.")
-    
+
     # Input validation 2
     if type(p) != int or type(q) != int or type(e) != int:
         raise TypeError("p, q, and e must be integers.")
-    
+
     # Test myRSA
     r = myRSA()
     r.generate_keys(p,q,e)
     if message != r.decrypt(r.encrypt(message)):
         raise ValueError("decrypt(encrypt(message)) failed.")
-    
+
     # return True if no exception has been raised.
     return True
-    
+
     # Or, a slightly longer way,
     ciphertext = r.encrypt(message)
     new_message = r.decrypt(ciphertext)
@@ -232,14 +230,14 @@ def is_prime(n):
     [2, n-1] as possible witnesses. If a witness number is found, return the
     number of tries it took to find the witness. If no witness number is found
     after five tries, return 0.
-    
+
     Inputs:
         n (int): the candidate for primality.
-    
+
     Returns:
         The number of tries it took to find a witness number, up to 5
         (or 0 if no witnesses were found).
-    
+
     """
     for i in range(5):          # Try at most 5 times
         a = randint(2,n)            # pick a random witness
@@ -252,39 +250,39 @@ def is_prime(n):
 class PyCrypto(object):
     """RSA String Encryption System. Do not use any external modules except for
     those found in the 'Crypto' package.
-    
+
     Attributes:
         _keypair (RSA obj, hidden): the RSA key (both public and private).
             Facilitates encrypt() and decrypt().
         public_key (str): A sharable string representation of the public key.
-    
+
     Examples:
-        
+
         >>> p = PyCrypto()
         >>> p.decrypt(p.encrypt("SECRET MESSAGE"))
         'SECRET MESSAGE'
-        
+
         >>> print(p.public_key)
         -----BEGIN PUBLIC KEY-----
         MIIBIjANBgkqhkiG9w0BAQ...
         ...
         ...HwIDAQAB
         -----END PUBLIC KEY-----
-        
+
         >>> q = PyCrypto()
         >>> q.decrypt(p.encrypt("SECRET MESSAGE",q.public_key))
         'SECRET MESSAGE'
-    
+
     """
     def __init__(self):
         """Initialize the _keypair and public_key attributes."""
         self._keypair = RSA.generate(2048)
         self.public_key = self._keypair.publickey().exportKey()
-    
+
     def encrypt(self, message, key=None):
         """Encrypt 'message' with a public key and return its encryption. If
         no key is provided, use the '_keypair' attribute to encrypt 'message'.
-        
+
         Inputs:
             message (str): the message to be encrypted.
             key (str, opt): the string representation of the public key to be
@@ -295,7 +293,7 @@ class PyCrypto(object):
             return self._keypair.encrypt(message, 2048)
         else:
             return RSA.importKey(key).encrypt(message, 2048)
-    
+
     def decrypt(self, ciphertext):
         """Decrypt 'ciphertext' with '_keypair' and return the decryption."""
         return self._keypair.decrypt(ciphertext)
@@ -325,21 +323,21 @@ def prime(n):
 # Test script
 def test(student_module, late=False):
     """Test script. You must import the student's solutions file as a module.
-    
+
     20 points for problem 1
     10 points for problem 2
     10 points for problem 3
     10 points for problem 4
-    
+
     Inputs:
         student_module: the imported module for the student's solutions file.
         late (bool): if True, half credit is awarded.
-    
+
     Returns:
         score (int): the student's score, out of 50.
         feedback (str): a printout of test results for the student.
     """
-    
+
     def crypt(o,p,message):
         """Test encrypt() and decrypt(). Return 1 on success, 0 else."""
         new_message = o.decrypt(p.encrypt(message,o.public_key))
@@ -351,7 +349,7 @@ def test(student_module, late=False):
                 error += "\n\tq.decrypt(p.encrypt(message,q.public_key)):\n\t\t"
             error += new_message
             return 0, error
-    
+
     def primality(n):
         """Call the student's is_prime() function 10 times on 'n'."""
         total = 0
@@ -359,7 +357,7 @@ def test(student_module, late=False):
             total += s.is_prime(n)
             if total > 0: break
         return total
-    
+
     def strTest(p, m):
         """Manually grade a problem worth 'p' points and failure message 'm'."""
         part = -1
@@ -367,12 +365,12 @@ def test(student_module, late=False):
             part = int(input("\nScore out of " + str(p) + ": "))
         if part == p: return p, ""
         else: return part, m
-        
+
     s = student_module
     score = 0
     total = 50
     feedback = ""
-    
+
     try:    # Problem 1: 20 points
         feedback += "\n\nProblem 1 (20 points):"
         points = 0
@@ -420,10 +418,10 @@ def test(student_module, late=False):
         print(r2.encrypt("test message"))
         p,f = strTest(1,"\n\tmyRSA.encrypt() must encrypt the message!")
         points *= p; feedback += f
-        
+
         score += points; feedback += "\n  Score += " + str(points)
     except Exception as e: feedback += "\nError: " + e.message
-    
+
     try:    # Problem 2: 10 points
         feedback += "\n\nProblem 2 (10 points):"
         points = 0
@@ -460,10 +458,10 @@ def test(student_module, late=False):
             points += 2
         except ValueError as e:
             feedback += "\n\t" + e.message + "(message = 'secret')"
-        
+
         score += points; feedback += "\n  Score += " + str(points)
     except Exception as e: feedback += "\nError: " + e.message
-    
+
     try:    # Problem 3: 10 points
         feedback += "\n\nProblem 3 (10 points):"
         points = 0
@@ -492,10 +490,10 @@ def test(student_module, late=False):
         else: feedback += nonprime + "1643)"
         if primality(340561) > 0: points += 1
         else: feedback += nonprime + "340561)"
-        
+
         score += points; feedback += "\n  Score += " + str(points)
     except Exception as e: feedback += "\nError: " + e.message
-    
+
     try:    # Problem 4: 10 points
         feedback += "\n\nProblem 4 (10 points):"
         points = 0
@@ -530,16 +528,16 @@ def test(student_module, late=False):
         print(r2.encrypt("test message"))
         p,f = strTest(1,"\n\tPyCrypto.encrypt() must encrypt the message!")
         points *= p; feedback += f
-        
+
         score += points; feedback += "\n  Score += " + str(points)
     except Exception as e: feedback += "\nError: " + e.message
-    
+
     # Late submission penalty
     if late:
         feedback += "\n\nHalf credit for late submission."
         feedback += "\nRaw score: " + str(score) + "/" + str(total)
         score *= .5
-    
+
     # Report final score.
     feedback += "\n\nTotal score: " + str(score) + "/" + str(total)
     percentage = (100.0 * score) / total

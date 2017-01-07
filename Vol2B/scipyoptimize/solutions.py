@@ -1,5 +1,5 @@
 # solutions.py
-"""Volume 2: Optimization Packages I (scipy.optimize) solutions file."""
+"""Volume 2B: Optimization with SciPy. Solutions File."""
 
 import scipy.optimize as opt
 import numpy as np
@@ -16,8 +16,8 @@ def prob1():
         CG
         BFGS
     Use x0 = np.array([4., -2.5]) for the initial guess for each test.
-    
-    For each method, print whether it converged, and if so, print how many 
+
+    For each method, print whether it converged, and if so, print how many
         iterations it took.
     """
     # Set up the initial guess.
@@ -38,30 +38,30 @@ def prob1():
 
 # Problem 2: Minizize an unknown "blackbox" function.
 def prob2():
-    """Minimize the function blackbox() in the blackbox_function module, 
+    """Minimize the function blackbox() in the blackbox_function module,
     selecting the appropriate method of scipy.optimize.minimize() for this
-    problem.  Do not pass your method a derivative. You may need to test 
+    problem.  Do not pass your method a derivative. You may need to test
     several methods and determine which is most appropriate.
 
     The blackbox() function returns the length of a piecewise-linear curve
-    between two fixed points: the origin, and the point (40,30). 
+    between two fixed points: the origin, and the point (40,30).
     It accepts a one-dimensional ndarray} of length m of y-values, where m
     is the number of points of the piecewise curve excluding endpoints.
-    These points are spaced evenly along the x-axis, so only the y-values 
+    These points are spaced evenly along the x-axis, so only the y-values
     of each point are passed into blackbox().
 
-    Once you have selected a method, select an initial point with the 
+    Once you have selected a method, select an initial point with the
     provided code.
 
     Then plot your initial curve and minimizing curve together on the same
-    plot, including endpoints. Note that this will require padding your 
-    array of internal y-values with the y-values of the endpoints, so 
+    plot, including endpoints. Note that this will require padding your
+    array of internal y-values with the y-values of the endpoints, so
     that you plot a total of 20 points for each curve.
 
-    SOLUTIONS NOTE: This solutions file uses method="BFGS", but 
-    method="Powell" also returns the correct answer, which is a straight 
-    line connecting the origin and the point (40,30). 
-        Students may attempt to minimize using method="Nelder-Mead", as 
+    SOLUTIONS NOTE: This solutions file uses method="BFGS", but
+    method="Powell" also returns the correct answer, which is a straight
+    line connecting the origin and the point (40,30).
+        Students may attempt to minimize using method="Nelder-Mead", as
     this also does not use a derivative. However, this does not return
     the optimal solution.
     """
@@ -74,14 +74,14 @@ def prob2():
     plt.plot(x, yplot, '.-r', markersize=10)
 
     # Minimize the blackbox() function using method="BFGS".
-    result = opt.minimize(blackbox, y_initial, tol=1e-4, method="BFGS") 
+    result = opt.minimize(blackbox, y_initial, tol=1e-4, method="BFGS")
     if not result['success']:
         raise RuntimeError("didn't converge")
 
     ypost = np.hstack((0,result['x'],30))
     plt.plot(x, ypost, '.-b', markersize=10)
     plt.show()
-    # The solution should plot the Batman symbol. 
+    # The solution should plot the Batman symbol.
     # Run blackbox_Batman.py to see original.
 
 prob2()
@@ -92,7 +92,7 @@ def prob3():
     online or via IPython. Use it to find the global minimum of the multmin()
     function given in the lab, with initial point x0 = np.array([-2, -2]) and
     the Nelder-Mead algorithm. Try it first with stepsize=0.5, then with
-    stepsize=0.2. 
+    stepsize=0.2.
 
     Plot the multimin function and minima found using the code provided.
     Print statements answering the following questions:
@@ -109,7 +109,7 @@ def prob3():
     small_step = .2
     large_step = .5
 
-    # Optimize using variations on Nelder-Mead.  NOTE: Here, each has been stored 
+    # Optimize using variations on Nelder-Mead.  NOTE: Here, each has been stored
     # seperately for ease of plotting differently colored minimums.
     small = opt.basinhopping(multimin, x0, stepsize=small_step,
                             minimizer_kwargs={'method':'nelder-mead'})
@@ -117,9 +117,9 @@ def prob3():
                             minimizer_kwargs={'method':'nelder-mead'})
 
     # Print the results.
-    print("Stepsize:\t{}\nMinimum:\t{}\nX-Values:\t{}\n".format(small_step, 
+    print("Stepsize:\t{}\nMinimum:\t{}\nX-Values:\t{}\n".format(small_step,
                                                      small['fun'], small['x']))
-    print("Stepsize:\t{}\nMinimum:\t{}\nX-Values:\t{}\n".format(large_step, 
+    print("Stepsize:\t{}\nMinimum:\t{}\nX-Values:\t{}\n".format(large_step,
                                                      large['fun'], large['x']))
 
     # Plot the multimin graph. Here, the points are colored differently for emphasis.
@@ -176,8 +176,8 @@ def prob4():
 # Problem 5: learn and use scipy.optimize.curve_fit().
 def prob5():
     """Use the scipy.optimize.curve_fit() function to fit a curve to
-    the data found in `convection.npy`. The first column of this file is R, 
-    the Rayleigh number, and the second column is Nu, the Nusselt number. 
+    the data found in `convection.npy`. The first column of this file is R,
+    the Rayleigh number, and the second column is Nu, the Nusselt number.
 
     The fitting parameters should be c and beta, as given in the convection
     equations.

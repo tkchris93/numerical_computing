@@ -1,5 +1,5 @@
 # solutions.py
-"""Volume 2A: Breadth-First Search (Kevin Bacon). Solutions file."""
+"""Volume 2A: Breadth-First Search (Kevin Bacon). Solutions File."""
 
 from collections import deque
 import networkx as nx

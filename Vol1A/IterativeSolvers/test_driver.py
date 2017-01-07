@@ -1,5 +1,5 @@
 # test_driver.py
-"""Volume 1A: Iterative Solvers. Test driver."""
+"""Volume 1A: Iterative Solvers. Test Driver."""
 
 import sys
 sys.path.insert(0, "../..")

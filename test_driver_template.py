@@ -2,7 +2,7 @@
 """For new test drivers, copy the following template class.
 
 Test driver files should be named test_driver.py and placed in the folder with
-the solutions file. See base_test_driver.py for more information.
+the corresponding solutions file. See base_test_driver.py for more information.
 """
 
 # import sys

@@ -1,5 +1,5 @@
 # solutions.py
-"""Volume 1B: Monte Carlo Integration. Solutions file."""
+"""Volume 1B: Monte Carlo Integration. Solutions File."""
 
 import numpy as np
 import scipy.stats as stats

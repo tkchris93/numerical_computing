@@ -1,5 +1,5 @@
 # solutions.py
-"""Volume II Lab 5: Data Structures II (Trees). Solutions file."""
+"""Volume 2A: Data Structures 2 (Trees). Solutions File."""
 
 from matplotlib import pyplot as plt
 from time import time

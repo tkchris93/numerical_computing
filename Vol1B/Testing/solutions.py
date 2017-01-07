@@ -1,5 +1,5 @@
 # solutions.py
-"""Volume IB: Testing. Solutions file (for specs.py)."""
+"""Volume IB: Testing. Solutions File (for specs.py)."""
 
 import math
 

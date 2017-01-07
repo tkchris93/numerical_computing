@@ -1,5 +1,5 @@
 # solutions.py
-"""Volume 1B: Differentiation. Solutions file."""
+"""Volume 1B: Differentiation. Solutions File."""
 
 
 import numpy as np

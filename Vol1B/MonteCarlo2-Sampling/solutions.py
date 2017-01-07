@@ -1,5 +1,5 @@
 # solutions.py
-"""Volume 1B: Monte Carlo 2 (Importance Sampling). Solutions file."""
+"""Volume 1B: Monte Carlo 2 (Importance Sampling). Solutions File."""
 
 from __future__ import division
 import matplotlib.pyplot as plt

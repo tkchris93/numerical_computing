@@ -1,5 +1,5 @@
 # test_driver.py
-"""Introductory Labs: Intro to Matplotlib. Test driver."""
+"""Introductory Labs: Intro to Matplotlib. Test Driver."""
 
 import sys
 sys.path.insert(0, "../..")

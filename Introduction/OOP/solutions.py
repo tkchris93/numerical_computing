@@ -1,5 +1,5 @@
 # solutions.py
-"""Introductory Labs: Object Oriented Programming. Solutions file."""
+"""Introductory Labs: Object Oriented Programming. Solutions File."""
 
 from math import sqrt
 
