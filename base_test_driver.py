@@ -7,7 +7,7 @@ on the corresponding solutions.py file so that student submissions are tested
 directly against the solutions when possible, but in some cases the test
 driver may be independent from the solutions file.
 
-test() function and test driver classes ---------------------------------------
+Test driver classes -----------------------------------------------------------
 
 This file includes a base test driver class (BaseTestDriver) that all other
 test drivers should inherit from, as it contains methods that are common to
@@ -23,9 +23,9 @@ each problem and collect feedback, but each problem can be graded individually
 via the different problemX() methods. This allows the instructor to grade from
 IPython, or to automate grading using Git.
 
-See the TestDriver class and the test() function below as a template for new
-drivers. Customize the docstrings of the test() function and the test driver
-class to give specific instructions about how the lab is to be graded.
+See test_driver_template.py for a template for new drivers. Customize the
+docstrings of the test() function and the test driver class to give specific
+instructions about how the lab is to be graded.
 
 Decorators --------------------------------------------------------------------
 
@@ -38,12 +38,6 @@ The @_timeout tag prevents a function from running for longer than a
 specificied number of seconds. Be careful not to use this wrapper in
 conjunction with _testDriver._grade() or another pausing command that waits
 for the grader's response. NOTE: this decorator only works on Unix machines.
-
-Testing -----------------------------------------------------------------------
-
-To validate the test driver, make sure that the solutions file passes with full
-points. The if __name__ == '__main__' clause imports the solutions file and
-grades it.
 """
 
 import signal
@@ -106,8 +100,8 @@ class BaseTestDriver(object):
     """Base Class for Foundations of Applied Mathematics student test drivers.
 
     Attributes:
-        score (int, float): the student's current score.
         feedback (str): a feedback string for the student.
+        total (int): the possible number of points for the assignment.
         problems (list): a list of tuples (func, label, value) with
             func (function): a function for testing a single problem. Should
                 accept as input the imported student module.
@@ -118,18 +112,18 @@ class BaseTestDriver(object):
         _feedback_newlines (bool): If False, feedback appears as follows:
 
             <message>
-                Correst Response: <correct>
+                Correct Response: <correct>
                 Student Response: <student>
 
             If True, feedback appears as follows:
 
             <message>
-                Correst Response:
+                Correct Response:
             <correct>
                 Student Response:
             <student>
 
-            Set to true for lengthy feedback, such as NumPy arrays.
+            Set to true for lengthy answers, such as NumPy arrays.
 
     Main Methods:
         __init__(): Initialize all attributes. Must be overwritten by inherited
@@ -169,10 +163,10 @@ class BaseTestDriver(object):
         then set the problems attribute so that it includes these methods.
 
         For example, if the lab has two problems, the first worth 5 points and
-        the second worth 15 points, set
+        the second worth 35 points, set
 
         self.problems = [(self.problem1, "Problem 1",  5),
-                         (self.problem2, "Problem 2", 15)]
+                         (self.problem2, "Problem 2", 35)]
 
         in the constructor, and define the following methods:
 
@@ -183,33 +177,53 @@ class BaseTestDriver(object):
             return points
 
         def problem2(self, s):
-            points = 0
-            # Test the second problem, out of 15 possible points.
-            return points
+            # Test the second problem, out of 35 possible points. For example,
+            return self._grade(35, "Problem 2 failed!")
     """
 
     # Constructor -------------------------------------------------------------
     def __init__(self):
         """Initialize attributes."""
         self.feedback = ""
-        self.score = 0
-        self._debug = False
-        self._feedback_newlines = False
-        self.problems = NotImplemented
+
+        # The number of points possible.
+        self.total = NotImplemented
+
         # Each test driver should initialize self.problems differently.
         # For example, if the lab has two problems, the first worth 5 points
         # and the second worth 15 points, set
         # self.problems = [(self.problem1, "Problem 1",  5),
         #                  (self.problem2, "Problem 2", 15)]
         # where problem1() and problem2() are methods of the test driver
-        # that test the corresponding problem.
+        # that test the corresponding problems.
+        self.problems = NotImplemented
 
-    # Main Routine ------------------------------------------------------------
-    def test_all(self, student_module, total):
-        """Grade the provided module on each problem and compile feedback."""
-        # Reset feedback and score.
+        self._debug = False
+        self._feedback_newlines = False
+
+    # Main Routines -----------------------------------------------------------
+    @staticmethod
+    def main(student_module):
+        """Derivative classes must implement this function as follows:
+
+        return TestDriver().test_all(student_module)
+
+        """
+        raise NotImplementedError("main() not implemented for this class")
+
+    def test_all(self, student_module):
+        """Grade the provided module on each problem and compile feedback.
+
+        Inputs:
+            student_module (module): the student's imported file.
+
+        Returns:
+            score (int): the number of points earned.
+            feedback (str): feedback for the student.
+        """
+        # Reset feedback and initialize score.
         self.feedback = ""
-        self.score = 0
+        score = 0
 
         # Grade each problem.
         for problem in self.problems:
@@ -217,7 +231,7 @@ class BaseTestDriver(object):
                 func, label, value = problem
                 self.feedback += "\n\n{} ({} points):".format(label, value)
                 points = func(student_module)
-                self.score += points
+                score += points
                 self.feedback += "\nScore += {}".format(points)
             except BaseException as e:
                 self.feedback += "\n{}: {}".format(self._errType(e), e)
@@ -225,9 +239,9 @@ class BaseTestDriver(object):
                     raise
 
         # Report final score.
-        percentage = (100. * self.score) / total
+        percentage = (100. * score) / self.total
         self.feedback += "\n\nTotal score: {}/{} = {}%".format(
-                                    self.score, total, round(percentage, 2))
+                                    score, self.total, round(percentage, 2))
         if   percentage >=  98: self.feedback += "\n\nExcellent!"
         elif percentage >=  90: self.feedback += "\n\nGreat job!"
 
@@ -236,6 +250,8 @@ class BaseTestDriver(object):
         comments = str(raw_input("Comments: "))
         if len(comments) > 0:
             self.feedback += '\n\n\nComments:\n\t{}'.format(comments)
+
+        return score, self.feedback
 
     # Helper Functions --------------------------------------------------------
     @staticmethod
@@ -319,4 +335,20 @@ class BaseTestDriver(object):
             elif message is not None:
                 self.feedback += "\n{}".format(message)
         return credit
+
+    # Magic methods -----------------------------------------------------------
+    def __str__(self):
+        """Current Feedback"""
+        return self.feedback if self.feedback else "No Feedback"
+
+    def __repr__(self):
+        """List problems, their worth, and the corresponding test functions."""
+        out = "{} class.".format(type(self).__name__)
+        for problem in self.problems:
+                func, label, value = problem
+                out += "\n\t{}: {} points. ".format(label, value)
+                out += "Test with self.{}().".format(func.__name__)
+        if self.feedback:
+            out += "\nCurrent Feedback:\n" + self.feedback
+        return out
 
