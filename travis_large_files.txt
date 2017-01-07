@@ -5,8 +5,8 @@ Vol1B/GMRES/figures/LeastSquares.pdf
 
 Vol2A/Wavelets/Archived/Haar.tex
 
-Vol2B/scipyoptimize/figures/ManyMinima.pdf
-Vol2B/scipyoptimize/figures/Rosenbrock.pdf
+Vol2B/ScipyOptimize/figures/ManyMinima.pdf
+Vol2B/ScipyOptimize/figures/Rosenbrock.pdf
 
 Vol3A/Pandas2/plotting_demos.ipynb
 Vol3A/Bokeh/BokehFigs/color_states.png
