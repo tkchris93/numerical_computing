@@ -37,8 +37,8 @@ def find_big_files(fatal=True):
     if violations:
         files = "\n".join(sorted(["\t{:.<50}{:.>20} bytes".format(*v)
                                                         for v in violations]))
-        msg = "Large files present:\n{}\nAdd these files to".format(files)
-        msg += "travis_large_files.txt if they are necessary to keep."
+        msg = "Large files present:\n{}\nAdd these files to ".format(files)
+        msg += "'travis_large_files.txt' if they are necessary to keep."
         raise_msg(msg, fatal=fatal)
 
 

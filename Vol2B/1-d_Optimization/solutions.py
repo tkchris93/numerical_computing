@@ -1,5 +1,5 @@
 # solutions.py
-"""Volume 2B: 1-D Optimization. Solutions file."""
+"""Volume 2B: 1-D Optimization. Solutions File."""
 
 import numpy as np
 from math import sqrt, exp

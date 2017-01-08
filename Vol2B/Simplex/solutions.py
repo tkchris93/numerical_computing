@@ -1,5 +1,5 @@
 # solutions.py
-"""Volume II Lab 16: Simplex. Solutions file.
+"""Volume 2B: Simplex. Solutions File.
 
 Student Instructions:
 Problems 1-6 give instructions on how to build the SimplexSolver class.
@@ -21,7 +21,7 @@ class SimplexSolver(object):
                                          x >= 0
     via the Simplex algorithm.
     """
-    
+
     def __init__(self, c, A, b):
         """
 
@@ -52,11 +52,11 @@ class SimplexSolver(object):
         The non-negative constraints for all variables is assumed.
 
         The remaining entries in the matrix are the constraint equations.
-        """        
+        """
         # Initialize a tableau of zeros.
         m, n = A.shape
         tableau = np.zeros((1+m, 1+m+n))
-        
+
         # Slice in each piece.
         tableau[0,1:] = np.hstack((-c, np.zeros(m)))
         tableau[1:,0] = b
@@ -122,7 +122,7 @@ class SimplexSolver(object):
         progress = self._pivot_col()
         while progress != "DONE":
             progress = self.pivot()
-        
+
         # Read the tableau to construct the final results.
         basic, nonbasic = {}, {}
         for i in xrange(self.tableau.shape[1]-1):

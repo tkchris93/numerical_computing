@@ -1,5 +1,5 @@
 # solutions.py
-"""Volume 1A: Linear Systems. Solutions file."""
+"""Volume 1A: Linear Systems. Solutions File."""
 
 import numpy as np
 from time import time

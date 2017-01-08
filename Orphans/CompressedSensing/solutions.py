@@ -1,5 +1,5 @@
 # solutions.py
-"""Volume II: Compressed Sensing. Solutions file."""
+"""Volume II: Compressed Sensing. Solutions File."""
 
 
 import numpy as np
@@ -71,7 +71,7 @@ def prob2(filename='ACME.png'):
     """
     image = 1 - plt.imread(filename)[:,:,0]
     measurements, err = [100, 200, 250, 275], []
-    
+
     for m in measurements:
         # Get 'm' random measurements.
         np.random.seed(1337)
@@ -90,7 +90,7 @@ def prob2(filename='ACME.png'):
     # Show the subplots and return the error list.
     plt.suptitle("Reconstruction of {}".format(filename))
     plt.show()
-    
+
     return err
 
 # Problem 3
@@ -123,7 +123,7 @@ def prob3(filename="StudentEarthData.npz", show=True):
         for b in B.T:
             reconstruction = l1Min(A.dot(V), b)
             results.append(V.dot(reconstruction))
-    
+
         # Reconstruct the results, calculate the error, and show the globe.
         results = np.column_stack(results)
         err.append(np.linalg.norm(colors - results, ord=np.inf))

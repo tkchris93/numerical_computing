@@ -1,5 +1,5 @@
 # solutions.py
-"""Volume II: Markov Chains. Solutions file."""
+"""Volume 2A: Markov Chains. Solutions File."""
 
 import numpy as np
 from scipy import linalg as la

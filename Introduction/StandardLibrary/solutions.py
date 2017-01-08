@@ -1,5 +1,5 @@
 # solutions.py
-"""Introductory Labs: The Standard Library. Solutions file."""
+"""Introductory Labs: The Standard Library. Solutions File."""
 
 # calculator.py ===============================================================
 # Students write this module as part of problem 3.

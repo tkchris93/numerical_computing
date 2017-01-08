@@ -274,7 +274,7 @@ Modify your Jacobi method function in the following ways:
 If the iteration converges, your plot should resemble the following figure.
 
 \begin{figure}[H]
-    \includegraphics[width=.7\textwidth]{jacobi_convergence.pdf}
+    \includegraphics[width=.7\textwidth]{figures/jacobi_convergence.pdf}
 \end{figure}
 
 \label{prob:plot-iterative-convergence}
@@ -542,7 +542,7 @@ where $h$ is the distance between $u_{i,j}$ and $u_{i+1,j}$ (and between $u_{i,j
 \footnote{The derivation of Equation \ref{eq:laplace-finite-diff} will be studied in the lab on numerical differentiation.}
 
 \begin{figure}[H]
-    \includegraphics[width=\linewidth]{Grid.pdf}
+    \includegraphics[width=\linewidth]{figures/Grid.pdf}
     \caption{On the left, an example of a $6\times 6$ grid where the red dots are hot boundary zones and the blue dots are cold boundary zones.
     On the right, the green dots are the neighbors of the interior black dot that are used to approximate the heat at the black dot.}
     \label{fig:itersolve-finite-difference-grid}
@@ -738,12 +738,12 @@ This Jacobi iteration is a \emph{finite difference method}, and is similar to ma
 \centering
 \begin{subfigure}{.5\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{jacobi_small.pdf}
+    \includegraphics[width=\linewidth]{figures/jacobi_small.pdf}
     \caption{$10\times 10$ approximation.}
 \end{subfigure}%
 \begin{subfigure}{.5\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{jacobi_big.pdf}
+    \includegraphics[width=\linewidth]{figures/jacobi_big.pdf}
     \caption{$100\times 100$ approximation.}
 \end{subfigure}
 \caption{Hot plates in steady state with different resolutions.}

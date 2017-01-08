@@ -1,5 +1,5 @@
 # solutions.py
-"""Volume II: Interior Point II (Quadratic Optimization). Solutions file."""
+"""Volume 2B: Interior Point 2 (Quadratic Optimization). Solutions File."""
 
 import numpy as np
 from scipy import linalg as la

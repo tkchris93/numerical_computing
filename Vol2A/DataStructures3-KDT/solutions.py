@@ -1,5 +1,5 @@
 # solutions.py
-"""Volume 2A: Data Structures 3 (K-d Trees). Solutions file."""
+"""Volume 2A: Data Structures 3 (K-d Trees). Solutions File."""
 
 # BSTNode / BST Classes from Data Structures II Lab ========================= #
 class BSTNode(object):

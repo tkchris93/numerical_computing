@@ -1,5 +1,5 @@
 # solutions.py
-"""Volume 1B: Differentiation 2 (SymPy and Autograd). Solutions file."""
+"""Volume 1B: Differentiation 2 (SymPy and Autograd). Solutions File."""
 
 import sympy as sy
 import time

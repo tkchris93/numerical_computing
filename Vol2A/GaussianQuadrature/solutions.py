@@ -1,5 +1,5 @@
 # solutions.py
-"""Lab 16: Gaussian Quadrature. Solutions file."""
+"""Volume 2A: Gaussian Quadrature. Solutions File."""
 
 import numpy as np
 from math import sqrt

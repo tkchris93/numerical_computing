@@ -1,12 +1,12 @@
-Vol1A/IterativeSolvers/jacobi_small.pdf
+Vol1A/IterativeSolvers/figures/jacobi_small.pdf
 Vol1A/DataVisualization/figures/heatmap_2.png
 
 Vol1B/GMRES/figures/LeastSquares.pdf
 
 Vol2A/Wavelets/Archived/Haar.tex
 
-Vol2B/scipyoptimize/ManyMinima.pdf
-Vol2B/scipyoptimize/Rosenbrock.pdf
+Vol2B/ScipyOptimize/figures/ManyMinima.pdf
+Vol2B/ScipyOptimize/figures/Rosenbrock.pdf
 
 Vol3A/Pandas2/plotting_demos.ipynb
 Vol3A/Bokeh/BokehFigs/color_states.png

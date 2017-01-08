@@ -1,5 +1,5 @@
 # solutions.py
-"""Volume 1B: Differentiation. Solutions file."""
+"""Volume 1B: Differentiation. Solutions File."""
 
 
 import numpy as np
@@ -24,7 +24,7 @@ def centered_difference_quotient(f, pts, h=1e-5):
     return Df_app(pts)
 
 # Problem 2
-def calculate_errors(f,df,pts,h = 1e-5):
+def calculate_errors(f, df, pts, h = 1e-5):
     """Compute the errors using the centered difference quotient approximation.
 
     Inputs:
@@ -42,7 +42,7 @@ def calculate_errors(f,df,pts,h = 1e-5):
 # Problem 3
 def prob3():
     """Use the centered difference quotient to approximate the derivative of
-    f(x)=(sin(x)+1)^x at x= π/3, π/4, and π/6.
+    f(x)=(sin(x)+1)^x at x= pi/3, pi/4, and pi/6.
     Then compute the error of each approximation
 
     Returns:
@@ -110,13 +110,10 @@ def jacobian(f, n, m, pt, h=1e-5):
         (ndarray) Jacobian matrix of f at pt using the centered difference
             quotient.
     """
-    J = np.zeros((n,m))
-    A = np.eye(m)
-    for j in range(m):
-        Df_app = lambda x: .5*(f(x+h*A[j,:])-f(x-h*A[j,:]))/h
-        J[:,j] = Df_app(pt)
-    return J
-
+    J = np.zeros((m,n))
+    A = np.eye(n)
+    Df_app = lambda x, j: .5*(f(x + h*A[j,:]) - f(x - h*A[j,:])) / h
+    return np.transpose([Df_app(pt, j) for j in xrange(n)])
 
 # Problem 6
 def findError():
@@ -135,41 +132,4 @@ def findError():
             if la.norm(myerror)>la.norm(maxerror):
                 maxerror = myerror
     return la.norm(maxerror)
-
-def test_one():
-    print "Testing 1"
-    f = lambda x: np.exp(x)
-    print centered_difference_quotient(f,np.array([1,2,3,4]))
-
-def test_two():
-    print "Testing 2"
-    f = lambda x: np.exp(x)
-    df = f
-    print calculate_errors(f,df, np.array([1,2,3,4]),h = 1e-5)
-
-def test_three():
-    print "Testing 3"
-    print prob3()
-
-def test_four():
-    print "Testing 4"
-    print prob4()
-
-def test_five():
-    print "Testing 5"
-    f = lambda x: np.array([(np.e**x[0])*np.sin(x[1])+x[1]**3, 3.*x[1]-np.cos(x[0])])
-    print jacobian(f, 2, 2, np.array([1.,1.]))
-
-def test_six():
-    print "Testing 6"
-    print findError()
-
-
-if __name__ == "__main__":
-    test_one()
-    test_two()
-    test_three()
-    test_four()
-    test_five()
-    test_six()
 
