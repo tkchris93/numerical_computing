@@ -281,44 +281,44 @@ class BaseTestDriver(object):
             return self._grade(10)/10.
         return 1
 
-    def _addFeedback(self, correct, student, message):
+    def _addFeedback(self, correct, student, message, compare):
         """Add a message to the feedback, plus a description of the correct
-        answer versus the student's answer.
+        answer versus the student's answer (if compare=True).
         """
         self.feedback += "\n{}".format(message)
-        if self._feedback_newlines:
+        if compare and self._feedback_newlines:
             self.feedback += "\n\tCorrect response:\n{}".format(correct)
             self.feedback += "\n\tStudent response:\n{}".format(student)
-        else:
+        elif compare:
             self.feedback += "\n\tCorrect response: {}".format(correct)
             self.feedback += "\n\tStudent response: {}".format(student)
 
-    def _eqTest(self, correct, student, message):
+    def _eqTest(self, correct, student, message, compare=True):
         """Test to see if 'correct' and 'student' have the same value."""
         if student is None:
             raise ValueError("{} (function returned None)".format(message))
         elif np.allclose(correct, student, atol=1e-4):
             return 1
         else:
-            self._addFeedback(correct, student, message)
+            self._addFeedback(correct, student, message, compare)
             return 0
 
-    def _isTest(self, correct, student, message):
+    def _isTest(self, correct, student, message, compare=True):
         """Test to see if 'correct' and 'student' are the same object."""
         if correct is student:
             return 1
         else:
-            self._addFeedback(correct, student, message)
+            self._addFeedback(correct, student, message, compare)
             return 0
 
-    def _strTest(self, correct, student, message):
+    def _strTest(self, correct, student, message, compare=True):
         """Test to see if 'correct' and 'student' have the same string
         representation.
         """
         if str(correct) == str(student):
             return 1
         else:
-            self._addFeedback(correct, student, message)
+            self._addFeedback(correct, student, message, compare)
             return 0
 
     def _grade(self, points, message=None):

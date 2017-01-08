@@ -89,7 +89,7 @@ def prob3(f, mins, maxs, N=10000):
 def prob4():
     """Integrate the joint normal distribution.
 
-    Return your Monte Carlo estimate, SciPy’s answer, and (assuming SciPy is
+    Return your Monte Carlo estimate, SciPy's answer, and (assuming SciPy is
     correct) the relative error of your Monte Carlo estimate.
     """
 
@@ -114,8 +114,7 @@ def prob5(numEstimates=50):
 
     # construct an array of values of N
     # use closer-spaced values near 50
-    N = [i*1000 for i in xrange(1,51)]
-    N = [50,100,500] + N
+    N = [50, 100, 500] + list(xrange(1000, 51000, 1000))
     errors = []
 
     for n in N:
