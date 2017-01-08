@@ -50,17 +50,6 @@ class TestDriver(BaseTestDriver):
         """
         return TestDriver().test_all(student_module)
 
-    # Helper Functions --------------------------------------------------------
-    def _eqTest(self, correct, student, message):
-        """Test to see if 'correct' and 'student' are equal. Report the given
-        'message' if they are not (but don't show correct vs student).
-        """
-        if np.allclose(correct, student):
-            return 1
-        else:
-            self.feedback += "\n{}".format(message)
-            return 0
-
     # Problems ----------------------------------------------------------------
     @_timeout(5)
     def problem1(self, s):
@@ -71,22 +60,22 @@ class TestDriver(BaseTestDriver):
         # stretch() (2 points).
         a, b = np.random.randint(1,11,2)
         points += 2 * self._eqTest(stretch(data, a, b), s.stretch(data, a, b),
-                                                            "stretch() failed")
+                                                    "stretch() failed", False)
 
         # shear() (2 points).
         a, b = np.random.randint(1,11,2)
         points += 2 * self._eqTest(shear(data, a, b), s.shear(data, a, b),
-                                                            "shear() failed")
+                                                    "shear() failed", False)
 
         # reflect() (3 points).
         a, b = np.random.randint(1,11,2)
         points += 3 * self._eqTest(reflect(data, a, b), s.reflect(data, a, b),
-                                                            "reflect() failed")
+                                                    "reflect() failed", False)
 
         # rotate() (3 points).
         theta = np.random.uniform(.1, 2*np.pi-.1)
         points += 3 * self._eqTest(rotate(data, theta), s.rotate(data, theta),
-                                                            "rotate() failed")
+                                                    "rotate() failed", False)
         return points
 
     @_autoclose
