@@ -21,7 +21,13 @@ install: # Download and install a vanilla TexLive.
   - sudo /usr/local/texlive/20*/bin/x86_64-linux/tlmgr update --self --all --no-auto-install
   - cd ../
 
-script: # Compile the major tex files.
+script: # Compile the major tex files (twice for references).
+  - /usr/local/texlive/20*/bin/x86_64-linux/pdflatex Vol1.tex
+  - /usr/local/texlive/20*/bin/x86_64-linux/pdflatex Vol2.tex
+  - /usr/local/texlive/20*/bin/x86_64-linux/pdflatex Vol3.tex
+  - /usr/local/texlive/20*/bin/x86_64-linux/pdflatex Vol4.tex
+  - /usr/local/texlive/20*/bin/x86_64-linux/pdflatex ExtraLabs.tex
+  - /usr/local/texlive/20*/bin/x86_64-linux/pdflatex InstructorNotes.tex
   - /usr/local/texlive/20*/bin/x86_64-linux/pdflatex Vol1.tex
   - /usr/local/texlive/20*/bin/x86_64-linux/pdflatex Vol2.tex
   - /usr/local/texlive/20*/bin/x86_64-linux/pdflatex Vol3.tex
