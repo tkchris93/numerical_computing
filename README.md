@@ -16,7 +16,10 @@ This project is funded in part by the National Science Foundation, grant no. TUE
 
 ### Build Instructions
 
-Each volume can be built separately using the Volume LaTex files listed below.
+Visit the [releases page](https://github.com/Foundations-of-Applied-Mathematics/Lab-Development/releases) to download the latest version of the lab curriculum.
+
+To gain access to the entire repository, fork this repository and clone it.
+Each volume can then be built separately using the LaTex files listed below.
 - Python Basics: `Introduction.tex`
 - Volume 1, Mathematical Analysis: `Vol1.tex`
 - Volume 2, Algorithm Design and Optimization: `Vol2.tex`
@@ -31,6 +34,7 @@ or
 ```bash
 $ pdflatex Vol1.tex
 ```
+(These commands create a PDF called, for example, `Vol1.pdf`.)
 
 ### Data Files
 
