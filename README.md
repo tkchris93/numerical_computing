@@ -4,7 +4,7 @@ This project contains the labs for the Foundations of Applied Mathematics curric
 The labs go in tandem with the four textbooks that are currently being written and will start rolling out in 2017.
 
 This work is licenced under the Creative Commons Attribution 3.0 United States License.
-To view a copy of this license please visit http://creativecommons.org/licenses/by/3.0/us/.
+To view a copy of this license please visit http://creativecommons.org/licenses/by/3.0/us/ and see [cc-by-license.txt](https://github.com/Foundations-of-Applied-Mathematics/Lab-Development/blob/develop/cc-by-license.txt).
 
 The owners of this work are  
 Jeffrey Humpherys and Tyler J. Jarvis  
