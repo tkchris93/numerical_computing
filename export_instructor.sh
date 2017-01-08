@@ -11,6 +11,8 @@ else
     # Test drivers
     find . -type f -name "*test_driver*.py" | cpio -pdv $1
 
+    # TODO: Auxiliary files
+
     # Instructor Notes
     find . -type f -name "*[Nn]otes.tex" | cpio -pdv $1
     cp SIAM-GH-book.cls $1

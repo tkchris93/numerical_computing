@@ -25,9 +25,9 @@ else
     cp Appendices/f2py/ftridiag/* $1/Appendices/f2py/ftridiag
     cp Appendices/mpltables/*.py $1/Appendices/mpltables
     cp Vol1A/ImageSegmentation/getNeighbors.py $1/Vol1A/ImageSegmentation/getNeighbors.py
-    cp Vol3B/WebTech1-InternetProtocol/tcp_server.py $1/Vol3B/WebTech1-InternetProtocol/tcp_server.py
-    cp Vol3B/WebTech1-InternetProtocol/tcp_client.py $1/Vol3B/WebTech1-InternetProtocol/tcp_client.py
-    cp Vol3B/WebTech2-Serialization/contacts.xml $1/Vol3B/WebTech2-Serialization/contacts.xml
+    cp Vol3B/WebTech1_InternetProtocol/tcp_server.py $1/Vol3B/WebTech1_InternetProtocol/tcp_server.py
+    cp Vol3B/WebTech1_InternetProtocol/tcp_client.py $1/Vol3B/WebTech1_InternetProtocol/tcp_client.py
+    cp Vol3B/WebTech2_Serialization/contacts.xml $1/Vol3B/WebTech2_Serialization/contacts.xml
     cp Vol4A/ShootingMethod/secant_method.py $1/Vol4A/ShootingMethod/secant_method.py
 
     # Remove extra files
