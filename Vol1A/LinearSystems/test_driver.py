@@ -163,7 +163,7 @@ class TestDriver(BaseTestDriver):
 
         def _test(n, p):
             """Do an nxn test case with p points."""
-            stu = prob5(n)
+            stu = s.prob5(n)
             if not sparse.issparse(stu):
                 self.feedback += "\n\tFailed to return a scipy.sparse matrix"
                 return 0
