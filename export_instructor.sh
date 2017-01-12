@@ -11,15 +11,22 @@ else
     # Test drivers
     find . -type f -name "*test_driver*.py" | cpio -pdv $1
 
-    # TODO: Auxiliary files
+    # Auxiliary files
+    cp -v Introduction/StandardLibrary/box.py $1/Introduction/StandardLibrary
+    cp -v Vol1A/ImageSegmentation/getNeighbors.py $1/Vol1A/ImageSegmentation
+    cp -v Vol1B/Testing/test_solutions.py $1/Vol1B/Testing
+    cp -v Vol2B/ScipyOptimize/blackbox_function.py $1/Vol2B/ScipyOptimize
+    cp -v Vol3B/WebTech1_IternetProtocol/*.py $1/Vol3B/WebTech1_IternetProtocol
 
-    # Instructor Notes
+    # Instructor notes
     find . -type f -name "*[Nn]otes.tex" | cpio -pdv $1
-    cp SIAM-GH-book.cls $1
-    cp command.tex $1
-    cp *.pdf $1
+    cp -v SIAM-GH-book.cls $1
+    cp -v command.tex $1
+    cp -v Cover.pdf $1
+    cp -v by.pdf $1
 
     # Remove extra directories
     rm -rf $1/Orphans
     rm -rf $1/Appendices
+    rm -rf $1/MachineLearning
 fi
