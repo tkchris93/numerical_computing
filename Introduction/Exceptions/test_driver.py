@@ -2,7 +2,7 @@
 """Introductory Labs: Exceptions and File I/O. Test Driver."""
 
 import sys
-sys.path.insert(0, "../..")
+sys.path.insert(1, "../..")
 from base_test_driver import BaseTestDriver
 
 import signal
@@ -77,7 +77,7 @@ class TestDriver(BaseTestDriver):
                     return self._grade(1, "Poor error message")
                 except Exception as e:
                     self.feedback += message
-                    self.feedback +="(got {} instead)".format(self._errType(e))
+                    self.feedback +="(got {} instead)".format(self._objType(e))
                     self.feedback += "\n\tError message: {}".format(e)
                 else:
                     self.feedback += message
@@ -142,7 +142,7 @@ class TestDriver(BaseTestDriver):
         except Exception as e:
             self.feedback += "\nContentFilter.__init__() failed to raise a "
             self.feedback += "TypeError (got {} instead)".format(
-                                                            self._errType(e))
+                                                            self._objType(e))
         else:
             self.feedback += "\nFailed to raise a TypeError"
 
@@ -171,7 +171,7 @@ class TestDriver(BaseTestDriver):
                 return 1
             except Exception as e:
                 self.feedback += message
-                self.feedback +="\n\t(got {} instead)".format(self._errType(e))
+                self.feedback +="\n\t(got {} instead)".format(self._objType(e))
             else:
                 self.feedback += message
             return 0

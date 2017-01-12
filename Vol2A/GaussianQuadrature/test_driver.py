@@ -2,7 +2,7 @@
 """Volume 2A: Gaussian Quadrature. Test Driver."""
 
 import sys
-sys.path.insert(0, "../..")
+sys.path.insert(1, "../..")
 from base_test_driver import BaseTestDriver, _autoclose, _timeout
 
 import numpy as np

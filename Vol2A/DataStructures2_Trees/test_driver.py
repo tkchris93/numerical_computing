@@ -2,7 +2,7 @@
 """Volume 2A: Data Structures 2 (Trees). Test Driver."""
 
 import sys
-sys.path.insert(0, "../..")
+sys.path.insert(1, "../..")
 from base_test_driver import BaseTestDriver, _timeout, _autoclose
 
 from time import time
@@ -165,7 +165,7 @@ class TestDriver(BaseTestDriver):
                         "BST.remove({}) failed{}".format(value, oldTree))
             except Exception as e:
                 self.feedback += "\n\t{} while removing {}".format(
-                                                    self._errType(e), value)
+                                                    self._objType(e), value)
                 self.feedback += ": {}{}".format(e, oldTree)
                 p = 0
             finally:

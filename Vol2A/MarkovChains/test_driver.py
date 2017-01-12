@@ -2,7 +2,7 @@
 """Volume 2A: Markov Chains. Test Driver."""
 
 import sys
-sys.path.insert(0, "../..")
+sys.path.insert(1, "../..")
 from base_test_driver import BaseTestDriver, _timeout
 
 import numpy as np
@@ -124,7 +124,7 @@ class TestDriver(BaseTestDriver):
             points += 2
         except Exception as e:
             self.feedback += "\nExpected a ValueError for A =\n{}".format(A)
-            self.feedback += "\n\t(got {} instead)".format(self._errType(e))
+            self.feedback += "\n\t(got {} instead)".format(self._objType(e))
         else:
             self.feedback += "\nValueError not raised for A =\n{}".format(A)
 
