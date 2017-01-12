@@ -2,7 +2,7 @@
 """Volume 1B: Monte Carlo 1 (Integration). Test Driver."""
 
 import sys
-sys.path.insert(0, "../..")
+sys.path.insert(1, "../..")
 from base_test_driver import BaseTestDriver, _timeout, _autoclose
 
 import numpy as np

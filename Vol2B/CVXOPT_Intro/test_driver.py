@@ -2,7 +2,7 @@
 """Volume 2B: Intro to CVXOPT. Solutions File."""
 
 import sys
-sys.path.insert(0, "../..")
+sys.path.insert(1, "../..")
 from base_test_driver import BaseTestDriver
 
 # Get problems, NumPy, and CVXOPT

@@ -2,7 +2,7 @@
 """Volume 2A: Data Structures 1 (Linked Lists). Test Driver."""
 
 import sys
-sys.path.insert(0, "../..")
+sys.path.insert(1, "../..")
 from base_test_driver import BaseTestDriver, _timeout
 
 from os import remove as rm
