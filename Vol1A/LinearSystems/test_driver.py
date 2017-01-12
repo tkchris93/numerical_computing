@@ -2,7 +2,7 @@
 """Volume 1A: Linear Systems. Test Driver."""
 
 import sys
-sys.path.insert(0, "../..")
+sys.path.insert(1, "../..")
 from base_test_driver import BaseTestDriver, _timeout, _autoclose
 
 import numpy as np
@@ -163,7 +163,7 @@ class TestDriver(BaseTestDriver):
 
         def _test(n, p):
             """Do an nxn test case with p points."""
-            stu = prob5(n)
+            stu = s.prob5(n)
             if not sparse.issparse(stu):
                 self.feedback += "\n\tFailed to return a scipy.sparse matrix"
                 return 0

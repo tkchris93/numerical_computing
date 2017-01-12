@@ -2,7 +2,7 @@
 """Volume 2A: Breadth-First Search (Kevin Bacon). Test Driver."""
 
 import sys
-sys.path.insert(0, "../..")
+sys.path.insert(1, "../..")
 from base_test_driver import BaseTestDriver, _timeout
 
 from solutions import *

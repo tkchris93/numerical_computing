@@ -336,14 +336,37 @@ r = requests.put("http://ipaddress:portnumber?name=Thomas&message=Hello World")
 % You may use GET requests of \li{AllNames} to the nameserver to retrieve the names of other active users.
 % To send them a message, use their IP address and port number in the above request examples.
 
+\begin{center}
+		
+\begin{tikzpicture}
+%Style
+\tikzstyle{block}=[rectangle, draw=black, fill=white, drop shadow,
+text centered, minimum height=4em, text width=2.4cm, node distance=1cm]
+%Blocks
+\node [block] (TAChat) {TA\\CHATSERVER};
+\node [block, below=of TAChat, yshift=-.5cm] (TAName) {TA\\NAMESERVER};
+\node [block, below left=of TAName, xshift=-.5cm, yshift=-.5cm] (S1Chat) {STUDENT 1\\CHATSERVER};
+\node [block, below right=of TAName, xshift=.5cm, yshift=-.5cm] (S2Chat) {STUDENT 2\\CHATSERVER};
+%One directional arrows
+\draw[->, >=stealth', thick, shorten <=.1cm, shorten >=.1cm] (TAChat.south) -- node[right, scale=.85, align=center] {PUT: NAME,\\IP, PORT} (TAName.north);
+\draw[->, >=stealth', thick, shorten <=.1cm, shorten >=.1cm] (S1Chat.north east) -- node[above, scale=.85, sloped] {PUT: NAME} node[below, scale=.85, sloped] {IP, PORT} (TAName.south west);
+\draw[->, >=stealth', thick, shorten <=.1cm, shorten >=.1cm] (S2Chat.north west) -- node[above, scale=.85, sloped] {PUT: NAME} node[below, scale=.85, sloped] {IP, PORT} (TAName.south east);
+%Two directional arrows
+\draw[<->, >=stealth', thick, shorten <=.1cm, shorten >=.1cm] (S1Chat.east) -- node[below, scale=.85] {PUT: MESSAGES} (S2Chat.west);
+\draw[<->, >=stealth', thick, shorten <=.1cm, shorten >=.1cm] (TAChat.west) -- node[above, scale=.85, sloped] {PUT: MESSAGES} (S1Chat.north);
+\draw[<->, >=stealth', thick, shorten <=.1cm, shorten >=.1cm] (TAChat.east) -- node[above, scale=.85, sloped] {PUT: MESSAGES} (S2Chat.north);
+
+\end{tikzpicture}
+
+\end{center}
+
 To receive credit for this problem, please do the following:
 \begin{enumerate}
 \item PUT your name, IP address, and port number on the provided nameserver.
 \item Send a message with your name to the \emph{TA} user IP address and port.
-\item Accomplish any additional specified by your instructor.
+\item Accomplish any additional tasks specified by your instructor.
 \end{enumerate}
 
-To receive credit for this problem, send a message with your name to the \emph{TA} user IP address.
 When you have finished chatting, update your IP address to an empty string in the name server.
 
 \begin{warn}

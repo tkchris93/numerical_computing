@@ -1,7 +1,7 @@
 # test_driver.py
 
 import sys
-sys.path.insert(0, "../..")
+sys.path.insert(1, "../..")
 from base_test_driver import BaseTestDriver, _timeout, _autoclose
 
 import numpy as np

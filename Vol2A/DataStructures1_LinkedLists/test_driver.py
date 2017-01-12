@@ -2,7 +2,7 @@
 """Volume 2A: Data Structures 1 (Linked Lists). Test Driver."""
 
 import sys
-sys.path.insert(0, "../..")
+sys.path.insert(1, "../..")
 from base_test_driver import BaseTestDriver, _timeout
 
 from os import remove as rm
@@ -96,7 +96,7 @@ class TestDriver(BaseTestDriver):
                 return 1
             except Exception as e:
                 self.feedback += "\nNode.__init__() failed (expected TypeError"
-                self.feedback += ", (got {} instead)".format(self._errType(e))
+                self.feedback += ", (got {} instead)".format(self._objType(e))
             return 0
 
         # Test that anyting other than int, long, float, or str are rejected.
@@ -136,7 +136,7 @@ class TestDriver(BaseTestDriver):
                 return 1
             except Exception as e:
                 self.feedback += "\nLinkedList.find(x) failed {} ".format(info)
-                self.feedback += "(expected ValueError, (got {} instead)".format(self._errType(e))
+                self.feedback += "(expected ValueError, (got {} instead)".format(self._objType(e))
             return 0
 
         l1, l2 = self._load_lists(s)
@@ -226,7 +226,7 @@ class TestDriver(BaseTestDriver):
                     p = 0
             except Exception as e:
                 self.feedback += "\n{} while removing {}: {}{}".format(
-                                            self._errType(e), item, e, old)
+                                            self._objType(e), item, e, old)
             finally:
                 return p, solList, stuList
 
@@ -288,7 +288,7 @@ class TestDriver(BaseTestDriver):
                     p = 0
             except Exception as e:
                 self.feedback += "\n{} while inserting {}: {}{}".format(
-                                            self._errType(e), item, e, old)
+                                            self._objType(e), item, e, old)
             finally:
                 return p, solList, stuList
 
@@ -338,7 +338,7 @@ class TestDriver(BaseTestDriver):
             except Exception as e:
                 self.feedback += "\nDeque.{}() not disabled ".format(func)
                 self.feedback += "correctly\n\t(expected NotImplementedError, "
-                self.feedback += "got {} instead)".format(self._errType(e))
+                self.feedback += "got {} instead)".format(self._objType(e))
                 self.feedback += "\n\tError message: {}".format(e)
             return 0
 
@@ -353,7 +353,7 @@ class TestDriver(BaseTestDriver):
                     p = 0
             except Exception as e:
                 self.feedback += "\n{} while {}ing {}: {}{}".format(
-                                        self._errType(e), func, item, e, old)
+                                        self._objType(e), func, item, e, old)
             finally:
                 return p, solDeque, stuDeque
 
@@ -368,7 +368,7 @@ class TestDriver(BaseTestDriver):
                     p = 0
             except Exception as e:
                 self.feedback += "\n{} while {}ing: {}{}".format(
-                                        self._errType(e), func, e, old)
+                                        self._objType(e), func, e, old)
             finally:
                 return p, solDeque, stuDeque
 
