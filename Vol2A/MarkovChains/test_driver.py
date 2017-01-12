@@ -124,7 +124,7 @@ class TestDriver(BaseTestDriver):
             points += 2
         except Exception as e:
             self.feedback += "\nExpected a ValueError for A =\n{}".format(A)
-            self.feedback += "\n\t(got {} instead)".format(self._errType(e))
+            self.feedback += "\n\t(got {} instead)".format(self._objType(e))
         else:
             self.feedback += "\nValueError not raised for A =\n{}".format(A)
 

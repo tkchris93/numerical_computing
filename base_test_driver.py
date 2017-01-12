@@ -15,8 +15,8 @@ most test drivers. In order for other test driver classes to access the base
 class, test driver files must begin with the code
 
     import sys
-    sys.path.insert(0, "../..")
-    from base_test_driver import BaseTestDriver, [other imports]
+    sys.path.insert(1, "../..")
+    from base_test_driver import BaseTestDriver[, other imports]
 
 The BaseTestDriver class is designed to be flexible. The test() method grades
 each problem and collect feedback, but each problem can be graded individually
@@ -40,6 +40,7 @@ conjunction with _testDriver._grade() or another pausing command that waits
 for the grader's response. NOTE: this decorator only works on Unix machines.
 """
 
+from __future__ import print_function
 import signal
 import numpy as np
 from functools import wraps
@@ -135,7 +136,7 @@ class BaseTestDriver(object):
             points earned and adding to self.feedback (if needed) internally.
 
     Helper Methods:
-        _errType(error): Return the type name of the exception 'error'.
+        _objType(obj): Return the type name of the object 'obj'.
         _printCode(f): Print the source code of the function 'f'.
         _checkCode(func, keyword): Check a function's source code for a key
             word to detect cheating. Return a fraction out of 1.
@@ -236,11 +237,18 @@ class BaseTestDriver(object):
                 func, label, value = problem
                 self.feedback += "\n\n{} ({} points):".format(label, value)
                 points = func(student_module)
+                # Ensure the function returned a numerical value.
+                if type(points) not in {int, float}:
+                    self._debug = True
+                    raise NotImplementedError("{}() returned {} ({})".format(
+                                func.__name__, points, self._objType(points)))
+                # Update score and feedback.
                 score += points
                 self.feedback += "\nScore += {}".format(points)
             except BaseException as e:
-                self.feedback += "\n{}: {}".format(self._errType(e), e)
+                self.feedback += "\n{}: {}".format(self._objType(e), e)
                 if self._debug:
+                    print(self.feedback, end="\n\n")
                     raise
 
         # Report final score.
@@ -260,14 +268,14 @@ class BaseTestDriver(object):
 
     # Helper Functions --------------------------------------------------------
     @staticmethod
-    def _errType(error):
-        """Return the type name of the exception 'error'."""
-        return str(type(error).__name__)
+    def _objType(obj):
+        """Return the type name of an object (useful for exceptions)."""
+        return type(obj).__name__
 
     @staticmethod
     def _printCode(f):
         """Print the source code of the function 'f'."""
-        print "".join(getsourcelines(f)[0][len(f.__doc__.splitlines())+1 :])
+        print("".join(getsourcelines(f)[0][len(f.__doc__.splitlines())+1 :]))
 
     def _checkCode(self, func, keyword):
         """Check a function's source code for a key word. If the word is found,

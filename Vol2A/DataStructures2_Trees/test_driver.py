@@ -165,7 +165,7 @@ class TestDriver(BaseTestDriver):
                         "BST.remove({}) failed{}".format(value, oldTree))
             except Exception as e:
                 self.feedback += "\n\t{} while removing {}".format(
-                                                    self._errType(e), value)
+                                                    self._objType(e), value)
                 self.feedback += ": {}{}".format(e, oldTree)
                 p = 0
             finally:

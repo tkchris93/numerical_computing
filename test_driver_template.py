@@ -6,7 +6,7 @@ the corresponding solutions file. See base_test_driver.py for more information.
 """
 
 # import sys
-# sys.path.insert(0, "../..")
+# sys.path.insert(1, "../..")
 from base_test_driver import BaseTestDriver #, _timeout, _autoclose
 
 class TestDriver(BaseTestDriver):
