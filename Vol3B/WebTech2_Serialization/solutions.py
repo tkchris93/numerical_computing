@@ -1,56 +1,125 @@
 import json
 import datetime
 import requests
+import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
+import xml.etree.ElementTree as et
 
-# Problem 1
+from pyproj import Proj, transform
+from scipy.spatial import cKDTree
 
-class DateEncoder(json.JSONEncoder):
+class DateTimeEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime.datetime):
-            return str(obj)
-        return json.JSONEncoder.default(self, obj)
+            return {'dtype': 'datetime',
+                    'year': obj.year,
+                    'month': obj.month,
+                    'day': obj.day,
+                    'hour': obj.hour,
+                    'minute': obj.minute,
+                    'second': obj.second,
+                    'microsecond': obj.microsecond}
 
-def date_decoder(dct):
-    def dedate(s):
-        # Ignore the quote marks (we have a string inside a string)
-        parts = s[1:-1].split('.')
-        r = datetime.datetime.strptime(parts[0], "%Y-%m-%d %H:%M:%S")
-        if parts[1]:
-            r.replace(microsecond=int(parts[1]))
-        return r
-    
-    # Try to decode any value that looks like a date
-    for i, k in dct.iteritems():
+def DateTimeDecoder(item):
+    if item["dtype"] != 'datetime':
+        raise ValueError("Object passed to decoder is not a datetime object")
+    else:
+        y = item["year"]
+        mo = item["month"]
+        d = item["day"]
+        h = item["hour"]
+        mi = item["minute"]
+        s = item["second"]
+        mu_s = item["microsecond"]
+        return datetime.datetime(y, mo, d, h, mi, s, mu_s)
+
+def prob3():
+    t = et.parse("books.xml")
+    root = t.getroot()
+    children = list(root)
+   
+    author = []
+    title = []
+    genre = []
+    price = []
+    publish_date = []
+    description = []     
+    for c in children:
         try:
-            dct[i] = dedate(k)
+            author.append(c.find("author").text)
         except:
-            continue
-    return dct
+            author.append("")
+        try:
+            title.append(c.find("title").text)
+        except:
+            title.append("")
+        try:
+            genre.append(c.find("genre").text)
+        except:
+            genre.append("")
+        try:
+            price.append(c.find("price").text)
+        except:
+            price.append("")
+        try:
+            publish_date.append(c.find("publish_date").text)
+        except:
+            publish_date.append("")
+        try:
+            description.append(c.find("description").text)
+        except:
+            description.append("")
+
+    d = {"author":author, "title":title, "genre":genre, "price":price, "publish_date":publish_date, "description":description} 
+
+    books = pd.DataFrame(d)        
+
+    books.publish_date = books.publish_date.apply(lambda s : datetime.datetime.strptime(s, "%Y-%m-%d"))
+
+
+    print "The author with the most expensive book is", books.author[books.price.argmax()]
+    print "The number of books published before Dec 1, 2000 is", books[books.publish_date < datetime.datetime(2000, 12, 1)].shape[0]
+
+    print "The books that reference Microsoft in their description are", books[books.description.str.find("Microsoft") != -1].title.tolist()
+
+def convert(longitudes, latitudes):
+    from_proj = Proj(init="epsg:4326")
+    to_proj = Proj(init="epsg:3857")
     
-# Problem 2
-    def water_data():
-        
+    x_vals = []
+    y_vals = []
+    for lon, lat in zip(longitudes, latitudes):
+        x, y = transform(from_proj, to_proj, lon, lat)
+        x_vals.append(x)
+        y_vals.append(y)
 
-        data = requests.get('https://data.lacity.org/resource/v87k-wgde.json')
-        data = json.loads(newz.content)
+    return x_vals, y_vals 
 
-        water = []
-        long = []
-        lat = []
+def prob4():
+    data = requests.get("https://data.cityofnewyork.us/api/views/sxx4-xhzg/rows.xml?accessType=DOWNLOAD").content
+    tree = et.fromstring(data[10:-11])
+    children = list(tree)
+    lat = []
+    lon = []
+    for i in xrange(len(children)):
+        try:
+            lat.append(children[i].find("latitude").text)
+            lon.append(children[i].find("longitude").text)
+        except Exception:
+            pass
 
-        for x in data:
-            long.append(x['location_1']['coordinates'][0])
-            lat.append(x['location_1']['coordinates'][1])
-            water.append(int(x['fy_12_13']))
-    
-        plt.rcParams['figure.figsize'] = [10,7]
-        plt.scatter(long, lat, c = water, s = water, alpha=.9)
-        cbar = plt.colorbar()
-        cbar.set_label('Water Use (Hundreds of cubic feet)')
-        plt.show()
+    lon, lat = convert(lon, lat)
+    cans = np.hstack((np.vstack(lon), np.vstack(lat))).astype(np.float64)
+  
+    ny_df = pd.read_csv("random_newyork_locations.csv")
 
-# Problem 3
-    def books_xml():
-        
+    ny_lon, ny_lat = convert(ny_df["longitude"], ny_df[ "latitude"])
+    ny_locations = np.hstack((np.vstack(ny_lon), np.vstack(ny_lat))).astype(np.float64)
+
+    kdtree = cKDTree(cans)
+    dist, ind = kdtree.query(ny_locations, k=1)
+
+    return np.average(dist) / 1000 * 0.621371    
+
+if __name__ == "__main__":
+    pass

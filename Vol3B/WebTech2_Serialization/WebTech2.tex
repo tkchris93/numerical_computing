@@ -4,7 +4,7 @@
 
 In order to more easily store and exchange data structures, standardized metalanguages have been developed to \emph{serialize} data.
 Serialization is the process of packaging data with special properties in a form that can be easily unpacked and reconstructed as an identical copy on any computer.
-For example, if you wanted to share a KD tree filled with data, you can easily send and replicate it on a colleagues computer by using serialization without having to send raw data and run the KD sorting algorithm again.
+For example, if you wanted to share a k-d tree filled with data, you can easily send and replicate it on a colleague's computer by using serialization without having to send raw data and run the k-d sorting algorithm again.
 This can be used to transport exact data structures, or just to send data in an organized fashion, even between different programming languages.
 There are many different kinds of serialization methods for different languages and with different purposes, however, we will focus on serialization with the XML and JSON languages.
 These are two of the most prevalent serialization languages used for web communication and web design, but are commonly used to transport all programming languages.
@@ -27,8 +27,35 @@ When JSON is deserialized, this special string is parsed and the objects are rec
 Despite its name, it is a completely language independent format.
 JSON is built on top of two types of data structures: a collection of key/value pairs and an ordered list of values.
 In Python, these data structures are more familiarly called dictionaries and lists respectively.
+
+The following is a very simple example of the characteristics of a family expressed in JSON:
+
+\begin{lstlisting}
+{
+    "lastname": "Smith"
+    "father": "John",
+    "mother": "Mary",
+    "children": [
+        {
+            "name": "Timmy",
+            "age": 8
+        },
+        {
+            "name": "Missy",
+            "age": 5
+        }
+    ]
+}
+\end{lstlisting}
+
+\begin{info}
+You have likely been working very closely with JSON without even knowing it! Jupyter Notebooks are actually stored as JSON. To see this, open one of your \li{.ipynb} files in a basic text editor.
+\end{info}
+
 In general, the JSON libraries of various languages have a fairly standard interface.
 Though the Python standard library has modules for JSON, if performance is critical, there are additional modules for JSON that are written in C such as \li{ujson} and \li{simplejson}.
+
+\subsection*{Serialization using JSON}
 
 Let's begin by serializing some common Python data structures.
 \begin{lstlisting}
@@ -114,6 +141,32 @@ Notice that we don't need to subclass anything.
 a
 \end{lstlisting}
 
+\begin{problem} % Serialize datetime objects.
+Python has a module in the standard library that allows easy manipulation of times and dates. The functionality is built around a \li{datetime} object.
+
+\begin{lstlisting}
+>>> import datetime
+>>> now = datetime.datetime.now()
+>>> print now
+2016-10-04 11:52:33.513885
+
+# We can also extract the individual time units
+>>> now.year
+2016
+>>> now.minute
+33
+>>> now.microsecond
+513885
+\end{lstlisting}
+
+However, \li{datetime} objects are not JSON serializable.
+Determine how best to serialize and deserialize a datetime object, then write a custom encoder and decoder.
+The datetime object you serialize should be equal to the datetime object you get after deserializing.
+\label{prob:datetime_json}
+\end{problem}
+
+\subsection*{APIs and JSON}
+
 Many websites and web APIs (Application Program Interface) make extensive use of JSON.
 For example, almost any programs that utilize Twitter, Facebook, Google Maps, or YouTube communicate with their APIs using JSON.
 This means that any website that uses an embedded version of Google Maps will receive JSON strings with data to display Google Maps interface on a portion of the webpage.
@@ -127,25 +180,62 @@ Each website has a policy about data usage and automated retrieval that requires
 If data is scraped without complying with these requirements, there can be legal consequences.
 \end{warn}
 
-\begin{problem} % Serialize datetime objects.
-Python has a module in the standard library that allows easy manipulation of times and dates. The functionality is built around a \li{datetime} object (refer to Lab ?? for more information).
-
-However, \li{datetime} objects are not JSON serializable.
-Determine how best to serialize and deserialize a datetime object, then write a custom encoder and decoder.
-The datetime object you serialize should be equal to the datetime object you get after deserializing.
-\label{prob:datetime_json}
-\end{problem}
-
 \begin{problem}
 JSON files are often used by APIs to respond to data requests.
 To demonstrate an example of this, we will do a brief data examination of water usage in Los Angeles, California.
 The City of Los Angeles publishes some water usage data for the public.
 The API \emph{endpoint} at which this data is available is at the address \url{https://data.lacity.org/resource/v87k-wgde.json}.
 
-Use the \li{requests} library from the previous lab to \li{GET} the data from the page. Load the object from JSON format into a Python list.
+We can use the \li{requests} library from the previous lab to \li{GET} the data from the page.
+
+\begin{lstlisting}
+requests.get("https://data.lacity.org/resource/v87k-wgde.json").json()
+\end{lstlisting}
+
+This code with load the object from JSON format into a Python list.
 Once the list has been created, gather the water usage data from 2012 to 2013 and the longitude and latitude of each point.
 
 Use Bokeh to plot these points on a map of Los Angeles (refer to Lab 10 for additional help on Bokeh).
+
+To draw a map centered on Los Angeles, you may use the following code:
+\begin{lstlisting}
+from bokeh.plotting import figure
+from bokeh.models import WMTSTileSource
+
+fig = figure(title="Los Angeles Water Usage 2012-2013", plot_width=600, plot_height=600, tools=["wheel_zoom", "pan", "hover"],
+            x_range=(-13209490, -13155375), y_range=(3992960, 4069860),
+             webgl=True, active_scroll="wheel_zoom")
+fig.axis.visible = False
+
+STAMEN_TONER_BACKGROUND = WMTSTileSource(
+    url='http://tile.stamen.com/toner-background/{Z}/{X}/{Y}.png',
+    attribution=(
+        'Map tiles by <a href="http://stamen.com">Stamen Design</a>, '
+        'under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>.'
+        'Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, '
+        'under <a href="http://www.openstreetmap.org/copyright">ODbL</a>'
+    )
+)
+
+background = fig.add_tile(STAMEN_TONER_BACKGROUND)
+\end{lstlisting}
+
+To convert the longitude and latitude locations to be compatible with the map, you may the following code:
+\begin{lstlisting}
+from pyproj import Proj, transform
+
+from_proj = Proj(init="epsg:4326")
+to_proj = Proj(init="epsg:3857")
+
+def convert(longitudes, latitudes):
+    x_vals = []
+    y_vals = []
+    for lon, lat in zip(longitudes, latitudes):
+        x, y = transform(from_proj, to_proj, lon, lat)
+        x_vals.append(x)
+        y_vals.append(y)
+    return x_vals, y_vals
+\end{lstlisting}
 
 More information about this dataset is available at \url{http://catalog.data.gov/dataset/residential-water-usage-zip-code-on-top-cb2ac}.
 \end{problem}
@@ -282,19 +372,47 @@ Include the code you used with your answers.
 
 1) Who is the author of the most expensive book in the list?
 
-2) How many of the books were published before May 1, 2000?
+2) How many of the books were published before Dec 1, 2000?
 
 3) Which books reference Microsoft in their descriptions?
+
+HINT: To answer these queries, it may be most convenient to populate a pandas DataFrame with all the XML data.
 \end{problem}
 
 \begin{problem}
 The City of New York makes publicly available some data concerning the location of publicly available recycling bins.
 The XML endpoint is located at \url{https://data.cityofnewyork.us/api/views/sxx4-xhzg/rows.xml?accessType=DOWNLOAD}.
 Using the \li{requests} library, GET the XML file from that address and build it into an Element Tree.
-Then calculate the average Euclidean distance between each recycling bin and it's closest neighbor.
-Each latitude or longitude degree is approximately 69 miles.
+
+Then, using Monte Carlo approximation, estimate the average distance from a given point in New York City to the nearest recycling bin.
+One efficient way of solving this problem is to perform a nearest neighbor search using a KDTree. We recommend you use scipy's \li{cKDTree} and its \li{query} method to find the nearest neighbor for each point.
+
+Here's a quick example of how to use \li{cKDTree}.
+
+\begin{lstlisting}
+>>> import numpy as np
+>>> from scipy.spatial import cKDTree
+
+>>> pts = np.random.rand(10,2)
+>>> kdtree = cKDTree(pts)
+>>> query_pts = [[0.5, 0.5], [0.25, 0.25]]
+# k=1 corresponds to finding the nearest neighbor
+>>> distance, index = kdtree.query(query_pts, k=1)
+
+# 'distance' returns the distance to the nearest neighbor
+# 'index' returns the index in 'pts' that corresponds to the
+#     nearest neighbor
+\end{lstlisting}
+
+The \li{random_newyork_locations.csv} file contains about 35,000 uniformly distributed points throughout New York City measured in longitude and latitude.
+
+We could measure the distance between the longitude and latitude points, however the units would not have a very interpretable and relatable value.
+Therefore, use the \li{convert()} function in Problem 2 to transform your longitude and latitude points to epsg:3857. These units very closely approximately meters.
+
+Return your final answer in miles.
+
 More information on this dataset is available at \url{https://catalog.data.gov/dataset/public-recycling-bins-eb48e}.
-\\ (Hint: If you get the file from requests, you must remove `$<$response$>$' and `$<$/response$>$' from the beginning and end of your content string.)
+\\ (Hint: If you get the file from requests, you may want to remove `$<$response$>$' and `$<$/response$>$' from the beginning and end of your content string to make parsing a little easier.)
 \end{problem}
 
 \newpage
